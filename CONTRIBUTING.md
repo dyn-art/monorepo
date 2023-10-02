@@ -14,7 +14,6 @@ Please read [the full text](https://code.fb.com/codeofconduct), so that you are 
 
 ## 🌟 Style Guide
 
-
 ### `package.json` structure
 
 The structure of the `package.json` file in this project should adhere to a specific format, as illustrated by the example structure below. This structure is based on the [npm documentation for creating a `package.json` file](https://docs.npmjs.com/creating-a-package-json-file).
@@ -34,7 +33,7 @@ The structure of the `package.json` file in this project should adhere to a spec
 	},
 	"keywords": [],
 	"author": "@yourgithubname",
-	"license": "MIT",
+    "license": "AGPL-3.0-or-later",
 	"bugs": {
 		"url": "https://issues.dyn.art/"
 	},

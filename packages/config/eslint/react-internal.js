@@ -2,6 +2,10 @@ const { resolve } = require('node:path');
 
 const project = resolve(process.cwd(), 'tsconfig.json');
 
+const OFF = 0;
+const WARNING = 1;
+const ERROR = 2;
+
 /*
  * This is a custom ESLint configuration for use with
  * internal (bundled by their consumer) libraries
@@ -12,6 +16,9 @@ const project = resolve(process.cwd(), 'tsconfig.json');
  *
  */
 
+/**
+ * @type {import('eslint').Linter.Config}
+ */
 module.exports = {
 	extends: [
 		'@vercel/style-guide/eslint/browser',

@@ -15,7 +15,7 @@
 	},
 	"keywords": [],
 	"author": "@bennoinbeta",
-	"license": "MIT",
+	"license": "AGPL-3.0-or-later",
 	"bugs": {
 		"url": "https://issues.dyn.art/"
 	},
@@ -26,6 +26,7 @@
 		"react-dom": "^18.2.0"
 	},
 	"devDependencies": {
+		"@dyn/config": "workspace:*",
 		"@next/eslint-plugin-next": "^13.4.19",
 		"@types/node": "^17.0.12",
 		"@types/react": "^18.0.22",
