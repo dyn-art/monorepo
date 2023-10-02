@@ -1,12 +1,11 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig",
-	"display": "React Library",
-	"extends": "./base.json",
+	"display": "Node Library",
+	"extends": "./base.tsconfig.json",
 	"compilerOptions": {
 		// Language and Environmet
-		"target": "es6",
+		"target": "esnext",
 		"lib": ["es2019"],
-		"jsx": "react-jsx",
 
 		// Modules
 		"module": "commonjs",
