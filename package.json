@@ -1,17 +1,32 @@
 {
-  "private": true,
-  "scripts": {
-    "build": "turbo run build",
-    "dev": "turbo run dev",
-    "lint": "turbo run lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\""
-  },
-  "devDependencies": {
-    "eslint": "^8.48.0",
-    "prettier": "^3.0.3",
-    "tsconfig": "workspace:*",
-    "turbo": "latest"
-  },
-  "packageManager": "pnpm@8.6.10",
-  "name": "monorepo"
+	"name": "monorepo",
+	"description": "Monorepo for dyn.art",
+	"private": true,
+	"scripts": {
+		"build": "turbo run build",
+		"dev": "turbo run dev",
+		"lint": "turbo run lint",
+		"format": "prettier --write \"**/*.{ts,tsx,md,json,js,jsx}\""
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/dyndotart/monorepo.git"
+	},
+	"keywords": [],
+	"author": "@bennoinbeta",
+	"license": "AGPL-3.0-or-later",
+	"bugs": {
+		"url": "https://issues.dyn.art/"
+	},
+	"homepage": "https://github.com/dyndotart/monorepo",
+	"devDependencies": {
+		"@dyn/config": "workspace:*",
+		"@ianvs/prettier-plugin-sort-imports": "^4.1.0",
+		"eslint": "^8.48.0",
+		"prettier": "^3.0.3",
+		"shx": "^0.3.4",
+		"turbo": "latest",
+		"typescript": "^5.2.2"
+	},
+	"packageManager": "pnpm@8.6.10"
 }

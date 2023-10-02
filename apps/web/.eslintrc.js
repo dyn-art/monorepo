@@ -1,3 +1,7 @@
+/**
+ * @type {import('eslint').Linter.Config}
+ */
 module.exports = {
-  extends: ["custom/next"],
+	root: true,
+	extends: [require.resolve('@dyn/config/eslint/next')]
 };
