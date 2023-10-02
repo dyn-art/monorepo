@@ -20,7 +20,7 @@ module.exports = {
 		// External packages
 		'<THIRD_PARTY_MODULES>',
 		// Dyn packages
-		'^@dyn/(interface|client|ui)(/.*)?$',
+		'^@dyn/',
 		// Internal packages
 		'^@/',
 		'^~/',

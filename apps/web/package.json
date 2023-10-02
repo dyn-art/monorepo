@@ -1,6 +1,7 @@
 {
-	"name": "web",
-	"version": "1.0.0",
+	"name": "@dyn/web",
+	"description": "Web client for dyn.art",
+	"version": "0.0.1",
 	"private": true,
 	"scripts": {
 		"dev": "next dev",
@@ -8,6 +9,17 @@
 		"start": "next start",
 		"lint": "next lint"
 	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/monatheoctocat/my_package.git"
+	},
+	"keywords": [],
+	"author": "@bennoinbeta",
+	"license": "MIT",
+	"bugs": {
+		"url": "https://issues.dyn.art/"
+	},
+	"homepage": "https://github.com/dyndotart/monorepo",
 	"dependencies": {
 		"next": "^13.4.19",
 		"react": "^18.2.0",
