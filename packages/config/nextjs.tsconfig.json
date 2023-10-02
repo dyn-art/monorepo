@@ -4,17 +4,22 @@
 	"extends": "./base.tsconfig.json",
 	"compilerOptions": {
 		"plugins": [{ "name": "next" }],
-		"allowJs": true,
+
+		// Projects
+		"incremental": true,
+
+		// Language and Environmet
+		"target": "es5",
+		"lib": ["dom", "dom.iterable", "esnext"],
+		"jsx": "preserve",
+
+		// Modules
+		"module": "esnext",
+
+		// Emit
 		"declaration": false,
 		"declarationMap": false,
-		"incremental": true,
-		"jsx": "preserve",
-		"lib": ["dom", "dom.iterable", "esnext"],
-		"module": "esnext",
-		"noEmit": true,
-		"resolveJsonModule": true,
-		"strict": false,
-		"target": "es5"
+		"noEmit": true
 	},
 	"include": ["src", "next-env.d.ts"],
 	"exclude": ["node_modules"]

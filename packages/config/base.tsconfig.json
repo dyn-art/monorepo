@@ -2,20 +2,41 @@
 	"$schema": "https://json.schemastore.org/tsconfig",
 	"display": "Default",
 	"compilerOptions": {
+		// Projects
 		"composite": false,
+
+		// Language and Environment
+		"target": "esnext",
+
+		// Modules
+		"module": "esnext",
+		"moduleResolution": "node",
+		"resolveJsonModule": true,
+
+		// Javascript Support
+		"allowJs": true,
+
+		// Emit
 		"declaration": true,
 		"declarationMap": true,
-		"esModuleInterop": true,
-		"forceConsistentCasingInFileNames": true,
 		"inlineSources": false,
+
+		// Interop Constraints
+		"esModuleInterop": true,
 		"isolatedModules": true,
-		"moduleResolution": "node",
+		"forceConsistentCasingInFileNames": true,
+
+		// Type Checking
+		"strict": true,
+		"noImplicitAny": true,
+		"strictPropertyInitialization": false,
+		"strictNullChecks": true,
 		"noUnusedLocals": false,
 		"noUnusedParameters": false,
-		"preserveWatchOutput": true,
+
+		// Completeness
 		"skipLibCheck": true,
-		"strict": true,
-		"strictNullChecks": true
+		"preserveWatchOutput": true
 	},
 	"exclude": ["node_modules"]
 }

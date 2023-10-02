@@ -12,7 +12,10 @@
 	},
 	"files.associations": {
 		"*.scss": "postcss",
-		"*.ts": "typescript"
+		"*.ts": "typescript",
+		// Allow comments in tsconfig.json by associating it with jsonc.
+        // TypeScript permits comments in tsconfig.json even though standard JSON does not.
+        "*.tsconfig.json": "jsonc"
 	},
 	"cSpell.words": ["tailwindcss"],
 	"explorer.fileNesting.enabled": true,
