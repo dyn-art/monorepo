@@ -1,0 +1,19 @@
+{
+	"$schema": "https://json.schemastore.org/tsconfig",
+	"display": "React Library",
+	"extends": "./base.json",
+	"compilerOptions": {
+		// Language and Environmet
+		"target": "es6",
+		"lib": ["es2019"],
+		"jsx": "react-jsx",
+
+		// Modules
+		"module": "commonjs",
+
+		// Emit
+		"outDir": "./dist",
+		"rootDir": "./src"
+	},
+	"include": ["src"]
+}

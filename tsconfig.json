@@ -1,0 +1,3 @@
+{
+	"extends": "@dyn/config/base.tsconfig.json"
+}
