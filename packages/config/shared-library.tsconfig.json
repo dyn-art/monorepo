@@ -1,14 +1,17 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig",
-	"display": "Node Library",
+	"display": "Shared Library",
 	"extends": "./base.tsconfig.json",
 	"compilerOptions": {
 		// Language and Environmet
 		"target": "esnext",
-		"lib": ["es2019"],
+		"lib": ["esnext"],
 
 		// Modules
 		"module": "commonjs",
+
+		// Javascript Support
+		"allowJs": true,
 
 		// Emit
 		"outDir": "./dist",

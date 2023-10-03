@@ -1,0 +1,11 @@
+{
+    "compilerOptions": {
+      "outDir": "./dist",
+      "rootDir": "./src",
+      "paths": {
+        "@/*": ["./src/*"],
+      },
+    },
+    "extends": "@dyn/config/node.tsconfig.json",
+    "include": ["src"],
+  }

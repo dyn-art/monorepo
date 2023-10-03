@@ -14,7 +14,7 @@
 		"resolveJsonModule": true,
 
 		// Javascript Support
-		"allowJs": true,
+		// "allowJs": true, // Global tsconfig.json has issues when this is enabled
 
 		// Emit
 		"declaration": true,
@@ -33,6 +33,7 @@
 		"strictNullChecks": true,
 		"noUnusedLocals": false,
 		"noUnusedParameters": false,
+		"noUncheckedIndexedAccess": true,
 
 		// Completeness
 		"skipLibCheck": true,

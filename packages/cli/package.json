@@ -1,0 +1,42 @@
+{
+	"name": "@dyn/cli",
+	"description": "CLI tool for dyn.art monorepo",
+	"version": "0.0.1",
+	"private": true,
+	"source": "./src/index.ts",
+	"main": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"bin": {
+		"dyn-cli": "./dist/index.js"
+	},
+	"scripts": {
+		"build": "tsc && pnpm run link:package",
+		"start:dev": "tsc -w",
+		"link:package": "pnpm --global unlink dyn-cli && pnpm --global link",
+		"lint": "eslint --cache \"**/*.{js,ts}\"",
+		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
+		"install:clean": "pnpm run clean && pnpm install",
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/dyndotart/monorepo.git"
+	},
+	"keywords": [],
+	"author": "@bennoinbeta",
+	"license": "AGPL-3.0-or-later",
+	"bugs": {
+		"url": "https://issues.dyn.art/"
+	},
+	"homepage": "https://github.com/dyndotart/monorepo",
+	"dependencies": {
+		"chalk": "^5.3.0",
+		"commander": "^11.0.0",
+		"figlet": "^1.6.0",
+		"nanospinner": "^1.1.0"
+	},
+	"devDependencies": {
+		"@dyn/config": "workspace:*",
+		"@types/node": "^17.0.12"
+	}
+}

@@ -1,3 +1,4 @@
+// https://github.com/tsconfig/bases/blob/main/bases/next.json
 {
 	"$schema": "https://json.schemastore.org/tsconfig",
 	"display": "Next.js",
@@ -15,6 +16,9 @@
 
 		// Modules
 		"module": "esnext",
+
+		// Javascript Support
+		"allowJs": true,
 
 		// Emit
 		"declaration": false,
