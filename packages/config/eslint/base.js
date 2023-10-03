@@ -26,8 +26,14 @@ module.exports = {
 		'@typescript-eslint/naming-convention': WARNING,
 		'@typescript-eslint/no-unused-vars': WARNING,
 		'@typescript-eslint/ban-ts-comment': WARNING,
+		'@typescript-eslint/require-await': WARNING,
+		'@typescript-eslint/no-unsafe-member-access': WARNING,
+		'@typescript-eslint/no-unsafe-return': WARNING,
 
 		// EsLint
-		'no-console': WARNING
+		'no-console': WARNING,
+		'import/no-default-export': WARNING,
+		'eqeqeq': OFF,
+		'import/order': OFF // Handled by prettier
 	}
 };
