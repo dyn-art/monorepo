@@ -18,58 +18,74 @@ export function mergeRollupConfigs(
 	overrideConfig: TBaseDynRollupOptions,
 	config: TMergeRollupConfigsConfig
 ): RollupOptions {
-	return mergeWith({}, baseConfig, overrideConfig, (objValue, srcValue, key) => {
-		if (key === 'plugins') {
-			return mergePlugins(objValue as Plugin[], srcValue as Plugin[], config);
-		}
-	}) as RollupOptions;
+	const { plugins: basePlugins = [], ...restBaseConfig } = baseConfig;
+	const { plugins: overridePlugins = [], ...restOverrideConfig } = overrideConfig;
+
+	// Merge plugins manually as lodash customizer function didn't work out for my use case
+	const mergedPlugins = mergePlugins(basePlugins, overridePlugins, config);
+
+	// Use lodash mergeWith for the rest of the configuration
+	const mergedConfig: Omit<RollupOptions, 'plugins'> = mergeWith(
+		{},
+		restBaseConfig,
+		restOverrideConfig
+	) as Omit<RollupOptions, 'plugins'>;
+
+	return { ...mergedConfig, plugins: mergedPlugins };
 }
 
 /**
- * Merge the plugins of two configurations.
+ * The function combines two lists of plugins by using one as a template (determined by the `pluginTemplate` option)
+ * and replacing any string placeholders in that template with the actual plugin instances from the other list.
+ * If a placeholder doesn't correspond to any plugin, a warning is logged.
  *
- * This function merges two plugin arrays. If placeholders are used, they will be replaced
- * with the actual plugin instances from the other array.
+ * Two modes of operation are supported:
+ * 1. Using the override list as a template (`pluginTemplate` set to 'override'), which will replace its placeholders
+ *    with plugins from the base list.
+ * 2. Using the base list as a template (`pluginTemplate` set to 'base'), which will replace its placeholders with
+ *    plugins from the override list.
  *
- * @param basePlugins - Plugin list from the base configuration.
- * @param overridePlugins - Plugin list from the overriding configuration.
- * @param options - Settings for controlling placeholder behavior.
- * @returns - The merged plugin list.
+ * @param basePlugins - List of plugins from the base configuration. This can contain actual plugin instances or string placeholders.
+ * @param overridePlugins - List of plugins from the overriding configuration. This can also contain plugin instances or string placeholders.
+ * @param config - Configuration object that contains the `command` for logging and `pluginTemplate` for determining which list to use as a template.
+ * @returns - The merged list of plugins.
  */
 function mergePlugins(
 	basePlugins: TDynRollupPlugin[] | null,
 	overridePlugins: TDynRollupPlugin[] | null,
 	config: TMergeRollupConfigsConfig
 ): InputPluginOption {
-	const { command, placeholdersInBase = true, placeholdersInOverride = true } = config;
+	const { command, pluginTemplate = 'override' } = config;
 	const basePluginsArray = basePlugins ?? [];
 	const overridePluginsArray = overridePlugins ?? [];
 
-	// Create a map to store plugin instances by name.
 	const allPluginsMap: Record<string, Plugin> = {};
+	let template: TDynRollupPlugin[] = [];
 
 	// Helper function to collect plugin instances into the map.
 	const gatherPlugins = (plugin: TDynRollupPlugin) => {
 		// We only care about Plugin objects with a name property
-		if (typeof plugin === 'object' && plugin != null && 'name' in plugin) {
+		if (isPlugin(plugin) && allPluginsMap[plugin.name] == null) {
 			allPluginsMap[plugin.name] = plugin;
 		}
 	};
 
-	// If placeholders are allowed in the base configuration, gather the plugins.
-	if (placeholdersInBase) {
+	// When using 'override' as a template, collect plugins from the base and use the override as the template.
+	if (pluginTemplate === 'override') {
 		basePluginsArray.forEach(gatherPlugins);
+		template = overridePluginsArray;
 	}
 
-	// If placeholders are allowed in the override configuration, gather the plugins.
-	if (placeholdersInOverride) {
+	// When using 'base' as a template, collect plugins from the override and use the base as the template.
+	if (pluginTemplate === 'base') {
 		overridePluginsArray.forEach(gatherPlugins);
+		template = basePluginsArray;
 	}
 
 	// Merge plugins
 	const mergedPlugins: InputPluginOption = [];
-	[...basePluginsArray, ...overridePluginsArray].forEach((plugin) => {
-		// Replace placeholders with their respective plugin instances.
+	template.forEach((plugin) => {
+		// Replace placeholders from the template with their respective plugin instances.
 		if (typeof plugin === 'string') {
 			const respectivePlugin = allPluginsMap[plugin];
 			if (respectivePlugin != null) {
@@ -77,13 +93,7 @@ function mergePlugins(
 			} else {
 				command.warn(`Plugin placeholder "${plugin}" does not match any available plugins.`);
 			}
-		}
-		// Only add plugins that haven't been added yet.
-		else if (
-			(!isPlugin(plugin) || !mergedPlugins.some((p) => isPlugin(p) && p.name === plugin.name)) &&
-			typeof plugin !== 'string' &&
-			!(plugin instanceof Promise) // TODO: figure out how to handle Promise
-		) {
+		} else if (isPlugin(plugin)) {
 			mergedPlugins.push(plugin);
 		}
 	});
@@ -93,6 +103,5 @@ function mergePlugins(
 
 interface TMergeRollupConfigsConfig {
 	command: Command;
-	placeholdersInBase?: boolean;
-	placeholdersInOverride?: boolean;
+	pluginTemplate?: 'base' | 'override';
 }

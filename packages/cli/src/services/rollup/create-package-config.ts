@@ -60,8 +60,7 @@ export async function createRollupPackageConfig(
 						: await rollupOptions(rollupOptionsCallbackConfig),
 					{
 						command,
-						placeholdersInBase: true,
-						placeholdersInOverride: true
+						pluginTemplate: 'base'
 					}
 				)
 			);

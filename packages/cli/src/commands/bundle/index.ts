@@ -57,6 +57,15 @@ export default class Bundle extends Command {
 			this.error(`No package.json file found at '${chalk.underline(process.cwd())}'!`, { exit: 1 });
 		}
 
+		this.log(chalk.yellowBright(await promisifyFiglet('dyn bundler')));
+		this.log(`\n`);
+		this.log(
+			`Started bundling package: ${chalk.magenta(
+				chalk.underline(packageJson.name ?? 'unknown-package')
+			)}`
+		);
+		this.log(`\n`);
+
 		// Read in tsconfig.json
 		const tsConfigPath = this.getValidTsConfigJsonPath(flags.prod);
 		if (tsConfigPath == null) {
@@ -67,15 +76,6 @@ export default class Bundle extends Command {
 
 		// Read in rollup.config.js
 		const rollupConfig = await this.getRollupConfig();
-
-		this.log(chalk.yellowBright(await promisifyFiglet('dyn bundler')));
-		this.log(`\n`);
-		this.log(
-			`Started bundling package: ${chalk.magenta(
-				chalk.underline(packageJson.name ?? 'unknown-package')
-			)}.`
-		);
-		this.log(`\n`);
 
 		// Bundle package based on bundle strategy
 		switch (flags.bundleStrategy) {
@@ -135,7 +135,11 @@ export default class Bundle extends Command {
 		const rollupConfigPath = path.resolve(process.cwd(), './rollup.config.js');
 		const rollupOptions = await readJsFile<TDynRollupOptions>(rollupConfigPath);
 		if (rollupOptions != null) {
-			this.log(`Detected rollup.config at ${chalk.underline(rollupConfigPath)}`);
+			this.log(
+				`🗞️  Detected ${chalk.underline('rollup.config.js')} at ${chalk.gray(
+					chalk.underline(rollupConfigPath)
+				)}`
+			);
 		}
 		return rollupOptions;
 	}

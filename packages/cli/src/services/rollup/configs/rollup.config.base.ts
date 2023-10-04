@@ -18,6 +18,7 @@ const config: TDynRollupOptionsCallback = async (options) => {
 			nodeExternals(),
 			// Convert CommonJS modules (from node_modules) into ES modules targeted by this app
 			commonjs(),
+			'import-css', // Plugin placeholder for "rollup-plugin-import-css"
 			// Automatically resolve path aliases set in the compilerOptions section of tsconfig.json
 			typescriptPaths({
 				tsConfigPath,
