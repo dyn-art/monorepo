@@ -19,7 +19,7 @@ function resolveOutputPathFromPackageJson(
 		relativeOutputPath = propertyValue;
 	}
 	relativeOutputPath = preserveModules
-		? relativeOutputPath.replace(/\/[^/]*\.js$/, '') // remove '/index.js' if bundling to dir
+		? relativeOutputPath.replace(/\/[^/]*\.js$/, '') // Remove '/index.js' if bundling to dir
 		: relativeOutputPath;
 	return path.resolve(process.cwd(), relativeOutputPath);
 }

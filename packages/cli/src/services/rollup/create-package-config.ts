@@ -39,7 +39,7 @@ export async function createRollupPackageConfig(
 			const { output, visualizeFilePath } =
 				format === 'esm' ? configureESM(moduleConfig) : configureCJS(moduleConfig);
 
-			// Define rollup options
+			// Define rollup config
 			const rollupOptionsCallbackConfig: TDynRollupOptionsCallbackConfig = {
 				path: {
 					input: inputPath,

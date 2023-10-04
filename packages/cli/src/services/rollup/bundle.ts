@@ -1,23 +1,29 @@
 import type { Command } from '@oclif/core';
+import chalk from 'chalk';
 import { rollup, type InputPluginOption, type OutputOptions, type RollupOptions } from 'rollup';
 
 import { isPlugin } from './is-plugin';
 
-export async function compileWithRollup(command: Command, rollupOptions: RollupOptions) {
-	command.log('Start compiling.', {
-		args: [
-			{
-				options: {
-					...rollupOptions,
-					plugins: pluginsToKeys(rollupOptions.plugins)
-				}
-			}
-		]
-	});
+export async function bundleWithRollup(command: Command, rollupOptions: RollupOptions) {
+	command.log(
+		'🚀 Started bundling.',
+		chalk.gray(
+			JSON.stringify({
+				args: [
+					{
+						options: {
+							...rollupOptions,
+							plugins: pluginsToKeys(rollupOptions.plugins)
+						}
+					}
+				]
+			})
+		)
+	);
 	const build = await rollup(rollupOptions);
 	const outputs: OutputOptions[] = formatOutput(rollupOptions.output);
 	const response = await Promise.all(outputs.map((output) => build.write(output)));
-	command.log('Completed compiling.');
+	command.log('🏁 Completed bundling.');
 	return response;
 }
 

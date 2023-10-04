@@ -4,7 +4,10 @@
 	"private": true,
 	"scripts": {
 		"build": "turbo run build",
-		"dev": "turbo run dev",
+		"build:cli": "turbo run build --filter=cli",
+		"start:dev": "turbo run start:dev",
+		"clean": "turbo run clean && shx rm -rf node_modules",
+		"install:clean": "pnpm run clean && pnpm install",
 		"lint": "turbo run lint",
 		"format": "prettier --write \"**/*.{ts,tsx,md,json,js,jsx}\""
 	},

@@ -4,8 +4,8 @@ import chalk from 'chalk';
 import type { PackageJson } from 'type-fest';
 
 import {
-	compileAllWithRollup,
-	compileWithTsc,
+	bundleAllWithRollup,
+	bundleWithTsc,
 	createRollupPackageConfig,
 	generateDts,
 	type TDynRollupOptions
@@ -75,11 +75,12 @@ export default class Bundle extends Command {
 				chalk.underline(packageJson.name ?? 'unknown-package')
 			)}.`
 		);
+		this.log(`\n`);
 
 		// Bundle package based on bundle strategy
 		switch (flags.bundleStrategy) {
 			case 'rollup':
-				await compileAllWithRollup(
+				await bundleAllWithRollup(
 					this,
 					await createRollupPackageConfig(this, {
 						format: 'esm',
@@ -91,7 +92,7 @@ export default class Bundle extends Command {
 						packageJson
 					})
 				);
-				await compileAllWithRollup(
+				await bundleAllWithRollup(
 					this,
 					await createRollupPackageConfig(this, {
 						format: 'cjs',
@@ -106,7 +107,7 @@ export default class Bundle extends Command {
 				await generateDts(this, { tsConfigPath });
 				break;
 			case 'tsc':
-				await compileWithTsc(this);
+				await bundleWithTsc(this);
 				break;
 			case 'typesonly':
 				await generateDts(this, { tsConfigPath });
@@ -115,13 +116,14 @@ export default class Bundle extends Command {
 				this.error(`Unknown build strategy '${flags.buildStrategy}'!`, { exit: 1 });
 		}
 
+		this.log(`\n`);
 		this.log(
-			`Package was bundled in ${chalk.green(
+			`${chalk.green('→')} Package was bundled in ${chalk.green(
 				chalk.underline(`${((Date.now() - startTime) / 1000).toFixed(2)}s`)
 			)}.`
 		);
 		this.log(`\n`);
-		this.exit(1);
+		this.exit(0);
 	}
 
 	private async getPackageJson(): Promise<PackageJson | null> {
