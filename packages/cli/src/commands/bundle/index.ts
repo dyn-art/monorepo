@@ -3,11 +3,17 @@ import { Command, Flags } from '@oclif/core';
 import chalk from 'chalk';
 import type { PackageJson } from 'type-fest';
 
-import type { DynRollupOptions } from '../../services';
+import {
+	compileAllWithRollup,
+	compileWithTsc,
+	createRollupPackageConfig,
+	generateDts,
+	type TDynRollupOptions
+} from '../../services';
 import { doesFileExist, promisifyFiglet, readJsFile, readJsonFile } from '../../utils';
 
 export default class Bundle extends Command {
-	static description = 'Say hello';
+	static description = 'Bundle dyn.art packages';
 
 	static examples = [];
 
@@ -73,10 +79,37 @@ export default class Bundle extends Command {
 		// Bundle package based on bundle strategy
 		switch (flags.bundleStrategy) {
 			case 'rollup':
+				await compileAllWithRollup(
+					this,
+					createRollupPackageConfig(this, {
+						format: 'esm',
+						isProduction: flags.prod,
+						preserveModules: true,
+						sourcemap: flags.sourcemap,
+						rollupOptions: rollupConfig ?? undefined,
+						tsConfigPath,
+						packageJson
+					})
+				);
+				await compileAllWithRollup(
+					this,
+					createRollupPackageConfig(this, {
+						format: 'cjs',
+						isProduction: flags.prod,
+						preserveModules: true,
+						sourcemap: flags.sourcemap,
+						rollupOptions: rollupConfig ?? undefined,
+						tsConfigPath,
+						packageJson
+					})
+				);
+				await generateDts(this, { tsConfigPath });
 				break;
 			case 'tsc':
+				await compileWithTsc(this);
 				break;
 			case 'typesonly':
+				await generateDts(this, { tsConfigPath });
 				break;
 			default:
 				this.error(`Unknown build strategy '${flags.buildStrategy}'!`, { exit: 1 });
@@ -96,9 +129,9 @@ export default class Bundle extends Command {
 		return readJsonFile<PackageJson>(packageJsonPath);
 	}
 
-	private async getRollupConfig(): Promise<DynRollupOptions | null> {
+	private async getRollupConfig(): Promise<TDynRollupOptions | null> {
 		const rollupConfigPath = path.resolve(process.cwd(), './rollup.config.js');
-		const rollupOptions = await readJsFile<DynRollupOptions>(rollupConfigPath);
+		const rollupOptions = await readJsFile<TDynRollupOptions>(rollupConfigPath);
 		if (rollupOptions != null) {
 			this.log(`Detected rollup.config at ${chalk.underline(rollupConfigPath)}`);
 		}

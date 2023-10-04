@@ -5,6 +5,8 @@
       "paths": {
         "@/*": ["./src/*"],
       },
+      "moduleResolution": "node",
+      "module": "esnext"
     },
     "extends": "@dyn/config/node.tsconfig.json",
     "include": ["src"]
