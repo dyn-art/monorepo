@@ -1,10 +1,10 @@
 import path from 'node:path';
 import type { Command } from '@oclif/core';
 import chalk from 'chalk';
-import maxmin from 'maxmin';
 import type { Plugin } from 'rollup';
 
-function bundleSize(command: Command): Plugin {
+async function bundleSize(command: Command): Promise<Plugin> {
+	const maxmin = (await import('maxmin')).default;
 	return {
 		name: 'rollup-plugin-bundle-size',
 		generateBundle(options, bundle) {

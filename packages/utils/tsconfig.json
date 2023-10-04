@@ -3,6 +3,6 @@
       "outDir": "./dist",
       "rootDir": "./src",
     },
-    "extends": "@dyn/config/node.tsconfig.json",
+    "extends": "@dyn/config/shared-library.tsconfig.json",
     "include": ["src"]
  }

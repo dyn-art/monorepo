@@ -14,7 +14,7 @@ export type TDynRollupOptions = TBaseDynRollupOptions | TDynRollupOptionsCallbac
 
 export type TDynRollupOptionsCallback = (
 	options: TDynRollupOptionsCallbackConfig
-) => TBaseDynRollupOptions;
+) => Promise<TBaseDynRollupOptions>;
 
 export interface TDynRollupOptionsCallbackConfig {
 	path: TPath;

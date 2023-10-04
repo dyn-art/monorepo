@@ -1,8 +1,8 @@
 import path from 'node:path';
 import type { Command } from '@oclif/core';
-import { execa } from 'execa';
 
 export async function compileWithTsc(command: Command) {
+	const { execa } = await import('execa');
 	const tsconfig = path.resolve(process.cwd(), './tsconfig.json');
 	command.log('Start compiling Typescript files.', {
 		args: [{ tsconfig }]

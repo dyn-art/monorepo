@@ -81,7 +81,7 @@ export default class Bundle extends Command {
 			case 'rollup':
 				await compileAllWithRollup(
 					this,
-					createRollupPackageConfig(this, {
+					await createRollupPackageConfig(this, {
 						format: 'esm',
 						isProduction: flags.prod,
 						preserveModules: true,
@@ -93,7 +93,7 @@ export default class Bundle extends Command {
 				);
 				await compileAllWithRollup(
 					this,
-					createRollupPackageConfig(this, {
+					await createRollupPackageConfig(this, {
 						format: 'cjs',
 						isProduction: flags.prod,
 						preserveModules: true,

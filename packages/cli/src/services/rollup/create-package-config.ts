@@ -8,10 +8,10 @@ import { rollupConfigBase } from './configs';
 import { mergeRollupConfigs } from './merge-rollup-configs';
 import type { TDynRollupOptions, TDynRollupOptionsCallbackConfig, TPath } from './types';
 
-export function createRollupPackageConfig(
+export async function createRollupPackageConfig(
 	command: Command,
 	config: TCreatePackageConfigConfig
-): RollupOptions[] {
+): Promise<RollupOptions[]> {
 	const {
 		tsConfigPath,
 		packageJson,
@@ -23,48 +23,50 @@ export function createRollupPackageConfig(
 	} = config;
 	const paths = resolvePaths({ paths: config.paths ?? null, packageJson, format, preserveModules });
 
-	return paths.map((pathItem) => {
-		const { input: inputPath, output: outputPath } = pathItem;
+	return Promise.all(
+		paths.map(async (pathItem) => {
+			const { input: inputPath, output: outputPath } = pathItem;
 
-		// Specific module format configuration
-		const moduleConfig: TConfigureModuleConfig = {
-			outputPath,
-			outputOptions: {
-				name: packageJson.name,
-				preserveModules,
-				sourcemap
-			}
-		};
-		const { output, visualizeFilePath } =
-			format === 'esm' ? configureESM(moduleConfig) : configureCJS(moduleConfig);
-
-		// Define rollup options
-		const rollupOptionsCallbackConfig: TDynRollupOptionsCallbackConfig = {
-			path: {
-				input: inputPath,
-				output: outputPath
-			},
-			output,
-			tsConfigPath,
-			packageJson,
-			isProduction,
-			command,
-			visualizeFilePath
-		};
-		return defineConfig(
-			mergeRollupConfigs(
-				rollupConfigBase(rollupOptionsCallbackConfig),
-				typeof rollupOptions === 'object'
-					? rollupOptions
-					: rollupOptions(rollupOptionsCallbackConfig),
-				{
-					command,
-					placeholdersInBase: true,
-					placeholdersInOverride: true
+			// Specific module format configuration
+			const moduleConfig: TConfigureModuleConfig = {
+				outputPath,
+				outputOptions: {
+					name: packageJson.name,
+					preserveModules,
+					sourcemap
 				}
-			)
-		);
-	});
+			};
+			const { output, visualizeFilePath } =
+				format === 'esm' ? configureESM(moduleConfig) : configureCJS(moduleConfig);
+
+			// Define rollup options
+			const rollupOptionsCallbackConfig: TDynRollupOptionsCallbackConfig = {
+				path: {
+					input: inputPath,
+					output: outputPath
+				},
+				output,
+				tsConfigPath,
+				packageJson,
+				isProduction,
+				command,
+				visualizeFilePath
+			};
+			return defineConfig(
+				mergeRollupConfigs(
+					await rollupConfigBase(rollupOptionsCallbackConfig),
+					typeof rollupOptions === 'object'
+						? rollupOptions
+						: await rollupOptions(rollupOptionsCallbackConfig),
+					{
+						command,
+						placeholdersInBase: true,
+						placeholdersInOverride: true
+					}
+				)
+			);
+		})
+	);
 }
 
 function configureESM(config: TConfigureModuleConfig): TConfigureModuleResponse {

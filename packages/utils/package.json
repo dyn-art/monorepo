@@ -1,0 +1,36 @@
+{
+	"name": "@dyn/utils",
+	"description": "Utils for dyn.art packages",
+	"version": "0.0.1",
+	"private": true,
+	"source": "./src/index.ts",
+	"main": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"scripts": {
+		"build": "shx rm -rf dist && dyn-cli bundle",
+		"start:dev": "tsc -w",
+		"lint": "eslint --cache \"**/*.{js,ts}\"",
+		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
+		"install:clean": "pnpm run clean && pnpm install",
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/dyndotart/monorepo.git"
+	},
+	"keywords": [],
+	"author": "@bennoinbeta",
+	"license": "AGPL-3.0-or-later",
+	"bugs": {
+		"url": "https://issues.dyn.art/"
+	},
+	"homepage": "https://github.com/dyndotart/monorepo",
+	"devDependencies": {
+		"@dyn/config": "workspace:*",
+		"@types/node": "^17.0.12"
+	},
+	"files": [
+		"dist",
+		"README.md"
+	]
+}

@@ -5,7 +5,7 @@ import nodeExternals from 'rollup-plugin-node-externals';
 import { bundleSize, typescriptPaths } from '../plugins';
 import type { TDynRollupOptionsCallback } from '../types';
 
-const config: TDynRollupOptionsCallback = (options) => {
+const config: TDynRollupOptionsCallback = async (options) => {
 	const { packageJson, path, output, command, tsConfigPath, isProduction } = options;
 
 	return {
@@ -37,7 +37,7 @@ const config: TDynRollupOptionsCallback = (options) => {
 			// typescript(/* */), // Obsolete as esbuild takes care of configuring typescript
 			// babel(/* */), // Obsolete as esbuild takes care of converting ES2015+ modules into compatible JavaScript files
 			// terser(/* */), // Obsolete as esbuild takes care of minifying
-			...(output.preserveModules ? [bundleSize(command)] : [])
+			...(output.preserveModules ? [await bundleSize(command)] : [])
 		],
 		// Exclude peer dependencies and dependencies from bundle for these reasons:
 		// 1. To prevent duplication: If every package included a copy of all its dependencies,
