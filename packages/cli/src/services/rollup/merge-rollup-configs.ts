@@ -37,11 +37,13 @@ export function mergeRollupConfigs(
  * @returns - The merged plugin list.
  */
 function mergePlugins(
-	basePlugins: TDynRollupPlugin[],
-	overridePlugins: TDynRollupPlugin[],
+	basePlugins: TDynRollupPlugin[] | null,
+	overridePlugins: TDynRollupPlugin[] | null,
 	config: TMergeRollupConfigsConfig
 ): InputPluginOption {
 	const { command, placeholdersInBase = true, placeholdersInOverride = true } = config;
+	const basePluginsArray = basePlugins ?? [];
+	const overridePluginsArray = overridePlugins ?? [];
 
 	// Create a map to store plugin instances by name.
 	const allPluginsMap: Record<string, Plugin> = {};
@@ -56,17 +58,17 @@ function mergePlugins(
 
 	// If placeholders are allowed in the base configuration, gather the plugins.
 	if (placeholdersInBase) {
-		basePlugins.forEach(gatherPlugins);
+		basePluginsArray.forEach(gatherPlugins);
 	}
 
 	// If placeholders are allowed in the override configuration, gather the plugins.
 	if (placeholdersInOverride) {
-		overridePlugins.forEach(gatherPlugins);
+		overridePluginsArray.forEach(gatherPlugins);
 	}
 
 	// Merge plugins
 	const mergedPlugins: InputPluginOption = [];
-	[...basePlugins, ...overridePlugins].forEach((plugin) => {
+	[...basePluginsArray, ...overridePluginsArray].forEach((plugin) => {
 		// Replace placeholders with their respective plugin instances.
 		if (typeof plugin === 'string') {
 			const respectivePlugin = allPluginsMap[plugin];
