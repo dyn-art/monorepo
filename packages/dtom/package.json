@@ -5,12 +5,11 @@
 	"private": true,
 	"scripts": {
 		"build": "shx rm -rf dist && pnpm run build:rust && pnpm run build:ts",
-		"build:rust": "cd ./rust && wasm-pack build --target bundler --out-dir ../local_modules/dyn-dtom-wasm && cd .. && pnpm install ./local_modules/dyn-dtom-wasm",
+		"build:rust": "cd ./rust && wasm-pack build --target bundler --out-dir ../rust_modules/dyn-dtom",
 		"build:ts": "dyn-cli bundle",
 		"start:dev": "tsc -w",
 		"lint": "eslint --cache \"**/*.{js,ts}\"",
 		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
-		"postinstall": "pnpm build:rust",
 		"install:clean": "pnpm run clean && pnpm install",
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
@@ -29,12 +28,9 @@
 		"url": "https://issues.dyn.art/"
 	},
 	"homepage": "https://github.com/dyndotart/monorepo",
-	"dependencies": {
-		"dyn-dtom-wasm": "link:local_modules/dyn-dtom-wasm",
-		"mathjs": "^11.11.1"
-	},
 	"devDependencies": {
-		"@dyn/config": "workspace:*"
+		"@dyn/config": "workspace:*",
+		"@types/node": "^17.0.12"
 	},
 	"files": [
 		"dist",

@@ -1,5 +1,5 @@
 [package]
-name = "dyn-dtom-wasm"
+name = "dyn-dtom"
 version = "0.0.1"
 authors = ["BennoDev <57860196+bennoinbeta@users.noreply.github.com>"]
 edition = "2018"

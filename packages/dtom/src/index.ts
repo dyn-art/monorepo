@@ -1,5 +1,5 @@
-import { greet } from 'dyn-dtom-wasm';
+import { greet } from '@rust/dyn-dtom';
 
-export function helloWorld() {
+export function greetRust() {
 	greet();
 }

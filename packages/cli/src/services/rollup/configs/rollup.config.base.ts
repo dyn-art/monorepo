@@ -1,5 +1,4 @@
 import commonjs from '@rollup/plugin-commonjs';
-import { nodeResolve } from '@rollup/plugin-node-resolve';
 import esbuild from 'rollup-plugin-esbuild';
 import nodeExternals from 'rollup-plugin-node-externals';
 
@@ -18,15 +17,12 @@ const config: TDynRollupOptionsCallback = async (options) => {
 			// This prevents Rollup from trying to bundle these built-in modules,
 			// which can cause unresolved dependencies warnings.
 			nodeExternals(),
-			// Resolve and bundle dependencies from node_modules
-			nodeResolve(),
 			// Convert CommonJS modules (from node_modules) into ES modules targeted by this app
 			commonjs(),
 			'import-css', // Plugin placeholder for "rollup-plugin-import-css"
 			// Automatically resolve path aliases set in the compilerOptions section of tsconfig.json
-			typescriptPaths({
-				tsConfigPath,
-				preserveExtensions: true
+			typescriptPaths(command, {
+				tsConfigPath
 			}),
 			// Transpile TypeScript code to JavaScript (ES6), and minify in production
 			esbuild({
@@ -35,7 +31,7 @@ const config: TDynRollupOptionsCallback = async (options) => {
 				target: 'es6',
 				exclude: [/node_modules/],
 				loaders: {
-					'.json': 'json'
+					'.json': 'json' // Require @rollup/plugin-commonjs
 				},
 				sourceMap: false // Configured in rollup 'output' object
 			}),
