@@ -1,7 +1,9 @@
 import commonjs from '@rollup/plugin-commonjs';
+import { nodeResolve } from '@rollup/plugin-node-resolve';
 import esbuild from 'rollup-plugin-esbuild';
 import nodeExternals from 'rollup-plugin-node-externals';
 
+import { getExternalModuleKeys } from '../get-external-module-keys';
 import { bundleSize, typescriptPaths } from '../plugins';
 import type { TDynRollupOptionsCallback } from '../types';
 
@@ -16,6 +18,8 @@ const config: TDynRollupOptionsCallback = async (options) => {
 			// This prevents Rollup from trying to bundle these built-in modules,
 			// which can cause unresolved dependencies warnings.
 			nodeExternals(),
+			// Resolve and bundle dependencies from node_modules
+			nodeResolve(),
 			// Convert CommonJS modules (from node_modules) into ES modules targeted by this app
 			commonjs(),
 			'import-css', // Plugin placeholder for "rollup-plugin-import-css"
@@ -47,12 +51,7 @@ const config: TDynRollupOptionsCallback = async (options) => {
 		// 3. For improved security: If a security vulnerability is found in a dependency,
 		//    npm can update it without needing to update this package.
 		// 4. Auto Installation: Package managers automatically install these dependencies, so no need to bundle them.
-		external: [
-			...Object.keys({
-				...(packageJson.dependencies || {}),
-				...(packageJson.peerDependencies || {})
-			})
-		]
+		external: getExternalModuleKeys(packageJson)
 	};
 };
 

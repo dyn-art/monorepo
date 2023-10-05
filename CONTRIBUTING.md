@@ -24,9 +24,13 @@ The structure of the `package.json` file in this project should adhere to a spec
 	"description": "Description of the package",
 	"version": "0.0.1",
 	"private": true,
-	"type": "module", // As we want to use 'esm' in the config files like 'rollup.config.js'
 	"scripts": {
-		// Your script tags here
+		"build": "shx rm -rf dist && dyn-cli bundle",
+		"start:dev": "tsc -w",
+		"lint": "eslint --cache \"**/*.{js,ts}\"",
+		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
+		"install:clean": "pnpm run clean && pnpm install",
+		"test": "echo \"Error: no test specified\" && exit 1"
 	},
 	"repository": {
 		"type": "git",
@@ -54,7 +58,7 @@ For specific packages, additional fields should be included as shown below. Note
 ```json
 {
     // ..
-    // "private": true,
+    // "scripts": ..,
 	"source": "./src/index.ts", // Entry file (source code)
 	"main": "./dist/cjs/index.js", // Entry point (CommonJS)
 	"module": "./dist/esm/index.js", // Entry point (ES Module)

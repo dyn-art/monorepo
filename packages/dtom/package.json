@@ -1,13 +1,16 @@
 {
-	"name": "@dyn/utils",
-	"description": "Utils for dyn.art packages",
+	"name": "@dyn/dtom",
+	"description": "Design Tree Object Model (DTOM) render engine for dyn.art",
 	"version": "0.0.1",
 	"private": true,
 	"scripts": {
-		"build": "shx rm -rf dist && dyn-cli bundle",
+		"build": "shx rm -rf dist && pnpm run build:rust && pnpm run build:ts",
+		"build:rust": "cd ./rust && wasm-pack build --target bundler --out-dir ../local_modules/dyn-dtom-wasm && cd .. && pnpm install ./local_modules/dyn-dtom-wasm",
+		"build:ts": "dyn-cli bundle",
 		"start:dev": "tsc -w",
 		"lint": "eslint --cache \"**/*.{js,ts}\"",
 		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
+		"postinstall": "pnpm build:rust",
 		"install:clean": "pnpm run clean && pnpm install",
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
@@ -26,9 +29,12 @@
 		"url": "https://issues.dyn.art/"
 	},
 	"homepage": "https://github.com/dyndotart/monorepo",
+	"dependencies": {
+		"dyn-dtom-wasm": "link:local_modules/dyn-dtom-wasm",
+		"mathjs": "^11.11.1"
+	},
 	"devDependencies": {
-		"@dyn/config": "workspace:*",
-		"@types/node": "^17.0.12"
+		"@dyn/config": "workspace:*"
 	},
 	"files": [
 		"dist",
