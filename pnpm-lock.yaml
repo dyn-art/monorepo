@@ -31,6 +31,9 @@ importers:
 
   apps/web:
     dependencies:
+      '@dyn/dtom':
+        specifier: workspace:*
+        version: link:../../packages/dtom
       next:
         specifier: ^13.4.19
         version: 13.4.19(@babel/core@7.23.0)(react-dom@18.2.0)(react@18.2.0)
@@ -65,9 +68,6 @@ importers:
       '@rollup/plugin-commonjs':
         specifier: ^25.0.4
         version: 25.0.4(rollup@3.29.4)
-      '@rollup/plugin-wasm':
-        specifier: ^6.2.2
-        version: 6.2.2(rollup@3.29.4)
       chalk:
         specifier: ^4.1.2
         version: 4.1.2
@@ -847,19 +847,6 @@ packages:
       glob: 8.1.0
       is-reference: 1.2.1
       magic-string: 0.27.0
-      rollup: 3.29.4
-    dev: false
-
-  /@rollup/plugin-wasm@6.2.2(rollup@3.29.4):
-    resolution: {integrity: sha512-gpC4R1G9Ni92ZIRTexqbhX7U+9estZrbhP+9SRb0DW9xpB9g7j34r+J2hqrcW/lRI7dJaU84MxZM0Rt82tqYPQ==}
-    engines: {node: '>=14.0.0'}
-    peerDependencies:
-      rollup: ^1.20.0||^2.0.0||^3.0.0||^4.0.0
-    peerDependenciesMeta:
-      rollup:
-        optional: true
-    dependencies:
-      '@rollup/pluginutils': 5.0.4(rollup@3.29.4)
       rollup: 3.29.4
     dev: false
 

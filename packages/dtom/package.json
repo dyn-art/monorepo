@@ -5,7 +5,7 @@
 	"private": true,
 	"scripts": {
 		"build": "shx rm -rf dist && pnpm run build:rust && pnpm run build:ts",
-		"build:rust": "cd ./rust && wasm-pack build --target bundler --out-dir ../rust_modules/dyn-dtom && cd ..",
+		"build:rust": "cd ./rust && wasm-pack build --target web --out-dir ../rust_modules/dyn-dtom && cd ..",
 		"build:ts": "dyn-cli bundle -f esm",
 		"start:dev": "tsc -w",
 		"lint": "eslint --cache \"**/*.{js,ts}\"",
