@@ -1,15 +1,14 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig",
-	"display": "React Library",
+	"display": "Shared Library",
 	"extends": "./base.tsconfig.json",
 	"compilerOptions": {
 		// Language and Environmet
-		"target": "es6",
-		"lib": ["dom", "dom.Iterable", "es2015"],
-		"jsx": "react-jsx",
+		"target": "esnext",
+		"lib": ["esnext"],
 
 		// Modules
-		"module": "esnext",
+		"module": "commonjs",
 
 		// Javascript Support
 		"allowJs": true,

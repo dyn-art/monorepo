@@ -1,16 +1,17 @@
+// https://github.com/tsconfig/bases/blob/main/bases/node-lts.json
 {
 	"$schema": "https://json.schemastore.org/tsconfig",
-	"display": "React Library",
+	"display": "Node LTS",
 	"extends": "./base.tsconfig.json",
 	"compilerOptions": {
 		// Language and Environmet
-		"target": "es6",
-		"lib": ["dom", "dom.Iterable", "es2015"],
-		"jsx": "react-jsx",
+		"target": "es2022",
+		"lib": ["es2023"],
 
 		// Modules
-		"module": "esnext",
-
+		"module": "node16",
+		"moduleResolution": "node16",
+		
 		// Javascript Support
 		"allowJs": true,
 

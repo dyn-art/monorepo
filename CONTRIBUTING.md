@@ -24,6 +24,7 @@ The structure of the `package.json` file in this project should adhere to a spec
 	"description": "Description of the package",
 	"version": "0.0.1",
 	"private": true,
+	"type": "module", // As we want to use 'esm' in the config files like 'rollup.config.js'
 	"scripts": {
 		// Your script tags here
 	},
