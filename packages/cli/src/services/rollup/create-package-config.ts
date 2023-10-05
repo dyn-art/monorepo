@@ -1,5 +1,6 @@
 import path from 'node:path';
 import type { Command } from '@oclif/core';
+import chalk from 'chalk';
 import { defineConfig, type OutputOptions, type RollupOptions } from 'rollup';
 import type { PackageJson } from 'type-fest';
 
@@ -22,6 +23,12 @@ export async function createRollupPackageConfig(
 		sourcemap = true
 	} = config;
 	const paths = resolvePaths({ paths: config.paths ?? null, packageJson, format, preserveModules });
+
+	command.log(
+		`🛣️  Resolved paths from ${chalk.underline('package.json')}'s export conditions: ${chalk.gray(
+			JSON.stringify(paths)
+		)}`
+	);
 
 	return Promise.all(
 		paths.map(async (pathItem) => {
