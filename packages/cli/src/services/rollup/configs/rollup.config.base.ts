@@ -2,12 +2,17 @@ import commonjs from '@rollup/plugin-commonjs';
 import esbuild from 'rollup-plugin-esbuild';
 import nodeExternals from 'rollup-plugin-node-externals';
 
-import { getExternalModuleKeys } from '../get-external-module-keys';
+import { isExternal as isExternalFactory } from '../is-external-factory';
 import { bundleSize, typescriptPaths } from '../plugins';
 import type { TDynRollupOptionsCallback } from '../types';
 
 const config: TDynRollupOptionsCallback = async (options) => {
 	const { packageJson, path, output, command, tsConfigPath, isProduction } = options;
+	const isExternal = isExternalFactory(packageJson, {
+		fileTypesAsExternal: ['.wasm'],
+		packageJsonDepsAsExternal: true,
+		ignoreRustModules: true
+	});
 
 	return {
 		input: path.input,
@@ -22,7 +27,8 @@ const config: TDynRollupOptionsCallback = async (options) => {
 			'import-css', // Plugin placeholder for "rollup-plugin-import-css"
 			// Automatically resolve path aliases set in the compilerOptions section of tsconfig.json
 			typescriptPaths(command, {
-				tsConfigPath
+				tsConfigPath,
+				shouldResolveRelativeToImporter: (importer: string) => importer.includes('/rust_modules/')
 			}),
 			// Transpile TypeScript code to JavaScript (ES6), and minify in production
 			esbuild({
@@ -35,6 +41,7 @@ const config: TDynRollupOptionsCallback = async (options) => {
 				},
 				sourceMap: false // Configured in rollup 'output' object
 			}),
+			'copy', // Plugin placeholder for "rollup-plugin-copy"
 			// typescript(/* */), // Obsolete as esbuild takes care of configuring typescript
 			// babel(/* */), // Obsolete as esbuild takes care of converting ES2015+ modules into compatible JavaScript files
 			// terser(/* */), // Obsolete as esbuild takes care of minifying
@@ -47,7 +54,7 @@ const config: TDynRollupOptionsCallback = async (options) => {
 		// 3. For improved security: If a security vulnerability is found in a dependency,
 		//    npm can update it without needing to update this package.
 		// 4. Auto Installation: Package managers automatically install these dependencies, so no need to bundle them.
-		external: getExternalModuleKeys(packageJson)
+		external: isExternal
 	};
 };
 

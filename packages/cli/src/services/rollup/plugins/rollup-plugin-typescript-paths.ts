@@ -1,6 +1,7 @@
 // Based on:
 // https://github.com/simonhaenisch/rollup-plugin-typescript-paths
 
+import path from 'node:path';
 import type { Command } from '@oclif/core';
 import chalk from 'chalk';
 import type { Plugin } from 'rollup';
@@ -11,10 +12,10 @@ export const typescriptPaths = (
 	options: TTypescriptPathsOptions = {}
 ): Plugin => {
 	const {
-		absolute = true,
 		nonRelative = false,
 		tsConfigPath = ts.findConfigFile('./', ts.sys.fileExists),
-		transform
+		transform,
+		shouldResolveRelativeToImporter = false
 	} = options;
 	const compilerOptions = getTsConfig(command, tsConfigPath);
 
@@ -39,8 +40,8 @@ export const typescriptPaths = (
 			}
 
 			// Match importee against TypeScript paths to check if it's a valid alias
-			const hasMatchingPath = Object.keys(compilerOptionsPaths as object).some((path) =>
-				new RegExp(`^${path.replace('*', '.+')}$`).test(importee)
+			const hasMatchingPath = Object.keys(compilerOptionsPaths as object).some((tsPath) =>
+				new RegExp(`^${tsPath.replace('*', '.+')}$`).test(importee)
 			);
 
 			if (!hasMatchingPath && !nonRelative) {
@@ -59,28 +60,28 @@ export const typescriptPaths = (
 			}
 
 			// Handle potential .d.ts files and check if corresponding .js exists
-			if (resolvedFileName.endsWith('.d.ts') && !doesJsFileExist(resolvedFileName)) {
-				return null;
+			let targetFileName: string = resolvedFileName;
+			if (resolvedFileName.endsWith('.d.ts')) {
+				if (doesJsFileExist(resolvedFileName)) {
+					targetFileName = resolvedFileName.replace(/\.d\.ts$/i, '.js');
+				} else {
+					return null;
+				}
 			}
 
-			// Map various TypeScript extensions to their JavaScript equivalents
-			const targetFileName = resolvedFileName.replace(/\.d\.ts$|\.ts$|\.tsx$/i, (match) => {
-				switch (match) {
-					case '.d.ts':
-						return '.js';
-					case '.tsx':
-						return '.jsx';
-					case '.ts':
-						return '.js';
-				}
-				command.error(`Unexpected file extension: ${chalk.red(chalk.underline(match))}`, {
-					exit: 1
-				});
-			});
+			// Resolve path to target file name
+			let resolvedPath: string;
+			if (
+				(typeof shouldResolveRelativeToImporter === 'boolean' && shouldResolveRelativeToImporter) ||
+				(typeof shouldResolveRelativeToImporter === 'function' &&
+					shouldResolveRelativeToImporter(targetFileName, importer))
+			) {
+				resolvedPath = path.relative(path.dirname(importer), targetFileName);
+			} else {
+				resolvedPath = ts.sys.resolvePath(targetFileName);
+			}
 
-			const resolved = absolute ? ts.sys.resolvePath(targetFileName) : targetFileName;
-
-			return transform ? transform(resolved) : resolved;
+			return transform ? transform(resolvedPath) : resolvedPath;
 		}
 	};
 };
@@ -130,32 +131,37 @@ function getTsConfig(command: Command, configPath?: string): TsConfig {
 
 export interface TTypescriptPathsOptions {
 	/**
-	 * Whether to resolve to absolute paths; defaults to `true`.
-	 */
-	absolute?: boolean;
-
-	/**
-	 * Whether to resolve non-relative paths based on tsconfig's `baseUrl`, even
-	 * if none of the `paths` are matched; defaults to `false`.
+	 * Determines if non-relative paths should be resolved based on the tsconfig's `baseUrl`.
+	 * The path resolution occurs even if none of the `paths` are matched. By default, this is set to `false`.
+	 * Useful in scenarios where the base URL and relative imports need to be considered.
 	 *
-	 * https://github.com/simonhaenisch/rollup-plugin-typescript-paths/issues/12
-	 *
-	 * @see https://www.typescriptlang.org/docs/handbook/module-resolution.html#relative-vs-non-relative-module-imports
-	 * @see https://www.typescriptlang.org/docs/handbook/module-resolution.html#base-url
+	 * @see {@link https://www.typescriptlang.org/docs/handbook/module-resolution.html#relative-vs-non-relative-module-imports}
+	 * @see {@link https://www.typescriptlang.org/docs/handbook/module-resolution.html#base-url}
 	 */
 	nonRelative?: boolean;
 
 	/**
-	 * Custom path to your `tsconfig.json`. Use this if the plugin can't seem to
-	 * find the correct one by itself.
+	 * Specifies the path to the `tsconfig.json` file.
+	 *
+	 * @example './path/to/tsconfig.json'
 	 */
 	tsConfigPath?: string;
 
 	/**
-	 * If the plugin successfully resolves a path, this function allows you to
-	 * hook into the process and transform that path before it is returned.
+	 * A function that gets invoked when the plugin successfully resolves a path.
+	 * It allows for custom transformation of the resolved path before it's returned.
+	 *
+	 * @param path - The resolved path.
+	 * @returns The transformed path string.
 	 */
 	transform?: (path: string) => string;
+
+	/**
+	 * Determines if the resolved paths should be relative to the importing file.
+	 */
+	shouldResolveRelativeToImporter?:
+		| boolean
+		| ((source: string, importer: string | undefined) => boolean);
 }
 
 type TsConfig = ts.CompilerOptions;

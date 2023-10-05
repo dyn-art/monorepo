@@ -42,6 +42,13 @@ export default class Bundle extends Command {
 			description: 'Generate sourcemaps',
 			required: false,
 			default: false
+		}),
+		format: Flags.string({
+			char: 'f',
+			description: `Bundle format like 'esm', 'cjs' or 'all'`,
+			required: false,
+			default: 'all',
+			options: ['all', 'esm', 'cjs']
 		})
 	};
 
@@ -80,30 +87,34 @@ export default class Bundle extends Command {
 		// Bundle package based on bundle strategy
 		switch (flags.bundleStrategy) {
 			case 'rollup':
-				await bundleAllWithRollup(
-					this,
-					await createRollupPackageConfig(this, {
-						format: 'esm',
-						isProduction: flags.prod,
-						preserveModules: true,
-						sourcemap: flags.sourcemap,
-						rollupOptions: rollupConfig ?? undefined,
-						tsConfigPath,
-						packageJson
-					})
-				);
-				await bundleAllWithRollup(
-					this,
-					await createRollupPackageConfig(this, {
-						format: 'cjs',
-						isProduction: flags.prod,
-						preserveModules: true,
-						sourcemap: flags.sourcemap,
-						rollupOptions: rollupConfig ?? undefined,
-						tsConfigPath,
-						packageJson
-					})
-				);
+				if (flags.format === 'all' || flags.format === 'esm') {
+					await bundleAllWithRollup(
+						this,
+						await createRollupPackageConfig(this, {
+							format: 'esm',
+							isProduction: flags.prod,
+							preserveModules: true,
+							sourcemap: flags.sourcemap,
+							rollupOptions: rollupConfig ?? undefined,
+							tsConfigPath,
+							packageJson
+						})
+					);
+				}
+				if (flags.format === 'all' || flags.format === 'cjs') {
+					await bundleAllWithRollup(
+						this,
+						await createRollupPackageConfig(this, {
+							format: 'cjs',
+							isProduction: flags.prod,
+							preserveModules: true,
+							sourcemap: flags.sourcemap,
+							rollupOptions: rollupConfig ?? undefined,
+							tsConfigPath,
+							packageJson
+						})
+					);
+				}
 				await generateDts(this, { tsConfigPath });
 				break;
 			case 'tsc':
