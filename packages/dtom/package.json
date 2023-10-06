@@ -9,7 +9,7 @@
 		"build:ts": "shx rm -rf dist && dyn-cli bundle",
 		"start:dev": "tsc -w",
 		"lint": "eslint --cache \"**/*.{js,ts}\"",
-		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
+		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo && shx rm -rf rust/target && shx rm -rf src/rust_modules",
 		"install:clean": "pnpm run clean && pnpm install",
 		"test": "vitest run"
 	},
