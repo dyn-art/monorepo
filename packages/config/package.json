@@ -17,6 +17,7 @@
 	"homepage": "https://github.com/dyndotart/monorepo",
 	"dependencies": {
 		"@vercel/style-guide": "^5.0.0",
-		"eslint-config-turbo": "^1.10.12"
+		"eslint-config-turbo": "^1.10.12",
+		"vite-tsconfig-paths": "^4.2.1"
 	}
 }

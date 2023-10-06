@@ -5,11 +5,7 @@ export function isExternal(
 	packageJson: PackageJson,
 	options: TExternalModuleKeysOptions = {}
 ): TIsExternal {
-	const {
-		fileTypesAsExternal = [],
-		packageJsonDepsAsExternal = true,
-		ignoreRustModules = true
-	} = options;
+	const { fileTypesAsExternal = [], packageJsonDepsAsExternal = true } = options;
 	const allDepKeys = Object.keys({
 		...(packageJson.dependencies || {}),
 		...(packageJson.peerDependencies || {})
@@ -22,9 +18,6 @@ export function isExternal(
 		if (!external && fileTypesAsExternal.length > 0) {
 			external = fileTypesAsExternal.some((fileType) => source.endsWith(fileType));
 		}
-		if (!external && ignoreRustModules) {
-			external = source.includes('/rust_modules/');
-		}
 		return external;
 	};
 }
@@ -32,7 +25,6 @@ export function isExternal(
 export interface TExternalModuleKeysOptions {
 	packageJsonDepsAsExternal?: boolean;
 	fileTypesAsExternal?: string[];
-	ignoreRustModules?: boolean;
 }
 
 export type TIsExternal = (

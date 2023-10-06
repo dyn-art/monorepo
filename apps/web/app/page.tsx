@@ -1,10 +1,11 @@
 'use client';
 
 import React from 'react';
+import * as dtom from '@dyn/dtom';
 
 async function onClick() {
-	const dtom = await import('@dyn/dtom');
-	dtom.greetRust();
+	const result = await dtom.greetRust();
+	console.log(result);
 }
 
 export default function Page(): JSX.Element {

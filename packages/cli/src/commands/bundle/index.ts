@@ -138,12 +138,12 @@ export default class Bundle extends Command {
 	}
 
 	private async getPackageJson(): Promise<PackageJson | null> {
-		const packageJsonPath = path.join(process.cwd(), './package.json');
+		const packageJsonPath = path.join(process.cwd(), 'package.json');
 		return readJsonFile<PackageJson>(packageJsonPath);
 	}
 
 	private async getRollupConfig(): Promise<TDynRollupOptions | null> {
-		const rollupConfigPath = path.resolve(process.cwd(), './rollup.config.js');
+		const rollupConfigPath = path.resolve(process.cwd(), 'rollup.config.js');
 		const rollupOptions = await readJsFile<TDynRollupOptions>(rollupConfigPath);
 		if (rollupOptions != null) {
 			this.log(
@@ -158,9 +158,9 @@ export default class Bundle extends Command {
 	private getValidTsConfigJsonPath(isProduction: boolean): string | null {
 		let tsConfigPath: string;
 		if (isProduction) {
-			tsConfigPath = path.resolve(process.cwd(), './tsconfig.prod.json');
+			tsConfigPath = path.resolve(process.cwd(), 'tsconfig.prod.json');
 		} else {
-			tsConfigPath = path.resolve(process.cwd(), './tsconfig.json');
+			tsConfigPath = path.resolve(process.cwd(), 'tsconfig.json');
 		}
 		if (!doesFileExist(tsConfigPath)) {
 			return isProduction ? this.getValidTsConfigJsonPath(false) : null;

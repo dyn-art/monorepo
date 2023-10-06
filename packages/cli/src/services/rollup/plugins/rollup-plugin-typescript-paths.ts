@@ -64,6 +64,8 @@ export const typescriptPaths = (
 			if (resolvedFileName.endsWith('.d.ts')) {
 				if (doesJsFileExist(resolvedFileName)) {
 					targetFileName = resolvedFileName.replace(/\.d\.ts$/i, '.js');
+				} else if (doesWasmFileExist(resolvedFileName)) {
+					targetFileName = resolvedFileName.replace(/(?:\.wasm)?\.d\.ts$/, '.wasm');
 				} else {
 					return null;
 				}
@@ -89,6 +91,11 @@ export const typescriptPaths = (
 function doesJsFileExist(fileName: string): boolean {
 	const potentialJsFile = fileName.replace(/\.d\.ts$/, '.js');
 	return ts.sys.fileExists(potentialJsFile);
+}
+
+function doesWasmFileExist(fileName: string): boolean {
+	const potentialWasmFile = fileName.replace(/(?:\.wasm)?\.d\.ts$/, '.wasm');
+	return ts.sys.fileExists(potentialWasmFile);
 }
 
 function getTsConfig(command: Command, configPath?: string): TsConfig {

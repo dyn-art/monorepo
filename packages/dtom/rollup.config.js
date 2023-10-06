@@ -1,12 +1,8 @@
-const copy = require('rollup-plugin-copy');
+const { wasm } = require('@rollup/plugin-wasm');
 
 /**
  * @type {import('@dyn/cli').TBaseDynRollupOptions}
  */
 module.exports = {
-	plugins: [
-		copy({
-			targets: [{ src: 'rust_modules', dest: 'dist' }]
-		})
-	]
+	plugins: [wasm()]
 };

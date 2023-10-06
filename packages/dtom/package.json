@@ -4,14 +4,14 @@
 	"version": "0.0.1",
 	"private": true,
 	"scripts": {
-		"build": "shx rm -rf dist && pnpm run build:rust && pnpm run build:ts",
-		"build:rust": "cd ./rust && wasm-pack build --target web --out-dir ../rust_modules/dyn-dtom && cd ..",
-		"build:ts": "dyn-cli bundle -f esm",
+		"build": "pnpm run build:rust && pnpm run build:ts",
+		"build:rust": "shx rm -rf src/rust_modules && dyn-cli bundle rust",
+		"build:ts": "shx rm -rf dist && dyn-cli bundle",
 		"start:dev": "tsc -w",
 		"lint": "eslint --cache \"**/*.{js,ts}\"",
 		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
 		"install:clean": "pnpm run clean && pnpm install",
-		"test": "echo \"Error: no test specified\" && exit 1"
+		"test": "vitest run"
 	},
 	"source": "./src/index.ts",
 	"module": "./dist/esm/index.js",
@@ -29,8 +29,8 @@
 	"homepage": "https://github.com/dyndotart/monorepo",
 	"devDependencies": {
 		"@dyn/config": "workspace:*",
-		"@types/node": "^17.0.12",
-		"rollup-plugin-copy": "^3.5.0"
+		"@rollup/plugin-wasm": "^6.2.2",
+		"@types/node": "^17.0.12"
 	},
 	"files": [
 		"dist",
