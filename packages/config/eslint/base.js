@@ -35,8 +35,10 @@ module.exports = {
 		// EsLint
 		'no-console': WARNING,
 		'import/no-default-export': WARNING,
-		'eqeqeq': OFF,
+		'eqeqeq': OFF, // Often use it to check against null & undefined (e.g. 'var == null')
 		'import/order': OFF, // Handled by prettier
-		'import/no-extraneous-dependencies': WARNING
+		'import/no-extraneous-dependencies': WARNING,
+		'no-await-in-loop': WARNING,
+		'no-bitwise': WARNING
 	}
 };

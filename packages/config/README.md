@@ -24,4 +24,5 @@ TypeScript configurations are placed at the root to allow easy referencing from 
 This setup bypasses limitations in TypeScript's module resolution mechanism when using the `extends` field.
 
 ## 🌟 Credits
-Thsi configuration is based on the [`turbo-basic`](https://github.com/vercel/turbo/tree/main/examples/basic) example and will be kept in sync with it as the Vercel team knows better than me what configurations settings are best for NextJs apps and co. Also [`tsconfig/bases`](https://github.com/tsconfig/bases) was used as inspiration.
+
+Thsi configuration is based on the [`turbo-basic`](https://github.com/vercel/turbo/tree/main/examples/basic) starter template and will be kept in sync with it as the Vercel team knows better than me what configurations settings are best for NextJs apps and co. Also [`tsconfig/bases`](https://github.com/tsconfig/bases) was used as inspiration and further adjustments.

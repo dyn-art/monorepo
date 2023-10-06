@@ -1,70 +1,107 @@
+// Based on:
+// https://github.com/simonhaenisch/rollup-plugin-typescript-paths
+
+import path from 'node:path';
+import type { Command } from '@oclif/core';
+import chalk from 'chalk';
 import type { Plugin } from 'rollup';
 import * as ts from 'typescript';
 
-export const typescriptPaths = ({
-	absolute = true,
-	nonRelative = false,
-	preserveExtensions = false,
-	tsConfigPath = ts.findConfigFile('./', ts.sys.fileExists),
-	transform
-}: Options = {}): Plugin => {
-	const compilerOptions = getTsConfig(tsConfigPath);
+export const typescriptPaths = (
+	command: Command,
+	options: TTypescriptPathsOptions = {}
+): Plugin => {
+	const {
+		nonRelative = false,
+		tsConfigPath = ts.findConfigFile('./', ts.sys.fileExists),
+		transform,
+		shouldResolveRelativeToImporter = false
+	} = options;
+	const compilerOptions = getTsConfig(command, tsConfigPath);
 
 	return {
 		name: 'resolve-typescript-paths',
 		resolveId: (importee: string, importer?: string) => {
-			const enabled = Boolean(compilerOptions.paths || (compilerOptions.baseUrl && nonRelative));
+			const compilerOptionsPaths = compilerOptions.paths;
+			const isEnabled =
+				compilerOptionsPaths != null || (compilerOptions.baseUrl != null && nonRelative);
 
-			if (typeof importer === 'undefined' || importee.startsWith('\0') || !enabled) {
+			// Initial checks for import validity
+			if (
+				!isEnabled ||
+				typeof importer !== 'string' ||
+				typeof importee !== 'string' ||
+				// Skip processing virtual Rollup modules (those starting with '\0')
+				importee.startsWith('\0') ||
+				// Can't resolve relative modules, only non-relative
+				importee.startsWith('.')
+			) {
 				return null;
 			}
 
-			const hasMatchingPath =
-				Boolean(compilerOptions.paths) &&
-				Object.keys(compilerOptions.paths as object).some((path) =>
-					new RegExp(`^${path.replace('*', '.+')}$`).test(importee)
-				);
+			// Match importee against TypeScript paths to check if it's a valid alias
+			const hasMatchingPath = Object.keys(compilerOptionsPaths as object).some((tsPath) =>
+				new RegExp(`^${tsPath.replace('*', '.+')}$`).test(importee)
+			);
 
 			if (!hasMatchingPath && !nonRelative) {
 				return null;
 			}
 
-			if (importee.startsWith('.')) {
-				return null; // never resolve relative modules, only non-relative
-			}
-
-			const { resolvedModule } = ts.nodeModuleNameResolver(
+			// Use Typescript's module resolution algorithm to find the correct file represented by the importee
+			const { resolvedModule: { resolvedFileName } = {} } = ts.nodeModuleNameResolver(
 				importee,
 				importer,
 				compilerOptions,
 				ts.sys
 			);
-
-			if (!resolvedModule) {
-				return null;
+			if (resolvedFileName == null) {
+				return;
 			}
 
-			const { resolvedFileName } = resolvedModule;
-
-			if (!resolvedFileName || resolvedFileName.endsWith('.d.ts')) {
-				return null;
+			// Handle potential .d.ts files and check if corresponding .js exists
+			let targetFileName: string = resolvedFileName;
+			if (resolvedFileName.endsWith('.d.ts')) {
+				if (doesJsFileExist(resolvedFileName)) {
+					targetFileName = resolvedFileName.replace(/\.d\.ts$/i, '.js');
+				} else if (doesWasmFileExist(resolvedFileName)) {
+					targetFileName = resolvedFileName.replace(/(?:\.wasm)?\.d\.ts$/, '.wasm');
+				} else {
+					return null;
+				}
 			}
 
-			const targetFileName = preserveExtensions
-				? resolvedFileName
-				: resolvedFileName.replace(/\.tsx?$/i, '.js');
+			// Resolve path to target file name
+			let resolvedPath: string;
+			if (
+				(typeof shouldResolveRelativeToImporter === 'boolean' && shouldResolveRelativeToImporter) ||
+				(typeof shouldResolveRelativeToImporter === 'function' &&
+					shouldResolveRelativeToImporter(targetFileName, importer))
+			) {
+				resolvedPath = path.relative(path.dirname(importer), targetFileName);
+			} else {
+				resolvedPath = ts.sys.resolvePath(targetFileName);
+			}
 
-			const resolved = absolute ? ts.sys.resolvePath(targetFileName) : targetFileName;
-
-			return transform ? transform(resolved) : resolved;
+			return transform ? transform(resolvedPath) : resolvedPath;
 		}
 	};
 };
 
-const getTsConfig = (configPath?: string): TsConfig => {
-	const defaults: TsConfig = { outDir: '.' };
+function doesJsFileExist(fileName: string): boolean {
+	const potentialJsFile = fileName.replace(/\.d\.ts$/, '.js');
+	return ts.sys.fileExists(potentialJsFile);
+}
+
+function doesWasmFileExist(fileName: string): boolean {
+	const potentialWasmFile = fileName.replace(/(?:\.wasm)?\.d\.ts$/, '.wasm');
+	return ts.sys.fileExists(potentialWasmFile);
+}
+
+function getTsConfig(command: Command, configPath?: string): TsConfig {
+	const defaultTsConfig: TsConfig = { outDir: '.' };
 	if (typeof configPath !== 'string') {
-		return defaults;
+		return defaultTsConfig;
 	}
 
 	// Define a host object that implements ParseConfigFileHost.
@@ -76,8 +113,10 @@ const getTsConfig = (configPath?: string): TsConfig => {
 		useCaseSensitiveFileNames: ts.sys.useCaseSensitiveFileNames,
 		getCurrentDirectory: ts.sys.getCurrentDirectory,
 		onUnRecoverableConfigFileDiagnostic: (diagnostic) => {
-			console.error('Unrecoverable error in config file:', diagnostic.messageText);
-			process.exit(1);
+			command.error(
+				`Unrecoverable error in config file: ${chalk.red(chalk.underline(diagnostic.messageText))}`,
+				{ exit: 1 }
+			);
 		}
 	};
 
@@ -85,56 +124,53 @@ const getTsConfig = (configPath?: string): TsConfig => {
 	const parsedCommandLine = ts.getParsedCommandLineOfConfigFile(configPath, {}, host);
 
 	// Access the parsed tsconfig.json file options
-	let resolvedConfig = {};
+	let resolvedTsConfig = {};
 	if (parsedCommandLine != null) {
-		resolvedConfig = parsedCommandLine.options;
+		resolvedTsConfig = parsedCommandLine.options;
 	} else {
-		console.error('Failed to parse TypeScript configuration file:', configPath);
-		process.exit(1);
+		command.error(`Failed to parse TypeScript configuration file: ${chalk.underline(configPath)}`, {
+			exit: 1
+		});
 	}
 
-	return { ...defaults, ...resolvedConfig };
-};
+	return { ...defaultTsConfig, ...resolvedTsConfig };
+}
 
-export interface Options {
+export interface TTypescriptPathsOptions {
 	/**
-	 * Whether to resolve to absolute paths; defaults to `true`.
-	 */
-	absolute?: boolean;
-
-	/**
-	 * Whether to resolve non-relative paths based on tsconfig's `baseUrl`, even
-	 * if none of the `paths` are matched; defaults to `false`.
+	 * Determines if non-relative paths should be resolved based on the tsconfig's `baseUrl`.
+	 * The path resolution occurs even if none of the `paths` are matched. By default, this is set to `false`.
+	 * Useful in scenarios where the base URL and relative imports need to be considered.
 	 *
-	 * @see https://www.typescriptlang.org/docs/handbook/module-resolution.html#relative-vs-non-relative-module-imports
-	 * @see https://www.typescriptlang.org/docs/handbook/module-resolution.html#base-url
+	 * @see {@link https://www.typescriptlang.org/docs/handbook/module-resolution.html#relative-vs-non-relative-module-imports}
+	 * @see {@link https://www.typescriptlang.org/docs/handbook/module-resolution.html#base-url}
 	 */
 	nonRelative?: boolean;
 
 	/**
-	 * Whether to preserve `.ts` and `.tsx` file extensions instead of having them
-	 * changed to `.js`; defaults to `false`.
-	 */
-	preserveExtensions?: boolean;
-
-	/**
-	 * Custom path to your `tsconfig.json`. Use this if the plugin can't seem to
-	 * find the correct one by itself.
+	 * Specifies the path to the `tsconfig.json` file.
+	 *
+	 * @example './path/to/tsconfig.json'
 	 */
 	tsConfigPath?: string;
 
 	/**
-	 * If the plugin successfully resolves a path, this function allows you to
-	 * hook into the process and transform that path before it is returned.
+	 * A function that gets invoked when the plugin successfully resolves a path.
+	 * It allows for custom transformation of the resolved path before it's returned.
+	 *
+	 * @param path - The resolved path.
+	 * @returns The transformed path string.
 	 */
 	transform?: (path: string) => string;
+
+	/**
+	 * Determines if the resolved paths should be relative to the importing file.
+	 */
+	shouldResolveRelativeToImporter?:
+		| boolean
+		| ((source: string, importer: string | undefined) => boolean);
 }
 
 type TsConfig = ts.CompilerOptions;
-
-/**
- * For backwards compatibility.
- */
-export const resolveTypescriptPaths = typescriptPaths;
 
 export default typescriptPaths;

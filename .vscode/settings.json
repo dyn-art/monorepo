@@ -8,7 +8,8 @@
 	"search.exclude": {
 		"**/node_modules": true,
 		"**/dist": true,
-		"**/*.next": true
+		"**/*.next": true,
+		"**/target": true
 	},
 	"files.associations": {
 		"*.scss": "postcss",
@@ -20,8 +21,8 @@
 	"cSpell.words": ["tailwindcss"],
 	"explorer.fileNesting.enabled": true,
 	"explorer.fileNesting.patterns": {
-		"*.ts": "${capture}.js",
-		"*.js": "${capture}.js.map, ${capture}.min.js, ${capture}.d.ts",
+		"*.ts": "${capture}.js, ${capture}.test.ts",
+		"*.js": "${capture}.js.map, ${capture}.min.js, ${capture}.d.ts, ${capture}.test.js",
 		"*.jsx": "${capture}.js",
 		"*.tsx": "${capture}.ts",
 		".npmrc": ".nvmrc, .yarnrc.yml",
@@ -40,8 +41,11 @@
 		}
 	],
 
-	// Languages
+	// Rust
 	"[rust]": {
 		"editor.defaultFormatter": "rust-lang.rust-analyzer"
-	}
+	},
+	"rust-analyzer.linkedProjects": [
+    	"packages/dtom/rust/Cargo.toml",
+	]
 }

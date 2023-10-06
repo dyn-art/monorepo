@@ -3,9 +3,6 @@
 	"description": "CLI tool for dyn.art monorepo",
 	"version": "0.0.1",
 	"private": true,
-	"source": "./src/index.ts",
-	"main": "./dist/index.js",
-	"types": "./dist/index.d.ts",
 	"bin": {
 		"dyn-cli": "./bin/run"
 	},
@@ -18,6 +15,9 @@
 		"install:clean": "pnpm run clean && pnpm install",
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
+	"source": "./src/index.ts",
+	"main": "./dist/index.js",
+	"types": "./dist/index.d.ts",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/dyndotart/monorepo.git"
