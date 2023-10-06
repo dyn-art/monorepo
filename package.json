@@ -3,7 +3,7 @@
 	"description": "Monorepo for dyn.art",
 	"private": true,
 	"scripts": {
-		"build": "turbo run build",
+		"build": "pnpm build:cli && turbo run build",
 		"build:cli": "turbo run build --filter=cli",
 		"start:dev": "turbo run start:dev",
 		"clean": "turbo run clean && shx rm -rf node_modules",
