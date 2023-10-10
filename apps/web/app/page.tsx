@@ -4,7 +4,8 @@ import React from 'react';
 import * as dtom from '@dyn/dtom';
 
 async function onClick() {
-	const result = await dtom.greetRust();
+	await dtom.initWasm();
+	const result = dtom.greetRust();
 	console.log(result);
 }
 

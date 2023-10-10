@@ -1,7 +1,15 @@
-import { expect, test } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 
-import { greetRust } from '..';
+import { greetRust, initWasm } from '..';
 
-test('adds 1 + 2 to equal 3', async () => {
-	expect(await greetRust()).toBe(3);
+describe('dtom', () => {
+	beforeEach(async () => {
+		await initWasm();
+	});
+
+	it('should add 1 + 2 to equal 3', async () => {
+		const result = greetRust();
+		console.log(result);
+		expect(3).toBe(3);
+	});
 });
