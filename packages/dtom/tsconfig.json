@@ -2,10 +2,11 @@
     "compilerOptions": {
       "outDir": "./dist",
       "rootDir": "./src",
+      "declarationDir": "./dist/types",
       "paths": {
         "@rust/*": ["./src/rust_modules/*"],
       },
     },
     "extends": "@dyn/config/shared-library.tsconfig.json",
-    "include": ["src"]
+    "include": ["src"],
  }

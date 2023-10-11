@@ -1,4 +1,4 @@
-import init, { add, cfgTest } from '@rust/dyn-dtom';
+import init, { Editor } from '@rust/dyn-dtom';
 import wasm from '@rust/dyn-dtom/bg.wasm';
 
 export async function initWasm(): Promise<void> {
@@ -8,7 +8,8 @@ export async function initWasm(): Promise<void> {
 	await init(wasmInstance);
 }
 
-export function greetRust(): string {
-	cfgTest();
-	return `Hello Rust ${add(3, 4)}`;
+export function editorFactory(): Editor {
+	return new Editor();
 }
+
+export * from '@rust/dyn-dtom';

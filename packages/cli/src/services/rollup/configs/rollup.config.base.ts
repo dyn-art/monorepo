@@ -22,7 +22,8 @@ const config: TDynRollupOptionsCallback = async (options) => {
 			// Automatically resolve path aliases set in the compilerOptions section of tsconfig.json
 			typescriptPaths(command, {
 				tsConfigPath,
-				shouldResolveRelativeToImporter: false
+				shouldResolveRelativeToImporter: false,
+				resolveDTsSource: true
 			}),
 			'import-css', // Plugin placeholder for "rollup-plugin-import-css"
 			'wasm', // Plugin placeholder for "rollup-plugin-wasm"

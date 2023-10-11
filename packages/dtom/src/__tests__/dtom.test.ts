@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { greetRust, initWasm } from '..';
+import { editorFactory, initWasm } from '..';
 
 describe('dtom', () => {
 	beforeEach(async () => {
@@ -8,8 +8,7 @@ describe('dtom', () => {
 	});
 
 	it('should add 1 + 2 to equal 3', async () => {
-		const result = greetRust();
-		console.log(result);
-		expect(3).toBe(3);
+		const result = editorFactory();
+		expect(result).toBeDefined();
 	});
 });

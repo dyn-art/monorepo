@@ -62,7 +62,7 @@ For specific packages, additional fields should be included as shown below. Note
 	"source": "./src/index.ts", // Entry file (source code)
 	"main": "./dist/cjs/index.js", // Entry point (CommonJS)
 	"module": "./dist/esm/index.js", // Entry point (ES Module)
-	"types": "./dist/index.d.ts", // Type definitions
+	"types": "./dist/types/index.d.ts", // Type definitions
     // ..
     // "devDependencies": {},
 	"files": [

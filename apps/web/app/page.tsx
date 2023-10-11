@@ -5,8 +5,9 @@ import * as dtom from '@dyn/dtom';
 
 async function onClick() {
 	await dtom.initWasm();
-	const result = dtom.greetRust();
-	console.log(result);
+	const editor = dtom.editorFactory();
+
+	console.log(editor);
 }
 
 export default function Page(): JSX.Element {
