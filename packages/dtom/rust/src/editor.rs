@@ -3,10 +3,9 @@ use bevy_app::Startup;
 use bevy_app::Update;
 use wasm_bindgen::prelude::*;
 
-use crate::svg_render_plugin::*;
-
-use crate::js_bindings;
-use crate::utils::set_panic_hook;
+use crate::bindgen::{js_bindings, utils::set_panic_hook};
+use crate::plugins::bindgen_render_plugin::BindgenRenderPlugin;
+use crate::plugins::render_plugin::RenderPlugin;
 
 #[wasm_bindgen]
 pub struct Editor {
@@ -23,7 +22,7 @@ impl Editor {
 
         js_bindings::log("Init Editor");
 
-        app.add_plugins(SVGRenderPlugin)
+        app.add_plugins((RenderPlugin, BindgenRenderPlugin))
             .add_systems(Update, update_system)
             .add_systems(Startup, startup_system);
 
