@@ -8,6 +8,10 @@ async function onClick() {
 	const editor = dtom.editorFactory();
 
 	console.log(editor);
+
+	for (let i = 0; i < 10; i++) {
+		editor.update();
+	}
 }
 
 export default function Page(): JSX.Element {

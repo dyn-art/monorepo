@@ -75,7 +75,7 @@ export default class Bundle extends Command {
 
 		this.log(`\n`);
 		this.log(
-			`${chalk.green('→')} Package was bundled in ${chalk.green(
+			`${chalk.green('→')} Rust was bundled in ${chalk.green(
 				chalk.underline(`${((Date.now() - startTime) / 1000).toFixed(2)}s`)
 			)}.`
 		);

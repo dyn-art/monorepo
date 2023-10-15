@@ -31,6 +31,9 @@ module.exports = {
 		'@typescript-eslint/no-unsafe-return': WARNING,
 		'@typescript-eslint/unbound-method': WARNING,
 		'@typescript-eslint/no-unsafe-call': WARNING,
+		'@typescript-eslint/no-dynamic-delete': WARNING,
+		'@typescript-eslint/ban-types': WARNING,
+		'@typescript-eslint/no-explicit-any': WARNING,
 
 		// EsLint
 		'no-console': WARNING,
@@ -39,6 +42,7 @@ module.exports = {
 		'import/order': OFF, // Handled by prettier
 		'import/no-extraneous-dependencies': WARNING,
 		'no-await-in-loop': WARNING,
-		'no-bitwise': WARNING
+		'no-bitwise': WARNING,
+		'unicorn/filename-case': WARNING
 	}
 };

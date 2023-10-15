@@ -139,6 +139,25 @@ importers:
         specifier: ^17.0.12
         version: 17.0.12
 
+  packages/experiments:
+    dependencies:
+      '@dyn/utils':
+        specifier: workspace:*
+        version: link:../utils
+      bitecs:
+        specifier: ^0.3.40
+        version: 0.3.40
+      piecs:
+        specifier: ^0.4.0
+        version: 0.4.0
+    devDependencies:
+      '@dyn/config':
+        specifier: workspace:*
+        version: link:../config
+      '@types/node':
+        specifier: ^17.0.12
+        version: 17.0.12
+
   packages/utils:
     devDependencies:
       '@dyn/config':
@@ -1670,6 +1689,10 @@ packages:
   /big-integer@1.6.51:
     resolution: {integrity: sha512-GPEid2Y9QU1Exl1rpO9B2IPJGHPSupF5GnVIP0blYvNOMer2bTvSWs1jGOUg04hTmu67nmLsQ9TBo1puaotBHg==}
     engines: {node: '>=0.6'}
+    dev: false
+
+  /bitecs@0.3.40:
+    resolution: {integrity: sha512-wAylY4pNfX8IeIH5phtwt1lUNtHKrkoSNrArI7Ris2Y4nEQWFIVvXdgAuqprEg9bq8Wolmlj0gVfeG6MFmtI2Q==}
     dev: false
 
   /bplist-parser@0.2.0:
@@ -3842,6 +3865,10 @@ packages:
   /picomatch@2.3.1:
     resolution: {integrity: sha512-JU3teHTNjmE2VCGFzuY8EXzCDVwEqB2a8fsIvwaStHhAWJEeVd1o1QD80CU6+ZdEXXSLbSsuLwJjkCBWqRQUVA==}
     engines: {node: '>=8.6'}
+
+  /piecs@0.4.0:
+    resolution: {integrity: sha512-NiGuWHykjFCahsYzn7U3+Q0nk9wUr0wITRioTVCZkK6nk8P4Px/arWYviezyMDT5OaqNmLg4eL00Udj4txlhrQ==}
+    dev: false
 
   /pkg-types@1.0.3:
     resolution: {integrity: sha512-nN7pYi0AQqJnoLPC9eHFQ8AcyaixBUOwvqc5TDnIKCMEE6I0y8P7OKA7fPexsXGCGxQDl/cmrLAp26LhcwxZ4A==}
