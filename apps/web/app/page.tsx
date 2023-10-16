@@ -6,6 +6,8 @@ import * as dtom from '@dyn/dtom';
 async function onClick() {
 	await dtom.initWasm();
 	const editor = dtom.editorFactory();
+	editor.create_rect();
+	editor.create_rect();
 
 	console.log(editor);
 

@@ -1,12 +1,16 @@
+//! https://github.com/bevyengine/bevy/blob/release-0.11.3/crates/bevy_render/src/lib.rs
+//!
 //! This module provides a stripped-down version of the Bevy renderer's core functionality.
 //! Specifically, it initializes a Render sub-app and sets up the basic render cycle.
 //! Note that this does not include Bevy's full rendering logic and capabilities,
 //! but rather aims to establish the necessary schedules and systems for a render cycle.
-//! https://docs.rs/bevy/latest/bevy/render/index.html
+
+pub mod extract_param;
 
 use crate::bindgen::js_bindings;
 use bevy_app::{App, AppLabel, Plugin, SubApp};
 use bevy_ecs::{prelude::*, schedule::ScheduleLabel};
+use std::ops::{Deref, DerefMut};
 
 // =============================================================================
 // Schedules
@@ -106,6 +110,20 @@ pub struct ExtractSchedule;
 /// See [`Extract`] for more details.
 #[derive(Resource, Default)]
 pub struct MainWorld(World);
+
+impl Deref for MainWorld {
+    type Target = World;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl DerefMut for MainWorld {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
+    }
+}
 
 #[derive(Resource, Default)]
 struct ScratchMainWorld(World);

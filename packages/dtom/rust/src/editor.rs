@@ -4,6 +4,7 @@ use bevy_app::Update;
 use wasm_bindgen::prelude::*;
 
 use crate::bindgen::{js_bindings, utils::set_panic_hook};
+use crate::plugins::bindgen_render_plugin::bundles::RectangleBundle;
 use crate::plugins::bindgen_render_plugin::BindgenRenderPlugin;
 use crate::plugins::render_plugin::RenderPlugin;
 
@@ -29,9 +30,8 @@ impl Editor {
         Self { app }
     }
 
-    pub fn run(&mut self) {
-        js_bindings::log("Run Editor");
-        self.app.run();
+    pub fn create_rect(&mut self) {
+        self.app.world.spawn(RectangleBundle::default());
     }
 
     pub fn update(&mut self) {
