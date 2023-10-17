@@ -1,31 +1,85 @@
 pub mod bundles;
+pub mod render_event_queue;
 pub mod shapes;
 
 use bevy_app::{App, Plugin};
 use bevy_ecs::{
+    entity::Entity,
     query::With,
-    system::{Commands, Query},
+    system::{Query, ResMut, Resource},
+};
+use bevy_utils::HashMap;
+use serde::Serialize;
+
+use self::{
+    render_event_queue::{RenderEvent, RenderEventQueue},
+    shapes::{Path, Shape, Transform},
 };
 
-use crate::bindgen::js_bindings;
+use super::render_plugin::{ExtractSchedule, RenderApp, RenderSchedule};
 
-use self::shapes::{Fill, Shape, Transform};
+#[derive(Serialize, Clone, Debug)]
+pub enum Change {
+    Transform(Transform),
+    Path(Path),
+}
 
-use super::render_plugin::{extract_param::Extract, ExtractSchedule, RenderApp, RenderSchedule};
+#[derive(Serialize, Debug)]
+pub struct ChangeSet {
+    pub entity: Entity,
+    pub changes: Vec<Change>,
+}
+
+// =============================================================================
+// Ressources
+// =============================================================================
+
+#[derive(Resource, Default, Debug)]
+pub struct ChangedRessource {
+    changes: HashMap<Entity, Vec<Change>>,
+}
 
 // =============================================================================
 // Systems
 // =============================================================================
 
-fn render_system() {
-    js_bindings::log("Inside render_system - bindgen");
+fn extract_transforms(
+    mut changed: ResMut<ChangedRessource>,
+    query: Query<(Entity, &Transform), With<Shape>>,
+) {
+    query.for_each(|(entity, transform)| {
+        let change_set = changed.changes.entry(entity).or_insert(vec![]);
+        change_set.push(Change::Transform(transform.clone()));
+    });
 }
 
-fn extract_shapes(mut commands: Commands, query: Extract<Query<(&Transform), With<Shape>>>) {
-    js_bindings::log("Inside extract_shapes");
-    query.for_each(|(transform)| {
-        js_bindings::log(&format!("transform: {:?}", transform));
+fn extract_paths(
+    mut changed: ResMut<ChangedRessource>,
+    query: Query<(Entity, &Path), With<Shape>>,
+) {
+    query.for_each(|(entity, path)| {
+        let change_set = changed.changes.entry(entity).or_insert(vec![]);
+        change_set.push(Change::Path(path.clone()));
     });
+}
+
+fn send_to_frontend(
+    mut changed: ResMut<ChangedRessource>,
+    mut event_queue: ResMut<RenderEventQueue>,
+) {
+    let change_sets: Vec<ChangeSet> = changed
+        .changes
+        .iter()
+        .map(|(entity, changes)| ChangeSet {
+            entity: entity.clone(),
+            changes: changes.clone(),
+        })
+        .collect();
+    let json_str = serde_json::to_string(&change_sets).expect("Failed to serialize");
+
+    event_queue.push_event(RenderEvent::Update(json_str));
+
+    changed.changes.clear();
 }
 
 // =============================================================================
@@ -41,8 +95,13 @@ impl Plugin for BindgenRenderPlugin {
             Err(_) => return,
         };
 
+        // Init Resources
+        render_app.init_resource::<ChangedRessource>();
+        render_app.init_resource::<RenderEventQueue>();
+
         render_app
-            .add_systems(ExtractSchedule, extract_shapes)
-            .add_systems(RenderSchedule, render_system);
+            .add_systems(ExtractSchedule, extract_transforms)
+            .add_systems(ExtractSchedule, extract_paths)
+            .add_systems(RenderSchedule, send_to_frontend);
     }
 }

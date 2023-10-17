@@ -2,8 +2,9 @@
 
 import React from 'react';
 import * as dtom from '@dyn/dtom';
+import { MaxWidthWrapper } from '@/components';
 
-async function onClick() {
+async function onClick(): Promise<void> {
 	await dtom.initWasm();
 	const editor = dtom.editorFactory();
 	editor.create_rect();
@@ -16,11 +17,11 @@ async function onClick() {
 	}
 }
 
-export default function Page(): JSX.Element {
+const Home: React.FC = () => {
 	const [isLoading, setIsLoading] = React.useState(false);
 
 	return (
-		<div>
+		<MaxWidthWrapper>
 			Our WASM component:
 			{isLoading ? <div>Loading...</div> : null}
 			<button
@@ -37,6 +38,8 @@ export default function Page(): JSX.Element {
 			>
 				Load WASM
 			</button>
-		</div>
+		</MaxWidthWrapper>
 	);
-}
+};
+
+export default Home;

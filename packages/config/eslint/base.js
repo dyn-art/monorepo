@@ -34,6 +34,7 @@ module.exports = {
 		'@typescript-eslint/no-dynamic-delete': WARNING,
 		'@typescript-eslint/ban-types': WARNING,
 		'@typescript-eslint/no-explicit-any': WARNING,
+		'@typescript-eslint/no-unsafe-assignment': WARNING,
 
 		// EsLint
 		'no-console': WARNING,
@@ -43,6 +44,8 @@ module.exports = {
 		'import/no-extraneous-dependencies': WARNING,
 		'no-await-in-loop': WARNING,
 		'no-bitwise': WARNING,
-		'unicorn/filename-case': WARNING
+		'unicorn/filename-case': OFF, // Annoying with React components and Typescript classes
+		'import/no-named-as-default-member': OFF, // For ReactJs imports like React.useState()
+		'import/no-extraneous-dependencies': WARNING
 	}
 };
