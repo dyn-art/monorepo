@@ -293,6 +293,7 @@ dependencies = [
  "bevy_utils",
  "console_error_panic_hook",
  "js-sys",
+ "once_cell",
  "serde",
  "serde_json",
  "wasm-bindgen",

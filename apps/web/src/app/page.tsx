@@ -7,8 +7,8 @@ import { MaxWidthWrapper } from '@/components';
 async function onClick(): Promise<void> {
 	await dtom.initWasm();
 	const editor = dtom.editorFactory();
-	editor.create_rect();
-	editor.create_rect();
+	editor.createRect();
+	editor.createRect();
 
 	console.log(editor);
 

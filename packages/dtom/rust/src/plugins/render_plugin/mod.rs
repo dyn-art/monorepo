@@ -137,18 +137,6 @@ struct ScratchMainWorld(World);
 pub struct RenderApp;
 
 // =============================================================================
-// Systems
-// =============================================================================
-
-fn render_system() {
-    js_bindings::log("Inside render_system");
-}
-
-fn extract_system() {
-    js_bindings::log("Inside extract_system");
-}
-
-// =============================================================================
 // Plugin
 // =============================================================================
 
@@ -195,9 +183,7 @@ fn initialize_render_app(app: &mut App) {
         .add_systems(
             RenderSchedule,
             apply_extract_commands.in_set(RenderSet::ExtractCommands),
-        )
-        .add_systems(ExtractSchedule, extract_system)
-        .add_systems(RenderSchedule, render_system);
+        );
 
     app.insert_sub_app(
         RenderApp,
