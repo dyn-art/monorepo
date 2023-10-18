@@ -11,8 +11,18 @@ export async function initWasm(): Promise<void> {
 export class Editor {
 	private _rustEditor: RustEditor;
 
+	private static INSTANCES: Editor[] = [];
+
 	constructor() {
 		this._rustEditor = new RustEditor();
+		Editor.INSTANCES.push(this);
+	}
+
+	public static onWasmEvent(data: any): void {
+		console.log('onWasmEvent', { data });
+		Editor.INSTANCES.forEach((instance) => {
+			instance.pollEvents();
+		});
 	}
 
 	public createRect(): void {
@@ -21,11 +31,11 @@ export class Editor {
 
 	public update(): void {
 		this._rustEditor.update();
-		this.pollAndTriggerCallbacks();
+		this.pollEvents();
 	}
 
-	private pollAndTriggerCallbacks(): void {
-		const events = JSON.parse(poll_js_event_queue() as string);
+	private pollEvents(): void {
+		const events = poll_js_event_queue();
 		console.log('pollAndTriggerCallbacks', { events });
 	}
 }

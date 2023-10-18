@@ -26,4 +26,7 @@ pub struct SolidPaint {
 }
 
 #[derive(Debug, Serialize, Clone)]
-pub struct Vec2(pub f32, pub f32);
+pub struct Vec2 {
+    pub x: f32,
+    pub y: f32,
+}

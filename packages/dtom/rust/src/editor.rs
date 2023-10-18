@@ -4,6 +4,7 @@ use bevy_app::Update;
 use wasm_bindgen::prelude::*;
 
 use crate::bindgen::{js_bindings, utils::set_panic_hook};
+use crate::js_event_queue::JsEventQueue;
 use crate::plugins::bindgen_render_plugin::bundles::RectangleBundle;
 use crate::plugins::bindgen_render_plugin::BindgenRenderPlugin;
 use crate::plugins::render_plugin::RenderPlugin;
@@ -21,10 +22,11 @@ impl Editor {
 
         let mut app = App::new();
 
-        js_bindings::log("Init Editor");
-
         // Register plugins
         app.add_plugins((RenderPlugin, BindgenRenderPlugin));
+
+        // Register resources
+        app.init_resource::<JsEventQueue>();
 
         // Register systems
         app.add_systems(Update, update_system)

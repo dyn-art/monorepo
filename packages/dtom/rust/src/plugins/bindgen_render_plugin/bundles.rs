@@ -15,7 +15,7 @@ impl Default for RectangleBundle {
             shape: Shape,
             path: Path { points: Vec::new() },
             transform: Transform {
-                translation: Vec2(0.0, 0.0),
+                translation: Vec2 { x: 0.0, y: 0.0 },
                 rotation: 0,
             },
         }

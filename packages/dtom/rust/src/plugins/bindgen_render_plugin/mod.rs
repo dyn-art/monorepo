@@ -22,7 +22,7 @@ pub enum Change {
     Path(Path),
 }
 
-#[derive(Serialize, Debug)]
+#[derive(Serialize, Debug, Clone)]
 pub struct ChangeSet {
     pub entity: Entity,
     pub changes: Vec<Change>,
@@ -70,9 +70,7 @@ fn send_to_frontend(mut changed: ResMut<ChangedComponents>, mut event_queue: Res
             changes: changes.clone(),
         })
         .collect();
-    let json_str = serde_json::to_string(&change_sets).expect("Failed to serialize");
-
-    event_queue.push_event(JsEvent::RenderUpdate(json_str));
+    event_queue.push_event(JsEvent::RenderUpdate(change_sets));
 
     changed.changes.clear();
 }
