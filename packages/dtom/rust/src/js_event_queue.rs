@@ -4,9 +4,11 @@ use bevy_ecs::{
 };
 use serde::Serialize;
 use std::{
-    collections::HashMap,
     mem::transmute,
-    sync::mpsc::{channel, Receiver, Sender, TryRecvError},
+    sync::{
+        mpsc::{channel, Receiver, Sender, TryRecvError},
+        Mutex,
+    },
 };
 use wasm_bindgen::{prelude::*, JsValue};
 
@@ -17,8 +19,6 @@ extern "C" {
     fn receiveRustEvents(id: usize, events: JsValue);
 }
 
-static mut WORLD_CHANNELS: Option<HashMap<usize, (Sender<JsEvent>, Receiver<JsEvent>)>> = None;
-
 #[derive(Debug, Serialize, Clone)]
 pub enum JsEvent {
     RenderUpdate(Vec<ChangeSet>),
@@ -26,39 +26,25 @@ pub enum JsEvent {
 
 #[derive(Resource, Debug)]
 pub struct JsEventQueue {
-    id: usize,
+    world_id: usize,
     sender: Sender<JsEvent>,
+    receiver: Mutex<Receiver<JsEvent>>,
 }
 
 impl FromWorld for JsEventQueue {
     fn from_world(world: &mut World) -> Self {
-        JsEventQueue::new(world.id())
+        return JsEventQueue::new(world.id());
     }
 }
 
 impl JsEventQueue {
     pub fn new(world_id: WorldId) -> Self {
-        unsafe {
-            if WORLD_CHANNELS.is_none() {
-                WORLD_CHANNELS = Some(HashMap::new());
-            }
-
-            let world_id_parsed: usize = unsafe { transmute(world_id) };
-
-            // Create a new channel if it doesn't exist yet
-            let (sender, _) = WORLD_CHANNELS
-                .as_mut()
-                .unwrap()
-                .entry(world_id_parsed)
-                .or_insert_with(|| {
-                    let (tx, rx) = channel();
-                    (tx, rx)
-                });
-
-            Self {
-                sender: sender.clone(), // The sender endpoint can be cloned
-                id: world_id_parsed,
-            }
+        let parsed_world_id: usize = unsafe { transmute(world_id) };
+        let (tx, rx) = channel();
+        Self {
+            sender: tx,
+            receiver: Mutex::new(rx),
+            world_id: parsed_world_id,
         }
     }
 
@@ -71,30 +57,19 @@ impl JsEventQueue {
     pub fn forward_events_to_js(&mut self) {
         let mut events = Vec::new();
 
-        unsafe {
-            // Find the correct receiver by index
-            let optional_receiver = WORLD_CHANNELS
-                .as_mut()
-                .unwrap()
-                .get(&self.id)
-                .map(|(_, rx)| rx);
-
-            // Drain the receiver and push all events to the events vector
-            if let Some(receiver) = optional_receiver {
-                loop {
-                    match receiver.try_recv() {
-                        Ok(event) => events.push(event),
-                        Err(TryRecvError::Empty) => break,
-                        Err(TryRecvError::Disconnected) => break,
-                    }
-                }
+        // Drain the receiver and push all events to the events vector
+        loop {
+            match self.receiver.lock().unwrap().try_recv() {
+                Ok(event) => events.push(event),
+                Err(TryRecvError::Empty) => break,
+                Err(TryRecvError::Disconnected) => break,
             }
         }
 
         // Send the events to JS
         if !events.is_empty() {
             let js_value = serde_wasm_bindgen::to_value(&events).unwrap();
-            receiveRustEvents(self.id, js_value);
+            receiveRustEvents(self.world_id, js_value); // Call into JS
         }
     }
 }

@@ -40,30 +40,25 @@ impl Editor {
             .add_systems(Last, forward_events_to_js);
 
         Self {
-            world_ids: Editor::retrieve_world_ids(&mut app),
+            world_ids: Editor::extract_world_ids(&mut app),
             app,
         }
     }
 
-    /// Returns the world id of the main world and the render world
-    fn retrieve_world_ids(app: &mut App) -> Vec<usize> {
+    /// Extracts the world id of the main world and the render world
+    fn extract_world_ids(app: &mut App) -> Vec<usize> {
         let mut world_ids: Vec<usize> = Vec::new();
 
         let main_world_id = app.world.id();
-        let main_world_id_parsed: usize = unsafe { transmute(main_world_id) };
-        world_ids.push(main_world_id_parsed);
+        let parsed_main_world_id: usize = unsafe { transmute(main_world_id) };
+        world_ids.push(parsed_main_world_id);
 
         let render_app = app.get_sub_app_mut(RenderApp).unwrap();
         let render_world_id = render_app.world.id();
-        let render_world_id_parsed: usize = unsafe { transmute(render_world_id) };
-        world_ids.push(render_world_id_parsed);
+        let parsed_render_world_id: usize = unsafe { transmute(render_world_id) };
+        world_ids.push(parsed_render_world_id);
 
         return world_ids;
-    }
-
-    pub fn create_rect(&mut self) {
-        js_bindings::log("Creating rect");
-        self.app.world.spawn(RectangleBundle::default());
     }
 
     pub fn update(&mut self) {
@@ -72,6 +67,11 @@ impl Editor {
 
     pub fn get_world_ids(&self) -> JsValue {
         serde_wasm_bindgen::to_value(&self.world_ids).unwrap()
+    }
+
+    pub fn create_rect(&mut self) {
+        js_bindings::log("Creating rect");
+        self.app.world.spawn(RectangleBundle::default());
     }
 }
 
