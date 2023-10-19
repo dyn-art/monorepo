@@ -1,17 +1,23 @@
-use bevy_ecs::system::Resource;
+use bevy_ecs::{
+    system::Resource,
+    world::{FromWorld, World, WorldId},
+};
 use serde::Serialize;
-use std::sync::mpsc::{channel, Receiver, Sender, TryRecvError};
+use std::{
+    collections::HashMap,
+    mem::transmute,
+    sync::mpsc::{channel, Receiver, Sender, TryRecvError},
+};
 use wasm_bindgen::{prelude::*, JsValue};
 
-use crate::{bindgen::js_bindings, plugins::bindgen_render_plugin::ChangeSet};
+use crate::plugins::bindgen_render_plugin::ChangeSet;
 
 #[wasm_bindgen]
 extern "C" {
-    fn receiveRustEvents(events: JsValue);
+    fn receiveRustEvents(id: usize, events: JsValue);
 }
 
-static mut RECEIVER: Option<Receiver<JsEvent>> = None;
-static mut SENDER: Option<Sender<JsEvent>> = None;
+static mut WORLD_CHANNELS: Option<HashMap<usize, (Sender<JsEvent>, Receiver<JsEvent>)>> = None;
 
 #[derive(Debug, Serialize, Clone)]
 pub enum JsEvent {
@@ -20,41 +26,61 @@ pub enum JsEvent {
 
 #[derive(Resource, Debug)]
 pub struct JsEventQueue {
+    id: usize,
     sender: Sender<JsEvent>,
 }
 
-impl Default for JsEventQueue {
-    fn default() -> Self {
-        Self::new()
+impl FromWorld for JsEventQueue {
+    fn from_world(world: &mut World) -> Self {
+        JsEventQueue::new(world.id())
     }
 }
 
 impl JsEventQueue {
-    pub fn new() -> Self {
+    pub fn new(world_id: WorldId) -> Self {
         unsafe {
-            if RECEIVER.is_none() || SENDER.is_none() {
-                let (tx, rx) = channel();
-                RECEIVER = Some(rx);
-                SENDER = Some(tx);
+            if WORLD_CHANNELS.is_none() {
+                WORLD_CHANNELS = Some(HashMap::new());
             }
+
+            let world_id_parsed: usize = unsafe { transmute(world_id) };
+
+            // Create a new channel if it doesn't exist yet
+            let (sender, _) = WORLD_CHANNELS
+                .as_mut()
+                .unwrap()
+                .entry(world_id_parsed)
+                .or_insert_with(|| {
+                    let (tx, rx) = channel();
+                    (tx, rx)
+                });
+
             Self {
-                // The sender endpoint can be cloned
-                sender: SENDER.clone().unwrap(),
+                sender: sender.clone(), // The sender endpoint can be cloned
+                id: world_id_parsed,
             }
         }
     }
 
-    // Adds the incoming event via the ender.
-    // Sending over a channel is inherently thread-safe.
+    /// Adds the incoming event via the sender.
+    /// Sending over a channel is inherently thread-safe.
     pub fn push_event(&self, event: JsEvent) {
         self.sender.send(event).unwrap();
     }
 
     pub fn forward_events_to_js(&mut self) {
-        js_bindings::log("Forwarding events to JS");
         let mut events = Vec::new();
+
         unsafe {
-            if let Some(receiver) = &RECEIVER {
+            // Find the correct receiver by index
+            let optional_receiver = WORLD_CHANNELS
+                .as_mut()
+                .unwrap()
+                .get(&self.id)
+                .map(|(_, rx)| rx);
+
+            // Drain the receiver and push all events to the events vector
+            if let Some(receiver) = optional_receiver {
                 loop {
                     match receiver.try_recv() {
                         Ok(event) => events.push(event),
@@ -65,9 +91,10 @@ impl JsEventQueue {
             }
         }
 
+        // Send the events to JS
         if !events.is_empty() {
             let js_value = serde_wasm_bindgen::to_value(&events).unwrap();
-            receiveRustEvents(js_value);
+            receiveRustEvents(self.id, js_value);
         }
     }
 }

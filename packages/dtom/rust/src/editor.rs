@@ -1,3 +1,5 @@
+use std::mem::transmute;
+
 use bevy_app::App;
 use bevy_app::Last;
 use bevy_app::Startup;
@@ -9,10 +11,12 @@ use crate::bindgen::{js_bindings, utils::set_panic_hook};
 use crate::bundles::RectangleBundle;
 use crate::js_event_queue::JsEventQueue;
 use crate::plugins::bindgen_render_plugin::BindgenRenderPlugin;
+use crate::plugins::render_plugin::RenderApp;
 use crate::plugins::render_plugin::RenderPlugin;
 
 #[wasm_bindgen]
 pub struct Editor {
+    world_ids: Vec<usize>,
     app: App,
 }
 
@@ -35,7 +39,26 @@ impl Editor {
             .add_systems(Startup, startup_system_log)
             .add_systems(Last, forward_events_to_js);
 
-        Self { app }
+        Self {
+            world_ids: Editor::retrieve_world_ids(&mut app),
+            app,
+        }
+    }
+
+    /// Returns the world id of the main world and the render world
+    fn retrieve_world_ids(app: &mut App) -> Vec<usize> {
+        let mut world_ids: Vec<usize> = Vec::new();
+
+        let main_world_id = app.world.id();
+        let main_world_id_parsed: usize = unsafe { transmute(main_world_id) };
+        world_ids.push(main_world_id_parsed);
+
+        let render_app = app.get_sub_app_mut(RenderApp).unwrap();
+        let render_world_id = render_app.world.id();
+        let render_world_id_parsed: usize = unsafe { transmute(render_world_id) };
+        world_ids.push(render_world_id_parsed);
+
+        return world_ids;
     }
 
     pub fn create_rect(&mut self) {
@@ -46,14 +69,18 @@ impl Editor {
     pub fn update(&mut self) {
         self.app.update();
     }
+
+    pub fn get_world_ids(&self) -> JsValue {
+        serde_wasm_bindgen::to_value(&self.world_ids).unwrap()
+    }
 }
 
 fn update_system_log() {
-    js_bindings::log("Inside update_system");
+    js_bindings::log("---- Inside update_system");
 }
 
 fn startup_system_log() {
-    js_bindings::log("----> Inside startup_system");
+    js_bindings::log("Inside startup_system");
 }
 
 fn forward_events_to_js(mut event_queue: ResMut<JsEventQueue>) {
