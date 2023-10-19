@@ -1,11 +1,13 @@
 use bevy_app::App;
+use bevy_app::Last;
 use bevy_app::Startup;
 use bevy_app::Update;
+use bevy_ecs::system::ResMut;
 use wasm_bindgen::prelude::*;
 
 use crate::bindgen::{js_bindings, utils::set_panic_hook};
+use crate::bundles::RectangleBundle;
 use crate::js_event_queue::JsEventQueue;
-use crate::plugins::bindgen_render_plugin::bundles::RectangleBundle;
 use crate::plugins::bindgen_render_plugin::BindgenRenderPlugin;
 use crate::plugins::render_plugin::RenderPlugin;
 
@@ -29,8 +31,9 @@ impl Editor {
         app.init_resource::<JsEventQueue>();
 
         // Register systems
-        app.add_systems(Update, update_system)
-            .add_systems(Startup, startup_system);
+        app.add_systems(Update, update_system_log)
+            .add_systems(Startup, startup_system_log)
+            .add_systems(Last, forward_events_to_js);
 
         Self { app }
     }
@@ -45,10 +48,14 @@ impl Editor {
     }
 }
 
-fn update_system() {
+fn update_system_log() {
     js_bindings::log("Inside update_system");
 }
 
-fn startup_system() {
-    js_bindings::log("Inside startup_system");
+fn startup_system_log() {
+    js_bindings::log("----> Inside startup_system");
+}
+
+fn forward_events_to_js(mut event_queue: ResMut<JsEventQueue>) {
+    event_queue.forward_events_to_js();
 }

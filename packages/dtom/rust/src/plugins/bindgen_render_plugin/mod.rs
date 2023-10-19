@@ -1,20 +1,22 @@
-pub mod bundles;
-pub mod shapes;
-
 use bevy_app::{App, Plugin};
 use bevy_ecs::{
     entity::Entity,
     query::{Changed, With},
+    schedule::IntoSystemConfigs,
     system::{Query, ResMut, Resource},
 };
 use bevy_utils::HashMap;
 use serde::Serialize;
 
-use crate::js_event_queue::{JsEvent, JsEventQueue};
+use crate::{
+    bindgen::js_bindings,
+    js_event_queue::{JsEvent, JsEventQueue},
+    shapes::{Path, Shape, Transform},
+};
 
-use self::shapes::{Path, Shape, Transform};
-
-use super::render_plugin::{extract_param::Extract, ExtractSchedule, RenderApp, RenderSchedule};
+use super::render_plugin::{
+    extract_param::Extract, ExtractSchedule, RenderApp, RenderSchedule, RenderSet,
+};
 
 #[derive(Serialize, Clone, Debug)]
 pub enum Change {
@@ -61,18 +63,33 @@ fn extract_paths(
     });
 }
 
-fn send_to_frontend(mut changed: ResMut<ChangedComponents>, mut event_queue: ResMut<JsEventQueue>) {
-    let change_sets: Vec<ChangeSet> = changed
-        .changes
-        .iter()
-        .map(|(entity, changes)| ChangeSet {
-            entity: entity.clone(),
-            changes: changes.clone(),
-        })
-        .collect();
-    event_queue.push_event(JsEvent::RenderUpdate(change_sets));
+fn queue_render_changes(
+    mut changed: ResMut<ChangedComponents>,
+    mut event_queue: ResMut<JsEventQueue>,
+) {
+    if (!changed.changes.is_empty()) {
+        let changed_sets: Vec<ChangeSet> = changed
+            .changes
+            .drain()
+            .map(|(entity, changes)| ChangeSet {
+                entity: entity.clone(),
+                changes: changes.clone(),
+            })
+            .collect();
+        event_queue.push_event(JsEvent::RenderUpdate(changed_sets));
+    }
+}
 
-    changed.changes.clear();
+fn forward_events_to_js(mut event_queue: ResMut<JsEventQueue>) {
+    event_queue.forward_events_to_js();
+}
+
+fn extract_system_log() {
+    js_bindings::log("Inside extract_system");
+}
+
+fn render_system_log() {
+    js_bindings::log("Inside render_system");
 }
 
 // =============================================================================
@@ -94,8 +111,17 @@ impl Plugin for BindgenRenderPlugin {
 
         // Register systems
         render_app
-            .add_systems(ExtractSchedule, extract_transforms)
-            .add_systems(ExtractSchedule, extract_paths)
-            .add_systems(RenderSchedule, send_to_frontend);
+            .add_systems(
+                ExtractSchedule,
+                (extract_system_log, extract_transforms, extract_paths),
+            )
+            .add_systems(
+                RenderSchedule,
+                (
+                    render_system_log,
+                    queue_render_changes.in_set(RenderSet::Queue),
+                    forward_events_to_js.in_set(RenderSet::Render),
+                ),
+            );
     }
 }
