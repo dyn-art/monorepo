@@ -1,19 +1,27 @@
 'use client';
 
 import React from 'react';
-import * as dtom from '@dyn/dtom';
+import { Editor, initWasm, SVGRenderer } from '@dyn/dtom';
 import { MaxWidthWrapper } from '@/components';
 
 async function onClick(): Promise<void> {
-	await dtom.initWasm();
-	const editor = dtom.editorFactory();
+	await initWasm();
+	const editor = new Editor(new SVGRenderer());
 	editor.createRect();
 	editor.createRect();
 
-	console.log(editor);
+	const editor2 = new Editor(new SVGRenderer());
+	editor2.createRect();
+
+	console.log({ editor, editor2 });
 
 	for (let i = 0; i < 10; i++) {
 		editor.update();
+	}
+
+	console.log('------------------');
+	for (let i = 0; i < 10; i++) {
+		editor2.update();
 	}
 }
 

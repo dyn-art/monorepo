@@ -7,7 +7,7 @@ use std::{
     mem::transmute,
     sync::{
         mpsc::{channel, Receiver, Sender, TryRecvError},
-        Mutex,
+        Arc, Mutex,
     },
 };
 use wasm_bindgen::{prelude::*, JsValue};
@@ -28,7 +28,7 @@ pub enum JsEvent {
 pub struct JsEventQueue {
     world_id: usize,
     sender: Sender<JsEvent>,
-    receiver: Mutex<Receiver<JsEvent>>,
+    receiver: Arc<Mutex<Receiver<JsEvent>>>,
 }
 
 impl FromWorld for JsEventQueue {
@@ -43,7 +43,7 @@ impl JsEventQueue {
         let (tx, rx) = channel();
         Self {
             sender: tx,
-            receiver: Mutex::new(rx),
+            receiver: Arc::new(Mutex::new(rx)),
             world_id: parsed_world_id,
         }
     }

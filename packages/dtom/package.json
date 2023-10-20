@@ -29,6 +29,9 @@
 		"url": "https://issues.dyn.art/"
 	},
 	"homepage": "https://github.com/dyndotart/monorepo",
+	"dependencies": {
+		"@dyn/utils": "workspace:*"
+	},
 	"devDependencies": {
 		"@dyn/config": "workspace:*",
 		"@rollup/plugin-wasm": "^6.2.2",

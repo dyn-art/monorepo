@@ -1,22 +1,28 @@
 import { Editor as RustEditor } from '@rust/dyn-dtom';
 
+import type { Renderer } from './render';
+
 export class Editor {
 	private _rustEditor: RustEditor;
 	private _worldIds: number[] = [];
 
-	private static INSTANCES: Editor[] = [];
+	private static _INSTANCES: Editor[] = [];
 
-	constructor() {
+	private _renderer: Renderer;
+
+	constructor(renderer: Renderer) {
 		this._rustEditor = new RustEditor();
 		this._worldIds = this._rustEditor.get_world_ids();
-		Editor.INSTANCES.push(this);
+		this._renderer = renderer;
+		Editor._INSTANCES.push(this);
 	}
 
 	public static onWasmEvent(worldId: number, data: unknown): void {
-		Editor.INSTANCES.find((instance) => instance.hasWorldId(worldId))?.onWasmEvent(data);
+		Editor._INSTANCES.find((instance) => instance.hasWorldId(worldId))?.onWasmEvent(data);
 	}
 
 	public onWasmEvent(data: unknown) {
+		this._renderer.render();
 		// TODO:
 		console.log('onWasmEvent', { data });
 	}
@@ -32,8 +38,4 @@ export class Editor {
 	public update(): void {
 		this._rustEditor.update();
 	}
-}
-
-export function editorFactory(): Editor {
-	return new Editor();
 }

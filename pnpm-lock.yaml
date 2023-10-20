@@ -134,6 +134,10 @@ importers:
         version: 4.2.1(typescript@5.2.2)
 
   packages/dtom:
+    dependencies:
+      '@dyn/utils':
+        specifier: workspace:^
+        version: link:../utils
     devDependencies:
       '@dyn/config':
         specifier: workspace:*
