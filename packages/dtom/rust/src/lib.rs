@@ -1,6 +1,5 @@
 mod bindgen;
-pub mod bundles;
 pub mod editor;
 mod js_event_queue;
+pub mod node;
 mod plugins;
-pub mod shapes;

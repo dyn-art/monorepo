@@ -8,8 +8,8 @@ use bevy_ecs::system::ResMut;
 use wasm_bindgen::prelude::*;
 
 use crate::bindgen::{js_bindings, utils::set_panic_hook};
-use crate::bundles::RectangleBundle;
 use crate::js_event_queue::JsEventQueue;
+use crate::node::bundles::RectangleNodeBundle;
 use crate::plugins::bindgen_render_plugin::BindgenRenderPlugin;
 use crate::plugins::render_plugin::RenderApp;
 use crate::plugins::render_plugin::RenderPlugin;
@@ -71,7 +71,7 @@ impl Editor {
 
     pub fn create_rect(&mut self) {
         js_bindings::log("Creating rect");
-        self.app.world.spawn(RectangleBundle::default());
+        self.app.world.spawn(RectangleNodeBundle::default());
     }
 }
 

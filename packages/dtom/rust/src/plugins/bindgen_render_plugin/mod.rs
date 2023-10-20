@@ -3,7 +3,7 @@ use bevy_ecs::{
     entity::Entity,
     query::{Changed, With},
     schedule::IntoSystemConfigs,
-    system::{Query, ResMut, Resource},
+    system::{Commands, Query, ResMut, Resource},
 };
 use bevy_utils::HashMap;
 use serde::Serialize;
@@ -11,7 +11,9 @@ use serde::Serialize;
 use crate::{
     bindgen::js_bindings,
     js_event_queue::{JsEvent, JsEventQueue},
-    shapes::{Path, Shape, Transform},
+    node::mixins::{
+        BlendMixin, ChildrenMixin, CompositionMixin, LayoutMixin, NodeMixin, RectangleCornerMixin,
+    },
 };
 
 use super::render_plugin::{
@@ -20,8 +22,11 @@ use super::render_plugin::{
 
 #[derive(Serialize, Clone, Debug)]
 pub enum Change {
-    Transform(Transform),
-    Path(Path),
+    RectangleCorner(RectangleCornerMixin),
+    Children(ChildrenMixin),
+    Layout(LayoutMixin),
+    Composition(CompositionMixin),
+    Blend(BlendMixin),
 }
 
 #[derive(Serialize, Debug, Clone)]
@@ -43,24 +48,64 @@ pub struct ChangedComponents {
 // Systems
 // =============================================================================
 
-fn extract_transforms(
+fn extract_rectangle_corner_mixin(
     mut changed: ResMut<ChangedComponents>,
-    query: Extract<Query<(Entity, &Transform), (With<Shape>, Changed<Transform>)>>,
+    query: Extract<
+        Query<(Entity, &RectangleCornerMixin), (With<NodeMixin>, Changed<RectangleCornerMixin>)>,
+    >,
 ) {
-    query.for_each(|(entity, transform)| {
+    query.for_each(|(entity, rectangle_corner_mixin)| {
         let change_set = changed.changes.entry(entity).or_insert(vec![]);
-        change_set.push(Change::Transform(transform.clone()));
+        change_set.push(Change::RectangleCorner(rectangle_corner_mixin.clone()));
     });
 }
 
-fn extract_paths(
+fn extract_children_mixin(
     mut changed: ResMut<ChangedComponents>,
-    query: Extract<Query<(Entity, &Path), (With<Shape>, Changed<Path>)>>,
+    query: Extract<Query<(Entity, &ChildrenMixin), (With<NodeMixin>, Changed<ChildrenMixin>)>>,
 ) {
-    query.for_each(|(entity, path)| {
+    query.for_each(|(entity, children_mixin)| {
         let change_set = changed.changes.entry(entity).or_insert(vec![]);
-        change_set.push(Change::Path(path.clone()));
+        change_set.push(Change::Children(children_mixin.clone()));
     });
+}
+
+fn extract_layout_mixin(
+    mut changed: ResMut<ChangedComponents>,
+    query: Extract<Query<(Entity, &LayoutMixin), (With<NodeMixin>, Changed<LayoutMixin>)>>,
+) {
+    query.for_each(|(entity, layout_mixin)| {
+        let change_set = changed.changes.entry(entity).or_insert(vec![]);
+        change_set.push(Change::Layout(layout_mixin.clone()));
+    });
+}
+
+fn extract_composition_mixin(
+    mut changed: ResMut<ChangedComponents>,
+    query: Extract<
+        Query<(Entity, &CompositionMixin), (With<NodeMixin>, Changed<CompositionMixin>)>,
+    >,
+) {
+    query.for_each(|(entity, composition_mixin)| {
+        let change_set = changed.changes.entry(entity).or_insert(vec![]);
+        change_set.push(Change::Composition(composition_mixin.clone()));
+    });
+}
+
+fn extract_blend_mixin(
+    mut changed: ResMut<ChangedComponents>,
+    query: Extract<Query<(Entity, &BlendMixin), (With<NodeMixin>, Changed<BlendMixin>)>>,
+) {
+    query.for_each(|(entity, blend_mixin)| {
+        let change_set = changed.changes.entry(entity).or_insert(vec![]);
+        change_set.push(Change::Blend(blend_mixin.clone()));
+    });
+}
+
+fn prepare_render_changes(mut commands: Commands, mut changed: ResMut<ChangedComponents>) {
+
+    // TODO:
+    // Construct Path and prepare other stuff for rendering
 }
 
 fn queue_render_changes(
@@ -80,7 +125,7 @@ fn queue_render_changes(
     }
 }
 
-fn forward_events_to_js(mut event_queue: ResMut<JsEventQueue>) {
+fn forward_render_changes_to_js(mut event_queue: ResMut<JsEventQueue>) {
     event_queue.forward_events_to_js();
 }
 
@@ -113,14 +158,22 @@ impl Plugin for BindgenRenderPlugin {
         render_app
             .add_systems(
                 ExtractSchedule,
-                (extract_system_log, extract_transforms, extract_paths),
+                (
+                    extract_system_log,
+                    extract_rectangle_corner_mixin,
+                    extract_children_mixin,
+                    extract_layout_mixin,
+                    extract_composition_mixin,
+                    extract_blend_mixin,
+                ),
             )
             .add_systems(
                 RenderSchedule,
                 (
                     render_system_log,
+                    prepare_render_changes.in_set(RenderSet::Prepare),
                     queue_render_changes.in_set(RenderSet::Queue),
-                    forward_events_to_js.in_set(RenderSet::Render),
+                    forward_render_changes_to_js.in_set(RenderSet::Render),
                 ),
             );
     }
