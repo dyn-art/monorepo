@@ -5,25 +5,18 @@ use bevy_app::Last;
 use bevy_app::PostUpdate;
 use bevy_app::Startup;
 use bevy_app::Update;
-use bevy_ecs::entity::Entity;
-use bevy_ecs::query::Changed;
-use bevy_ecs::query::Or;
-use bevy_ecs::system::Query;
-use bevy_ecs::system::ResMut;
-use glam::Vec2;
 use wasm_bindgen::prelude::*;
 
 use crate::bindgen::{js_bindings, utils::set_panic_hook};
-use crate::js_event_queue::JsEventQueue;
+use crate::event_queue::js_event_queue::JsEventQueue;
 use crate::node::bundles::RectangleNodeBundle;
-use crate::node::mixins::Anchor;
-use crate::node::mixins::LayoutMixin;
-use crate::node::mixins::PathMixin;
-use crate::node::mixins::RectangleCornerMixin;
 use crate::plugins::bindgen_render_plugin::BindgenRenderPlugin;
 use crate::plugins::render_plugin::RenderApp;
 use crate::plugins::render_plugin::RenderPlugin;
 use crate::systems::construct_path::construct_rectangle_path;
+use crate::systems::forward_events_to_js;
+use crate::systems::startup_system_log;
+use crate::systems::update_system_log;
 
 #[wasm_bindgen]
 pub struct Editor {
@@ -85,16 +78,4 @@ impl Editor {
         js_bindings::log("Creating rect");
         self.app.world.spawn(RectangleNodeBundle::default());
     }
-}
-
-fn update_system_log() {
-    js_bindings::log("---- Inside update_system");
-}
-
-fn startup_system_log() {
-    js_bindings::log("Inside startup_system");
-}
-
-fn forward_events_to_js(mut event_queue: ResMut<JsEventQueue>) {
-    event_queue.forward_events_to_js();
 }

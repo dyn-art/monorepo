@@ -10,7 +10,7 @@ use serde::Serialize;
 
 use crate::{
     bindgen::js_bindings,
-    js_event_queue::{JsEvent, JsEventQueue},
+    event_queue::js_event_queue::{JsEvent, JsEventQueue},
     node::mixins::{
         BlendMixin, ChildrenMixin, CompositionMixin, LayoutMixin, NodeMixin, PathMixin,
         RectangleCornerMixin,

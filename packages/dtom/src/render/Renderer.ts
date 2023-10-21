@@ -10,7 +10,7 @@ export abstract class Renderer {
 
 	public abstract setSize(width: number, height: number): this;
 
-	public abstract render(): this;
+	public abstract render(data: unknown): this;
 }
 
 export interface TRendererOptions {

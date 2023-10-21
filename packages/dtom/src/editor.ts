@@ -21,10 +21,19 @@ export class Editor {
 		Editor._INSTANCES.find((instance) => instance.hasWorldId(worldId))?.onWasmEvent(data);
 	}
 
-	public onWasmEvent(data: unknown) {
-		this._renderer.render();
-		// TODO:
-		console.log('onWasmEvent', { data });
+	public onWasmEvent(event: unknown) {
+		if (typeof event === 'object') {
+			for (const [key, value] of Object.entries(event as Record<string, unknown>)) {
+				switch (key) {
+					case 'RenderUpdate':
+						this._renderer.render(value);
+						break;
+					default:
+						console.warn(`Unknown event: ${key}`);
+						break;
+				}
+			}
+		}
 	}
 
 	public createRect(): void {

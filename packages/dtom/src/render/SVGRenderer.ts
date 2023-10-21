@@ -25,9 +25,9 @@ export class SVGRenderer extends Renderer {
 		return this;
 	}
 
-	public render(): this {
+	public render(data: unknown): this {
 		// TODO:
-		console.log('SVG render');
+		console.log('SVG render', { data });
 		return this;
 	}
 
