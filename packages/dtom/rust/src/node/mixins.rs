@@ -65,7 +65,7 @@ impl Default for ChildrenMixin {
 pub struct LayoutMixin {
     pub width: usize,
     pub height: usize,
-    pub relative_transform: TransformMatrix,
+    pub relative_transform: Mat3,
 }
 
 impl Default for LayoutMixin {
@@ -73,7 +73,7 @@ impl Default for LayoutMixin {
         Self {
             width: 100,
             height: 100,
-            relative_transform: TransformMatrix::default(),
+            relative_transform: Mat3::default(),
         }
     }
 }
@@ -112,7 +112,13 @@ impl Default for BlendMixin {
 
 #[derive(Component, Serialize, Clone, Debug)]
 pub struct PathMixin {
-    verticies: Vec<Point>,
+    pub vertices: Vec<Anchor>,
+}
+
+#[derive(Serialize, Clone, Debug)]
+pub struct Anchor {
+    pub position: Vec2,
+    pub controls: Option<(Vec2, Vec2)>,
 }
 
 // =============================================================================
@@ -140,46 +146,4 @@ pub enum BlendMode {
     Saturation,
     Color,
     Luminosity,
-}
-
-// =============================================================================
-// Base
-// =============================================================================
-
-#[derive(Debug, Clone, Default)]
-pub struct TransformMatrix(pub Mat3);
-
-impl Serialize for TransformMatrix {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::ser::Serializer,
-    {
-        use serde::ser::SerializeTuple;
-
-        let mut seq = serializer.serialize_tuple(6)?;
-        seq.serialize_element(&self.0.x_axis.x)?;
-        seq.serialize_element(&self.0.x_axis.y)?;
-        seq.serialize_element(&self.0.x_axis.z)?;
-        seq.serialize_element(&self.0.y_axis.x)?;
-        seq.serialize_element(&self.0.y_axis.y)?;
-        seq.serialize_element(&self.0.y_axis.z)?;
-        seq.end()
-    }
-}
-
-#[derive(Debug, Clone, Default)]
-pub struct Point(pub Vec2);
-
-impl Serialize for Point {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::ser::Serializer,
-    {
-        use serde::ser::SerializeTuple;
-
-        let mut seq = serializer.serialize_tuple(2)?;
-        seq.serialize_element(&self.0.x)?;
-        seq.serialize_element(&self.0.y)?;
-        seq.end()
-    }
 }

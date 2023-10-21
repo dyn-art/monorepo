@@ -2,17 +2,28 @@ use std::mem::transmute;
 
 use bevy_app::App;
 use bevy_app::Last;
+use bevy_app::PostUpdate;
 use bevy_app::Startup;
 use bevy_app::Update;
+use bevy_ecs::entity::Entity;
+use bevy_ecs::query::Changed;
+use bevy_ecs::query::Or;
+use bevy_ecs::system::Query;
 use bevy_ecs::system::ResMut;
+use glam::Vec2;
 use wasm_bindgen::prelude::*;
 
 use crate::bindgen::{js_bindings, utils::set_panic_hook};
 use crate::js_event_queue::JsEventQueue;
 use crate::node::bundles::RectangleNodeBundle;
+use crate::node::mixins::Anchor;
+use crate::node::mixins::LayoutMixin;
+use crate::node::mixins::PathMixin;
+use crate::node::mixins::RectangleCornerMixin;
 use crate::plugins::bindgen_render_plugin::BindgenRenderPlugin;
 use crate::plugins::render_plugin::RenderApp;
 use crate::plugins::render_plugin::RenderPlugin;
+use crate::systems::construct_path::construct_rectangle_path;
 
 #[wasm_bindgen]
 pub struct Editor {
@@ -35,8 +46,9 @@ impl Editor {
         app.init_resource::<JsEventQueue>();
 
         // Register systems
-        app.add_systems(Update, update_system_log)
-            .add_systems(Startup, startup_system_log)
+        app.add_systems(Startup, startup_system_log)
+            .add_systems(Update, update_system_log)
+            .add_systems(PostUpdate, construct_rectangle_path)
             .add_systems(Last, forward_events_to_js);
 
         Self {

@@ -12,7 +12,8 @@ use crate::{
     bindgen::js_bindings,
     js_event_queue::{JsEvent, JsEventQueue},
     node::mixins::{
-        BlendMixin, ChildrenMixin, CompositionMixin, LayoutMixin, NodeMixin, RectangleCornerMixin,
+        BlendMixin, ChildrenMixin, CompositionMixin, LayoutMixin, NodeMixin, PathMixin,
+        RectangleCornerMixin,
     },
 };
 
@@ -27,6 +28,7 @@ pub enum Change {
     Layout(LayoutMixin),
     Composition(CompositionMixin),
     Blend(BlendMixin),
+    Path(PathMixin),
 }
 
 #[derive(Serialize, Debug, Clone)]
@@ -102,10 +104,21 @@ fn extract_blend_mixin(
     });
 }
 
-fn prepare_render_changes(mut commands: Commands, mut changed: ResMut<ChangedComponents>) {
+fn extract_path_mixin(
+    mut changed: ResMut<ChangedComponents>,
+    query: Extract<Query<(Entity, &PathMixin), (With<NodeMixin>, Changed<PathMixin>)>>,
+) {
+    query.for_each(|(entity, path_mixin)| {
+        let change_set = changed.changes.entry(entity).or_insert(vec![]);
+        change_set.push(Change::Path(path_mixin.clone()));
+    });
+}
 
+fn prepare_render_changes(mut commands: Commands, mut changed: ResMut<ChangedComponents>) {
     // TODO:
-    // Construct Path and prepare other stuff for rendering
+    // Prepare SVG path based on PathMixin
+    // and other stuff that needs to be prepared
+    // or not because its SVG specific?
 }
 
 fn queue_render_changes(
@@ -165,6 +178,7 @@ impl Plugin for BindgenRenderPlugin {
                     extract_layout_mixin,
                     extract_composition_mixin,
                     extract_blend_mixin,
+                    extract_path_mixin,
                 ),
             )
             .add_systems(
