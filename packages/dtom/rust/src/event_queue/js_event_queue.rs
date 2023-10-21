@@ -3,6 +3,8 @@ use bevy_ecs::{
     world::{FromWorld, World, WorldId},
 };
 use serde::Serialize;
+#[cfg(feature = "cli")]
+use specta::Type;
 use std::{
     mem::transmute,
     sync::{
@@ -19,6 +21,7 @@ extern "C" {
     fn receiveRustEvents(id: usize, events: JsValue);
 }
 
+#[cfg_attr(feature = "cli", derive(Type))]
 #[derive(Debug, Serialize, Clone)]
 pub enum JsEvent {
     RenderUpdate(Vec<ChangeSet>),

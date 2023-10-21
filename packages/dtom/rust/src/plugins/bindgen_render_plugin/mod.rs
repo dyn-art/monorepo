@@ -7,6 +7,8 @@ use bevy_ecs::{
 };
 use bevy_utils::HashMap;
 use serde::Serialize;
+#[cfg(feature = "cli")]
+use specta::Type;
 
 use crate::{
     bindgen::js_bindings,
@@ -21,6 +23,7 @@ use super::render_plugin::{
     extract_param::Extract, ExtractSchedule, RenderApp, RenderSchedule, RenderSet,
 };
 
+#[cfg_attr(feature = "cli", derive(Type))]
 #[derive(Serialize, Clone, Debug)]
 pub enum Change {
     RectangleCorner(RectangleCornerMixin),
@@ -31,9 +34,10 @@ pub enum Change {
     Path(PathMixin),
 }
 
+#[cfg_attr(feature = "cli", derive(Type))]
 #[derive(Serialize, Debug, Clone)]
 pub struct ChangeSet {
-    pub entity: Entity,
+    pub entity: u32,
     pub changes: Vec<Change>,
 }
 
@@ -130,7 +134,7 @@ fn queue_render_changes(
             .changes
             .drain()
             .map(|(entity, changes)| ChangeSet {
-                entity: entity.clone(),
+                entity: entity.index(),
                 changes: changes.clone(),
             })
             .collect();

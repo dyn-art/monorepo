@@ -7,7 +7,6 @@
 
 pub mod extract_param;
 
-use crate::bindgen::js_bindings;
 use bevy_app::{App, AppLabel, Plugin, SubApp};
 use bevy_ecs::{prelude::*, schedule::ScheduleLabel};
 use std::ops::{Deref, DerefMut};

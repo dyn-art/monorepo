@@ -25,7 +25,7 @@ export default class Bundle extends Command {
 		this.log(`Started bundling Rust`);
 		this.log(`\n`);
 
-		// Execute wasm-pack build
+		// Build WASM
 		const rustInputDirPath = path.join(process.cwd(), 'rust');
 		const rustOutputDirPath = path.join(rustModulesDirPath, tempRustOutputName);
 		const { execa } = await import('execa');
@@ -36,6 +36,23 @@ export default class Bundle extends Command {
 			`Bundled Rust with ${chalk.underline('wasm-pack')} to ${chalk.gray(
 				chalk.underline(rustOutputDirPath)
 			)}`
+		);
+
+		// Generate type declarations for Typescript
+		await execa(
+			'cargo',
+			[
+				'run',
+				'--features',
+				'cli',
+				'--',
+				'generate-ts-types',
+				'--export-path',
+				path.join(rustOutputDirPath, './bindings.ts')
+			],
+			{
+				cwd: rustInputDirPath
+			}
 		);
 
 		// Read in package.json and extract name of Rust module
