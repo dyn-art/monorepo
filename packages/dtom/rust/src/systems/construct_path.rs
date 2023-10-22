@@ -5,79 +5,123 @@ use bevy_ecs::{
 };
 use glam::Vec2;
 
-use crate::node::mixins::{Anchor, LayoutMixin, PathMixin, RectangleCornerMixin};
+use crate::node::mixins::{Anchor, AnchorCommand, LayoutMixin, PathMixin, RectangleCornerMixin};
 
 // =============================================================================
 // Rectangle
 // =============================================================================
 
-fn create_corner_anchor(x: f32, y: f32, radius: i16, max_radius: f32) -> Anchor {
-    let final_radius = f32::min(radius as f32, max_radius);
-
-    let controls = if final_radius > 0.0 {
-        Some((
-            Vec2::new(x + final_radius, y),
-            Vec2::new(x, y + final_radius),
-        ))
-    } else {
-        None
-    };
-
-    return Anchor {
-        position: Vec2::new(x, y),
-        controls,
-    };
-}
-
 pub fn construct_rectangle_path(
-    mut query: Query<
+    query: Query<
         (Entity, &RectangleCornerMixin, &LayoutMixin),
         Or<(Changed<RectangleCornerMixin>, Changed<LayoutMixin>)>,
     >,
     mut commands: Commands,
 ) {
-    for (entity, rect_corner, layout) in query.iter_mut() {
-        // Calculate maximum possible radius
-        let max_radius = (layout.width.min(layout.height) / 2) as f32;
+    for (_entity, corners, layout) in query.iter() {
+        let mut path = PathMixin { vertices: vec![] };
+        let max_radius = std::cmp::min(layout.width, layout.height) as f32 / 2.0;
 
-        let mut vertices: Vec<Anchor> = Vec::new();
+        let min_radius =
+            |radius: i16| -> f32 { f32::from(std::cmp::min(radius, max_radius as i16)) };
 
-        // Top left corner
-        vertices.push(create_corner_anchor(
-            0.0,
-            0.0,
-            rect_corner.top_left_radius,
-            max_radius,
-        ));
+        // Move to start point, considering the top left radius
+        path.vertices.push(Anchor {
+            position: Vec2::new(min_radius(corners.top_left_radius), 0.0),
+            command: AnchorCommand::MoveTo,
+        });
 
         // Top right corner
-        vertices.push(create_corner_anchor(
-            layout.width as f32,
-            0.0,
-            rect_corner.top_right_radius,
-            max_radius,
-        ));
+        path.vertices.push(Anchor {
+            position: Vec2::new(
+                layout.width as f32 - min_radius(corners.top_right_radius),
+                0.0,
+            ),
+            command: AnchorCommand::LineTo,
+        });
+
+        if corners.top_right_radius > 0 {
+            path.vertices.push(Anchor {
+                position: Vec2::new(layout.width as f32, min_radius(corners.top_right_radius)),
+                command: AnchorCommand::ArcTo {
+                    radius: Vec2::splat(min_radius(corners.top_right_radius)),
+                    x_axis_rotation: 0.0,
+                    large_arc_flag: false,
+                    sweep_flag: true,
+                },
+            });
+        }
 
         // Bottom right corner
-        vertices.push(create_corner_anchor(
-            layout.width as f32,
-            layout.height as f32,
-            rect_corner.bottom_right_radius,
-            max_radius,
-        ));
+        path.vertices.push(Anchor {
+            position: Vec2::new(
+                layout.width as f32,
+                layout.height as f32 - min_radius(corners.bottom_right_radius),
+            ),
+            command: AnchorCommand::LineTo,
+        });
+
+        if corners.bottom_right_radius > 0 {
+            path.vertices.push(Anchor {
+                position: Vec2::new(
+                    layout.width as f32 - min_radius(corners.bottom_right_radius),
+                    layout.height as f32,
+                ),
+                command: AnchorCommand::ArcTo {
+                    radius: Vec2::splat(min_radius(corners.bottom_right_radius)),
+                    x_axis_rotation: 0.0,
+                    large_arc_flag: false,
+                    sweep_flag: true,
+                },
+            });
+        }
 
         // Bottom left corner
-        vertices.push(create_corner_anchor(
-            0.0,
-            layout.height as f32,
-            rect_corner.bottom_left_radius,
-            max_radius,
-        ));
+        path.vertices.push(Anchor {
+            position: Vec2::new(min_radius(corners.bottom_left_radius), layout.height as f32),
+            command: AnchorCommand::LineTo,
+        });
 
-        // Create PathMixin with the constructed vertices
-        let path_mixin = PathMixin { vertices };
+        if corners.bottom_left_radius > 0 {
+            path.vertices.push(Anchor {
+                position: Vec2::new(
+                    0.0,
+                    layout.height as f32 - min_radius(corners.bottom_left_radius),
+                ),
+                command: AnchorCommand::ArcTo {
+                    radius: Vec2::splat(min_radius(corners.bottom_left_radius)),
+                    x_axis_rotation: 0.0,
+                    large_arc_flag: false,
+                    sweep_flag: true,
+                },
+            });
+        }
 
-        // Add the constructed PathMixin to the entity
-        commands.entity(entity).insert(path_mixin);
+        // Back to top left corner
+        path.vertices.push(Anchor {
+            position: Vec2::new(0.0, min_radius(corners.top_left_radius)),
+            command: AnchorCommand::LineTo,
+        });
+
+        if corners.top_left_radius > 0 {
+            path.vertices.push(Anchor {
+                position: Vec2::new(min_radius(corners.top_left_radius), 0.0),
+                command: AnchorCommand::ArcTo {
+                    radius: Vec2::splat(min_radius(corners.top_left_radius)),
+                    x_axis_rotation: 0.0,
+                    large_arc_flag: false,
+                    sweep_flag: true,
+                },
+            });
+        }
+
+        // Close the path
+        path.vertices.push(Anchor {
+            position: Vec2::ZERO,
+            command: AnchorCommand::ClosePath,
+        });
+
+        // Insert or update the PathMixin component for the entity
+        commands.entity(_entity).insert(path);
     }
 }

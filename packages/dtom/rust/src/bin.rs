@@ -3,7 +3,7 @@ use clap::Parser;
 #[cfg(feature = "cli")]
 use specta::export;
 
-// Import all types and modules from `dyn_dtom` to make them accessible to specta.
+// Import all types and modules from `dyn_dtom` to make them accessible to specta here
 #[cfg(feature = "cli")]
 use dyn_dtom::*;
 

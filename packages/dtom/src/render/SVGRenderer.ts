@@ -1,3 +1,5 @@
+import { notEmpty } from '@dyn/utils';
+
 import { Renderer, type TRendererOptions } from './Renderer';
 
 export class SVGRenderer extends Renderer {
@@ -25,10 +27,61 @@ export class SVGRenderer extends Renderer {
 		return this;
 	}
 
-	public render(data: unknown): this {
+	public render(data: any[]): this {
 		// TODO:
 		console.log('SVG render', { data });
+
+		for (const item of data) {
+			for (const change of item.changes) {
+				if (change.Path != null) {
+					const pathString = this.constructPathString(change.Path as Path);
+					console.log({ pathString });
+				}
+			}
+		}
+
 		return this;
+	}
+
+	private constructPathString(path: Path): string {
+		// Helper function to translate boolean flags to 1 or 0 for SVG
+		const boolToNum = (flag: boolean) => (flag ? '1' : '0');
+
+		// Map path vertices to SVG path commands
+		// and join them into a string
+		return path.vertices
+			.map((anchor) => {
+				const [x, y] = anchor.position;
+				const anchorCommand = anchor.command;
+
+				if (typeof anchorCommand === 'string') {
+					switch (anchor.command) {
+						case 'MoveTo':
+							return `M ${x} ${y}`;
+						case 'LineTo':
+							return `L ${x} ${y}`;
+						case 'ClosePath':
+							return 'Z';
+						default:
+							return null;
+					}
+				} else if (typeof anchorCommand === 'object') {
+					if ('ArcTo' in anchorCommand) {
+						const arcParams = anchorCommand.ArcTo;
+						const [rx, ry] = arcParams.radius;
+						return `A ${rx} ${ry} ${arcParams.x_axis_rotation} ${boolToNum(
+							arcParams.large_arc_flag
+						)} ${boolToNum(arcParams.sweep_flag)} ${x} ${y}`;
+					} else if ('CurveTo' in anchorCommand) {
+						const curveParams = anchorCommand.CurveTo;
+						return `C ${curveParams.control_point_1[0]} ${curveParams.control_point_1[1]} ${curveParams.control_point_2[0]} ${curveParams.control_point_2[1]} ${x} ${y}`;
+					}
+				}
+
+				return null;
+			})
+			.filter(notEmpty)
+			.join(' ');
 	}
 
 	// Create a namespaced SVG element
@@ -82,3 +135,30 @@ export type TSVGTagNames =
 	| 'defs'
 	| 'g'
 	| 'symbol';
+
+// TODO: REMOVE - Only temp until specta changes merged for type generation
+
+type Vec2 = [number, number];
+
+interface ArcTo {
+	radius: Vec2;
+	x_axis_rotation: number;
+	large_arc_flag: boolean;
+	sweep_flag: boolean;
+}
+
+interface CurveTo {
+	control_point_1: Vec2;
+	control_point_2: Vec2;
+}
+
+type Command = 'MoveTo' | 'LineTo' | { CurveTo: CurveTo } | 'ClosePath' | { ArcTo: ArcTo };
+
+interface Anchor {
+	position: Vec2;
+	command: Command;
+}
+
+interface Path {
+	vertices: Anchor[];
+}

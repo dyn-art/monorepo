@@ -39,21 +39,21 @@ export default class Bundle extends Command {
 		);
 
 		// Generate type declarations for Typescript
-		await execa(
-			'cargo',
-			[
-				'run',
-				'--features',
-				'cli',
-				'--',
-				'generate-ts-types',
-				'--export-path',
-				path.join(rustOutputDirPath, './bindings.ts')
-			],
-			{
-				cwd: rustInputDirPath
-			}
-		);
+		// await execa(
+		// 	'cargo',
+		// 	[
+		// 		'run',
+		// 		'--features',
+		// 		'cli',
+		// 		'--',
+		// 		'generate-ts-types',
+		// 		'--export-path',
+		// 		path.join(rustOutputDirPath, './bindings.ts')
+		// 	],
+		// 	{
+		// 		cwd: rustInputDirPath
+		// 	}
+		// );
 
 		// Read in package.json and extract name of Rust module
 		const rustOutputPackageJsonPath = path.join(rustOutputDirPath, 'package.json');

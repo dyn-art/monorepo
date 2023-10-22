@@ -132,7 +132,25 @@ pub struct PathMixin {
 #[derive(Serialize, Clone, Debug)]
 pub struct Anchor {
     pub position: Vec2,
-    pub controls: Option<(Vec2, Vec2)>,
+    pub command: AnchorCommand,
+}
+
+#[cfg_attr(feature = "cli", derive(Type))]
+#[derive(Serialize, Clone, Debug)]
+pub enum AnchorCommand {
+    MoveTo,
+    LineTo,
+    CurveTo {
+        control_point_1: Vec2,
+        control_point_2: Vec2,
+    },
+    ArcTo {
+        radius: Vec2,
+        x_axis_rotation: f32,
+        large_arc_flag: bool,
+        sweep_flag: bool,
+    },
+    ClosePath,
 }
 
 // =============================================================================
