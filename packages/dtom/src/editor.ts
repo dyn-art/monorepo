@@ -1,4 +1,4 @@
-import { Editor as RustEditor } from '@rust/dyn-dtom';
+import { enqueue_js_events, Editor as RustEditor } from '@rust/dyn-dtom';
 
 import type { Renderer } from './render';
 
@@ -15,6 +15,11 @@ export class Editor {
 		this._worldIds = this._rustEditor.get_world_ids();
 		this._renderer = renderer;
 		Editor._INSTANCES.push(this);
+
+		// TODO: REMOVE
+		enqueue_js_events(this._worldIds[0] as unknown as number, [
+			{ PointerDownEvent: { entity: 0 } }
+		]);
 	}
 
 	public static onWasmEvent(worldId: number, data: unknown): void {

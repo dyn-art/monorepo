@@ -1,6 +1,7 @@
 import { notEmpty } from '@dyn/utils';
 
-import { Renderer, type TRendererOptions } from './Renderer';
+import { Renderer, type TRendererOptions } from '../Renderer';
+import type { SVGNode } from './SVGNode';
 
 export class SVGRenderer extends Renderer {
 	private _domElement: SVGElement;
@@ -9,6 +10,8 @@ export class SVGRenderer extends Renderer {
 	private readonly _version = '1.1';
 	private readonly _ns = 'http://www.w3.org/2000/svg';
 	private readonly _xlink = 'http://www.w3.org/1999/xlink';
+
+	private _entityMap = new Map<number, SVGNode>();
 
 	constructor(options: TSVGRendererOptions = {}) {
 		super(options);
@@ -27,16 +30,22 @@ export class SVGRenderer extends Renderer {
 		return this;
 	}
 
-	public render(data: any[]): this {
-		// TODO:
-		console.log('SVG render', { data });
+	public getNodeByEntityId(entityId: number): SVGNode | null {
+		return this._entityMap.get(entityId) ?? null;
+	}
 
-		for (const item of data) {
-			for (const change of item.changes) {
-				if (change.Path != null) {
-					const pathString = this.constructPathString(change.Path as Path);
-					console.log({ pathString });
-				}
+	public render(data: { entity: number; changes: any[] }): this {
+		// TODO:
+		console.log('Called SVG render', { data });
+
+		// 1. Check whether element for entity already exists
+		// 2. If not, create new element and append to parent or DOM
+		// 3. Register callbacks for changes
+
+		for (const change of data.changes) {
+			if (change.Path != null) {
+				const pathString = this.constructPathString(change.Path as Path);
+				console.log({ pathString });
 			}
 		}
 

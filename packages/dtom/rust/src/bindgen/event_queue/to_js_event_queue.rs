@@ -14,33 +14,37 @@ use std::{
 };
 use wasm_bindgen::{prelude::*, JsValue};
 
-use crate::plugins::bindgen_render_plugin::ChangeSet;
+use crate::plugins::bindgen_render_plugin::RenderChange;
 
 #[wasm_bindgen]
 extern "C" {
-    fn receiveRustEvents(id: usize, events: JsValue);
+    fn enqueue_rust_events(world_id: usize, events: JsValue);
 }
 
 #[cfg_attr(feature = "cli", derive(Type))]
 #[derive(Debug, Serialize, Clone)]
-pub enum JsEvent {
-    RenderUpdate(Vec<ChangeSet>),
+pub enum ToJsEvent {
+    RenderUpdate {
+        entity: u32,
+        changes: Vec<RenderChange>,
+    },
+    // ..
 }
 
 #[derive(Resource, Debug)]
-pub struct JsEventQueue {
+pub struct ToJsEventQueue {
     world_id: usize,
-    sender: Sender<JsEvent>,
-    receiver: Arc<Mutex<Receiver<JsEvent>>>,
+    sender: Sender<ToJsEvent>,
+    receiver: Arc<Mutex<Receiver<ToJsEvent>>>,
 }
 
-impl FromWorld for JsEventQueue {
+impl FromWorld for ToJsEventQueue {
     fn from_world(world: &mut World) -> Self {
-        return JsEventQueue::new(world.id());
+        return ToJsEventQueue::new(world.id());
     }
 }
 
-impl JsEventQueue {
+impl ToJsEventQueue {
     pub fn new(world_id: WorldId) -> Self {
         let parsed_world_id: usize = unsafe { transmute(world_id) };
         let (tx, rx) = channel();
@@ -53,12 +57,12 @@ impl JsEventQueue {
 
     /// Adds the incoming event via the sender.
     /// Sending over a channel is inherently thread-safe.
-    pub fn push_event(&self, event: JsEvent) {
+    pub fn push_event(&self, event: ToJsEvent) {
         self.sender.send(event).unwrap();
     }
 
     pub fn forward_events_to_js(&mut self) {
-        let mut events = Vec::new();
+        let mut events: Vec<ToJsEvent> = Vec::new();
 
         // Drain the receiver and push all events to the events vector
         loop {
@@ -72,7 +76,7 @@ impl JsEventQueue {
         // Send the events to JS
         if !events.is_empty() {
             let js_value = serde_wasm_bindgen::to_value(&events).unwrap();
-            receiveRustEvents(self.world_id, js_value); // Call into JS
+            enqueue_rust_events(self.world_id, js_value); // Call into JS
         }
     }
 }

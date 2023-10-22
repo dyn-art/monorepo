@@ -414,6 +414,7 @@ dependencies = [
  "console_error_panic_hook",
  "glam 0.24.2",
  "js-sys",
+ "once_cell",
  "serde",
  "serde-wasm-bindgen",
  "serde_json",

@@ -1,2 +1,2 @@
 export * from './Renderer';
-export * from './SVGRenderer';
+export * from './svg';

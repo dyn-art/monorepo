@@ -11,8 +11,10 @@ use serde::Serialize;
 use specta::Type;
 
 use crate::{
-    bindgen::js_bindings,
-    event_queue::js_event_queue::{JsEvent, JsEventQueue},
+    bindgen::{
+        event_queue::to_js_event_queue::{ToJsEvent, ToJsEventQueue},
+        js_bindings,
+    },
     node::mixins::{
         BlendMixin, ChildrenMixin, CompositionMixin, LayoutMixin, NodeMixin, PathMixin,
         RectangleCornerMixin,
@@ -25,7 +27,7 @@ use super::render_plugin::{
 
 #[cfg_attr(feature = "cli", derive(Type))]
 #[derive(Serialize, Clone, Debug)]
-pub enum Change {
+pub enum RenderChange {
     RectangleCorner(RectangleCornerMixin),
     Children(ChildrenMixin),
     Layout(LayoutMixin),
@@ -34,20 +36,13 @@ pub enum Change {
     Path(PathMixin),
 }
 
-#[cfg_attr(feature = "cli", derive(Type))]
-#[derive(Serialize, Debug, Clone)]
-pub struct ChangeSet {
-    pub entity: u32,
-    pub changes: Vec<Change>,
-}
-
 // =============================================================================
 // Ressources
 // =============================================================================
 
 #[derive(Resource, Default, Debug)]
 pub struct ChangedComponents {
-    changes: HashMap<Entity, Vec<Change>>,
+    changes: HashMap<Entity, Vec<RenderChange>>,
 }
 
 // =============================================================================
@@ -62,7 +57,9 @@ fn extract_rectangle_corner_mixin(
 ) {
     query.for_each(|(entity, rectangle_corner_mixin)| {
         let change_set = changed.changes.entry(entity).or_insert(vec![]);
-        change_set.push(Change::RectangleCorner(rectangle_corner_mixin.clone()));
+        change_set.push(RenderChange::RectangleCorner(
+            rectangle_corner_mixin.clone(),
+        ));
     });
 }
 
@@ -72,7 +69,7 @@ fn extract_children_mixin(
 ) {
     query.for_each(|(entity, children_mixin)| {
         let change_set = changed.changes.entry(entity).or_insert(vec![]);
-        change_set.push(Change::Children(children_mixin.clone()));
+        change_set.push(RenderChange::Children(children_mixin.clone()));
     });
 }
 
@@ -82,7 +79,7 @@ fn extract_layout_mixin(
 ) {
     query.for_each(|(entity, layout_mixin)| {
         let change_set = changed.changes.entry(entity).or_insert(vec![]);
-        change_set.push(Change::Layout(layout_mixin.clone()));
+        change_set.push(RenderChange::Layout(layout_mixin.clone()));
     });
 }
 
@@ -94,7 +91,7 @@ fn extract_composition_mixin(
 ) {
     query.for_each(|(entity, composition_mixin)| {
         let change_set = changed.changes.entry(entity).or_insert(vec![]);
-        change_set.push(Change::Composition(composition_mixin.clone()));
+        change_set.push(RenderChange::Composition(composition_mixin.clone()));
     });
 }
 
@@ -104,7 +101,7 @@ fn extract_blend_mixin(
 ) {
     query.for_each(|(entity, blend_mixin)| {
         let change_set = changed.changes.entry(entity).or_insert(vec![]);
-        change_set.push(Change::Blend(blend_mixin.clone()));
+        change_set.push(RenderChange::Blend(blend_mixin.clone()));
     });
 }
 
@@ -114,7 +111,7 @@ fn extract_path_mixin(
 ) {
     query.for_each(|(entity, path_mixin)| {
         let change_set = changed.changes.entry(entity).or_insert(vec![]);
-        change_set.push(Change::Path(path_mixin.clone()));
+        change_set.push(RenderChange::Path(path_mixin.clone()));
     });
 }
 
@@ -127,22 +124,23 @@ fn prepare_render_changes(mut commands: Commands, mut changed: ResMut<ChangedCom
 
 fn queue_render_changes(
     mut changed: ResMut<ChangedComponents>,
-    mut event_queue: ResMut<JsEventQueue>,
+    event_queue: ResMut<ToJsEventQueue>,
 ) {
-    if (!changed.changes.is_empty()) {
-        let changed_sets: Vec<ChangeSet> = changed
+    if !changed.changes.is_empty() {
+        changed
             .changes
             .drain()
-            .map(|(entity, changes)| ChangeSet {
-                entity: entity.index(),
-                changes: changes.clone(),
-            })
-            .collect();
-        event_queue.push_event(JsEvent::RenderUpdate(changed_sets));
+            .into_iter()
+            .for_each(|(entity, changes)| {
+                event_queue.push_event(ToJsEvent::RenderUpdate {
+                    entity: entity.index(),
+                    changes: changes.clone(),
+                });
+            });
     }
 }
 
-fn forward_render_changes_to_js(mut event_queue: ResMut<JsEventQueue>) {
+fn forward_render_changes_to_js(mut event_queue: ResMut<ToJsEventQueue>) {
     event_queue.forward_events_to_js();
 }
 
@@ -169,7 +167,7 @@ impl Plugin for BindgenRenderPlugin {
 
         // Register resources
         render_app.init_resource::<ChangedComponents>();
-        render_app.init_resource::<JsEventQueue>();
+        render_app.init_resource::<ToJsEventQueue>();
 
         // Register systems
         render_app
