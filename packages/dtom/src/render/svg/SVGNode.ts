@@ -9,33 +9,35 @@ export class SVGNode {
 	// Events
 	// ============================================================================
 
-	public onWheel(callback: (event: WheelEvent, node: SVGNode) => void) {
+	public onWheel(callback: TEventCallback<WheelEvent>) {
 		this._element.addEventListener('wheel', (event) => {
 			callback(event, this);
 		});
 	}
 
-	public onPointerDown(callback: (event: PointerEvent, node: SVGNode) => void) {
+	public onPointerDown(callback: TEventCallback<PointerEvent>) {
 		this._element.addEventListener('pointerdown', (event) => {
 			callback(event, this);
 		});
 	}
 
-	public onPointerMove(callback: (event: PointerEvent, node: SVGNode) => void) {
+	public onPointerMove(callback: TEventCallback<PointerEvent>) {
 		this._element.addEventListener('pointermove', (event) => {
 			callback(event, this);
 		});
 	}
 
-	public onPointerLeave(callback: (event: PointerEvent, node: SVGNode) => void) {
+	public onPointerLeave(callback: TEventCallback<PointerEvent>) {
 		this._element.addEventListener('pointerleave', (event) => {
 			callback(event, this);
 		});
 	}
 
-	public onPointerUp(callback: (event: PointerEvent, node: SVGNode) => void) {
+	public onPointerUp(callback: TEventCallback<PointerEvent>) {
 		this._element.addEventListener('pointerup', (event) => {
 			callback(event, this);
 		});
 	}
 }
+
+export type TEventCallback<TEvent> = (event: TEvent, node: SVGNode) => void;

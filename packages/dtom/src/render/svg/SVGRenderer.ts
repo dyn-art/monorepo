@@ -1,6 +1,8 @@
 import { notEmpty } from '@dyn/utils';
 
-import { Renderer, type TRendererOptions } from '../Renderer';
+import type { Editor } from '../../editor';
+import type { PathMixin, RenderUpdate } from '../../wasm';
+import { Renderer } from '../Renderer';
 import type { SVGNode } from './SVGNode';
 
 export class SVGRenderer extends Renderer {
@@ -13,8 +15,8 @@ export class SVGRenderer extends Renderer {
 
 	private _entityMap = new Map<number, SVGNode>();
 
-	constructor(options: TSVGRendererOptions = {}) {
-		super(options);
+	constructor(editor: Editor, options: TSVGRendererOptions = {}) {
+		super(editor);
 		const { domElement = this.createSVGElement('svg') } = options;
 		this._domElement = domElement;
 		this._defsElement = this.createSVGElement('defs');
@@ -23,8 +25,6 @@ export class SVGRenderer extends Renderer {
 	}
 
 	public setSize(width: number, height: number): this {
-		this._width = width;
-		this._height = height;
 		this.setAttributes(this._domElement, { width: `${width}px`, height: `${height}px` });
 		// TODO: trigger resize event
 		return this;
@@ -34,35 +34,42 @@ export class SVGRenderer extends Renderer {
 		return this._entityMap.get(entityId) ?? null;
 	}
 
-	public render(data: { entity: number; changes: any[] }): this {
+	public render(data: RenderUpdate): this {
+		const { changes, entity: entityId } = data;
+
 		// TODO:
-		console.log('Called SVG render', { data });
+		console.log('Called SVG render', { changes, entityId });
 
 		// 1. Check whether element for entity already exists
 		// 2. If not, create new element and append to parent or DOM
 		// 3. Register callbacks for changes
 
-		for (const change of data.changes) {
-			if (change.Path != null) {
-				const pathString = this.constructPathString(change.Path as Path);
-				console.log({ pathString });
+		for (const change of changes) {
+			if ('Path' in change) {
+				const pathParams = change.Path;
+				const svgPath = this.constructSVGPath(pathParams);
+				console.log({ pathString: svgPath });
 			}
 		}
 
 		return this;
 	}
 
-	private constructPathString(path: Path): string {
+	// =========================================================================
+	// SVG
+	// =========================================================================
+
+	private constructSVGPath(pathParams: PathMixin): string {
 		// Helper function to translate boolean flags to 1 or 0 for SVG
-		const boolToNum = (flag: boolean) => (flag ? '1' : '0');
+		const boolToNum = (flag: boolean): string => (flag ? '1' : '0');
 
 		// Map path vertices to SVG path commands
-		// and join them into a string
-		return path.vertices
+		const pathCommands: string[] = pathParams.vertices
 			.map((anchor) => {
 				const [x, y] = anchor.position;
 				const anchorCommand = anchor.command;
 
+				// Handle anchor commands without parameters
 				if (typeof anchorCommand === 'string') {
 					switch (anchor.command) {
 						case 'MoveTo':
@@ -74,7 +81,10 @@ export class SVGRenderer extends Renderer {
 						default:
 							return null;
 					}
-				} else if (typeof anchorCommand === 'object') {
+				}
+
+				// Handle anchor commands with parameters
+				else if (typeof anchorCommand === 'object') {
 					if ('ArcTo' in anchorCommand) {
 						const arcParams = anchorCommand.ArcTo;
 						const [rx, ry] = arcParams.radius;
@@ -89,9 +99,14 @@ export class SVGRenderer extends Renderer {
 
 				return null;
 			})
-			.filter(notEmpty)
-			.join(' ');
+			.filter(notEmpty);
+
+		return pathCommands.join(' ');
 	}
+
+	// =========================================================================
+	// DOM
+	// =========================================================================
 
 	// Create a namespaced SVG element
 	private createSVGElement(tag: TSVGTagNames, attributes: Record<string, string> = {}): SVGElement {
@@ -126,9 +141,9 @@ export class SVGRenderer extends Renderer {
 	}
 }
 
-export type TSVGRendererOptions = {
+export interface TSVGRendererOptions {
 	domElement?: SVGElement;
-} & TRendererOptions;
+}
 
 export type TSVGTagNames =
 	| 'svg'
@@ -146,28 +161,3 @@ export type TSVGTagNames =
 	| 'symbol';
 
 // TODO: REMOVE - Only temp until specta changes merged for type generation
-
-type Vec2 = [number, number];
-
-interface ArcTo {
-	radius: Vec2;
-	x_axis_rotation: number;
-	large_arc_flag: boolean;
-	sweep_flag: boolean;
-}
-
-interface CurveTo {
-	control_point_1: Vec2;
-	control_point_2: Vec2;
-}
-
-type Command = 'MoveTo' | 'LineTo' | { CurveTo: CurveTo } | 'ClosePath' | { ArcTo: ArcTo };
-
-interface Anchor {
-	position: Vec2;
-	command: Command;
-}
-
-interface Path {
-	vertices: Anchor[];
-}

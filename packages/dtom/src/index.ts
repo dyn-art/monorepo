@@ -1,5 +1,5 @@
-import './bindgen';
+import './wasm/bindgen';
 
-export * from './Editor';
+export * from './editor';
 export * from './render';
 export * from './wasm';

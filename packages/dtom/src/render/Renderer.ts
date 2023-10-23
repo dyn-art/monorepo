@@ -1,19 +1,25 @@
-export abstract class Renderer {
-	protected _width: number;
-	protected _height: number;
+import type { Editor } from '../editor';
 
-	constructor(options: TRendererOptions = {}) {
-		const { width = 100, height = 100 } = options;
-		this._width = width;
-		this._height = height;
+export abstract class Renderer {
+	private _editor: () => Editor; // TODO: Bad practice?
+
+	constructor(editor: Editor) {
+		this._editor = () => editor;
 	}
+
+	// =========================================================================
+	// Getter & Setter
+	// =========================================================================
+
+	protected get editor(): Editor {
+		return this._editor();
+	}
+
+	// =========================================================================
+	// Abstract
+	// =========================================================================
 
 	public abstract setSize(width: number, height: number): this;
 
 	public abstract render(data: unknown): this;
-}
-
-export interface TRendererOptions {
-	width?: number;
-	height?: number;
 }

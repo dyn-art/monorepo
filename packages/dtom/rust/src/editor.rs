@@ -6,9 +6,9 @@ use bevy_app::PostUpdate;
 use bevy_app::PreUpdate;
 use bevy_app::Startup;
 use bevy_app::Update;
+use serde::Serialize;
 use wasm_bindgen::prelude::*;
 
-use crate::bindgen::event_queue::from_js_event_queue::FromJsEvent;
 use crate::bindgen::event_queue::from_js_event_queue::FromJsEventQueue;
 use crate::bindgen::event_queue::to_js_event_queue::ToJsEventQueue;
 use crate::bindgen::{js_bindings, utils::set_panic_hook};
@@ -21,10 +21,19 @@ use crate::systems::forward_events_to_js;
 use crate::systems::poll_events_from_js;
 use crate::systems::startup_system_log;
 use crate::systems::update_system_log;
+#[cfg(feature = "cli")]
+use specta::Type;
+
+#[cfg_attr(feature = "cli", derive(Type))]
+#[derive(Serialize)]
+pub struct WorldIds {
+    main_world_id: usize,
+    render_world_id: usize,
+}
 
 #[wasm_bindgen]
 pub struct Editor {
-    world_ids: Vec<usize>,
+    world_ids: WorldIds,
     app: App,
 }
 
@@ -51,25 +60,25 @@ impl Editor {
             .add_systems(Last, forward_events_to_js);
 
         Self {
-            world_ids: Editor::extract_world_ids(&mut app),
+            world_ids: WorldIds {
+                main_world_id: Editor::extract_main_world_id(&mut app),
+                render_world_id: Editor::extract_render_world_id(&mut app),
+            },
             app,
         }
     }
 
-    /// Extracts the world id of the main world and the render world
-    fn extract_world_ids(app: &mut App) -> Vec<usize> {
-        let mut world_ids: Vec<usize> = Vec::new();
-
+    fn extract_main_world_id(app: &mut App) -> usize {
         let main_world_id = app.world.id();
         let parsed_main_world_id: usize = unsafe { transmute(main_world_id) };
-        world_ids.push(parsed_main_world_id);
+        return parsed_main_world_id;
+    }
 
+    fn extract_render_world_id(app: &mut App) -> usize {
         let render_app = app.get_sub_app_mut(RenderApp).unwrap();
         let render_world_id = render_app.world.id();
         let parsed_render_world_id: usize = unsafe { transmute(render_world_id) };
-        world_ids.push(parsed_render_world_id);
-
-        return world_ids;
+        return parsed_render_world_id;
     }
 
     pub fn update(&mut self) {

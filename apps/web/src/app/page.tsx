@@ -1,16 +1,16 @@
 'use client';
 
 import React from 'react';
-import { Editor, initWasm, SVGRenderer } from '@dyn/dtom';
+import { createSVGEditor, initWasm } from '@dyn/dtom';
 import { MaxWidthWrapper } from '@/components';
 
 async function onClick(): Promise<void> {
 	await initWasm();
-	const editor = new Editor(new SVGRenderer());
+	const editor = createSVGEditor({ width: 500, height: 500 });
 	editor.createRect();
 	editor.createRect();
 
-	const editor2 = new Editor(new SVGRenderer());
+	const editor2 = createSVGEditor({ width: 500, height: 500 });
 	editor2.createRect();
 
 	console.log({ editor, editor2 });
