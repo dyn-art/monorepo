@@ -1,6 +1,6 @@
 import { notEmpty } from '@dyn/utils';
 
-import type { Editor } from '../../editor';
+import type { Canvas } from '../../canvas';
 import type { PathMixin, RenderUpdate } from '../../wasm';
 import { Renderer } from '../Renderer';
 import type { SVGNode } from './SVGNode';
@@ -15,8 +15,8 @@ export class SVGRenderer extends Renderer {
 
 	private _entityMap = new Map<number, SVGNode>();
 
-	constructor(editor: Editor, options: TSVGRendererOptions = {}) {
-		super(editor);
+	constructor(canvas: Canvas, options: TSVGRendererOptions = {}) {
+		super(canvas);
 		const { domElement = this.createSVGElement('svg') } = options;
 		this._domElement = domElement;
 		this._defsElement = this.createSVGElement('defs');

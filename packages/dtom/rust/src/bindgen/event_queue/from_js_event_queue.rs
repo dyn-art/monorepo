@@ -11,6 +11,7 @@ use bevy_ecs::{
     system::Resource,
     world::{FromWorld, World, WorldId},
 };
+use glam::Vec2;
 use once_cell::sync::Lazy;
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::{prelude::*, JsValue};
@@ -18,7 +19,10 @@ use wasm_bindgen::{prelude::*, JsValue};
 #[cfg_attr(feature = "cli", derive(Type))]
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum FromJsEvent {
-    PointerDownEvent { entity: u32 },
+    PointerDownEventOnEntity { entity: u32 },
+    PointerMovedOnCanvas { position: Vec2 },
+    PointerEnteredCanvas,
+    PointerExitedCanvas,
     // ..
 }
 

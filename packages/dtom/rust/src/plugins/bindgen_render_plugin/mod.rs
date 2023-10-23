@@ -15,9 +15,12 @@ use crate::{
         event_queue::to_js_event_queue::{ToJsEvent, ToJsEventQueue},
         js_bindings,
     },
-    node::mixins::{
-        BlendMixin, ChildrenMixin, CompositionMixin, LayoutMixin, NodeMixin, PathMixin,
-        RectangleCornerMixin,
+    core::node::{
+        mixins::{
+            BlendMixin, ChildrenMixin, CompositionMixin, LayoutMixin, PathMixin,
+            RectangleCornerMixin,
+        },
+        types::Node,
     },
 };
 
@@ -52,7 +55,7 @@ pub struct ChangedComponents {
 fn extract_rectangle_corner_mixin(
     mut changed: ResMut<ChangedComponents>,
     query: Extract<
-        Query<(Entity, &RectangleCornerMixin), (With<NodeMixin>, Changed<RectangleCornerMixin>)>,
+        Query<(Entity, &RectangleCornerMixin), (With<Node>, Changed<RectangleCornerMixin>)>,
     >,
 ) {
     query.for_each(|(entity, rectangle_corner_mixin)| {
@@ -65,7 +68,7 @@ fn extract_rectangle_corner_mixin(
 
 fn extract_children_mixin(
     mut changed: ResMut<ChangedComponents>,
-    query: Extract<Query<(Entity, &ChildrenMixin), (With<NodeMixin>, Changed<ChildrenMixin>)>>,
+    query: Extract<Query<(Entity, &ChildrenMixin), (With<Node>, Changed<ChildrenMixin>)>>,
 ) {
     query.for_each(|(entity, children_mixin)| {
         let change_set = changed.changes.entry(entity).or_insert(vec![]);
@@ -75,7 +78,7 @@ fn extract_children_mixin(
 
 fn extract_layout_mixin(
     mut changed: ResMut<ChangedComponents>,
-    query: Extract<Query<(Entity, &LayoutMixin), (With<NodeMixin>, Changed<LayoutMixin>)>>,
+    query: Extract<Query<(Entity, &LayoutMixin), (With<Node>, Changed<LayoutMixin>)>>,
 ) {
     query.for_each(|(entity, layout_mixin)| {
         let change_set = changed.changes.entry(entity).or_insert(vec![]);
@@ -85,9 +88,7 @@ fn extract_layout_mixin(
 
 fn extract_composition_mixin(
     mut changed: ResMut<ChangedComponents>,
-    query: Extract<
-        Query<(Entity, &CompositionMixin), (With<NodeMixin>, Changed<CompositionMixin>)>,
-    >,
+    query: Extract<Query<(Entity, &CompositionMixin), (With<Node>, Changed<CompositionMixin>)>>,
 ) {
     query.for_each(|(entity, composition_mixin)| {
         let change_set = changed.changes.entry(entity).or_insert(vec![]);
@@ -97,7 +98,7 @@ fn extract_composition_mixin(
 
 fn extract_blend_mixin(
     mut changed: ResMut<ChangedComponents>,
-    query: Extract<Query<(Entity, &BlendMixin), (With<NodeMixin>, Changed<BlendMixin>)>>,
+    query: Extract<Query<(Entity, &BlendMixin), (With<Node>, Changed<BlendMixin>)>>,
 ) {
     query.for_each(|(entity, blend_mixin)| {
         let change_set = changed.changes.entry(entity).or_insert(vec![]);
@@ -107,7 +108,7 @@ fn extract_blend_mixin(
 
 fn extract_path_mixin(
     mut changed: ResMut<ChangedComponents>,
-    query: Extract<Query<(Entity, &PathMixin), (With<NodeMixin>, Changed<PathMixin>)>>,
+    query: Extract<Query<(Entity, &PathMixin), (With<Node>, Changed<PathMixin>)>>,
 ) {
     query.for_each(|(entity, path_mixin)| {
         let change_set = changed.changes.entry(entity).or_insert(vec![]);

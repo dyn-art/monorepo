@@ -1,18 +1,18 @@
-import type { Editor } from '../editor';
+import type { Canvas } from '../canvas';
 
 export abstract class Renderer {
-	private _editor: () => Editor; // TODO: Bad practice?
+	private _canvas: () => Canvas; // TODO: Bad practice?
 
-	constructor(editor: Editor) {
-		this._editor = () => editor;
+	constructor(canvas: Canvas) {
+		this._canvas = () => canvas;
 	}
 
 	// =========================================================================
 	// Getter & Setter
 	// =========================================================================
 
-	protected get editor(): Editor {
-		return this._editor();
+	protected get canvas(): Canvas {
+		return this._canvas();
 	}
 
 	// =========================================================================

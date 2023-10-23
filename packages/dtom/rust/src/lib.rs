@@ -1,5 +1,3 @@
 mod bindgen;
-pub mod editor;
-pub mod node;
+pub mod core;
 mod plugins;
-mod systems;

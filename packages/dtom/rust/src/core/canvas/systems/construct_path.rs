@@ -5,7 +5,9 @@ use bevy_ecs::{
 };
 use glam::Vec2;
 
-use crate::node::mixins::{Anchor, AnchorCommand, LayoutMixin, PathMixin, RectangleCornerMixin};
+use crate::core::node::mixins::{
+    Anchor, AnchorCommand, LayoutMixin, PathMixin, RectangleCornerMixin,
+};
 
 // =============================================================================
 // Rectangle

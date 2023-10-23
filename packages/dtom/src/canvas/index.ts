@@ -1,2 +1,2 @@
-export * from './Editor';
+export * from './Canvas';
 export * from './factories';

@@ -5,40 +5,6 @@ use serde::Serialize;
 use specta::Type;
 
 #[cfg_attr(feature = "cli", derive(Type))]
-#[derive(Component, Serialize, Clone, Default, Debug)]
-pub struct NodeMixin;
-
-#[cfg_attr(feature = "cli", derive(Type))]
-#[derive(Component, Serialize, Clone, Debug)]
-pub struct ShapeMixin;
-
-#[cfg_attr(feature = "cli", derive(Type))]
-#[derive(Component, Serialize, Clone, Debug)]
-pub struct FrameMixin {
-    clip_content: bool,
-}
-
-impl Default for FrameMixin {
-    fn default() -> Self {
-        Self {
-            clip_content: false,
-        }
-    }
-}
-
-#[cfg_attr(feature = "cli", derive(Type))]
-#[derive(Component, Serialize, Clone, Default, Debug)]
-pub struct GroupMixin;
-
-#[cfg_attr(feature = "cli", derive(Type))]
-#[derive(Component, Serialize, Clone, Default, Debug)]
-pub struct RectangleMixin;
-
-// =============================================================================
-// Mixins
-// =============================================================================
-
-#[cfg_attr(feature = "cli", derive(Type))]
 #[derive(Component, Serialize, Clone, Debug)]
 pub struct RectangleCornerMixin {
     pub top_left_radius: i16,

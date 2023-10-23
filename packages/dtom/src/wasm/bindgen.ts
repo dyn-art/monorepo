@@ -1,4 +1,4 @@
-import { Editor } from '../editor/Editor';
+import { Canvas } from '../canvas/Canvas';
 
 (globalThis as any).enqueue_rust_events = function onNewWasmEvents(
 	worldId: number,
@@ -6,7 +6,7 @@ import { Editor } from '../editor/Editor';
 ) {
 	console.log('Received new events from Rust', { worldId, events });
 	for (const event of events) {
-		Editor.onWasmEvent(worldId, event);
+		Canvas.onWasmEvent(worldId, event);
 	}
 };
 

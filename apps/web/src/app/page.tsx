@@ -1,27 +1,27 @@
 'use client';
 
 import React from 'react';
-import { createSVGEditor, initWasm } from '@dyn/dtom';
+import { createSVGCanvas, initWasm } from '@dyn/dtom';
 import { MaxWidthWrapper } from '@/components';
 
 async function onClick(): Promise<void> {
 	await initWasm();
-	const editor = createSVGEditor({ width: 500, height: 500 });
-	editor.createRect();
-	editor.createRect();
+	const canvas = createSVGCanvas({ width: 500, height: 500 });
+	canvas.createRect();
+	canvas.createRect();
 
-	const editor2 = createSVGEditor({ width: 500, height: 500 });
-	editor2.createRect();
+	const canvas2 = createSVGCanvas({ width: 500, height: 500 });
+	canvas2.createRect();
 
-	console.log({ editor, editor2 });
+	console.log({ canvas, canvas2 });
 
 	for (let i = 0; i < 10; i++) {
-		editor.update();
+		canvas.update();
 	}
 
 	console.log('------------------');
 	for (let i = 0; i < 10; i++) {
-		editor2.update();
+		canvas2.update();
 	}
 }
 

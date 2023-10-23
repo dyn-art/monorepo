@@ -1,29 +1,29 @@
-import { Editor as RustEditor } from '@rust/dyn-dtom';
+import { CanvasApp as RustCanvasApp } from '@rust/dyn-dtom';
 
 import type { Renderer } from '../render';
 import type { RenderUpdate, ToJsEvent, WorldIds } from '../wasm';
 
-export class Editor {
-	private _rustEditor: RustEditor;
+export class Canvas {
+	private _rustCanvas: RustCanvasApp;
 	private _worldIds: TWorldIds;
 
-	// Keep track of all instances of Editor
+	// Keep track of all instances of the Canvas class
 	// so we can pass WASM events to the correct instance based on the worldId
-	private static _INSTANCES: Editor[] = [];
+	private static _INSTANCES: Canvas[] = [];
 
 	private _renderer: Renderer[] = [];
 
 	protected _width: number;
 	protected _height: number;
 
-	constructor(config: TEditorConfig) {
+	constructor(config: TCanvasConfig) {
 		const { width, height } = config;
-		this._rustEditor = new RustEditor();
+		this._rustCanvas = new RustCanvasApp();
 		this._worldIds = this.retrieveWorldIds();
 		this._width = width;
 		this._height = height;
 
-		Editor._INSTANCES.push(this);
+		Canvas._INSTANCES.push(this);
 	}
 
 	// =========================================================================
@@ -39,7 +39,7 @@ export class Editor {
 	// =========================================================================
 
 	private retrieveWorldIds(): TWorldIds {
-		const worldIds: WorldIds = this._rustEditor.get_world_ids();
+		const worldIds: WorldIds = this._rustCanvas.get_world_ids();
 		return {
 			mainWorldId: worldIds.main_world_id,
 			renderWorldId: worldIds.render_world_id
@@ -47,7 +47,7 @@ export class Editor {
 	}
 
 	public static onWasmEvent(worldId: number, data: ToJsEvent): void {
-		Editor._INSTANCES.find((instance) => instance.hasWorldId(worldId))?.onWasmEvent(data);
+		Canvas._INSTANCES.find((instance) => instance.hasWorldId(worldId))?.onWasmEvent(data);
 	}
 
 	public onWasmEvent(event: ToJsEvent): this {
@@ -87,7 +87,7 @@ export class Editor {
 	}
 
 	public createRect(): void {
-		this._rustEditor.create_rect();
+		this._rustCanvas.create_rect();
 	}
 
 	public hasWorldId(worldId: number): boolean {
@@ -95,11 +95,11 @@ export class Editor {
 	}
 
 	public update(): void {
-		this._rustEditor.update();
+		this._rustCanvas.update();
 	}
 }
 
-export interface TEditorConfig {
+export interface TCanvasConfig {
 	width: number;
 	height: number;
 }

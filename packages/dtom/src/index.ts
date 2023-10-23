@@ -1,5 +1,5 @@
 import './wasm/bindgen';
 
-export * from './editor';
+export * from './canvas';
 export * from './render';
 export * from './wasm';
