@@ -3,7 +3,6 @@ use bevy_ecs::{
     world::{FromWorld, World, WorldId},
 };
 use serde::Serialize;
-#[cfg(feature = "cli")]
 use specta::Type;
 use std::{
     mem::transmute,
@@ -14,18 +13,18 @@ use std::{
 };
 use wasm_bindgen::{prelude::*, JsValue};
 
-use crate::plugins::bindgen_render_plugin::RenderChange;
+use crate::{core::node::types::NodeType, plugins::bindgen_render_plugin::RenderChange};
 
 #[wasm_bindgen]
 extern "C" {
     fn enqueue_rust_events(world_id: usize, events: JsValue);
 }
 
-#[cfg_attr(feature = "cli", derive(Type))]
-#[derive(Debug, Serialize, Clone)]
+#[derive(Debug, Serialize, Clone, Type)]
 pub enum ToJsEvent {
     RenderUpdate {
         entity: u32,
+        node_type: NodeType,
         changes: Vec<RenderChange>,
     },
     // ..

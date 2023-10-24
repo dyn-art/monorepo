@@ -1,4 +1,4 @@
-import { Canvas } from '../canvas/Canvas';
+import { Composition } from '../composition';
 
 (globalThis as any).enqueue_rust_events = function onNewWasmEvents(
 	worldId: number,
@@ -6,7 +6,7 @@ import { Canvas } from '../canvas/Canvas';
 ) {
 	console.log('Received new events from Rust', { worldId, events });
 	for (const event of events) {
-		Canvas.onWasmEvent(worldId, event);
+		Composition.onWasmEvent(worldId, event);
 	}
 };
 
@@ -22,26 +22,33 @@ export interface ToJsEvent {
 export interface RenderUpdate {
 	entity: number;
 	changes: RenderChange[];
+	node_type: 'Rectangle' | 'Group' | 'Frame';
 }
 
-export type RenderChange = Layout | Composition | Blend | Path | RectangleCorner | Children;
+export type RenderChange =
+	| LayoutChange
+	| CompositionChange
+	| BlendChange
+	| Path
+	| RectangleCornerChange
+	| ChildrenChange;
 
-export interface Layout {
+export interface LayoutChange {
 	Layout: any;
 }
-export interface Composition {
+export interface CompositionChange {
 	Composition: any;
 }
-export interface Blend {
+export interface BlendChange {
 	Blend: any;
 }
 export interface Path {
 	Path: PathMixin;
 }
-export interface RectangleCorner {
+export interface RectangleCornerChange {
 	RectangleCorner: any;
 }
-export interface Children {
+export interface ChildrenChange {
 	Children: any;
 }
 

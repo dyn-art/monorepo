@@ -136,12 +136,15 @@ importers:
   packages/dtom:
     dependencies:
       '@dyn/utils':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../utils
     devDependencies:
       '@dyn/config':
         specifier: workspace:*
         version: link:../config
+      '@dyn/types':
+        specifier: workspace:^
+        version: link:../types
       '@rollup/plugin-wasm':
         specifier: ^6.2.2
         version: 6.2.2
@@ -167,6 +170,12 @@ importers:
       '@types/node':
         specifier: ^17.0.12
         version: 17.0.12
+
+  packages/types:
+    devDependencies:
+      '@dyn/config':
+        specifier: workspace:*
+        version: link:../config
 
   packages/utils:
     devDependencies:

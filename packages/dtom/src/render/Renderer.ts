@@ -1,18 +1,18 @@
-import type { Canvas } from '../canvas';
+import type { Composition } from '../composition';
 
 export abstract class Renderer {
-	private _canvas: () => Canvas; // TODO: Bad practice?
+	private _composition: () => Composition; // TODO: Bad practice?
 
-	constructor(canvas: Canvas) {
-		this._canvas = () => canvas;
+	constructor(composition: Composition) {
+		this._composition = () => composition;
 	}
 
 	// =========================================================================
 	// Getter & Setter
 	// =========================================================================
 
-	protected get canvas(): Canvas {
-		return this._canvas();
+	protected get composition(): Composition {
+		return this._composition();
 	}
 
 	// =========================================================================

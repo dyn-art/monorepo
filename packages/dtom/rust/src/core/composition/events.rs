@@ -2,18 +2,18 @@ use bevy_ecs::event::Event;
 use glam::Vec2;
 
 // #[derive(Event, Debug)]
-// pub struct CanvasResized {
+// pub struct CompositionResized {
 //     pub width: f32,
 //     pub height: f32,
 // }
 
 #[derive(Event, Debug)]
-pub struct CursorMovedOnCanvas {
+pub struct CursorMovedOnComposition {
     pub position: Vec2,
 }
 
 #[derive(Event, Debug)]
-pub struct CursorEnteredCanvas;
+pub struct CursorEnteredComposition;
 
 #[derive(Event, Debug)]
-pub struct CursorExitedCanvas;
+pub struct CursorExitedComposition;

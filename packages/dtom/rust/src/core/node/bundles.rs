@@ -1,14 +1,15 @@
-use bevy_ecs::bundle::Bundle;
+use bevy_ecs::{bundle::Bundle, entity::Entity};
+use serde::{Deserialize, Serialize};
 
 use super::{
     mixins::{BlendMixin, ChildrenMixin, CompositionMixin, LayoutMixin, RectangleCornerMixin},
-    types::{Frame, Group, Node, Rectangle},
+    types::{Frame, Group, Node, NodeType, Rectangle},
 };
 
-#[derive(Bundle, Debug)]
+#[derive(Bundle, Debug, Serialize, Deserialize, Clone)]
 pub struct FrameNodeBundle {
-    pub node_mixin: Node,
-    pub frame_mixin: Frame,
+    pub node: Node,
+    pub frame: Frame,
     pub rectangle_corner_mixin: RectangleCornerMixin,
     pub children_mixin: ChildrenMixin,
     pub composition_mixin: CompositionMixin,
@@ -16,11 +17,13 @@ pub struct FrameNodeBundle {
     pub blend_mixin: BlendMixin,
 }
 
-impl Default for FrameNodeBundle {
-    fn default() -> Self {
+impl FrameNodeBundle {
+    pub fn default() -> Self {
         Self {
-            node_mixin: Node::default(),
-            frame_mixin: Frame::default(),
+            node: Node {
+                node_type: NodeType::Frame,
+            },
+            frame: Frame::default(),
             rectangle_corner_mixin: RectangleCornerMixin::default(),
             children_mixin: ChildrenMixin::default(),
             composition_mixin: CompositionMixin::default(),
@@ -30,21 +33,23 @@ impl Default for FrameNodeBundle {
     }
 }
 
-#[derive(Bundle, Debug)]
+#[derive(Bundle, Debug, Serialize, Deserialize, Clone)]
 pub struct GroupNodeBundle {
-    pub node_mixin: Node,
-    pub group_mixin: Group,
+    pub node: Node,
+    pub group: Group,
     pub children_mixin: ChildrenMixin,
     pub composition_mixin: CompositionMixin,
     pub layout_mixin: LayoutMixin,
     pub blend_mixin: BlendMixin,
 }
 
-impl Default for GroupNodeBundle {
-    fn default() -> Self {
+impl GroupNodeBundle {
+    pub fn default(parent: Entity) -> Self {
         Self {
-            node_mixin: Node::default(),
-            group_mixin: Group::default(),
+            node: Node {
+                node_type: NodeType::Group,
+            },
+            group: Group::default(),
             children_mixin: ChildrenMixin::default(),
             composition_mixin: CompositionMixin::default(),
             layout_mixin: LayoutMixin::default(),
@@ -53,21 +58,23 @@ impl Default for GroupNodeBundle {
     }
 }
 
-#[derive(Bundle, Debug)]
+#[derive(Bundle, Debug, Serialize, Deserialize, Clone)]
 pub struct RectangleNodeBundle {
-    pub node_mixin: Node,
-    pub recangle_mixin: Rectangle,
+    pub node: Node,
+    pub recangle: Rectangle,
     pub rectangle_corner_mixin: RectangleCornerMixin,
     pub composition_mixin: CompositionMixin,
     pub layout_mixin: LayoutMixin,
     pub blend_mixin: BlendMixin,
 }
 
-impl Default for RectangleNodeBundle {
-    fn default() -> Self {
+impl RectangleNodeBundle {
+    pub fn default(parent: Entity) -> Self {
         Self {
-            node_mixin: Node::default(),
-            recangle_mixin: Rectangle::default(),
+            node: Node {
+                node_type: NodeType::Rectangle,
+            },
+            recangle: Rectangle::default(),
             rectangle_corner_mixin: RectangleCornerMixin::default(),
             composition_mixin: CompositionMixin::default(),
             layout_mixin: LayoutMixin::default(),

@@ -14,15 +14,15 @@ use bevy_ecs::{
 use glam::Vec2;
 use once_cell::sync::Lazy;
 use serde::{Deserialize, Serialize};
+use specta::Type;
 use wasm_bindgen::{prelude::*, JsValue};
 
-#[cfg_attr(feature = "cli", derive(Type))]
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, Type)]
 pub enum FromJsEvent {
     PointerDownEventOnEntity { entity: u32 },
-    PointerMovedOnCanvas { position: Vec2 },
-    PointerEnteredCanvas,
-    PointerExitedCanvas,
+    PointerMovedOnComposition { position: Vec2 },
+    PointerEnteredComposition,
+    PointerExitedComposition,
     // ..
 }
 

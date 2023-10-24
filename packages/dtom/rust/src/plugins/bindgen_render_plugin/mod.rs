@@ -1,5 +1,6 @@
 use bevy_app::{App, Plugin};
 use bevy_ecs::{
+    component::Component,
     entity::Entity,
     query::{Changed, With},
     schedule::IntoSystemConfigs,
@@ -7,6 +8,7 @@ use bevy_ecs::{
 };
 use bevy_utils::HashMap;
 use serde::Serialize;
+use specta::Type;
 #[cfg(feature = "cli")]
 use specta::Type;
 
@@ -20,7 +22,7 @@ use crate::{
             BlendMixin, ChildrenMixin, CompositionMixin, LayoutMixin, PathMixin,
             RectangleCornerMixin,
         },
-        types::Node,
+        types::{Node, NodeType},
     },
 };
 
@@ -28,8 +30,7 @@ use super::render_plugin::{
     extract_param::Extract, ExtractSchedule, RenderApp, RenderSchedule, RenderSet,
 };
 
-#[cfg_attr(feature = "cli", derive(Type))]
-#[derive(Serialize, Clone, Debug)]
+#[derive(Serialize, Clone, Debug, Type)]
 pub enum RenderChange {
     RectangleCorner(RectangleCornerMixin),
     Children(ChildrenMixin),
@@ -39,80 +40,69 @@ pub enum RenderChange {
     Path(PathMixin),
 }
 
+pub trait ToRenderChange {
+    fn to_render_change(&self) -> RenderChange;
+}
+
+impl ToRenderChange for ChildrenMixin {
+    fn to_render_change(&self) -> RenderChange {
+        RenderChange::Children(self.clone())
+    }
+}
+
+impl ToRenderChange for LayoutMixin {
+    fn to_render_change(&self) -> RenderChange {
+        RenderChange::Layout(self.clone())
+    }
+}
+
+impl ToRenderChange for CompositionMixin {
+    fn to_render_change(&self) -> RenderChange {
+        RenderChange::Composition(self.clone())
+    }
+}
+
+impl ToRenderChange for BlendMixin {
+    fn to_render_change(&self) -> RenderChange {
+        RenderChange::Blend(self.clone())
+    }
+}
+
+impl ToRenderChange for PathMixin {
+    fn to_render_change(&self) -> RenderChange {
+        RenderChange::Path(self.clone())
+    }
+}
+
+impl ToRenderChange for RectangleCornerMixin {
+    fn to_render_change(&self) -> RenderChange {
+        RenderChange::RectangleCorner(self.clone())
+    }
+}
+
 // =============================================================================
 // Ressources
 // =============================================================================
 
 #[derive(Resource, Default, Debug)]
 pub struct ChangedComponents {
-    changes: HashMap<Entity, Vec<RenderChange>>,
+    changes: HashMap<Entity, (NodeType, Vec<RenderChange>)>,
 }
 
 // =============================================================================
 // Systems
 // =============================================================================
 
-fn extract_rectangle_corner_mixin(
+fn extract_mixin_generic<T: Component + Clone + ToRenderChange>(
     mut changed: ResMut<ChangedComponents>,
-    query: Extract<
-        Query<(Entity, &RectangleCornerMixin), (With<Node>, Changed<RectangleCornerMixin>)>,
-    >,
+    query: Extract<Query<(Entity, &Node, &T), (With<Node>, Changed<T>)>>,
 ) {
-    query.for_each(|(entity, rectangle_corner_mixin)| {
-        let change_set = changed.changes.entry(entity).or_insert(vec![]);
-        change_set.push(RenderChange::RectangleCorner(
-            rectangle_corner_mixin.clone(),
-        ));
-    });
-}
-
-fn extract_children_mixin(
-    mut changed: ResMut<ChangedComponents>,
-    query: Extract<Query<(Entity, &ChildrenMixin), (With<Node>, Changed<ChildrenMixin>)>>,
-) {
-    query.for_each(|(entity, children_mixin)| {
-        let change_set = changed.changes.entry(entity).or_insert(vec![]);
-        change_set.push(RenderChange::Children(children_mixin.clone()));
-    });
-}
-
-fn extract_layout_mixin(
-    mut changed: ResMut<ChangedComponents>,
-    query: Extract<Query<(Entity, &LayoutMixin), (With<Node>, Changed<LayoutMixin>)>>,
-) {
-    query.for_each(|(entity, layout_mixin)| {
-        let change_set = changed.changes.entry(entity).or_insert(vec![]);
-        change_set.push(RenderChange::Layout(layout_mixin.clone()));
-    });
-}
-
-fn extract_composition_mixin(
-    mut changed: ResMut<ChangedComponents>,
-    query: Extract<Query<(Entity, &CompositionMixin), (With<Node>, Changed<CompositionMixin>)>>,
-) {
-    query.for_each(|(entity, composition_mixin)| {
-        let change_set = changed.changes.entry(entity).or_insert(vec![]);
-        change_set.push(RenderChange::Composition(composition_mixin.clone()));
-    });
-}
-
-fn extract_blend_mixin(
-    mut changed: ResMut<ChangedComponents>,
-    query: Extract<Query<(Entity, &BlendMixin), (With<Node>, Changed<BlendMixin>)>>,
-) {
-    query.for_each(|(entity, blend_mixin)| {
-        let change_set = changed.changes.entry(entity).or_insert(vec![]);
-        change_set.push(RenderChange::Blend(blend_mixin.clone()));
-    });
-}
-
-fn extract_path_mixin(
-    mut changed: ResMut<ChangedComponents>,
-    query: Extract<Query<(Entity, &PathMixin), (With<Node>, Changed<PathMixin>)>>,
-) {
-    query.for_each(|(entity, path_mixin)| {
-        let change_set = changed.changes.entry(entity).or_insert(vec![]);
-        change_set.push(RenderChange::Path(path_mixin.clone()));
+    query.for_each(|(entity, node, mixin)| {
+        let (_, change_set) = changed
+            .changes
+            .entry(entity)
+            .or_insert((node.node_type.clone(), vec![]));
+        change_set.push(mixin.to_render_change());
     });
 }
 
@@ -132,10 +122,11 @@ fn queue_render_changes(
             .changes
             .drain()
             .into_iter()
-            .for_each(|(entity, changes)| {
+            .for_each(|(entity, (node_type, changes))| {
                 event_queue.push_event(ToJsEvent::RenderUpdate {
                     entity: entity.index(),
-                    changes: changes.clone(),
+                    node_type,
+                    changes,
                 });
             });
     }
@@ -176,12 +167,12 @@ impl Plugin for BindgenRenderPlugin {
                 ExtractSchedule,
                 (
                     extract_system_log,
-                    extract_rectangle_corner_mixin,
-                    extract_children_mixin,
-                    extract_layout_mixin,
-                    extract_composition_mixin,
-                    extract_blend_mixin,
-                    extract_path_mixin,
+                    extract_mixin_generic::<RectangleCornerMixin>,
+                    extract_mixin_generic::<ChildrenMixin>,
+                    extract_mixin_generic::<LayoutMixin>,
+                    extract_mixin_generic::<CompositionMixin>,
+                    extract_mixin_generic::<BlendMixin>,
+                    extract_mixin_generic::<PathMixin>,
                 ),
             )
             .add_systems(

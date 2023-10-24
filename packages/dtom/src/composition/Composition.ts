@@ -1,29 +1,30 @@
-import { CanvasApp as RustCanvasApp } from '@rust/dyn-dtom';
+import { CompositionApp as RustCompositionApp } from '@rust/dyn-dtom';
+import type { TComposition } from '@dyn/types/dtif';
 
 import type { Renderer } from '../render';
 import type { RenderUpdate, ToJsEvent, WorldIds } from '../wasm';
 
-export class Canvas {
-	private _rustCanvas: RustCanvasApp;
+export class Composition {
+	private _rustComposition: RustCompositionApp;
 	private _worldIds: TWorldIds;
 
-	// Keep track of all instances of the Canvas class
+	// Keep track of all instances of the Composition class
 	// so we can pass WASM events to the correct instance based on the worldId
-	private static _INSTANCES: Canvas[] = [];
+	private static _INSTANCES: Composition[] = [];
 
 	private _renderer: Renderer[] = [];
 
 	protected _width: number;
 	protected _height: number;
 
-	constructor(config: TCanvasConfig) {
+	constructor(config: TCompositionConfig) {
 		const { width, height } = config;
-		this._rustCanvas = new RustCanvasApp();
+		this._rustComposition = new RustCompositionApp({});
 		this._worldIds = this.retrieveWorldIds();
 		this._width = width;
 		this._height = height;
 
-		Canvas._INSTANCES.push(this);
+		Composition._INSTANCES.push(this);
 	}
 
 	// =========================================================================
@@ -39,7 +40,7 @@ export class Canvas {
 	// =========================================================================
 
 	private retrieveWorldIds(): TWorldIds {
-		const worldIds: WorldIds = this._rustCanvas.get_world_ids();
+		const worldIds: WorldIds = this._rustComposition.get_world_ids();
 		return {
 			mainWorldId: worldIds.main_world_id,
 			renderWorldId: worldIds.render_world_id
@@ -47,7 +48,7 @@ export class Canvas {
 	}
 
 	public static onWasmEvent(worldId: number, data: ToJsEvent): void {
-		Canvas._INSTANCES.find((instance) => instance.hasWorldId(worldId))?.onWasmEvent(data);
+		Composition._INSTANCES.find((instance) => instance.hasWorldId(worldId))?.onWasmEvent(data);
 	}
 
 	public onWasmEvent(event: ToJsEvent): this {
@@ -86,22 +87,19 @@ export class Canvas {
 		return this;
 	}
 
-	public createRect(): void {
-		this._rustCanvas.create_rect();
-	}
-
 	public hasWorldId(worldId: number): boolean {
 		return Object.values(this._worldIds).includes(worldId);
 	}
 
 	public update(): void {
-		this._rustCanvas.update();
+		this._rustComposition.update();
 	}
 }
 
-export interface TCanvasConfig {
+export interface TCompositionConfig {
 	width: number;
 	height: number;
+	dtif?: TComposition;
 }
 
 export interface TWorldIds {

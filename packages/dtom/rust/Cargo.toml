@@ -15,7 +15,7 @@ path = "src/bin.rs"
 
 [features]
 default = ["console_error_panic_hook"]
-cli = ["clap", "specta"]
+cli = ["clap", "specta/export"]
 
 [dependencies]
 wasm-bindgen = "0.2.87"
@@ -37,12 +37,10 @@ glam = { version = "0.24.2", features = ["serde"] }
 once_cell = "1.18.0"
 
 # CLI dependencies
-specta = { version = "1.0.5", features = [
+specta = { git = "https://github.com/bennoinbeta/specta.git", branch = "158-widen-glam-type-support-to-f32", features = [
     "typescript",
-    "serde",
     "glam",
-    "export",
-], optional = true }
+] }
 clap = { version = "4.4.6", features = ["derive"], optional = true }
 
 [dev-dependencies]

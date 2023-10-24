@@ -8,7 +8,9 @@ use crate::{
         },
         js_bindings,
     },
-    core::canvas::events::{CursorEnteredCanvas, CursorExitedCanvas, CursorMovedOnCanvas},
+    core::composition::events::{
+        CursorEnteredComposition, CursorExitedComposition, CursorMovedOnComposition,
+    },
 };
 
 pub fn forward_events_to_js(mut event_queue: ResMut<ToJsEventQueue>) {
@@ -17,9 +19,9 @@ pub fn forward_events_to_js(mut event_queue: ResMut<ToJsEventQueue>) {
 
 pub fn poll_events_from_js(
     mut event_queue: ResMut<FromJsEventQueue>,
-    mut cursor_moved_events: EventWriter<CursorMovedOnCanvas>,
-    mut cursor_entered_events: EventWriter<CursorEnteredCanvas>,
-    mut cursor_exited_events: EventWriter<CursorExitedCanvas>,
+    mut cursor_moved_events: EventWriter<CursorMovedOnComposition>,
+    mut cursor_entered_events: EventWriter<CursorEnteredComposition>,
+    mut cursor_exited_events: EventWriter<CursorExitedComposition>,
 ) {
     // Poll events from JS
     let events = event_queue.poll_events_from_js();
@@ -30,19 +32,19 @@ pub fn poll_events_from_js(
             // TODO
             js_bindings::log(&format!("PointerDownEvent: {:?}", entity));
         }
-        FromJsEvent::PointerMovedOnCanvas { position } => {
-            cursor_moved_events.send(CursorMovedOnCanvas {
+        FromJsEvent::PointerMovedOnComposition { position } => {
+            cursor_moved_events.send(CursorMovedOnComposition {
                 position: *position,
             });
             js_bindings::log(&format!("PointerMoveEvent: {:?}", position));
         }
-        FromJsEvent::PointerEnteredCanvas => {
-            cursor_entered_events.send(CursorEnteredCanvas);
-            js_bindings::log("PointerEnteredCanvas");
+        FromJsEvent::PointerEnteredComposition => {
+            cursor_entered_events.send(CursorEnteredComposition);
+            js_bindings::log("PointerEnteredComposition");
         }
-        FromJsEvent::PointerExitedCanvas => {
-            cursor_exited_events.send(CursorExitedCanvas);
-            js_bindings::log("PointerExitedCanvas");
+        FromJsEvent::PointerExitedComposition => {
+            cursor_exited_events.send(CursorExitedComposition);
+            js_bindings::log("PointerExitedComposition");
         }
     });
 }

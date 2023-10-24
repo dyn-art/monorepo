@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { createSVGCanvas } from '../canvas';
+import { createSVGComposition } from '../composition';
 import { initWasm } from '../wasm';
 
 describe('dtom', () => {
@@ -9,7 +9,7 @@ describe('dtom', () => {
 	});
 
 	it('should add 1 + 2 to equal 3', async () => {
-		const result = createSVGCanvas({ width: 100, height: 100 });
+		const result = createSVGComposition({ width: 100, height: 100 });
 		expect(result).toBeDefined();
 	});
 });

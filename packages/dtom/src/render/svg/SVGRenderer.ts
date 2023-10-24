@@ -1,9 +1,9 @@
 import { notEmpty } from '@dyn/utils';
 
-import type { Canvas } from '../../canvas';
-import type { PathMixin, RenderUpdate } from '../../wasm';
+import type { Composition } from '../../composition';
+import type { PathMixin, RenderChange, RenderUpdate } from '../../wasm';
 import { Renderer } from '../Renderer';
-import type { SVGNode } from './SVGNode';
+import { SVGNode } from './SVGNode';
 
 export class SVGRenderer extends Renderer {
 	private _domElement: SVGElement;
@@ -15,8 +15,8 @@ export class SVGRenderer extends Renderer {
 
 	private _entityMap = new Map<number, SVGNode>();
 
-	constructor(canvas: Canvas, options: TSVGRendererOptions = {}) {
-		super(canvas);
+	constructor(composition: Composition, options: TSVGRendererOptions = {}) {
+		super(composition);
 		const { domElement = this.createSVGElement('svg') } = options;
 		this._domElement = domElement;
 		this._defsElement = this.createSVGElement('defs');
@@ -34,16 +34,50 @@ export class SVGRenderer extends Renderer {
 		return this._entityMap.get(entityId) ?? null;
 	}
 
+	// TODO
+	public getOrCreateNodeByEntityId(entityId: number, parentEntityId?: number): SVGNode {
+		let node = this._entityMap.get(entityId);
+		if (node == null) {
+			const parentSVGElement =
+				(parentEntityId != null ? this.getNodeByEntityId(parentEntityId)?.element : null) ??
+				this._domElement;
+			parentSVGElement.appendChild(this.createSVGElement('path'));
+			node = new SVGNode(parentSVGElement);
+			this._entityMap.set(entityId, node);
+		}
+		return node;
+	}
+
 	public render(data: RenderUpdate): this {
-		const { changes, entity: entityId } = data;
+		const { changes, entity: entityId, node_type: nodeType } = data;
 
 		// TODO:
-		console.log('Called SVG render', { changes, entityId });
+		console.log('Called SVG render', { changes, entityId, nodeType });
 
 		// 1. Check whether element for entity already exists
 		// 2. If not, create new element and append to parent or DOM
 		// 3. Register callbacks for changes
 
+		switch (nodeType) {
+			case 'Rectangle':
+				this.renderPath(entityId, changes);
+				break;
+			case 'Group':
+			case 'Frame':
+				this.renderGroup(entityId, changes);
+				break;
+			default:
+				break;
+		}
+
+		return this;
+	}
+
+	public renderGroup(enitityId: number, changes: RenderChange[]): this {
+		return this;
+	}
+
+	public renderPath(enitityId: number, changes: RenderChange[]): this {
 		for (const change of changes) {
 			if ('Path' in change) {
 				const pathParams = change.Path;
@@ -51,7 +85,14 @@ export class SVGRenderer extends Renderer {
 				console.log({ pathString: svgPath });
 			}
 		}
+		return this;
+	}
 
+	public renderFill(enitityId: number, changes: RenderChange[]): this {
+		return this;
+	}
+
+	public renderText(enitityId: number, changes: RenderChange[]): this {
 		return this;
 	}
 
@@ -159,5 +200,3 @@ export type TSVGTagNames =
 	| 'defs'
 	| 'g'
 	| 'symbol';
-
-// TODO: REMOVE - Only temp until specta changes merged for type generation

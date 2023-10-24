@@ -1,11 +1,9 @@
 use bevy_ecs::prelude::*;
-use glam::{Mat3, Vec2};
-use serde::Serialize;
-#[cfg(feature = "cli")]
+use glam::{DVec2, Mat3, Vec2};
+use serde::{Deserialize, Serialize};
 use specta::Type;
 
-#[cfg_attr(feature = "cli", derive(Type))]
-#[derive(Component, Serialize, Clone, Debug)]
+#[derive(Component, Serialize, Deserialize, Clone, Debug, Type)]
 pub struct RectangleCornerMixin {
     pub top_left_radius: i16,
     pub top_right_radius: i16,
@@ -24,8 +22,7 @@ impl Default for RectangleCornerMixin {
     }
 }
 
-#[cfg_attr(feature = "cli", derive(Type))]
-#[derive(Component, Serialize, Clone, Debug)]
+#[derive(Component, Serialize, Deserialize, Clone, Debug, Type)]
 pub struct ChildrenMixin {
     pub children: Vec<Entity>,
 }
@@ -36,8 +33,12 @@ impl Default for ChildrenMixin {
     }
 }
 
-#[cfg_attr(feature = "cli", derive(Type))]
-#[derive(Component, Serialize, Clone, Debug)]
+#[derive(Component, Serialize, Deserialize, Clone, Debug, Type)]
+pub struct ParentMixin {
+    pub parent: Entity,
+}
+
+#[derive(Component, Serialize, Deserialize, Clone, Debug, Type)]
 pub struct LayoutMixin {
     pub width: usize,
     pub height: usize,
@@ -54,8 +55,7 @@ impl Default for LayoutMixin {
     }
 }
 
-#[cfg_attr(feature = "cli", derive(Type))]
-#[derive(Component, Serialize, Clone, Debug)]
+#[derive(Component, Serialize, Deserialize, Clone, Debug, Type)]
 pub struct CompositionMixin {
     is_visible: bool,
     is_locked: bool,
@@ -70,8 +70,7 @@ impl Default for CompositionMixin {
     }
 }
 
-#[cfg_attr(feature = "cli", derive(Type))]
-#[derive(Component, Serialize, Clone, Debug)]
+#[derive(Component, Serialize, Deserialize, Clone, Debug, Type)]
 pub struct BlendMixin {
     blend_mode: BlendMode,
     opacity: u8,
@@ -88,21 +87,18 @@ impl Default for BlendMixin {
     }
 }
 
-#[cfg_attr(feature = "cli", derive(Type))]
-#[derive(Component, Serialize, Clone, Debug)]
+#[derive(Component, Serialize, Deserialize, Clone, Debug, Type)]
 pub struct PathMixin {
     pub vertices: Vec<Anchor>,
 }
 
-#[cfg_attr(feature = "cli", derive(Type))]
-#[derive(Serialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug, Type)]
 pub struct Anchor {
     pub position: Vec2,
     pub command: AnchorCommand,
 }
 
-#[cfg_attr(feature = "cli", derive(Type))]
-#[derive(Serialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug, Type)]
 pub enum AnchorCommand {
     MoveTo,
     LineTo,
@@ -123,8 +119,7 @@ pub enum AnchorCommand {
 // Effects
 // =============================================================================
 
-#[cfg_attr(feature = "cli", derive(Type))]
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Type)]
 pub enum BlendMode {
     PassThrough,
     Normal,

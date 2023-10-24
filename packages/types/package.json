@@ -1,0 +1,43 @@
+{
+	"name": "@dyn/types",
+	"description": "Shared types for dyn.art monorepo",
+	"version": "0.0.1",
+	"private": true,
+	"scripts": {
+		"build": "shx rm -rf dist && dyn-cli bundle",
+		"lint": "eslint --cache \"**/*.{js,ts}\"",
+		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
+		"install:clean": "pnpm run clean && pnpm install"
+	},
+	"exports": {
+		"dtif": {
+			"source": "./src/dtif.ts",
+			"types": "./dist/types/dtif.d.ts"
+		}
+	},
+	"typesVersions": {
+		"*": {
+			"dtif": [
+				"./dist/types/dtif.d.ts"
+			]
+		}
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/dyndotart/monorepo.git"
+	},
+	"keywords": [],
+	"author": "@bennoinbeta",
+	"license": "AGPL-3.0-or-later",
+	"bugs": {
+		"url": "https://issues.dyn.art/"
+	},
+	"homepage": "https://github.com/dyndotart/monorepo",
+	"devDependencies": {
+		"@dyn/config": "workspace:*"
+	},
+	"files": [
+		"dist",
+		"README.md"
+	]
+}

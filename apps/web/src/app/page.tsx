@@ -1,27 +1,23 @@
 'use client';
 
 import React from 'react';
-import { createSVGCanvas, initWasm } from '@dyn/dtom';
+import { createSVGComposition, initWasm } from '@dyn/dtom';
 import { MaxWidthWrapper } from '@/components';
 
 async function onClick(): Promise<void> {
 	await initWasm();
-	const canvas = createSVGCanvas({ width: 500, height: 500 });
-	canvas.createRect();
-	canvas.createRect();
+	const composition = createSVGComposition({ width: 500, height: 500 });
+	const composition2 = createSVGComposition({ width: 500, height: 500 });
 
-	const canvas2 = createSVGCanvas({ width: 500, height: 500 });
-	canvas2.createRect();
-
-	console.log({ canvas, canvas2 });
+	console.log({ composition, composition2 });
 
 	for (let i = 0; i < 10; i++) {
-		canvas.update();
+		composition.update();
 	}
 
 	console.log('------------------');
 	for (let i = 0; i < 10; i++) {
-		canvas2.update();
+		composition2.update();
 	}
 }
 

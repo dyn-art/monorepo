@@ -1,18 +1,29 @@
 use bevy_ecs::component::Component;
-use serde::Serialize;
-#[cfg(feature = "cli")]
+use serde::{Deserialize, Serialize};
 use specta::Type;
 
-#[cfg_attr(feature = "cli", derive(Type))]
-#[derive(Component, Serialize, Clone, Default, Debug)]
-pub struct Node;
+#[derive(Serialize, Deserialize, Clone, Debug, Type)]
+pub enum NodeType {
+    None,
+    Group,
+    Rectangle,
+    Frame,
+}
 
-#[cfg_attr(feature = "cli", derive(Type))]
-#[derive(Component, Serialize, Clone, Debug)]
-pub struct Shape;
+impl Default for NodeType {
+    fn default() -> Self {
+        Self::None
+    }
+}
 
-#[cfg_attr(feature = "cli", derive(Type))]
-#[derive(Component, Serialize, Clone, Debug)]
+#[derive(Component, Serialize, Deserialize, Clone, Default, Debug, Type)]
+pub struct Node {
+    // Keep track of the node type here for frontend
+    // TODO: Figure out how to do this in a more generic way
+    pub node_type: NodeType,
+}
+
+#[derive(Component, Serialize, Deserialize, Clone, Debug, Type)]
 pub struct Frame {
     clip_content: bool,
 }
@@ -25,10 +36,8 @@ impl Default for Frame {
     }
 }
 
-#[cfg_attr(feature = "cli", derive(Type))]
-#[derive(Component, Serialize, Clone, Default, Debug)]
+#[derive(Component, Serialize, Deserialize, Clone, Default, Debug, Type)]
 pub struct Group;
 
-#[cfg_attr(feature = "cli", derive(Type))]
-#[derive(Component, Serialize, Clone, Default, Debug)]
+#[derive(Component, Serialize, Deserialize, Clone, Default, Debug, Type)]
 pub struct Rectangle;
