@@ -755,9 +755,9 @@ checksum = "942b4a808e05215192e39f4ab80813e599068285906cc91aa64f923db842bd5a"
 
 [[package]]
 name = "specta"
-version = "2.0.0-rc.5"
-source = "git+https://github.com/bennoinbeta/specta.git?branch=158-widen-glam-type-support-to-f32#f07b8b06b4ed53067f080aaeff255869c437bcc9"
+version = "2.0.0-rc.6"
 dependencies = [
+ "bevy_ecs",
  "ctor",
  "glam",
  "once_cell",
@@ -769,8 +769,7 @@ dependencies = [
 
 [[package]]
 name = "specta-macros"
-version = "2.0.0-rc.5"
-source = "git+https://github.com/bennoinbeta/specta.git?branch=158-widen-glam-type-support-to-f32#f07b8b06b4ed53067f080aaeff255869c437bcc9"
+version = "2.0.0-rc.6"
 dependencies = [
  "Inflector",
  "proc-macro2",

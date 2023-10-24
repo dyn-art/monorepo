@@ -36,11 +36,13 @@ serde-wasm-bindgen = "0.6.0"
 glam = { version = "0.24.2", features = ["serde"] }
 once_cell = "1.18.0"
 
-# CLI dependencies
-specta = { git = "https://github.com/bennoinbeta/specta.git", branch = "158-widen-glam-type-support-to-f32", features = [
+specta = { path = "/Users/benno/Desktop/workspace/contribution/code/specta", features = [
     "typescript",
+    "serde",
     "glam",
+    "bevy_ecs",
 ] }
+# CLI dependencies
 clap = { version = "4.4.6", features = ["derive"], optional = true }
 
 [dev-dependencies]

@@ -9,8 +9,6 @@ use bevy_ecs::{
 use bevy_utils::HashMap;
 use serde::Serialize;
 use specta::Type;
-#[cfg(feature = "cli")]
-use specta::Type;
 
 use crate::{
     bindgen::{

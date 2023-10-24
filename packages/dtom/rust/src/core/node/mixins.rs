@@ -1,5 +1,5 @@
 use bevy_ecs::prelude::*;
-use glam::{DVec2, Mat3, Vec2};
+use glam::{Mat3, Vec2};
 use serde::{Deserialize, Serialize};
 use specta::Type;
 
