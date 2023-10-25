@@ -53,7 +53,7 @@ impl CompositionApp {
     pub fn new(dtif: JsValue) -> Self {
         set_panic_hook();
 
-        let mut parsed_dtif: DTIFComposition = serde_wasm_bindgen::from_value(dtif).unwrap();
+        let parsed_dtif: DTIFComposition = serde_wasm_bindgen::from_value(dtif).unwrap();
 
         let mut app = App::new();
 
@@ -89,7 +89,6 @@ impl CompositionApp {
 
         // Spawn composition as entity (only one should exist).
         // Why entity? Because I see it as part of the "game" world,
-        // it changes frequently as it keeps track of the interaction mode
         // and to spawn it with values passed from JS.
         let new_root_id = *id_map
             .get(&root_node_id)
@@ -162,13 +161,13 @@ fn process_dtif_nodes(
                 let new_child_id = *id_map.get(child).expect("Child node not found in id_map");
                 new_children.push(new_child_id);
             }
-        }
 
-        // Update parent with new children (override old ones)
-        if !new_children.is_empty() {
-            world.entity_mut(new_entity).insert(ChildrenMixin {
-                children: new_children,
-            });
+            // Update parent with new children (override old ones)
+            if !new_children.is_empty() {
+                world.entity_mut(new_entity).insert(ChildrenMixin {
+                    children: new_children,
+                });
+            }
         }
     }
 }
@@ -208,7 +207,7 @@ impl Default for InteractionMode {
 // DTIF
 // =============================================================================
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Type)]
 pub struct DTIFComposition {
     version: String,
     name: String,
@@ -218,7 +217,7 @@ pub struct DTIFComposition {
     nodes: HashMap<Entity, DTIFNode>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Type)]
 enum DTIFNode {
     Rectangle(RectangleNodeBundle),
     Frame(FrameNodeBundle),

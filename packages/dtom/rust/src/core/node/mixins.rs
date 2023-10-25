@@ -40,8 +40,8 @@ pub struct ParentMixin {
 
 #[derive(Component, Serialize, Deserialize, Clone, Debug, Type)]
 pub struct LayoutMixin {
-    pub width: usize,
-    pub height: usize,
+    pub width: u32,
+    pub height: u32,
     pub relative_transform: Mat3,
 }
 

@@ -5,6 +5,7 @@ import chalk from 'chalk';
 import type { PackageJson } from 'type-fest';
 
 import {
+	execaVerbose,
 	findNearestTsConfigPath,
 	getTsConfigCompilerOptions,
 	resolveTsPathsFactory,
@@ -18,8 +19,6 @@ export async function generateDts(command: Command, options: TGenerateDtsOptions
 		packageJson,
 		shouldResolveTsPaths = true
 	} = options;
-	const { execa } = await import('execa');
-
 	command.log(
 		'🚀 Started generating Typescript Declaration files.',
 		chalk.gray(
@@ -36,7 +35,9 @@ export async function generateDts(command: Command, options: TGenerateDtsOptions
 	const compilerOptions = getTsConfigCompilerOptions(command, tsConfigPath);
 
 	// Generate declaration files
-	await execa('pnpm', ['tsc', '--emitDeclarationOnly', '--project', tsConfigPath]);
+	await execaVerbose('pnpm', ['tsc', '--emitDeclarationOnly', '--project', tsConfigPath], {
+		command
+	});
 
 	if (shouldResolveTsPaths && compilerOptions.paths != null) {
 		const relativeDeclarationDirPath = getRelativeDeclarationDirPath(compilerOptions, packageJson);

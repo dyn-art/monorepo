@@ -1,12 +1,13 @@
 use bevy_ecs::{bundle::Bundle, entity::Entity};
 use serde::{Deserialize, Serialize};
+use specta::Type;
 
 use super::{
     mixins::{BlendMixin, ChildrenMixin, CompositionMixin, LayoutMixin, RectangleCornerMixin},
     types::{Frame, Group, Node, NodeType, Rectangle},
 };
 
-#[derive(Bundle, Debug, Serialize, Deserialize, Clone)]
+#[derive(Bundle, Debug, Serialize, Deserialize, Clone, Type)]
 pub struct FrameNodeBundle {
     pub node: Node,
     pub frame: Frame,
@@ -33,7 +34,7 @@ impl FrameNodeBundle {
     }
 }
 
-#[derive(Bundle, Debug, Serialize, Deserialize, Clone)]
+#[derive(Bundle, Debug, Serialize, Deserialize, Clone, Type)]
 pub struct GroupNodeBundle {
     pub node: Node,
     pub group: Group,
@@ -58,7 +59,7 @@ impl GroupNodeBundle {
     }
 }
 
-#[derive(Bundle, Debug, Serialize, Deserialize, Clone)]
+#[derive(Bundle, Debug, Serialize, Deserialize, Clone, Type)]
 pub struct RectangleNodeBundle {
     pub node: Node,
     pub recangle: Rectangle,

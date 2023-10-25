@@ -4,7 +4,7 @@ import { Command } from '@oclif/core';
 import chalk from 'chalk';
 import type { PackageJson } from 'type-fest';
 
-import { doesFileExist, promisifyFiglet, readJsonFile, shortId } from '../../utils';
+import { doesFileExist, execaVerbose, promisifyFiglet, readJsonFile, shortId } from '../../utils';
 
 export default class Bundle extends Command {
 	static description = 'Bundle Rust part of dyn.art packages';
@@ -28,8 +28,8 @@ export default class Bundle extends Command {
 		// Build WASM
 		const rustInputDirPath = path.join(process.cwd(), 'rust');
 		const rustOutputDirPath = path.join(rustModulesDirPath, tempRustOutputName);
-		const { execa } = await import('execa');
-		await execa('wasm-pack', ['build', '--target', 'web', '--out-dir', rustOutputDirPath], {
+		await execaVerbose('wasm-pack', ['build', '--target', 'web', '--out-dir', rustOutputDirPath], {
+			command: this,
 			cwd: rustInputDirPath // Set the cwd to the ./rust directory
 		});
 		this.log(
@@ -39,7 +39,8 @@ export default class Bundle extends Command {
 		);
 
 		// Generate type declarations for Typescript
-		await execa(
+		const bindingTypesOutputPath = path.join(rustOutputDirPath, './bindings.ts');
+		await execaVerbose(
 			'cargo',
 			[
 				'run',
@@ -48,11 +49,17 @@ export default class Bundle extends Command {
 				'--',
 				'generate-ts-types',
 				'--export-path',
-				path.join(rustOutputDirPath, './bindings.ts')
+				bindingTypesOutputPath
 			],
 			{
+				command: this,
 				cwd: rustInputDirPath
 			}
+		);
+		this.log(
+			`Generated type declarations for Typescript to ${chalk.gray(
+				chalk.underline(bindingTypesOutputPath)
+			)}`
 		);
 
 		// Read in package.json and extract name of Rust module
