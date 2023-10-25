@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 use std::mem::transmute;
 
+use crate::bindgen::js_bindings;
 use crate::core::composition::systems::{
     construct_path::construct_rectangle_path, startup_system_log, update_system_log,
 };
@@ -54,6 +55,7 @@ impl CompositionApp {
         set_panic_hook();
 
         let parsed_dtif: DTIFComposition = serde_wasm_bindgen::from_value(dtif).unwrap();
+        js_bindings::log(format!("Parsed DTIF: {:?}", parsed_dtif).as_str());
 
         let mut app = App::new();
 
@@ -77,20 +79,20 @@ impl CompositionApp {
         app.add_event::<CursorMovedOnComposition>();
 
         let root_node_id = parsed_dtif.root_node_id;
-        let mut id_map: HashMap<Entity, Entity> = HashMap::new();
+        let mut eid_to_entity_map: HashMap<String, Entity> = HashMap::new();
 
         // Spawn and process nodes recursively
         process_dtif_nodes(
             &mut app.world,
             &parsed_dtif.nodes,
-            root_node_id,
-            &mut id_map,
+            &root_node_id,
+            &mut eid_to_entity_map,
         );
 
         // Spawn composition as entity (only one should exist).
         // Why entity? Because I see it as part of the "game" world,
         // and to spawn it with values passed from JS.
-        let new_root_id = *id_map
+        let new_root_id = *eid_to_entity_map
             .get(&root_node_id)
             .expect("Root node not found in id_map");
         app.world.spawn(Composition {
@@ -141,15 +143,19 @@ fn spawn_node(world: &mut World, node: &DTIFNode) -> Entity {
     }
 }
 
+fn entity_to_id(entity: &Entity) -> String {
+    format!("{}:{}", entity.generation(), entity.index())
+}
+
 fn process_dtif_nodes(
     world: &mut World,
-    dtif_nodes: &HashMap<Entity, DTIFNode>,
-    parent: Entity,
-    id_map: &mut HashMap<Entity, Entity>,
+    dtif_nodes: &HashMap<String, DTIFNode>,
+    parent_id: &String,
+    eid_to_entity: &mut HashMap<String, Entity>,
 ) {
-    if let Some(node) = dtif_nodes.get(&parent) {
+    if let Some(node) = dtif_nodes.get(parent_id) {
         let new_entity = spawn_node(world, node);
-        id_map.insert(parent, new_entity);
+        eid_to_entity.insert(parent_id.clone(), new_entity);
 
         // Recursive call for children
         let mut new_children: Vec<Entity> = vec![];
@@ -157,8 +163,11 @@ fn process_dtif_nodes(
         | DTIFNode::Group(GroupNodeBundle { children_mixin, .. }) = node
         {
             for child in &children_mixin.children {
-                process_dtif_nodes(world, dtif_nodes, *child, id_map);
-                let new_child_id = *id_map.get(child).expect("Child node not found in id_map");
+                let child_id = entity_to_id(child);
+                process_dtif_nodes(world, dtif_nodes, &child_id, eid_to_entity);
+                let new_child_id = *eid_to_entity
+                    .get(&child_id)
+                    .expect("Child node not found in id_map");
                 new_children.push(new_child_id);
             }
 
@@ -213,8 +222,8 @@ pub struct DTIFComposition {
     name: String,
     width: f32,
     height: f32,
-    root_node_id: Entity,
-    nodes: HashMap<Entity, DTIFNode>,
+    root_node_id: String,
+    nodes: HashMap<String, DTIFNode>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Type)]

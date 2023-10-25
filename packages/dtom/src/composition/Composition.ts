@@ -1,8 +1,9 @@
 import { CompositionApp as RustCompositionApp } from '@rust/dyn-dtom';
+import type { ToJsEvent, WorldIds } from '@rust/dyn-dtom/bindings';
 import type { TComposition } from '@dyn/types/dtif';
 
 import type { Renderer } from '../render';
-import type { RenderUpdate, ToJsEvent, WorldIds } from '../wasm';
+import { TEST_COMPOSITION_1 } from '../test-data';
 
 export class Composition {
 	private _rustComposition: RustCompositionApp;
@@ -19,7 +20,7 @@ export class Composition {
 
 	constructor(config: TCompositionConfig) {
 		const { width, height } = config;
-		this._rustComposition = new RustCompositionApp({});
+		this._rustComposition = new RustCompositionApp(TEST_COMPOSITION_1); // TODO: Map TComposition to DTIFComposition
 		this._worldIds = this.retrieveWorldIds();
 		this._width = width;
 		this._height = height;
@@ -55,7 +56,7 @@ export class Composition {
 		for (const [key, value] of Object.entries(event)) {
 			switch (key) {
 				case 'RenderUpdate':
-					this.onRenderUpdate(value as RenderUpdate);
+					this.onRenderUpdate(value);
 					break;
 				default:
 					console.warn(`Unknown event: ${key}`);
@@ -65,7 +66,7 @@ export class Composition {
 		return this;
 	}
 
-	private onRenderUpdate(data: RenderUpdate): this {
+	private onRenderUpdate(data: ToJsEvent['RenderUpdate']): this {
 		this._renderer.forEach((renderer) => renderer.render(data));
 		return this;
 	}
