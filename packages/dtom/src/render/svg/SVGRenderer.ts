@@ -107,7 +107,7 @@ export class SVGRenderer extends Renderer {
 		// Map path vertices to SVG path commands
 		const pathCommands: string[] = pathParams.vertices
 			.map((anchor) => {
-				const { x, y } = anchor.position;
+				const [x, y] = anchor.position;
 				const anchorCommand = anchor.command;
 
 				// Handle anchor commands without parameters
@@ -128,13 +128,13 @@ export class SVGRenderer extends Renderer {
 				else if (typeof anchorCommand === 'object') {
 					if ('ArcTo' in anchorCommand) {
 						const arcParams = anchorCommand.ArcTo;
-						const { x: rx, y: ry } = arcParams.radius;
+						const [rx, ry] = arcParams.radius;
 						return `A ${rx} ${ry} ${arcParams.x_axis_rotation} ${boolToNum(
 							arcParams.large_arc_flag
 						)} ${boolToNum(arcParams.sweep_flag)} ${x} ${y}`;
 					} else if ('CurveTo' in anchorCommand) {
 						const curveParams = anchorCommand.CurveTo;
-						return `C ${curveParams.control_point_1.x} ${curveParams.control_point_1.y} ${curveParams.control_point_2.x} ${curveParams.control_point_2.y} ${x} ${y}`;
+						return `C ${curveParams.control_point_1[0]} ${curveParams.control_point_1[1]} ${curveParams.control_point_2[0]} ${curveParams.control_point_2[1]} ${x} ${y}`;
 					}
 				}
 

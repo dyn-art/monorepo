@@ -9,9 +9,9 @@ export const TEST_COMPOSITION_1: DTIFComposition = {
 	name: 'Test',
 	width,
 	height,
-	root_node_id: '0:0',
+	root_node_id: 0,
 	nodes: {
-		'0:0': {
+		0: {
 			Frame: {
 				node: { node_type: 'Frame' },
 				frame: { clip_content: true },
@@ -22,7 +22,7 @@ export const TEST_COMPOSITION_1: DTIFComposition = {
 					bottom_right_radius: 0
 				},
 				children_mixin: {
-					children: [{ generation: 0, index: 1 }]
+					children: [1]
 				},
 				composition_mixin: { is_visible: true, is_locked: false },
 				layout_mixin: {
@@ -33,7 +33,7 @@ export const TEST_COMPOSITION_1: DTIFComposition = {
 				blend_mixin: { blend_mode: 'Normal', opacity: 1, is_mask: false }
 			}
 		},
-		'0:1': {
+		1: {
 			Rectangle: {
 				node: { node_type: 'Rectangle' },
 				recangle: null,
@@ -64,17 +64,13 @@ export const TEST_COMPOSITION_1: DTIFComposition = {
 // =============================================================================
 
 function vec2(x: number, y: number): Vec2 {
-	return { x, y };
+	return [x, y];
 }
 
 function vec3(x: number, y: number, z: number): Vec3 {
-	return { x, y, z };
+	return [x, y, z];
 }
 
 function mat3(xAxis: Vec3, yAxis: Vec3, zAxis: Vec3): Mat3 {
-	return {
-		x_axis: xAxis,
-		y_axis: yAxis,
-		z_axis: zAxis
-	};
+	return [...xAxis, ...yAxis, ...zAxis];
 }

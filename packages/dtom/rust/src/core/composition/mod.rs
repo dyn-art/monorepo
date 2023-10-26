@@ -55,7 +55,6 @@ impl CompositionApp {
         set_panic_hook();
 
         let parsed_dtif: DTIFComposition = serde_wasm_bindgen::from_value(dtif).unwrap();
-        js_bindings::log(format!("Parsed DTIF: {:?}", parsed_dtif).as_str());
 
         let mut app = App::new();
 
@@ -78,7 +77,7 @@ impl CompositionApp {
         app.add_event::<CursorExitedComposition>();
         app.add_event::<CursorMovedOnComposition>();
 
-        let root_node_id = parsed_dtif.root_node_id;
+        let root_node_id = entity_to_id(&parsed_dtif.root_node_id);
         let mut eid_to_entity_map: HashMap<String, Entity> = HashMap::new();
 
         // Spawn and process nodes recursively
@@ -144,7 +143,7 @@ fn spawn_node(world: &mut World, node: &DTIFNode) -> Entity {
 }
 
 fn entity_to_id(entity: &Entity) -> String {
-    format!("{}:{}", entity.generation(), entity.index())
+    entity.to_bits().to_string()
 }
 
 fn process_dtif_nodes(
@@ -222,8 +221,8 @@ pub struct DTIFComposition {
     name: String,
     width: f32,
     height: f32,
-    root_node_id: String,
-    nodes: HashMap<String, DTIFNode>,
+    root_node_id: Entity,
+    nodes: HashMap<String, DTIFNode>, // TODO: Entity as key when fixed: https://github.com/serde-rs/serde/issues/1183
 }
 
 #[derive(Serialize, Deserialize, Debug, Type)]
