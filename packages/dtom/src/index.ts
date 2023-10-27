@@ -1,4 +1,4 @@
-import './wasm/bindgen';
+import './wasm/from-rust';
 
 export * from './core/composition';
 export * from './core/render';

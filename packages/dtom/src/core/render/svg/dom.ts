@@ -19,9 +19,9 @@ export function createSVGElement(tag: TSVGTagNames, attributes: TSVGAttributes =
 export function setAttributes(element: SVGElement, attributes: TSVGAttributes) {
 	for (const [key, value] of Object.entries(attributes)) {
 		if (key.includes('href')) {
-			element.setAttributeNS(XLINK, key, value);
+			element.setAttributeNS(XLINK, key, value.toString());
 		} else {
-			element.setAttribute(key, value);
+			element.setAttribute(key, value.toString());
 		}
 	}
 }
@@ -36,12 +36,12 @@ export function removeAttributes(element: Element, attributeKeys: string[]) {
 // Add styles to SVG element
 export function setStyles(element: SVGElement, styles: TSVGStyles) {
 	for (const [key, value] of Object.entries(styles)) {
-		element.style.setProperty(key, value);
+		element.style.setProperty(key, value.toString());
 	}
 }
 
-export type TSVGAttributes = Record<string, string>;
-export type TSVGStyles = Record<string, string>;
+export type TSVGAttributes = Record<string, string | number>;
+export type TSVGStyles = Record<string, string | number>;
 
 export type TSVGTagNames =
 	| 'svg'

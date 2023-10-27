@@ -1,7 +1,19 @@
-import type { Entity, PathMixin, RenderChange, ToJsEvent } from '@rust/dyn-dtom/bindings';
-import { notEmpty } from '@dyn/utils';
+import type {
+	BlendMixin,
+	CompositionMixin,
+	Entity,
+	LayoutMixin,
+	PathMixin,
+	RenderChange,
+	ToJsEvent
+} from '@rust/dyn-dtom/bindings';
+import { notEmpty, type Unarray } from '@dyn/utils';
 
-import { transformRustEnumArrayToObject, type GroupedRustEnums } from '../../../wasm';
+import {
+	enqueueJsEvents,
+	transformRustEnumArrayToObject,
+	type GroupedRustEnums
+} from '../../../wasm';
 import type { Composition } from '../../composition';
 import { Renderer } from '../Renderer';
 import { createSVGNode, type SVGNode } from './SVGNode';
@@ -54,7 +66,6 @@ export class SVGRenderer extends Renderer {
 				changes: groupedChanges,
 				parentId
 			};
-			// TODO: extract parent here and create GroupedRustEnum stuff
 		}
 
 		// Process each render update
@@ -71,7 +82,7 @@ export class SVGRenderer extends Renderer {
 		return this;
 	}
 
-	public handleRenderUpdate(entity: Entity, renderUpdate: TToProcessRenderUpdate): this {
+	private handleRenderUpdate(entity: Entity, renderUpdate: TToProcessRenderUpdate): this {
 		const { node_type: nodeType, parentId } = renderUpdate;
 
 		// If parent exists and hasn't been rendered yet, try to render it first
@@ -98,7 +109,7 @@ export class SVGRenderer extends Renderer {
 		return this;
 	}
 
-	public renderGroup(enitity: number, renderUpdate: TToProcessRenderUpdate): this {
+	private renderGroup(enitity: number, renderUpdate: TToProcessRenderUpdate): void {
 		const { changes, parentId } = renderUpdate;
 		let renderElement = this.getNodeByEntity(enitity);
 
@@ -115,12 +126,34 @@ export class SVGRenderer extends Renderer {
 				this._svgElement.appendChild(renderElement);
 			}
 			this._svgNodeMap.set(enitity, renderElement);
+			renderElement.setAttributes({ id: `group-${enitity}` });
+			renderElement.setStyles({ fill: 'blue' });
+			renderElement.onPointerDown(() => {
+				console.log('PointerDownEventOnEntity', { enitity });
+				enqueueJsEvents(this.composition.worldIds.mainWorldId, [
+					{ PointerDownEventOnEntity: { entity: enitity } }
+				]);
+			});
 		}
 
-		return this;
+		if (!renderElement.isVisible) {
+			return;
+		}
+
+		// Handle Blend change
+		const blendChange = this.getLatestChange(changes, 'Blend');
+		if (blendChange != null) {
+			this.handleBlendChange(renderElement, blendChange);
+		}
+
+		// Handle Composition change
+		const compositionChange = this.getLatestChange(changes, 'Composition');
+		if (compositionChange != null) {
+			this.handleCompositionChange(renderElement, compositionChange);
+		}
 	}
 
-	public renderShape(enitity: number, renderUpdate: TToProcessRenderUpdate): this {
+	private renderShape(enitity: number, renderUpdate: TToProcessRenderUpdate): void {
 		const { changes, parentId } = renderUpdate;
 		let renderElement = this.getNodeByEntity(enitity);
 
@@ -137,28 +170,80 @@ export class SVGRenderer extends Renderer {
 				this._svgElement.appendChild(renderElement);
 			}
 			this._svgNodeMap.set(enitity, renderElement);
+			renderElement.setAttributes({ id: `shape-${enitity}` });
+			renderElement.setStyles({ fill: 'red' });
+			renderElement.onPointerDown(() => {
+				console.log('PointerDownEventOnEntity', { enitity });
+				enqueueJsEvents(this.composition.worldIds.mainWorldId, [
+					{ PointerDownEventOnEntity: { entity: enitity } }
+				]);
+			});
+		}
+
+		if (!renderElement.isVisible) {
+			return;
 		}
 
 		// Handle Path change
-		if ('Path' in changes && changes.Path != null && changes.Path.length > 0) {
-			const change = changes.Path[changes.Path.length - 1] as unknown as PathMixin;
-			const svgPath = this.constructSVGPath(change);
-			renderElement.setAttributes({ d: svgPath });
+		const pathChange = this.getLatestChange(changes, 'Path');
+		if (pathChange != null) {
+			this.handlePathChange(renderElement, pathChange);
+		}
 
-			console.log({ pathString: svgPath });
+		// Handle Layout change
+		const layoutChange = this.getLatestChange(changes, 'Layout');
+		if (layoutChange != null) {
+			this.handleLayoutChange(renderElement, layoutChange);
+		}
+
+		// Handle Blend change
+		const blendChange = this.getLatestChange(changes, 'Blend');
+		if (blendChange != null) {
+			this.handleBlendChange(renderElement, blendChange);
+		}
+
+		// Handle Composition change
+		const compositionChange = this.getLatestChange(changes, 'Composition');
+		if (compositionChange != null) {
+			this.handleCompositionChange(renderElement, compositionChange);
 		}
 
 		// TODO:
-
-		return this;
 	}
 
-	public renderFill(enitityId: number, changes: RenderChange[]): this {
-		return this;
+	private renderFill(enitityId: number, changes: RenderChange[]): void {
+		// TODO
 	}
 
-	public renderText(enitityId: number, changes: RenderChange[]): this {
-		return this;
+	private renderText(enitityId: number, changes: RenderChange[]): void {
+		// TODO
+	}
+
+	// =========================================================================
+	// Render Update Handler
+	// =========================================================================
+
+	private handlePathChange(renderElement: SVGNode, mixin: PathMixin): void {
+		const svgPath = this.constructSVGPath(mixin);
+		renderElement.setAttributes({ d: svgPath });
+	}
+
+	private handleLayoutChange(renderElement: SVGNode, mixin: LayoutMixin): void {
+		const [aX, aY, , bX, bY, , cX, cY] = mixin.relative_transform;
+		renderElement.setAttributes({
+			transform: `matrix(${aX}, ${aY}, ${bX}, ${bY}, ${cX}, ${cY})`,
+			width: mixin.width,
+			height: mixin.height
+		});
+	}
+
+	private handleBlendChange(renderElement: SVGNode, mixin: BlendMixin): void {
+		renderElement.setAttributes({ opacity: mixin.opacity });
+	}
+
+	private handleCompositionChange(renderElement: SVGNode, mixin: CompositionMixin): void {
+		renderElement.isVisible = mixin.is_visible;
+		renderElement.setStyles({ display: renderElement.isVisible ? 'block' : 'none' });
 	}
 
 	// =========================================================================
@@ -211,8 +296,19 @@ export class SVGRenderer extends Renderer {
 	}
 
 	// =========================================================================
-	// DOM
+	// Helper
 	// =========================================================================
+
+	private getLatestChange<
+		TChanges extends Record<string, unknown[]> = GroupedRustEnums<RenderChange>,
+		TKey extends keyof TChanges = keyof TChanges
+	>(changes: TChanges, elementType: TKey): Unarray<TChanges[TKey]> | null {
+		const change = changes[elementType];
+		if (change != null && change.length > 0) {
+			return change[change.length - 1] as Unarray<TChanges[TKey]>;
+		}
+		return null;
+	}
 }
 
 export interface TSVGRendererOptions {

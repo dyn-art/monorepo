@@ -14,6 +14,7 @@ export class SVGNode {
 	private readonly _element: SVGElement;
 	private _children: Entity[] = [];
 	private _parent: Entity | null = null;
+	public isVisible = true;
 
 	constructor(svgElement: SVGElement) {
 		this._element = svgElement;

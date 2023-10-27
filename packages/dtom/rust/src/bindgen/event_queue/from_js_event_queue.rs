@@ -17,6 +17,8 @@ use serde::{Deserialize, Serialize};
 use specta::Type;
 use wasm_bindgen::{prelude::*, JsValue};
 
+use crate::bindgen::js_bindings;
+
 #[derive(Debug, Serialize, Deserialize, Clone, Type)]
 pub enum FromJsEvent {
     PointerDownEventOnEntity { entity: u32 },
@@ -80,6 +82,7 @@ impl FromJsEventQueue {
 #[wasm_bindgen]
 pub fn enqueue_js_events(world_id: usize, events: JsValue) {
     let parsed_events: Vec<FromJsEvent> = serde_wasm_bindgen::from_value(events).unwrap();
+    js_bindings::log(format!("Received {:?} events", parsed_events).as_str());
     if let Some(sender) = SENDER_MAP.lock().unwrap().get(&world_id) {
         parsed_events
             .iter()
