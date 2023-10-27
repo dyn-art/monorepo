@@ -1,3 +1,4 @@
+import type { ToJsEvent } from '../../rust_modules/dyn-dtom/bindings';
 import type { Composition } from '../composition';
 
 export abstract class Renderer {
@@ -21,5 +22,5 @@ export abstract class Renderer {
 
 	public abstract setSize(width: number, height: number): this;
 
-	public abstract render(data: unknown): this;
+	public abstract render(data: ToJsEvent['RenderUpdate'][]): this;
 }

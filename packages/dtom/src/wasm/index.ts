@@ -1,7 +1,7 @@
 import init, { type InitInput } from '@rust/dyn-dtom';
 import wasm from '@rust/dyn-dtom/bg.wasm';
 
-export * from './bindgen';
+export * from './helper';
 
 export async function initWasm(): Promise<void> {
 	// https://www.npmjs.com/package/@rollup/plugin-wasm#using-with-wasm-bindgen-and-wasm-pack

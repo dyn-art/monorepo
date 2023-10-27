@@ -27,7 +27,7 @@ use wasm_bindgen::prelude::*;
 use self::events::{CursorEnteredComposition, CursorExitedComposition, CursorMovedOnComposition};
 
 use super::node::bundles::{GroupNodeBundle, RectangleNodeBundle};
-use super::node::mixins::ChildrenMixin;
+use super::node::mixins::{ChildrenMixin, ParentMixin};
 
 pub mod events;
 mod systems;
@@ -77,29 +77,27 @@ impl CompositionApp {
         app.add_event::<CursorExitedComposition>();
         app.add_event::<CursorMovedOnComposition>();
 
-        let root_node_id = entity_to_id(&parsed_dtif.root_node_id);
+        let root_node_eid = entity_to_eid(&parsed_dtif.root_node_id);
         let mut eid_to_entity_map: HashMap<String, Entity> = HashMap::new();
 
         // Spawn and process nodes recursively
-        process_dtif_nodes(
+        let root_node_entity = process_dtif_nodes(
             &mut app.world,
             &parsed_dtif.nodes,
-            &root_node_id,
+            &root_node_eid,
             &mut eid_to_entity_map,
-        );
+        )
+        .unwrap();
 
         // Spawn composition as entity (only one should exist).
         // Why entity? Because I see it as part of the "game" world,
         // and to spawn it with values passed from JS.
-        let new_root_id = *eid_to_entity_map
-            .get(&root_node_id)
-            .expect("Root node not found in id_map");
         app.world.spawn(Composition {
             version: parsed_dtif.version,
             name: parsed_dtif.name,
             width: parsed_dtif.width,
             height: parsed_dtif.height,
-            root_node: new_root_id,
+            root_node: root_node_entity,
         });
         app.world.spawn(CompositionInteractionMixin::default());
 
@@ -142,42 +140,57 @@ fn spawn_node(world: &mut World, node: &DTIFNode) -> Entity {
     }
 }
 
-fn entity_to_id(entity: &Entity) -> String {
+// Due to a issue we have to work with a stringified Enitity in the Hashmap.
+// https://github.com/serde-rs/serde/issues/1183
+// This function basically converts an Entity to a string we call "eid".
+fn entity_to_eid(entity: &Entity) -> String {
     entity.to_bits().to_string()
 }
 
 fn process_dtif_nodes(
     world: &mut World,
     dtif_nodes: &HashMap<String, DTIFNode>,
-    parent_id: &String,
+    node_eid: &String,
     eid_to_entity: &mut HashMap<String, Entity>,
-) {
-    if let Some(node) = dtif_nodes.get(parent_id) {
-        let new_entity = spawn_node(world, node);
-        eid_to_entity.insert(parent_id.clone(), new_entity);
+) -> Option<Entity> {
+    // If  node exists, spawn it and process its children
+    if let Some(dtif_node) = dtif_nodes.get(node_eid) {
+        // Spawn node
+        let node_entity = spawn_node(world, dtif_node);
+        eid_to_entity.insert(node_eid.clone(), node_entity);
 
-        // Recursive call for children
+        // Process children
         let mut new_children: Vec<Entity> = vec![];
         if let DTIFNode::Frame(FrameNodeBundle { children_mixin, .. })
-        | DTIFNode::Group(GroupNodeBundle { children_mixin, .. }) = node
+        | DTIFNode::Group(GroupNodeBundle { children_mixin, .. }) = dtif_node
         {
-            for child in &children_mixin.children {
-                let child_id = entity_to_id(child);
-                process_dtif_nodes(world, dtif_nodes, &child_id, eid_to_entity);
-                let new_child_id = *eid_to_entity
-                    .get(&child_id)
-                    .expect("Child node not found in id_map");
-                new_children.push(new_child_id);
+            for child_entity in &children_mixin.children {
+                let child_eid = entity_to_eid(child_entity);
+                let processed_child_entity =
+                    process_dtif_nodes(world, dtif_nodes, &child_eid, eid_to_entity).unwrap();
+                new_children.push(processed_child_entity);
+
+                // Keep track of parent in children
+                // to easily know where to append it in some render appraoches (e.g. svg)
+                world
+                    .entity_mut(processed_child_entity)
+                    .insert(ParentMixin {
+                        parent: node_entity.clone(),
+                    });
             }
 
             // Update parent with new children (override old ones)
             if !new_children.is_empty() {
-                world.entity_mut(new_entity).insert(ChildrenMixin {
+                world.entity_mut(node_entity).insert(ChildrenMixin {
                     children: new_children,
                 });
             }
         }
+
+        return Some(node_entity);
     }
+
+    return None;
 }
 
 // =============================================================================

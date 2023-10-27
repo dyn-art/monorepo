@@ -17,7 +17,7 @@ use crate::{
     },
     core::node::{
         mixins::{
-            BlendMixin, ChildrenMixin, CompositionMixin, LayoutMixin, PathMixin,
+            BlendMixin, ChildrenMixin, CompositionMixin, LayoutMixin, ParentMixin, PathMixin,
             RectangleCornerMixin,
         },
         types::{Node, NodeType},
@@ -36,6 +36,7 @@ pub enum RenderChange {
     Composition(CompositionMixin),
     Blend(BlendMixin),
     Path(PathMixin),
+    ParentMixin(ParentMixin),
 }
 
 pub trait ToRenderChange {
@@ -75,6 +76,12 @@ impl ToRenderChange for PathMixin {
 impl ToRenderChange for RectangleCornerMixin {
     fn to_render_change(&self) -> RenderChange {
         RenderChange::RectangleCorner(self.clone())
+    }
+}
+
+impl ToRenderChange for ParentMixin {
+    fn to_render_change(&self) -> RenderChange {
+        RenderChange::ParentMixin(self.clone())
     }
 }
 
@@ -171,6 +178,7 @@ impl Plugin for BindgenRenderPlugin {
                     extract_mixin_generic::<CompositionMixin>,
                     extract_mixin_generic::<BlendMixin>,
                     extract_mixin_generic::<PathMixin>,
+                    extract_mixin_generic::<ParentMixin>,
                 ),
             )
             .add_systems(

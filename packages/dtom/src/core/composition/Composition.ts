@@ -2,8 +2,13 @@ import { CompositionApp as RustCompositionApp } from '@rust/dyn-dtom';
 import type { ToJsEvent, WorldIds } from '@rust/dyn-dtom/bindings';
 import type { TComposition } from '@dyn/types/dtif';
 
+import { TEST_COMPOSITION_1 } from '../../test-data';
+import {
+	transformRustEnumArrayToObject,
+	type GroupedRustEnums,
+	type RustEnumKeys
+} from '../../wasm';
 import type { Renderer } from '../render';
-import { TEST_COMPOSITION_1 } from '../test-data';
 
 export class Composition {
 	private _rustComposition: RustCompositionApp;
@@ -48,26 +53,34 @@ export class Composition {
 		};
 	}
 
-	public static onWasmEvent(worldId: number, data: ToJsEvent): void {
-		Composition._INSTANCES.find((instance) => instance.hasWorldId(worldId))?.onWasmEvent(data);
+	public static onWasmEvents(worldId: number, events: ToJsEvent[]): void {
+		Composition._INSTANCES.find((instance) => instance.hasWorldId(worldId))?.onWasmEvents(events);
 	}
 
-	public onWasmEvent(event: ToJsEvent): this {
-		for (const [key, value] of Object.entries(event)) {
-			switch (key) {
+	public onWasmEvents(events: ToJsEvent[]): this {
+		const groupedEvents: GroupedRustEnums<ToJsEvent> = transformRustEnumArrayToObject(events);
+
+		// Process grouped events
+		for (const eventType in groupedEvents) {
+			const eventGroup = groupedEvents[eventType as RustEnumKeys<ToJsEvent>];
+			if (eventGroup == null) {
+				continue;
+			}
+			switch (eventType) {
 				case 'RenderUpdate':
-					this.onRenderUpdate(value);
+					this.onRenderUpdate(eventGroup);
 					break;
 				default:
-					console.warn(`Unknown event: ${key}`);
+					console.warn(`Unknown event: ${eventType}`);
 					break;
 			}
 		}
+
 		return this;
 	}
 
-	private onRenderUpdate(data: ToJsEvent['RenderUpdate']): this {
-		this._renderer.forEach((renderer) => renderer.render(data));
+	private onRenderUpdate(events: ToJsEvent['RenderUpdate'][]): this {
+		this._renderer.forEach((renderer) => renderer.render(events));
 		return this;
 	}
 
