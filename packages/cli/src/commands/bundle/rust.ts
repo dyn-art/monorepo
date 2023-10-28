@@ -16,7 +16,7 @@ export default class Rust extends Command {
 			char: 'p',
 			description: 'Production mode',
 			required: false,
-			default: true
+			default: false
 		})
 	};
 
@@ -30,7 +30,11 @@ export default class Rust extends Command {
 
 		this.log(chalk.yellowBright(await promisifyFiglet('dyn brustler')));
 		this.log(`\n`);
-		this.log(`Started bundling Rust`);
+		this.log(
+			`Started bundling Rust for ${
+				flags.prod ? chalk.green('production') : chalk.blue('development')
+			}`
+		);
 		this.log(`\n`);
 
 		// Build WASM

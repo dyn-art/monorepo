@@ -4,10 +4,8 @@ use std::mem::transmute;
 use crate::bindgen::event_queue::from_js_event_queue::poll_events_from_js;
 use crate::bindgen::event_queue::to_js_event_queue::forward_events_to_js;
 use crate::bindgen::setup_bindgen;
+use crate::core::composition::systems::construct_path::construct_rectangle_path;
 use crate::core::composition::systems::handle_entity_moved_events;
-use crate::core::composition::systems::{
-    construct_path::construct_rectangle_path, startup_system_log, update_system_log,
-};
 use crate::plugins::bindgen_render_plugin::BindgenRenderPlugin;
 use crate::plugins::render_plugin::RenderApp;
 use crate::plugins::render_plugin::RenderPlugin;
@@ -69,9 +67,8 @@ impl CompositionApp {
         app.init_resource::<FromJsEventQueue>();
 
         // Register systems
-        app.add_systems(Startup, startup_system_log)
-            .add_systems(PreUpdate, poll_events_from_js)
-            .add_systems(Update, (update_system_log, handle_entity_moved_events))
+        app.add_systems(PreUpdate, poll_events_from_js)
+            .add_systems(Update, handle_entity_moved_events)
             .add_systems(PostUpdate, construct_rectangle_path)
             .add_systems(Last, forward_events_to_js);
 

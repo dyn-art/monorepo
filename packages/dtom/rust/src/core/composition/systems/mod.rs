@@ -8,14 +8,6 @@ use super::events::EntityMoved;
 
 pub mod construct_path;
 
-pub fn update_system_log() {
-    info!("---- Inside update_system");
-}
-
-pub fn startup_system_log() {
-    info!("Inside startup_system");
-}
-
 pub fn handle_entity_moved_events(
     mut event_reader: EventReader<EntityMoved>,
     mut query: Query<&mut LayoutMixin>,

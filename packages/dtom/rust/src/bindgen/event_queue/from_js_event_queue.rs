@@ -93,7 +93,6 @@ impl FromJsEventQueue {
 #[wasm_bindgen]
 pub fn enqueue_js_events(world_id: usize, events: JsValue) {
     let parsed_events: Vec<FromJsEvent> = serde_wasm_bindgen::from_value(events).unwrap();
-    info!("Received {:?} events", parsed_events);
     if let Some(sender) = SENDER_MAP.lock().unwrap().get(&world_id) {
         parsed_events
             .iter()
@@ -146,7 +145,6 @@ pub fn poll_events_from_js(
                 dx: *dx,
                 dy: *dy,
             });
-            info!("MoveEntity: {:?}, {:?}, {:?}", entity, dx, dy);
         }
     });
 }

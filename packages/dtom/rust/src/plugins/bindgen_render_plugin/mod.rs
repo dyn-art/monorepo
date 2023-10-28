@@ -139,14 +139,6 @@ fn forward_render_changes_to_js(mut event_queue: ResMut<ToJsEventQueue>) {
     event_queue.forward_events_to_js();
 }
 
-fn extract_system_log() {
-    info!("Inside extract_system");
-}
-
-fn render_system_log() {
-    info!("Inside render_system");
-}
-
 // =============================================================================
 // Plugin
 // =============================================================================
@@ -169,7 +161,6 @@ impl Plugin for BindgenRenderPlugin {
             .add_systems(
                 ExtractSchedule,
                 (
-                    extract_system_log,
                     extract_mixin_generic::<RectangleCornerMixin>,
                     extract_mixin_generic::<ChildrenMixin>,
                     extract_mixin_generic::<LayoutMixin>,
@@ -182,7 +173,6 @@ impl Plugin for BindgenRenderPlugin {
             .add_systems(
                 RenderSchedule,
                 (
-                    render_system_log,
                     prepare_render_changes.in_set(RenderSet::Prepare),
                     queue_render_changes.in_set(RenderSet::Queue),
                     forward_render_changes_to_js.in_set(RenderSet::Render),
