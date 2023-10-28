@@ -1,21 +1,29 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { Command } from '@oclif/core';
+import { Command, Flags } from '@oclif/core';
 import chalk from 'chalk';
 import type { PackageJson } from 'type-fest';
 
 import { doesFileExist, execaVerbose, promisifyFiglet, readJsonFile, shortId } from '../../utils';
 
-export default class Bundle extends Command {
+export default class Rust extends Command {
 	static description = 'Bundle Rust part of dyn.art packages';
 
 	static examples = [];
 
-	static flags = {};
+	static flags = {
+		prod: Flags.boolean({
+			char: 'p',
+			description: 'Production mode',
+			required: false,
+			default: true
+		})
+	};
 
 	static args = {};
 
 	public async run(): Promise<void> {
+		const { flags } = await this.parse(Rust);
 		const startTime = Date.now();
 		const tempRustOutputName = `temp-${shortId()}`;
 		const rustModulesDirPath = path.join(process.cwd(), 'src', 'rust_modules');
@@ -28,10 +36,21 @@ export default class Bundle extends Command {
 		// Build WASM
 		const rustInputDirPath = path.join(process.cwd(), 'rust');
 		const rustOutputDirPath = path.join(rustModulesDirPath, tempRustOutputName);
-		await execaVerbose('wasm-pack', ['build', '--target', 'web', '--out-dir', rustOutputDirPath], {
-			command: this,
-			cwd: rustInputDirPath // Set the cwd to the ./rust directory
-		});
+		await execaVerbose(
+			'wasm-pack',
+			[
+				'build',
+				'--target',
+				'web',
+				'--out-dir',
+				rustOutputDirPath,
+				...(flags.prod ? [] : ['--features', 'dev'])
+			],
+			{
+				command: this,
+				cwd: rustInputDirPath // Set the cwd to the ./rust directory
+			}
+		);
 		this.log(
 			`Bundled Rust with ${chalk.underline('wasm-pack')} to ${chalk.gray(
 				chalk.underline(rustOutputDirPath)

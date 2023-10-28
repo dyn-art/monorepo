@@ -6,6 +6,5 @@ import { Composition } from '../core';
 	worldId: number,
 	events: ToJsEvent[]
 ) {
-	console.log('Received new events from Rust', { worldId, events });
 	Composition.onWasmEvents(worldId, events);
 };

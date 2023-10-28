@@ -406,6 +406,7 @@ dependencies = [
  "console_error_panic_hook",
  "glam",
  "js-sys",
+ "log",
  "once_cell",
  "serde",
  "serde-wasm-bindgen",

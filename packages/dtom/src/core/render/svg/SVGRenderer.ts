@@ -130,7 +130,6 @@ export class SVGRenderer extends Renderer {
 			renderElement.setAttributes({ id: `group-${enitity}` });
 			renderElement.setStyles({ fill: 'blue' });
 			renderElement.onPointerDown(() => {
-				console.log('PointerDownEventOnEntity', { enitity });
 				enqueueJsEvents(this.composition.worldIds.mainWorldId, [
 					{ PointerDownEventOnEntity: { entity: enitity } }
 				]);
@@ -174,7 +173,6 @@ export class SVGRenderer extends Renderer {
 			renderElement.setAttributes({ id: `shape-${enitity}` });
 			renderElement.setStyles({ fill: 'red' });
 			renderElement.onPointerDown(() => {
-				console.log('PointerDownEventOnEntity', { enitity });
 				enqueueJsEvents(this.composition.worldIds.mainWorldId, [
 					{ PointerDownEventOnEntity: { entity: enitity } }
 				]);

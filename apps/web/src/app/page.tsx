@@ -87,7 +87,7 @@ async function spawnAndMoveRectangles(rectangleCount: number): Promise<void> {
 
 async function onClick(): Promise<void> {
 	await initWasm();
-	await spawnAndMoveRectangles(10);
+	await spawnAndMoveRectangles(100);
 }
 
 const Home: React.FC = () => {

@@ -1,18 +1,19 @@
 use bevy_ecs::{event::EventReader, system::Query};
 use glam::{Mat3, Vec2};
+use log::info;
 
-use crate::{bindgen::js_bindings, core::node::mixins::LayoutMixin};
+use crate::core::node::mixins::LayoutMixin;
 
 use super::events::EntityMoved;
 
 pub mod construct_path;
 
 pub fn update_system_log() {
-    js_bindings::log("---- Inside update_system");
+    info!("---- Inside update_system");
 }
 
 pub fn startup_system_log() {
-    js_bindings::log("Inside startup_system");
+    info!("Inside startup_system");
 }
 
 pub fn handle_entity_moved_events(

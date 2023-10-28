@@ -7,14 +7,12 @@ use bevy_ecs::{
     system::{Commands, Query, ResMut, Resource},
 };
 use bevy_utils::HashMap;
+use log::info;
 use serde::Serialize;
 use specta::Type;
 
 use crate::{
-    bindgen::{
-        event_queue::to_js_event_queue::{ToJsEvent, ToJsEventQueue},
-        js_bindings,
-    },
+    bindgen::event_queue::to_js_event_queue::{ToJsEvent, ToJsEventQueue},
     core::node::{
         mixins::{
             BlendMixin, ChildrenMixin, CompositionMixin, LayoutMixin, ParentMixin, PathMixin,
@@ -142,11 +140,11 @@ fn forward_render_changes_to_js(mut event_queue: ResMut<ToJsEventQueue>) {
 }
 
 fn extract_system_log() {
-    js_bindings::log("Inside extract_system");
+    info!("Inside extract_system");
 }
 
 fn render_system_log() {
-    js_bindings::log("Inside render_system");
+    info!("Inside render_system");
 }
 
 // =============================================================================

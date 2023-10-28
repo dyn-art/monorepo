@@ -5,7 +5,6 @@ export const XLINK = 'http://www.w3.org/1999/xlink';
 // Create a namespaced SVG element
 export function createSVGElement(tag: TSVGTagNames, attributes: TSVGAttributes = {}): SVGElement {
 	const element = document.createElementNS(NS, tag);
-	console.log('createSVGElement', { element });
 	if (tag === 'svg' && attributes.version == null) {
 		attributes.version = VERSION;
 	}

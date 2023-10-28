@@ -1,7 +1,9 @@
 use std::collections::HashMap;
 use std::mem::transmute;
 
-use crate::bindgen::js_bindings;
+use crate::bindgen::event_queue::from_js_event_queue::poll_events_from_js;
+use crate::bindgen::event_queue::to_js_event_queue::forward_events_to_js;
+use crate::bindgen::setup_bindgen;
 use crate::core::composition::systems::handle_entity_moved_events;
 use crate::core::composition::systems::{
     construct_path::construct_rectangle_path, startup_system_log, update_system_log,
@@ -10,10 +12,8 @@ use crate::plugins::bindgen_render_plugin::BindgenRenderPlugin;
 use crate::plugins::render_plugin::RenderApp;
 use crate::plugins::render_plugin::RenderPlugin;
 use crate::{
-    bindgen::{
-        event_queue::{from_js_event_queue::FromJsEventQueue, to_js_event_queue::ToJsEventQueue},
-        systems::{forward_events_to_js, poll_events_from_js},
-        utils::set_panic_hook,
+    bindgen::event_queue::{
+        from_js_event_queue::FromJsEventQueue, to_js_event_queue::ToJsEventQueue,
     },
     core::node::bundles::FrameNodeBundle,
 };
@@ -55,7 +55,7 @@ pub struct CompositionApp {
 impl CompositionApp {
     #[wasm_bindgen(constructor)]
     pub fn new(dtif: JsValue) -> Self {
-        set_panic_hook();
+        setup_bindgen();
 
         let parsed_dtif: DTIFComposition = serde_wasm_bindgen::from_value(dtif).unwrap();
 
