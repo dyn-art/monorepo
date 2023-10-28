@@ -18,6 +18,7 @@ import type { Composition } from '../../composition';
 import { Renderer } from '../Renderer';
 import { createSVGNode, type SVGNode } from './SVGNode';
 
+// TODO: Refactor and create established SVG structure (see old POC)
 export class SVGRenderer extends Renderer {
 	private _svgElement: SVGNode;
 	private _defsElement: SVGNode;

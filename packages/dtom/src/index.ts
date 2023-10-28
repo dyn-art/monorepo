@@ -1,5 +1,5 @@
 import './wasm/from-rust';
 
-export * from './core/composition';
-export * from './core/render';
+export * from '@rust/dyn-dtom/bindings';
+export * from './core';
 export * from './wasm';

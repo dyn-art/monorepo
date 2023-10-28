@@ -8,6 +8,7 @@ use std::{
 };
 
 use bevy_ecs::{
+    entity::Entity,
     system::Resource,
     world::{FromWorld, World, WorldId},
 };
@@ -21,11 +22,14 @@ use crate::bindgen::js_bindings;
 
 #[derive(Debug, Serialize, Deserialize, Clone, Type)]
 pub enum FromJsEvent {
-    PointerDownEventOnEntity { entity: u32 },
+    // Pointer Events
+    PointerDownEventOnEntity { entity: Entity },
     PointerMovedOnComposition { position: Vec2 },
     PointerEnteredComposition,
     PointerExitedComposition,
-    // ..
+
+    // Entity Events
+    EntityMoved { entity: Entity, dx: f32, dy: f32 },
 }
 
 #[derive(Resource, Debug)]

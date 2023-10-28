@@ -2,6 +2,7 @@ use std::collections::HashMap;
 use std::mem::transmute;
 
 use crate::bindgen::js_bindings;
+use crate::core::composition::systems::handle_entity_moved_events;
 use crate::core::composition::systems::{
     construct_path::construct_rectangle_path, startup_system_log, update_system_log,
 };
@@ -24,7 +25,9 @@ use serde::{Deserialize, Serialize};
 use specta::Type;
 use wasm_bindgen::prelude::*;
 
-use self::events::{CursorEnteredComposition, CursorExitedComposition, CursorMovedOnComposition};
+use self::events::{
+    CursorEnteredComposition, CursorExitedComposition, CursorMovedOnComposition, EntityMoved,
+};
 
 use super::node::bundles::{GroupNodeBundle, RectangleNodeBundle};
 use super::node::mixins::{ChildrenMixin, ParentMixin};
@@ -68,7 +71,7 @@ impl CompositionApp {
         // Register systems
         app.add_systems(Startup, startup_system_log)
             .add_systems(PreUpdate, poll_events_from_js)
-            .add_systems(Update, update_system_log)
+            .add_systems(Update, (update_system_log, handle_entity_moved_events))
             .add_systems(PostUpdate, construct_rectangle_path)
             .add_systems(Last, forward_events_to_js);
 
@@ -76,6 +79,7 @@ impl CompositionApp {
         app.add_event::<CursorEnteredComposition>();
         app.add_event::<CursorExitedComposition>();
         app.add_event::<CursorMovedOnComposition>();
+        app.add_event::<EntityMoved>();
 
         let root_node_eid = entity_to_eid(&parsed_dtif.root_node_id);
         let mut eid_to_entity_map: HashMap<String, Entity> = HashMap::new();
@@ -129,6 +133,11 @@ impl CompositionApp {
 
     pub fn get_world_ids(&self) -> JsValue {
         serde_wasm_bindgen::to_value(&self.world_ids).unwrap()
+    }
+
+    pub fn spawn_rectangle(&mut self, mixin: JsValue) -> JsValue {
+        let mixin: RectangleNodeBundle = serde_wasm_bindgen::from_value(mixin).unwrap();
+        return serde_wasm_bindgen::to_value(&self.app.world.spawn(mixin).id()).unwrap();
     }
 }
 

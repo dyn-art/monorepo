@@ -1,9 +1,16 @@
 import { CompositionApp as RustCompositionApp } from '@rust/dyn-dtom';
-import type { ToJsEvent, WorldIds } from '@rust/dyn-dtom/bindings';
+import type {
+	Entity,
+	FromJsEvent,
+	RectangleNodeBundle,
+	ToJsEvent,
+	WorldIds
+} from '@rust/dyn-dtom/bindings';
 import type { TComposition } from '@dyn/types/dtif';
 
 import { TEST_COMPOSITION_1 } from '../../test-data';
 import {
+	enqueueJsEvents,
 	transformRustEnumArrayToObject,
 	type GroupedRustEnums,
 	type RustEnumKeys
@@ -22,6 +29,8 @@ export class Composition {
 
 	protected _width: number;
 	protected _height: number;
+
+	protected _eventQueue: FromJsEvent[] = [];
 
 	constructor(config: TCompositionConfig) {
 		const { width, height } = config;
@@ -106,7 +115,17 @@ export class Composition {
 	}
 
 	public update(): void {
+		enqueueJsEvents(this.worldIds.mainWorldId, this._eventQueue);
+		this._eventQueue = [];
 		this._rustComposition.update();
+	}
+
+	public createRectangle(bundle: RectangleNodeBundle): Entity {
+		return this._rustComposition.spawn_rectangle(bundle);
+	}
+
+	public moveEntity(entity: Entity, dx: number, dy: number): void {
+		this._eventQueue.push({ EntityMoved: { entity, dx, dy } });
 	}
 }
 

@@ -1,4 +1,4 @@
-use bevy_ecs::{event::EventWriter, system::ResMut};
+use bevy_ecs::{entity, event::EventWriter, system::ResMut};
 
 use crate::{
     bindgen::{
@@ -9,7 +9,7 @@ use crate::{
         js_bindings,
     },
     core::composition::events::{
-        CursorEnteredComposition, CursorExitedComposition, CursorMovedOnComposition,
+        CursorEnteredComposition, CursorExitedComposition, CursorMovedOnComposition, EntityMoved,
     },
 };
 
@@ -19,15 +19,21 @@ pub fn forward_events_to_js(mut event_queue: ResMut<ToJsEventQueue>) {
 
 pub fn poll_events_from_js(
     mut event_queue: ResMut<FromJsEventQueue>,
+
+    // Cursor Events
     mut cursor_moved_events: EventWriter<CursorMovedOnComposition>,
     mut cursor_entered_events: EventWriter<CursorEnteredComposition>,
     mut cursor_exited_events: EventWriter<CursorExitedComposition>,
+
+    // Entity Events
+    mut entity_moved_events: EventWriter<EntityMoved>,
 ) {
     // Poll events from JS
     let events = event_queue.poll_events_from_js();
 
     // Map JS events to Bevy events
     events.iter().for_each(|event| match event {
+        // Cursor Events
         FromJsEvent::PointerDownEventOnEntity { entity } => {
             // TODO
             js_bindings::log(&format!("PointerDownEvent: {:?}", entity));
@@ -45,6 +51,16 @@ pub fn poll_events_from_js(
         FromJsEvent::PointerExitedComposition => {
             cursor_exited_events.send(CursorExitedComposition);
             js_bindings::log("PointerExitedComposition");
+        }
+
+        // Entity Events
+        FromJsEvent::EntityMoved { entity, dx, dy } => {
+            entity_moved_events.send(EntityMoved {
+                entity: *entity,
+                dx: *dx,
+                dy: *dy,
+            });
+            js_bindings::log(format!("MoveEntity: {:?}, {:?}, {:?}", entity, dx, dy).as_str());
         }
     });
 }
