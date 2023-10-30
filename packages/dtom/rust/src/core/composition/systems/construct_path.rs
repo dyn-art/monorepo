@@ -25,7 +25,7 @@ pub fn construct_rectangle_path(
         let max_radius = std::cmp::min(layout.width, layout.height) as f32 / 2.0;
 
         let min_radius =
-            |radius: i16| -> f32 { f32::from(std::cmp::min(radius, max_radius as i16)) };
+            |radius: u8| -> f32 { std::cmp::min(radius as i32, max_radius as i32) as f32 };
 
         // Move to start point, considering the top left radius
         path.vertices.push(Anchor {

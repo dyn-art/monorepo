@@ -5,10 +5,10 @@ use specta::Type;
 
 #[derive(Component, Serialize, Deserialize, Clone, Debug, Type)]
 pub struct RectangleCornerMixin {
-    pub top_left_radius: i16,
-    pub top_right_radius: i16,
-    pub bottom_right_radius: i16,
-    pub bottom_left_radius: i16,
+    pub top_left_radius: u8,
+    pub top_right_radius: u8,
+    pub bottom_right_radius: u8,
+    pub bottom_left_radius: u8,
 }
 
 impl Default for RectangleCornerMixin {

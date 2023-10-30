@@ -4,13 +4,7 @@ use bevy_ecs::{
 };
 use serde::Serialize;
 use specta::Type;
-use std::{
-    mem::transmute,
-    sync::{
-        mpsc::{channel, Receiver, Sender, TryRecvError},
-        Arc, Mutex,
-    },
-};
+use std::{collections::VecDeque, mem::transmute};
 
 use crate::{
     bindgen::js_bindings, core::node::types::NodeType, plugins::bindgen_render_plugin::RenderChange,
@@ -29,8 +23,7 @@ pub enum ToJsEvent {
 #[derive(Resource, Debug)]
 pub struct ToJsEventQueue {
     world_id: usize,
-    sender: Sender<ToJsEvent>,
-    receiver: Arc<Mutex<Receiver<ToJsEvent>>>,
+    queue: VecDeque<ToJsEvent>,
 }
 
 impl FromWorld for ToJsEventQueue {
@@ -42,31 +35,23 @@ impl FromWorld for ToJsEventQueue {
 impl ToJsEventQueue {
     pub fn new(world_id: WorldId) -> Self {
         let parsed_world_id: usize = unsafe { transmute(world_id) };
-        let (tx, rx) = channel();
         Self {
-            sender: tx,
-            receiver: Arc::new(Mutex::new(rx)),
+            queue: VecDeque::new(),
             world_id: parsed_world_id,
         }
     }
 
     /// Adds the incoming event via the sender.
     /// Sending over a channel is inherently thread-safe.
-    pub fn push_event(&self, event: ToJsEvent) {
-        self.sender.send(event).unwrap();
+    pub fn push_event(&mut self, event: ToJsEvent) {
+        self.queue.push_back(event);
     }
 
     pub fn forward_events_to_js(&mut self) {
         let mut events: Vec<ToJsEvent> = Vec::new();
 
-        // Drain the receiver and push all events to the events vector
-        loop {
-            match self.receiver.lock().unwrap().try_recv() {
-                Ok(event) => events.push(event),
-                Err(TryRecvError::Empty) => break,
-                Err(TryRecvError::Disconnected) => break,
-            }
-        }
+        // Drain events push all events to the events vector
+        self.queue.drain(..).for_each(|event| events.push(event));
 
         // Send the events to JS
         if !events.is_empty() {

@@ -7,7 +7,6 @@ use bevy_ecs::{
     system::{Commands, Query, ResMut, Resource},
 };
 use bevy_utils::HashMap;
-use log::info;
 use serde::Serialize;
 use specta::Type;
 
@@ -118,7 +117,7 @@ fn prepare_render_changes(mut commands: Commands, mut changed: ResMut<ChangedCom
 
 fn queue_render_changes(
     mut changed: ResMut<ChangedComponents>,
-    event_queue: ResMut<ToJsEventQueue>,
+    mut event_queue: ResMut<ToJsEventQueue>,
 ) {
     if !changed.changes.is_empty() {
         changed

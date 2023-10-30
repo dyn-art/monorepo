@@ -15,7 +15,7 @@ use crate::{
     },
     core::node::bundles::FrameNodeBundle,
 };
-use bevy_app::{App, Last, PostUpdate, PreUpdate, Startup, Update};
+use bevy_app::{App, Last, PostUpdate, PreUpdate, Update};
 use bevy_ecs::world::World;
 use bevy_ecs::{component::Component, entity::Entity};
 use glam::Vec2;
@@ -136,6 +136,35 @@ impl CompositionApp {
         let mixin: RectangleNodeBundle = serde_wasm_bindgen::from_value(mixin).unwrap();
         return serde_wasm_bindgen::to_value(&self.app.world.spawn(mixin).id()).unwrap();
     }
+
+    // pub fn get_layout_components(&mut self, parent: JsValue) -> JsValue {
+    //     let parsed_parent: Entity = serde_wasm_bindgen::from_value(parent).unwrap();
+    //     let mut query = self
+    //         .app
+    //         .world
+    //         .query_filtered::<(Entity, &LayoutMixin, &ParentMixin), With<Node>>();
+    // }
+
+    // pub fn get_components_by_entity(&mut self, entity: JsValue) -> JsValue {
+    //     let parsed_entity: Entity = serde_wasm_bindgen::from_value(entity).unwrap();
+    //     let world_components = self.app.world.components();
+    //     for archetype in self.app.world.archetypes().iter() {
+    //         if archetype
+    //             .entities()
+    //             .iter()
+    //             .any(|e| e.entity() == parsed_entity)
+    //         {
+    //             let components_vec: Vec<&ComponentInfo> = archetype
+    //                 .components()
+    //                 .map(|component_id| world_components.get_info(component_id).unwrap())
+    //                 .collect();
+    //             info!("components_vec: {:?}", components_vec);
+
+    //             // TODO: can't figure out to access value
+    //         }
+    //     }
+    //     return JsValue::NULL;
+    // }
 }
 
 fn spawn_node(world: &mut World, node: &DTIFNode) -> Entity {
@@ -148,7 +177,7 @@ fn spawn_node(world: &mut World, node: &DTIFNode) -> Entity {
 
 // Due to a issue we have to work with a stringified Enitity in the Hashmap.
 // https://github.com/serde-rs/serde/issues/1183
-// This function basically converts an Entity to a string we call "eid".
+// This function basically converts an Entity to a string we called "eid".
 fn entity_to_eid(entity: &Entity) -> String {
     entity.to_bits().to_string()
 }

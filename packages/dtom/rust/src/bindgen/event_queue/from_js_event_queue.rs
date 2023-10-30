@@ -7,11 +7,8 @@ use std::{
     },
 };
 
-use crate::{
-    bindgen::js_bindings,
-    core::composition::events::{
-        CursorEnteredComposition, CursorExitedComposition, CursorMovedOnComposition, EntityMoved,
-    },
+use crate::core::composition::events::{
+    CursorEnteredComposition, CursorExitedComposition, CursorMovedOnComposition, EntityMoved,
 };
 
 use bevy_ecs::{
@@ -79,7 +76,8 @@ impl FromJsEventQueue {
 
         // Drain the receiver and push all events to the events vector
         loop {
-            match self.receiver.lock().unwrap().try_recv() {
+            let result = { self.receiver.lock().unwrap().try_recv() };
+            match result {
                 Ok(event) => events.push(event),
                 Err(TryRecvError::Empty) => break,
                 Err(TryRecvError::Disconnected) => break,
