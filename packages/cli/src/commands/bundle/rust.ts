@@ -17,6 +17,12 @@ export default class Rust extends Command {
 			description: 'Production mode',
 			required: false,
 			default: false
+		}),
+		analyze: Flags.boolean({
+			char: 'a',
+			description: 'Analyze bundle',
+			required: false,
+			default: false
 		})
 	};
 
@@ -115,6 +121,16 @@ export default class Rust extends Command {
 			if (doesFileExist(filePath)) {
 				await fs.rm(filePath);
 			}
+		}
+
+		// Analyze wasm file size
+		// https://rustwasm.github.io/docs/book/reference/code-size.html
+		if (flags.analyze) {
+			await execaVerbose('twiggy', ['top', '-n', '20', path.join(rustOutputDirPath, 'bg.wasm')], {
+				command: this,
+				cwd: rustInputDirPath,
+				verbose: true
+			});
 		}
 
 		// Rename output directory

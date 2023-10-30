@@ -1,0 +1,88 @@
+@startuml
+
+skinparam componentStyle uml2
+title Render Core - Component Diagram
+
+package "Rust" as Rust #Orange {
+
+    component Composition {
+    
+        component "App (Main World)" as App { 
+            () Resources #Yellow
+            () Systems #Cyan
+            () Plugins #MediumPurple
+
+            component "Render Plugin" as RenderPlugin #MediumPurple
+            component "Bindgen Render Plugin" as BindgenRenderPlugin #MediumPurple
+            component "From JS Event Queue" as FromJsEventQueue #Yellow
+            component "To JS Event Queue" as ToJsEventQueue #Yellow
+            component "poll_events_from_js" as PollEventsFromJsSystem #Cyan
+            component "Core Systems" as CoreSystems #Cyan
+
+            component "App (Render World)" as RenderApp {
+                () "Resources" as ResourcesRenderApp #Yellow
+                () "Systems" as SystemsRenderApp #Cyan
+
+                component "To JS Event Queue" as ToJsEventQueueRenderApp #Yellow
+                component "Extract Systems" as ExtractSystemsRenderApp  #Cyan
+                component "prepare_render_changes" as PrepareRenderChangesSystemRenderApp #Cyan
+                component "queue_render_changes" as QueueRenderChangesSystemRenderApp #Cyan
+                component "forward_render_changes_to_js" as ForwardRenderChangesToJsSystemRenderApp #Cyan
+            }
+        }
+
+    }
+  
+}
+
+node "WASM" as WASM {
+    component "enqueue_js_events" as EnqueueJsEvents #Orange
+    component "enqueue_rust_events" as EnqueueRustEvents #LightBlue
+}
+
+package "Typescript" as Typescript #LightBlue {
+    component "Composition" as TComposition
+}
+
+    ' WASM function
+    EnqueueJsEvents -- Rust
+    EnqueueRustEvents -- Typescript
+
+    ' Main App
+    Plugins .. RenderPlugin
+    Plugins .. BindgenRenderPlugin
+    Resources .. ToJsEventQueue
+    Resources .. FromJsEventQueue
+    ResourcesRenderApp .. ToJsEventQueueRenderApp
+    Systems .. PollEventsFromJsSystem
+    Systems .. CoreSystems
+
+    ' Render App
+    SystemsRenderApp .. ExtractSystemsRenderApp
+    SystemsRenderApp .. PrepareRenderChangesSystemRenderApp
+    SystemsRenderApp .. QueueRenderChangesSystemRenderApp
+    SystemsRenderApp .. ForwardRenderChangesToJsSystemRenderApp
+  
+    ' Systems
+    ForwardRenderChangesToJsSystemRenderApp --> ToJsEventQueueRenderApp : enqueue events
+    PollEventsFromJsSystem --> FromJsEventQueue : poll events
+    CoreSystems --> ToJsEventQueue : emit events
+    CoreSystems --> FromJsEventQueue : react on events
+    EnqueueJsEvents --> FromJsEventQueue : enqueue events
+    ToJsEventQueue --> EnqueueRustEvents : enqueue events
+
+    ' Systems Order
+    PollEventsFromJsSystem ..> CoreSystems
+    CoreSystems ..> ExtractSystemsRenderApp
+    ExtractSystemsRenderApp ..> PrepareRenderChangesSystemRenderApp
+    PrepareRenderChangesSystemRenderApp ..> QueueRenderChangesSystemRenderApp
+    QueueRenderChangesSystemRenderApp ..> ForwardRenderChangesToJsSystemRenderApp
+
+    ' Plugins Registration
+    ' RenderPlugin --> RenderApp : create
+    ' BindgenRenderPlugin --> ExtractSystemsRenderApp : register
+    ' BindgenRenderPlugin --> PrepareRenderChangesSystemRenderApp : register
+    ' BindgenRenderPlugin --> QueueRenderChangesSystemRenderApp : register
+    ' BindgenRenderPlugin --> ForwardRenderChangesToJsSystemRenderApp : register
+
+@enduml

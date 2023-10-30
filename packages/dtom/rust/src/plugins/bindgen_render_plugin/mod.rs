@@ -11,7 +11,7 @@ use serde::Serialize;
 use specta::Type;
 
 use crate::{
-    bindgen::event_queue::to_js_event_queue::{ToJsEvent, ToJsEventQueue},
+    bindgen::event_queue::to_js_event_queue::{forward_events_to_js, ToJsEvent, ToJsEventQueue},
     core::node::{
         mixins::{
             BlendMixin, ChildrenMixin, CompositionMixin, LayoutMixin, ParentMixin, PathMixin,
@@ -134,8 +134,8 @@ fn queue_render_changes(
     }
 }
 
-fn forward_render_changes_to_js(mut event_queue: ResMut<ToJsEventQueue>) {
-    event_queue.forward_events_to_js();
+fn forward_render_changes_to_js(event_queue: ResMut<ToJsEventQueue>) {
+    forward_events_to_js(event_queue)
 }
 
 // =============================================================================

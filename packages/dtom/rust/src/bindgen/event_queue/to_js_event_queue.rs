@@ -23,6 +23,7 @@ pub enum ToJsEvent {
 #[derive(Resource, Debug)]
 pub struct ToJsEventQueue {
     world_id: usize,
+    // https://users.rust-lang.org/t/mpsc-channels-vs-arc-mutex-vecdeque/92909
     queue: VecDeque<ToJsEvent>,
 }
 

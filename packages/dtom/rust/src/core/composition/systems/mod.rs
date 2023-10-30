@@ -1,6 +1,5 @@
 use bevy_ecs::{event::EventReader, system::Query};
 use glam::{Mat3, Vec2};
-use log::info;
 
 use crate::core::node::mixins::LayoutMixin;
 

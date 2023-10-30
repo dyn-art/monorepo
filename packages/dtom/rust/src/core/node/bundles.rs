@@ -1,4 +1,4 @@
-use bevy_ecs::{bundle::Bundle, entity::Entity};
+use bevy_ecs::bundle::Bundle;
 use serde::{Deserialize, Serialize};
 use specta::Type;
 
@@ -18,8 +18,8 @@ pub struct FrameNodeBundle {
     pub blend_mixin: BlendMixin,
 }
 
-impl FrameNodeBundle {
-    pub fn default() -> Self {
+impl Default for FrameNodeBundle {
+    fn default() -> Self {
         Self {
             node: Node {
                 node_type: NodeType::Frame,
@@ -44,8 +44,8 @@ pub struct GroupNodeBundle {
     pub blend_mixin: BlendMixin,
 }
 
-impl GroupNodeBundle {
-    pub fn default(parent: Entity) -> Self {
+impl Default for GroupNodeBundle {
+    fn default() -> Self {
         Self {
             node: Node {
                 node_type: NodeType::Group,
@@ -69,8 +69,8 @@ pub struct RectangleNodeBundle {
     pub blend_mixin: BlendMixin,
 }
 
-impl RectangleNodeBundle {
-    pub fn default(parent: Entity) -> Self {
+impl Default for RectangleNodeBundle {
+    fn default() -> Self {
         Self {
             node: Node {
                 node_type: NodeType::Rectangle,
