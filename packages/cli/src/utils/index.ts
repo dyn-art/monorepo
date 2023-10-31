@@ -1,4 +1,5 @@
 export * from './does-file-exist';
+export * from './execa-verbose';
 export * from './find-nearest-ts-config-path';
 export * from './get-ts-config-compiler-options';
 export * from './promisify-figlet';

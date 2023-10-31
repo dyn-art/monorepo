@@ -22,7 +22,7 @@ export default class Bundle extends Command {
 			char: 'p',
 			description: 'Production mode',
 			required: false,
-			default: true
+			default: false
 		}),
 		bundleStrategy: Flags.string({
 			char: 'b',
@@ -67,9 +67,9 @@ export default class Bundle extends Command {
 		this.log(chalk.yellowBright(await promisifyFiglet('dyn bundler')));
 		this.log(`\n`);
 		this.log(
-			`Started bundling package: ${chalk.magenta(
+			`Started bundling package ${chalk.magenta(
 				chalk.underline(packageJson.name ?? 'unknown-package')
-			)}`
+			)} for ${flags.prod ? chalk.green('production') : chalk.blue('development')}`
 		);
 		this.log(`\n`);
 

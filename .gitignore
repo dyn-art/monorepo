@@ -38,6 +38,7 @@ yarn-error.log*
 
 # Node
 dist
+dist.*
 
 # Wasm
 target

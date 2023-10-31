@@ -1,0 +1,46 @@
+{
+	"name": "@dyn/experiments",
+	"description": "Random experiments",
+	"version": "0.0.1",
+	"private": true,
+	"scripts": {
+		"build": "shx rm -rf dist && dyn-cli bundle",
+		"start:dev": "tsc -w",
+		"lint": "eslint --cache \"**/*.{js,ts}\"",
+		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
+		"install:clean": "pnpm run clean && pnpm install",
+		"test": "vitest run"
+	},
+	"exports": {
+		"rectangle-eater": {
+			"source": "./src/rectangle-eater/index.ts",
+			"main": "./dist/rectangle-eater/cjs/index.js",
+			"module": "./dist/rectangle-eater/esm/index.js",
+			"types": "./dist/types/rectangle-eater/index.d.ts"
+		}
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/dyndotart/monorepo.git"
+	},
+	"keywords": [],
+	"author": "@bennoinbeta",
+	"license": "AGPL-3.0-or-later",
+	"bugs": {
+		"url": "https://issues.dyn.art/"
+	},
+	"homepage": "https://github.com/dyndotart/monorepo",
+	"dependencies": {
+		"@dyn/utils": "workspace:*",
+		"bitecs": "^0.3.40",
+		"piecs": "^0.4.0"
+	},
+	"devDependencies": {
+		"@dyn/config": "workspace:*",
+		"@types/node": "^17.0.12"
+	},
+	"files": [
+		"dist",
+		"README.md"
+	]
+}

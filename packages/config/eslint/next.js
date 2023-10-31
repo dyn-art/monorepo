@@ -19,7 +19,6 @@ module.exports = {
 		require.resolve('@vercel/style-guide/eslint/browser'),
 		require.resolve('@vercel/style-guide/eslint/react'),
 		require.resolve('@vercel/style-guide/eslint/next'),
-		require.resolve('@vercel/style-guide/eslint/typescript'),
 		require.resolve('./base')
 	],
 	globals: {
@@ -27,6 +26,15 @@ module.exports = {
 		JSX: true
 	},
 	rules: {
-		'import/no-default-export': OFF
+		// EsLint
+		'import/no-default-export': OFF,
+
+		// React
+		'react/function-component-definition': [
+			'error',
+			{
+				namedComponents: 'arrow-function'
+			}
+		]
 	}
 };

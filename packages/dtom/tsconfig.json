@@ -6,6 +6,7 @@
       "paths": {
         "@rust/*": ["./src/rust_modules/*"],
       },
+      "lib": ["esnext", "dom"]
     },
     "extends": "@dyn/config/shared-library.tsconfig.json",
     "include": ["src"],

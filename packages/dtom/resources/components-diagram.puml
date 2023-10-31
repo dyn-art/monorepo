@@ -1,0 +1,99 @@
+@startuml
+
+skinparam componentStyle uml2
+title Render Core - Component Diagram
+
+package "Rust" as Rust #Orange {
+
+    component Composition {
+    
+        component "App (Main World)" as App { 
+            () Resources #Yellow
+            () Systems #Cyan
+            () Plugins #MediumPurple
+
+            component "Render Plugin" as RenderPlugin #MediumPurple
+            component "Bindgen Render Plugin" as BindgenRenderPlugin #MediumPurple
+            component "From JS Event Queue" as FromJsEventQueue #Yellow
+            component "To JS Event Queue" as ToJsEventQueue #Yellow
+            component "poll_events_from_js" as PollEventsFromJsSystem #Cyan
+            component "Core Systems (x)" as CoreSystems #Cyan
+            component "forward_events_to_js" as ForwardEventsToJs #Cyan
+
+            component "App (Render World)" as RenderApp {
+                () "Resources" as ResourcesRenderApp #Yellow
+                () "Systems" as SystemsRenderApp #Cyan
+
+                component "To JS Event Queue" as ToJsEventQueueRenderApp #Yellow
+                component "Changed Components" as ChangedComponentsRenderApp #Yellow
+                component "Extract Systems (x)" as ExtractSystemsRenderApp  #Cyan
+                component "prepare_render_changes" as PrepareRenderChangesSystemRenderApp #Cyan
+                component "queue_render_changes" as QueueRenderChangesSystemRenderApp #Cyan
+                component "forward_events_to_js" as ForwardEventsToJsRenderApp #Cyan
+            }
+        }
+
+    }
+  
+}
+
+node "WASM" as WASM {
+    component "enqueue_js_events" as EnqueueJsEvents #Orange
+    component "enqueue_rust_events" as EnqueueRustEvents #LightBlue
+}
+
+package "Typescript" as Typescript #LightBlue {
+    component "Composition" as TComposition
+}
+
+    ' WASM function
+    EnqueueJsEvents --> FromJsEventQueue : enqueue events
+
+    ' Main App
+    Plugins .. RenderPlugin
+    Plugins .. BindgenRenderPlugin
+    Resources .. ToJsEventQueue
+    Resources .. FromJsEventQueue
+    Systems .. PollEventsFromJsSystem
+    Systems .. CoreSystems
+    Systems ..ForwardEventsToJs
+
+    ' Render App
+    ResourcesRenderApp .. ToJsEventQueueRenderApp
+    ResourcesRenderApp .. ChangedComponentsRenderApp
+    SystemsRenderApp .. ExtractSystemsRenderApp
+    SystemsRenderApp .. PrepareRenderChangesSystemRenderApp
+    SystemsRenderApp .. QueueRenderChangesSystemRenderApp
+    SystemsRenderApp .. ForwardEventsToJsRenderApp
+  
+    ' Systems
+    ForwardEventsToJsRenderApp --> ToJsEventQueueRenderApp : forward events
+    QueueRenderChangesSystemRenderApp --> ToJsEventQueueRenderApp : push events
+    PollEventsFromJsSystem --> FromJsEventQueue : poll events
+    CoreSystems --> ToJsEventQueue : push events
+    CoreSystems --> FromJsEventQueue : react on events
+    ForwardEventsToJs --> ToJsEventQueue : forward events
+    ExtractSystemsRenderApp --> App : extract relevant data from main world
+    ExtractSystemsRenderApp --> ChangedComponentsRenderApp : push changes
+    QueueRenderChangesSystemRenderApp --> ChangedComponentsRenderApp : poll changes
+
+    ' Systems Order
+    PollEventsFromJsSystem ..> CoreSystems
+    CoreSystems ..> ForwardEventsToJs
+    ForwardEventsToJs ..> ExtractSystemsRenderApp
+    ExtractSystemsRenderApp ..> PrepareRenderChangesSystemRenderApp
+    PrepareRenderChangesSystemRenderApp ..> QueueRenderChangesSystemRenderApp
+    QueueRenderChangesSystemRenderApp ..> ForwardEventsToJsRenderApp
+
+    ' Resources
+    ToJsEventQueue --> EnqueueRustEvents : forward events
+    ToJsEventQueueRenderApp --> EnqueueRustEvents : forward events
+
+    ' Plugins Registration
+    ' RenderPlugin --> RenderApp : create
+    ' BindgenRenderPlugin --> ExtractSystemsRenderApp : register
+    ' BindgenRenderPlugin --> PrepareRenderChangesSystemRenderApp : register
+    ' BindgenRenderPlugin --> QueueRenderChangesSystemRenderApp : register
+    ' BindgenRenderPlugin --> ForwardEventsToJsRenderApp : register
+
+@enduml

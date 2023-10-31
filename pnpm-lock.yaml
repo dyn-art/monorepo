@@ -37,6 +37,9 @@ importers:
       '@dyn/dtom':
         specifier: workspace:*
         version: link:../../packages/dtom
+      clsx:
+        specifier: ^2.0.0
+        version: 2.0.0
       next:
         specifier: ^13.4.19
         version: 13.4.19(@babel/core@7.23.0)(react-dom@18.2.0)(react@18.2.0)
@@ -46,6 +49,9 @@ importers:
       react-dom:
         specifier: ^18.2.0
         version: 18.2.0(react@18.2.0)
+      tailwind-merge:
+        specifier: ^1.14.0
+        version: 1.14.0
     devDependencies:
       '@dyn/config':
         specifier: workspace:*
@@ -128,16 +134,48 @@ importers:
         version: 4.2.1(typescript@5.2.2)
 
   packages/dtom:
+    dependencies:
+      '@dyn/utils':
+        specifier: workspace:*
+        version: link:../utils
     devDependencies:
       '@dyn/config':
         specifier: workspace:*
         version: link:../config
+      '@dyn/types':
+        specifier: workspace:^
+        version: link:../types
       '@rollup/plugin-wasm':
         specifier: ^6.2.2
         version: 6.2.2
       '@types/node':
         specifier: ^17.0.12
         version: 17.0.12
+
+  packages/experiments:
+    dependencies:
+      '@dyn/utils':
+        specifier: workspace:*
+        version: link:../utils
+      bitecs:
+        specifier: ^0.3.40
+        version: 0.3.40
+      piecs:
+        specifier: ^0.4.0
+        version: 0.4.0
+    devDependencies:
+      '@dyn/config':
+        specifier: workspace:*
+        version: link:../config
+      '@types/node':
+        specifier: ^17.0.12
+        version: 17.0.12
+
+  packages/types:
+    devDependencies:
+      '@dyn/config':
+        specifier: workspace:*
+        version: link:../config
 
   packages/utils:
     devDependencies:
@@ -1672,6 +1710,10 @@ packages:
     engines: {node: '>=0.6'}
     dev: false
 
+  /bitecs@0.3.40:
+    resolution: {integrity: sha512-wAylY4pNfX8IeIH5phtwt1lUNtHKrkoSNrArI7Ris2Y4nEQWFIVvXdgAuqprEg9bq8Wolmlj0gVfeG6MFmtI2Q==}
+    dev: false
+
   /bplist-parser@0.2.0:
     resolution: {integrity: sha512-z0M+byMThzQmD9NILRniCUXYsYpjwnlO8N5uCFaCqIOpqRsJCrQL9NK3JsD67CN5a08nF5oIL2bD6loTdHOuKw==}
     engines: {node: '>= 5.10.0'}
@@ -1827,6 +1869,11 @@ packages:
 
   /client-only@0.0.1:
     resolution: {integrity: sha512-IV3Ou0jSMzZrd3pZ48nLkT9DA7Ag1pnPzaiQhpW7c3RbcqqzvzzVu+L8gfqMp/8IM2MQtSiqaCxrrcfu8I8rMA==}
+    dev: false
+
+  /clsx@2.0.0:
+    resolution: {integrity: sha512-rQ1+kcj+ttHG0MKVGBUXwayCCF1oh39BF5COIpRzuCEv8Mwjv0XucrI2ExNTOn9IlLifGClWQcU9BrZORvtw6Q==}
+    engines: {node: '>=6'}
     dev: false
 
   /color-convert@1.9.3:
@@ -3843,6 +3890,10 @@ packages:
     resolution: {integrity: sha512-JU3teHTNjmE2VCGFzuY8EXzCDVwEqB2a8fsIvwaStHhAWJEeVd1o1QD80CU6+ZdEXXSLbSsuLwJjkCBWqRQUVA==}
     engines: {node: '>=8.6'}
 
+  /piecs@0.4.0:
+    resolution: {integrity: sha512-NiGuWHykjFCahsYzn7U3+Q0nk9wUr0wITRioTVCZkK6nk8P4Px/arWYviezyMDT5OaqNmLg4eL00Udj4txlhrQ==}
+    dev: false
+
   /pkg-types@1.0.3:
     resolution: {integrity: sha512-nN7pYi0AQqJnoLPC9eHFQ8AcyaixBUOwvqc5TDnIKCMEE6I0y8P7OKA7fPexsXGCGxQDl/cmrLAp26LhcwxZ4A==}
     dependencies:
@@ -4450,6 +4501,10 @@ packages:
     dependencies:
       '@pkgr/utils': 2.4.2
       tslib: 2.6.2
+    dev: false
+
+  /tailwind-merge@1.14.0:
+    resolution: {integrity: sha512-3mFKyCo/MBcgyOTlrY8T7odzZFx+w+qKSMAmdFzRvqBfLlSigU6TZnlFHK0lkMwj9Bj8OYU+9yW9lmGuS0QEnQ==}
     dev: false
 
   /tapable@2.2.1:

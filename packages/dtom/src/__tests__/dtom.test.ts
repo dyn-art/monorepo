@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { editorFactory, initWasm } from '..';
+import { createSVGComposition } from '../core/composition';
+import { initWasm } from '../wasm';
 
 describe('dtom', () => {
 	beforeEach(async () => {
@@ -8,7 +9,7 @@ describe('dtom', () => {
 	});
 
 	it('should add 1 + 2 to equal 3', async () => {
-		const result = editorFactory();
+		const result = createSVGComposition({ width: 100, height: 100 });
 		expect(result).toBeDefined();
 	});
 });

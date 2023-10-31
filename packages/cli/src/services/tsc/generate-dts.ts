@@ -5,6 +5,7 @@ import chalk from 'chalk';
 import type { PackageJson } from 'type-fest';
 
 import {
+	execaVerbose,
 	findNearestTsConfigPath,
 	getTsConfigCompilerOptions,
 	resolveTsPathsFactory,
@@ -13,9 +14,11 @@ import {
 } from '../../utils';
 
 export async function generateDts(command: Command, options: TGenerateDtsOptions = {}) {
-	const { tsConfigPath = findNearestTsConfigPath(), packageJson } = options;
-	const { execa } = await import('execa');
-
+	const {
+		tsConfigPath = findNearestTsConfigPath(),
+		packageJson,
+		shouldResolveTsPaths = true
+	} = options;
 	command.log(
 		'🚀 Started generating Typescript Declaration files.',
 		chalk.gray(
@@ -25,35 +28,39 @@ export async function generateDts(command: Command, options: TGenerateDtsOptions
 		)
 	);
 
-	// Resolve compiler options
+	// Resolve Typescript compiler options
 	if (tsConfigPath == null) {
 		command.error('No tsconfig.json found.', { exit: 1 });
 	}
 	const compilerOptions = getTsConfigCompilerOptions(command, tsConfigPath);
 
-	const relativeDeclarationDirPath = getRelativeDeclarationDirPath(compilerOptions, packageJson);
-	const declarationFileEnding = '.d.ts';
-	const resolveTsPaths = resolveTsPathsFactory(command, {
-		compilerOptions: createResolveTsPathsCompilerOptions(
-			compilerOptions,
-			relativeDeclarationDirPath
-		),
-		shouldResolveRelativeToImporter: true
+	// Generate declaration files
+	await execaVerbose('pnpm', ['tsc', '--emitDeclarationOnly', '--project', tsConfigPath], {
+		command
 	});
 
-	// Generate declaration files
-	await execa('pnpm', ['tsc', '--emitDeclarationOnly', '--project', tsConfigPath]);
+	if (shouldResolveTsPaths && compilerOptions.paths != null) {
+		const relativeDeclarationDirPath = getRelativeDeclarationDirPath(compilerOptions, packageJson);
+		const declarationFileEnding = '.d.ts';
+		const resolveTsPaths = resolveTsPathsFactory(command, {
+			compilerOptions: createResolveTsPathsCompilerOptions(
+				compilerOptions,
+				relativeDeclarationDirPath
+			),
+			shouldResolveRelativeToImporter: true
+		});
 
-	// Update import paths in declaration files
-	const declarationFilePaths = getFilePathsWithExtDeep(
-		relativeDeclarationDirPath,
-		declarationFileEnding
-	);
-	for (const filePath of declarationFilePaths) {
-		let content = fs.readFileSync(filePath, 'utf-8');
-		content = updateImportPaths(content, filePath, resolveTsPaths);
-		content = updateExportPaths(content, filePath, resolveTsPaths);
-		fs.writeFileSync(filePath, content);
+		// Update import paths in declaration files
+		const declarationFilePaths = getFilePathsWithExtDeep(
+			relativeDeclarationDirPath,
+			declarationFileEnding
+		);
+		for (const filePath of declarationFilePaths) {
+			let content = fs.readFileSync(filePath, 'utf-8');
+			content = updateImportPaths(content, filePath, resolveTsPaths);
+			content = updateExportPaths(content, filePath, resolveTsPaths);
+			fs.writeFileSync(filePath, content);
+		}
 	}
 
 	command.log('🏁 Completed generating Typescript Declaration files.');
@@ -133,6 +140,7 @@ function updateExportPaths(
 	filePath: string,
 	resolveTsPath: TResolveTsPaths
 ): string {
+	// Regular expression to match export statements with named groups
 	const exportRegex =
 		/(?:^|\n)export\s+(?<exported>\*|\{[^}]*\})\s+from\s+(?<quote>'|")(?<path>[^'"]+)(?:\2);?/;
 
@@ -170,4 +178,5 @@ function getFilePathsWithExtDeep(dir: string, ext: string): string[] {
 export interface TGenerateDtsOptions {
 	tsConfigPath?: string;
 	packageJson?: PackageJson;
+	shouldResolveTsPaths?: boolean;
 }
