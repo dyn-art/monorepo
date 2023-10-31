@@ -3,7 +3,6 @@ use bevy_ecs::{
     system::{ResMut, Resource},
     world::{FromWorld, World, WorldId},
 };
-use crossbeam_channel::{unbounded, Receiver, Sender};
 use serde::Serialize;
 use specta::Type;
 use std::mem::transmute;
@@ -25,8 +24,7 @@ pub enum ToJsEvent {
 #[derive(Resource, Debug)]
 pub struct ToJsEventQueue {
     world_id: usize,
-    receiver: Receiver<ToJsEvent>,
-    sender: Sender<ToJsEvent>,
+    queue: Vec<ToJsEvent>,
     // Reuse this Vec to avoid reallocations
     events: Vec<ToJsEvent>,
 }
@@ -40,32 +38,27 @@ impl FromWorld for ToJsEventQueue {
 impl ToJsEventQueue {
     pub fn new(world_id: WorldId) -> Self {
         let parsed_world_id: usize = unsafe { transmute(world_id) };
-        let (sender, receiver) = unbounded();
-
         Self {
-            sender,
-            receiver,
+            queue: Vec::new(),
             world_id: parsed_world_id,
             events: Vec::new(),
         }
     }
 
-    /// Adds the incoming event via the sender.
-    /// Sending over a channel is inherently thread-safe.
     pub fn push_event(&mut self, event: ToJsEvent) {
-        self.sender.send(event);
+        self.queue.push(event);
     }
 
     pub fn forward_events_to_js(&mut self) {
         // Clear previous events
         self.events.clear();
 
-        // Get events from receiver and push them into the events vec
-        for event in self.receiver.try_iter() {
+        // Drain events from queue and push them into the events vec
+        self.queue.drain(..).into_iter().for_each(|event| {
             self.events.push(event.clone());
-        }
+        });
 
-        // Send the events to JS
+        // Send events to JS
         if !self.events.is_empty() {
             let js_value = serde_wasm_bindgen::to_value(&self.events).unwrap();
             js_bindings::enqueue_rust_events(self.world_id, js_value);
