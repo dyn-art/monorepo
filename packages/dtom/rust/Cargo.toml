@@ -38,6 +38,7 @@ serde-wasm-bindgen = "0.6.0"
 glam = { version = "0.24.2", features = ["serde"] }
 once_cell = "1.18.0"
 log = "0.4.20"
+crossbeam-channel = "0.5.8"
 
 # CLI dependencies
 specta = { path = "/Users/benno/Desktop/workspace/contribution/code/specta", features = [

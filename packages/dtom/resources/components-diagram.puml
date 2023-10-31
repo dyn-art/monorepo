@@ -17,17 +17,19 @@ package "Rust" as Rust #Orange {
             component "From JS Event Queue" as FromJsEventQueue #Yellow
             component "To JS Event Queue" as ToJsEventQueue #Yellow
             component "poll_events_from_js" as PollEventsFromJsSystem #Cyan
-            component "Core Systems" as CoreSystems #Cyan
+            component "Core Systems (x)" as CoreSystems #Cyan
+            component "forward_events_to_js" as ForwardEventsToJs #Cyan
 
             component "App (Render World)" as RenderApp {
                 () "Resources" as ResourcesRenderApp #Yellow
                 () "Systems" as SystemsRenderApp #Cyan
 
                 component "To JS Event Queue" as ToJsEventQueueRenderApp #Yellow
-                component "Extract Systems" as ExtractSystemsRenderApp  #Cyan
+                component "Changed Components" as ChangedComponentsRenderApp #Yellow
+                component "Extract Systems (x)" as ExtractSystemsRenderApp  #Cyan
                 component "prepare_render_changes" as PrepareRenderChangesSystemRenderApp #Cyan
                 component "queue_render_changes" as QueueRenderChangesSystemRenderApp #Cyan
-                component "forward_render_changes_to_js" as ForwardRenderChangesToJsSystemRenderApp #Cyan
+                component "forward_events_to_js" as ForwardEventsToJsRenderApp #Cyan
             }
         }
 
@@ -45,44 +47,53 @@ package "Typescript" as Typescript #LightBlue {
 }
 
     ' WASM function
-    EnqueueJsEvents -- Rust
-    EnqueueRustEvents -- Typescript
+    EnqueueJsEvents --> FromJsEventQueue : enqueue events
 
     ' Main App
     Plugins .. RenderPlugin
     Plugins .. BindgenRenderPlugin
     Resources .. ToJsEventQueue
     Resources .. FromJsEventQueue
-    ResourcesRenderApp .. ToJsEventQueueRenderApp
     Systems .. PollEventsFromJsSystem
     Systems .. CoreSystems
+    Systems ..ForwardEventsToJs
 
     ' Render App
+    ResourcesRenderApp .. ToJsEventQueueRenderApp
+    ResourcesRenderApp .. ChangedComponentsRenderApp
     SystemsRenderApp .. ExtractSystemsRenderApp
     SystemsRenderApp .. PrepareRenderChangesSystemRenderApp
     SystemsRenderApp .. QueueRenderChangesSystemRenderApp
-    SystemsRenderApp .. ForwardRenderChangesToJsSystemRenderApp
+    SystemsRenderApp .. ForwardEventsToJsRenderApp
   
     ' Systems
-    ForwardRenderChangesToJsSystemRenderApp --> ToJsEventQueueRenderApp : enqueue events
+    ForwardEventsToJsRenderApp --> ToJsEventQueueRenderApp : forward events
+    QueueRenderChangesSystemRenderApp --> ToJsEventQueueRenderApp : push events
     PollEventsFromJsSystem --> FromJsEventQueue : poll events
-    CoreSystems --> ToJsEventQueue : emit events
+    CoreSystems --> ToJsEventQueue : push events
     CoreSystems --> FromJsEventQueue : react on events
-    EnqueueJsEvents --> FromJsEventQueue : enqueue events
-    ToJsEventQueue --> EnqueueRustEvents : enqueue events
+    ForwardEventsToJs --> ToJsEventQueue : forward events
+    ExtractSystemsRenderApp --> App : extract relevant data from main world
+    ExtractSystemsRenderApp --> ChangedComponentsRenderApp : push changes
+    QueueRenderChangesSystemRenderApp --> ChangedComponentsRenderApp : poll changes
 
     ' Systems Order
     PollEventsFromJsSystem ..> CoreSystems
-    CoreSystems ..> ExtractSystemsRenderApp
+    CoreSystems ..> ForwardEventsToJs
+    ForwardEventsToJs ..> ExtractSystemsRenderApp
     ExtractSystemsRenderApp ..> PrepareRenderChangesSystemRenderApp
     PrepareRenderChangesSystemRenderApp ..> QueueRenderChangesSystemRenderApp
-    QueueRenderChangesSystemRenderApp ..> ForwardRenderChangesToJsSystemRenderApp
+    QueueRenderChangesSystemRenderApp ..> ForwardEventsToJsRenderApp
+
+    ' Resources
+    ToJsEventQueue --> EnqueueRustEvents : forward events
+    ToJsEventQueueRenderApp --> EnqueueRustEvents : forward events
 
     ' Plugins Registration
     ' RenderPlugin --> RenderApp : create
     ' BindgenRenderPlugin --> ExtractSystemsRenderApp : register
     ' BindgenRenderPlugin --> PrepareRenderChangesSystemRenderApp : register
     ' BindgenRenderPlugin --> QueueRenderChangesSystemRenderApp : register
-    ' BindgenRenderPlugin --> ForwardRenderChangesToJsSystemRenderApp : register
+    ' BindgenRenderPlugin --> ForwardEventsToJsRenderApp : register
 
 @enduml

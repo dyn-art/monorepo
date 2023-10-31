@@ -126,16 +126,12 @@ fn queue_render_changes(
             .into_iter()
             .for_each(|(entity, (node_type, changes))| {
                 event_queue.push_event(ToJsEvent::RenderUpdate {
-                    entity: entity.index(),
+                    entity,
                     node_type,
                     changes,
                 });
             });
     }
-}
-
-fn forward_render_changes_to_js(event_queue: ResMut<ToJsEventQueue>) {
-    forward_events_to_js(event_queue)
 }
 
 // =============================================================================
@@ -174,7 +170,7 @@ impl Plugin for BindgenRenderPlugin {
                 (
                     prepare_render_changes.in_set(RenderSet::Prepare),
                     queue_render_changes.in_set(RenderSet::Queue),
-                    forward_render_changes_to_js.in_set(RenderSet::Render),
+                    forward_events_to_js.in_set(RenderSet::Render),
                 ),
             );
     }

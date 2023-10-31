@@ -1,11 +1,5 @@
-use std::{
-    collections::HashMap,
-    mem::transmute,
-    sync::{
-        mpsc::{channel, Receiver, Sender, TryRecvError},
-        Arc, Mutex,
-    },
-};
+use crossbeam_channel::{unbounded, Receiver, Sender};
+use std::{collections::HashMap, mem::transmute, sync::Mutex};
 
 use crate::core::composition::events::{
     CursorEnteredComposition, CursorExitedComposition, CursorMovedOnComposition, EntityMoved,
@@ -38,9 +32,9 @@ pub enum FromJsEvent {
 
 #[derive(Resource, Debug)]
 pub struct FromJsEventQueue {
-    world_id: usize,
-    sender: Sender<FromJsEvent>,
-    receiver: Arc<Mutex<Receiver<FromJsEvent>>>,
+    receiver: Receiver<FromJsEvent>,
+    // Reuse this Vec to avoid reallocations
+    events: Vec<FromJsEvent>,
 }
 
 impl FromWorld for FromJsEventQueue {
@@ -55,48 +49,48 @@ static SENDER_MAP: Lazy<Mutex<HashMap<usize, Sender<FromJsEvent>>>> =
 impl FromJsEventQueue {
     pub fn new(world_id: WorldId) -> Self {
         let parsed_world_id: usize = unsafe { transmute(world_id) };
-        let (tx, rx) = channel();
+        let (sender, receiver) = unbounded();
 
         // Store the sender in the global map
-        // so that it can be accessed from the enqueue_js_events function
+        // so that it can be accessed from the enqueue_js_events() function (called by JS)
         SENDER_MAP
             .lock()
             .unwrap()
-            .insert(parsed_world_id, tx.clone());
+            .insert(parsed_world_id, sender.clone());
 
         Self {
-            sender: tx,
-            receiver: Arc::new(Mutex::new(rx)),
-            world_id: parsed_world_id,
+            receiver,
+            events: Vec::new(),
         }
     }
 
-    pub fn poll_events_from_js(&mut self) -> Vec<FromJsEvent> {
-        let mut events = Vec::new();
+    pub fn poll_events_from_js(&mut self) -> &Vec<FromJsEvent> {
+        // Clear previous events
+        self.events.clear();
 
-        // Drain the receiver and push all events to the events vector
-        loop {
-            let result = { self.receiver.lock().unwrap().try_recv() };
-            match result {
-                Ok(event) => events.push(event),
-                Err(TryRecvError::Empty) => break,
-                Err(TryRecvError::Disconnected) => break,
-            }
+        // Get events from receiver and push them into the events vec
+        for event in self.receiver.try_iter() {
+            self.events.push(event.clone());
         }
 
-        return events;
+        return &self.events;
     }
 }
 
 #[wasm_bindgen]
 pub fn enqueue_js_events(world_id: usize, events: JsValue) {
     let parsed_events: Vec<FromJsEvent> = serde_wasm_bindgen::from_value(events).unwrap();
-    if let Some(sender) = SENDER_MAP.lock().unwrap().get(&world_id) {
-        parsed_events
-            .iter()
-            .for_each(|event| sender.send(event.clone()).unwrap());
-    } else {
-        // TODO:
+    match SENDER_MAP.lock() {
+        Ok(guard) => {
+            if let Some(sender) = guard.get(&world_id) {
+                for event in parsed_events.iter() {
+                    sender.send(event.clone());
+                }
+            }
+        }
+        Err(_) => {
+            // TODO: handle error
+        }
     }
 }
 
