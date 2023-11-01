@@ -28,7 +28,7 @@
 	"homepage": "https://github.com/dyndotart/monorepo",
 	"devDependencies": {
 		"@dyn/config": "workspace:*",
-		"@types/node": "^17.0.12"
+		"@types/node": "^20.8.10"
 	},
 	"files": [
 		"dist",

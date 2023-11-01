@@ -41,7 +41,7 @@
 		"@dyn/config": "workspace:*",
 		"@dyn/types": "workspace:*",
 		"@rollup/plugin-wasm": "^6.2.2",
-		"@types/node": "^17.0.12"
+		"@types/node": "^20.8.10"
 	},
 	"files": [
 		"dist",

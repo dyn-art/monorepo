@@ -24,6 +24,7 @@ The structure of the `package.json` file in this project should adhere to a spec
 	"description": "Description of the package",
 	"version": "0.0.1",
 	"private": true,
+	"type": "module",
 	"scripts": {
 		"build": "shx rm -rf dist && dyn-cli bundle",
 		"start:dev": "tsc -w",
