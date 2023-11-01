@@ -17,7 +17,8 @@
 		"lint": "eslint --ext .js,.ts src/",
 		"clean": "pnpm run clean:ts && shx rm -rf node_modules && pnpm run clean:rust && shx rm -rf rust/target && shx rm -rf .turbo",
 		"install:clean": "pnpm run clean && pnpm install",
-		"test": "vitest run"
+		"test": "vitest run",
+		"update": "pnpm update --latest"
 	},
 	"source": "./src/index.ts",
 	"main": "./dist/cjs/index.js",

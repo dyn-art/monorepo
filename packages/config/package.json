@@ -3,7 +3,9 @@
 	"description": "Shared configuration for dyn.art monorepo",
 	"version": "0.0.1",
 	"private": true,
-	"scripts": {},
+	"scripts": {
+		"update": "pnpm update --latest"
+	},
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/dyndotart/monorepo.git"

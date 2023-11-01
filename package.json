@@ -9,7 +9,8 @@
 		"clean": "turbo run clean && shx rm -rf node_modules",
 		"install:clean": "pnpm run clean && pnpm install",
 		"lint": "turbo run lint",
-		"format": "prettier --write \"**/*.{ts,tsx,md,json,js,jsx}\""
+		"format": "prettier --write \"**/*.{ts,tsx,md,json,js,jsx}\"",
+		"update": "trubo run update"
 	},
 	"repository": {
 		"type": "git",
