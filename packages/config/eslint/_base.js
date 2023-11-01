@@ -4,7 +4,7 @@ const ERROR = 2;
 
 const { resolve } = require('node:path');
 
-const project = resolve(process.cwd(), 'tsconfig.json');
+const tsConfigPath = resolve(process.cwd(), 'tsconfig.json');
 
 /**
  * @type {import('eslint').Linter.Config}
@@ -12,12 +12,12 @@ const project = resolve(process.cwd(), 'tsconfig.json');
 module.exports = {
 	extends: [require.resolve('@vercel/style-guide/eslint/typescript'), 'turbo'],
 	parserOptions: {
-		project
+		project: [tsConfigPath]
 	},
 	settings: {
 		'import/resolver': {
 			typescript: {
-				project
+				project: tsConfigPath
 			}
 		}
 	},
@@ -49,6 +49,7 @@ module.exports = {
 		'no-bitwise': WARNING,
 		'unicorn/filename-case': OFF, // Annoying with React components and Typescript classes
 		'import/no-named-as-default-member': OFF, // For ReactJs imports like React.useState()
-		'import/no-extraneous-dependencies': WARNING
+		'import/no-extraneous-dependencies': OFF, // Conflict with Typescript paths
+		'camelcase': WARNING
 	}
 };

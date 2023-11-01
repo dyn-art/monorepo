@@ -14,7 +14,7 @@ const ERROR = 2;
  * @type {import('eslint').Linter.Config}
  */
 module.exports = {
-	extends: [require.resolve('@vercel/style-guide/eslint/node'), require.resolve('./base')],
+	extends: [require.resolve('@vercel/style-guide/eslint/node'), require.resolve('./_base')],
 	rules: {
 		// Add specific rules configurations here
 	}

@@ -14,7 +14,7 @@
 		"clean:ts": "shx rm -rf dist",
 		"start:dev": "pnpm run watch:rust",
 		"watch:rust": "cd rust && cargo watch -i \"target/*\" -s \"cd .. && pnpm run build\"",
-		"lint": "eslint --cache \"**/*.{js,ts}\"",
+		"lint": "eslint --ext .js,.ts src/",
 		"clean": "pnpm run clean:ts && shx rm -rf node_modules && pnpm run clean:rust && shx rm -rf rust/target && shx rm -rf .turbo",
 		"install:clean": "pnpm run clean && pnpm install",
 		"test": "vitest run"

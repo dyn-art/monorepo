@@ -1,4 +1,4 @@
-import type { DTIFComposition, Mat3, Vec2, Vec3 } from '@rust/dyn-dtom/bindings';
+import type { DTIFComposition, Mat3, Vec2, Vec3 } from '@/rust/dyn-dtom/bindings';
 
 // Composition dimensions
 const width = 800;

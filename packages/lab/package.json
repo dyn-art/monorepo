@@ -1,12 +1,12 @@
 {
-	"name": "@dyn/experiments",
-	"description": "Random experiments",
+	"name": "@dyn/lab",
+	"description": "Random experimentl project libraries for testing purpose",
 	"version": "0.0.1",
 	"private": true,
 	"scripts": {
 		"build": "shx rm -rf dist && dyn-cli bundle",
 		"start:dev": "tsc -w",
-		"lint": "eslint --cache \"**/*.{js,ts}\"",
+		"lint": "eslint --ext .js,.ts src/",
 		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
 		"install:clean": "pnpm run clean && pnpm install",
 		"test": "vitest run"

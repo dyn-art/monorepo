@@ -1,12 +1,12 @@
-import { CompositionApp as RustCompositionApp } from '@rust/dyn-dtom';
+import type { TComposition } from '@dyn/types/dtif';
+import { CompositionApp as RustCompositionApp } from '@/rust/dyn-dtom';
 import type {
 	Entity,
 	FromJsEvent,
 	RectangleNodeBundle,
 	ToJsEvent,
 	WorldIds
-} from '@rust/dyn-dtom/bindings';
-import type { TComposition } from '@dyn/types/dtif';
+} from '@/rust/dyn-dtom/bindings';
 
 import { TEST_COMPOSITION_1 } from '../../test-data';
 import {

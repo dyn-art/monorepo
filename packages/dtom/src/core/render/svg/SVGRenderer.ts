@@ -1,3 +1,4 @@
+import { notEmpty, type Unarray } from '@dyn/utils';
 import type {
 	BlendMixin,
 	CompositionMixin,
@@ -6,8 +7,7 @@ import type {
 	PathMixin,
 	RenderChange,
 	ToJsEvent
-} from '@rust/dyn-dtom/bindings';
-import { notEmpty, type Unarray } from '@dyn/utils';
+} from '@/rust/dyn-dtom/bindings';
 
 import {
 	enqueueJsEvents,

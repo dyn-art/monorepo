@@ -133,7 +133,7 @@ export type TEllipseNode = {
 export type TStarNode = {
 	type: 'STAR';
 	/**
-	 * Number of "spikes", or outer points of the star. Must be an integer >= 3.
+	 * Number of "spikes", or outer points of the star. Must be an integer \>= 3.
 	 */
 	pointCount: number;
 	/**
@@ -149,7 +149,7 @@ export type TStarNode = {
 export type TPolygonNode = {
 	type: 'POLYGON';
 	/**
-	 * Number of sides of the polygon. Must be an integer >= 3.
+	 * Number of sides of the polygon. Must be an integer \>= 3.
 	 */
 	pointCount: number;
 } & TShapeNodeMixin;

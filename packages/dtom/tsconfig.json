@@ -4,7 +4,7 @@
       "rootDir": "./src",
       "declarationDir": "./dist/types",
       "paths": {
-        "@rust/*": ["./src/rust_modules/*"],
+        "@/rust/*": ["./src/rust_modules/*"],
       },
       "lib": ["esnext", "dom"]
     },

@@ -1,4 +1,4 @@
-import type { ToJsEvent } from '@rust/dyn-dtom/bindings';
+import type { ToJsEvent } from '@/rust/dyn-dtom/bindings';
 
 import { Composition } from '../core';
 

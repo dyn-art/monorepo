@@ -1,7 +1,6 @@
 /*
  * This is a custom ESLint configuration for use with
- * internal (bundled by their consumer) libraries
- * that utilize React.
+ * Remix.js apps.
  *
  * This config extends the Vercel Engineering Style Guide.
  * For more information, see https://github.com/vercel/style-guide
@@ -16,6 +15,9 @@ const ERROR = 2;
  */
 module.exports = {
 	extends: [
+		require.resolve('@remix-run/eslint-config'),
+		require.resolve('@remix-run/eslint-config/node'),
+		require.resolve('@vercel/style-guide/eslint/node'),
 		require.resolve('@vercel/style-guide/eslint/browser'),
 		require.resolve('@vercel/style-guide/eslint/react'),
 		require.resolve('./_base')
@@ -25,6 +27,15 @@ module.exports = {
 		JSX: true
 	},
 	rules: {
-		// Add specific rules configurations here
+		// EsLint
+		'import/no-default-export': OFF,
+
+		// React
+		'react/function-component-definition': [
+			'error',
+			{
+				namedComponents: 'arrow-function'
+			}
+		]
 	}
 };
