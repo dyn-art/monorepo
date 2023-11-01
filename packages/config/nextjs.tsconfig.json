@@ -16,6 +16,7 @@
 
 		// Modules
 		"module": "esnext",
+		"moduleResolution": "node",
 
 		// Javascript Support
 		"allowJs": true,

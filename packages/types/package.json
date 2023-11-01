@@ -8,7 +8,7 @@
 		"lint": "eslint --ext .js,.ts src/",
 		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
 		"install:clean": "pnpm run clean && pnpm install",
-		"update": "pnpm update --latest"
+		"update:deps": "pnpm update --latest"
 	},
 	"exports": {
 		"dtif": {

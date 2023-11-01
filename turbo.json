@@ -16,7 +16,7 @@
 		"clean": {
 			"cache": false
 		},
-		"update": {
+		"update:deps": {
 			"cache": false
 		}
 	}

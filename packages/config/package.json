@@ -4,7 +4,7 @@
 	"version": "0.0.1",
 	"private": true,
 	"scripts": {
-		"update": "pnpm update --latest"
+		"update:deps": "pnpm update --latest"
 	},
 	"repository": {
 		"type": "git",

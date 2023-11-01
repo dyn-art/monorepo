@@ -24,7 +24,7 @@ The structure of the `package.json` file in this project should adhere to a spec
 	"description": "Description of the package",
 	"version": "0.0.1",
 	"private": true,
-	"type": "module",
+	// "type": "module",
 	"scripts": {
 		"build": "shx rm -rf dist && dyn-cli bundle",
 		"start:dev": "tsc -w",
@@ -32,7 +32,7 @@ The structure of the `package.json` file in this project should adhere to a spec
 		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
 		"install:clean": "pnpm run clean && pnpm install",
 		"test": "echo \"Error: no test specified\" && exit 1",
-		"update": "pnpm update --latest"
+		"update:deps": "pnpm update --latest"
 	},
 	"repository": {
 		"type": "git",

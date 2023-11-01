@@ -1,4 +1,5 @@
 // https://github.com/tsconfig/bases/blob/main/bases/node-lts.json
+// https://github.com/tsconfig/bases/issues/233
 {
 	"$schema": "https://json.schemastore.org/tsconfig",
 	"display": "Node LTS",

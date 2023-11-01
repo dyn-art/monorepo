@@ -14,7 +14,7 @@
 		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
 		"install:clean": "pnpm run clean && pnpm install",
 		"test": "echo \"Error: no test specified\" && exit 1",
-		"update": "pnpm update --latest"
+		"update:deps": "pnpm update --latest"
 	},
 	"source": "./src/index.ts",
 	"main": "./dist/index.js",
