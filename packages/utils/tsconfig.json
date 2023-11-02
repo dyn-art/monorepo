@@ -1,9 +1,9 @@
 {
-    "compilerOptions": {
-      "outDir": "./dist",
-      "rootDir": "./src",
-      "declarationDir": "./dist/types",
-    },
-    "extends": "@dyn/config/shared-library.tsconfig.json",
-    "include": ["src"]
- }
+	"compilerOptions": {
+		"outDir": "./dist",
+		"rootDir": "./src",
+		"declarationDir": "./dist/types"
+	},
+	"extends": "@dyn/config/shared-library.tsconfig.json",
+	"include": ["src"]
+}

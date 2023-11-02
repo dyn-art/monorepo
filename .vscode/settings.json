@@ -15,8 +15,8 @@
 		"*.scss": "postcss",
 		"*.ts": "typescript",
 		// Allow comments in tsconfig.json by associating it with jsonc.
-        // TypeScript permits comments in tsconfig.json even though standard JSON does not.
-        "*.tsconfig.json": "jsonc"
+		// TypeScript permits comments in tsconfig.json even though standard JSON does not.
+		"*.tsconfig.json": "jsonc"
 	},
 	"cSpell.words": ["tailwindcss"],
 	"explorer.fileNesting.enabled": true,
@@ -45,7 +45,5 @@
 	"[rust]": {
 		"editor.defaultFormatter": "rust-lang.rust-analyzer"
 	},
-	"rust-analyzer.linkedProjects": [
-    	"packages/dtom/rust/Cargo.toml",
-	]
+	"rust-analyzer.linkedProjects": ["packages/dtom/rust/Cargo.toml"]
 }

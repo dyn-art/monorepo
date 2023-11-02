@@ -18,9 +18,14 @@
 	},
 	"homepage": "https://github.com/dyndotart/monorepo",
 	"dependencies": {
-		"@remix-run/eslint-config": "^2.2.0",
 		"@vercel/style-guide": "^5.0.1",
 		"eslint-config-turbo": "^1.10.16",
 		"vite-tsconfig-paths": "^4.2.1"
+	},
+	"peerDependencies": {
+		"@remix-run/eslint-config": "^2.2.0"
+	},
+	"devDependencies": {
+		"@remix-run/eslint-config": "^2.2.0"
 	}
 }

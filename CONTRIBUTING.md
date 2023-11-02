@@ -1,4 +1,5 @@
 # Contributing to dyn.art
+
 We are open and grateful for any contribution made by the community. If you're interested in contributing to dyn.art, this document might make the process for you easier.
 
 The [Open Source Guides](https://opensource.guide/) website has a collection of resources for individuals,
@@ -40,7 +41,7 @@ The structure of the `package.json` file in this project should adhere to a spec
 	},
 	"keywords": [],
 	"author": "@yourgithubname",
-    "license": "AGPL-3.0-or-later",
+	"license": "AGPL-3.0-or-later",
 	"bugs": {
 		"url": "https://issues.dyn.art/"
 	},
@@ -56,17 +57,19 @@ The structure of the `package.json` file in this project should adhere to a spec
 	}
 }
 ```
+
 For specific packages, additional fields should be included as shown below. Note that the fields `source`, `main`, `module`, `types`, and `files` are usually required in packages:
+
 ```json
 {
-    // ..
-    // "scripts": ..,
+	// ..
+	// "scripts": ..,
 	"source": "./src/index.ts", // Entry file (source code)
 	"main": "./dist/cjs/index.js", // Entry point (CommonJS)
 	"module": "./dist/esm/index.js", // Entry point (ES Module)
 	"types": "./dist/types/index.d.ts", // Type definitions
-    // ..
-    // "devDependencies": {},
+	// ..
+	// "devDependencies": {},
 	"files": [
 		// List of files to be included in your package
 	]

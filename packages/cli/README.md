@@ -4,32 +4,33 @@
 
 ### Auto-reading `exports` in `package.json` for Bundling
 
-The `@dyn/cli` bundler can automatically interpret the exports field in your `package.json` to deduce appropriate input and output paths for bundling. 
+The `@dyn/cli` bundler can automatically interpret the exports field in your `package.json` to deduce appropriate input and output paths for bundling.
 
 #### Recognized `exports` Formats
 
 1. **Object-based Mappings (Nested Conditions or Subpaths)**:
-    - Specify exports for specific conditions or subpaths.
-      ```json
-      {
-        "exports": {
-          "package1": {
-            "import": "./feature.mjs",
-            "require": "./feature.cjs"
-          }
-        }
-      }
-      ```
+
+   - Specify exports for specific conditions or subpaths.
+     ```json
+     {
+     	"exports": {
+     		"package1": {
+     			"import": "./feature.mjs",
+     			"require": "./feature.cjs"
+     		}
+     	}
+     }
+     ```
 
 2. **Top-level Fields**:
-    - The bundler will automatically consider `source`, `main`, and `module` fields if no specific export conditions are found.
-      ```json
-      {
-        "source": "./src/index.ts",
-        "main": "./dist/cjs/index.js",
-        "module": "./dist/esm/index.js"
-      }
-      ```
+   - The bundler will automatically consider `source`, `main`, and `module` fields if no specific export conditions are found.
+     ```json
+     {
+     	"source": "./src/index.ts",
+     	"main": "./dist/cjs/index.js",
+     	"module": "./dist/esm/index.js"
+     }
+     ```
 
 #### Recommendations
 
@@ -52,7 +53,7 @@ Here, the `overrideConfig` acts as the template. Its placeholders are filled by 
 ```javascript
 export default {
 	plugins: [
-        nodeExternals(),
+		nodeExternals(),
 		commonjs(),
 		'import-css', // Ignored if 'override'
 		typescriptPaths(),
@@ -65,26 +66,14 @@ export default {
 
 ```javascript
 export default {
-	plugins: [
-		'node-externals',
-		'commonjs',
-		css(),
-		'resolve-typescript-paths',
-		'esbuild',
-	]
+	plugins: ['node-externals', 'commonjs', css(), 'resolve-typescript-paths', 'esbuild']
 };
 ```
 
 **Merged Configuration (using `--pluginTemplate=override`):**
 
 ```javascript
-plugins: [
-	nodeExternals(),
-	commonjs(),
-	css(),
-	typescriptPaths(),
-	esbuild()
-]
+plugins: [nodeExternals(), commonjs(), css(), typescriptPaths(), esbuild()];
 ```
 
 #### **2. Using `--pluginTemplate=base`**
@@ -95,13 +84,7 @@ In this scenario, the `baseConfig` is the template. Its placeholders are filled 
 
 ```javascript
 export default {
-	plugins: [
-		nodeExternals(),
-		commonjs(),
-		'import-css',
-		typescriptPaths(),
-		esbuild()
-	]
+	plugins: [nodeExternals(), commonjs(), 'import-css', typescriptPaths(), esbuild()]
 };
 ```
 
@@ -109,20 +92,12 @@ export default {
 
 ```javascript
 export default {
-	plugins: [
-		css(),
-	]
+	plugins: [css()]
 };
 ```
 
 **Merged Configuration (using `--pluginTemplate=base`):**
 
 ```javascript
-plugins: [
-	nodeExternals(),
-	commonjs(),
-	css(),
-	typescriptPaths(),
-	esbuild()
-]
+plugins: [nodeExternals(), commonjs(), css(), typescriptPaths(), esbuild()];
 ```

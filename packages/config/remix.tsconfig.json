@@ -24,9 +24,9 @@
 		"declarationMap": false,
 		"noEmit": true
 	},
-    "include": ["remix.env.d.ts", "**/*.ts", "**/*.tsx"],
+	"include": ["remix.env.d.ts", "**/*.ts", "**/*.tsx"],
 	"exclude": ["node_modules"],
 
-    // Remix takes care of building everything in `remix build`.
-    "noEmit": true
+	// Remix takes care of building everything in `remix build`.
+	"noEmit": true
 }

@@ -5,6 +5,7 @@
 ### Debugging ESLint Configuration
 
 If you are encountering issues or unexpected behavior with ESLint, you can use the following command to output the final configuration ESLint is using for a specific file. This can be helpful for debugging configuration issues.
+
 ```bash
 npx eslint --print-config ./some/file/to/test/on.ts
 ```
@@ -17,7 +18,7 @@ TypeScript configurations are placed at the root to allow easy referencing from 
 
 ```json
 {
-  "extends": "@dyn/config/base.json"
+	"extends": "@dyn/config/base.json"
 }
 ```
 
