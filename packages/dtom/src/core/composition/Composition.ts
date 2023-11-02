@@ -127,6 +127,10 @@ export class Composition {
 	public moveEntity(entity: Entity, dx: number, dy: number): void {
 		this._eventQueue.push({ EntityMoved: { entity, dx, dy } });
 	}
+
+	public destory() {
+		this._renderer.forEach((renderer) => renderer.destroy());
+	}
 }
 
 export interface TCompositionConfig {

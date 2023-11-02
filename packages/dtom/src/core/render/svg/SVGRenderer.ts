@@ -22,6 +22,7 @@ import { createSVGNode, type SVGNode } from './SVGNode';
 export class SVGRenderer extends Renderer {
 	private _svgElement: SVGNode;
 	private _defsElement: SVGNode;
+	private _domElement: Element;
 
 	private _svgNodeMap = new Map<Entity, SVGNode>();
 
@@ -31,8 +32,9 @@ export class SVGRenderer extends Renderer {
 	constructor(composition: Composition, options: TSVGRendererOptions = {}) {
 		super(composition);
 		const { domElement = document.body } = options;
+		this._domElement = domElement;
 		this._svgElement = createSVGNode('svg');
-		domElement.appendChild(this._svgElement.element);
+		this._domElement.appendChild(this._svgElement.element);
 		this._defsElement = createSVGNode('defs');
 		this._svgElement.appendChild(this._defsElement);
 		this._svgElement.setStyles({ overflow: 'hidden' });
@@ -46,6 +48,13 @@ export class SVGRenderer extends Renderer {
 
 	public getNodeByEntity(entity: number): SVGNode | null {
 		return this._svgNodeMap.get(entity) ?? null;
+	}
+
+	public destroy(): this {
+		while (this._domElement.firstChild) {
+			this._domElement.removeChild(this._domElement.firstChild);
+		}
+		return this;
 	}
 
 	// =========================================================================

@@ -23,9 +23,11 @@
 		"vite-tsconfig-paths": "^4.2.1"
 	},
 	"peerDependencies": {
+		"@next/eslint-plugin-next": "^14.0.1",
 		"@remix-run/eslint-config": "^2.2.0"
 	},
 	"devDependencies": {
+		"@next/eslint-plugin-next": "^14.0.1",
 		"@remix-run/eslint-config": "^2.2.0"
 	}
 }

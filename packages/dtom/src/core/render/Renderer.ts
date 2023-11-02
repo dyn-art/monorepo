@@ -23,4 +23,6 @@ export abstract class Renderer {
 	public abstract setSize(width: number, height: number): this;
 
 	public abstract render(data: ToJsEvent['RenderUpdate'][]): this;
+
+	public abstract destroy(): this;
 }

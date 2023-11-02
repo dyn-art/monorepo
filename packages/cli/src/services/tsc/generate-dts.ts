@@ -126,10 +126,7 @@ function updateImportPaths(
 		}
 		const resolvedPath = resolveTsPath(importPath, filePath);
 		if (resolvedPath) {
-			return `import type ${imported} from ${quote}${resolvedPath.replace(
-				'/index.d.ts',
-				''
-			)}${quote};`;
+			return `import ${imported} from ${quote}${resolvedPath.replace('/index.d.ts', '')}${quote};`;
 		}
 		return match;
 	});
