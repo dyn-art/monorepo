@@ -1,5 +1,5 @@
 {
-	"name": "@dyn/web-remix",
+	"name": "@dyn/web",
 	"description": "Web client for dyn.art",
 	"version": "0.0.1",
 	"private": true,
