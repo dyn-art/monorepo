@@ -6,7 +6,7 @@
 		"build": "pnpm build:cli && turbo run build",
 		"build:cli": "turbo run build --filter=cli",
 		"prebuild:vercel": "pnpm run prebuild:rust && pnpm run build:cli",
-		"prebuild:rust": "sh ./scripts/prepare_rust.sh",
+		"prebuild:rust": "sh ./scripts/vercel/prepare_rust.sh",
 		"start:dev": "turbo run start:dev",
 		"clean": "turbo run clean && shx rm -rf node_modules",
 		"install:clean": "pnpm run clean && pnpm install",
