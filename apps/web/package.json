@@ -7,7 +7,6 @@
 	"scripts": {
 		"build": "remix build",
 		"build:vercel": "cd ../.. && pnpm run prebuild:vercel && turbo run build --filter=web",
-		"script:test": "./build.sh",
 		"start": "remix-serve ./build/index.js",
 		"start:dev": "remix dev --manual",
 		"lint": "eslint --ext .js,.ts src/",
