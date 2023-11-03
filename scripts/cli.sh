@@ -10,6 +10,9 @@
 # Exit immediately if a command exits with a non-zero status
 set -e
 
+# Add Rust's cargo bin directory to PATH
+export PATH="/root/.cargo/bin:$PATH"
+
 # Find the absolute path to the monorepo's root directory
 MONOREPO_ROOT=$(git rev-parse --show-toplevel)
 
