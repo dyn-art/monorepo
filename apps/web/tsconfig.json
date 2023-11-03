@@ -3,9 +3,9 @@
 	"compilerOptions": {
 		"baseUrl": ".",
 		"paths": {
-			"@/core": ["./src/core/*"],
-			"@/components": ["./src/components/*"],
-			"@/app": ["./src/app/*"]
+			"@/core/*": ["./src/core/*"],
+			"@/components/*": ["./src/components/*"],
+			"@/app/*": ["./src/app/*"]
 		}
 	},
 	"include": ["remix.env.d.ts", "**/*.ts", "**/*.tsx"],

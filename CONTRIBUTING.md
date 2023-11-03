@@ -27,7 +27,7 @@ The structure of the `package.json` file in this project should adhere to a spec
 	"private": true,
 	// "type": "module",
 	"scripts": {
-		"build": "shx rm -rf dist && dyn-cli bundle",
+		"build": "shx rm -rf dist && ../../scripts/cli.sh bundle",
 		"start:dev": "tsc -w",
 		"lint": "eslint --ext .js,.ts src/",
 		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",

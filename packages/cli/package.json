@@ -7,9 +7,8 @@
 		"dyn-cli": "./bin/run"
 	},
 	"scripts": {
-		"build": "shx rm -rf dist && tsc && pnpm run link:package",
+		"build": "shx rm -rf dist && tsc",
 		"start:dev": "tsc -w",
-		"link:package": "pnpm --global unlink dyn-cli && pnpm --global link",
 		"lint": "eslint --ext .js,.ts,.jsx,.tsx src/",
 		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
 		"install:clean": "pnpm run clean && pnpm install",

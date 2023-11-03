@@ -757,6 +757,7 @@ checksum = "942b4a808e05215192e39f4ab80813e599068285906cc91aa64f923db842bd5a"
 [[package]]
 name = "specta"
 version = "2.0.0-rc.6"
+source = "git+https://github.com/bennoinbeta/specta?branch=dyndotart#ebbe4060497c10b4d05933441b0e44ff7ffe36fe"
 dependencies = [
  "bevy_ecs",
  "ctor",
@@ -771,6 +772,7 @@ dependencies = [
 [[package]]
 name = "specta-macros"
 version = "2.0.0-rc.6"
+source = "git+https://github.com/bennoinbeta/specta?branch=dyndotart#ebbe4060497c10b4d05933441b0e44ff7ffe36fe"
 dependencies = [
  "Inflector",
  "proc-macro2",
