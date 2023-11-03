@@ -4,7 +4,7 @@
 	"private": true,
 	"scripts": {
 		"build": "pnpm build:cli && turbo run build",
-		"build:cli": "turbo run build --filter=cli",
+		"build:cli": "turbo run build --filter=cli && pnpm run cli:hello",
 		"prebuild:vercel": "pnpm run prebuild:rust && pnpm run build:cli",
 		"prebuild:rust": "sh ./scripts/vercel/prepare_rust.sh",
 		"start:dev": "turbo run start:dev",
@@ -12,7 +12,8 @@
 		"install:clean": "pnpm run clean && pnpm install",
 		"lint": "turbo run lint",
 		"format": "prettier --write \"**/*.{ts,tsx,md,json,js,jsx}\"",
-		"update:deps": "turbo run update:deps"
+		"update:deps": "turbo run update:deps",
+		"cli:hello": "dyn-cli hello"
 	},
 	"repository": {
 		"type": "git",
