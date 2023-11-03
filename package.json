@@ -4,7 +4,7 @@
 	"private": true,
 	"scripts": {
 		"build": "pnpm build:cli && turbo run build",
-		"build:cli": "turbo run build --filter=cli && pnpm run cli:hello",
+		"build:cli": "sh ./scripts/build_cli.sh && pnpm run cli:hello",
 		"prebuild:vercel": "pnpm run prebuild:rust && pnpm run build:cli",
 		"prebuild:rust": "sh ./scripts/vercel/prepare_rust.sh",
 		"start:dev": "turbo run start:dev",
