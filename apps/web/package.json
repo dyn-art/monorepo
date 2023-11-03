@@ -6,7 +6,8 @@
 	"type": "module",
 	"scripts": {
 		"build": "remix build",
-		"build:vercel": "cd ../.. && pnpm run prebuild:vercel && turbo run build --filter=web",
+		"build:vercel": "pnpm run prebuild:rust && cd ../.. && pnpm run build:cli && turbo run build --filter=web",
+		"prebuild:rust": "sh ../../scripts/prepare_rust.sh",
 		"start": "remix-serve ./build/index.js",
 		"start:dev": "remix dev --manual",
 		"lint": "eslint --ext .js,.ts src/",
