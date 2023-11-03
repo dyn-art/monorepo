@@ -4,16 +4,16 @@
 	"private": true,
 	"scripts": {
 		"build": "pnpm build:cli && turbo run build",
-		"build:cli": "sh ./scripts/build_cli.sh && pnpm run cli:hello",
+		"build:cli": "turbo run build --filter=cli && chmod +x ./scripts/cli.sh && pnpm run cli:hello",
 		"prebuild:vercel": "pnpm run prebuild:rust && pnpm run build:cli",
-		"prebuild:rust": "sh ./scripts/vercel/prepare_rust.sh",
+		"prebuild:rust": "chmod +x ./scripts/vercel/prepare_rust.sh && sh ./scripts/vercel/prepare_rust.sh",
 		"start:dev": "turbo run start:dev",
 		"clean": "turbo run clean && shx rm -rf node_modules",
 		"install:clean": "pnpm run clean && pnpm install",
 		"lint": "turbo run lint",
 		"format": "prettier --write \"**/*.{ts,tsx,md,json,js,jsx}\"",
 		"update:deps": "turbo run update:deps",
-		"cli:hello": "dyn-cli hello"
+		"cli:hello": "sh ./scripts/cli.sh hello"
 	},
 	"repository": {
 		"type": "git",
