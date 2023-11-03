@@ -13,6 +13,9 @@ set -e
 # Add Rust's cargo bin directory to PATH
 export PATH="/root/.cargo/bin:$PATH"
 
+# Set the default Rust toolchain to stable
+rustup default stable
+
 # Find the absolute path to the monorepo's root directory
 MONOREPO_ROOT=$(git rev-parse --show-toplevel)
 
