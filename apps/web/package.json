@@ -6,6 +6,7 @@
 	"type": "module",
 	"scripts": {
 		"build": "remix build",
+		"build:vercel": "cd ../.. && pnpm run prebuild:vercel && turbo run build --filter=web",
 		"start": "remix-serve ./build/index.js",
 		"start:dev": "remix dev --manual",
 		"lint": "eslint --ext .js,.ts src/",
@@ -28,6 +29,7 @@
 	"dependencies": {
 		"@dyn/dtom": "workspace:*",
 		"@radix-ui/react-icons": "^1.3.0",
+		"@radix-ui/react-slot": "^1.0.2",
 		"@remix-run/css-bundle": "^2.2.0",
 		"@remix-run/eslint-config": "^2.2.0",
 		"@remix-run/node": "^2.2.0",
