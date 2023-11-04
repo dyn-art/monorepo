@@ -5,7 +5,7 @@
 	"scripts": {
 		"build": "pnpm build:cli && turbo run build",
 		"build:cli": "turbo run build --filter=cli && chmod +x ./scripts/cli.sh && pnpm run cli:hello",
-		"prebuild:vercel": "pnpm run build:cli && chmod +x ./scripts/vercel/setup.sh && sh ./scripts/vercel/setup.sh",
+		"prebuild:vercel": "chmod +x ./scripts/vercel/setup.sh && sh ./scripts/vercel/setup.sh && pnpm run build:cli",
 		"start:dev": "turbo run start:dev",
 		"clean": "turbo run clean && shx rm -rf node_modules",
 		"install:clean": "pnpm run clean && pnpm install",
