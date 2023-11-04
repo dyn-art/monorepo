@@ -5,9 +5,6 @@ set -e
 
 echo "🦀 Preparing Rust environment..."
 
-# Change directory to the script's directory
-cd "$(dirname "$0")"
-
 RUST_ENV_FILE="$HOME/temp/rust/env.sh"
 
 # Execute the scripts and source them to ensure environment changes affect the current shell
