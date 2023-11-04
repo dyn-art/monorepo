@@ -4,7 +4,39 @@ import type { DTIFComposition, Mat3, Vec2, Vec3 } from '@/rust/dyn-dtom/bindings
 const width = 800;
 const height = 600;
 
-export const TEST_COMPOSITION_1: DTIFComposition = {
+export const EMPTY_COMPOSITION: DTIFComposition = {
+	version: '0.0.1',
+	name: 'Test',
+	width,
+	height,
+	root_node_id: 0,
+	nodes: {
+		0: {
+			Frame: {
+				node: { node_type: 'Frame' },
+				frame: { clip_content: true },
+				rectangle_corner_mixin: {
+					top_left_radius: 0,
+					top_right_radius: 0,
+					bottom_left_radius: 0,
+					bottom_right_radius: 0
+				},
+				children_mixin: {
+					children: []
+				},
+				composition_mixin: { is_visible: true, is_locked: false },
+				layout_mixin: {
+					width,
+					height,
+					relative_transform: mat3(vec3(1, 0, 0), vec3(0, 1, 0), vec3(0, 0, 1))
+				},
+				blend_mixin: { blend_mode: 'Normal', opacity: 1, is_mask: false }
+			}
+		}
+	}
+};
+
+export const COMPOSITION_ONE_RECT: DTIFComposition = {
 	version: '0.0.1',
 	name: 'Test',
 	width,

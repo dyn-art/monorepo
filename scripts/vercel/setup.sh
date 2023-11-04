@@ -3,7 +3,7 @@
 # Make sure the script stops if there are any errors
 set -e
 
-echo "⬛️ Preparing Vercel environment"
+echo "🔄 - ⬛️ Preparing Vercel environment"
 
 DIR="$(dirname "$0")"
 

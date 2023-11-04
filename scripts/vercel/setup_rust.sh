@@ -3,7 +3,7 @@
 # Exit immediately if a command exits with a non-zero status
 set -e
 
-echo "🦀 Preparing Rust environment..."
+echo "🔄 - 🦀 Preparing Rust environment..."
 
 DIR="$(dirname "$0")"
 RUST_ENV_DIR="$HOME/temp/rust"

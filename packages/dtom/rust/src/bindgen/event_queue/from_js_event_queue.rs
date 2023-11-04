@@ -6,6 +6,7 @@ use std::{
 
 use crate::core::composition::events::{
     CursorEnteredComposition, CursorExitedComposition, CursorMovedOnComposition, EntityMoved,
+    EntitySetPosition,
 };
 
 use bevy_ecs::{
@@ -31,6 +32,7 @@ pub enum FromJsEvent {
 
     // Entity Events
     EntityMoved { entity: Entity, dx: f32, dy: f32 },
+    EntitySetPosition { entity: Entity, x: f32, y: f32 },
 }
 
 #[derive(Resource, Debug)]
@@ -114,6 +116,7 @@ pub fn poll_events_from_js(
 
     // Entity Events
     mut entity_moved_events: EventWriter<EntityMoved>,
+    mut entity_set_position_events: EventWriter<EntitySetPosition>,
 ) {
     // Poll events from JS
     let events = event_queue.poll_events_from_js();
@@ -147,6 +150,13 @@ pub fn poll_events_from_js(
                 dx: *dx,
                 dy: *dy,
             });
+        }
+        FromJsEvent::EntitySetPosition { entity, x, y } => {
+            entity_set_position_events.send(EntitySetPosition {
+                entity: *entity,
+                x: *x,
+                y: *y,
+            })
         }
     });
 }

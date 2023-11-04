@@ -3,7 +3,7 @@
 # Exit immediately if a command exits with a non-zero status
 set -e
 
-echo "🦀 Installing Rustup..."
+echo "🔄 - 🦀 Installing Rustup..."
 
 # Install Rustup (the Rust toolchain installer)
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y

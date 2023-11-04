@@ -6,6 +6,7 @@ use crate::bindgen::event_queue::to_js_event_queue::forward_events_to_js;
 use crate::bindgen::setup_bindgen;
 use crate::core::composition::systems::construct_path::construct_rectangle_path;
 use crate::core::composition::systems::handle_entity_moved_events;
+use crate::core::composition::systems::handle_entity_set_position_events;
 use crate::plugins::bindgen_render_plugin::BindgenRenderPlugin;
 use crate::plugins::render_plugin::RenderApp;
 use crate::plugins::render_plugin::RenderPlugin;
@@ -23,6 +24,7 @@ use serde::{Deserialize, Serialize};
 use specta::Type;
 use wasm_bindgen::prelude::*;
 
+use self::events::EntitySetPosition;
 use self::events::{
     CursorEnteredComposition, CursorExitedComposition, CursorMovedOnComposition, EntityMoved,
 };
@@ -68,7 +70,13 @@ impl CompositionApp {
 
         // Register systems
         app.add_systems(PreUpdate, poll_events_from_js)
-            .add_systems(Update, handle_entity_moved_events)
+            .add_systems(
+                Update,
+                (
+                    handle_entity_moved_events,
+                    handle_entity_set_position_events,
+                ),
+            )
             .add_systems(PostUpdate, construct_rectangle_path)
             .add_systems(Last, forward_events_to_js);
 
@@ -77,6 +85,7 @@ impl CompositionApp {
         app.add_event::<CursorExitedComposition>();
         app.add_event::<CursorMovedOnComposition>();
         app.add_event::<EntityMoved>();
+        app.add_event::<EntitySetPosition>();
 
         let root_node_eid = entity_to_eid(&parsed_dtif.root_node_id);
         let mut eid_to_entity_map: HashMap<String, Entity> = HashMap::new();
@@ -132,6 +141,7 @@ impl CompositionApp {
         serde_wasm_bindgen::to_value(&self.world_ids).unwrap()
     }
 
+    // TODO: make this an event
     pub fn spawn_rectangle(&mut self, mixin: JsValue) -> JsValue {
         let mixin: RectangleNodeBundle = serde_wasm_bindgen::from_value(mixin).unwrap();
         return serde_wasm_bindgen::to_value(&self.app.world.spawn(mixin).id()).unwrap();

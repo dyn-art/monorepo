@@ -32,3 +32,10 @@ pub struct EntityMoved {
     pub dx: f32,
     pub dy: f32,
 }
+
+#[derive(Event, Debug)]
+pub struct EntitySetPosition {
+    pub entity: Entity,
+    pub x: f32,
+    pub y: f32,
+}

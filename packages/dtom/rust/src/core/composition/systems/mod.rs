@@ -3,7 +3,7 @@ use glam::{Mat3, Vec2};
 
 use crate::core::node::mixins::LayoutMixin;
 
-use super::events::EntityMoved;
+use super::events::{EntityMoved, EntitySetPosition};
 
 pub mod construct_path;
 
@@ -14,11 +14,21 @@ pub fn handle_entity_moved_events(
     for event in event_reader.iter() {
         let EntityMoved { entity, dx, dy } = event;
         if let Ok(mut mixin) = query.get_mut(*entity) {
-            // Create a translation matrix
             let translation = Mat3::from_translation(Vec2::new(*dx, *dy));
-
-            // Combine it with the existing relative_transform
             mixin.relative_transform = mixin.relative_transform * translation;
+        }
+    }
+}
+
+pub fn handle_entity_set_position_events(
+    mut event_reader: EventReader<EntitySetPosition>,
+    mut query: Query<&mut LayoutMixin>,
+) {
+    for event in event_reader.iter() {
+        let EntitySetPosition { entity, x, y } = event;
+        if let Ok(mut mixin) = query.get_mut(*entity) {
+            mixin.relative_transform.col_mut(2).x = *x;
+            mixin.relative_transform.col_mut(2).y = *y;
         }
     }
 }

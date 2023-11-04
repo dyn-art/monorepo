@@ -4,7 +4,7 @@
 set -e
 
 # List of branches to allow builds for
-build_branches="develop main 9-dyn-40-build-dtom-mvp-bhag"
+build_branches="develop main"
 
 # Helper function to check if the current branch is in the build branches list
 is_build_branch() {
@@ -21,6 +21,6 @@ is_build_branch() {
 if is_build_branch "$VERCEL_GIT_COMMIT_REF"; then
     echo "✅ - Build can proceed"
 else
-    echo "🛑 - Build cancelled for branch $VERCEL_GIT_COMMIT_REF"
+    echo "⛔️ - Build cancelled for branch $VERCEL_GIT_COMMIT_REF"
     exit 0
 fi

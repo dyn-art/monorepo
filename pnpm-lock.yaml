@@ -79,6 +79,9 @@ importers:
       react-dom:
         specifier: ^18.2.0
         version: 18.2.0(react@18.2.0)
+      react-fps-stats:
+        specifier: ^0.3.1
+        version: 0.3.1(prop-types@15.8.1)(react@18.2.0)
       tailwind-merge:
         specifier: ^2.0.0
         version: 2.0.0
@@ -6904,6 +6907,16 @@ packages:
       loose-envify: 1.4.0
       react: 18.2.0
       scheduler: 0.23.0
+    dev: false
+
+  /react-fps-stats@0.3.1(prop-types@15.8.1)(react@18.2.0):
+    resolution: {integrity: sha512-SwjJd8eK6XQseXF0DjOv0PotfzSkIm9yhqsggEaJHhPgKq0P7QcL5xuLy/UlOFGjFbRMHRp1w8b8wJfoWNR3uA==}
+    peerDependencies:
+      prop-types: ^15.6.2
+      react: '>=16'
+    dependencies:
+      prop-types: 15.8.1
+      react: 18.2.0
     dev: false
 
   /react-is@16.13.1:
