@@ -17,9 +17,9 @@ is_build_branch() {
 }
 
 # Proceed with build if the commit reference is a build branch
+# https://vercel.com/guides/how-do-i-use-the-ignored-build-step-field-on-vercel
 if is_build_branch "$VERCEL_GIT_COMMIT_REF"; then
     echo "✅ - Build can proceed"
-    exit 1
 else
     echo "🛑 - Build cancelled for branch $VERCEL_GIT_COMMIT_REF"
     exit 0
