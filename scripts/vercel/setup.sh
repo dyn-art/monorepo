@@ -5,9 +5,6 @@ set -e
 
 echo "⬛️ Preparing Vercel environment"
 
-# Change directory to the script's directory
-cd "$(dirname "$0")"
-
 # Check whether to build
 chmod +x ./check_build.sh
 source ./check_build.sh

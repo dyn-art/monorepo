@@ -10,14 +10,13 @@
 # Exit immediately if a command exits with a non-zero status
 set -e
 
-# Change directory to the script's directory
-cd "$(dirname "$0")"
+DIR="$(dirname "$0")"
 
 # Check if we are running on Vercel (https://vercel.com/docs/projects/environment-variables/system-environment-variables)
 if [ "$VERCEL" = "1" ]; then
     echo "⬛️ Detected Vercel environment. Setting up..."
-    chmod +x ./vercel/setup_cli.sh
-    source ./vercel/setup_cli.sh
+    chmod +x "$DIR/vercel/setup_cli.sh"
+    source "$DIR/vercel/setup_cli.sh"
 else
     echo "🔶 Running locally..."
 fi

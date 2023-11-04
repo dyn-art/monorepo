@@ -11,4 +11,4 @@ curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh -s -- -y
 # Verify if wasm-pack is installed correctly by checking its version
 wasm-pack --version
 
-echo "✅ - 🦀 easm-pack installation complete."
+echo "✅ - 🦀 wasm-pack installation complete."
