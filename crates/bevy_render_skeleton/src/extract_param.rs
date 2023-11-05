@@ -1,5 +1,6 @@
-//! https://github.com/bevyengine/bevy/blob/release-0.11.3/crates/bevy_render/src/extract_resource.rs
+//! https://github.com/bevyengine/bevy/blob/release-0.12.0/crates/bevy_render/src/extract_param.rs
 
+use crate::MainWorld;
 use bevy_ecs::{
     component::Tick,
     prelude::*,
@@ -7,8 +8,6 @@ use bevy_ecs::{
     world::unsafe_world_cell::UnsafeWorldCell,
 };
 use std::ops::{Deref, DerefMut};
-
-use super::MainWorld;
 
 /// A helper for accessing [`MainWorld`] content using a system parameter.
 ///
@@ -22,7 +21,7 @@ use super::MainWorld;
 /// ## Context
 ///
 /// [`ExtractSchedule`] is used to extract (move) data from the simulation world ([`MainWorld`]) to the
-/// render world. The render world drives rendering each frame (generally to a [Window]).
+/// render world. The render world drives rendering each frame (generally to a `Window`).
 /// This design is used to allow performing calculations related to rendering a prior frame at the same
 /// time as the next frame is simulated, which increases throughput (FPS).
 ///

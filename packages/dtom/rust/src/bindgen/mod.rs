@@ -1,6 +1,6 @@
 mod console_logger;
 pub mod event_queue;
-pub mod js_bindings;
+mod js_bindings;
 
 pub fn setup_bindgen() {
     #[cfg(feature = "console_log")]

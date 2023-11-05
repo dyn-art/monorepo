@@ -1,10 +1,10 @@
-import type { ToJsEvent } from '@/rust/dyn-dtom/bindings';
+import type { BindgenRenderToJsEvent } from '@/rust/dyn_dtom/bindings';
 
 import { Composition } from '../core';
 
 (globalThis as any).enqueue_rust_events = function onNewWasmEvents(
 	worldId: number,
-	events: ToJsEvent[]
+	events: BindgenRenderToJsEvent[]
 ) {
 	Composition.onWasmEvents(worldId, events);
 };

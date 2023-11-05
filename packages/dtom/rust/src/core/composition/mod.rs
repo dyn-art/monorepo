@@ -1,30 +1,25 @@
 use std::collections::HashMap;
 use std::mem::transmute;
 
-use crate::bindgen::event_queue::from_js_event_queue::poll_events_from_js;
-use crate::bindgen::event_queue::to_js_event_queue::forward_events_to_js;
 use crate::bindgen::setup_bindgen;
 use crate::core::composition::systems::construct_path::construct_rectangle_path;
 use crate::core::composition::systems::handle_entity_moved_events;
 use crate::core::composition::systems::handle_entity_set_position_events;
+use crate::core::node::bundles::FrameNodeBundle;
 use crate::plugins::bindgen_render_plugin::BindgenRenderPlugin;
-use crate::plugins::render_plugin::RenderApp;
-use crate::plugins::render_plugin::RenderPlugin;
-use crate::{
-    bindgen::event_queue::{
-        from_js_event_queue::FromJsEventQueue, to_js_event_queue::ToJsEventQueue,
-    },
-    core::node::bundles::FrameNodeBundle,
-};
-use bevy_app::{App, Last, PostUpdate, PreUpdate, Update};
+use bevy_app::{App, PostUpdate, PreUpdate, Update};
 use bevy_ecs::world::World;
 use bevy_ecs::{component::Component, entity::Entity};
+use dyn_bevy_render_skeleton::RenderApp;
+use dyn_bevy_render_skeleton::RenderPlugin;
 use glam::Vec2;
+use log::info;
 use serde::{Deserialize, Serialize};
 use specta::Type;
 use wasm_bindgen::prelude::*;
 
 use self::events::EntitySetPosition;
+use self::events::FromJsEvent;
 use self::events::{
     CursorEnteredComposition, CursorExitedComposition, CursorMovedOnComposition, EntityMoved,
 };
@@ -65,20 +60,18 @@ impl CompositionApp {
         app.add_plugins((RenderPlugin, BindgenRenderPlugin));
 
         // Register resources
-        app.init_resource::<ToJsEventQueue>();
-        app.init_resource::<FromJsEventQueue>();
+        // app.init_resource::<ToJsEventQueue>();
 
         // Register systems
-        app.add_systems(PreUpdate, poll_events_from_js)
-            .add_systems(
-                Update,
-                (
-                    handle_entity_moved_events,
-                    handle_entity_set_position_events,
-                ),
-            )
-            .add_systems(PostUpdate, construct_rectangle_path)
-            .add_systems(Last, forward_events_to_js);
+        app.add_systems(
+            Update,
+            (
+                handle_entity_moved_events,
+                handle_entity_set_position_events,
+            ),
+        )
+        .add_systems(PostUpdate, construct_rectangle_path);
+        // .add_systems(Last, forward_events_to_js);
 
         // Register events
         app.add_event::<CursorEnteredComposition>();
@@ -133,7 +126,9 @@ impl CompositionApp {
         return parsed_render_world_id;
     }
 
-    pub fn update(&mut self) {
+    pub fn update(&mut self, events: JsValue) {
+        let parsed_events: Vec<FromJsEvent> = serde_wasm_bindgen::from_value(events).unwrap();
+        emit_js_events(&mut self.app.world, parsed_events);
         self.app.update();
     }
 
@@ -142,6 +137,7 @@ impl CompositionApp {
     }
 
     // TODO: make this an event
+    // Problem: no reference to the spawned entity
     pub fn spawn_rectangle(&mut self, mixin: JsValue) -> JsValue {
         let mixin: RectangleNodeBundle = serde_wasm_bindgen::from_value(mixin).unwrap();
         return serde_wasm_bindgen::to_value(&self.app.world.spawn(mixin).id()).unwrap();
@@ -175,6 +171,32 @@ impl CompositionApp {
     //     }
     //     return JsValue::NULL;
     // }
+}
+
+pub fn emit_js_events(world: &mut World, events: Vec<FromJsEvent>) {
+    // Map JS events to Bevy events
+    events.iter().for_each(|event| match event {
+        // Cursor Events
+        FromJsEvent::PointerDownEventOnEntity(event) => {
+            // TODO
+            info!("PointerDownEvent: {:?}", event);
+        }
+        FromJsEvent::PointerMovedOnComposition(event) => {
+            world.send_event(event.clone());
+        }
+        FromJsEvent::PointerEnteredComposition(event) => {
+            world.send_event(event.clone());
+        }
+        FromJsEvent::PointerExitedComposition(event) => {
+            world.send_event(event.clone());
+        }
+
+        // Entity Events
+        FromJsEvent::EntityMoved(event) => {
+            world.send_event(event.clone());
+        }
+        FromJsEvent::EntitySetPosition(event) => world.send_event(event.clone()),
+    });
 }
 
 fn spawn_node(world: &mut World, node: &DTIFNode) -> Entity {

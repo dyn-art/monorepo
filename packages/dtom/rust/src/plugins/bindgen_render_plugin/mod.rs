@@ -7,11 +7,16 @@ use bevy_ecs::{
     system::{Commands, Query, ResMut, Resource},
 };
 use bevy_utils::HashMap;
+use dyn_bevy_render_skeleton::{
+    extract_param::Extract, ExtractSchedule, Render, RenderApp, RenderSet,
+};
 use serde::Serialize;
 use specta::Type;
 
 use crate::{
-    bindgen::event_queue::to_js_event_queue::{forward_events_to_js, ToJsEvent, ToJsEventQueue},
+    bindgen::event_queue::to_js_event_queue::{
+        forward_events_to_js, BaseToJsEvent, ToJsEventQueue,
+    },
     core::node::{
         mixins::{
             BlendMixin, ChildrenMixin, CompositionMixin, LayoutMixin, ParentMixin, PathMixin,
@@ -21,9 +26,16 @@ use crate::{
     },
 };
 
-use super::render_plugin::{
-    extract_param::Extract, ExtractSchedule, RenderApp, RenderSchedule, RenderSet,
-};
+#[derive(Debug, Serialize, Clone, Type)]
+pub enum BindgenRenderToJsEvent {
+    RenderUpdate {
+        entity: Entity,
+        node_type: NodeType,
+        changes: Vec<RenderChange>,
+    },
+}
+
+impl BaseToJsEvent for BindgenRenderToJsEvent {}
 
 #[derive(Serialize, Clone, Debug, Type)]
 pub enum RenderChange {
@@ -117,7 +129,7 @@ fn prepare_render_changes(mut commands: Commands, mut changed: ResMut<ChangedCom
 
 fn queue_render_changes(
     mut changed: ResMut<ChangedComponents>,
-    mut event_queue: ResMut<ToJsEventQueue>,
+    mut event_queue: ResMut<ToJsEventQueue<BindgenRenderToJsEvent>>,
 ) {
     if !changed.changes.is_empty() {
         changed
@@ -125,7 +137,7 @@ fn queue_render_changes(
             .drain()
             .into_iter()
             .for_each(|(entity, (node_type, changes))| {
-                event_queue.push_event(ToJsEvent::RenderUpdate {
+                event_queue.push_event(BindgenRenderToJsEvent::RenderUpdate {
                     entity,
                     node_type,
                     changes,
@@ -149,7 +161,7 @@ impl Plugin for BindgenRenderPlugin {
 
         // Register resources
         render_app.init_resource::<ChangedComponents>();
-        render_app.init_resource::<ToJsEventQueue>();
+        render_app.init_resource::<ToJsEventQueue<BindgenRenderToJsEvent>>();
 
         // Register systems
         render_app
@@ -166,11 +178,11 @@ impl Plugin for BindgenRenderPlugin {
                 ),
             )
             .add_systems(
-                RenderSchedule,
+                Render,
                 (
                     prepare_render_changes.in_set(RenderSet::Prepare),
                     queue_render_changes.in_set(RenderSet::Queue),
-                    forward_events_to_js.in_set(RenderSet::Render),
+                    forward_events_to_js::<BindgenRenderToJsEvent>.in_set(RenderSet::Render),
                 ),
             );
     }

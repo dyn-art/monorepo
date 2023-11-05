@@ -1,28 +1,28 @@
 import React from 'react';
-import { Composition, createSVGComposition, Entity, initWasm } from '@dyn/dtom';
+import Two from 'two.js';
 
 export const useSVGComposition = (props: UseSVGCompositionProps) => {
 	const { width, height, count = 50 } = props;
 	const svgContainerRef = React.useRef<HTMLDivElement>(null);
-	const [composition, setComposition] = React.useState<Composition | null>(null);
+	const [twoJs, setTwoJs] = React.useState<Two | null>(null);
 
 	let isMounted = true; // https://github.com/facebook/react/issues/24502
 	React.useEffect(() => {
 		(async () => {
-			if (svgContainerRef.current && composition == null && isMounted) {
-				const newComposition = await createComposition({
+			if (svgContainerRef.current && twoJs == null && isMounted) {
+				const newTwoJs = await createTwoJs({
 					width,
 					height,
 					element: svgContainerRef.current
 				});
-				setComposition(newComposition);
-				startLoop({ composition: newComposition, width, height, count });
+				setTwoJs(newTwoJs);
+				startLoop({ twoJs: newTwoJs, width, height, count });
 			}
 		})();
 		return () => {
 			isMounted = false;
-			if (composition != null) {
-				composition.destory();
+			if (twoJs != null) {
+				twoJs.unbind();
 			}
 		};
 	}, [width, height, count, svgContainerRef.current]);
@@ -30,38 +30,26 @@ export const useSVGComposition = (props: UseSVGCompositionProps) => {
 	return svgContainerRef;
 };
 
-async function createComposition(config: {
+async function createTwoJs(config: {
 	width: number;
 	height: number;
-	element: Element;
-}): Promise<Composition> {
+	element: HTMLElement;
+}): Promise<Two> {
 	const { width, height, element } = config;
-	await initWasm();
 
-	const composition = createSVGComposition({
-		width,
-		height,
-		renderer: {
-			domElement: element
-		}
-	});
-
-	return composition;
+	return new Two({
+		width: width,
+		height: height,
+		type: Two.Types['svg'],
+		autostart: true
+	}).appendTo(element);
 }
 
-function startLoop(config: {
-	count: number;
-	width: number;
-	height: number;
-	composition: Composition;
-}) {
-	const { count, width, height, composition } = config;
+function startLoop(config: { count: number; width: number; height: number; twoJs: Two }) {
+	const { count, width, height, twoJs } = config;
 
 	// Set up your rectangles
-	const rects: Record<
-		string,
-		{ x: number; y: number; size: number; speed: number; entity: Entity }
-	> = {};
+	const rects: Record<string, { x: number; y: number; size: number; speed: number; el: any }> = {};
 	for (let i = 0; i < count; i++) {
 		const x = Math.random() * width;
 		const y = Math.random() * height;
@@ -73,7 +61,7 @@ function startLoop(config: {
 			y,
 			size,
 			speed,
-			entity: composition.createRectangle({ x, y, width: size, height: size })
+			el: twoJs.makeRectangle(x, y, size, size)
 		};
 	}
 
@@ -88,7 +76,7 @@ function startLoop(config: {
 			}
 
 			rect.x -= rect.speed;
-			composition.setEntityPosition(rect.entity, rect.x, rect.y);
+			rect.el.translation.set(rect.x, rect.y);
 
 			if (rect.x + rect.size / 2 < 0) {
 				rectKeysToRemove.push(key);
@@ -98,11 +86,9 @@ function startLoop(config: {
 		rectKeysToRemove.forEach((key) => {
 			const rect = rects[key];
 			if (rect != null) {
-				rect.x = composition.width + rect.size / 2;
+				rect.x = twoJs.width + rect.size / 2;
 			}
 		});
-
-		composition.update();
 
 		requestAnimationFrame(animate);
 	};

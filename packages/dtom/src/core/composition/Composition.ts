@@ -1,10 +1,14 @@
 import type { TComposition } from '@dyn/types/dtif';
-import { CompositionApp as RustCompositionApp } from '@/rust/dyn-dtom';
-import type { Entity, FromJsEvent, ToJsEvent, WorldIds } from '@/rust/dyn-dtom/bindings';
+import { CompositionApp as RustCompositionApp } from '@/rust/dyn_dtom';
+import type {
+	BindgenRenderToJsEvent,
+	Entity,
+	FromJsEvent,
+	WorldIds
+} from '@/rust/dyn_dtom/bindings';
 
 import { EMPTY_COMPOSITION } from '../../test-data';
 import {
-	enqueueJsEvents,
 	transformRustEnumArrayToObject,
 	type GroupedRustEnums,
 	type RustEnumKeys
@@ -64,16 +68,17 @@ export class Composition {
 		};
 	}
 
-	public static onWasmEvents(worldId: number, events: ToJsEvent[]): void {
+	public static onWasmEvents(worldId: number, events: BindgenRenderToJsEvent[]): void {
 		Composition._INSTANCES.find((instance) => instance.hasWorldId(worldId))?.onWasmEvents(events);
 	}
 
-	public onWasmEvents(events: ToJsEvent[]): this {
-		const groupedEvents: GroupedRustEnums<ToJsEvent> = transformRustEnumArrayToObject(events);
+	public onWasmEvents(events: BindgenRenderToJsEvent[]): this {
+		const groupedEvents: GroupedRustEnums<BindgenRenderToJsEvent> =
+			transformRustEnumArrayToObject(events);
 
 		// Process grouped events
 		for (const eventType in groupedEvents) {
-			const eventGroup = groupedEvents[eventType as RustEnumKeys<ToJsEvent>];
+			const eventGroup = groupedEvents[eventType as RustEnumKeys<BindgenRenderToJsEvent>];
 			if (eventGroup == null) {
 				continue;
 			}
@@ -90,7 +95,7 @@ export class Composition {
 		return this;
 	}
 
-	private onRenderUpdate(events: ToJsEvent['RenderUpdate'][]): this {
+	private onRenderUpdate(events: BindgenRenderToJsEvent['RenderUpdate'][]): this {
 		this._renderer.forEach((renderer) => renderer.render(events));
 		return this;
 	}
@@ -117,9 +122,12 @@ export class Composition {
 	}
 
 	public update(): void {
-		enqueueJsEvents(this.worldIds.mainWorldId, this._eventQueue);
+		this._rustComposition.update(this._eventQueue);
 		this._eventQueue = [];
-		this._rustComposition.update();
+	}
+
+	public emitEvents(events: FromJsEvent[]) {
+		this._eventQueue.push(...events);
 	}
 
 	public createRectangle(config: { x: number; y: number; width: number; height: number }): Entity {
@@ -153,11 +161,11 @@ export class Composition {
 	}
 
 	public moveEntity(entity: Entity, dx: number, dy: number): void {
-		this._eventQueue.push({ EntityMoved: { entity, dx, dy } });
+		this.emitEvents([{ EntityMoved: { entity, dx, dy } }]);
 	}
 
 	public setEntityPosition(entity: Entity, x: number, y: number): void {
-		this._eventQueue.push({ EntitySetPosition: { entity, x, y } });
+		this.emitEvents([{ EntitySetPosition: { entity, x, y } }]);
 	}
 
 	public destory(): void {

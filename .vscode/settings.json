@@ -45,5 +45,8 @@
 	"[rust]": {
 		"editor.defaultFormatter": "rust-lang.rust-analyzer"
 	},
-	"rust-analyzer.linkedProjects": ["packages/dtom/rust/Cargo.toml"]
+	"rust-analyzer.linkedProjects": [
+		"packages/dtom/rust/Cargo.toml",
+		"crates/bevy_render_skeleton/Cargo.toml"
+	]
 }

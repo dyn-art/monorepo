@@ -45,7 +45,7 @@ The structure of the `package.json` file in this project should adhere to a spec
 	"bugs": {
 		"url": "https://issues.dyn.art/"
 	},
-	"homepage": "https://github.com/dyndotart/monorepo",
+	"homepage": "https://dyn.art/github",
 	"dependencies": {
 		// Project dependencies here
 	},
@@ -74,6 +74,25 @@ For specific packages, additional fields should be included as shown below. Note
 		// List of files to be included in your package
 	]
 }
+```
+
+### `Cargo.toml` structure
+```toml
+[package]
+name = "dyn_example"
+version = "0.0.1"
+edition = "2021"
+description = "Description of the package"
+homepage = "https://dyn.art/github"
+repository = "https://github.com/dyndotart/monorepo"
+license = "AGPL-3.0-or-later"
+authors = ["@yourgithubname"]
+
+[features]
+default = []
+
+[dependencies]
+# Project dependencies here
 ```
 
 ## 📄 License

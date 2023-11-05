@@ -7,7 +7,7 @@ const Playground: React.FC = () => {
 		<>
 			<div className="space-y-1">
 				<h4 className="text-sm font-medium leading-none">Playground</h4>
-				<p className="text-sm text-muted-foreground">Test and compare different canvas engines.</p>
+				<p className="text-muted-foreground text-sm">Test and compare different canvas engines.</p>
 			</div>
 			<Separator className="my-4" />
 			<div className="flex h-5 items-center space-x-4 text-sm">

@@ -1,19 +1,15 @@
 import { notEmpty, type Unarray } from '@dyn/utils';
 import type {
+	BindgenRenderToJsEvent,
 	BlendMixin,
 	CompositionMixin,
 	Entity,
 	LayoutMixin,
 	PathMixin,
-	RenderChange,
-	ToJsEvent
-} from '@/rust/dyn-dtom/bindings';
+	RenderChange
+} from '@/rust/dyn_dtom/bindings';
 
-import {
-	enqueueJsEvents,
-	transformRustEnumArrayToObject,
-	type GroupedRustEnums
-} from '../../../wasm';
+import { transformRustEnumArrayToObject, type GroupedRustEnums } from '../../../wasm';
 import type { Composition } from '../../composition';
 import { Renderer } from '../Renderer';
 import { createSVGNode, type SVGNode } from './SVGNode';
@@ -61,7 +57,7 @@ export class SVGRenderer extends Renderer {
 	// Rendering
 	// =========================================================================
 
-	public render(events: ToJsEvent['RenderUpdate'][]): this {
+	public render(events: BindgenRenderToJsEvent['RenderUpdate'][]): this {
 		for (const renderUpdate of events) {
 			const groupedChanges: GroupedRustEnums<RenderChange> = transformRustEnumArrayToObject(
 				renderUpdate.changes
@@ -139,9 +135,7 @@ export class SVGRenderer extends Renderer {
 			renderElement.setAttributes({ id: `group-${enitity}` });
 			renderElement.setStyles({ fill: 'blue' });
 			renderElement.onPointerDown(() => {
-				enqueueJsEvents(this.composition.worldIds.mainWorldId, [
-					{ PointerDownEventOnEntity: { entity: enitity } }
-				]);
+				this.composition.emitEvents([{ PointerDownEventOnEntity: { entity: enitity } }]);
 			});
 		}
 
@@ -182,9 +176,7 @@ export class SVGRenderer extends Renderer {
 			renderElement.setAttributes({ id: `shape-${enitity}` });
 			renderElement.setStyles({ fill: 'red' });
 			renderElement.onPointerDown(() => {
-				enqueueJsEvents(this.composition.worldIds.mainWorldId, [
-					{ PointerDownEventOnEntity: { entity: enitity } }
-				]);
+				this.composition.emitEvents([{ PointerDownEventOnEntity: { entity: enitity } }]);
 			});
 		}
 
@@ -326,4 +318,4 @@ export interface TSVGRendererOptions {
 type TToProcessRenderUpdate = {
 	changes: GroupedRustEnums<RenderChange>;
 	parentId: Entity | null;
-} & Omit<Omit<ToJsEvent['RenderUpdate'], 'changes'>, 'entity'>;
+} & Omit<Omit<BindgenRenderToJsEvent['RenderUpdate'], 'changes'>, 'entity'>;
