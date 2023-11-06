@@ -1,4 +1,4 @@
-import type { Entity } from '@/rust/dyn_dtom/bindings';
+import type { Entity } from '@/rust/dyn_dtom_api/bindings';
 
 import {
 	createSVGElement,

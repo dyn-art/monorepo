@@ -1,3 +1,2 @@
 mod bindgen;
-pub mod core;
-mod plugins;
+pub mod composition_api;

@@ -15,5 +15,4 @@ extern "C" {
     #[wasm_bindgen(js_namespace=console)]
     pub fn error(text: &str);
 
-    pub fn enqueue_rust_events(world_id: usize, events: JsValue);
 }

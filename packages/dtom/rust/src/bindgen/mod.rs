@@ -1,6 +1,19 @@
+use wasm_bindgen::{prelude::wasm_bindgen, JsValue};
+
 mod console_logger;
-pub mod event_queue;
 mod js_bindings;
+
+/// Initalize
+#[wasm_bindgen(start)]
+pub fn init() {
+    setup_bindgen();
+}
+
+/// Provides a handle to access the raw WASM memory
+#[wasm_bindgen(js_name = wasmMemory)]
+pub fn wasm_memory() -> JsValue {
+    wasm_bindgen::memory()
+}
 
 pub fn setup_bindgen() {
     #[cfg(feature = "console_log")]

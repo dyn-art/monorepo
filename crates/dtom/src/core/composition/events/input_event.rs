@@ -1,15 +1,17 @@
+//! Events received by the Composition
+
 use bevy_ecs::{entity::Entity, event::Event};
 use glam::Vec2;
 use serde::{Deserialize, Serialize};
 use specta::Type;
 
 #[derive(Debug, Deserialize, Type, Clone)]
-pub enum FromJsEvent {
-    // Pointer Events
-    PointerDownEventOnEntity(CursorDownOnEntity),
-    PointerMovedOnComposition(CursorMovedOnComposition),
-    PointerEnteredComposition(CursorEnteredComposition),
-    PointerExitedComposition(CursorExitedComposition),
+pub enum InputEvent {
+    // Cursor Events
+    CursorDownOnEntity(CursorDownOnEntity),
+    CursorMovedOnComposition(CursorMovedOnComposition),
+    CursorEnteredComposition(CursorEnteredComposition),
+    CursorExitedComposition(CursorExitedComposition),
 
     // Entity Events
     EntityMoved(EntityMoved),

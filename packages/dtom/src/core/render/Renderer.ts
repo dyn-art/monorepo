@@ -1,4 +1,4 @@
-import type { BindgenRenderToJsEvent } from '@/rust/dyn_dtom/bindings';
+import type { OutputEvent } from '@/rust/dyn_dtom_api/bindings';
 
 import type { Composition } from '../composition';
 
@@ -23,7 +23,7 @@ export abstract class Renderer {
 
 	public abstract setSize(width: number, height: number): this;
 
-	public abstract render(data: BindgenRenderToJsEvent['RenderUpdate'][]): this;
+	public abstract render(data: OutputEvent['RenderUpdate'][]): this;
 
 	public abstract destroy(): this;
 }

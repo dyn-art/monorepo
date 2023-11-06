@@ -1,5 +1,3 @@
-import './wasm/from-rust';
-
-export * from '@/rust/dyn_dtom/bindings';
+export * from '@/rust/dyn_dtom_api/bindings';
 export * from './core';
 export * from './wasm';

@@ -1,13 +1,13 @@
 import { notEmpty, type Unarray } from '@dyn/utils';
 import type {
-	BindgenRenderToJsEvent,
 	BlendMixin,
 	CompositionMixin,
 	Entity,
 	LayoutMixin,
+	OutputEvent,
 	PathMixin,
 	RenderChange
-} from '@/rust/dyn_dtom/bindings';
+} from '@/rust/dyn_dtom_api/bindings';
 
 import { transformRustEnumArrayToObject, type GroupedRustEnums } from '../../../wasm';
 import type { Composition } from '../../composition';
@@ -57,7 +57,7 @@ export class SVGRenderer extends Renderer {
 	// Rendering
 	// =========================================================================
 
-	public render(events: BindgenRenderToJsEvent['RenderUpdate'][]): this {
+	public render(events: OutputEvent['RenderUpdate'][]): this {
 		for (const renderUpdate of events) {
 			const groupedChanges: GroupedRustEnums<RenderChange> = transformRustEnumArrayToObject(
 				renderUpdate.changes
@@ -135,7 +135,7 @@ export class SVGRenderer extends Renderer {
 			renderElement.setAttributes({ id: `group-${enitity}` });
 			renderElement.setStyles({ fill: 'blue' });
 			renderElement.onPointerDown(() => {
-				this.composition.emitEvents([{ PointerDownEventOnEntity: { entity: enitity } }]);
+				this.composition.emitEvents([{ CursorDownOnEntity: { entity: enitity } }]);
 			});
 		}
 
@@ -176,7 +176,7 @@ export class SVGRenderer extends Renderer {
 			renderElement.setAttributes({ id: `shape-${enitity}` });
 			renderElement.setStyles({ fill: 'red' });
 			renderElement.onPointerDown(() => {
-				this.composition.emitEvents([{ PointerDownEventOnEntity: { entity: enitity } }]);
+				this.composition.emitEvents([{ CursorDownOnEntity: { entity: enitity } }]);
 			});
 		}
 
@@ -318,4 +318,4 @@ export interface TSVGRendererOptions {
 type TToProcessRenderUpdate = {
 	changes: GroupedRustEnums<RenderChange>;
 	parentId: Entity | null;
-} & Omit<Omit<BindgenRenderToJsEvent['RenderUpdate'], 'changes'>, 'entity'>;
+} & Omit<Omit<OutputEvent['RenderUpdate'], 'changes'>, 'entity'>;
