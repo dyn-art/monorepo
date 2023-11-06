@@ -5,8 +5,8 @@ use specta::export;
 use specta::ts::{BigIntExportBehavior, ExportConfig};
 use std::process;
 
-// Import all types and modules from `dyn_dtom` to make them accessible to specta here
-use dyn_dtom_api::*;
+// Import all types and modules from `dyn_composition` to make them accessible to specta here
+use dyn_composition_api::*;
 
 // Root CLI argument structure
 #[derive(Parser, Debug)]

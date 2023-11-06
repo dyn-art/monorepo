@@ -1,5 +1,5 @@
 [package]
-name = "dyn_dtom"
+name = "dyn_composition"
 version = "0.0.1"
 edition = "2021"
 description = "Description of the package"

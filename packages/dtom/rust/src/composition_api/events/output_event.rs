@@ -1,7 +1,7 @@
 //! Events emitted by the Composition
 
 use bevy_ecs::entity::Entity;
-use dyn_dtom::core::composition::nodes::types::NodeType;
+use dyn_composition::core::composition::nodes::types::NodeType;
 use serde::Serialize;
 use specta::Type;
 

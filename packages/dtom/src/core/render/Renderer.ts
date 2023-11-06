@@ -1,4 +1,4 @@
-import type { OutputEvent } from '@/rust/dyn_dtom_api/bindings';
+import type { OutputEvent } from '@/rust/dyn_composition_api/bindings';
 
 import type { Composition } from '../composition';
 

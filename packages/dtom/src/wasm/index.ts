@@ -1,5 +1,5 @@
-import init, { type InitInput } from '@/rust/dyn_dtom_api';
-import wasm from '@/rust/dyn_dtom_api/bg.wasm';
+import init, { type InitInput } from '@/rust/dyn_composition_api';
+import wasm from '@/rust/dyn_composition_api/bg.wasm';
 
 export * from './helper';
 

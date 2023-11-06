@@ -316,7 +316,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "dyn_dtom"
+name = "dyn_composition"
 version = "0.0.1"
 dependencies = [
  "bevy_app",

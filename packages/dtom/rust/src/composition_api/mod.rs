@@ -3,10 +3,10 @@ mod plugins;
 
 use std::sync::mpsc::{channel, Receiver};
 
-use dyn_dtom::core::composition::dtif::DTIFComposition;
-use dyn_dtom::core::composition::events::input_event::InputEvent;
-use dyn_dtom::core::composition::nodes::bundles::RectangleNodeBundle;
-use dyn_dtom::core::composition::Composition;
+use dyn_composition::core::composition::dtif::DTIFComposition;
+use dyn_composition::core::composition::events::input_event::InputEvent;
+use dyn_composition::core::composition::nodes::bundles::RectangleNodeBundle;
+use dyn_composition::core::composition::Composition;
 use wasm_bindgen::prelude::wasm_bindgen;
 use wasm_bindgen::JsValue;
 

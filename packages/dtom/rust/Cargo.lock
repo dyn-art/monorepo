@@ -428,7 +428,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "dyn_dtom"
+name = "dyn_composition"
 version = "0.0.1"
 dependencies = [
  "bevy_app",
@@ -442,7 +442,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "dyn_dtom_api"
+name = "dyn_composition_api"
 version = "0.0.1"
 dependencies = [
  "bevy_app",
@@ -451,7 +451,7 @@ dependencies = [
  "clap",
  "console_error_panic_hook",
  "dyn_bevy_render_skeleton",
- "dyn_dtom",
+ "dyn_composition",
  "js-sys",
  "log",
  "once_cell",

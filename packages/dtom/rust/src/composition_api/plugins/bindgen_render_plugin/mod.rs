@@ -12,7 +12,7 @@ use bevy_utils::HashMap;
 use dyn_bevy_render_skeleton::{
     extract_param::Extract, ExtractSchedule, Render, RenderApp, RenderSet,
 };
-use dyn_dtom::core::composition::nodes::{
+use dyn_composition::core::composition::nodes::{
     mixins::{
         BlendMixin, ChildrenMixin, CompositionMixin, LayoutMixin, ParentMixin, PathMixin,
         RectangleCornerMixin,

@@ -7,7 +7,7 @@ import type {
 	OutputEvent,
 	PathMixin,
 	RenderChange
-} from '@/rust/dyn_dtom_api/bindings';
+} from '@/rust/dyn_composition_api/bindings';
 
 import { transformRustEnumArrayToObject, type GroupedRustEnums } from '../../../wasm';
 import type { Composition } from '../../composition';

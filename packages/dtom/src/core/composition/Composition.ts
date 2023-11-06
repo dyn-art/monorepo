@@ -1,6 +1,6 @@
 import type { TComposition } from '@dyn/types/dtif';
-import { JsCompositionHandle } from '@/rust/dyn_dtom_api';
-import type { Entity, InputEvent, OutputEvent } from '@/rust/dyn_dtom_api/bindings';
+import { JsCompositionHandle } from '@/rust/dyn_composition_api';
+import type { Entity, InputEvent, OutputEvent } from '@/rust/dyn_composition_api/bindings';
 
 import { EMPTY_COMPOSITION } from '../../test-data';
 import {
