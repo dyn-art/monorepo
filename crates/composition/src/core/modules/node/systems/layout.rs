@@ -1,9 +1,9 @@
 use bevy_ecs::{event::EventReader, system::Query};
 use glam::{Mat3, Vec2};
 
-use crate::core::composition::{
-    events::input_event::{EntityMoved, EntitySetPosition},
-    nodes::mixins::LayoutMixin,
+use crate::core::modules::{
+    composition::events::input_event::{EntityMoved, EntitySetPosition},
+    node::components::mixins::LayoutMixin,
 };
 
 pub fn handle_entity_moved_events(

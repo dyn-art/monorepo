@@ -4,7 +4,7 @@ use bevy_ecs::{entity::Entity, world::World};
 use serde::{Deserialize, Serialize};
 use specta::Type;
 
-use super::nodes::{
+use super::modules::node::components::{
     bundles::{FrameNodeBundle, GroupNodeBundle, RectangleNodeBundle},
     mixins::{ChildrenMixin, ParentMixin},
 };

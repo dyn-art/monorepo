@@ -25,10 +25,3 @@ specta = { path = "/Users/benno/Desktop/workspace/contribution/code/specta", fea
     "glam",
     "bevy_ecs",
 ] }
-
-[profile.release]
-opt-level = "s"
-lto = true
-
-[profile.dev.package."*"]
-opt-level = 3

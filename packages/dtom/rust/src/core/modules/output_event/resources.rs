@@ -2,7 +2,7 @@ use std::sync::mpsc::Sender;
 
 use bevy_ecs::system::Resource;
 
-use crate::composition_api::events::output_event::OutputEvent;
+use crate::core::modules::output_event::OutputEvent;
 
 #[derive(Resource, Debug)]
 pub struct OutputEventQueue {

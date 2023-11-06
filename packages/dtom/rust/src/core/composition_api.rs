@@ -1,18 +1,15 @@
-mod events;
-mod plugins;
-
 use std::sync::mpsc::{channel, Receiver};
 
-use dyn_composition::core::composition::dtif::DTIFComposition;
-use dyn_composition::core::composition::events::input_event::InputEvent;
-use dyn_composition::core::composition::nodes::bundles::RectangleNodeBundle;
 use dyn_composition::core::composition::Composition;
+use dyn_composition::core::dtif::DTIFComposition;
+use dyn_composition::core::modules::composition::events::input_event::InputEvent;
+use dyn_composition::core::modules::node::components::bundles::RectangleNodeBundle;
 use wasm_bindgen::prelude::wasm_bindgen;
 use wasm_bindgen::JsValue;
 
-use crate::composition_api::plugins::bindgen_render_plugin::BindgenRenderPlugin;
+use crate::core::modules::bindgen_render::BindgenRenderPlugin;
 
-use self::events::output_event::OutputEvent;
+use super::modules::output_event::OutputEvent;
 
 #[wasm_bindgen]
 pub struct JsCompositionHandle {
@@ -30,7 +27,7 @@ impl JsCompositionHandle {
         let (output_event_sender, output_event_receiver) = channel::<OutputEvent>();
 
         // Initalize composition
-        let mut composition = Composition::new(parsed_dtif);
+        let mut composition = Composition::new(Option::from(parsed_dtif));
         composition.add_plugins(BindgenRenderPlugin {
             output_event_sender: output_event_sender.clone(),
         });
