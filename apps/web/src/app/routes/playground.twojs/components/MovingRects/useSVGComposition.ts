@@ -16,7 +16,7 @@ export const useSVGComposition = (props: UseSVGCompositionProps) => {
 					element: svgContainerRef.current
 				});
 				setTwoJs(newTwoJs);
-				startLoop({ twoJs: newTwoJs, width, height, count });
+				startLoop({ twoJs: newTwoJs, count });
 			}
 		})();
 		return () => {
@@ -45,14 +45,14 @@ async function createTwoJs(config: {
 	}).appendTo(element);
 }
 
-function startLoop(config: { count: number; width: number; height: number; twoJs: Two }) {
-	const { count, width, height, twoJs } = config;
+function startLoop(config: { count: number; twoJs: Two }) {
+	const { count, twoJs } = config;
 
 	// Set up your rectangles
 	const rects: Record<string, { x: number; y: number; size: number; speed: number; el: any }> = {};
 	for (let i = 0; i < count; i++) {
-		const x = Math.random() * width;
-		const y = Math.random() * height;
+		const x = Math.random() * twoJs.width;
+		const y = Math.random() * twoJs.height;
 		const size = 10 + Math.random() * 40;
 		const speed = 1 + Math.random();
 

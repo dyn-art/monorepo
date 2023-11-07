@@ -4,6 +4,7 @@ use dyn_composition::core::composition::Composition;
 use dyn_composition::core::dtif::DTIFComposition;
 use dyn_composition::core::modules::composition::events::input_event::InputEvent;
 use dyn_composition::core::modules::node::components::bundles::RectangleNodeBundle;
+use log::info;
 use wasm_bindgen::prelude::wasm_bindgen;
 use wasm_bindgen::JsValue;
 
@@ -23,8 +24,9 @@ impl JsCompositionHandle {
     #[wasm_bindgen(constructor)]
     pub fn new(dtif: JsValue, event_callback: js_sys::Function) -> Self {
         let parsed_dtif: DTIFComposition = serde_wasm_bindgen::from_value(dtif).unwrap();
-
         let (output_event_sender, output_event_receiver) = channel::<OutputEvent>();
+
+        info!("Create new Composition Interface to Javascript");
 
         // Initalize composition
         let mut composition = Composition::new(Option::from(parsed_dtif));
@@ -54,7 +56,7 @@ impl JsCompositionHandle {
             output_events.push(event);
         }
 
-        // If we have collected events, call the JavaScript callback with the vector
+        // Call the JavaScript callback with the vector
         if !output_events.is_empty() {
             let js_events_value =
                 serde_wasm_bindgen::to_value(&output_events).unwrap_or_else(|e| JsValue::NULL);

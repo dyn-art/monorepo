@@ -6,6 +6,7 @@ use serde::{Deserialize, Serialize};
 use specta::Type;
 
 #[derive(Debug, Deserialize, Type, Clone)]
+#[serde(tag = "type")]
 pub enum InputEvent {
     // Cursor Events
     CursorDownOnEntity(CursorDownOnEntity),

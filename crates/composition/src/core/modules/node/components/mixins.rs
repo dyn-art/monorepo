@@ -5,9 +5,16 @@ use specta::Type;
 
 #[derive(Component, Serialize, Deserialize, Clone, Debug, Type)]
 pub struct RectangleCornerMixin {
+    #[serde(rename = "topLeftRadius")]
     pub top_left_radius: u8,
+
+    #[serde(rename = "topRightRadius")]
     pub top_right_radius: u8,
+
+    #[serde(rename = "bottomRightRadius")]
     pub bottom_right_radius: u8,
+
+    #[serde(rename = "bottomLeftRadius")]
     pub bottom_left_radius: u8,
 }
 
@@ -23,45 +30,51 @@ impl Default for RectangleCornerMixin {
 }
 
 #[derive(Component, Serialize, Deserialize, Clone, Debug, Type)]
-pub struct ChildrenMixin {
-    pub children: Vec<Entity>,
-}
+pub struct ChildrenMixin(pub Vec<Entity>);
 
 impl Default for ChildrenMixin {
     fn default() -> Self {
-        Self { children: vec![] }
+        Self(vec![])
     }
 }
 
 #[derive(Component, Serialize, Deserialize, Clone, Debug, Type)]
-pub struct ParentMixin {
-    pub parent: Entity,
-}
+pub struct ParentMixin(pub Entity);
 
 #[derive(Component, Serialize, Deserialize, Clone, Debug, Type)]
-pub struct LayoutMixin {
+pub struct DimensionMixin {
     pub width: u32,
     pub height: u32,
-    pub relative_transform: Mat3,
 }
 
-impl Default for LayoutMixin {
+impl Default for DimensionMixin {
     fn default() -> Self {
         Self {
             width: 100,
             height: 100,
-            relative_transform: Mat3::default(),
         }
     }
 }
 
 #[derive(Component, Serialize, Deserialize, Clone, Debug, Type)]
-pub struct CompositionMixin {
+pub struct RelativeTransformMixin(pub Mat3);
+
+impl Default for RelativeTransformMixin {
+    fn default() -> Self {
+        Self(Mat3::default())
+    }
+}
+
+#[derive(Component, Serialize, Deserialize, Clone, Debug, Type)]
+pub struct NodeCompositionMixin {
+    #[serde(rename = "isVisible")]
     is_visible: bool,
+
+    #[serde(rename = "isLocked")]
     is_locked: bool,
 }
 
-impl Default for CompositionMixin {
+impl Default for NodeCompositionMixin {
     fn default() -> Self {
         Self {
             is_visible: true,
@@ -72,8 +85,12 @@ impl Default for CompositionMixin {
 
 #[derive(Component, Serialize, Deserialize, Clone, Debug, Type)]
 pub struct BlendMixin {
+    #[serde(rename = "blendMode")]
     blend_mode: BlendMode,
+
     opacity: u8,
+
+    #[serde(rename = "isMask")]
     is_mask: bool,
 }
 
@@ -103,13 +120,22 @@ pub enum AnchorCommand {
     MoveTo,
     LineTo,
     CurveTo {
+        #[serde(rename = "controlPoint1")]
         control_point_1: Vec2,
+
+        #[serde(rename = "controlPoint2")]
         control_point_2: Vec2,
     },
     ArcTo {
         radius: Vec2,
+
+        #[serde(rename = "xAxisRotation")]
         x_axis_rotation: f32,
+
+        #[serde(rename = "largeArcFlag")]
         large_arc_flag: bool,
+
+        #[serde(rename = "sweepFlag")]
         sweep_flag: bool,
     },
     ClosePath,

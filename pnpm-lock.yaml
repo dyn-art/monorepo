@@ -197,6 +197,9 @@ importers:
       '@types/node':
         specifier: ^20.8.10
         version: 20.8.10
+      '@types/react':
+        specifier: ^18.2.33
+        version: 18.2.34
 
   packages/lab:
     dependencies:

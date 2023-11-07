@@ -40,7 +40,7 @@ export function setStyles(element: SVGElement, styles: TSVGStyles) {
 }
 
 export type TSVGAttributes = Record<string, string | number>;
-export type TSVGStyles = Record<string, string | number>;
+export type TSVGStyles = React.CSSProperties;
 
 export type TSVGTagNames =
 	| 'svg'

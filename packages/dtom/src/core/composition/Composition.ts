@@ -51,6 +51,10 @@ export class Composition {
 	public onWasmEvents(events: OutputEvent[]): this {
 		const groupedEvents: GroupedRustEnums<OutputEvent> = transformRustEnumArrayToObject(events);
 
+		// TODO: Make it with one update cycle work
+		// e.g. relative_transform on creation is not applied
+		console.log('onWasmEvents', { events });
+
 		// Process grouped events
 		for (const eventType in groupedEvents) {
 			const eventGroup = groupedEvents[eventType as RustEnumKeys<OutputEvent>];

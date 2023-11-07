@@ -15,11 +15,13 @@ pub struct DTIFComposition {
     pub name: String,
     pub width: f32,
     pub height: f32,
+    #[serde(rename = "rootNodeId")]
     pub root_node_id: Entity,
     pub nodes: HashMap<String, DTIFNode>, // TODO: Entity as key when fixed: https://github.com/serde-rs/serde/issues/1183
 }
 
 #[derive(Serialize, Deserialize, Debug, Type)]
+#[serde(tag = "type")]
 pub enum DTIFNode {
     Rectangle(RectangleNodeBundle),
     Frame(FrameNodeBundle),
@@ -58,7 +60,7 @@ pub fn process_dtif_nodes(
         if let DTIFNode::Frame(FrameNodeBundle { children_mixin, .. })
         | DTIFNode::Group(GroupNodeBundle { children_mixin, .. }) = dtif_node
         {
-            for child_entity in &children_mixin.children {
+            for child_entity in &children_mixin.0 {
                 let child_eid = entity_to_eid(child_entity);
                 let processed_child_entity =
                     process_dtif_nodes(world, dtif_nodes, &child_eid, eid_to_entity).unwrap();
@@ -68,16 +70,14 @@ pub fn process_dtif_nodes(
                 // to easily know where to append it in some render appraoches (e.g. svg)
                 world
                     .entity_mut(processed_child_entity)
-                    .insert(ParentMixin {
-                        parent: node_entity.clone(),
-                    });
+                    .insert(ParentMixin(node_entity.clone()));
             }
 
             // Update parent with new children (override old ones)
             if !new_children.is_empty() {
-                world.entity_mut(node_entity).insert(ChildrenMixin {
-                    children: new_children,
-                });
+                world
+                    .entity_mut(node_entity)
+                    .insert(ChildrenMixin(new_children));
             }
         }
 

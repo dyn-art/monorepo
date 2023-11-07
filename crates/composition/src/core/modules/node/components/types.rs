@@ -18,8 +18,8 @@ impl Default for NodeType {
 
 #[derive(Component, Serialize, Deserialize, Clone, Default, Debug, Type)]
 pub struct Node {
-    // Keep track of the node type here for frontend
-    // TODO: Figure out how to do this in a more generic way
+    // Keep track of node type to know what node the renderer is dealing with in the render cycle
+    // without a separate system for each node type/variant
     pub node_type: NodeType,
 }
 

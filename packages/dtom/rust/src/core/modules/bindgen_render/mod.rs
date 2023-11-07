@@ -4,8 +4,8 @@ use bevy_app::{App, Plugin};
 use bevy_ecs::schedule::IntoSystemConfigs;
 use dyn_bevy_render_skeleton::{ExtractSchedule, Render, RenderApp, RenderSet};
 use dyn_composition::core::modules::node::components::mixins::{
-    BlendMixin, ChildrenMixin, CompositionMixin, LayoutMixin, ParentMixin, PathMixin,
-    RectangleCornerMixin,
+    BlendMixin, ChildrenMixin, DimensionMixin, NodeCompositionMixin, ParentMixin, PathMixin,
+    RectangleCornerMixin, RelativeTransformMixin,
 };
 use serde::Serialize;
 use specta::Type;
@@ -21,11 +21,13 @@ mod resources;
 mod systems;
 
 #[derive(Serialize, Clone, Debug, Type)]
+#[serde(tag = "type")]
 pub enum RenderChange {
     RectangleCorner(RectangleCornerMixin),
     Children(ChildrenMixin),
-    Layout(LayoutMixin),
-    Composition(CompositionMixin),
+    Dimension(DimensionMixin),
+    RelativeTransform(RelativeTransformMixin),
+    Composition(NodeCompositionMixin),
     Blend(BlendMixin),
     Path(PathMixin),
     ParentMixin(ParentMixin),
@@ -41,13 +43,19 @@ impl ToRenderChange for ChildrenMixin {
     }
 }
 
-impl ToRenderChange for LayoutMixin {
+impl ToRenderChange for DimensionMixin {
     fn to_render_change(&self) -> RenderChange {
-        RenderChange::Layout(self.clone())
+        RenderChange::Dimension(self.clone())
     }
 }
 
-impl ToRenderChange for CompositionMixin {
+impl ToRenderChange for RelativeTransformMixin {
+    fn to_render_change(&self) -> RenderChange {
+        RenderChange::RelativeTransform(self.clone())
+    }
+}
+
+impl ToRenderChange for NodeCompositionMixin {
     fn to_render_change(&self) -> RenderChange {
         RenderChange::Composition(self.clone())
     }
@@ -99,8 +107,9 @@ impl Plugin for BindgenRenderPlugin {
                 (
                     extract_mixin_generic::<RectangleCornerMixin>,
                     extract_mixin_generic::<ChildrenMixin>,
-                    extract_mixin_generic::<LayoutMixin>,
-                    extract_mixin_generic::<CompositionMixin>,
+                    extract_mixin_generic::<DimensionMixin>,
+                    extract_mixin_generic::<RelativeTransformMixin>,
+                    extract_mixin_generic::<NodeCompositionMixin>,
                     extract_mixin_generic::<BlendMixin>,
                     extract_mixin_generic::<PathMixin>,
                     extract_mixin_generic::<ParentMixin>,

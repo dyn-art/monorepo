@@ -11,6 +11,7 @@ import type {
 
 import { transformRustEnumArrayToObject, type GroupedRustEnums } from '../../../wasm';
 import type { Composition } from '../../composition';
+import { transformToCSS } from '../../helper';
 import { Renderer } from '../Renderer';
 import { createSVGNode, type SVGNode } from './SVGNode';
 
@@ -229,12 +230,11 @@ export class SVGRenderer extends Renderer {
 	}
 
 	private handleLayoutChange(renderElement: SVGNode, mixin: LayoutMixin): void {
-		const [aX, aY, , bX, bY, , cX, cY] = mixin.relative_transform;
 		renderElement.setAttributes({
-			transform: `matrix(${aX}, ${aY}, ${bX}, ${bY}, ${cX}, ${cY})`,
 			width: mixin.width,
 			height: mixin.height
 		});
+		renderElement.setStyles(transformToCSS(mixin.relative_transform, true));
 	}
 
 	private handleBlendChange(renderElement: SVGNode, mixin: BlendMixin): void {

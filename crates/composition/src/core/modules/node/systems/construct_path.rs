@@ -6,7 +6,7 @@ use bevy_ecs::{
 use glam::Vec2;
 
 use crate::core::modules::node::components::mixins::{
-    Anchor, AnchorCommand, LayoutMixin, PathMixin, RectangleCornerMixin,
+    Anchor, AnchorCommand, DimensionMixin, PathMixin, RectangleCornerMixin,
 };
 
 // =============================================================================
@@ -15,14 +15,15 @@ use crate::core::modules::node::components::mixins::{
 
 pub fn construct_rectangle_path(
     query: Query<
-        (Entity, &RectangleCornerMixin, &LayoutMixin),
-        Or<(Changed<RectangleCornerMixin>, Changed<LayoutMixin>)>,
+        (Entity, &RectangleCornerMixin, &DimensionMixin),
+        Or<(Changed<RectangleCornerMixin>, Changed<DimensionMixin>)>,
     >,
     mut commands: Commands,
 ) {
-    for (_entity, corners, layout) in query.iter() {
+    // TODO: split Layout mixin as rn we recalulate the path every position change
+    for (_entity, corners, dimension) in query.iter() {
         let mut path = PathMixin { vertices: vec![] };
-        let max_radius = std::cmp::min(layout.width, layout.height) as f32 / 2.0;
+        let max_radius = std::cmp::min(dimension.width, dimension.height) as f32 / 2.0;
 
         let min_radius =
             |radius: u8| -> f32 { std::cmp::min(radius as i32, max_radius as i32) as f32 };
@@ -36,7 +37,7 @@ pub fn construct_rectangle_path(
         // Top right corner
         path.vertices.push(Anchor {
             position: Vec2::new(
-                layout.width as f32 - min_radius(corners.top_right_radius),
+                dimension.width as f32 - min_radius(corners.top_right_radius),
                 0.0,
             ),
             command: AnchorCommand::LineTo,
@@ -44,7 +45,7 @@ pub fn construct_rectangle_path(
 
         if corners.top_right_radius > 0 {
             path.vertices.push(Anchor {
-                position: Vec2::new(layout.width as f32, min_radius(corners.top_right_radius)),
+                position: Vec2::new(dimension.width as f32, min_radius(corners.top_right_radius)),
                 command: AnchorCommand::ArcTo {
                     radius: Vec2::splat(min_radius(corners.top_right_radius)),
                     x_axis_rotation: 0.0,
@@ -57,8 +58,8 @@ pub fn construct_rectangle_path(
         // Bottom right corner
         path.vertices.push(Anchor {
             position: Vec2::new(
-                layout.width as f32,
-                layout.height as f32 - min_radius(corners.bottom_right_radius),
+                dimension.width as f32,
+                dimension.height as f32 - min_radius(corners.bottom_right_radius),
             ),
             command: AnchorCommand::LineTo,
         });
@@ -66,8 +67,8 @@ pub fn construct_rectangle_path(
         if corners.bottom_right_radius > 0 {
             path.vertices.push(Anchor {
                 position: Vec2::new(
-                    layout.width as f32 - min_radius(corners.bottom_right_radius),
-                    layout.height as f32,
+                    dimension.width as f32 - min_radius(corners.bottom_right_radius),
+                    dimension.height as f32,
                 ),
                 command: AnchorCommand::ArcTo {
                     radius: Vec2::splat(min_radius(corners.bottom_right_radius)),
@@ -80,7 +81,10 @@ pub fn construct_rectangle_path(
 
         // Bottom left corner
         path.vertices.push(Anchor {
-            position: Vec2::new(min_radius(corners.bottom_left_radius), layout.height as f32),
+            position: Vec2::new(
+                min_radius(corners.bottom_left_radius),
+                dimension.height as f32,
+            ),
             command: AnchorCommand::LineTo,
         });
 
@@ -88,7 +92,7 @@ pub fn construct_rectangle_path(
             path.vertices.push(Anchor {
                 position: Vec2::new(
                     0.0,
-                    layout.height as f32 - min_radius(corners.bottom_left_radius),
+                    dimension.height as f32 - min_radius(corners.bottom_left_radius),
                 ),
                 command: AnchorCommand::ArcTo {
                     radius: Vec2::splat(min_radius(corners.bottom_left_radius)),

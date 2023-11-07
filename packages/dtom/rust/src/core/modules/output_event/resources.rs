@@ -17,6 +17,11 @@ impl OutputEventQueue {
     }
 
     pub fn push_event(&mut self, event: OutputEvent) {
-        self.output_event_sender.send(event);
+        match self.output_event_sender.send(event) {
+            Ok(_) => {}
+            Err(e) => {
+                // TODO
+            }
+        }
     }
 }
