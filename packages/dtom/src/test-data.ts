@@ -1,4 +1,6 @@
-import type { DTIFComposition, Mat3, Vec2, Vec3 } from '@/rust/dyn_composition_api/bindings';
+import type { DTIFComposition } from '@/rust/dyn_composition_api/bindings';
+
+import { mat3, vec3 } from './core/helper';
 
 // Composition dimensions
 const width = 800;
@@ -65,15 +67,3 @@ export const COMPOSITION_ONE_RECT: DTIFComposition = {
 // =============================================================================
 // Helper
 // =============================================================================
-
-function vec2(x: number, y: number): Vec2 {
-	return [x, y];
-}
-
-function vec3(x: number, y: number, z: number): Vec3 {
-	return [x, y, z];
-}
-
-function mat3(xAxis: Vec3, yAxis: Vec3, zAxis: Vec3): Mat3 {
-	return [...xAxis, ...yAxis, ...zAxis];
-}

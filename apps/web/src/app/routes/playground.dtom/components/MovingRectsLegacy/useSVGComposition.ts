@@ -70,14 +70,11 @@ function startLoop(config: { count: number; composition: Composition }) {
 	}
 
 	// Spawn non moving rects
-	// for (let i = 0; i < count; i++) {
-	// 	const x = Math.random() * (composition.width - rectWidth);
-	// 	const y = Math.random() * (composition.height - rectHeight);
-	// 	composition.createRectangle({ x, y, width: rectWidth, height: rectHeight });
-	// }
-	composition.update(); // TODO: why first cycle transform matrix 0
-
-	return;
+	for (let i = 0; i < count; i++) {
+		const x = Math.random() * (composition.width - rectWidth);
+		const y = Math.random() * (composition.height - rectHeight);
+		composition.createRectangle({ x, y, width: rectWidth, height: rectHeight });
+	}
 
 	// Animation loop
 	const animate = () => {

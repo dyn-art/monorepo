@@ -12,7 +12,7 @@ use super::{
 
 #[derive(Bundle, Debug, Serialize, Deserialize, Clone, Type)]
 pub struct FrameNodeBundle {
-    #[serde(default)]
+    #[serde(default = "frame_node_bundle_node_default")]
     pub node: Node,
 
     #[serde(default)]
@@ -39,12 +39,16 @@ pub struct FrameNodeBundle {
     pub blend_mixin: BlendMixin,
 }
 
+fn frame_node_bundle_node_default() -> Node {
+    Node {
+        node_type: NodeType::Frame,
+    }
+}
+
 impl Default for FrameNodeBundle {
     fn default() -> Self {
         Self {
-            node: Node {
-                node_type: NodeType::Frame,
-            },
+            node: frame_node_bundle_node_default(),
             frame: Frame::default(),
             rectangle_corner_mixin: RectangleCornerMixin::default(),
             children_mixin: ChildrenMixin::default(),
@@ -58,7 +62,7 @@ impl Default for FrameNodeBundle {
 
 #[derive(Bundle, Debug, Serialize, Deserialize, Clone, Type)]
 pub struct GroupNodeBundle {
-    #[serde(default)]
+    #[serde(default = "group_node_bundle_node_default")]
     pub node: Node,
 
     #[serde(default)]
@@ -81,12 +85,16 @@ pub struct GroupNodeBundle {
     pub blend_mixin: BlendMixin,
 }
 
+fn group_node_bundle_node_default() -> Node {
+    Node {
+        node_type: NodeType::Group,
+    }
+}
+
 impl Default for GroupNodeBundle {
     fn default() -> Self {
         Self {
-            node: Node {
-                node_type: NodeType::Group,
-            },
+            node: group_node_bundle_node_default(),
             group: Group::default(),
             children_mixin: ChildrenMixin::default(),
             composition_mixin: NodeCompositionMixin::default(),
@@ -99,7 +107,7 @@ impl Default for GroupNodeBundle {
 
 #[derive(Bundle, Debug, Serialize, Deserialize, Clone, Type)]
 pub struct RectangleNodeBundle {
-    #[serde(default)]
+    #[serde(default = "rectangle_node_bundle_node_default")]
     pub node: Node,
 
     #[serde(default)]
@@ -123,12 +131,16 @@ pub struct RectangleNodeBundle {
     pub blend_mixin: BlendMixin,
 }
 
+fn rectangle_node_bundle_node_default() -> Node {
+    Node {
+        node_type: NodeType::Rectangle,
+    }
+}
+
 impl Default for RectangleNodeBundle {
     fn default() -> Self {
         Self {
-            node: Node {
-                node_type: NodeType::Rectangle,
-            },
+            node: rectangle_node_bundle_node_default(),
             recangle: Rectangle::default(),
             rectangle_corner_mixin: RectangleCornerMixin::default(),
             composition_mixin: NodeCompositionMixin::default(),

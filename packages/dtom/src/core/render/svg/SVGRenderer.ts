@@ -59,15 +59,12 @@ export class SVGRenderer extends Renderer {
 	// =========================================================================
 
 	public render(events: RenderUpdateEvent[]): this {
-		console.log('render', { events }); // TODO: REMOVE
-
 		for (const renderUpdate of events) {
 			const groupedChanges = groupByType(renderUpdate.changes);
-
-			console.log('render update', { groupedChanges, changes: renderUpdate.changes }); // TODO: REMOVE
-
 			const parentMixin =
-				groupedChanges.ParentMixin.length > 0 ? groupedChanges.ParentMixin[0] : null;
+				groupedChanges.ParentMixin != null && groupedChanges.ParentMixin.length > 0
+					? groupedChanges.ParentMixin[0]
+					: null;
 			const parentId = parentMixin?.parent ?? null;
 			this._toProcessRenderUpdates[renderUpdate.entity] = {
 				nodeType: renderUpdate.nodeType,
@@ -79,8 +76,7 @@ export class SVGRenderer extends Renderer {
 		// TODO: Make it with one update cycle work
 		// e.g. relative_transform on creation is not applied
 		// TODO: Not getting here and parent mixin missing in children
-		console.log('test');
-		console.log('after render presort', { toProcessRenderUpdates: this._toProcessRenderUpdates }); // TODO: REMOVE
+		// console.log('after render presort', { toProcessRenderUpdates: this._toProcessRenderUpdates }); // TODO: REMOVE
 
 		// Process each render update
 		for (const entity of Object.keys(this._toProcessRenderUpdates)) {
@@ -246,7 +242,10 @@ export class SVGRenderer extends Renderer {
 		renderElement: SVGNode,
 		mixin: RenderChangeRelativeTransformMixin
 	): void {
-		renderElement.setStyles(transformToCSS(mixin.relativeTransform, true));
+		// Note: Setting transform attribute is like 30% faster
+		renderElement.setAttributes({
+			transform: transformToCSS(mixin.relativeTransform, true).transform
+		});
 	}
 
 	private handleDimensionChange(renderElement: SVGNode, mixin: DimensionMixin): void {

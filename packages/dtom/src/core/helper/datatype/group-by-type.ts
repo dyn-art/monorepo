@@ -3,7 +3,7 @@ export type TypeWithDiscriminator<T extends string> = { type: T } & Record<strin
 
 // This type will map each unique 'type' value to an array of objects that have that type
 export type GroupedByType<T extends TypeWithDiscriminator<string>> = {
-	[K in T['type']]: Extract<T, { type: K }>[];
+	[K in T['type']]?: Extract<T, { type: K }>[];
 };
 
 // groupByType function

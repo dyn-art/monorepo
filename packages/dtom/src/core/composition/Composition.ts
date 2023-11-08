@@ -9,7 +9,7 @@ import type {
 } from '@/rust/dyn_composition_api/bindings';
 
 import { EMPTY_COMPOSITION } from '../../test-data';
-import { groupByType } from '../helper';
+import { groupByType, mat3, vec3 } from '../helper';
 import type { Renderer } from '../render';
 
 export class Composition {
@@ -54,13 +54,15 @@ export class Composition {
 		const groupedEvents = groupByType(events);
 		for (const eventType of Object.keys(groupedEvents) as (keyof typeof groupedEvents)[]) {
 			const groupedEvent = groupedEvents[eventType];
-			switch (eventType) {
-				case 'RenderUpdate':
-					this.onRenderUpdate(groupedEvent);
-					break;
-				default:
-					console.warn(`Unknown event: ${eventType as string}`);
-					break;
+			if (groupedEvent != null) {
+				switch (eventType) {
+					case 'RenderUpdate':
+						this.onRenderUpdate(groupedEvent);
+						break;
+					default:
+						console.warn(`Unknown event: ${eventType as string}`);
+						break;
+				}
 			}
 		}
 		return this;
@@ -108,7 +110,7 @@ export class Composition {
 				width: Math.round(width),
 				height: Math.round(height)
 			},
-			relativeTransform: [1, 0, x, 0, 1, y, 0, 0, 1],
+			relativeTransform: mat3(vec3(1, 0, 0), vec3(0, 1, 0), vec3(x, y, 1)),
 			blendMixin: {
 				blendMode: 'Normal',
 				opacity: 1,

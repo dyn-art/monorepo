@@ -1,7 +1,9 @@
-import type { TSVGStyles } from '../../render';
 import { extract2DTransformMatrixData, type T3x3Matrix } from '../math';
 
-export function transformToCSS(transform: T3x3Matrix, asMatrix = true): TSVGStyles {
+export function transformToCSS(
+	transform: T3x3Matrix,
+	asMatrix = true
+): { transform: string; transformOrigin: string } {
 	if (asMatrix) {
 		// | a d tx |
 		// | b e ty |
