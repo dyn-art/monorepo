@@ -37,6 +37,9 @@ importers:
 
   apps/web:
     dependencies:
+      '@cesdk/cesdk-js':
+        specifier: ^1.18.0
+        version: 1.18.0
       '@dyn/dtom':
         specifier: workspace:*
         version: link:../../packages/dtom
@@ -624,6 +627,10 @@ packages:
       '@babel/helper-string-parser': 7.22.5
       '@babel/helper-validator-identifier': 7.22.20
       to-fast-properties: 2.0.0
+
+  /@cesdk/cesdk-js@1.18.0:
+    resolution: {integrity: sha512-A04qyyv+MRuS7nLwn6dXnfn3nFrdZhG+Z7Dx2k2fwZWMs7e6T/s7HoHwCHc3oENriF8LAi9R7rgsrD+FXTEDTg==}
+    dev: false
 
   /@emotion/hash@0.9.1:
     resolution: {integrity: sha512-gJB6HLm5rYwSLI6PQa+X1t5CFGrv1J1TWG+sOyMCeKz2ojaj6Fnl/rZEspogG+cvqbt4AE/2eIyD2QfLKTBNlQ==}

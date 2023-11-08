@@ -1,17 +1,17 @@
 import { notEmpty, type Unarray } from '@dyn/utils';
 import type {
 	BlendMixin,
-	CompositionMixin,
+	DimensionMixin,
 	Entity,
-	LayoutMixin,
-	OutputEvent,
+	NodeCompositionMixin,
 	PathMixin,
-	RenderChange
+	RenderChange,
+	RenderChangeRelativeTransformMixin,
+	RenderUpdateEvent
 } from '@/rust/dyn_composition_api/bindings';
 
-import { transformRustEnumArrayToObject, type GroupedRustEnums } from '../../../wasm';
 import type { Composition } from '../../composition';
-import { transformToCSS } from '../../helper';
+import { groupByType, transformToCSS, type GroupedByType } from '../../helper';
 import { Renderer } from '../Renderer';
 import { createSVGNode, type SVGNode } from './SVGNode';
 
@@ -58,22 +58,29 @@ export class SVGRenderer extends Renderer {
 	// Rendering
 	// =========================================================================
 
-	public render(events: OutputEvent['RenderUpdate'][]): this {
+	public render(events: RenderUpdateEvent[]): this {
+		console.log('render', { events }); // TODO: REMOVE
+
 		for (const renderUpdate of events) {
-			const groupedChanges: GroupedRustEnums<RenderChange> = transformRustEnumArrayToObject(
-				renderUpdate.changes
-			);
+			const groupedChanges = groupByType(renderUpdate.changes);
+
+			console.log('render update', { groupedChanges, changes: renderUpdate.changes }); // TODO: REMOVE
+
 			const parentMixin =
-				groupedChanges.ParentMixin != null && groupedChanges.ParentMixin.length > 0
-					? groupedChanges.ParentMixin[0]
-					: null;
+				groupedChanges.ParentMixin.length > 0 ? groupedChanges.ParentMixin[0] : null;
 			const parentId = parentMixin?.parent ?? null;
 			this._toProcessRenderUpdates[renderUpdate.entity] = {
-				node_type: renderUpdate.node_type,
+				nodeType: renderUpdate.nodeType,
 				changes: groupedChanges,
 				parentId
 			};
 		}
+
+		// TODO: Make it with one update cycle work
+		// e.g. relative_transform on creation is not applied
+		// TODO: Not getting here and parent mixin missing in children
+		console.log('test');
+		console.log('after render presort', { toProcessRenderUpdates: this._toProcessRenderUpdates }); // TODO: REMOVE
 
 		// Process each render update
 		for (const entity of Object.keys(this._toProcessRenderUpdates)) {
@@ -90,7 +97,7 @@ export class SVGRenderer extends Renderer {
 	}
 
 	private handleRenderUpdate(entity: Entity, renderUpdate: TToProcessRenderUpdate): this {
-		const { node_type: nodeType, parentId } = renderUpdate;
+		const { nodeType, parentId } = renderUpdate;
 
 		// If parent exists and hasn't been rendered yet, try to render it first
 		if (parentId !== null && !this._renderedInRenderCycle.has(parentId)) {
@@ -136,7 +143,7 @@ export class SVGRenderer extends Renderer {
 			renderElement.setAttributes({ id: `group-${enitity}` });
 			renderElement.setStyles({ fill: 'blue' });
 			renderElement.onPointerDown(() => {
-				this.composition.emitEvents([{ CursorDownOnEntity: { entity: enitity } }]);
+				this.composition.emitEvents([{ type: 'CursorDownOnEntity', entity: enitity }]);
 			});
 		}
 
@@ -177,7 +184,7 @@ export class SVGRenderer extends Renderer {
 			renderElement.setAttributes({ id: `shape-${enitity}` });
 			renderElement.setStyles({ fill: 'red' });
 			renderElement.onPointerDown(() => {
-				this.composition.emitEvents([{ CursorDownOnEntity: { entity: enitity } }]);
+				this.composition.emitEvents([{ type: 'CursorDownOnEntity', entity: enitity }]);
 			});
 		}
 
@@ -191,10 +198,16 @@ export class SVGRenderer extends Renderer {
 			this.handlePathChange(renderElement, pathChange);
 		}
 
-		// Handle Layout change
-		const layoutChange = this.getLatestChange(changes, 'Layout');
-		if (layoutChange != null) {
-			this.handleLayoutChange(renderElement, layoutChange);
+		// Handle Relative Transform change
+		const relativeTransformChange = this.getLatestChange(changes, 'RelativeTransform');
+		if (relativeTransformChange != null) {
+			this.handleRelativeTransformChange(renderElement, relativeTransformChange);
+		}
+
+		// Handle Dimension change
+		const dimensionChange = this.getLatestChange(changes, 'Dimension');
+		if (dimensionChange != null) {
+			this.handleDimensionChange(renderElement, dimensionChange);
 		}
 
 		// Handle Blend change
@@ -229,20 +242,26 @@ export class SVGRenderer extends Renderer {
 		renderElement.setAttributes({ d: svgPath });
 	}
 
-	private handleLayoutChange(renderElement: SVGNode, mixin: LayoutMixin): void {
+	private handleRelativeTransformChange(
+		renderElement: SVGNode,
+		mixin: RenderChangeRelativeTransformMixin
+	): void {
+		renderElement.setStyles(transformToCSS(mixin.relativeTransform, true));
+	}
+
+	private handleDimensionChange(renderElement: SVGNode, mixin: DimensionMixin): void {
 		renderElement.setAttributes({
 			width: mixin.width,
 			height: mixin.height
 		});
-		renderElement.setStyles(transformToCSS(mixin.relative_transform, true));
 	}
 
 	private handleBlendChange(renderElement: SVGNode, mixin: BlendMixin): void {
 		renderElement.setAttributes({ opacity: mixin.opacity });
 	}
 
-	private handleCompositionChange(renderElement: SVGNode, mixin: CompositionMixin): void {
-		renderElement.isVisible = mixin.is_visible;
+	private handleCompositionChange(renderElement: SVGNode, mixin: NodeCompositionMixin): void {
+		renderElement.isVisible = mixin.isVisible;
 		renderElement.setStyles({ display: renderElement.isVisible ? 'block' : 'none' });
 	}
 
@@ -279,12 +298,12 @@ export class SVGRenderer extends Renderer {
 					if ('ArcTo' in anchorCommand) {
 						const arcParams = anchorCommand.ArcTo;
 						const [rx, ry] = arcParams.radius;
-						return `A ${rx} ${ry} ${arcParams.x_axis_rotation} ${boolToNum(
-							arcParams.large_arc_flag
-						)} ${boolToNum(arcParams.sweep_flag)} ${x} ${y}`;
+						return `A ${rx} ${ry} ${arcParams.xAxisRotation} ${boolToNum(
+							arcParams.largeArcFlag
+						)} ${boolToNum(arcParams.sweepFlag)} ${x} ${y}`;
 					} else if ('CurveTo' in anchorCommand) {
 						const curveParams = anchorCommand.CurveTo;
-						return `C ${curveParams.control_point_1[0]} ${curveParams.control_point_1[1]} ${curveParams.control_point_2[0]} ${curveParams.control_point_2[1]} ${x} ${y}`;
+						return `C ${curveParams.controlPoint1[0]} ${curveParams.controlPoint1[1]} ${curveParams.controlPoint2[0]} ${curveParams.controlPoint2[1]} ${x} ${y}`;
 					}
 				}
 
@@ -300,7 +319,7 @@ export class SVGRenderer extends Renderer {
 	// =========================================================================
 
 	private getLatestChange<
-		TChanges extends Record<string, unknown[]> = GroupedRustEnums<RenderChange>,
+		TChanges extends Record<string, unknown[]> = GroupedByType<RenderChange>,
 		TKey extends keyof TChanges = keyof TChanges
 	>(changes: TChanges, elementType: TKey): Unarray<TChanges[TKey]> | null {
 		const change = changes[elementType];
@@ -316,6 +335,6 @@ export interface TSVGRendererOptions {
 }
 
 type TToProcessRenderUpdate = {
-	changes: GroupedRustEnums<RenderChange>;
+	changes: GroupedByType<RenderChange>;
 	parentId: Entity | null;
-} & Omit<Omit<OutputEvent['RenderUpdate'], 'changes'>, 'entity'>;
+} & Omit<Omit<RenderUpdateEvent, 'changes'>, 'entity'>;

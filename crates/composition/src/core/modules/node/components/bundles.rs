@@ -32,7 +32,7 @@ pub struct FrameNodeBundle {
     #[serde(rename = "relativeTransform")]
     pub relative_transform: RelativeTransformMixin,
 
-    #[serde(rename = "diemension")]
+    #[serde(rename = "dimension")]
     pub dimension: DimensionMixin,
 
     #[serde(rename = "blendMixin")]
@@ -74,7 +74,7 @@ pub struct GroupNodeBundle {
     #[serde(rename = "relativeTransform")]
     pub relative_transform: RelativeTransformMixin,
 
-    #[serde(rename = "diemension")]
+    #[serde(rename = "dimension")]
     pub dimension: DimensionMixin,
 
     #[serde(rename = "blendMixin")]
@@ -116,7 +116,7 @@ pub struct RectangleNodeBundle {
     #[serde(rename = "relativeTransform")]
     pub relative_transform: RelativeTransformMixin,
 
-    #[serde(rename = "diemension")]
+    #[serde(rename = "dimension")]
     pub dimension: DimensionMixin,
 
     #[serde(rename = "blendMixin")]

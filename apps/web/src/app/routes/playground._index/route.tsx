@@ -1,10 +1,11 @@
 import { Link } from '@remix-run/react';
 import React from 'react';
+import { MaxWidthWrapper } from '@/components/layout';
 import { Separator } from '@/components/primitive';
 
 const Playground: React.FC = () => {
 	return (
-		<>
+		<MaxWidthWrapper className="mt-8">
 			<div className="space-y-1">
 				<h4 className="text-sm font-medium leading-none">Playground</h4>
 				<p className="text-muted-foreground text-sm">Test and compare different canvas engines.</p>
@@ -15,7 +16,7 @@ const Playground: React.FC = () => {
 				<Separator orientation="vertical" />
 				<Link to={'/playground/twojs'}>Two.js</Link>
 			</div>
-		</>
+		</MaxWidthWrapper>
 	);
 };
 

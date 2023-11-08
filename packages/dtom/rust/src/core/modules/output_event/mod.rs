@@ -10,10 +10,13 @@ pub mod resources;
 #[derive(Debug, Serialize, Clone, Type)]
 #[serde(tag = "type")]
 pub enum OutputEvent {
-    RenderUpdate {
-        entity: Entity,
-        #[serde(rename = "nodeType")]
-        node_type: NodeType,
-        changes: Vec<RenderChange>,
-    },
+    RenderUpdate(RenderUpdateEvent),
+}
+
+#[derive(Debug, Serialize, Clone, Type)]
+pub struct RenderUpdateEvent {
+    pub entity: Entity,
+    #[serde(rename = "nodeType")]
+    pub node_type: NodeType,
+    pub changes: Vec<RenderChange>,
 }

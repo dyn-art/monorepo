@@ -7,7 +7,9 @@ use bevy_ecs::{
 use dyn_bevy_render_skeleton::extract_param::Extract;
 use dyn_composition::core::modules::node::components::types::Node;
 
-use crate::core::modules::output_event::{resources::OutputEventQueue, OutputEvent};
+use crate::core::modules::output_event::{
+    resources::OutputEventQueue, OutputEvent, RenderUpdateEvent,
+};
 
 use super::{resources::ChangedComponents, ToRenderChange};
 
@@ -41,11 +43,11 @@ pub fn queue_render_changes(
             .drain()
             .into_iter()
             .for_each(|(entity, (node_type, changes))| {
-                output_event_queue.push_event(OutputEvent::RenderUpdate {
+                output_event_queue.push_event(OutputEvent::RenderUpdate(RenderUpdateEvent {
                     entity,
                     node_type,
                     changes,
-                });
+                }));
             });
     }
 }

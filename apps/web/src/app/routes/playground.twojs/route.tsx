@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, CONTENT_WIDTH } from '@/components/layout';
+import { Card, CONTENT_WIDTH, MaxWidthWrapper } from '@/components/layout';
 import { FPSStats } from '@/components/monitoring';
 import { Button, Separator } from '@/components/primitive';
 
@@ -9,7 +9,7 @@ const DTOM: React.FC = () => {
 	const [canvasState, setCanvasState] = React.useState(CANVAS_STATE.NONE);
 
 	return (
-		<>
+		<MaxWidthWrapper className="mt-8">
 			<div className="flex flex-row justify-between align-top">
 				<div className="space-y-1">
 					<h4 className="text-sm font-medium leading-none">TwoJs Playground</h4>
@@ -37,7 +37,7 @@ const DTOM: React.FC = () => {
 				{/* None */}
 				{canvasState === CANVAS_STATE.NONE && <p>Select Playground</p>}
 			</Card>
-		</>
+		</MaxWidthWrapper>
 	);
 };
 

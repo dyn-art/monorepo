@@ -1,13 +1,15 @@
 import type { TComposition } from '@dyn/types/dtif';
 import { JsCompositionHandle } from '@/rust/dyn_composition_api';
-import type { Entity, InputEvent, OutputEvent } from '@/rust/dyn_composition_api/bindings';
+import type {
+	Entity,
+	InputEvent,
+	OutputEvent,
+	RectangleNodeBundle,
+	RenderUpdateEvent
+} from '@/rust/dyn_composition_api/bindings';
 
 import { EMPTY_COMPOSITION } from '../../test-data';
-import {
-	transformRustEnumArrayToObject,
-	type GroupedRustEnums,
-	type RustEnumKeys
-} from '../../wasm';
+import { groupByType } from '../helper';
 import type { Renderer } from '../render';
 
 export class Composition {
@@ -49,32 +51,22 @@ export class Composition {
 	// =========================================================================
 
 	public onWasmEvents(events: OutputEvent[]): this {
-		const groupedEvents: GroupedRustEnums<OutputEvent> = transformRustEnumArrayToObject(events);
-
-		// TODO: Make it with one update cycle work
-		// e.g. relative_transform on creation is not applied
-		console.log('onWasmEvents', { events });
-
-		// Process grouped events
-		for (const eventType in groupedEvents) {
-			const eventGroup = groupedEvents[eventType as RustEnumKeys<OutputEvent>];
-			if (eventGroup == null) {
-				continue;
-			}
+		const groupedEvents = groupByType(events);
+		for (const eventType of Object.keys(groupedEvents) as (keyof typeof groupedEvents)[]) {
+			const groupedEvent = groupedEvents[eventType];
 			switch (eventType) {
 				case 'RenderUpdate':
-					this.onRenderUpdate(eventGroup);
+					this.onRenderUpdate(groupedEvent);
 					break;
 				default:
-					console.warn(`Unknown event: ${eventType}`);
+					console.warn(`Unknown event: ${eventType as string}`);
 					break;
 			}
 		}
-
 		return this;
 	}
 
-	private onRenderUpdate(events: OutputEvent['RenderUpdate'][]): this {
+	private onRenderUpdate(events: RenderUpdateEvent[]): this {
 		this._renderer.forEach((renderer) => renderer.render(events));
 		return this;
 	}
@@ -108,39 +100,29 @@ export class Composition {
 	public createRectangle(config: { x: number; y: number; width: number; height: number }): Entity {
 		const { x, y, width, height } = config;
 		return this._compositionHandle.spawn_rectangle({
-			node: {
-				node_type: 'Rectangle'
+			compositionMixin: {
+				isVisible: true,
+				isLocked: false
 			},
-			recangle: null,
-			rectangle_corner_mixin: {
-				top_left_radius: 5,
-				top_right_radius: 5,
-				bottom_right_radius: 5,
-				bottom_left_radius: 5
-			},
-			composition_mixin: {
-				is_visible: true,
-				is_locked: false
-			},
-			layout_mixin: {
+			dimension: {
 				width: Math.round(width),
-				height: Math.round(height),
-				relative_transform: [1, 0, x, 0, 1, y, 0, 0, 1]
+				height: Math.round(height)
 			},
-			blend_mixin: {
-				blend_mode: 'Normal',
+			relativeTransform: [1, 0, x, 0, 1, y, 0, 0, 1],
+			blendMixin: {
+				blendMode: 'Normal',
 				opacity: 1,
-				is_mask: false
+				isMask: false
 			}
-		});
+		} as RectangleNodeBundle);
 	}
 
 	public moveEntity(entity: Entity, dx: number, dy: number): void {
-		this.emitEvents([{ EntityMoved: { entity, dx, dy } }]);
+		this.emitEvents([{ type: 'EntityMoved', entity, dx, dy }]);
 	}
 
 	public setEntityPosition(entity: Entity, x: number, y: number): void {
-		this.emitEvents([{ EntitySetPosition: { entity, x, y } }]);
+		this.emitEvents([{ type: 'EntitySetPosition', entity, x, y }]);
 	}
 
 	public destory(): void {

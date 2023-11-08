@@ -9,29 +9,19 @@ export const EMPTY_COMPOSITION: DTIFComposition = {
 	name: 'Test',
 	width,
 	height,
-	root_node_id: 0,
+	rootNodeId: 0,
 	nodes: {
 		0: {
-			Frame: {
-				node: { node_type: 'Frame' },
-				frame: { clip_content: true },
-				rectangle_corner_mixin: {
-					top_left_radius: 0,
-					top_right_radius: 0,
-					bottom_left_radius: 0,
-					bottom_right_radius: 0
-				},
-				children_mixin: {
-					children: []
-				},
-				composition_mixin: { is_visible: true, is_locked: false },
-				layout_mixin: {
-					width,
-					height,
-					relative_transform: mat3(vec3(1, 0, 0), vec3(0, 1, 0), vec3(0, 0, 1))
-				},
-				blend_mixin: { blend_mode: 'Normal', opacity: 1, is_mask: false }
-			}
+			type: 'Frame',
+			frame: { clip_content: true },
+			children: [],
+			compositionMixin: { isVisible: true, isLocked: false },
+			dimension: {
+				width,
+				height
+			},
+			relativeTransform: mat3(vec3(1, 0, 0), vec3(0, 1, 0), vec3(0, 0, 1)),
+			blendMixin: { blendMode: 'Normal', opacity: 1, isMask: false }
 		}
 	}
 };
@@ -41,52 +31,33 @@ export const COMPOSITION_ONE_RECT: DTIFComposition = {
 	name: 'Test',
 	width,
 	height,
-	root_node_id: 0,
+	rootNodeId: 0,
 	nodes: {
 		0: {
-			Frame: {
-				node: { node_type: 'Frame' },
-				frame: { clip_content: true },
-				rectangle_corner_mixin: {
-					top_left_radius: 0,
-					top_right_radius: 0,
-					bottom_left_radius: 0,
-					bottom_right_radius: 0
-				},
-				children_mixin: {
-					children: [1]
-				},
-				composition_mixin: { is_visible: true, is_locked: false },
-				layout_mixin: {
-					width,
-					height,
-					relative_transform: mat3(vec3(1, 0, 0), vec3(0, 1, 0), vec3(0, 0, 1))
-				},
-				blend_mixin: { blend_mode: 'Normal', opacity: 1, is_mask: false }
-			}
+			type: 'Frame',
+			frame: { clip_content: true },
+			children: [1],
+			compositionMixin: { isVisible: true, isLocked: false },
+			dimension: {
+				width,
+				height
+			},
+			relativeTransform: mat3(vec3(1, 0, 0), vec3(0, 1, 0), vec3(0, 0, 1)),
+			blendMixin: { blendMode: 'Normal', opacity: 1, isMask: false }
 		},
 		1: {
-			Rectangle: {
-				node: { node_type: 'Rectangle' },
-				recangle: null,
-				rectangle_corner_mixin: {
-					top_left_radius: 0,
-					top_right_radius: 0,
-					bottom_left_radius: 0,
-					bottom_right_radius: 0
-				},
-				composition_mixin: { is_visible: true, is_locked: false },
-				layout_mixin: {
-					width: 100,
-					height: 100,
-					relative_transform: mat3(
-						vec3(1, 0, 0),
-						vec3(0, 1, 0),
-						vec3((width - 100) / 2, (height - 100) / 2, 1)
-					)
-				},
-				blend_mixin: { blend_mode: 'Normal', opacity: 1, is_mask: false }
-			}
+			type: 'Rectangle',
+			compositionMixin: { isVisible: true, isLocked: false },
+			dimension: {
+				width: 100,
+				height: 100
+			},
+			relativeTransform: mat3(
+				vec3(1, 0, 0),
+				vec3(0, 1, 0),
+				vec3((width - 100) / 2, (height - 100) / 2, 1)
+			),
+			blendMixin: { blendMode: 'Normal', opacity: 1, isMask: false }
 		}
 	}
 };
