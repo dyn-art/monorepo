@@ -101,7 +101,7 @@ export class Composition {
 
 	public createRectangle(config: { x: number; y: number; width: number; height: number }): Entity {
 		const { x, y, width, height } = config;
-		return this._compositionHandle.spawn_rectangle({
+		return this._compositionHandle.spawn_rectangle_node({
 			compositionMixin: {
 				isVisible: true,
 				isLocked: false

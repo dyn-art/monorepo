@@ -71,10 +71,9 @@ impl JsCompositionHandle {
         }
     }
 
-    // TODO: make this an event
-    // Problem: no reference to the spawned entity
-    pub fn spawn_rectangle(&mut self, mixin: JsValue) -> JsValue {
+    pub fn spawn_rectangle_node(&mut self, mixin: JsValue) -> JsValue {
         let mixin: RectangleNodeBundle = serde_wasm_bindgen::from_value(mixin).unwrap();
-        return serde_wasm_bindgen::to_value(&self.composition.spawn(mixin)).unwrap();
+        let entity = self.composition.spawn(mixin);
+        return serde_wasm_bindgen::to_value(&entity).unwrap();
     }
 }

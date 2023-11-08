@@ -15,15 +15,12 @@ export const EMPTY_COMPOSITION: DTIFComposition = {
 	nodes: {
 		0: {
 			type: 'Frame',
-			frame: { clip_content: true },
 			children: [],
-			compositionMixin: { isVisible: true, isLocked: false },
 			dimension: {
 				width,
 				height
 			},
-			relativeTransform: mat3(vec3(1, 0, 0), vec3(0, 1, 0), vec3(0, 0, 1)),
-			blendMixin: { blendMode: 'Normal', opacity: 1, isMask: false }
+			relativeTransform: mat3(vec3(1, 0, 0), vec3(0, 1, 0), vec3(0, 0, 1))
 		}
 	}
 };
@@ -37,15 +34,12 @@ export const COMPOSITION_ONE_RECT: DTIFComposition = {
 	nodes: {
 		0: {
 			type: 'Frame',
-			frame: { clip_content: true },
 			children: [1],
-			compositionMixin: { isVisible: true, isLocked: false },
 			dimension: {
 				width,
 				height
 			},
-			relativeTransform: mat3(vec3(1, 0, 0), vec3(0, 1, 0), vec3(0, 0, 1)),
-			blendMixin: { blendMode: 'Normal', opacity: 1, isMask: false }
+			relativeTransform: mat3(vec3(1, 0, 0), vec3(0, 1, 0), vec3(0, 0, 1))
 		},
 		1: {
 			type: 'Rectangle',
@@ -58,8 +52,7 @@ export const COMPOSITION_ONE_RECT: DTIFComposition = {
 				vec3(1, 0, 0),
 				vec3(0, 1, 0),
 				vec3((width - 100) / 2, (height - 100) / 2, 1)
-			),
-			blendMixin: { blendMode: 'Normal', opacity: 1, isMask: false }
+			)
 		}
 	}
 };

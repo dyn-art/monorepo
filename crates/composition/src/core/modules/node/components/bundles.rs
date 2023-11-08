@@ -35,6 +35,7 @@ pub struct FrameNodeBundle {
     #[serde(rename = "dimension")]
     pub dimension: DimensionMixin,
 
+    #[serde(default)]
     #[serde(rename = "blendMixin")]
     pub blend_mixin: BlendMixin,
 }
@@ -81,6 +82,7 @@ pub struct GroupNodeBundle {
     #[serde(rename = "dimension")]
     pub dimension: DimensionMixin,
 
+    #[serde(default)]
     #[serde(rename = "blendMixin")]
     pub blend_mixin: BlendMixin,
 }
@@ -127,6 +129,7 @@ pub struct RectangleNodeBundle {
     #[serde(rename = "dimension")]
     pub dimension: DimensionMixin,
 
+    #[serde(default)]
     #[serde(rename = "blendMixin")]
     pub blend_mixin: BlendMixin,
 }
