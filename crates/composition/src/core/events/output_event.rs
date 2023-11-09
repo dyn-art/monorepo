@@ -12,5 +12,5 @@
 //
 // To emit output events, set up a system using the Bevy_ECS
 // and listen on desired component changes.
-//  Implement an event queue or similar resource to manage these events.
+// Implement an event queue or similar resource to manage these events.
 // For practical implementation examples, refer to the `dtom` package.

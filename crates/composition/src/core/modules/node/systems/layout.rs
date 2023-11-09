@@ -2,7 +2,7 @@ use bevy_ecs::{event::EventReader, system::Query};
 use glam::{Mat3, Vec2};
 
 use crate::core::modules::{
-    composition::events::input_event::{EntityMoved, EntitySetPosition},
+    composition::events::{EntityMoved, EntitySetPosition},
     node::components::mixins::RelativeTransformMixin,
 };
 

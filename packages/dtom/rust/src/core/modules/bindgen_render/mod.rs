@@ -10,12 +10,12 @@ use dyn_composition::core::modules::node::components::mixins::{
 use serde::Serialize;
 use specta::Type;
 
+use crate::core::events::output_event::{OutputEvent, OutputEventQueue};
+
 use self::{
     resources::ChangedComponents,
-    systems::{extract_mixin_generic, prepare_render_changes, queue_render_changes},
+    systems::{extract_mixin_generic, queue_render_changes},
 };
-
-use super::output_event::{resources::OutputEventQueue, OutputEvent};
 
 mod resources;
 mod systems;
@@ -140,12 +140,6 @@ impl Plugin for BindgenRenderPlugin {
                     extract_mixin_generic::<ParentMixin>,
                 ),
             )
-            .add_systems(
-                Render,
-                (
-                    prepare_render_changes.in_set(RenderSet::Prepare),
-                    queue_render_changes.in_set(RenderSet::Queue),
-                ),
-            );
+            .add_systems(Render, (queue_render_changes.in_set(RenderSet::Queue),));
     }
 }

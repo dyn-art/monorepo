@@ -139,7 +139,7 @@ export class SVGRenderer extends Renderer {
 			renderElement.setAttributes({ id: `group-${enitity}` });
 			renderElement.setStyles({ fill: 'blue' });
 			renderElement.onPointerDown(() => {
-				this.composition.emitEvents([{ type: 'CursorDownOnEntity', entity: enitity }]);
+				this.composition.emitInteractionEvents([{ type: 'CursorDownOnEntity', entity: enitity }]);
 			});
 		}
 
@@ -180,7 +180,7 @@ export class SVGRenderer extends Renderer {
 			renderElement.setAttributes({ id: `shape-${enitity}` });
 			renderElement.setStyles({ fill: 'red' });
 			renderElement.onPointerDown(() => {
-				this.composition.emitEvents([{ type: 'CursorDownOnEntity', entity: enitity }]);
+				this.composition.emitInteractionEvents([{ type: 'CursorDownOnEntity', entity: enitity }]);
 			});
 		}
 

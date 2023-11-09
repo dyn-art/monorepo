@@ -6,11 +6,8 @@ use bevy_ecs::{entity::Entity, world::World};
 use crate::core::dtif::{entity_to_eid, process_dtif_nodes, DTIFComposition};
 
 use self::{
-    components::{CompositionInteractionMixin, CompositionMixin},
-    events::input_event::{
-        CursorDownOnEntity, CursorEnteredComposition, CursorExitedComposition,
-        CursorMovedOnComposition, EntityMoved, EntitySetPosition,
-    },
+    components::CompositionMixin,
+    events::{EntityMoved, EntitySetPosition},
 };
 
 pub mod components;
@@ -23,10 +20,6 @@ pub struct CompositionPlugin {
 impl Plugin for CompositionPlugin {
     fn build(&self, app: &mut bevy_app::App) {
         // Register events
-        app.add_event::<CursorMovedOnComposition>();
-        app.add_event::<CursorEnteredComposition>();
-        app.add_event::<CursorExitedComposition>();
-        app.add_event::<CursorDownOnEntity>();
         app.add_event::<EntityMoved>();
         app.add_event::<EntitySetPosition>();
 
@@ -56,5 +49,4 @@ fn insert_dtif(world: &mut World, dtif: &DTIFComposition) {
         height: dtif.height,
         root_node: root_node_entity,
     });
-    world.spawn(CompositionInteractionMixin::default());
 }

@@ -4,9 +4,12 @@ use bevy_ecs::{entity::Entity, world::World};
 use serde::{Deserialize, Serialize};
 use specta::Type;
 
-use super::modules::node::components::{
-    bundles::{FrameNodeBundle, GroupNodeBundle, RectangleNodeBundle},
-    mixins::{ChildrenMixin, ParentMixin},
+use super::modules::{
+    composition::events::CoreInputEvent,
+    node::components::{
+        bundles::{FrameNodeBundle, GroupNodeBundle, RectangleNodeBundle},
+        mixins::{ChildrenMixin, ParentMixin},
+    },
 };
 
 #[derive(Serialize, Deserialize, Debug, Type)]
@@ -18,6 +21,8 @@ pub struct DTIFComposition {
     #[serde(rename = "rootNodeId")]
     pub root_node_id: Entity,
     pub nodes: HashMap<String, DTIFNode>, // TODO: Entity as key when fixed: https://github.com/serde-rs/serde/issues/1183
+    #[serde(default)]
+    pub changes: Option<Vec<CoreInputEvent>>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Type)]

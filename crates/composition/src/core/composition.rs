@@ -3,13 +3,11 @@ use bevy_ecs::{bundle::Bundle, entity::Entity};
 use dyn_bevy_render_skeleton::RenderPlugin;
 use log::info;
 
-use super::{
-    dtif::DTIFComposition,
-    modules::{
-        composition::{events::input_event::InputEvent, CompositionPlugin},
-        node::NodePlugin,
-    },
+use crate::core::modules::{
+    composition::CompositionPlugin, interactive_composition::InteractiveCompositionPlugin,
 };
+
+use super::{dtif::DTIFComposition, events::input_event::InputEvent, modules::node::NodePlugin};
 
 pub struct Composition {
     app: App,
@@ -22,7 +20,12 @@ impl Composition {
         info!("Create new Composition with DTIF: {:?}", dtif);
 
         // Register plugins
-        app.add_plugins((RenderPlugin, CompositionPlugin { dtif }, NodePlugin));
+        app.add_plugins((
+            RenderPlugin,
+            CompositionPlugin { dtif },
+            InteractiveCompositionPlugin, // TODO: only include if "interaction" feature active?
+            NodePlugin,
+        ));
 
         // Register resources
         // TODO
@@ -48,35 +51,13 @@ impl Composition {
         return self.app.world.spawn::<B>(bundle).id();
     }
 
-    pub fn register_events(&mut self, events: Vec<InputEvent>) {
+    pub fn register_events<T: InputEvent>(&mut self, events: Vec<T>) {
         for event in events {
-            self.register_event(event);
+            self.register_event(event)
         }
     }
 
-    pub fn register_event(&mut self, event: InputEvent) {
-        match event {
-            // Cursor Events
-            InputEvent::CursorMovedOnComposition(event) => {
-                self.app.world.send_event(event);
-            }
-            InputEvent::CursorEnteredComposition(event) => {
-                self.app.world.send_event(event);
-            }
-            InputEvent::CursorExitedComposition(event) => {
-                self.app.world.send_event(event);
-            }
-            InputEvent::CursorDownOnEntity(event) => {
-                self.app.world.send_event(event);
-            }
-
-            // Entity Events
-            InputEvent::EntityMoved(event) => {
-                self.app.world.send_event(event);
-            }
-            InputEvent::EntitySetPosition(event) => {
-                self.app.world.send_event(event);
-            }
-        }
+    pub fn register_event<T: InputEvent>(&mut self, event: T) {
+        event.send_to_ecs(&mut self.app.world);
     }
 }

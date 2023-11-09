@@ -2,15 +2,15 @@ use std::sync::mpsc::{channel, Receiver};
 
 use dyn_composition::core::composition::Composition;
 use dyn_composition::core::dtif::DTIFComposition;
-use dyn_composition::core::modules::composition::events::input_event::InputEvent;
 use dyn_composition::core::modules::node::components::bundles::RectangleNodeBundle;
 use log::info;
 use wasm_bindgen::prelude::wasm_bindgen;
 use wasm_bindgen::JsValue;
 
+use crate::core::events::input_event::AnyInputEvent;
 use crate::core::modules::bindgen_render::BindgenRenderPlugin;
 
-use super::modules::output_event::OutputEvent;
+use super::events::output_event::OutputEvent;
 
 #[wasm_bindgen]
 pub struct JsCompositionHandle {
@@ -42,10 +42,20 @@ impl JsCompositionHandle {
     }
 
     pub fn update(&mut self, input_events: JsValue) {
-        // Emit input events
-        let parsed_input_events: Vec<InputEvent> =
+        let parsed_input_events: Vec<AnyInputEvent> =
             serde_wasm_bindgen::from_value(input_events).unwrap();
-        self.composition.register_events(parsed_input_events);
+
+        // Emit input events
+        for any_event in parsed_input_events {
+            match any_event {
+                AnyInputEvent::Core(any_event) => {
+                    self.composition.register_events(any_event.events);
+                }
+                AnyInputEvent::Interaction(any_event) => {
+                    self.composition.register_events(any_event.events);
+                }
+            }
+        }
 
         // Update the internal composition state
         self.composition.update();

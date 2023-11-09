@@ -1,8 +1,10 @@
 import type { TComposition } from '@dyn/types/dtif';
 import { JsCompositionHandle } from '@/rust/dyn_composition_api';
 import type {
+	AnyInputEvent,
+	CoreInputEvent,
 	Entity,
-	InputEvent,
+	InteractionInputEvent,
 	OutputEvent,
 	RectangleNodeBundle,
 	RenderUpdateEvent
@@ -20,7 +22,7 @@ export class Composition {
 	protected _width: number;
 	protected _height: number;
 
-	protected _eventQueue: InputEvent[] = [];
+	protected _eventQueue: AnyInputEvent[] = [];
 
 	constructor(config: TCompositionConfig) {
 		const { width, height } = config;
@@ -95,8 +97,12 @@ export class Composition {
 		this._eventQueue = [];
 	}
 
-	public emitEvents(events: InputEvent[]) {
-		this._eventQueue.push(...events);
+	public emitCoreEvents(events: CoreInputEvent[]) {
+		this._eventQueue.push({ type: 'Core', events });
+	}
+
+	public emitInteractionEvents(events: InteractionInputEvent[]) {
+		this._eventQueue.push({ type: 'Interaction', events });
 	}
 
 	public createRectangle(config: { x: number; y: number; width: number; height: number }): Entity {
@@ -120,11 +126,11 @@ export class Composition {
 	}
 
 	public moveEntity(entity: Entity, dx: number, dy: number): void {
-		this.emitEvents([{ type: 'EntityMoved', entity, dx, dy }]);
+		this.emitCoreEvents([{ type: 'EntityMoved', entity, dx, dy }]);
 	}
 
 	public setEntityPosition(entity: Entity, x: number, y: number): void {
-		this.emitEvents([{ type: 'EntitySetPosition', entity, x, y }]);
+		this.emitCoreEvents([{ type: 'EntitySetPosition', entity, x, y }]);
 	}
 
 	public destory(): void {
