@@ -4,7 +4,7 @@ use bevy_app::{App, Plugin};
 use bevy_ecs::schedule::IntoSystemConfigs;
 use dyn_bevy_render_skeleton::{ExtractSchedule, Render, RenderApp, RenderSet};
 use dyn_composition::core::modules::node::components::mixins::{
-    BlendMixin, ChildrenMixin, DimensionMixin, NodeCompositionMixin, ParentMixin, PathMixin,
+    BlendMixin, ChildrenMixin, DimensionMixin, NodeCompositionMixin, PathMixin,
     RectangleCornerMixin, RelativeTransformMixin,
 };
 use serde::Serialize;
@@ -30,7 +30,6 @@ pub enum RenderChange {
     Composition(NodeCompositionMixin),
     Blend(BlendMixin),
     Path(PathMixin),
-    ParentMixin(RenderChangeParentMixin),
 }
 
 pub trait ToRenderChange {
@@ -97,19 +96,6 @@ impl ToRenderChange for RectangleCornerMixin {
     }
 }
 
-#[derive(Serialize, Clone, Debug, Type)]
-pub struct RenderChangeParentMixin {
-    parent: ParentMixin,
-}
-
-impl ToRenderChange for ParentMixin {
-    fn to_render_change(&self) -> RenderChange {
-        RenderChange::ParentMixin(RenderChangeParentMixin {
-            parent: self.clone(),
-        })
-    }
-}
-
 pub struct BindgenRenderPlugin {
     pub output_event_sender: Sender<OutputEvent>,
 }
@@ -137,7 +123,6 @@ impl Plugin for BindgenRenderPlugin {
                     extract_mixin_generic::<NodeCompositionMixin>,
                     extract_mixin_generic::<BlendMixin>,
                     extract_mixin_generic::<PathMixin>,
-                    extract_mixin_generic::<ParentMixin>,
                 ),
             )
             .add_systems(Render, (queue_render_changes.in_set(RenderSet::Queue),));

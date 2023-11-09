@@ -38,10 +38,6 @@ impl Default for ChildrenMixin {
     }
 }
 
-// TODO: Figure out bevy_ecs hierarchy (https://bevy-cheatbook.github.io/fundamentals/hierarchy.html)
-#[derive(Component, Serialize, Deserialize, Clone, Debug, Type)]
-pub struct ParentMixin(pub Entity);
-
 #[derive(Component, Serialize, Deserialize, Clone, Debug, Type)]
 pub struct DimensionMixin {
     pub width: u32,

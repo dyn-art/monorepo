@@ -1,6 +1,8 @@
 use std::collections::HashMap;
 
 use bevy_ecs::{entity::Entity, world::World};
+use bevy_hierarchy::{BuildWorldChildren, Children, Parent};
+use log::info;
 use serde::{Deserialize, Serialize};
 use specta::Type;
 
@@ -8,7 +10,7 @@ use super::modules::{
     composition::events::CoreInputEvent,
     node::components::{
         bundles::{FrameNodeBundle, GroupNodeBundle, RectangleNodeBundle},
-        mixins::{ChildrenMixin, ParentMixin},
+        mixins::ChildrenMixin,
     },
 };
 
@@ -67,17 +69,18 @@ impl DTIFProcessor {
                         let processed_child_entity =
                             self.process_node(&child_eid, world, dtif_nodes)?;
 
-                        // Keep track of parent in children
-                        // to easily know where to append it in some render appraoches (e.g. svg)
-                        world
-                            .entity_mut(processed_child_entity)
-                            .insert(ParentMixin(node_entity.clone()));
-
                         return Some(processed_child_entity);
                     })
                     .collect();
 
                 if !new_children.is_empty() {
+                    // Create parent children relation using bevy_hierarchy
+                    // https://bevy-cheatbook.github.io/fundamentals/hierarchy.html
+                    // https://github.com/bevyengine/bevy/blob/v0.12.0/examples/ecs/hierarchy.rs
+                    world.entity_mut(node_entity).push_children(&new_children);
+
+                    // TODO REMOVE: Figure out whether its possible to provide children (by dtom)
+                    // and pass children changes to renderer using just bevy_hierarchy
                     world
                         .entity_mut(node_entity)
                         .insert(ChildrenMixin(new_children));

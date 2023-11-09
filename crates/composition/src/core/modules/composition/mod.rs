@@ -24,7 +24,6 @@ impl Plugin for CompositionPlugin {
         // Load DTIF
         if let Some(dtif) = &self.dtif {
             insert_dtif(&mut app.world, dtif);
-            // TODO: clear storage DTIF takes
         }
     }
 }
