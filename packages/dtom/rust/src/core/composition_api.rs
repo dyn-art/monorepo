@@ -3,7 +3,6 @@ use std::sync::mpsc::{channel, Receiver};
 use dyn_composition::core::composition::Composition;
 use dyn_composition::core::dtif::DTIFComposition;
 use dyn_composition::core::modules::node::components::bundles::RectangleNodeBundle;
-use log::info;
 use wasm_bindgen::prelude::wasm_bindgen;
 use wasm_bindgen::JsValue;
 
@@ -25,8 +24,6 @@ impl JsCompositionHandle {
     pub fn new(dtif: JsValue, event_callback: js_sys::Function) -> Self {
         let parsed_dtif: DTIFComposition = serde_wasm_bindgen::from_value(dtif).unwrap();
         let (output_event_sender, output_event_receiver) = channel::<OutputEvent>();
-
-        info!("Create new Composition Interface to Javascript");
 
         // Initalize composition
         let mut composition = Composition::new(Option::from(parsed_dtif));
@@ -60,7 +57,7 @@ impl JsCompositionHandle {
         // Update the internal composition state
         self.composition.update();
 
-        // Collect all available events into a vector
+        // Collect all (in the last update cycle) emited events into a vector
         let mut output_events = Vec::new();
         while let Ok(event) = self.event_receiver.try_recv() {
             output_events.push(event);

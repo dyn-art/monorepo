@@ -1,7 +1,6 @@
 use bevy_app::{App, Plugins};
 use bevy_ecs::{bundle::Bundle, entity::Entity};
 use dyn_bevy_render_skeleton::RenderPlugin;
-use log::info;
 
 use crate::core::modules::{
     composition::CompositionPlugin, interactive_composition::InteractiveCompositionPlugin,
@@ -16,8 +15,6 @@ pub struct Composition {
 impl Composition {
     pub fn new(dtif: Option<DTIFComposition>) -> Self {
         let mut app = App::new();
-
-        info!("Create new Composition with DTIF: {:?}", dtif);
 
         // Register plugins
         app.add_plugins((
@@ -59,5 +56,9 @@ impl Composition {
 
     pub fn register_event<T: InputEvent>(&mut self, event: T) {
         event.send_to_ecs(&mut self.app.world);
+    }
+
+    pub fn clear(&mut self) {
+        self.app.world.clear_all();
     }
 }
