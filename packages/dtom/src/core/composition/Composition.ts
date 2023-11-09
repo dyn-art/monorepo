@@ -1,8 +1,8 @@
-import type { TComposition } from '@dyn/types/dtif';
 import { JsCompositionHandle } from '@/rust/dyn_composition_api';
 import type {
 	AnyInputEvent,
 	CoreInputEvent,
+	DTIFComposition,
 	Entity,
 	InteractionInputEvent,
 	OutputEvent,
@@ -10,7 +10,6 @@ import type {
 	RenderUpdateEvent
 } from '@/rust/dyn_composition_api/bindings';
 
-import { EMPTY_COMPOSITION } from '../../test-data';
 import { groupByType, mat3, vec3 } from '../helper';
 import type { Renderer } from '../render';
 
@@ -25,13 +24,31 @@ export class Composition {
 	protected _eventQueue: AnyInputEvent[] = [];
 
 	constructor(config: TCompositionConfig) {
-		const { width, height } = config;
-		this._compositionHandle = new JsCompositionHandle(
-			EMPTY_COMPOSITION,
-			(events: OutputEvent[]) => {
-				this.onWasmEvents(events);
+		const {
+			width,
+			height,
+			dtif = {
+				version: '0.0.1',
+				name: 'Test',
+				width,
+				height,
+				rootNodeId: 0,
+				nodes: {
+					0: {
+						type: 'Frame',
+						children: [],
+						dimension: {
+							width,
+							height
+						},
+						relativeTransform: mat3(vec3(1, 0, 0), vec3(0, 1, 0), vec3(0, 0, 1))
+					}
+				}
 			}
-		);
+		} = config;
+		this._compositionHandle = new JsCompositionHandle(dtif, (events: OutputEvent[]) => {
+			this.onWasmEvents(events);
+		});
 		this._width = width;
 		this._height = height;
 	}
@@ -141,7 +158,7 @@ export class Composition {
 export interface TCompositionConfig {
 	width: number;
 	height: number;
-	dtif?: TComposition;
+	dtif?: DTIFComposition;
 }
 
 export interface TWorldIds {

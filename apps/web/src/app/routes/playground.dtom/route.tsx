@@ -3,7 +3,7 @@ import { Card, CONTENT_WIDTH, MaxWidthWrapper } from '@/components/layout';
 import { FPSStats } from '@/components/monitoring';
 import { Button, Separator } from '@/components/primitive';
 
-import { MovingRects, MovingRectsLegacy } from './components';
+import { MovingRects, MovingRectsLegacy, Static } from './components';
 
 const DTOM: React.FC = () => {
 	const [canvasState, setCanvasState] = React.useState(CANVAS_STATE.NONE);
@@ -21,8 +21,8 @@ const DTOM: React.FC = () => {
 			</div>
 			<Separator className="my-4" />
 			<div className="mb-4 flex h-5 items-center space-x-4 text-sm">
-				<Button variant={'link'} onClick={() => setCanvasState(CANVAS_STATE.WIP)}>
-					WIP
+				<Button variant={'link'} onClick={() => setCanvasState(CANVAS_STATE.STATIC)}>
+					Static
 				</Button>
 				<Separator orientation="vertical" />
 				<Button variant={'link'} onClick={() => setCanvasState(CANVAS_STATE.MOVING_RECTS)}>
@@ -37,6 +37,9 @@ const DTOM: React.FC = () => {
 				style={{ maxWidth: CONTENT_WIDTH, height: CONTENT_WIDTH }}
 				className="flex items-center justify-center"
 			>
+				{/* Static */}
+				{canvasState === CANVAS_STATE.STATIC && <Static size={CONTENT_WIDTH} />}
+
 				{/* Moving Rects */}
 				{canvasState === CANVAS_STATE.MOVING_RECTS && <MovingRects size={CONTENT_WIDTH} />}
 
@@ -56,7 +59,7 @@ export default DTOM;
 
 enum CANVAS_STATE {
 	NONE,
-	WIP,
 	MOVING_RECTS,
-	MOVING_RECTS_LEGACY
+	MOVING_RECTS_LEGACY,
+	STATIC
 }

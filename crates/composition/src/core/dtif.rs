@@ -33,61 +33,101 @@ pub enum DTIFNode {
     Group(GroupNodeBundle),
 }
 
-fn spawn_node(world: &mut World, node: &DTIFNode) -> Entity {
-    match node {
-        DTIFNode::Frame(bundle) => world.spawn(bundle.clone()).id(),
-        DTIFNode::Rectangle(bundle) => world.spawn(bundle.clone()).id(),
-        DTIFNode::Group(bundle) => world.spawn(bundle.clone()).id(),
+pub struct DTIFProcessor {
+    eid_to_entity: HashMap<String, Entity>,
+}
+
+impl DTIFProcessor {
+    pub fn new() -> Self {
+        DTIFProcessor {
+            eid_to_entity: HashMap::new(),
+        }
     }
-}
 
-// Due to a issue we have to work with a stringified Enitity in the Hashmap.
-// https://github.com/serde-rs/serde/issues/1183
-// This function basically converts an Entity to a string we called "eid".
-pub fn entity_to_eid(entity: &Entity) -> String {
-    entity.to_bits().to_string()
-}
+    // Process a single dtif node and its children
+    // and update the internal mapping to keep track of ECS id and id used in DTIF
+    pub fn process_node(
+        &mut self,
+        node_eid: &String,
+        world: &mut World,
+        dtif_nodes: &HashMap<String, DTIFNode>,
+    ) -> Option<Entity> {
+        if let Some(dtif_node) = dtif_nodes.get(node_eid) {
+            let node_entity = self.spawn_node(world, dtif_node);
+            self.eid_to_entity.insert(node_eid.clone(), node_entity);
 
-pub fn process_dtif_nodes(
-    world: &mut World,
-    dtif_nodes: &HashMap<String, DTIFNode>,
-    node_eid: &String,
-    eid_to_entity: &mut HashMap<String, Entity>,
-) -> Option<Entity> {
-    // If  node exists, spawn it and process its children
-    if let Some(dtif_node) = dtif_nodes.get(node_eid) {
-        // Spawn node
-        let node_entity = spawn_node(world, dtif_node);
-        eid_to_entity.insert(node_eid.clone(), node_entity);
+            if let DTIFNode::Frame(FrameNodeBundle { children_mixin, .. })
+            | DTIFNode::Group(GroupNodeBundle { children_mixin, .. }) = dtif_node
+            {
+                let new_children: Vec<Entity> = children_mixin
+                    .0
+                    .iter()
+                    .filter_map(|child_entity| {
+                        let child_eid = DTIFProcessor::entity_to_eid(child_entity);
+                        let processed_child_entity =
+                            self.process_node(&child_eid, world, dtif_nodes)?;
 
-        // Process children
-        let mut new_children: Vec<Entity> = vec![];
-        if let DTIFNode::Frame(FrameNodeBundle { children_mixin, .. })
-        | DTIFNode::Group(GroupNodeBundle { children_mixin, .. }) = dtif_node
-        {
-            for child_entity in &children_mixin.0 {
-                let child_eid = entity_to_eid(child_entity);
-                let processed_child_entity =
-                    process_dtif_nodes(world, dtif_nodes, &child_eid, eid_to_entity).unwrap();
-                new_children.push(processed_child_entity);
+                        // Keep track of parent in children
+                        // to easily know where to append it in some render appraoches (e.g. svg)
+                        world
+                            .entity_mut(processed_child_entity)
+                            .insert(ParentMixin(node_entity.clone()));
 
-                // Keep track of parent in children
-                // to easily know where to append it in some render appraoches (e.g. svg)
-                world
-                    .entity_mut(processed_child_entity)
-                    .insert(ParentMixin(node_entity.clone()));
+                        return Some(processed_child_entity);
+                    })
+                    .collect();
+
+                if !new_children.is_empty() {
+                    world
+                        .entity_mut(node_entity)
+                        .insert(ChildrenMixin(new_children));
+                }
             }
 
-            // Update parent with new children (override old ones)
-            if !new_children.is_empty() {
-                world
-                    .entity_mut(node_entity)
-                    .insert(ChildrenMixin(new_children));
+            Some(node_entity)
+        } else {
+            None
+        }
+    }
+
+    // Spawn a dtif node in the ECS world
+    fn spawn_node(&self, world: &mut World, node: &DTIFNode) -> Entity {
+        match node {
+            DTIFNode::Frame(bundle) => world.spawn(bundle.clone()).id(),
+            DTIFNode::Rectangle(bundle) => world.spawn(bundle.clone()).id(),
+            DTIFNode::Group(bundle) => world.spawn(bundle.clone()).id(),
+        }
+    }
+
+    // Translate an entity id from the event to the actual entity.
+    pub fn translate_event_entity(&self, event_entity_id: &Entity) -> Option<Entity> {
+        let eid = DTIFProcessor::entity_to_eid(event_entity_id);
+        self.eid_to_entity.get(&eid).cloned()
+    }
+
+    // Process and send the event to the ECS.
+    pub fn send_event_to_ecs(&self, world: &mut World, event: CoreInputEvent) {
+        match event {
+            CoreInputEvent::EntityMoved(mut event) => {
+                if let Some(entity) = self.translate_event_entity(&event.entity) {
+                    event.entity = entity;
+                    world.send_event(event);
+                }
+            }
+            CoreInputEvent::EntitySetPosition(mut event) => {
+                if let Some(entity) = self.translate_event_entity(&event.entity) {
+                    event.entity = entity;
+                    world.send_event(event);
+                }
             }
         }
-
-        return Some(node_entity);
     }
 
-    return None;
+    // Due to a issue we have to work with a stringified Enitity in the Hashmap.
+    // https://github.com/serde-rs/serde/issues/1183
+    // This function basically converts an Entity to a string we called "eid".
+    #[inline]
+    pub fn entity_to_eid(entity: &Entity) -> String {
+        entity.to_bits().to_string()
+    }
 }

@@ -1,9 +1,7 @@
-use std::collections::HashMap;
-
 use bevy_app::Plugin;
-use bevy_ecs::{entity::Entity, world::World};
+use bevy_ecs::world::World;
 
-use crate::core::dtif::{entity_to_eid, process_dtif_nodes, DTIFComposition};
+use crate::core::dtif::{DTIFComposition, DTIFProcessor};
 
 use self::{
     components::CompositionMixin,
@@ -25,19 +23,27 @@ impl Plugin for CompositionPlugin {
 
         // Load DTIF
         if let Some(dtif) = &self.dtif {
-            insert_dtif(&mut app.world, &dtif);
+            insert_dtif(&mut app.world, dtif);
             // TODO: clear storage DTIF takes
         }
     }
 }
 
 fn insert_dtif(world: &mut World, dtif: &DTIFComposition) {
-    let root_node_eid = entity_to_eid(&dtif.root_node_id);
-    let mut eid_to_entity_map: HashMap<String, Entity> = HashMap::new();
+    let root_node_eid = DTIFProcessor::entity_to_eid(&dtif.root_node_id);
+    let mut dtif_processor = DTIFProcessor::new();
 
     // Spawn and process nodes recursively
-    let root_node_entity =
-        process_dtif_nodes(world, &dtif.nodes, &root_node_eid, &mut eid_to_entity_map).unwrap();
+    let root_node_entity = dtif_processor
+        .process_node(&root_node_eid, world, &dtif.nodes)
+        .unwrap();
+
+    // Apply changes
+    if let Some(changes) = &dtif.changes {
+        for change in changes {
+            dtif_processor.send_event_to_ecs(world, change.clone())
+        }
+    }
 
     // Spawn composition as entity (only one should exist).
     // Why entity? Because I see it as part of the "game" world,
