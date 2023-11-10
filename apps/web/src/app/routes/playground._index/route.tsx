@@ -15,6 +15,8 @@ const Playground: React.FC = () => {
 				<Link to={'/playground/dtom'}>DTOM</Link>
 				<Separator orientation="vertical" />
 				<Link to={'/playground/twojs'}>Two.js</Link>
+				<Separator orientation="vertical" />
+				<Link to={'/playground/cesdk'}>Creative Editor SDK</Link>
 			</div>
 		</MaxWidthWrapper>
 	);
