@@ -7,47 +7,52 @@ use bevy_ecs::{
 use bevy_hierarchy::Parent;
 use dyn_bevy_render_skeleton::extract_param::Extract;
 use dyn_composition::core::modules::node::components::types::Node;
-use log::info;
 
 use crate::core::events::output_event::{OutputEvent, OutputEventQueue, RenderUpdateEvent};
 
-use super::{resources::ChangedComponents, ToRenderChange};
+use super::{
+    resources::{ChangedComponent, ChangedComponents},
+    ToRenderChange,
+};
 
-pub fn extract_mixin_generic<T: Component + Clone + ToRenderChange>(
+pub fn extract_mixin_generic<T: Component + ToRenderChange>(
     mut changed: ResMut<ChangedComponents>,
     query: Extract<Query<(Entity, &Node, &T), (With<Node>, Changed<T>)>>,
+    parent_query: Extract<Query<&Parent>>,
 ) {
     query.for_each(|(entity, node, mixin)| {
-        let (_, change_set) = changed
-            .changes
-            .entry(entity)
-            .or_insert((node.node_type.clone(), vec![]));
-        change_set.push(mixin.to_render_change());
+        let changed_component = changed.changes.entry(entity).or_insert_with(|| {
+            // Attempt to get the parent entity id
+            let mut parent_id: Option<Entity> = None;
+            if let Ok(parent) = parent_query.get(entity) {
+                parent_id = Some(parent.get());
+            }
+
+            return ChangedComponent {
+                node_type: node.node_type.clone(),
+                changes: vec![],
+                parent_id,
+            };
+        });
+        changed_component.changes.push(mixin.to_render_change());
     });
 }
 
 pub fn queue_render_changes(
     mut changed: ResMut<ChangedComponents>,
     mut output_event_queue: ResMut<OutputEventQueue>,
-    parent_query: Query<&Parent>,
 ) {
     if !changed.changes.is_empty() {
         changed
             .changes
             .drain()
             .into_iter()
-            .for_each(|(entity, (node_type, changes))| {
-                // Attempt to get the parent entity ID
-                let mut parent_id: Option<Entity> = None;
-                if let Ok(parent) = parent_query.get(entity) {
-                    parent_id = Some(parent.get());
-                }
-
+            .for_each(|(entity, changed_component)| {
                 output_event_queue.push_event(OutputEvent::RenderUpdate(RenderUpdateEvent {
-                    parent: parent_id,
                     entity,
-                    node_type,
-                    changes,
+                    parent_id: changed_component.parent_id,
+                    node_type: changed_component.node_type,
+                    changes: changed_component.changes,
                 }));
             });
     }

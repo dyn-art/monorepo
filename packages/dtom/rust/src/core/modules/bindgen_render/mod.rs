@@ -1,7 +1,8 @@
-use std::sync::mpsc::Sender;
+use std::{ops::Deref, sync::mpsc::Sender};
 
 use bevy_app::{App, Plugin};
 use bevy_ecs::schedule::IntoSystemConfigs;
+use bevy_hierarchy::Children;
 use dyn_bevy_render_skeleton::{ExtractSchedule, Render, RenderApp, RenderSet};
 use dyn_composition::core::modules::node::components::mixins::{
     BlendMixin, ChildrenMixin, DimensionMixin, NodeCompositionMixin, PathMixin,
@@ -44,10 +45,10 @@ pub struct RenderChangeChildrenMixin {
     children: ChildrenMixin,
 }
 
-impl ToRenderChange for ChildrenMixin {
+impl ToRenderChange for Children {
     fn to_render_change(&self) -> RenderChange {
         RenderChange::Children(RenderChangeChildrenMixin {
-            children: self.clone(),
+            children: ChildrenMixin(self.deref().to_vec()),
         })
     }
 }
@@ -117,7 +118,7 @@ impl Plugin for BindgenRenderPlugin {
                 ExtractSchedule,
                 (
                     extract_mixin_generic::<RectangleCornerMixin>,
-                    extract_mixin_generic::<ChildrenMixin>,
+                    extract_mixin_generic::<Children>,
                     extract_mixin_generic::<DimensionMixin>,
                     extract_mixin_generic::<RelativeTransformMixin>,
                     extract_mixin_generic::<NodeCompositionMixin>,

@@ -59,20 +59,14 @@ export class SVGRenderer extends Renderer {
 	// =========================================================================
 
 	public render(events: RenderUpdateEvent[]): this {
-		console.log({ events }); // TODO: REMOVE
 		for (const renderUpdate of events) {
 			const groupedChanges = groupByType(renderUpdate.changes);
 			this._toProcessRenderUpdates[renderUpdate.entity] = {
 				nodeType: renderUpdate.nodeType,
-				parent: renderUpdate.parent,
+				parentId: renderUpdate.parentId,
 				changes: groupedChanges
 			};
 		}
-
-		// TODO: Make it with one update cycle work
-		// e.g. relative_transform on creation is not applied
-		// TODO: Not getting here and parent mixin missing in children
-		// console.log('after render presort', { toProcessRenderUpdates: this._toProcessRenderUpdates }); // TODO: REMOVE
 
 		// Process each render update
 		for (const entity of Object.keys(this._toProcessRenderUpdates)) {
@@ -89,13 +83,13 @@ export class SVGRenderer extends Renderer {
 	}
 
 	private handleRenderUpdate(entity: Entity, renderUpdate: TToProcessRenderUpdate): this {
-		const { nodeType, parent } = renderUpdate;
+		const { nodeType, parentId } = renderUpdate;
 
 		// If parent exists and hasn't been rendered yet, try to render it first
-		if (parent !== null && !this._renderedInRenderCycle.has(parent)) {
-			const parentUpdate = this._toProcessRenderUpdates[parent];
+		if (parentId !== null && !this._renderedInRenderCycle.has(parentId)) {
+			const parentUpdate = this._toProcessRenderUpdates[parentId];
 			if (parentUpdate != null) {
-				this.handleRenderUpdate(parent, parentUpdate);
+				this.handleRenderUpdate(parentId, parentUpdate);
 			}
 		}
 
@@ -116,15 +110,15 @@ export class SVGRenderer extends Renderer {
 	}
 
 	private renderGroup(enitity: number, renderUpdate: TToProcessRenderUpdate): void {
-		const { changes, parent } = renderUpdate;
+		const { changes, parentId } = renderUpdate;
 		let renderElement = this.getNodeByEntity(enitity);
 
 		// Append SVG element if it doesn't exist yet
 		if (renderElement == null) {
 			// TODO: Create more advanced Node similar to the plain Typescript POC
 			renderElement = createSVGNode('g');
-			if (parent != null) {
-				const parentElement = this.getNodeByEntity(parent);
+			if (parentId != null) {
+				const parentElement = this.getNodeByEntity(parentId);
 				if (parentElement != null) {
 					parentElement.appendChild(renderElement);
 				}
@@ -157,15 +151,15 @@ export class SVGRenderer extends Renderer {
 	}
 
 	private renderShape(enitity: number, renderUpdate: TToProcessRenderUpdate): void {
-		const { changes, parent } = renderUpdate;
+		const { changes, parentId } = renderUpdate;
 		let renderElement = this.getNodeByEntity(enitity);
 
 		// Append SVG element if it doesn't exist yet
 		if (renderElement == null) {
 			// TODO: Create more advanced Node similar to the plain Typescript POC
 			renderElement = createSVGNode('path');
-			if (parent != null) {
-				const parentElement = this.getNodeByEntity(parent);
+			if (parentId != null) {
+				const parentElement = this.getNodeByEntity(parentId);
 				if (parentElement != null) {
 					parentElement.appendChild(renderElement);
 				}

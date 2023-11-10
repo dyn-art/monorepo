@@ -35,13 +35,7 @@ export const COMPOSITION_WITH_ONE_RECT = (width: number, height: number): DTIFCo
 			type: 'EntityMoved',
 			entity: 1,
 			dx: 100,
-			dy: -100
-		},
-		{
-			type: 'EntityMoved',
-			entity: 1,
-			dx: 0,
-			dy: -100
+			dy: -300
 		}
 	]
 });
