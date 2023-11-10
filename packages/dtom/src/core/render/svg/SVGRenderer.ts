@@ -61,22 +61,12 @@ export class SVGRenderer extends Renderer {
 	public render(events: RenderUpdateEvent[]): this {
 		for (const renderUpdate of events) {
 			const groupedChanges = groupByType(renderUpdate.changes);
-			const parentMixin =
-				groupedChanges.ParentMixin != null && groupedChanges.ParentMixin.length > 0
-					? groupedChanges.ParentMixin[0]
-					: null;
-			const parentId = parentMixin?.parent ?? null;
 			this._toProcessRenderUpdates[renderUpdate.entity] = {
 				nodeType: renderUpdate.nodeType,
-				changes: groupedChanges,
-				parentId
+				parentId: renderUpdate.parentId,
+				changes: groupedChanges
 			};
 		}
-
-		// TODO: Make it with one update cycle work
-		// e.g. relative_transform on creation is not applied
-		// TODO: Not getting here and parent mixin missing in children
-		// console.log('after render presort', { toProcessRenderUpdates: this._toProcessRenderUpdates }); // TODO: REMOVE
 
 		// Process each render update
 		for (const entity of Object.keys(this._toProcessRenderUpdates)) {
@@ -335,5 +325,4 @@ export interface TSVGRendererOptions {
 
 type TToProcessRenderUpdate = {
 	changes: GroupedByType<RenderChange>;
-	parentId: Entity | null;
 } & Omit<Omit<RenderUpdateEvent, 'changes'>, 'entity'>;

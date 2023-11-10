@@ -16,6 +16,8 @@ pub enum OutputEvent {
 #[derive(Debug, Serialize, Clone, Type)]
 pub struct RenderUpdateEvent {
     pub entity: Entity,
+    #[serde(rename = "parentId")]
+    pub parent_id: Option<Entity>,
     #[serde(rename = "nodeType")]
     pub node_type: NodeType,
     pub changes: Vec<RenderChange>,

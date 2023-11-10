@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 use bevy_ecs::{entity::Entity, world::World};
+use bevy_hierarchy::BuildWorldChildren;
 use serde::{Deserialize, Serialize};
 use specta::Type;
 
@@ -8,7 +9,7 @@ use super::modules::{
     composition::events::CoreInputEvent,
     node::components::{
         bundles::{FrameNodeBundle, GroupNodeBundle, RectangleNodeBundle},
-        mixins::{ChildrenMixin, ParentMixin},
+        mixins::ChildrenMixin,
     },
 };
 
@@ -59,6 +60,7 @@ impl DTIFProcessor {
             if let DTIFNode::Frame(FrameNodeBundle { children_mixin, .. })
             | DTIFNode::Group(GroupNodeBundle { children_mixin, .. }) = dtif_node
             {
+                // Process child entities and collect their Bevy entity ids
                 let new_children: Vec<Entity> = children_mixin
                     .0
                     .iter()
@@ -67,20 +69,19 @@ impl DTIFProcessor {
                         let processed_child_entity =
                             self.process_node(&child_eid, world, dtif_nodes)?;
 
-                        // Keep track of parent in children
-                        // to easily know where to append it in some render appraoches (e.g. svg)
-                        world
-                            .entity_mut(processed_child_entity)
-                            .insert(ParentMixin(node_entity.clone()));
-
                         return Some(processed_child_entity);
                     })
                     .collect();
 
                 if !new_children.is_empty() {
-                    world
-                        .entity_mut(node_entity)
-                        .insert(ChildrenMixin(new_children));
+                    // Establish Bevy parent-child relationships. Bevy's hierarchy system allows for
+                    // more optimized and feature-rich parent-child interactions within the ECS
+                    // https://bevy-cheatbook.github.io/fundamentals/hierarchy.html
+                    world.entity_mut(node_entity).push_children(&new_children);
+
+                    // Now that Bevy's own parent-child relationship is established, we remove the
+                    // `ChildrenMixin` as it was only a temporary measure to transition from the DTIF format
+                    world.entity_mut(node_entity).remove::<ChildrenMixin>();
                 }
             }
 

@@ -1,10 +1,11 @@
-use std::sync::mpsc::Sender;
+use std::{ops::Deref, sync::mpsc::Sender};
 
 use bevy_app::{App, Plugin};
 use bevy_ecs::schedule::IntoSystemConfigs;
+use bevy_hierarchy::Children;
 use dyn_bevy_render_skeleton::{ExtractSchedule, Render, RenderApp, RenderSet};
 use dyn_composition::core::modules::node::components::mixins::{
-    BlendMixin, ChildrenMixin, DimensionMixin, NodeCompositionMixin, ParentMixin, PathMixin,
+    BlendMixin, ChildrenMixin, DimensionMixin, NodeCompositionMixin, PathMixin,
     RectangleCornerMixin, RelativeTransformMixin,
 };
 use serde::Serialize;
@@ -30,7 +31,6 @@ pub enum RenderChange {
     Composition(NodeCompositionMixin),
     Blend(BlendMixin),
     Path(PathMixin),
-    ParentMixin(RenderChangeParentMixin),
 }
 
 pub trait ToRenderChange {
@@ -45,10 +45,10 @@ pub struct RenderChangeChildrenMixin {
     children: ChildrenMixin,
 }
 
-impl ToRenderChange for ChildrenMixin {
+impl ToRenderChange for Children {
     fn to_render_change(&self) -> RenderChange {
         RenderChange::Children(RenderChangeChildrenMixin {
-            children: self.clone(),
+            children: ChildrenMixin(self.deref().to_vec()),
         })
     }
 }
@@ -97,19 +97,6 @@ impl ToRenderChange for RectangleCornerMixin {
     }
 }
 
-#[derive(Serialize, Clone, Debug, Type)]
-pub struct RenderChangeParentMixin {
-    parent: ParentMixin,
-}
-
-impl ToRenderChange for ParentMixin {
-    fn to_render_change(&self) -> RenderChange {
-        RenderChange::ParentMixin(RenderChangeParentMixin {
-            parent: self.clone(),
-        })
-    }
-}
-
 pub struct BindgenRenderPlugin {
     pub output_event_sender: Sender<OutputEvent>,
 }
@@ -131,13 +118,12 @@ impl Plugin for BindgenRenderPlugin {
                 ExtractSchedule,
                 (
                     extract_mixin_generic::<RectangleCornerMixin>,
-                    extract_mixin_generic::<ChildrenMixin>,
+                    extract_mixin_generic::<Children>,
                     extract_mixin_generic::<DimensionMixin>,
                     extract_mixin_generic::<RelativeTransformMixin>,
                     extract_mixin_generic::<NodeCompositionMixin>,
                     extract_mixin_generic::<BlendMixin>,
                     extract_mixin_generic::<PathMixin>,
-                    extract_mixin_generic::<ParentMixin>,
                 ),
             )
             .add_systems(Render, (queue_render_changes.in_set(RenderSet::Queue),));
