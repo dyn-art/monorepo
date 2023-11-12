@@ -14,6 +14,8 @@ const Playground: React.FC = () => {
 			<div className="flex h-5 items-center space-x-4 text-sm">
 				<Link to={'/playground/dtom'}>DTOM</Link>
 				<Separator orientation="vertical" />
+				<Link to={'/playground/svg-composition'}>SVG Composition</Link>
+				<Separator orientation="vertical" />
 				<Link to={'/playground/twojs'}>Two.js</Link>
 				<Separator orientation="vertical" />
 				<Link to={'/playground/cesdk'}>Creative Editor SDK</Link>

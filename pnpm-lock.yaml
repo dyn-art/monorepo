@@ -43,6 +43,9 @@ importers:
       '@dyn/dtom':
         specifier: workspace:*
         version: link:../../packages/dtom
+      '@dyn/svg-composition':
+        specifier: workspace:^
+        version: link:../../packages/svg-composition
       '@radix-ui/react-icons':
         specifier: ^1.3.0
         version: 1.3.0(react@18.2.0)
