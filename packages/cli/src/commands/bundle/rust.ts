@@ -50,7 +50,7 @@ export default class Rust extends Command {
 			'wasm-pack',
 			[
 				'build',
-				...(flags.prod ? [] : ['--debug']),
+				...(flags.prod ? ['--release'] : ['--dev']),
 				'--target',
 				'web',
 				'--out-dir',
