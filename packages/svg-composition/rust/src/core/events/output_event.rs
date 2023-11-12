@@ -7,7 +7,7 @@ use specta::Type;
 #[derive(Debug, Serialize, Clone, Type)]
 #[serde(tag = "type")]
 pub enum OutputEvent {
-    Todo(u32),
+    // Todo(u32),
 }
 
 #[derive(Resource, Debug)]

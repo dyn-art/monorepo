@@ -2,6 +2,9 @@ use bevy_ecs::component::Component;
 use serde::{Deserialize, Serialize};
 use specta::Type;
 
+#[derive(Component, Serialize, Deserialize, Clone, Default, Debug, Type)]
+pub struct Root;
+
 #[derive(Serialize, Deserialize, Clone, Debug, Type)]
 pub enum NodeType {
     None,

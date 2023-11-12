@@ -8,6 +8,8 @@ use self::{
     events::{EntityMoved, EntitySetPosition},
 };
 
+use super::node::components::types::Root;
+
 pub mod components;
 pub mod events;
 
@@ -36,6 +38,7 @@ fn insert_dtif(world: &mut World, dtif: &DTIFComposition) {
     let root_node_entity = dtif_processor
         .process_node(&root_node_eid, world, &dtif.nodes)
         .unwrap();
+    world.entity_mut(root_node_entity).insert(Root);
 
     // Apply changes
     if let Some(changes) = &dtif.changes {

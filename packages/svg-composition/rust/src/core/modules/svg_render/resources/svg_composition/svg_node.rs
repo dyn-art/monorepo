@@ -26,6 +26,14 @@ pub struct BaseSVGNode {
 }
 
 impl BaseSVGNode {
+    pub fn new(element: SVGElement) -> Self {
+        BaseSVGNode {
+            id: rand::random(),
+            element,
+            child_elements: vec![],
+        }
+    }
+
     pub fn get_children(&self) -> &Vec<SVGElement> {
         &self.child_elements
     }
@@ -86,11 +94,7 @@ impl ShapeSVGNode {
         let element = SVGElement::new(SVGTag::Group);
 
         // Create base
-        let mut base = BaseSVGNode {
-            id: rand::random(),
-            element,
-            child_elements: vec![],
-        };
+        let mut base = BaseSVGNode::new(element);
 
         let fill_clip_path_defs_element = SVGElement::new(SVGTag::Defs);
         let fill_clip_path_defs_index = base.append_child(fill_clip_path_defs_element);

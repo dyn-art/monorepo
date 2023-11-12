@@ -9,8 +9,6 @@ use super::{svg_composition::SVGComposition, svg_node::BaseSVGNode};
 pub struct SVGElement {
     // Unique identifier for the SVGElement
     id: u32,
-    // Index in 'child_elements' of SVGNode for quick access
-    index: Option<u8>,
     // The type of SVG element (e.g., circle, rect)
     tag_name: SVGTag,
     // Attributes of the SVG element
@@ -33,7 +31,6 @@ impl SVGElement {
     pub fn new(tag_name: SVGTag) -> Self {
         SVGElement {
             id: rand::random(),
-            index: None,
             tag_name,
             attributes: HashMap::new(),
             styles: HashMap::new(),
@@ -71,12 +68,12 @@ impl SVGElement {
         for child in &self.children {
             match child {
                 SVGChildElementIdentifier::InContext(child_index) => {
-                    if let Some(child_element) = node.get_children().get(*child_index as usize) {
+                    if let Some(child_element) = node.get_children().get(*child_index) {
                         result.push_str(&child_element.to_string(node, composition));
                     }
                 }
                 SVGChildElementIdentifier::OutOfContext(entity) => {
-                    if let Some(child_element) = composition.nodes.get(entity) {
+                    if let Some(child_element) = composition.get_node(entity) {
                         result.push_str(&child_element.to_string(composition));
                     }
                 }

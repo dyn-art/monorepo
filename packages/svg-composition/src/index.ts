@@ -1,3 +1,3 @@
-export function helloWorld() {
-	console.log('Hello World');
-}
+export * from '@/rust/dyn_composition_api/bindings';
+export * from './core';
+export * from './wasm';

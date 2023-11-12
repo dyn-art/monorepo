@@ -12,11 +12,11 @@ pub struct SVGComposition {
     // https://users.rust-lang.org/t/how-much-slower-is-a-dynamic-dispatch-really/98181/5
     // https://doc.rust-lang.org/book/ch17-02-trait-objects.html#using-trait-objects-that-allow-for-values-of-different-types
     // All nodes of the SVGComposition
-    pub nodes: HashMap<Entity, Box<dyn SVGNode>>,
+    nodes: HashMap<Entity, Box<dyn SVGNode>>,
     // Root entity
-    pub root: Option<Entity>,
+    root: Option<Entity>,
     // Map of updates from SVGElements
-    pub updated: HashMap<u32, SVGNodeUpdate>,
+    updated: HashMap<u32, SVGNodeUpdate>,
     output_event_sender: Sender<OutputEvent>,
 }
 
@@ -34,6 +34,10 @@ impl SVGComposition {
             updated: HashMap::new(),
             output_event_sender,
         }
+    }
+
+    pub fn get_node(&self, entity: &Entity) -> Option<&Box<dyn SVGNode>> {
+        self.nodes.get(&entity)
     }
 
     pub fn to_string(&self) -> String {
