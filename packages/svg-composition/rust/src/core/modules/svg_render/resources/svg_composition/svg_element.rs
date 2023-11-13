@@ -29,10 +29,11 @@ pub enum SVGChildElementIdentifier {
 
 impl SVGElement {
     pub fn new(tag_name: SVGTag) -> Self {
+        let id: u32 = rand::random();
         SVGElement {
-            id: rand::random(),
+            id,
             tag_name,
-            attributes: HashMap::new(),
+            attributes: HashMap::from([(String::from("id"), id.to_string())]),
             styles: HashMap::new(),
             children: vec![],
         }
@@ -56,6 +57,10 @@ impl SVGElement {
 
     pub fn append_child(&mut self, identifier: SVGChildElementIdentifier) {
         self.children.push(identifier);
+    }
+
+    pub fn get_id(&self) -> u32 {
+        self.id
     }
 
     pub fn to_string(&self, node: &BaseSVGNode, composition: &SVGComposition) -> String {

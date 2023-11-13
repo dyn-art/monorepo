@@ -8,14 +8,17 @@ use bevy_ecs::{
 };
 use bevy_hierarchy::Parent;
 use dyn_bevy_render_skeleton::extract_param::Extract;
-use dyn_composition::core::modules::node::components::types::Node;
+use dyn_composition::core::modules::node::components::types::{Node, NodeType};
 use log::info;
 
 use super::{
     mixin_change::ToMixinChange,
     resources::{
         changed_components::{ChangedComponent, ChangedComponents},
-        svg_composition::svg_composition::SVGComposition,
+        svg_composition::{
+            svg_composition::SVGComposition,
+            svg_node::{SVGNode, ShapeSVGNode},
+        },
     },
 };
 
@@ -51,12 +54,10 @@ pub fn queue_render_changes(
         changed.changes
     );
 
-    // Sort entities
-    let mut to_process = Vec::new();
-    let mut processed = HashSet::new();
-    collect_entities(&mut to_process, &mut processed, &changed.changes, None);
+    // Collect entities to process
+    let to_process = initiate_entity_collection(&changed.changes);
 
-    // Process entities
+    // Process each collected entity
     for entity in to_process {
         if let Some(changed_component) = changed.changes.get(&entity) {
             process_entity(entity, changed_component, &mut svg_composition);
@@ -69,31 +70,37 @@ pub fn queue_render_changes(
     );
 }
 
-fn collect_entities(
-    to_process: &mut Vec<Entity>,
+fn initiate_entity_collection(changes: &HashMap<Entity, ChangedComponent>) -> Vec<Entity> {
+    let mut to_process = HashSet::new();
+    let mut processed = HashSet::new();
+
+    for &entity in changes.keys() {
+        collect_entities_iteratively(&mut to_process, &mut processed, changes, entity);
+    }
+
+    to_process.into_iter().collect()
+}
+
+fn collect_entities_iteratively(
+    to_process: &mut HashSet<Entity>,
     processed: &mut HashSet<Entity>,
     changes: &HashMap<Entity, ChangedComponent>,
-    current_entity: Option<Entity>,
+    start_entity: Entity,
 ) {
-    if let Some(entity) = current_entity {
-        // Avoid re-processing entities
-        if processed.contains(&entity) {
-            return;
+    let mut stack = vec![start_entity];
+
+    while let Some(entity) = stack.pop() {
+        // Skip already processed entities
+        if !processed.insert(entity) {
+            continue;
         }
 
         if let Some(changed) = changes.get(&entity) {
             if let Some(parent_id) = changed.parent_id {
-                collect_entities(to_process, processed, changes, Some(parent_id));
+                stack.push(parent_id);
             }
 
-            to_process.push(entity);
-            processed.insert(entity);
-        }
-    }
-    // Initial call to function for all entities
-    else {
-        for &entity in changes.keys() {
-            collect_entities(to_process, processed, changes, Some(entity));
+            to_process.insert(entity);
         }
     }
 }
@@ -107,5 +114,15 @@ fn process_entity(
         "Called process_entity for {:?} with changes {:?} and in SvgComposition: {:?}",
         entity, changed_component, svg_composition
     ); // TODO: REMOVE
-       // TODO
+
+    let maybe_node = svg_composition.get_or_insert_node(entity, &changed_component.node_type);
+    if let Some(node) = maybe_node {
+        node.apply_mixin_changes(&changed_component.changes);
+    }
+
+    // if !svg_composition.has_root_node() {
+    //     // TODO: set root node
+    // }
+
+    // TODO: create nodes
 }
