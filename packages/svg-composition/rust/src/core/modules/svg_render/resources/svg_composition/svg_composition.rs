@@ -79,7 +79,7 @@ impl SVGComposition {
         self.nodes.insert(entity, node);
 
         // First inserted node without known parent will become root node
-        if self.root.is_none() && maybe_parent_id.is_none() {
+        if !self.has_root_node() && maybe_parent_id.is_none() {
             self.root = Some(entity);
         }
 
@@ -100,11 +100,22 @@ impl SVGComposition {
     }
 
     pub fn to_string(&self) -> String {
-        let maybe_root = self.nodes.get(&self.root.unwrap());
-        if let Some(root) = maybe_root {
-            return root.to_string(self);
+        if let Some(root) = self.get_root_node() {
+            let element = root.get_base().get_element();
+            let mut result = format!(
+                "<svg width=\"{}\" height=\"{}\" xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\">",
+                element.get_attribute("width").unwrap(), element.get_attribute("height").unwrap() 
+            );
+
+            // Append the content from the root node
+            result.push_str(&root.to_string(self));
+
+            // Close the SVG tag
+            result.push_str("</svg>");
+
+            return result;
         } else {
-            return String::from("undefined");
+            String::from("undefined")
         }
     }
 }
