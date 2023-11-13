@@ -3,9 +3,7 @@ use std::{collections::HashMap, sync::mpsc::Sender};
 use bevy_ecs::{entity::Entity, system::Resource};
 use dyn_composition::core::modules::node::components::types::NodeType;
 
-use crate::core::{
-    events::output_event::OutputEvent, modules::svg_render::mixin_change::MixinChange,
-};
+use crate::core::events::output_event::OutputEvent;
 
 use super::svg_node::{FrameSVGNode, SVGNode, ShapeSVGNode};
 
@@ -39,10 +37,6 @@ impl SVGComposition {
         }
     }
 
-    pub fn get_node(&self, entity: &Entity) -> Option<&Box<dyn SVGNode>> {
-        self.nodes.get(&entity)
-    }
-
     pub fn has_root_node(&self) -> bool {
         self.root.is_some()
     }
@@ -54,17 +48,47 @@ impl SVGComposition {
         return None;
     }
 
+    pub fn get_node(&self, entity: &Entity) -> Option<&Box<dyn SVGNode>> {
+        self.nodes.get(&entity)
+    }
+
+    pub fn get_node_mut(&mut self, entity: &Entity) -> Option<&mut Box<dyn SVGNode>> {
+        self.nodes.get_mut(entity)
+    }
+
     pub fn get_or_insert_node(
         &mut self,
         entity: Entity,
         node_type: &NodeType,
+        parent_id: &Option<Entity>,
     ) -> Option<&mut Box<dyn SVGNode>> {
         if !self.nodes.contains_key(&entity) {
             if let Some(node) = SVGComposition::create_node(node_type) {
-                self.nodes.insert(entity, node);
+                self.insert_node(entity, node, parent_id);
             }
         }
-        return self.nodes.get_mut(&entity);
+        return self.get_node_mut(&entity);
+    }
+
+    pub fn insert_node(
+        &mut self,
+        entity: Entity,
+        node: Box<dyn SVGNode>,
+        maybe_parent_id: &Option<Entity>,
+    ) {
+        self.nodes.insert(entity, node);
+
+        // First inserted node without known parent will become root node
+        if self.root.is_none() && maybe_parent_id.is_none() {
+            self.root = Some(entity);
+        }
+
+        // Append child node to parent node
+        if let Some(parent_id) = maybe_parent_id {
+            if let Some(node) = self.get_node_mut(parent_id) {
+                node.append_external_child(entity);
+            }
+        }
     }
 
     fn create_node(node_type: &NodeType) -> Option<Box<dyn SVGNode>> {
@@ -76,6 +100,11 @@ impl SVGComposition {
     }
 
     pub fn to_string(&self) -> String {
-        self.nodes.get(&self.root.unwrap()).unwrap().to_string(self)
+        let maybe_root = self.nodes.get(&self.root.unwrap());
+        if let Some(root) = maybe_root {
+            return root.to_string(self);
+        } else {
+            return String::from("undefined");
+        }
     }
 }

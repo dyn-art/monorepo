@@ -64,10 +64,27 @@ impl SVGElement {
     }
 
     pub fn to_string(&self, node: &BaseSVGNode, composition: &SVGComposition) -> String {
-        // Start with the opening tag
-        let mut result = format!("<{} id=\"{}\"", self.tag_name.as_str(), self.id);
+        // Start with the opening tag and the tag name
+        let mut result = format!("<{}", self.tag_name.as_str());
 
-        // TODO Append attributes and styles..
+        // Append attributes from the hash map, including 'id'
+        for (key, value) in &self.attributes {
+            result.push_str(&format!(" {}=\"{}\"", key, value));
+        }
+
+        // Append styles as a single 'style' attribute
+        if !self.styles.is_empty() {
+            let style_string: String = self
+                .styles
+                .iter()
+                .map(|(key, value)| format!("{}: {}", key, value))
+                .collect::<Vec<String>>()
+                .join("; ");
+            result.push_str(&format!(" style=\"{}\"", style_string));
+        }
+
+        // Add the closing bracket of the opening tag
+        result.push('>');
 
         // Handle children
         for child in &self.children {

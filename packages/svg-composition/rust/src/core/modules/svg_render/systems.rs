@@ -65,9 +65,11 @@ pub fn queue_render_changes(
     }
 
     info!(
-        "End queue_render_changes with svg_composition: {:?}",
+        "End queue_render_changes with svg_composition: {:#?}",
         svg_composition
     );
+
+    info!("Stringified: {}", svg_composition.to_string());
 }
 
 fn initiate_entity_collection(changes: &HashMap<Entity, ChangedComponent>) -> Vec<Entity> {
@@ -115,7 +117,11 @@ fn process_entity(
         entity, changed_component, svg_composition
     ); // TODO: REMOVE
 
-    let maybe_node = svg_composition.get_or_insert_node(entity, &changed_component.node_type);
+    let maybe_node = svg_composition.get_or_insert_node(
+        entity,
+        &changed_component.node_type,
+        &changed_component.parent_id,
+    );
     if let Some(node) = maybe_node {
         node.apply_mixin_changes(&changed_component.changes);
     }
