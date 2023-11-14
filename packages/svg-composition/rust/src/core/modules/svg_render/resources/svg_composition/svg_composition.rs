@@ -5,24 +5,23 @@ use dyn_composition::core::modules::node::components::types::NodeType;
 
 use crate::core::events::output_event::OutputEvent;
 
-use super::svg_node::{FrameSVGNode, SVGNode, ShapeSVGNode};
+use super::svg_node::{frame_svg_node::FrameSVGNode, shape_svg_node::ShapeSVGNode, SVGNode};
 
 #[derive(Resource, Debug)]
 pub struct SVGComposition {
-    // TODO: enum better? Is more performant but not so flexible
-    // https://users.rust-lang.org/t/how-much-slower-is-a-dynamic-dispatch-really/98181/5
-    // https://doc.rust-lang.org/book/ch17-02-trait-objects.html#using-trait-objects-that-allow-for-values-of-different-types
     // All nodes of the SVGComposition
     nodes: HashMap<Entity, Box<dyn SVGNode>>,
     // Root entity
     root: Option<Entity>,
     // Map of updates from SVGElements
-    updated: HashMap<u32, SVGNodeUpdate>,
+    changes: HashMap<u32, SVGElementChange>,
+    // Sender to enque events for frontend
     output_event_sender: Sender<OutputEvent>,
 }
 
+// TODO: Improve
 #[derive(Debug, Default)]
-pub struct SVGNodeUpdate {
+pub struct SVGElementChange {
     pub changed_attributes: HashMap<String, String>,
     pub changed_styles: HashMap<String, String>,
 }
@@ -32,7 +31,7 @@ impl SVGComposition {
         SVGComposition {
             root: None,
             nodes: HashMap::new(),
-            updated: HashMap::new(),
+            changes: HashMap::new(),
             output_event_sender,
         }
     }
@@ -97,6 +96,10 @@ impl SVGComposition {
             NodeType::Frame => Some(Box::new(FrameSVGNode::new())),
             _ => None,
         }
+    }
+
+    fn enqueue_changes(&mut self) -> () {
+        // TODO:
     }
 
     pub fn to_string(&self) -> String {

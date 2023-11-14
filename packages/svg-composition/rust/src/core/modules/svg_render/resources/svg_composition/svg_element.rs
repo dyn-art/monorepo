@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use bevy_ecs::entity::Entity;
 
-use super::{svg_composition::SVGComposition, svg_node::BaseSVGNode};
+use super::{svg_composition::SVGComposition, svg_node::base_svg_node::BaseSVGNode};
 
 // Defines an individual SVG element
 #[derive(Debug)]

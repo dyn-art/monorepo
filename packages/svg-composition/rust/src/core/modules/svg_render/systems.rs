@@ -8,17 +8,14 @@ use bevy_ecs::{
 };
 use bevy_hierarchy::Parent;
 use dyn_bevy_render_skeleton::extract_param::Extract;
-use dyn_composition::core::modules::node::components::types::{Node, NodeType};
+use dyn_composition::core::modules::node::components::types::Node;
 use log::info;
 
 use super::{
     mixin_change::ToMixinChange,
     resources::{
         changed_components::{ChangedComponent, ChangedComponents},
-        svg_composition::{
-            svg_composition::SVGComposition,
-            svg_node::{SVGNode, ShapeSVGNode},
-        },
+        svg_composition::svg_composition::SVGComposition,
     },
 };
 
@@ -126,9 +123,7 @@ fn process_entity(
         node.apply_mixin_changes(&changed_component.changes);
     }
 
-    // if !svg_composition.has_root_node() {
-    //     // TODO: set root node
-    // }
-
-    // TODO: create nodes
+    // TODO sync SVGElement to frontend. If:
+    // 1. newly created
+    // 2. attributes or styles changes
 }
