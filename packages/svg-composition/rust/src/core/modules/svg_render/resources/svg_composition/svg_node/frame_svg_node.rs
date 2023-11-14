@@ -33,7 +33,7 @@ pub struct FrameSVGNode {
     fill_clip_path: ElementReference,
     fill_clip_path_defs: ElementReference,
     fill_clipped_shape: ElementReference,
-    fill_element: ElementReference,
+    fill_wrapper: ElementReference,
 }
 
 impl SVGNode for FrameSVGNode {
@@ -219,19 +219,19 @@ impl FrameSVGNode {
             .append_child_element_to(fill_clip_path_index, fill_clipped_shape_element)
             .unwrap();
 
-        let mut fill_element = SVGElement::new(SVGTag::Group);
-        let fill_element_id = fill_element.get_id();
+        let mut fill_wrapper_element = SVGElement::new(SVGTag::Group);
+        let fill_wrapper_id = fill_wrapper_element.get_id();
         #[cfg(feature = "trace")]
-        fill_element.set_attribute(
+        fill_wrapper_element.set_attribute(
             String::from("name"),
-            FrameSVGNode::create_element_name(fill_element_id, String::from("fill"), false),
+            FrameSVGNode::create_element_name(fill_wrapper_id, String::from("fill"), false),
         );
-        fill_element.set_attribute(
+        fill_wrapper_element.set_attribute(
             String::from("clipPath"),
             format!("url(#{fill_clip_path_id})"),
         );
-        let fill_element_index = base
-            .append_child_element_to(content_wrapper_index, fill_element)
+        let fill_wrapper_index = base
+            .append_child_element_to(content_wrapper_index, fill_wrapper_element)
             .unwrap();
 
         // Create children wrapper element
@@ -286,9 +286,9 @@ impl FrameSVGNode {
                 id: fill_clipped_shape_id,
                 index: fill_clipped_shape_index,
             },
-            fill_element: ElementReference {
-                id: fill_element_id,
-                index: fill_element_index,
+            fill_wrapper: ElementReference {
+                id: fill_wrapper_id,
+                index: fill_wrapper_index,
             },
         }
     }

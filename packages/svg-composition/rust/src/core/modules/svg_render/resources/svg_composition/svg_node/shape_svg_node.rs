@@ -24,7 +24,8 @@ pub struct ShapeSVGNode {
     fill_clip_path: ElementReference,
     fill_clip_path_defs: ElementReference,
     fill_clipped_shape: ElementReference,
-    fill_element: ElementReference,
+    fill_wrapper: ElementReference,
+    temp_solid_fill: ElementReference, // TODO: REMOVE
 }
 
 impl SVGNode for ShapeSVGNode {
@@ -40,11 +41,17 @@ impl SVGNode for ShapeSVGNode {
         for change in changes {
             match change {
                 MixinChange::Dimension(mixin) => {
+                    let temp_solid_fill_index = self.temp_solid_fill.index;
+
                     let width_attr = (String::from("width"), mixin.width.to_string());
                     let height_attr = (String::from("height"), mixin.height.to_string());
 
                     let base = self.get_base_mut();
                     base.set_attributes(vec![width_attr.clone(), height_attr.clone()]);
+                    base.set_attributes_at(
+                        temp_solid_fill_index,
+                        vec![width_attr.clone(), height_attr.clone()],
+                    );
                 }
                 MixinChange::RelativeTransform(mixin) => {
                     let base = self.get_base_mut();
@@ -139,18 +146,26 @@ impl ShapeSVGNode {
             .append_child_element_to(fill_clip_path_index, fill_clipped_shape_element)
             .unwrap();
 
-        let mut fill_element = SVGElement::new(SVGTag::Group);
-        let fill_element_id = fill_element.get_id();
+        let mut fill_wrapper_element = SVGElement::new(SVGTag::Group);
+        let fill_wrapper_id = fill_wrapper_element.get_id();
         #[cfg(feature = "trace")]
-        fill_element.set_attribute(
+        fill_wrapper_element.set_attribute(
             String::from("name"),
-            ShapeSVGNode::create_element_name(fill_element_id, String::from("fill"), false),
+            ShapeSVGNode::create_element_name(fill_wrapper_id, String::from("fill"), false),
         );
-        fill_element.set_attribute(
+        fill_wrapper_element.set_attribute(
             String::from("clipPath"),
             format!("url(#{fill_clip_path_id})"),
         );
-        let fill_element_index = base.append_child_element(fill_element);
+        let fill_wrapper_index = base.append_child_element(fill_wrapper_element);
+
+        // TODO: REMOVE
+        let mut temp_solid_fill_element = SVGElement::new(SVGTag::Rect);
+        let temp_solid_fill_id = temp_solid_fill_element.get_id();
+        temp_solid_fill_element.set_attribute(String::from("fill"), String::from("red"));
+        let temp_solid_fill_index = base
+            .append_child_element_to(fill_wrapper_index, temp_solid_fill_element)
+            .unwrap();
 
         Self {
             base,
@@ -168,10 +183,14 @@ impl ShapeSVGNode {
                 id: fill_clipped_shape_id,
                 index: fill_clipped_shape_index,
             },
-            fill_element: ElementReference {
-                id: fill_element_id,
-                index: fill_element_index,
+            fill_wrapper: ElementReference {
+                id: fill_wrapper_id,
+                index: fill_wrapper_index,
             },
+            temp_solid_fill: ElementReference {
+                id: temp_solid_fill_id,
+                index: temp_solid_fill_index,
+            }, // TODO: REMOVE
         }
     }
 

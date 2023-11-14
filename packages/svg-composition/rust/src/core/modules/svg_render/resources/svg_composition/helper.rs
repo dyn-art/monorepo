@@ -2,12 +2,16 @@ use dyn_composition::core::modules::node::components::mixins::{Anchor, AnchorCom
 use glam::{Mat3, Vec2};
 
 pub fn transform_to_css_matrix(transform: Mat3) -> String {
+    //   x y z
+    // | a d tx |
+    // | b e ty |
+    // | c f j |
     let a = transform.x_axis.x;
-    let b = transform.y_axis.x;
-    let d = transform.x_axis.y;
+    let b = transform.x_axis.y;
+    let d = transform.y_axis.x;
     let e = transform.y_axis.y;
-    let tx = transform.x_axis.z;
-    let ty = transform.y_axis.z;
+    let tx = transform.z_axis.x;
+    let ty = transform.z_axis.y;
 
     return format!("matrix({a}, {b}, {d}, {e}, {tx}, {ty})");
 }
