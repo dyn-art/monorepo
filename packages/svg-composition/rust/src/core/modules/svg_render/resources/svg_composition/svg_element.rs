@@ -1,10 +1,6 @@
-use std::{collections::HashMap, sync::mpsc::Sender};
+use std::collections::HashMap;
 
 use bevy_ecs::entity::Entity;
-
-use crate::core::events::output_event::{
-    AttributeUpdated, ElementCreated, OutputEvent, StyleUpdated,
-};
 
 use super::{svg_composition::SVGComposition, svg_node::base_svg_node::BaseSVGNode};
 
@@ -21,8 +17,6 @@ pub struct SVGElement {
     styles: HashMap<String, String>,
     // Identifiers for child elements, supporting both in-context and out-of-context children
     children: Vec<SVGChildElementIdentifier>,
-    // Sender to enque events for frontend
-    output_event_sender: Sender<OutputEvent>,
 }
 
 #[derive(Debug)]
@@ -34,7 +28,7 @@ pub enum SVGChildElementIdentifier {
 }
 
 impl SVGElement {
-    pub fn new(tag_name: SVGTag, output_event_sender: Sender<OutputEvent>) -> Self {
+    pub fn new(tag_name: SVGTag) -> Self {
         let id: u32 = rand::random();
         SVGElement {
             id,
@@ -42,19 +36,17 @@ impl SVGElement {
             attributes: HashMap::from([(String::from("id"), id.to_string())]),
             styles: HashMap::new(),
             children: vec![],
-            output_event_sender,
         }
     }
 
     pub fn set_attribute(&mut self, name: String, value: String) {
-        let _ = self
-            .output_event_sender
-            .send(OutputEvent::AttributeUpdated(AttributeUpdated {
-                id: self.id,
-                attribute_name: name.clone(),
-                new_value: Some(value.clone()),
-            }));
         self.attributes.insert(name, value);
+    }
+
+    pub fn set_attributes(&mut self, attributes: Vec<(String, String)>) {
+        for (name, value) in attributes {
+            self.set_attribute(name, value);
+        }
     }
 
     pub fn get_attribute(&self, name: &str) -> Option<&String> {
@@ -62,14 +54,13 @@ impl SVGElement {
     }
 
     pub fn set_style(&mut self, name: String, value: String) {
-        let _ = self
-            .output_event_sender
-            .send(OutputEvent::StyleUpdated(StyleUpdated {
-                id: self.id,
-                style_name: name.clone(),
-                new_value: Some(value.clone()),
-            }));
         self.styles.insert(name, value);
+    }
+
+    pub fn set_styles(&mut self, styles: Vec<(String, String)>) {
+        for (name, value) in styles {
+            self.set_style(name, value);
+        }
     }
 
     pub fn get_style(&self, name: &str) -> Option<&String> {

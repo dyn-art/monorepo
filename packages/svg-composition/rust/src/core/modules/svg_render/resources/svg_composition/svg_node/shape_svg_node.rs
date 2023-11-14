@@ -19,9 +19,6 @@ use super::{base_svg_node::BaseSVGNode, ElementReference, SVGNode};
 pub struct ShapeSVGNode {
     pub base: BaseSVGNode,
 
-    // Sender to enque events for frontend
-    output_event_sender: Sender<OutputEvent>,
-
     // Fill elements
     fill_clip_path: ElementReference,
     fill_clip_path_defs: ElementReference,
@@ -42,11 +39,17 @@ impl SVGNode for ShapeSVGNode {
         for change in changes {
             match change {
                 MixinChange::Dimension(mixin) => {
+                    let fill_clipped_shape_index = self.fill_clipped_shape.index;
+
+                    let width_attr = ("width".to_string(), mixin.width.to_string());
+                    let height_attr = ("height".to_string(), mixin.height.to_string());
+
                     let base = self.get_base_mut();
-                    base.get_element_mut()
-                        .set_attribute(String::from("width"), mixin.width.to_string());
-                    base.get_element_mut()
-                        .set_attribute(String::from("height"), mixin.height.to_string());
+                    base.set_attributes(vec![width_attr.clone(), height_attr.clone()]);
+                    base.set_attributes_at(
+                        fill_clipped_shape_index,
+                        vec![width_attr.clone(), height_attr.clone()],
+                    );
                 }
                 _ => {
                     // do nothing
@@ -70,7 +73,7 @@ impl ShapeSVGNode {
         maybe_parent_element_id: Option<u32>,
     ) -> Self {
         // Create root element and apply it to SVG node
-        let mut element = SVGElement::new(SVGTag::Group, output_event_sender.clone());
+        let mut element = SVGElement::new(SVGTag::Group);
         #[cfg(feature = "trace")]
         element.set_attribute(
             String::from("name"),
@@ -83,7 +86,7 @@ impl ShapeSVGNode {
         );
 
         // Create fill elements
-        let mut fill_clip_path_defs = base.create_element(SVGTag::Defs);
+        let mut fill_clip_path_defs = SVGElement::new(SVGTag::Defs);
         let fill_clip_path_defs_id = fill_clip_path_defs.get_id();
         #[cfg(feature = "trace")]
         fill_clip_path_defs.set_attribute(
@@ -94,9 +97,9 @@ impl ShapeSVGNode {
                 false,
             ),
         );
-        let fill_clip_path_defs_index = base.append_child(fill_clip_path_defs);
+        let fill_clip_path_defs_index = base.append_child_element(fill_clip_path_defs);
 
-        let mut fill_clip_path_element = base.create_element(SVGTag::Defs);
+        let mut fill_clip_path_element = SVGElement::new(SVGTag::Defs);
         let fill_clip_path_id = fill_clip_path_element.get_id();
         #[cfg(feature = "trace")]
         fill_clip_path_element.set_attribute(
@@ -104,10 +107,10 @@ impl ShapeSVGNode {
             ShapeSVGNode::create_element_name(fill_clip_path_id, String::from("fill-clip"), true),
         );
         let fill_clip_path_index = base
-            .append_child_to(fill_clip_path_defs_index, fill_clip_path_element)
+            .append_child_element_to(fill_clip_path_defs_index, fill_clip_path_element)
             .unwrap();
 
-        let mut fill_clipped_shape_element = base.create_element(SVGTag::Rect);
+        let mut fill_clipped_shape_element = SVGElement::new(SVGTag::Rect);
         let fill_clipped_shape_id = fill_clipped_shape_element.get_id();
         #[cfg(feature = "trace")]
         fill_clipped_shape_element.set_attribute(
@@ -119,10 +122,10 @@ impl ShapeSVGNode {
             ),
         );
         let fill_clipped_shape_index = base
-            .append_child_to(fill_clip_path_index, fill_clipped_shape_element)
+            .append_child_element_to(fill_clip_path_index, fill_clipped_shape_element)
             .unwrap();
 
-        let mut fill_element = base.create_element(SVGTag::Group);
+        let mut fill_element = SVGElement::new(SVGTag::Group);
         let fill_element_id = fill_element.get_id();
         #[cfg(feature = "trace")]
         fill_element.set_attribute(
@@ -133,11 +136,10 @@ impl ShapeSVGNode {
             String::from("clipPath"),
             format!("url(#{fill_clip_path_id})"),
         );
-        let fill_element_index = base.append_child(fill_element);
+        let fill_element_index = base.append_child_element(fill_element);
 
         Self {
             base,
-            output_event_sender,
 
             // Fill element references
             fill_clip_path_defs: ElementReference {

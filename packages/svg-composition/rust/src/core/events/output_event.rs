@@ -32,9 +32,11 @@ pub enum OutputEvent {
 #[derive(Debug, Serialize, Clone, Type)]
 pub struct ElementCreated {
     pub id: u32,
+    #[serde(rename = "tagName")]
     pub tag_name: String,
     pub attributes: HashMap<String, String>,
     pub styles: HashMap<String, String>,
+    #[serde(rename = "parentId")]
     pub parent_id: Option<u32>, // Optional parent ID, if it's a child element
 }
 
@@ -48,7 +50,8 @@ pub struct ElementDeleted {
 #[derive(Debug, Serialize, Clone, Type)]
 pub struct AttributeUpdated {
     pub id: u32,
-    pub attribute_name: String,
+    pub name: String,
+    #[serde(rename = "newValue")]
     pub new_value: Option<String>, // None indicates removal of the attribute
 }
 
@@ -56,7 +59,8 @@ pub struct AttributeUpdated {
 #[derive(Debug, Serialize, Clone, Type)]
 pub struct StyleUpdated {
     pub id: u32,
-    pub style_name: String,
+    pub name: String,
+    #[serde(rename = "newValue")]
     pub new_value: Option<String>, // None indicates removal of the style
 }
 
@@ -64,7 +68,9 @@ pub struct StyleUpdated {
 #[derive(Debug, Serialize, Clone, Type)]
 pub struct ElementUpdated {
     pub id: u32,
+    #[serde(rename = "updatedAttributes")]
     pub updated_attributes: HashMap<String, String>,
+    #[serde(rename = "updatedStyles")]
     pub updated_styles: HashMap<String, String>,
 }
 
