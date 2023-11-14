@@ -3,6 +3,7 @@ use std::sync::mpsc::{channel, Receiver};
 use dyn_composition::core::composition::Composition;
 use dyn_composition::core::dtif::DTIFComposition;
 use dyn_composition::core::modules::node::components::bundles::RectangleNodeBundle;
+use log::info;
 use wasm_bindgen::prelude::wasm_bindgen;
 use wasm_bindgen::JsValue;
 
@@ -62,6 +63,8 @@ impl JsCompositionHandle {
         while let Ok(event) = self.event_receiver.try_recv() {
             output_events.push(event);
         }
+
+        info!("OutputEvents {:#?}", output_events);
 
         // Call the JavaScript callback with the vector
         if !output_events.is_empty() {

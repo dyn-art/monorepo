@@ -13,8 +13,6 @@ pub struct SVGComposition {
     nodes: HashMap<Entity, Box<dyn SVGNode>>,
     // Root entity
     root: Option<Entity>,
-    // Map of updates from SVGElements
-    changes: HashMap<u32, SVGElementChange>,
     // Sender to enque events for frontend
     output_event_sender: Sender<OutputEvent>,
 }
@@ -31,7 +29,6 @@ impl SVGComposition {
         SVGComposition {
             root: None,
             nodes: HashMap::new(),
-            changes: HashMap::new(),
             output_event_sender,
         }
     }
@@ -59,11 +56,12 @@ impl SVGComposition {
         &mut self,
         entity: Entity,
         node_type: &NodeType,
-        parent_id: &Option<Entity>,
+        maybe_parent_id: &Option<Entity>,
     ) -> Option<&mut Box<dyn SVGNode>> {
         if !self.nodes.contains_key(&entity) {
-            if let Some(node) = SVGComposition::create_node(node_type) {
-                self.insert_node(entity, node, parent_id);
+            let maybe_node = self.create_node(node_type, maybe_parent_id);
+            if let Some(node) = maybe_node {
+                self.insert_node(entity, node, maybe_parent_id);
             }
         }
         return self.get_node_mut(&entity);
@@ -90,16 +88,25 @@ impl SVGComposition {
         }
     }
 
-    fn create_node(node_type: &NodeType) -> Option<Box<dyn SVGNode>> {
+    fn create_node(
+        &mut self,
+        node_type: &NodeType,
+        maybe_parent_id: &Option<Entity>,
+    ) -> Option<Box<dyn SVGNode>> {
+        let maybe_parent_element_id = maybe_parent_id
+            .and_then(|parent_id| self.get_node_mut(&parent_id))
+            .and_then(|parent| Some(parent.get_base().get_element().get_id()));
         match node_type {
-            NodeType::Rectangle => Some(Box::new(ShapeSVGNode::new())),
-            NodeType::Frame => Some(Box::new(FrameSVGNode::new())),
+            NodeType::Rectangle => Some(Box::new(ShapeSVGNode::new(
+                self.output_event_sender.clone(),
+                maybe_parent_element_id,
+            ))),
+            NodeType::Frame => Some(Box::new(FrameSVGNode::new(
+                self.output_event_sender.clone(),
+                maybe_parent_element_id,
+            ))),
             _ => None,
         }
-    }
-
-    fn enqueue_changes(&mut self) -> () {
-        // TODO:
     }
 
     pub fn to_string(&self) -> String {
