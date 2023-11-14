@@ -9,7 +9,7 @@ import type {
 	RectangleNodeBundle
 } from '@/rust/dyn_composition_api/bindings';
 
-import { groupByType, mat3, vec3 } from '../helper';
+import { mat3, vec3 } from '../helper';
 
 export class Composition {
 	private _compositionHandle: JsCompositionHandle;
@@ -66,8 +66,8 @@ export class Composition {
 	// =========================================================================
 
 	public onWasmEvents(events: OutputEvent[]): this {
-		const groupedEvents = groupByType(events);
-		console.log({ events, groupedEvents });
+		console.log({ events });
+		// TODO: Handle events
 		return this;
 	}
 
@@ -90,7 +90,7 @@ export class Composition {
 
 	public createRectangle(config: { x: number; y: number; width: number; height: number }): Entity {
 		const { x, y, width, height } = config;
-		return this._compositionHandle.spawn_rectangle_node({
+		return this._compositionHandle.spawnRectangleNode({
 			compositionMixin: {
 				isVisible: true,
 				isLocked: false
@@ -114,6 +114,10 @@ export class Composition {
 
 	public setEntityPosition(entity: Entity, x: number, y: number): void {
 		this.emitCoreEvents([{ type: 'EntitySetPosition', entity, x, y }]);
+	}
+
+	public toString(): string {
+		return this._compositionHandle.toString();
 	}
 }
 

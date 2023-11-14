@@ -1,5 +1,6 @@
 use std::sync::mpsc::{channel, Receiver};
 
+use dyn_bevy_render_skeleton::RenderApp;
 use dyn_composition::core::composition::Composition;
 use dyn_composition::core::dtif::DTIFComposition;
 use dyn_composition::core::modules::node::components::bundles::RectangleNodeBundle;
@@ -8,6 +9,7 @@ use wasm_bindgen::prelude::wasm_bindgen;
 use wasm_bindgen::JsValue;
 
 use crate::core::events::input_event::AnyInputEvent;
+use crate::core::modules::svg_render::resources::svg_composition::svg_composition::SVGComposition;
 use crate::core::modules::svg_render::SvgRenderPlugin;
 
 use super::events::output_event::OutputEvent;
@@ -64,8 +66,6 @@ impl JsCompositionHandle {
             output_events.push(event);
         }
 
-        info!("OutputEvents {:#?}", output_events);
-
         // Call the JavaScript callback with the vector
         if !output_events.is_empty() {
             let js_events_value =
@@ -81,9 +81,23 @@ impl JsCompositionHandle {
         }
     }
 
+    #[wasm_bindgen(js_name = spawnRectangleNode)]
     pub fn spawn_rectangle_node(&mut self, mixin: JsValue) -> JsValue {
         let mixin: RectangleNodeBundle = serde_wasm_bindgen::from_value(mixin).unwrap();
         let entity = self.composition.spawn(mixin);
         return serde_wasm_bindgen::to_value(&entity).unwrap();
+    }
+
+    #[wasm_bindgen(js_name = toString)]
+    pub fn to_string(&self) -> String {
+        let svg_composition = self
+            .composition
+            .get_app()
+            .get_sub_app(RenderApp)
+            .unwrap()
+            .world
+            .get_resource::<SVGComposition>()
+            .unwrap();
+        return svg_composition.to_string();
     }
 }

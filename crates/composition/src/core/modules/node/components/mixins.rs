@@ -65,10 +65,10 @@ impl Default for RelativeTransformMixin {
 #[derive(Component, Serialize, Deserialize, Clone, Debug, Type)]
 pub struct NodeCompositionMixin {
     #[serde(rename = "isVisible")]
-    is_visible: bool,
+    pub is_visible: bool,
 
     #[serde(rename = "isLocked")]
-    is_locked: bool,
+    pub is_locked: bool,
 }
 
 impl Default for NodeCompositionMixin {
@@ -83,12 +83,12 @@ impl Default for NodeCompositionMixin {
 #[derive(Component, Serialize, Deserialize, Clone, Debug, Type)]
 pub struct BlendMixin {
     #[serde(rename = "blendMode")]
-    blend_mode: BlendMode,
+    pub blend_mode: BlendMode,
 
-    opacity: u8,
+    pub opacity: u8,
 
     #[serde(rename = "isMask")]
-    is_mask: bool,
+    pub is_mask: bool,
 }
 
 impl Default for BlendMixin {

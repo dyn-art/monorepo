@@ -7,6 +7,7 @@ use crate::core::{
     modules::svg_render::{
         mixin_change::MixinChange,
         resources::svg_composition::{
+            helper::{construct_svg_path, transform_to_css_matrix},
             svg_composition::SVGComposition,
             svg_element::{SVGElement, SVGTag},
         },
@@ -39,17 +40,30 @@ impl SVGNode for ShapeSVGNode {
         for change in changes {
             match change {
                 MixinChange::Dimension(mixin) => {
-                    let fill_clipped_shape_index = self.fill_clipped_shape.index;
-
-                    let width_attr = ("width".to_string(), mixin.width.to_string());
-                    let height_attr = ("height".to_string(), mixin.height.to_string());
+                    let width_attr = (String::from("width"), mixin.width.to_string());
+                    let height_attr = (String::from("height"), mixin.height.to_string());
 
                     let base = self.get_base_mut();
                     base.set_attributes(vec![width_attr.clone(), height_attr.clone()]);
+                }
+                MixinChange::RelativeTransform(mixin) => {
+                    let base = self.get_base_mut();
+                    base.set_attributes(vec![(
+                        String::from("transform"),
+                        transform_to_css_matrix(mixin.relative_transform.0),
+                    )]);
+                }
+                MixinChange::Path(mixin) => {
+                    let fill_clipped_shape_index = self.fill_clipped_shape.index;
+                    let base = self.get_base_mut();
                     base.set_attributes_at(
                         fill_clipped_shape_index,
-                        vec![width_attr.clone(), height_attr.clone()],
-                    );
+                        vec![(String::from("p"), construct_svg_path(&mixin.vertices))],
+                    )
+                }
+                MixinChange::Blend(mixin) => {
+                    let base = self.get_base_mut();
+                    base.set_attributes(vec![(String::from("opacity"), mixin.opacity.to_string())]);
                 }
                 _ => {
                     // do nothing
@@ -110,7 +124,7 @@ impl ShapeSVGNode {
             .append_child_element_to(fill_clip_path_defs_index, fill_clip_path_element)
             .unwrap();
 
-        let mut fill_clipped_shape_element = SVGElement::new(SVGTag::Rect);
+        let mut fill_clipped_shape_element = SVGElement::new(SVGTag::Path);
         let fill_clipped_shape_id = fill_clipped_shape_element.get_id();
         #[cfg(feature = "trace")]
         fill_clipped_shape_element.set_attribute(

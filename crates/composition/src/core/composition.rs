@@ -1,6 +1,6 @@
 use bevy_app::{App, Plugins};
 use bevy_ecs::{bundle::Bundle, entity::Entity};
-use dyn_bevy_render_skeleton::RenderPlugin;
+use dyn_bevy_render_skeleton::{RenderApp, RenderPlugin};
 
 use crate::core::modules::{
     composition::CompositionPlugin, interactive_composition::InteractiveCompositionPlugin,
@@ -34,6 +34,10 @@ impl Composition {
         // TODO
 
         return Self { app };
+    }
+
+    pub fn get_app(&self) -> &App {
+        &self.app
     }
 
     pub fn add_plugins<M>(&mut self, plugins: impl Plugins<M>) {

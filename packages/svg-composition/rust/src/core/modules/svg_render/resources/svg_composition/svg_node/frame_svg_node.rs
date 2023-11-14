@@ -7,6 +7,7 @@ use crate::core::{
     modules::svg_render::{
         mixin_change::MixinChange,
         resources::svg_composition::{
+            helper::transform_to_css_matrix,
             svg_composition::SVGComposition,
             svg_element::{SVGChildElementIdentifier, SVGElement, SVGTag},
         },
@@ -51,8 +52,8 @@ impl SVGNode for FrameSVGNode {
                     let content_clipped_shape_index = self.content_clipped_shape.index;
                     let fill_clipped_shape_index = self.fill_clipped_shape.index;
 
-                    let width_attr = ("width".to_string(), mixin.width.to_string());
-                    let height_attr = ("height".to_string(), mixin.height.to_string());
+                    let width_attr = (String::from("width"), mixin.width.to_string());
+                    let height_attr = (String::from("height"), mixin.height.to_string());
 
                     let base = self.get_base_mut();
                     base.set_attributes(vec![width_attr.clone(), height_attr.clone()]);
@@ -64,6 +65,17 @@ impl SVGNode for FrameSVGNode {
                         content_clipped_shape_index,
                         vec![width_attr, height_attr],
                     );
+                }
+                MixinChange::RelativeTransform(mixin) => {
+                    let base = self.get_base_mut();
+                    base.set_attributes(vec![(
+                        String::from("transform"),
+                        transform_to_css_matrix(mixin.relative_transform.0),
+                    )]);
+                }
+                MixinChange::Blend(mixin) => {
+                    let base = self.get_base_mut();
+                    base.set_attributes(vec![(String::from("opacity"), mixin.opacity.to_string())]);
                 }
                 _ => {
                     // do nothing

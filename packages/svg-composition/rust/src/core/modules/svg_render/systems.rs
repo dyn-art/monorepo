@@ -9,7 +9,6 @@ use bevy_ecs::{
 use bevy_hierarchy::Parent;
 use dyn_bevy_render_skeleton::extract_param::Extract;
 use dyn_composition::core::modules::node::components::types::Node;
-use log::info;
 
 use super::{
     mixin_change::ToMixinChange,
@@ -46,11 +45,6 @@ pub fn queue_render_changes(
     mut changed: ResMut<ChangedComponents>,
     mut svg_composition: ResMut<SVGComposition>,
 ) {
-    info!(
-        "Called queue_render_changes with changes: {:?}",
-        changed.changes
-    );
-
     // Collect entities to process
     let to_process = initiate_entity_collection(&changed.changes);
 
@@ -60,13 +54,6 @@ pub fn queue_render_changes(
             process_entity(entity, changed_component, &mut svg_composition);
         }
     }
-
-    info!(
-        "End queue_render_changes with svg_composition: {:#?}",
-        svg_composition
-    );
-
-    info!("Stringified: {}", svg_composition.to_string());
 }
 
 fn initiate_entity_collection(changes: &HashMap<Entity, ChangedComponent>) -> Vec<Entity> {
@@ -109,11 +96,6 @@ fn process_entity(
     changed_component: &ChangedComponent,
     svg_composition: &mut SVGComposition,
 ) {
-    info!(
-        "Called process_entity for {:?} with changes {:?} and in SvgComposition: {:?}",
-        entity, changed_component, svg_composition
-    ); // TODO: REMOVE
-
     let maybe_node = svg_composition.get_or_insert_node(
         entity,
         &changed_component.node_type,
@@ -122,8 +104,4 @@ fn process_entity(
     if let Some(node) = maybe_node {
         node.apply_mixin_changes(&changed_component.changes);
     }
-
-    // TODO sync SVGElement to frontend. If:
-    // 1. newly created
-    // 2. attributes or styles changes
 }

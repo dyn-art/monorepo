@@ -515,6 +515,7 @@ dependencies = [
  "console_error_panic_hook",
  "dyn_bevy_render_skeleton",
  "dyn_composition",
+ "glam",
  "js-sys",
  "log",
  "once_cell",

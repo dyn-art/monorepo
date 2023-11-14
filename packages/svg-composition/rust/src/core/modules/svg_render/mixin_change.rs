@@ -49,7 +49,7 @@ impl ToMixinChange for DimensionMixin {
 #[derive(Serialize, Clone, Debug, Type)]
 pub struct RenderChangeRelativeTransformMixin {
     #[serde(rename = "relativeTransform")]
-    relative_transform: RelativeTransformMixin,
+    pub relative_transform: RelativeTransformMixin,
 }
 
 impl ToMixinChange for RelativeTransformMixin {

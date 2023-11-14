@@ -26,7 +26,7 @@ export const useSVGComposition = (props: UseSVGCompositionProps) => {
 		};
 	}, [width, height, svgContainerRef.current]);
 
-	return svgContainerRef;
+	return { svgContainerRef, composition };
 };
 
 async function createComposition(config: {

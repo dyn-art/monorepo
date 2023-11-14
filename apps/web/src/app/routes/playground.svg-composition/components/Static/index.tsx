@@ -6,7 +6,7 @@ import { useSVGComposition } from './useSVGComposition';
 
 export const Static: React.FC<TProps> = (props) => {
 	const { size } = props;
-	const svgContainerRef = useSVGComposition({ width: size, height: size });
+	const { svgContainerRef, composition } = useSVGComposition({ width: size, height: size });
 	const [svg2pdf, setSvg2pdf] = React.useState<any>(null);
 
 	// Dynamically import svg2pdf when the component mounts,
@@ -18,7 +18,7 @@ export const Static: React.FC<TProps> = (props) => {
 	}, []);
 
 	const handleDownloadPDF = React.useCallback(async () => {
-		if (svgContainerRef.current) {
+		if (svgContainerRef.current != null) {
 			const pdf = new jsPDF({
 				orientation: 'landscape',
 				unit: 'px',
@@ -40,12 +40,19 @@ export const Static: React.FC<TProps> = (props) => {
 		}
 	}, [svgContainerRef.current, svg2pdf]);
 
+	const handleToString = React.useCallback(async () => {
+		if (composition != null) {
+			console.log('SVG String: ', composition?.toString());
+		}
+	}, [composition]);
+
 	return (
-		<div className="relative">
+		<div className="relative h-full w-full">
 			<div ref={svgContainerRef} />
-			<Button onClick={handleDownloadPDF} className="absolute left-4 top-4 z-50">
-				To PDF
-			</Button>
+			<div className="absolute left-4 top-4 z-50 flex flex-row gap-x-2">
+				<Button onClick={handleDownloadPDF}>To PDF</Button>
+				<Button onClick={handleToString}>To String</Button>
+			</div>
 		</div>
 	);
 };

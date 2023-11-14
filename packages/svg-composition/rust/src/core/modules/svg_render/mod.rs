@@ -20,7 +20,7 @@ use self::{
 };
 
 mod mixin_change;
-mod resources;
+pub mod resources;
 mod systems;
 
 pub struct SvgRenderPlugin {
