@@ -89,10 +89,7 @@ impl SVGNode for ShapeSVGNode {
 }
 
 impl ShapeSVGNode {
-    pub fn new(
-        output_event_sender: Sender<OutputEvent>,
-        maybe_parent_element_id: Option<u32>,
-    ) -> Self {
+    pub fn new(maybe_parent_element_id: Option<u32>) -> Self {
         // Create root element and apply it to SVG node
         let mut element = SVGElement::new(SVGTag::Group);
         #[cfg(feature = "trace")]
@@ -100,11 +97,7 @@ impl ShapeSVGNode {
             String::from("name"),
             ShapeSVGNode::create_element_name(element.get_id(), String::from("root"), false),
         );
-        let mut base = BaseSVGNode::new(
-            element,
-            maybe_parent_element_id,
-            output_event_sender.clone(),
-        );
+        let mut base = BaseSVGNode::new(element, maybe_parent_element_id);
 
         // Create fill elements
         let mut fill_clip_path_defs = SVGElement::new(SVGTag::Defs);

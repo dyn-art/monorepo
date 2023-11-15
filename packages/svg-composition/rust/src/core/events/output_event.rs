@@ -21,6 +21,17 @@ use specta::Type;
 #[derive(Debug, Serialize, Clone, Type)]
 #[serde(tag = "type")]
 pub enum OutputEvent {
+    RenderUpdate(RenderUpdateEvent),
+}
+
+#[derive(Debug, Serialize, Clone, Type)]
+pub struct RenderUpdateEvent {
+    pub id: u32,
+    pub updates: Vec<RenderChange>,
+}
+
+#[derive(Debug, Serialize, Clone, Type)]
+pub enum RenderChange {
     ElementCreated(ElementCreated),
     ElementDeleted(ElementDeleted),
     AttributeUpdated(AttributeUpdated),
@@ -31,7 +42,6 @@ pub enum OutputEvent {
 /// Emitted when a new SVGElement is created
 #[derive(Debug, Serialize, Clone, Type)]
 pub struct ElementCreated {
-    pub id: u32,
     #[serde(rename = "tagName")]
     pub tag_name: String,
     pub attributes: HashMap<String, String>,
@@ -42,14 +52,11 @@ pub struct ElementCreated {
 
 /// Emitted when an SVGElement is deleted
 #[derive(Debug, Serialize, Clone, Type)]
-pub struct ElementDeleted {
-    pub id: u32,
-}
+pub struct ElementDeleted;
 
 /// Emitted when an attribute of an SVGElement is updated
 #[derive(Debug, Serialize, Clone, Type)]
 pub struct AttributeUpdated {
-    pub id: u32,
     pub name: String,
     #[serde(rename = "newValue")]
     pub new_value: Option<String>, // None indicates removal of the attribute
@@ -58,7 +65,6 @@ pub struct AttributeUpdated {
 /// Emitted when a style property of an SVGElement is updated
 #[derive(Debug, Serialize, Clone, Type)]
 pub struct StyleUpdated {
-    pub id: u32,
     pub name: String,
     #[serde(rename = "newValue")]
     pub new_value: Option<String>, // None indicates removal of the style
@@ -67,7 +73,6 @@ pub struct StyleUpdated {
 /// Emitted for bulk updates to an SVGElement
 #[derive(Debug, Serialize, Clone, Type)]
 pub struct ElementUpdated {
-    pub id: u32,
     #[serde(rename = "updatedAttributes")]
     pub updated_attributes: HashMap<String, String>,
     #[serde(rename = "updatedStyles")]

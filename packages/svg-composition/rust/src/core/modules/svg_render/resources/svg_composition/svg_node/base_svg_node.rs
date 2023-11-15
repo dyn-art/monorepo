@@ -1,7 +1,9 @@
-use std::sync::mpsc::Sender;
+use bevy_utils::HashMap;
 
 use crate::core::{
-    events::output_event::{AttributeUpdated, ElementCreated, OutputEvent, StyleUpdated},
+    events::output_event::{
+        AttributeUpdated, ElementCreated, RenderChange, RenderUpdateEvent, StyleUpdated,
+    },
     modules::svg_render::resources::svg_composition::{
         svg_composition::SVGComposition,
         svg_element::{SVGChildElementIdentifier, SVGElement},
@@ -21,24 +23,28 @@ pub struct BaseSVGNode {
     // - Offers efficient O(1) access by index, suitable for our use case.
     // - More memory-efficient and simpler than a HashMap for fixed-size collections.
     child_elements: Vec<SVGElement>,
-    // Sender to enque events for frontend
-    output_event_sender: Sender<OutputEvent>,
+    // Maps element ids to a list of render changes
+    updates: HashMap<u32, Vec<RenderChange>>,
 }
 
 impl BaseSVGNode {
-    pub fn new(
-        element: SVGElement,
-        maybe_parent_element_id: Option<u32>,
-        output_event_sender: Sender<OutputEvent>,
-    ) -> Self {
-        let node = BaseSVGNode {
+    pub fn new(element: SVGElement, maybe_parent_element_id: Option<u32>) -> Self {
+        let initial_updates = HashMap::from([(
+            element.get_id(),
+            vec![RenderChange::ElementCreated(ElementCreated {
+                parent_id: maybe_parent_element_id,
+                tag_name: element.get_tag_name().as_str().to_string(),
+                attributes: element.get_attributes().clone(),
+                styles: element.get_styles().clone(),
+            })],
+        )]);
+
+        return BaseSVGNode {
             id: rand::random(),
             element,
             child_elements: vec![],
-            output_event_sender,
+            updates: initial_updates,
         };
-        node.sync_element_creation(node.get_element(), maybe_parent_element_id);
-        return node;
     }
 
     pub fn get_children(&self) -> &Vec<SVGElement> {
@@ -62,7 +68,7 @@ impl BaseSVGNode {
         if let Some(target_element) = self.child_elements.get_mut(index) {
             target_element.append_child(SVGChildElementIdentifier::InContext(next_index));
             let target_element_id = target_element.get_id();
-            self.sync_element_creation(&element, Some(target_element_id));
+            self.register_element_creation_render_change(&element, Some(target_element_id));
             self.child_elements.push(element);
             return Ok(next_index);
         } else {
@@ -72,7 +78,7 @@ impl BaseSVGNode {
 
     pub fn append_child_element(&mut self, element: SVGElement) -> usize {
         let index = self.child_elements.len();
-        self.sync_element_creation(&element, Some(self.element.get_id()));
+        self.register_element_creation_render_change(&element, Some(self.element.get_id()));
         self.child_elements.push(element);
         self.element
             .append_child(SVGChildElementIdentifier::InContext(index));
@@ -89,78 +95,89 @@ impl BaseSVGNode {
     //      and at the end collect all attribute changes at the end or so
     pub fn set_attributes_at(&mut self, index: usize, attributes: Vec<(String, String)>) {
         if let Some(element) = self.get_child_element_at_mut(index) {
-            let mut output_events: Vec<OutputEvent> = vec![];
+            let mut render_changes: Vec<RenderChange> = vec![];
             for (name, value) in attributes {
-                output_events.push(OutputEvent::AttributeUpdated(AttributeUpdated {
-                    id: element.get_id(),
+                render_changes.push(RenderChange::AttributeUpdated(AttributeUpdated {
                     name: name.clone(),
                     new_value: Some(value.clone()),
                 }));
                 element.set_attribute(name, value);
             }
-            for output_event in output_events {
-                let _ = self.output_event_sender.send(output_event);
+            let element_id = element.get_id();
+            for render_change in render_changes {
+                self.register_render_change(element_id, render_change);
             }
         }
     }
 
     pub fn set_attributes(&mut self, attributes: Vec<(String, String)>) {
-        let mut output_events: Vec<OutputEvent> = vec![];
         for (name, value) in attributes {
-            output_events.push(OutputEvent::AttributeUpdated(AttributeUpdated {
-                id: self.element.get_id(),
-                name: name.clone(),
-                new_value: Some(value.clone()),
-            }));
+            self.register_render_change(
+                self.element.get_id(),
+                RenderChange::AttributeUpdated(AttributeUpdated {
+                    name: name.clone(),
+                    new_value: Some(value.clone()),
+                }),
+            );
             self.element.set_attribute(name, value);
-        }
-        for output_event in output_events {
-            let _ = self.output_event_sender.send(output_event);
         }
     }
 
     pub fn set_styles_at(&mut self, index: usize, styles: Vec<(String, String)>) {
         if let Some(element) = self.get_child_element_at_mut(index) {
-            let mut output_events: Vec<OutputEvent> = vec![];
+            let mut render_changes: Vec<RenderChange> = vec![];
             for (name, value) in styles {
-                output_events.push(OutputEvent::StyleUpdated(StyleUpdated {
-                    id: element.get_id(),
+                render_changes.push(RenderChange::StyleUpdated(StyleUpdated {
                     name: name.clone(),
                     new_value: Some(value.clone()),
                 }));
                 element.set_style(name, value);
             }
-            for output_event in output_events {
-                let _ = self.output_event_sender.send(output_event);
+            let element_id = element.get_id();
+            for render_change in render_changes {
+                self.register_render_change(element_id, render_change);
             }
         }
     }
 
     pub fn set_styles(&mut self, styles: Vec<(String, String)>) {
-        let mut output_events: Vec<OutputEvent> = vec![];
         for (name, value) in styles {
-            output_events.push(OutputEvent::StyleUpdated(StyleUpdated {
-                id: self.element.get_id(),
-                name: name.clone(),
-                new_value: Some(value.clone()),
-            }));
+            self.register_render_change(
+                self.element.get_id(),
+                RenderChange::StyleUpdated(StyleUpdated {
+                    name: name.clone(),
+                    new_value: Some(value.clone()),
+                }),
+            );
             self.element.set_style(name, value);
-        }
-        for output_event in output_events {
-            let _ = self.output_event_sender.send(output_event);
         }
     }
 
-    pub fn sync_element_creation(&self, element: &SVGElement, parent_id: Option<u32>) {
-        let _ = self
-            .output_event_sender
-            .send(OutputEvent::ElementCreated(ElementCreated {
-                id: element.get_id(),
+    fn register_element_creation_render_change(
+        &mut self,
+        element: &SVGElement,
+        parent_id: Option<u32>,
+    ) {
+        self.register_render_change(
+            element.get_id(),
+            RenderChange::ElementCreated(ElementCreated {
                 parent_id,
                 tag_name: element.get_tag_name().as_str().to_string(),
                 attributes: element.get_attributes().clone(),
                 styles: element.get_styles().clone(),
-            }));
+            }),
+        );
+    }
+
+    fn register_render_change(&mut self, id: u32, change: RenderChange) {
+        self.updates.entry(id).or_insert_with(Vec::new).push(change);
+    }
+
+    pub fn drain_updates(&mut self) -> Vec<RenderUpdateEvent> {
+        self.updates
+            .drain()
+            .map(|(id, updates)| RenderUpdateEvent { id, updates })
+            .collect()
     }
 
     pub fn to_string(&self, composition: &SVGComposition) -> String {

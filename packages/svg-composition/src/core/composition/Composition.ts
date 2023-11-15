@@ -9,20 +9,24 @@ import type {
 	RectangleNodeBundle
 } from '@/rust/dyn_composition_api/bindings';
 
-import { mat3, vec3 } from '../helper';
+import { groupByType, mat3, vec3 } from '../helper';
+import type { Renderer } from '../render';
 
 export class Composition {
-	private _compositionHandle: JsCompositionHandle;
+	private readonly _compositionHandle: JsCompositionHandle;
 
 	protected _width: number;
 	protected _height: number;
 
-	protected _eventQueue: AnyInputEvent[] = [];
+	private _eventQueue: AnyInputEvent[] = [];
+
+	private readonly _renderer: Renderer;
 
 	constructor(config: TCompositionConfig) {
 		const {
 			width,
 			height,
+			renderer,
 			dtif = {
 				version: '0.0.1',
 				name: 'Test',
@@ -42,6 +46,7 @@ export class Composition {
 				}
 			}
 		} = config;
+		this._renderer = renderer;
 		this._compositionHandle = new JsCompositionHandle(dtif, (events: OutputEvent[]) => {
 			this.onWasmEvents(events);
 		});
@@ -65,10 +70,21 @@ export class Composition {
 	// WASM interface
 	// =========================================================================
 
-	public onWasmEvents(events: OutputEvent[]): this {
-		console.log({ events });
-		// TODO: Handle events
-		return this;
+	public onWasmEvents(events: OutputEvent[]) {
+		const groupedEvents = groupByType(events);
+		for (const eventType of Object.keys(groupedEvents) as (keyof typeof groupedEvents)[]) {
+			const groupedEvent = groupedEvents[eventType];
+			if (groupedEvent != null) {
+				switch (eventType) {
+					case 'RenderUpdate':
+						this._renderer.render(groupedEvent);
+						break;
+					default:
+						console.warn(`Unknown event: ${eventType as string}`);
+						break;
+				}
+			}
+		}
 	}
 
 	// =========================================================================
@@ -124,5 +140,6 @@ export class Composition {
 export interface TCompositionConfig {
 	width: number;
 	height: number;
+	renderer: Renderer;
 	dtif?: DTIFComposition;
 }

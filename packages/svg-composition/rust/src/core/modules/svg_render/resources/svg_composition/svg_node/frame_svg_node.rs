@@ -98,10 +98,7 @@ impl SVGNode for FrameSVGNode {
 }
 
 impl FrameSVGNode {
-    pub fn new(
-        output_event_sender: Sender<OutputEvent>,
-        maybe_parent_element_id: Option<u32>,
-    ) -> Self {
+    pub fn new(maybe_parent_element_id: Option<u32>) -> Self {
         // TODO: implment clip path without having to remove or add elements
         // as the size should be known at compile time so that we can use Vector
         // over Hashmap for storing SVGElements
@@ -113,11 +110,7 @@ impl FrameSVGNode {
             String::from("name"),
             FrameSVGNode::create_element_name(element.get_id(), String::from("root"), false),
         );
-        let mut base = BaseSVGNode::new(
-            element,
-            maybe_parent_element_id,
-            output_event_sender.clone(),
-        );
+        let mut base = BaseSVGNode::new(element, maybe_parent_element_id);
 
         // Create content elements
         let mut content_clip_path_defs_element = SVGElement::new(SVGTag::Defs);

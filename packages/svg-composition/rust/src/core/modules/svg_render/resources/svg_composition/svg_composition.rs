@@ -17,13 +17,6 @@ pub struct SVGComposition {
     output_event_sender: Sender<OutputEvent>,
 }
 
-// TODO: Improve
-#[derive(Debug, Default)]
-pub struct SVGElementChange {
-    pub changed_attributes: HashMap<String, String>,
-    pub changed_styles: HashMap<String, String>,
-}
-
 impl SVGComposition {
     pub fn new(output_event_sender: Sender<OutputEvent>) -> Self {
         SVGComposition {
@@ -97,15 +90,21 @@ impl SVGComposition {
             .and_then(|parent_id| self.get_node_mut(&parent_id))
             .and_then(|parent| Some(parent.get_base().get_element().get_id()));
         match node_type {
-            NodeType::Rectangle => Some(Box::new(ShapeSVGNode::new(
-                self.output_event_sender.clone(),
-                maybe_parent_element_id,
-            ))),
-            NodeType::Frame => Some(Box::new(FrameSVGNode::new(
-                self.output_event_sender.clone(),
-                maybe_parent_element_id,
-            ))),
+            NodeType::Rectangle => Some(Box::new(ShapeSVGNode::new(maybe_parent_element_id))),
+            NodeType::Frame => Some(Box::new(FrameSVGNode::new(maybe_parent_element_id))),
             _ => None,
+        }
+    }
+
+    pub fn forward_node_updates(&mut self, entity: &Entity) {
+        let maybe_node = self.nodes.get_mut(entity);
+        if let Some(node) = maybe_node {
+            let changes = node.get_base_mut().drain_updates();
+            for change in changes {
+                self.output_event_sender
+                    .send(OutputEvent::RenderUpdate(change))
+                    .expect("Failed to send RenderChange event");
+            }
         }
     }
 

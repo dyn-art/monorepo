@@ -104,4 +104,5 @@ fn process_entity(
     if let Some(node) = maybe_node {
         node.apply_mixin_changes(&changed_component.changes);
     }
+    svg_composition.forward_node_updates(&entity);
 }

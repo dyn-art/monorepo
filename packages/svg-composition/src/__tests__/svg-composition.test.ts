@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
+import type { DTIFComposition } from '@/rust/dyn_composition_api/bindings';
 
-import type { DTIFComposition } from '..';
-import { Composition, mat3, vec3 } from '../core';
+import { createSVGComposition, mat3, vec3 } from '../core';
 import { initWasm } from '../wasm';
 
 export const COMPOSITION_WITH_ONE_RECT = (width: number, height: number): DTIFComposition => ({
@@ -50,7 +50,7 @@ describe('SVGComposition class tests', () => {
 	});
 
 	it('should create Composition', async () => {
-		const composition = new Composition({
+		const composition = createSVGComposition({
 			dtif: COMPOSITION_WITH_ONE_RECT(500, 500),
 			width: 500,
 			height: 500
