@@ -133,6 +133,10 @@ export class Composition {
 		this.emitCoreEvents([{ type: 'EntitySetPosition', entity, x, y }]);
 	}
 
+	public clear(): void {
+		this._renderer.clear();
+	}
+
 	public toString(): string {
 		return this._compositionHandle.toString();
 	}
