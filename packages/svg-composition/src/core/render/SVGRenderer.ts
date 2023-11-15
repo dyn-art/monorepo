@@ -16,6 +16,7 @@ export class SVGRenderer extends Renderer {
 		const { domElement = document.body } = options;
 		this._domElement = domElement;
 		this._svgElement = document.createElementNS(NS, 'svg');
+		this._svgElement.setAttribute('version', VERSION);
 		this._svgElement.style.setProperty('overflow', 'hidden');
 		this._domElement.appendChild(this._svgElement);
 	}
@@ -29,37 +30,49 @@ export class SVGRenderer extends Renderer {
 	public render(events: RenderUpdateEvent[]): this {
 		for (const renderUpdate of events) {
 			const elementId = renderUpdate.id;
+			let element: SVGElement | null = null;
+			const getElement = (): SVGElement | null => {
+				if (element == null) {
+					element = this._svgElementMap.get(elementId) ?? null;
+				}
+				return element;
+			};
+
 			for (const update of renderUpdate.updates) {
 				if ('ElementCreated' in update) {
 					const creation = update.ElementCreated;
-					const newElement = document.createElementNS(
-						'http://www.w3.org/2000/svg',
-						creation.tagName
-					);
-					Object.entries(creation.attributes).forEach(([key, value]) => {
-						newElement.setAttribute(key, value);
-					});
-					Object.entries(creation.styles).forEach(([key, value]) => {
-						newElement.style.setProperty(key, value);
-					});
+
+					// Create element
+					const newElement: SVGElement = document.createElementNS(NS, creation.tagName);
+					for (const [key, value] of creation.attributes as unknown as [string, string][]) {
+						newElement.setAttribute(key, `${value}`);
+					}
+					for (const [key, value] of creation.styles as unknown as [string, string][]) {
+						newElement.style.setProperty(key, `${value}`);
+					}
 
 					this._svgElementMap.set(elementId, newElement);
 
+					// Append element to parent
 					if (creation.parentId != null) {
 						const parentElement = this._svgElementMap.get(creation.parentId);
 						if (parentElement != null) {
 							parentElement.appendChild(newElement);
 						}
+					} else {
+						this._svgElement.appendChild(newElement);
 					}
+
+					element = newElement;
 				} else if ('ElementDeleted' in update) {
-					const elementToDelete = this._svgElementMap.get(elementId);
+					const elementToDelete = getElement();
 					if (elementToDelete?.parentNode != null) {
 						elementToDelete.parentNode.removeChild(elementToDelete);
 						this._svgElementMap.delete(elementId);
 					}
 				} else if ('AttributeUpdated' in update) {
 					const updateInfo = update.AttributeUpdated;
-					const elementToUpdate = this._svgElementMap.get(elementId);
+					const elementToUpdate = getElement();
 					if (elementToUpdate != null) {
 						if (updateInfo.newValue === null) {
 							elementToUpdate.removeAttribute(updateInfo.name);
@@ -69,20 +82,9 @@ export class SVGRenderer extends Renderer {
 					}
 				} else if ('StyleUpdated' in update) {
 					const styleUpdate = update.StyleUpdated;
-					const elementToUpdate = this._svgElementMap.get(elementId);
+					const elementToUpdate = getElement();
 					if (elementToUpdate != null) {
 						elementToUpdate.style.setProperty(styleUpdate.name, styleUpdate.newValue || '');
-					}
-				} else if ('ElementUpdated' in update) {
-					const elementUpdate = update.ElementUpdated;
-					const elementToUpdate = this._svgElementMap.get(elementId);
-					if (elementToUpdate != null) {
-						Object.entries(elementUpdate.updatedAttributes).forEach(([key, value]) => {
-							elementToUpdate.setAttribute(key, value);
-						});
-						Object.entries(elementUpdate.updatedStyles).forEach(([key, value]) => {
-							elementToUpdate.style.setProperty(key, value);
-						});
 					}
 				}
 			}

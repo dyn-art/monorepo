@@ -25,12 +25,14 @@ pub struct BaseSVGNode {
     child_elements: Vec<SVGElement>,
     // Maps element ids to a list of render changes
     updates: HashMap<u32, Vec<RenderChange>>,
+    updates_order: Vec<u32>,
 }
 
 impl BaseSVGNode {
     pub fn new(element: SVGElement, maybe_parent_element_id: Option<u32>) -> Self {
+        let element_id = element.get_id();
         let initial_updates = HashMap::from([(
-            element.get_id(),
+            element_id,
             vec![RenderChange::ElementCreated(ElementCreated {
                 parent_id: maybe_parent_element_id,
                 tag_name: element.get_tag_name().as_str().to_string(),
@@ -44,6 +46,7 @@ impl BaseSVGNode {
             element,
             child_elements: vec![],
             updates: initial_updates,
+            updates_order: vec![element_id],
         };
     }
 
@@ -170,14 +173,23 @@ impl BaseSVGNode {
     }
 
     fn register_render_change(&mut self, id: u32, change: RenderChange) {
-        self.updates.entry(id).or_insert_with(Vec::new).push(change);
+        if self.updates.entry(id).or_insert_with(Vec::new).is_empty() {
+            // If it's a new key, record its order
+            self.updates_order.push(id);
+        }
+        self.updates.get_mut(&id).unwrap().push(change);
     }
 
     pub fn drain_updates(&mut self) -> Vec<RenderUpdateEvent> {
-        self.updates
-            .drain()
-            .map(|(id, updates)| RenderUpdateEvent { id, updates })
-            .collect()
+        let mut drained_updates = Vec::new();
+
+        for id in self.updates_order.drain(..) {
+            if let Some(updates) = self.updates.remove(&id) {
+                drained_updates.push(RenderUpdateEvent { id, updates });
+            }
+        }
+
+        return drained_updates;
     }
 
     pub fn to_string(&self, composition: &SVGComposition) -> String {

@@ -47,6 +47,7 @@ export class Composition {
 			}
 		} = config;
 		this._renderer = renderer;
+		this._renderer.setSize(width, height);
 		this._compositionHandle = new JsCompositionHandle(dtif, (events: OutputEvent[]) => {
 			this.onWasmEvents(events);
 		});

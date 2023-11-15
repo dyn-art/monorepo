@@ -2,6 +2,7 @@ use std::{collections::HashMap, sync::mpsc::Sender};
 
 use bevy_ecs::system::Resource;
 use serde::Serialize;
+use serde_with::serde_as;
 use specta::Type;
 
 /// OutputEvent Enum
@@ -40,11 +41,14 @@ pub enum RenderChange {
 }
 
 /// Emitted when a new SVGElement is created
+#[serde_as]
 #[derive(Debug, Serialize, Clone, Type)]
 pub struct ElementCreated {
     #[serde(rename = "tagName")]
     pub tag_name: String,
+    #[serde_as(as = "Vec<(_, _)>")]
     pub attributes: HashMap<String, String>,
+    #[serde_as(as = "Vec<(_, _)>")]
     pub styles: HashMap<String, String>,
     #[serde(rename = "parentId")]
     pub parent_id: Option<u32>, // Optional parent ID, if it's a child element

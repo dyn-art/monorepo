@@ -1,5 +1,5 @@
 import React from 'react';
-import { Composition, initWasm } from '@dyn/svg-composition';
+import { Composition, createSVGComposition, initWasm } from '@dyn/svg-composition';
 
 import { COMPOSITION_WITH_ONE_RECT } from './test-data';
 
@@ -37,12 +37,12 @@ async function createComposition(config: {
 	const { width, height, element } = config;
 	await initWasm();
 
-	const composition = new Composition({
+	const composition = createSVGComposition({
 		width,
 		height,
-		// renderer: {
-		// 	domElement: element
-		// },
+		renderer: {
+			domElement: element
+		},
 		dtif: COMPOSITION_WITH_ONE_RECT(width, height)
 	});
 

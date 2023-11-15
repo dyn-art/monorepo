@@ -34,8 +34,6 @@ impl Plugin for SvgRenderPlugin {
             Err(_) => return,
         };
 
-        info!("Build SvgRenderPlugin"); // TODO: REMOVE
-
         // Register resources
         render_app.init_resource::<ChangedComponents>();
         render_app.insert_resource(OutputEventQueue::new(self.output_event_sender.clone()));
