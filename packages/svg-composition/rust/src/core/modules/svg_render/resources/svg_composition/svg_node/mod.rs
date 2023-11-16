@@ -23,4 +23,5 @@ pub trait SVGNode: Sync + Send + Debug {
     fn to_string(&self, composition: &SVGComposition) -> String;
     fn apply_mixin_changes(&mut self, changes: &[MixinChange]) -> ();
     fn append_external_child(&mut self, entity: Entity) -> ();
+    fn get_external_child_append_id(&self) -> Option<&ElementReference>;
 }

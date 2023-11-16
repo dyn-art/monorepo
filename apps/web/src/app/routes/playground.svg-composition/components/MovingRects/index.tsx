@@ -4,7 +4,7 @@ import { useSVGComposition } from './useSVGComposition';
 
 export const MovingRects: React.FC<TProps> = (props) => {
 	const { size } = props;
-	const svgContainerRef = useSVGComposition({ width: size, height: size, count: 5 });
+	const svgContainerRef = useSVGComposition({ width: size, height: size, count: 1 });
 
 	return <div ref={svgContainerRef} />;
 };

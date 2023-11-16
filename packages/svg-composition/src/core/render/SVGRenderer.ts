@@ -1,4 +1,5 @@
-import type { RenderUpdateEvent } from '../../rust_modules/dyn_composition_api/bindings';
+import type { RenderUpdateEvent, SVGAttribute } from '@/rust/dyn_composition_api/bindings';
+
 import { Renderer } from './Renderer';
 
 export const VERSION = '1.1';
@@ -44,8 +45,9 @@ export class SVGRenderer extends Renderer {
 
 					// Create element
 					const newElement: SVGElement = document.createElementNS(NS, creation.tagName);
-					for (const [key, value] of creation.attributes as unknown as [string, string][]) {
-						newElement.setAttribute(key, `${value}`);
+					for (const attribute of creation.attributes) {
+						const [key, value] = this.svgAttributeToTuple(attribute);
+						newElement.setAttribute(key, value);
 					}
 					for (const [key, value] of creation.styles as unknown as [string, string][]) {
 						newElement.style.setProperty(key, `${value}`);
@@ -74,10 +76,11 @@ export class SVGRenderer extends Renderer {
 					const updateInfo = update.AttributeUpdated;
 					const elementToUpdate = getElement();
 					if (elementToUpdate != null) {
-						if (updateInfo.newValue === null) {
+						if (updateInfo.newValue == null) {
 							elementToUpdate.removeAttribute(updateInfo.name);
 						} else {
-							elementToUpdate.setAttribute(updateInfo.name, updateInfo.newValue);
+							const [, value] = this.svgAttributeToTuple(updateInfo.newValue);
+							elementToUpdate.setAttribute(updateInfo.name, value);
 						}
 					}
 				} else if ('StyleUpdated' in update) {
@@ -90,6 +93,47 @@ export class SVGRenderer extends Renderer {
 			}
 		}
 		return this;
+	}
+
+	// TODO: refactor to type when changed Rust data type
+	private svgAttributeToTuple(attribute: SVGAttribute): [string, string] {
+		if ('Id' in attribute) {
+			return ['id', attribute.Id.toString()];
+		} else if ('Width' in attribute) {
+			return ['width', attribute.Width.toString()];
+		} else if ('Height' in attribute) {
+			return ['height', attribute.Height.toString()];
+		} else if ('Opacity' in attribute) {
+			return ['opacity', attribute.Opacity.toString()];
+		} else if ('Transform' in attribute) {
+			const matrix = `matrix(${attribute.Transform.Matrix.join(', ')})`;
+			return ['transform', matrix];
+		} else if ('D' in attribute) {
+			const d = attribute.D.map((command) => {
+				if (typeof command === 'object') {
+					if ('MoveTo' in command) {
+						return `M${command.MoveTo.join(' ')}`;
+					} else if ('LineTo' in command) {
+						return `L${command.LineTo.join(' ')}`;
+					} else if ('CurveTo' in command) {
+						return `C${command.CurveTo.join(' ')}`;
+					} else if ('ArcTo' in command) {
+						return `A${command.ArcTo.join(' ')}`;
+					}
+				} else if ((command as any) === 'ClosePath') {
+					return 'Z';
+				}
+				return '';
+			}).join(' ');
+			return ['d', d];
+		} else if ('ClipPath' in attribute) {
+			return ['clip-path', `url(#${attribute.ClipPath})`];
+		} else if ('Fill' in attribute) {
+			return ['fill', attribute.Fill];
+		} else if ('Name' in attribute) {
+			return ['name', attribute.Name];
+		}
+		return ['', ''];
 	}
 
 	public clear(): this {

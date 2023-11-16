@@ -88,7 +88,7 @@ impl SVGComposition {
     ) -> Option<Box<dyn SVGNode>> {
         let maybe_parent_element_id = maybe_parent_id
             .and_then(|parent_id| self.get_node_mut(&parent_id))
-            .and_then(|parent| Some(parent.get_base().get_element().get_id()));
+            .and_then(|parent| parent.get_external_child_append_id());
         match node_type {
             NodeType::Rectangle => Some(Box::new(ShapeSVGNode::new(maybe_parent_element_id))),
             NodeType::Frame => Some(Box::new(FrameSVGNode::new(maybe_parent_element_id))),
@@ -113,7 +113,7 @@ impl SVGComposition {
             let element = root.get_base().get_element();
             let mut result = format!(
                 "<svg width=\"{}\" height=\"{}\" xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\">",
-                element.get_attribute("width").unwrap(), element.get_attribute("height").unwrap() 
+                element.get_attribute("width").unwrap().to_svg_string(), element.get_attribute("height").unwrap().to_svg_string() 
             );
 
             // Append the content from the root node

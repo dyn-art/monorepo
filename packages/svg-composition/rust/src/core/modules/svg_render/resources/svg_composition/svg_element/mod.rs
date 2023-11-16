@@ -2,7 +2,13 @@ use std::collections::HashMap;
 
 use bevy_ecs::entity::Entity;
 
+use self::attributes::SVGAttribute;
+
 use super::{svg_composition::SVGComposition, svg_node::base_svg_node::BaseSVGNode};
+
+pub mod attributes;
+pub mod events;
+pub mod helper;
 
 // Defines an individual SVG element
 #[derive(Debug)]
@@ -12,7 +18,7 @@ pub struct SVGElement {
     // The type of SVG element (e.g., circle, rect)
     tag_name: SVGTag,
     // Attributes of the SVG element
-    attributes: HashMap<String, String>,
+    attributes: HashMap<&'static str, SVGAttribute>,
     // Style properties of the SVG element
     styles: HashMap<String, String>,
     // Identifiers for child elements, supporting both in-context and out-of-context children
@@ -30,27 +36,28 @@ pub enum SVGChildElementIdentifier {
 impl SVGElement {
     pub fn new(tag_name: SVGTag) -> Self {
         let id: u32 = rand::random();
+        let id_attribute = SVGAttribute::Id(id);
         SVGElement {
             id,
             tag_name,
-            attributes: HashMap::from([(String::from("id"), id.to_string())]),
+            attributes: HashMap::from([(id_attribute.key(), id_attribute)]),
             styles: HashMap::new(),
             children: vec![],
         }
     }
 
-    pub fn set_attribute(&mut self, name: String, value: String) {
-        self.attributes.insert(name, value);
+    pub fn set_attribute(&mut self, attribute: SVGAttribute) {
+        self.attributes.insert(attribute.key(), attribute);
     }
 
-    pub fn set_attributes(&mut self, attributes: Vec<(String, String)>) {
-        for (name, value) in attributes {
-            self.set_attribute(name, value);
+    pub fn set_attributes(&mut self, attributes: Vec<SVGAttribute>) {
+        for attribute in attributes {
+            self.set_attribute(attribute);
         }
     }
 
-    pub fn get_attribute(&self, name: &str) -> Option<&String> {
-        self.attributes.get(name)
+    pub fn get_attribute(&self, key: &'static str) -> Option<&SVGAttribute> {
+        self.attributes.get(key)
     }
 
     pub fn set_style(&mut self, name: String, value: String) {
@@ -63,8 +70,8 @@ impl SVGElement {
         }
     }
 
-    pub fn get_style(&self, name: &str) -> Option<&String> {
-        self.styles.get(name)
+    pub fn get_style(&self, key: &str) -> Option<&String> {
+        self.styles.get(key)
     }
 
     pub fn append_child(&mut self, identifier: SVGChildElementIdentifier) {
@@ -79,8 +86,8 @@ impl SVGElement {
         &self.tag_name
     }
 
-    pub fn get_attributes(&self) -> &HashMap<String, String> {
-        &self.attributes
+    pub fn get_attributes(&self) -> Vec<SVGAttribute> {
+        self.attributes.values().cloned().collect()
     }
 
     pub fn get_styles(&self) -> &HashMap<String, String> {
@@ -93,7 +100,7 @@ impl SVGElement {
 
         // Append attributes from the hash map, including 'id'
         for (key, value) in &self.attributes {
-            result.push_str(&format!(" {}=\"{}\"", key, value));
+            result.push_str(&format!(" {}=\"{}\"", key, value.to_svg_string()));
         }
 
         // Append styles as a single 'style' attribute

@@ -1,14 +1,18 @@
 use bevy_utils::HashMap;
 
 use crate::core::{
-    events::output_event::{
-        AttributeUpdated, ElementCreated, RenderChange, RenderUpdateEvent, StyleUpdated,
-    },
+    events::output_event::RenderUpdateEvent,
     modules::svg_render::resources::svg_composition::{
         svg_composition::SVGComposition,
-        svg_element::{SVGChildElementIdentifier, SVGElement},
+        svg_element::{
+            attributes::SVGAttribute,
+            events::{AttributeUpdated, ElementCreated, RenderChange, StyleUpdated},
+            SVGChildElementIdentifier, SVGElement,
+        },
     },
 };
+
+use super::ElementReference;
 
 // Represents a node in the SVG structure, corresponding to an ECS entity
 #[derive(Debug)]
@@ -24,18 +28,19 @@ pub struct BaseSVGNode {
     // - More memory-efficient and simpler than a HashMap for fixed-size collections.
     child_elements: Vec<SVGElement>,
     // Maps element ids to a list of render changes
+    // TODO: OPTIMIZATION - Send events directly into channel who cares about grouping
     updates: HashMap<u32, Vec<RenderChange>>,
     updates_order: Vec<u32>,
 }
 
 impl BaseSVGNode {
-    pub fn new(element: SVGElement, maybe_parent_element_id: Option<u32>) -> Self {
+    pub fn new(element: SVGElement, maybe_parent_element_id: Option<&ElementReference>) -> Self {
         let element_id = element.get_id();
         let initial_updates = HashMap::from([(
             element_id,
             vec![RenderChange::ElementCreated(ElementCreated {
-                parent_id: maybe_parent_element_id,
-                tag_name: element.get_tag_name().as_str().to_string(),
+                parent_id: maybe_parent_element_id.map(|reference| reference.id),
+                tag_name: element.get_tag_name().as_str(),
                 attributes: element.get_attributes().clone(),
                 styles: element.get_styles().clone(),
             })],
@@ -96,15 +101,15 @@ impl BaseSVGNode {
     // e.g. Hashmap where changed attributes are collected (last come, will go)
     //      Then in the SVGComposition we keep track of changed nodes
     //      and at the end collect all attribute changes at the end or so
-    pub fn set_attributes_at(&mut self, index: usize, attributes: Vec<(String, String)>) {
+    pub fn set_attributes_at(&mut self, index: usize, attributes: Vec<SVGAttribute>) {
         if let Some(element) = self.get_child_element_at_mut(index) {
             let mut render_changes: Vec<RenderChange> = vec![];
-            for (name, value) in attributes {
+            for attribute in attributes {
                 render_changes.push(RenderChange::AttributeUpdated(AttributeUpdated {
-                    name: name.clone(),
-                    new_value: Some(value.clone()),
+                    name: attribute.key(),
+                    new_value: Some(attribute.clone()),
                 }));
-                element.set_attribute(name, value);
+                element.set_attribute(attribute);
             }
             let element_id = element.get_id();
             for render_change in render_changes {
@@ -113,16 +118,16 @@ impl BaseSVGNode {
         }
     }
 
-    pub fn set_attributes(&mut self, attributes: Vec<(String, String)>) {
-        for (name, value) in attributes {
+    pub fn set_attributes(&mut self, attributes: Vec<SVGAttribute>) {
+        for attribute in attributes {
             self.register_render_change(
                 self.element.get_id(),
                 RenderChange::AttributeUpdated(AttributeUpdated {
-                    name: name.clone(),
-                    new_value: Some(value.clone()),
+                    name: attribute.key(),
+                    new_value: Some(attribute.clone()),
                 }),
             );
-            self.element.set_attribute(name, value);
+            self.element.set_attribute(attribute);
         }
     }
 
@@ -165,8 +170,8 @@ impl BaseSVGNode {
             element.get_id(),
             RenderChange::ElementCreated(ElementCreated {
                 parent_id,
-                tag_name: element.get_tag_name().as_str().to_string(),
-                attributes: element.get_attributes().clone(),
+                tag_name: element.get_tag_name().as_str(),
+                attributes: element.get_attributes(),
                 styles: element.get_styles().clone(),
             }),
         );
