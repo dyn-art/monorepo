@@ -3,7 +3,7 @@ use std::{collections::HashMap, sync::mpsc::Sender};
 use bevy_ecs::{entity::Entity, system::Resource};
 use dyn_composition::core::modules::node::components::types::NodeType;
 
-use crate::core::events::output_event::OutputEvent;
+use crate::core::events::output_event::{OutputEvent, RenderUpdateEvent};
 
 use super::svg_node::{frame_svg_node::FrameSVGNode, shape_svg_node::ShapeSVGNode, SVGNode};
 
@@ -96,15 +96,11 @@ impl SVGComposition {
         }
     }
 
-    pub fn forward_node_updates(&mut self, entity: &Entity) {
-        let maybe_node = self.nodes.get_mut(entity);
-        if let Some(node) = maybe_node {
-            let changes = node.get_base_mut().drain_updates();
-            for change in changes {
-                self.output_event_sender
-                    .send(OutputEvent::RenderUpdate(change))
-                    .expect("Failed to send RenderChange event");
-            }
+    pub fn forward_node_updates(&mut self, updates: Vec<RenderUpdateEvent>) {
+        for update in updates {
+            self.output_event_sender
+                .send(OutputEvent::RenderUpdate(update))
+                .expect("Failed to send RenderChange event");
         }
     }
 

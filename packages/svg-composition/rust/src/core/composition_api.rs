@@ -45,8 +45,8 @@ impl JsCompositionHandle {
             serde_wasm_bindgen::from_value(input_events).unwrap();
 
         // Emit input events
-        for any_event in parsed_input_events {
-            match any_event {
+        for any_input_event in parsed_input_events {
+            match any_input_event {
                 AnyInputEvent::Core(any_event) => {
                     self.composition.register_events(any_event.events);
                 }

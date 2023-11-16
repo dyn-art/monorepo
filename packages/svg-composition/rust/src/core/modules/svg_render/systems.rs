@@ -1,4 +1,7 @@
-use std::collections::{HashMap, HashSet};
+use std::{
+    collections::{HashMap, HashSet},
+    mem::take,
+};
 
 use bevy_ecs::{
     component::Component,
@@ -42,13 +45,14 @@ pub fn extract_mixin_generic<T: Component + ToMixinChange>(
 }
 
 pub fn queue_render_changes(
-    changed: ResMut<ChangedComponents>,
+    mut changed: ResMut<ChangedComponents>,
     mut svg_composition: ResMut<SVGComposition>,
 ) {
-    let changes = &changed.changes;
+    let changes = take(&mut changed.changes);
     let mut processed = HashSet::new();
 
     // Recursive function to process an entity and its parents
+    // TODO: Iterative approach bad? Could we run into stackoverflow?
     fn process_with_parents(
         entity: Entity,
         changes: &HashMap<Entity, ChangedComponent>,
@@ -69,9 +73,38 @@ pub fn queue_render_changes(
 
     // Iterate over changes and process each entity
     for &entity in changes.keys() {
-        process_with_parents(entity, changes, &mut processed, &mut svg_composition);
+        process_with_parents(entity, &changes, &mut processed, &mut svg_composition);
     }
 }
+
+// Non iterative approach:
+//
+// pub fn queue_render_changes(
+//     mut changed: ResMut<ChangedComponents>,
+//     mut svg_composition: ResMut<SVGComposition>,
+// ) {
+//     let mut changes = std::mem::take(&mut changed.changes);
+//     let mut processed = HashSet::new();
+//     let mut to_process = VecDeque::new();
+
+//     // Initialize the processing queue with all entities
+//     to_process.extend(changes.keys().cloned());
+
+//     while let Some(entity) = to_process.pop_front() {
+//         if processed.insert(entity) {
+//             if let Some(change) = changes.remove(&entity) {
+//                 process_entity(entity, &change, &mut svg_composition);
+
+//                 // Add parent for processing if it exists and hasn't been processed yet
+//                 if let Some(parent_id) = change.parent_id {
+//                     if !processed.contains(&parent_id) {
+//                         to_process.push_back(parent_id);
+//                     }
+//                 }
+//             }
+//         }
+//     }
+// }
 
 fn process_entity(
     entity: Entity,
@@ -85,6 +118,7 @@ fn process_entity(
     );
     if let Some(node) = maybe_node {
         node.apply_mixin_changes(&changed_component.changes);
+        let updates = node.get_base_mut().drain_updates();
+        svg_composition.forward_node_updates(updates);
     }
-    svg_composition.forward_node_updates(&entity);
 }

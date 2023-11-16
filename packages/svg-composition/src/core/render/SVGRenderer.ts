@@ -29,6 +29,7 @@ export class SVGRenderer extends Renderer {
 	}
 
 	public render(events: RenderUpdateEvent[]): this {
+		console.log({ events });
 		for (const renderUpdate of events) {
 			const elementId = renderUpdate.id;
 			let element: SVGElement | null = null;
