@@ -105,24 +105,30 @@ export class Composition {
 		this._eventQueue.push({ type: 'Interaction', events });
 	}
 
-	public createRectangle(config: { x: number; y: number; width: number; height: number }): Entity {
+	public createRectangle(
+		config: { x: number; y: number; width: number; height: number },
+		parentId?: Entity
+	): Entity {
 		const { x, y, width, height } = config;
-		return this._compositionHandle.spawnRectangleNode({
-			compositionMixin: {
-				isVisible: true,
-				isLocked: false
-			},
-			dimension: {
-				width: Math.round(width),
-				height: Math.round(height)
-			},
-			relativeTransform: mat3(vec3(1, 0, 0), vec3(0, 1, 0), vec3(x, y, 1)),
-			blendMixin: {
-				blendMode: 'Normal',
-				opacity: 1,
-				isMask: false
-			}
-		} as RectangleNodeBundle);
+		return this._compositionHandle.spawnRectangleNode(
+			{
+				compositionMixin: {
+					isVisible: true,
+					isLocked: false
+				},
+				dimension: {
+					width: Math.round(width),
+					height: Math.round(height)
+				},
+				relativeTransform: mat3(vec3(1, 0, 0), vec3(0, 1, 0), vec3(x, y, 1)),
+				blendMixin: {
+					blendMode: 'Normal',
+					opacity: 1,
+					isMask: false
+				}
+			} as RectangleNodeBundle,
+			parentId
+		);
 	}
 
 	public moveEntity(entity: Entity, dx: number, dy: number): void {

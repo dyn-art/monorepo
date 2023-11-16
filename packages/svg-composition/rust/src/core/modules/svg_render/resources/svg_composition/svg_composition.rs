@@ -30,6 +30,10 @@ impl SVGComposition {
         self.root.is_some()
     }
 
+    pub fn get_root_node_id(&self) -> Option<Entity> {
+        self.root
+    }
+
     pub fn get_root_node(&self) -> Option<&Box<dyn SVGNode>> {
         if let Some(root_entity) = self.root {
             return self.nodes.get(&root_entity);
@@ -89,11 +93,12 @@ impl SVGComposition {
         let maybe_parent_element_id = maybe_parent_id
             .and_then(|parent_id| self.get_node_mut(&parent_id))
             .and_then(|parent| parent.get_external_child_append_id());
-        match node_type {
+
+        return match node_type {
             NodeType::Rectangle => Some(Box::new(ShapeSVGNode::new(maybe_parent_element_id))),
             NodeType::Frame => Some(Box::new(FrameSVGNode::new(maybe_parent_element_id))),
             _ => None,
-        }
+        };
     }
 
     pub fn forward_node_updates(&mut self, updates: Vec<RenderUpdateEvent>) {

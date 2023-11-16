@@ -1,9 +1,11 @@
 use std::sync::mpsc::{channel, Receiver};
 
+use bevy_ecs::entity::Entity;
 use dyn_bevy_render_skeleton::RenderApp;
 use dyn_composition::core::composition::Composition;
 use dyn_composition::core::dtif::DTIFComposition;
 use dyn_composition::core::modules::node::components::bundles::RectangleNodeBundle;
+use serde::de::DeserializeOwned;
 use wasm_bindgen::prelude::wasm_bindgen;
 use wasm_bindgen::JsValue;
 
@@ -41,62 +43,95 @@ impl JsCompositionHandle {
     }
 
     pub fn update(&mut self, input_events: JsValue) {
-        let parsed_input_events: Vec<AnyInputEvent> =
-            serde_wasm_bindgen::from_value(input_events).unwrap();
+        let parsed_input_events: Result<Vec<AnyInputEvent>, _> =
+            serde_wasm_bindgen::from_value(input_events);
 
-        // Emit input events
-        for any_input_event in parsed_input_events {
-            match any_input_event {
-                AnyInputEvent::Core(any_event) => {
-                    self.composition.register_events(any_event.events);
+        // Emit input events into the world
+        match parsed_input_events {
+            Ok(events) => {
+                for any_input_event in events {
+                    match any_input_event {
+                        AnyInputEvent::Core(any_event) => {
+                            self.composition.register_events(any_event.events);
+                        }
+                        AnyInputEvent::Interaction(any_event) => {
+                            self.composition.register_events(any_event.events);
+                        }
+                    }
                 }
-                AnyInputEvent::Interaction(any_event) => {
-                    self.composition.register_events(any_event.events);
-                }
+            }
+            Err(e) => {
+                // TODO
             }
         }
 
-        // Update the internal composition state
+        // Update all registered worlds via schedules and thus the composition state
         self.composition.update();
 
-        // Collect all (in the last update cycle) emited events into a vector
+        // Collect all output events emitted during the last update cycle
         let mut output_events = Vec::new();
         while let Ok(event) = self.event_receiver.try_recv() {
             output_events.push(event);
         }
 
-        // Call the JavaScript callback with the vector
+        // Call the JavaScript callback with the collected output events
         if !output_events.is_empty() {
             let js_events_value =
-                serde_wasm_bindgen::to_value(&output_events).unwrap_or_else(|e| JsValue::NULL);
+                serde_wasm_bindgen::to_value(&output_events).unwrap_or_else(|_| JsValue::NULL);
 
             let this = JsValue::NULL;
-            match self.event_callback.call1(&this, &js_events_value) {
-                Ok(_) => {}
-                Err(e) => {
-                    // TODO
-                }
+            if let Err(e) = self.event_callback.call1(&this, &js_events_value) {
+                // TODO
             }
         }
     }
 
     #[wasm_bindgen(js_name = spawnRectangleNode)]
-    pub fn spawn_rectangle_node(&mut self, mixin: JsValue) -> JsValue {
-        let mixin: RectangleNodeBundle = serde_wasm_bindgen::from_value(mixin).unwrap();
-        let entity = self.composition.spawn(mixin);
-        return serde_wasm_bindgen::to_value(&entity).unwrap();
+    pub fn spawn_rectangle_node(
+        &mut self,
+        mixin: JsValue,
+        maybe_parent_id: JsValue,
+    ) -> Result<JsValue, JsValue> {
+        let mixin: RectangleNodeBundle = serde_wasm_bindgen::from_value(mixin)
+            .map_err(|e| JsValue::from_str(&format!("Error parsing mixin: {:?}", e)))?;
+        let maybe_parent_id = convert_optional_jsvalue::<Entity>(maybe_parent_id).or_else(|| {
+            self.get_svg_composition()
+                .ok()
+                .and_then(|composition| composition.get_root_node_id())
+        });
+
+        // Spawn rectangle into main world
+        let entity = self.composition.spawn(mixin, maybe_parent_id);
+
+        return serde_wasm_bindgen::to_value(&entity).map_err(|_| JsValue::NULL);
+    }
+
+    fn get_svg_composition(&self) -> Result<&SVGComposition, String> {
+        let app = self.composition.get_app();
+
+        let sub_app = app
+            .get_sub_app(RenderApp)
+            .map_err(|e| format!("RenderApp error: {:?}", e))?;
+
+        return sub_app
+            .world
+            .get_resource::<SVGComposition>()
+            .ok_or_else(|| "SVGComposition resource not found".to_string());
     }
 
     #[wasm_bindgen(js_name = toString)]
     pub fn to_string(&self) -> String {
-        let svg_composition = self
-            .composition
-            .get_app()
-            .get_sub_app(RenderApp)
-            .unwrap()
-            .world
-            .get_resource::<SVGComposition>()
-            .unwrap();
-        return svg_composition.to_string();
+        self.get_svg_composition().unwrap().to_string()
+    }
+}
+
+fn convert_optional_jsvalue<T>(value: JsValue) -> Option<T>
+where
+    T: DeserializeOwned,
+{
+    if value.is_undefined() || value.is_null() {
+        None
+    } else {
+        serde_wasm_bindgen::from_value(value).ok()
     }
 }

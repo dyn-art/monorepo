@@ -1,5 +1,6 @@
 use bevy_app::{App, Plugins};
 use bevy_ecs::{bundle::Bundle, entity::Entity};
+use bevy_hierarchy::BuildWorldChildren;
 use dyn_bevy_render_skeleton::{RenderApp, RenderPlugin};
 
 use crate::core::modules::{
@@ -48,8 +49,19 @@ impl Composition {
         self.app.update();
     }
 
-    pub fn spawn<B: Bundle + std::fmt::Debug>(&mut self, bundle: B) -> Entity {
-        return self.app.world.spawn::<B>(bundle).id();
+    pub fn spawn<B: Bundle + std::fmt::Debug>(
+        &mut self,
+        bundle: B,
+        maybe_parent_id: Option<Entity>,
+    ) -> Entity {
+        let entity = self.app.world.spawn::<B>(bundle).id();
+        if let Some(parent_id) = maybe_parent_id {
+            self.app
+                .world
+                .entity_mut(parent_id)
+                .push_children(&vec![entity]);
+        }
+        return entity;
     }
 
     pub fn register_events<T: InputEvent>(&mut self, events: Vec<T>) {

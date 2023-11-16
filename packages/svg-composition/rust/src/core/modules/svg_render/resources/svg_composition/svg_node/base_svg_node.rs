@@ -97,10 +97,6 @@ impl BaseSVGNode {
         self.child_elements.get_mut(index)
     }
 
-    // TODO: Refactor to group attribute changes or something before sending event
-    // e.g. Hashmap where changed attributes are collected (last come, will go)
-    //      Then in the SVGComposition we keep track of changed nodes
-    //      and at the end collect all attribute changes at the end or so
     pub fn set_attributes_at(&mut self, index: usize, attributes: Vec<SVGAttribute>) {
         if let Some(element) = self.get_child_element_at_mut(index) {
             let mut render_changes: Vec<RenderChange> = vec![];
