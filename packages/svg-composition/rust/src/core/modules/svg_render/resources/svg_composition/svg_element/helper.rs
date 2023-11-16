@@ -8,15 +8,15 @@ pub fn mat3_to_svg_transform(transform: Mat3) -> SVGTransformAttribute {
     // | a d tx |
     // | b e ty |
     // | c f j |
-    let a = transform.x_axis.x;
-    let b = transform.x_axis.y;
-    let d = transform.y_axis.x;
-    let e = transform.y_axis.y;
-    let tx = transform.z_axis.x;
-    let ty = transform.z_axis.y;
-
     // https://developer.mozilla.org/en-US/docs/Web/CSS/transform-function/matrix
-    return SVGTransformAttribute::Matrix(a, b, d, e, tx, ty);
+    SVGTransformAttribute::Matrix {
+        a: transform.x_axis.x,
+        b: transform.x_axis.y,
+        c: transform.y_axis.x,
+        d: transform.y_axis.y,
+        tx: transform.z_axis.x,
+        ty: transform.z_axis.y,
+    }
 }
 
 pub fn construct_svg_path(vertices: &[Anchor]) -> Vec<SVGPathCommand> {
@@ -25,8 +25,8 @@ pub fn construct_svg_path(vertices: &[Anchor]) -> Vec<SVGPathCommand> {
         .filter_map(|anchor| {
             let Vec2 { x, y } = anchor.position;
             match &anchor.command {
-                AnchorCommand::MoveTo => Some(SVGPathCommand::MoveTo(x, y)),
-                AnchorCommand::LineTo => Some(SVGPathCommand::LineTo(x, y)),
+                AnchorCommand::MoveTo => Some(SVGPathCommand::MoveTo { x, y }),
+                AnchorCommand::LineTo => Some(SVGPathCommand::LineTo { x, y }),
                 AnchorCommand::ClosePath => Some(SVGPathCommand::ClosePath),
                 AnchorCommand::ArcTo {
                     radius,
@@ -35,15 +35,15 @@ pub fn construct_svg_path(vertices: &[Anchor]) -> Vec<SVGPathCommand> {
                     sweep_flag,
                 } => {
                     let Vec2 { x: rx, y: ry } = *radius;
-                    Some(SVGPathCommand::ArcTo(
+                    Some(SVGPathCommand::ArcTo {
                         rx,
                         ry,
-                        *x_axis_rotation,
-                        *large_arc_flag as u8,
-                        *sweep_flag as u8,
+                        x_axis_rotation: *x_axis_rotation,
+                        large_arc_flag: *large_arc_flag,
+                        sweep_flag: *sweep_flag,
                         x,
                         y,
-                    ))
+                    })
                 }
                 AnchorCommand::CurveTo {
                     control_point_1,
@@ -51,7 +51,14 @@ pub fn construct_svg_path(vertices: &[Anchor]) -> Vec<SVGPathCommand> {
                 } => {
                     let Vec2 { x: cx1, y: cy1 } = *control_point_1;
                     let Vec2 { x: cx2, y: cy2 } = *control_point_2;
-                    Some(SVGPathCommand::CurveTo(cx1, cy1, cx2, cy2, x, y))
+                    Some(SVGPathCommand::CurveTo {
+                        cx1,
+                        cy1,
+                        cx2,
+                        cy2,
+                        x,
+                        y,
+                    })
                 }
             }
         })

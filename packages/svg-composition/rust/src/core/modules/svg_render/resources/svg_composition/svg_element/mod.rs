@@ -36,7 +36,7 @@ pub enum SVGChildElementIdentifier {
 impl SVGElement {
     pub fn new(tag_name: SVGTag) -> Self {
         let id: u32 = rand::random();
-        let id_attribute = SVGAttribute::Id(id);
+        let id_attribute = SVGAttribute::Id { id };
         SVGElement {
             id,
             tag_name,

@@ -43,23 +43,27 @@ impl SVGNode for ShapeSVGNode {
 
                     let base = self.get_base_mut();
                     base.set_attributes(vec![
-                        SVGAttribute::Width(mixin.width),
-                        SVGAttribute::Height(mixin.height),
+                        SVGAttribute::Width { width: mixin.width },
+                        SVGAttribute::Height {
+                            height: mixin.height,
+                        },
                     ]);
                     base.set_attributes_at(
                         temp_solid_fill_index,
                         vec![
-                            SVGAttribute::Width(mixin.width),
-                            SVGAttribute::Height(mixin.height),
+                            SVGAttribute::Width { width: mixin.width },
+                            SVGAttribute::Height {
+                                height: mixin.height,
+                            },
                         ],
                     );
                 }
                 MixinChange::RelativeTransform(mixin) => {
                     let base = self.get_base_mut();
                     base.set_attributes(vec![
-                        (SVGAttribute::Transform(mat3_to_svg_transform(
-                            mixin.relative_transform.0,
-                        ))),
+                        (SVGAttribute::Transform {
+                            transform: mat3_to_svg_transform(mixin.relative_transform.0),
+                        }),
                     ]);
                 }
                 MixinChange::Path(mixin) => {
@@ -67,12 +71,16 @@ impl SVGNode for ShapeSVGNode {
                     let base = self.get_base_mut();
                     base.set_attributes_at(
                         fill_clipped_shape_index,
-                        vec![SVGAttribute::D(construct_svg_path(&mixin.vertices))],
+                        vec![SVGAttribute::D {
+                            d: construct_svg_path(&mixin.vertices),
+                        }],
                     )
                 }
                 MixinChange::Blend(mixin) => {
                     let base = self.get_base_mut();
-                    base.set_attributes(vec![SVGAttribute::Opacity(mixin.opacity)]);
+                    base.set_attributes(vec![SVGAttribute::Opacity {
+                        opacity: mixin.opacity,
+                    }]);
                 }
                 _ => {
                     // do nothing
@@ -149,13 +157,17 @@ impl ShapeSVGNode {
             String::from("fill"),
             false,
         )));
-        fill_wrapper_element.set_attribute(SVGAttribute::ClipPath(fill_clip_path_id));
+        fill_wrapper_element.set_attribute(SVGAttribute::ClipPath {
+            clip_path: fill_clip_path_id,
+        });
         let fill_wrapper_index = base.append_child_element(fill_wrapper_element);
 
         // TODO: REMOVE
         let mut temp_solid_fill_element = SVGElement::new(SVGTag::Rect);
         let temp_solid_fill_id = temp_solid_fill_element.get_id();
-        temp_solid_fill_element.set_attribute(SVGAttribute::Fill(String::from("red")));
+        temp_solid_fill_element.set_attribute(SVGAttribute::Fill {
+            fill: String::from("red"),
+        });
         let temp_solid_fill_index = base
             .append_child_element_to(fill_wrapper_index, temp_solid_fill_element)
             .unwrap();

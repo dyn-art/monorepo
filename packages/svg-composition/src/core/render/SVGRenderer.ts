@@ -29,7 +29,6 @@ export class SVGRenderer extends Renderer {
 	}
 
 	public render(events: RenderUpdateEvent[]): this {
-		console.log({ events });
 		for (const renderUpdate of events) {
 			const elementId = renderUpdate.id;
 			let element: SVGElement | null = null;
@@ -47,7 +46,7 @@ export class SVGRenderer extends Renderer {
 					// Create element
 					const newElement: SVGElement = document.createElementNS(NS, creation.tagName);
 					for (const attribute of creation.attributes) {
-						const [key, value] = this.svgAttributeToTuple(attribute);
+						const [key, value] = this.parseSVGAttribute(attribute);
 						newElement.setAttribute(key, value);
 					}
 					for (const [key, value] of creation.styles as unknown as [string, string][]) {
@@ -80,7 +79,7 @@ export class SVGRenderer extends Renderer {
 						if (updateInfo.newValue == null) {
 							elementToUpdate.removeAttribute(updateInfo.name);
 						} else {
-							const [, value] = this.svgAttributeToTuple(updateInfo.newValue);
+							const [, value] = this.parseSVGAttribute(updateInfo.newValue);
 							elementToUpdate.setAttribute(updateInfo.name, value);
 						}
 					}
@@ -96,45 +95,53 @@ export class SVGRenderer extends Renderer {
 		return this;
 	}
 
-	// TODO: refactor to type when changed Rust data type
-	private svgAttributeToTuple(attribute: SVGAttribute): [string, string] {
-		if ('Id' in attribute) {
-			return ['id', attribute.Id.toString()];
-		} else if ('Width' in attribute) {
-			return ['width', attribute.Width.toString()];
-		} else if ('Height' in attribute) {
-			return ['height', attribute.Height.toString()];
-		} else if ('Opacity' in attribute) {
-			return ['opacity', attribute.Opacity.toString()];
-		} else if ('Transform' in attribute) {
-			const matrix = `matrix(${attribute.Transform.Matrix.join(', ')})`;
-			return ['transform', matrix];
-		} else if ('D' in attribute) {
-			const d = attribute.D.map((command) => {
-				if (typeof command === 'object') {
-					if ('MoveTo' in command) {
-						return `M${command.MoveTo.join(' ')}`;
-					} else if ('LineTo' in command) {
-						return `L${command.LineTo.join(' ')}`;
-					} else if ('CurveTo' in command) {
-						return `C${command.CurveTo.join(' ')}`;
-					} else if ('ArcTo' in command) {
-						return `A${command.ArcTo.join(' ')}`;
-					}
-				} else if ((command as any) === 'ClosePath') {
-					return 'Z';
-				}
-				return '';
-			}).join(' ');
-			return ['d', d];
-		} else if ('ClipPath' in attribute) {
-			return ['clip-path', `url(#${attribute.ClipPath})`];
-		} else if ('Fill' in attribute) {
-			return ['fill', attribute.Fill];
-		} else if ('Name' in attribute) {
-			return ['name', attribute.Name];
+	private parseSVGAttribute(attribute: SVGAttribute): [string, string] {
+		switch (attribute.type) {
+			case 'Id':
+				return ['id', attribute.id.toString()];
+			case 'Width':
+				return ['width', attribute.width.toString()];
+			case 'Height':
+				return ['height', attribute.height.toString()];
+			case 'Opacity':
+				return ['opacity', attribute.opacity.toString()];
+			case 'Transform': {
+				const transform = attribute.transform;
+				const matrix = `matrix(${transform.a}, ${transform.b}, ${transform.c}, ${transform.d}, ${transform.tx}, ${transform.ty})`;
+				return ['transform', matrix];
+			}
+			case 'D': {
+				const d = attribute.d
+					.map((command) => {
+						switch (command.type) {
+							case 'MoveTo':
+								return `M${command.x} ${command.y}`;
+							case 'LineTo':
+								return `L${command.x} ${command.y}`;
+							case 'CurveTo':
+								return `C${command.cx1} ${command.cy1} ${command.cx2} ${command.cy2} ${command.x} ${command.y}`;
+							case 'ArcTo':
+								return `A${command.rx} ${command.ry} ${command.xAxisRotation} ${
+									command.largeArcFlag ? 1 : 0
+								} ${command.sweepFlag ? 1 : 0} ${command.x} ${command.y}`;
+							case 'ClosePath':
+								return 'Z';
+							default:
+								return '';
+						}
+					})
+					.join(' ');
+				return ['d', d];
+			}
+			case 'ClipPath':
+				return ['clip-path', `url(#${attribute.clipPath})`];
+			case 'Fill':
+				return ['fill', attribute.fill];
+			case 'Name':
+				return ['name', attribute.name];
+			default:
+				return ['', ''];
 		}
-		return ['', ''];
 	}
 
 	public clear(): this {

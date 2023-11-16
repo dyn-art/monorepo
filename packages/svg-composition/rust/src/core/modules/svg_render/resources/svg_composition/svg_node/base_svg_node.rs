@@ -28,7 +28,7 @@ pub struct BaseSVGNode {
     // - More memory-efficient and simpler than a HashMap for fixed-size collections.
     child_elements: Vec<SVGElement>,
     // Maps element ids to a list of render changes
-    // TODO: OPTIMIZATION - Send events directly into channel who cares about grouping
+    // Group here by element id to avoid grouping or frequent lookups of elements on the JS site
     updates: HashMap<u32, Vec<RenderChange>>,
     updates_order: Vec<u32>,
 }

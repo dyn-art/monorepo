@@ -3,74 +3,130 @@ use specta::Type;
 
 // https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/d
 #[derive(Debug, Serialize, Clone, Type)]
+#[serde(tag = "type")]
 pub enum SVGPathCommand {
-    // (x, y)
-    MoveTo(f32, f32),
-    // (x, y)
-    LineTo(f32, f32),
-    // (cx1, cy1, cx2, cy2, x, y)
-    CurveTo(f32, f32, f32, f32, f32, f32),
-    // (rx, ry, x_axis_rotation, large_arc_flag, sweep_flag, x, y)
-    ArcTo(f32, f32, f32, u8, u8, f32, f32),
+    MoveTo {
+        x: f32,
+        y: f32,
+    },
+    LineTo {
+        x: f32,
+        y: f32,
+    },
+    CurveTo {
+        cx1: f32,
+        cy1: f32,
+        cx2: f32,
+        cy2: f32,
+        x: f32,
+        y: f32,
+    },
+    ArcTo {
+        rx: f32,
+        ry: f32,
+        #[serde(rename = "xAxisRotation")]
+        x_axis_rotation: f32,
+        #[serde(rename = "largeArcFlag")]
+        large_arc_flag: bool,
+        #[serde(rename = "sweepFlag")]
+        sweep_flag: bool,
+        x: f32,
+        y: f32,
+    },
     ClosePath,
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/CSS/transform-function
 #[derive(Debug, Serialize, Clone, Type)]
+#[serde(tag = "type")]
 pub enum SVGTransformAttribute {
-    // matrix(a, b, c, d, tx, ty)
-    Matrix(f32, f32, f32, f32, f32, f32),
+    Matrix {
+        a: f32,
+        b: f32,
+        c: f32,
+        d: f32,
+        tx: f32,
+        ty: f32,
+    },
 }
 
 #[derive(Debug, Serialize, Clone, Type)]
-// #[serde(tag = "type")] // TODO: Serialize tag can't be used with tuples -> Restructure
+// Using struct variants over tuples to use serde tag feature which enables efficient property access in TypeScript,
+// allowing for faster and simpler type checks, e.g., `change.type === "Width"`
+#[serde(tag = "type")]
 pub enum SVGAttribute {
-    Id(u32),
-    Width(u32),
-    Height(u32),
-    Opacity(u8),
-    Transform(SVGTransformAttribute),
-    D(Vec<SVGPathCommand>),
-    ClipPath(u32),
-    Fill(String),
-    Name(String),
+    Id {
+        id: u32,
+    },
+    Width {
+        width: u32,
+    },
+    Height {
+        height: u32,
+    },
+    Opacity {
+        opacity: u8,
+    },
+    Transform {
+        transform: SVGTransformAttribute,
+    },
+    D {
+        d: Vec<SVGPathCommand>,
+    },
+    ClipPath {
+        #[serde(rename = "clipPath")]
+        clip_path: u32,
+    },
+    Fill {
+        fill: String,
+    },
+    Name {
+        name: String,
+    },
 }
 
 impl SVGAttribute {
     pub fn key(&self) -> &'static str {
         match self {
-            Self::Id(_) => "id",
-            Self::Width(_) => "width",
-            Self::Height(_) => "height",
-            Self::Opacity(_) => "opacity",
-            Self::Transform(_) => "transform",
-            Self::D(_) => "d",
-            Self::ClipPath(_) => "clipPath",
-            Self::Fill(_) => "fill",
-            Self::Name(_) => "name",
+            Self::Id { .. } => "id",
+            Self::Width { .. } => "width",
+            Self::Height { .. } => "height",
+            Self::Opacity { .. } => "opacity",
+            Self::Transform { .. } => "transform",
+            Self::D { .. } => "d",
+            Self::ClipPath { .. } => "clipPath",
+            Self::Fill { .. } => "fill",
+            Self::Name { .. } => "name",
         }
     }
 
     pub fn to_svg_string(&self) -> String {
         match self {
-            Self::Id(value) => value.to_string(),
-            Self::Width(value) => value.to_string(),
-            Self::Height(value) => value.to_string(),
-            Self::Opacity(value) => value.to_string(),
-            Self::Transform(value) => match value {
-                SVGTransformAttribute::Matrix(a, b, c, d, tx, ty) => {
+            Self::Id { id } => id.to_string(),
+            Self::Width { width } => width.to_string(),
+            Self::Height { height } => height.to_string(),
+            Self::Opacity { opacity } => opacity.to_string(),
+            Self::Transform { transform } => match transform {
+                SVGTransformAttribute::Matrix { a, b, c, d, tx, ty } => {
                     format!("matrix({a}, {b}, {c}, {d}, {tx}, {ty})")
                 }
             },
-            Self::D(path_data) => path_data
+            Self::D { d } => d
                 .iter()
                 .map(|command| match command {
-                    SVGPathCommand::MoveTo(x, y) => format!("M{} {}", x, y),
-                    SVGPathCommand::LineTo(x, y) => format!("L{} {}", x, y),
-                    SVGPathCommand::CurveTo(cx1, cy1, cx2, cy2, x, y) => {
-                        format!("C{} {} {} {} {} {}", cx1, cy1, cx2, cy2, x, y)
+                    SVGPathCommand::MoveTo { x, y } => format!("M{x} {y}"),
+                    SVGPathCommand::LineTo { x, y } => format!("L{x} {y}"),
+                    SVGPathCommand::CurveTo {
+                        cx1,
+                        cy1,
+                        cx2,
+                        cy2,
+                        x,
+                        y,
+                    } => {
+                        format!("C{cx1} {cy1} {cx2} {cy2} {x} {y}")
                     }
-                    SVGPathCommand::ArcTo(
+                    SVGPathCommand::ArcTo {
                         rx,
                         ry,
                         x_axis_rotation,
@@ -78,17 +134,19 @@ impl SVGAttribute {
                         sweep_flag,
                         x,
                         y,
-                    ) => format!(
-                        "A{} {} {} {} {} {} {}",
-                        rx, ry, x_axis_rotation, large_arc_flag, sweep_flag, x, y
-                    ),
+                    } => {
+                        let parsed_large_arc_flag = *large_arc_flag as u8;
+                        let parsed_sweep_flag = *sweep_flag as u8;
+                        format!(
+                        "A{rx} {ry} {x_axis_rotation} {parsed_large_arc_flag} {parsed_sweep_flag} {x} {y}"
+                    )},
                     SVGPathCommand::ClosePath => "Z".to_string(),
                 })
                 .collect::<Vec<_>>()
                 .join(" "),
-            Self::ClipPath(id) => format!("url(#{id})"),
-            Self::Fill(value) => value.clone(),
-            Self::Name(value) => value.clone(),
+            Self::ClipPath { clip_path } => format!("url(#{clip_path})"),
+            Self::Fill { fill } => fill.clone(),
+            Self::Name { name } => name.clone(),
         }
     }
 }
