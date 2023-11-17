@@ -85,7 +85,7 @@ pub struct BlendMixin {
     #[serde(rename = "blendMode")]
     pub blend_mode: BlendMode,
 
-    pub opacity: u8, // 0 - 100 // TODO: change to small float or so
+    pub opacity: f32, // 0 - 1
 
     #[serde(rename = "isMask")]
     pub is_mask: bool,
@@ -95,7 +95,7 @@ impl Default for BlendMixin {
     fn default() -> Self {
         Self {
             blend_mode: BlendMode::Normal,
-            opacity: 1,
+            opacity: 1.0,
             is_mask: false,
         }
     }

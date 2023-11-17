@@ -125,7 +125,7 @@ impl ShapeSVGNode {
         });
         let fill_clip_path_defs_index = base.append_child_element(fill_clip_path_defs);
 
-        let mut fill_clip_path_element = SVGElement::new(SVGTag::Defs);
+        let mut fill_clip_path_element = SVGElement::new(SVGTag::ClipPath);
         let fill_clip_path_id = fill_clip_path_element.get_id();
         #[cfg(feature = "trace")]
         fill_clip_path_element.set_attribute(SVGAttribute::Name {

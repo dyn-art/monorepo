@@ -16,7 +16,7 @@ pub enum SVGAttribute {
         height: u32,
     },
     Opacity {
-        opacity: u8,
+        opacity: f32,
     },
     Transform {
         transform: SVGTransformAttribute,

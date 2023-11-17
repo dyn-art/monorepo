@@ -20,7 +20,6 @@ pub fn construct_rectangle_path(
     >,
     mut commands: Commands,
 ) {
-    // TODO: split Layout mixin as rn we recalulate the path every position change
     for (_entity, corners, dimension) in query.iter() {
         let mut path = PathMixin { vertices: vec![] };
         let max_radius = std::cmp::min(dimension.width, dimension.height) as f32 / 2.0;

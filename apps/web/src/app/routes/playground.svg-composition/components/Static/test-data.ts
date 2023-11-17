@@ -27,7 +27,13 @@ export const COMPOSITION_WITH_ONE_RECT = (width: number, height: number): DTIFCo
 				vec3(1, 0, 0),
 				vec3(0, 1, 0),
 				vec3((width - 100) / 2, (height - 100) / 2, 1)
-			)
+			),
+			rectangleCornerMixin: {
+				bottomLeftRadius: 20,
+				bottomRightRadius: 0,
+				topLeftRadius: 0,
+				topRightRadius: 0
+			}
 		}
 	},
 	changes: [

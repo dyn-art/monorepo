@@ -125,6 +125,12 @@ export class Composition {
 					blendMode: 'Normal',
 					opacity: 1,
 					isMask: false
+				},
+				rectangleCornerMixin: {
+					bottomLeftRadius: 20,
+					bottomRightRadius: 0,
+					topLeftRadius: 0,
+					topRightRadius: 0
 				}
 			} as RectangleNodeBundle,
 			parentId
