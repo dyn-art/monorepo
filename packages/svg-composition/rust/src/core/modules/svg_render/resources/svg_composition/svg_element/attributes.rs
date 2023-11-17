@@ -45,7 +45,7 @@ impl SVGAttribute {
             Self::Opacity { .. } => "opacity",
             Self::Transform { .. } => "transform",
             Self::D { .. } => "d",
-            Self::ClipPath { .. } => "clipPath",
+            Self::ClipPath { .. } => "clip-path",
             Self::Fill { .. } => "fill",
             Self::Name { .. } => "name",
         }
