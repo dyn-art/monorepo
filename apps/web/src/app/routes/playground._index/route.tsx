@@ -12,8 +12,6 @@ const Playground: React.FC = () => {
 			</div>
 			<Separator className="my-4" />
 			<div className="flex h-5 items-center space-x-4 text-sm">
-				<Link to={'/playground/dtom'}>DTOM</Link>
-				<Separator orientation="vertical" />
 				<Link to={'/playground/svg-composition'}>SVG Composition</Link>
 				<Separator orientation="vertical" />
 				<Link to={'/playground/twojs'}>Two.js</Link>

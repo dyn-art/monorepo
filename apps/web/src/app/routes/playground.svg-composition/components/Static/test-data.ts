@@ -1,4 +1,4 @@
-import { DTIFComposition, mat3, vec3 } from '@dyn/dtom';
+import { DTIFComposition, mat3, vec3 } from '@dyn/svg-composition';
 
 export const COMPOSITION_WITH_ONE_RECT = (width: number, height: number): DTIFComposition => ({
 	version: '0.0.1',

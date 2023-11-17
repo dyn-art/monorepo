@@ -1,5 +1,5 @@
 import React from 'react';
-import { Composition, createSVGComposition, Entity, initWasm } from '@dyn/dtom';
+import { Composition, createSVGComposition, Entity, initWasm } from '@dyn/svg-composition';
 
 export const useSVGComposition = (props: UseSVGCompositionProps) => {
 	const { width, height, count = 50 } = props;
@@ -22,7 +22,7 @@ export const useSVGComposition = (props: UseSVGCompositionProps) => {
 		return () => {
 			isMounted = false;
 			if (composition != null) {
-				composition.destory();
+				composition.clear();
 			}
 		};
 	}, [width, height, count, svgContainerRef.current]);
@@ -51,54 +51,47 @@ async function createComposition(config: {
 
 function startLoop(config: { count: number; composition: Composition }) {
 	const { count, composition } = config;
+	const rectWidth = 50;
+	const rectHeight = 50;
 
 	// Set up your rectangles
-	const rects: Record<
-		string,
-		{ x: number; y: number; size: number; speed: number; entity: Entity }
-	> = {};
+	const rects: Record<Entity, { x: number; y: number; dx: number; dy: number }> = {};
 	for (let i = 0; i < count; i++) {
-		const x = Math.random() * composition.width;
-		const y = Math.random() * composition.height;
-		const size = 10 + Math.random() * 40;
-		const speed = 1 + Math.random();
+		const x = Math.random() * (composition.width - rectWidth);
+		const y = Math.random() * (composition.height - rectHeight);
+		const entity = composition.createRectangle({ x, y, width: rectWidth, height: rectHeight });
 
-		rects[i] = {
+		rects[entity] = {
 			x,
 			y,
-			size,
-			speed,
-			entity: composition.createRectangle({ x, y, width: size, height: size })
+			dx: Math.random() > 0.5 ? 5 : -5,
+			dy: Math.random() > 0.5 ? 5 : -5
 		};
+	}
+
+	// Spawn non moving rects
+	for (let i = 0; i < count; i++) {
+		const x = Math.random() * (composition.width - rectWidth);
+		const y = Math.random() * (composition.height - rectHeight);
+		composition.createRectangle({ x, y, width: rectWidth, height: rectHeight });
 	}
 
 	// Animation loop
 	const animate = () => {
-		const rectKeysToRemove: string[] = [];
+		for (const [rectangleEntity, state] of Object.entries(rects)) {
+			// Update positions
+			state.x += state.dx;
+			state.y += state.dy;
 
-		for (const key in rects) {
-			const rect = rects[key];
-			if (rect == null) {
-				continue;
-			}
+			// Bounce off the walls, account for rectangle size
+			if (state.x <= 0 || state.x + rectWidth >= composition.width) state.dx = -state.dx;
+			if (state.y <= 0 || state.y + rectHeight >= composition.height) state.dy = -state.dy;
 
-			rect.x -= rect.speed;
-			composition.setEntityPosition(rect.entity, rect.x, rect.y);
-
-			if (rect.x + rect.size / 2 < 0) {
-				rectKeysToRemove.push(key);
-			}
+			// Move the entity to its updated position
+			composition.setEntityPosition(Number(rectangleEntity), state.x, state.y);
 		}
 
-		rectKeysToRemove.forEach((key) => {
-			const rect = rects[key];
-			if (rect != null) {
-				rect.x = composition.width + rect.size / 2;
-			}
-		});
-
 		composition.update();
-
 		requestAnimationFrame(animate);
 	};
 

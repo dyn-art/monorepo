@@ -3,7 +3,7 @@ import { Card, CONTENT_WIDTH, MaxWidthWrapper } from '@/components/layout';
 import { FPSStats } from '@/components/monitoring';
 import { Button, Separator } from '@/components/primitive';
 
-import { MovingRects, Static } from './components';
+import { MovingRects, MovingRectsLegacy, Static } from './components';
 
 const DTOM: React.FC = () => {
 	const [canvasState, setCanvasState] = React.useState(CANVAS_STATE.NONE);
@@ -26,6 +26,10 @@ const DTOM: React.FC = () => {
 				<Button variant={'link'} onClick={() => setCanvasState(CANVAS_STATE.MOVING_RECTS)}>
 					Moving Rects
 				</Button>
+				<Separator orientation="vertical" />
+				<Button variant={'link'} onClick={() => setCanvasState(CANVAS_STATE.MOVING_RECTS_LEGACY)}>
+					Moving Rects Legacy
+				</Button>
 			</div>
 			<Card
 				style={{ maxWidth: CONTENT_WIDTH, height: CONTENT_WIDTH }}
@@ -36,6 +40,11 @@ const DTOM: React.FC = () => {
 
 				{/* Moving Rects */}
 				{canvasState === CANVAS_STATE.MOVING_RECTS && <MovingRects size={CONTENT_WIDTH} />}
+
+				{/* Moving Rects Legacy */}
+				{canvasState === CANVAS_STATE.MOVING_RECTS_LEGACY && (
+					<MovingRectsLegacy size={CONTENT_WIDTH} />
+				)}
 
 				{/* None */}
 				{canvasState === CANVAS_STATE.NONE && <p>Select Playground</p>}
@@ -49,5 +58,6 @@ export default DTOM;
 enum CANVAS_STATE {
 	NONE,
 	STATIC,
-	MOVING_RECTS
+	MOVING_RECTS,
+	MOVING_RECTS_LEGACY
 }
