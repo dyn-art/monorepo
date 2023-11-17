@@ -7,6 +7,7 @@ use crate::core::{
         svg_element::{
             attributes::SVGAttribute,
             events::{AttributeUpdated, ElementCreated, RenderChange, StyleUpdated},
+            styles::SVGStyle,
             SVGChildElementIdentifier, SVGElement,
         },
     },
@@ -102,8 +103,7 @@ impl BaseSVGNode {
             let mut render_changes: Vec<RenderChange> = vec![];
             for attribute in attributes {
                 render_changes.push(RenderChange::AttributeUpdated(AttributeUpdated {
-                    name: attribute.key(),
-                    new_value: Some(attribute.clone()),
+                    new_value: attribute.clone(),
                 }));
                 element.set_attribute(attribute);
             }
@@ -119,23 +119,21 @@ impl BaseSVGNode {
             self.register_render_change(
                 self.element.get_id(),
                 RenderChange::AttributeUpdated(AttributeUpdated {
-                    name: attribute.key(),
-                    new_value: Some(attribute.clone()),
+                    new_value: attribute.clone(),
                 }),
             );
             self.element.set_attribute(attribute);
         }
     }
 
-    pub fn set_styles_at(&mut self, index: usize, styles: Vec<(String, String)>) {
+    pub fn set_styles_at(&mut self, index: usize, styles: Vec<SVGStyle>) {
         if let Some(element) = self.get_child_element_at_mut(index) {
             let mut render_changes: Vec<RenderChange> = vec![];
-            for (name, value) in styles {
+            for style in styles {
                 render_changes.push(RenderChange::StyleUpdated(StyleUpdated {
-                    name: name.clone(),
-                    new_value: Some(value.clone()),
+                    new_value: style.clone(),
                 }));
-                element.set_style(name, value);
+                element.set_style(style);
             }
             let element_id = element.get_id();
             for render_change in render_changes {
@@ -144,16 +142,15 @@ impl BaseSVGNode {
         }
     }
 
-    pub fn set_styles(&mut self, styles: Vec<(String, String)>) {
-        for (name, value) in styles {
+    pub fn set_styles(&mut self, styles: Vec<SVGStyle>) {
+        for style in styles {
             self.register_render_change(
                 self.element.get_id(),
                 RenderChange::StyleUpdated(StyleUpdated {
-                    name: name.clone(),
-                    new_value: Some(value.clone()),
+                    new_value: style.clone(),
                 }),
             );
-            self.element.set_style(name, value);
+            self.element.set_style(style);
         }
     }
 

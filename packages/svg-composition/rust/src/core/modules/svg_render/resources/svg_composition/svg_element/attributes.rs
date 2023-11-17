@@ -1,55 +1,6 @@
 use serde::Serialize;
 use specta::Type;
 
-// https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/d
-#[derive(Debug, Serialize, Clone, Type)]
-#[serde(tag = "type")]
-pub enum SVGPathCommand {
-    MoveTo {
-        x: f32,
-        y: f32,
-    },
-    LineTo {
-        x: f32,
-        y: f32,
-    },
-    CurveTo {
-        cx1: f32,
-        cy1: f32,
-        cx2: f32,
-        cy2: f32,
-        x: f32,
-        y: f32,
-    },
-    ArcTo {
-        rx: f32,
-        ry: f32,
-        #[serde(rename = "xAxisRotation")]
-        x_axis_rotation: f32,
-        #[serde(rename = "largeArcFlag")]
-        large_arc_flag: bool,
-        #[serde(rename = "sweepFlag")]
-        sweep_flag: bool,
-        x: f32,
-        y: f32,
-    },
-    ClosePath,
-}
-
-// https://developer.mozilla.org/en-US/docs/Web/CSS/transform-function
-#[derive(Debug, Serialize, Clone, Type)]
-#[serde(tag = "type")]
-pub enum SVGTransformAttribute {
-    Matrix {
-        a: f32,
-        b: f32,
-        c: f32,
-        d: f32,
-        tx: f32,
-        ty: f32,
-    },
-}
-
 #[derive(Debug, Serialize, Clone, Type)]
 // Using struct variants over tuples to use serde tag feature which enables efficient property access in TypeScript,
 // allowing for faster and simpler type checks, e.g., `change.type === "Width"`
@@ -149,4 +100,53 @@ impl SVGAttribute {
             Self::Name { name } => name.clone(),
         }
     }
+}
+
+// https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/d
+#[derive(Debug, Serialize, Clone, Type)]
+#[serde(tag = "type")]
+pub enum SVGPathCommand {
+    MoveTo {
+        x: f32,
+        y: f32,
+    },
+    LineTo {
+        x: f32,
+        y: f32,
+    },
+    CurveTo {
+        cx1: f32,
+        cy1: f32,
+        cx2: f32,
+        cy2: f32,
+        x: f32,
+        y: f32,
+    },
+    ArcTo {
+        rx: f32,
+        ry: f32,
+        #[serde(rename = "xAxisRotation")]
+        x_axis_rotation: f32,
+        #[serde(rename = "largeArcFlag")]
+        large_arc_flag: bool,
+        #[serde(rename = "sweepFlag")]
+        sweep_flag: bool,
+        x: f32,
+        y: f32,
+    },
+    ClosePath,
+}
+
+// https://developer.mozilla.org/en-US/docs/Web/CSS/transform-function
+#[derive(Debug, Serialize, Clone, Type)]
+#[serde(tag = "type")]
+pub enum SVGTransformAttribute {
+    Matrix {
+        a: f32,
+        b: f32,
+        c: f32,
+        d: f32,
+        tx: f32,
+        ty: f32,
+    },
 }

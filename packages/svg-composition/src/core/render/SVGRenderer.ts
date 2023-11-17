@@ -1,4 +1,8 @@
-import type { RenderUpdateEvent, SVGAttribute } from '@/rust/dyn_composition_api/bindings';
+import type {
+	RenderUpdateEvent,
+	SVGAttribute,
+	SVGStyle
+} from '@/rust/dyn_composition_api/bindings';
 
 import { Renderer } from './Renderer';
 
@@ -40,54 +44,70 @@ export class SVGRenderer extends Renderer {
 			};
 
 			for (const update of renderUpdate.updates) {
-				if ('ElementCreated' in update) {
-					const creation = update.ElementCreated;
-
-					// Create element
-					const newElement: SVGElement = document.createElementNS(NS, creation.tagName);
-					for (const attribute of creation.attributes) {
-						const [key, value] = this.parseSVGAttribute(attribute);
-						newElement.setAttribute(key, value);
-					}
-					for (const [key, value] of creation.styles as unknown as [string, string][]) {
-						newElement.style.setProperty(key, `${value}`);
-					}
-
-					this._svgElementMap.set(elementId, newElement);
-
-					// Append element to parent
-					if (creation.parentId != null) {
-						const parentElement = this._svgElementMap.get(creation.parentId);
-						if (parentElement != null) {
-							parentElement.appendChild(newElement);
+				switch (update.type) {
+					case 'ElementCreated': {
+						// Create element
+						const newElement: SVGElement = document.createElementNS(NS, update.tagName);
+						for (const attribute of update.attributes) {
+							const [key, value] = this.parseSVGAttribute(attribute);
+							newElement.setAttribute(key, value);
 						}
-					} else {
-						this._svgElement.appendChild(newElement);
-					}
+						for (const [key, value] of update.styles as unknown as [string, string][]) {
+							newElement.style.setProperty(key, `${value}`);
+						}
 
-					element = newElement;
-				} else if ('ElementDeleted' in update) {
-					const elementToDelete = getElement();
-					if (elementToDelete?.parentNode != null) {
-						elementToDelete.parentNode.removeChild(elementToDelete);
-						this._svgElementMap.delete(elementId);
-					}
-				} else if ('AttributeUpdated' in update) {
-					const updateInfo = update.AttributeUpdated;
-					const elementToUpdate = getElement();
-					if (elementToUpdate != null) {
-						if (updateInfo.newValue == null) {
-							elementToUpdate.removeAttribute(updateInfo.name);
+						this._svgElementMap.set(elementId, newElement);
+
+						// Append element to parent
+						if (update.parentId != null) {
+							const parentElement = this._svgElementMap.get(update.parentId);
+							if (parentElement != null) {
+								parentElement.appendChild(newElement);
+							}
 						} else {
-							const [, value] = this.parseSVGAttribute(updateInfo.newValue);
-							elementToUpdate.setAttribute(updateInfo.name, value);
+							this._svgElement.appendChild(newElement);
 						}
+
+						element = newElement;
+						break;
 					}
-				} else if ('StyleUpdated' in update) {
-					const styleUpdate = update.StyleUpdated;
-					const elementToUpdate = getElement();
-					if (elementToUpdate != null) {
-						elementToUpdate.style.setProperty(styleUpdate.name, styleUpdate.newValue || '');
+					case 'ElementDeleted': {
+						const elementToDelete = getElement();
+						if (elementToDelete?.parentNode != null) {
+							elementToDelete.parentNode.removeChild(elementToDelete);
+							this._svgElementMap.delete(elementId);
+						}
+						break;
+					}
+					case 'AttributeUpdated': {
+						const elementToUpdate = getElement();
+						if (elementToUpdate != null) {
+							const [key, value] = this.parseSVGAttribute(update.newValue);
+							elementToUpdate.setAttribute(key, value);
+						}
+						break;
+					}
+					case 'AttributeRemoved': {
+						const elementToUpdate = getElement();
+						if (elementToUpdate != null) {
+							elementToUpdate.removeAttribute(update.key);
+						}
+						break;
+					}
+					case 'StyleUpdated': {
+						const elementToUpdate = getElement();
+						if (elementToUpdate != null) {
+							const [key, value] = this.parseSVGStyle(update.newValue);
+							elementToUpdate.style.setProperty(key, value);
+						}
+						break;
+					}
+					case 'StyleRemoved': {
+						const elementToUpdate = getElement();
+						if (elementToUpdate != null) {
+							elementToUpdate.style.removeProperty(update.key);
+						}
+						break;
 					}
 				}
 			}
@@ -139,6 +159,15 @@ export class SVGRenderer extends Renderer {
 				return ['fill', attribute.fill];
 			case 'Name':
 				return ['name', attribute.name];
+			default:
+				return ['', ''];
+		}
+	}
+
+	private parseSVGStyle(style: SVGStyle): [string, string] {
+		switch (style.type) {
+			case 'Display':
+				return ['display', 'block'];
 			default:
 				return ['', ''];
 		}

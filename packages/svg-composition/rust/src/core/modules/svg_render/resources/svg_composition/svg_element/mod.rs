@@ -2,13 +2,14 @@ use std::collections::HashMap;
 
 use bevy_ecs::entity::Entity;
 
-use self::attributes::SVGAttribute;
+use self::{attributes::SVGAttribute, styles::SVGStyle};
 
 use super::{svg_composition::SVGComposition, svg_node::base_svg_node::BaseSVGNode};
 
 pub mod attributes;
 pub mod events;
 pub mod helper;
+pub mod styles;
 
 // Defines an individual SVG element
 #[derive(Debug)]
@@ -20,7 +21,7 @@ pub struct SVGElement {
     // Attributes of the SVG element
     attributes: HashMap<&'static str, SVGAttribute>,
     // Style properties of the SVG element
-    styles: HashMap<String, String>,
+    styles: HashMap<&'static str, SVGStyle>,
     // Identifiers for child elements, supporting both in-context and out-of-context children
     children: Vec<SVGChildElementIdentifier>,
 }
@@ -60,18 +61,26 @@ impl SVGElement {
         self.attributes.get(key)
     }
 
-    pub fn set_style(&mut self, name: String, value: String) {
-        self.styles.insert(name, value);
+    pub fn get_attributes(&self) -> Vec<SVGAttribute> {
+        self.attributes.values().cloned().collect()
     }
 
-    pub fn set_styles(&mut self, styles: Vec<(String, String)>) {
-        for (name, value) in styles {
-            self.set_style(name, value);
+    pub fn set_style(&mut self, style: SVGStyle) {
+        self.styles.insert(style.key(), style);
+    }
+
+    pub fn set_styles(&mut self, styles: Vec<SVGStyle>) {
+        for style in styles {
+            self.set_style(style);
         }
     }
 
-    pub fn get_style(&self, key: &str) -> Option<&String> {
+    pub fn get_style(&self, key: &'static str) -> Option<&SVGStyle> {
         self.styles.get(key)
+    }
+
+    pub fn get_styles(&self) -> Vec<SVGStyle> {
+        self.styles.values().cloned().collect()
     }
 
     pub fn append_child(&mut self, identifier: SVGChildElementIdentifier) {
@@ -84,14 +93,6 @@ impl SVGElement {
 
     pub fn get_tag_name(&self) -> &SVGTag {
         &self.tag_name
-    }
-
-    pub fn get_attributes(&self) -> Vec<SVGAttribute> {
-        self.attributes.values().cloned().collect()
-    }
-
-    pub fn get_styles(&self) -> &HashMap<String, String> {
-        &self.styles
     }
 
     pub fn to_string(&self, node: &BaseSVGNode, composition: &SVGComposition) -> String {
@@ -108,7 +109,7 @@ impl SVGElement {
             let style_string: String = self
                 .styles
                 .iter()
-                .map(|(key, value)| format!("{}: {}", key, value))
+                .map(|(key, value)| format!("{}: {}", key, value.to_svg_string()))
                 .collect::<Vec<String>>()
                 .join("; ");
             result.push_str(&format!(" style=\"{}\"", style_string));

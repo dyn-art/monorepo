@@ -1,18 +1,18 @@
-use std::collections::HashMap;
-
 use serde::Serialize;
 use serde_with::serde_as;
 use specta::Type;
 
-use super::attributes::SVGAttribute;
+use super::{attributes::SVGAttribute, styles::SVGStyle};
 
 #[derive(Debug, Serialize, Clone, Type)]
+#[serde(tag = "type")]
 pub enum RenderChange {
     ElementCreated(ElementCreated),
     ElementDeleted(ElementDeleted),
     AttributeUpdated(AttributeUpdated),
+    AttributeRemoved(AttributeRemoved),
     StyleUpdated(StyleUpdated),
-    ElementUpdated(ElementUpdated),
+    StyleRemoved(StyleRemoved),
 }
 
 /// Emitted when a new SVGElement is created
@@ -22,37 +22,37 @@ pub struct ElementCreated {
     #[serde(rename = "tagName")]
     pub tag_name: &'static str,
     pub attributes: Vec<SVGAttribute>,
-    #[serde_as(as = "Vec<(_, _)>")]
-    pub styles: HashMap<String, String>,
+    pub styles: Vec<SVGStyle>,
     #[serde(rename = "parentId")]
     pub parent_id: Option<u32>, // Optional parent ID, if it's a child element
 }
 
 /// Emitted when an SVGElement is deleted
 #[derive(Debug, Serialize, Clone, Type)]
-pub struct ElementDeleted;
+pub struct ElementDeleted {}
 
 /// Emitted when an attribute of an SVGElement is updated
 #[derive(Debug, Serialize, Clone, Type)]
 pub struct AttributeUpdated {
-    pub name: &'static str,
     #[serde(rename = "newValue")]
-    pub new_value: Option<SVGAttribute>, // None indicates removal of the attribute
+    pub new_value: SVGAttribute,
+}
+
+/// Emitted when an attribute of an SVGElement is removed
+#[derive(Debug, Serialize, Clone, Type)]
+pub struct AttributeRemoved {
+    key: &'static str,
 }
 
 /// Emitted when a style property of an SVGElement is updated
 #[derive(Debug, Serialize, Clone, Type)]
 pub struct StyleUpdated {
-    pub name: String,
     #[serde(rename = "newValue")]
-    pub new_value: Option<String>, // None indicates removal of the style
+    pub new_value: SVGStyle,
 }
 
-/// Emitted for bulk updates to an SVGElement
+/// Emitted when a style property of an SVGElement is removed
 #[derive(Debug, Serialize, Clone, Type)]
-pub struct ElementUpdated {
-    #[serde(rename = "updatedAttributes")]
-    pub updated_attributes: HashMap<String, String>,
-    #[serde(rename = "updatedStyles")]
-    pub updated_styles: HashMap<String, String>,
+pub struct StyleRemoved {
+    key: &'static str,
 }
