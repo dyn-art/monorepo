@@ -11,8 +11,8 @@ use super::svg_node::{frame_svg_node::FrameSVGNode, shape_svg_node::ShapeSVGNode
 pub struct SVGComposition {
     // All nodes of the SVGComposition
     nodes: HashMap<Entity, Box<dyn SVGNode>>,
-    // Root entity
-    root: Option<Entity>,
+    // Root entities
+    root_ids: Vec<Entity>,
     // Sender to enque events for frontend
     output_event_sender: Sender<OutputEvent>,
 }
@@ -20,25 +20,10 @@ pub struct SVGComposition {
 impl SVGComposition {
     pub fn new(output_event_sender: Sender<OutputEvent>) -> Self {
         SVGComposition {
-            root: None,
+            root_ids: vec![],
             nodes: HashMap::new(),
             output_event_sender,
         }
-    }
-
-    pub fn has_root_node(&self) -> bool {
-        self.root.is_some()
-    }
-
-    pub fn get_root_node_id(&self) -> Option<Entity> {
-        self.root
-    }
-
-    pub fn get_root_node(&self) -> Option<&Box<dyn SVGNode>> {
-        if let Some(root_entity) = self.root {
-            return self.nodes.get(&root_entity);
-        }
-        return None;
     }
 
     pub fn get_node(&self, entity: &Entity) -> Option<&Box<dyn SVGNode>> {
@@ -72,9 +57,9 @@ impl SVGComposition {
     ) {
         self.nodes.insert(entity, node);
 
-        // First inserted node without known parent will become root node
-        if !self.has_root_node() && maybe_parent_id.is_none() {
-            self.root = Some(entity);
+        // Nodes without known parent will become root nodes
+        if maybe_parent_id.is_none() {
+            self.root_ids.push(entity);
         }
 
         // Append child node to parent node
@@ -109,23 +94,32 @@ impl SVGComposition {
         }
     }
 
-    pub fn to_string(&self) -> String {
-        if let Some(root) = self.get_root_node() {
-            let element = root.get_base().get_element();
-            let mut result = format!(
-                "<svg width=\"{}\" height=\"{}\" xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\">",
-                element.get_attribute("width").unwrap().to_svg_string(), element.get_attribute("height").unwrap().to_svg_string() 
-            );
+    pub fn to_string(&self) -> Option<String> {
+        let mut svg_strings = Vec::new();
 
-            // Append the content from the root node
-            result.push_str(&root.to_string(self));
+        for id in self.root_ids.iter() {
+            if let Some(root) = self.get_node(id) {
+                let element = root.get_base().get_element();
+                let mut result = format!(
+                    "<svg width=\"{}\" height=\"{}\" xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\">",
+                    element.get_attribute("width").unwrap().to_svg_string(),
+                    element.get_attribute("height").unwrap().to_svg_string()
+                );
 
-            // Close the SVG tag
-            result.push_str("</svg>");
+                // Append the content from the root node
+                result.push_str(&root.to_string(self));
 
-            return result;
-        } else {
-            String::from("undefined")
+                // Close the SVG tag
+                result.push_str("</svg>");
+
+                svg_strings.push(result);
+            }
         }
+
+        return if svg_strings.is_empty() {
+            None
+        } else {
+            Some(svg_strings.join("\n"))
+        };
     }
 }

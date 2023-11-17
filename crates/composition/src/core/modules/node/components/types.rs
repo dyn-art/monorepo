@@ -2,6 +2,11 @@ use bevy_ecs::component::Component;
 use serde::{Deserialize, Serialize};
 use specta::Type;
 
+/// Marks the root node.
+///
+/// This component is intended to be used with only one entity in the game world.
+/// There is no enforcement at the Bevy framework level to ensure this uniqueness,
+/// so it must be managed through game logic.
 #[derive(Component, Serialize, Deserialize, Clone, Default, Debug, Type)]
 pub struct Root;
 

@@ -143,8 +143,8 @@ export class Composition {
 		this._renderer.clear();
 	}
 
-	public toString(): string {
-		return this._compositionHandle.toString();
+	public toString(): string | null {
+		return this._compositionHandle.toString() ?? null;
 	}
 }
 

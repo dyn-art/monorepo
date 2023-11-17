@@ -80,7 +80,7 @@ impl JsCompositionHandle {
 
     pub fn spawn_rectangle_node(&mut self, mixin: JsValue) -> JsValue {
         let mixin: RectangleNodeBundle = serde_wasm_bindgen::from_value(mixin).unwrap();
-        let entity = self.composition.spawn(mixin);
+        let entity = self.composition.spawn(mixin, None);
         return serde_wasm_bindgen::to_value(&entity).unwrap();
     }
 }

@@ -94,11 +94,7 @@ impl JsCompositionHandle {
     ) -> Result<JsValue, JsValue> {
         let mixin: RectangleNodeBundle = serde_wasm_bindgen::from_value(mixin)
             .map_err(|e| JsValue::from_str(&format!("Error parsing mixin: {:?}", e)))?;
-        let maybe_parent_id = convert_optional_jsvalue::<Entity>(maybe_parent_id).or_else(|| {
-            self.get_svg_composition()
-                .ok()
-                .and_then(|composition| composition.get_root_node_id())
-        });
+        let maybe_parent_id = convert_optional_jsvalue::<Entity>(maybe_parent_id);
 
         // Spawn rectangle into main world
         let entity = self.composition.spawn(mixin, maybe_parent_id);
@@ -120,7 +116,7 @@ impl JsCompositionHandle {
     }
 
     #[wasm_bindgen(js_name = toString)]
-    pub fn to_string(&self) -> String {
+    pub fn to_string(&self) -> Option<String> {
         self.get_svg_composition().unwrap().to_string()
     }
 }
