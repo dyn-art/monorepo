@@ -1,12 +1,17 @@
 use bevy_app::{App, Plugins};
-use bevy_ecs::{bundle::Bundle, entity::Entity};
+use bevy_ecs::{bundle::Bundle, entity::Entity, query::With};
+use bevy_hierarchy::BuildWorldChildren;
 use dyn_bevy_render_skeleton::RenderPlugin;
 
 use crate::core::modules::{
     composition::CompositionPlugin, interactive_composition::InteractiveCompositionPlugin,
 };
 
-use super::{dtif::DTIFComposition, events::input_event::InputEvent, modules::node::NodePlugin};
+use super::{
+    dtif::DTIFComposition,
+    events::input_event::InputEvent,
+    modules::node::{components::types::Root, NodePlugin},
+};
 
 pub struct Composition {
     app: App,
@@ -36,6 +41,10 @@ impl Composition {
         return Self { app };
     }
 
+    pub fn get_app(&self) -> &App {
+        &self.app
+    }
+
     pub fn add_plugins<M>(&mut self, plugins: impl Plugins<M>) {
         self.app.add_plugins(plugins);
     }
@@ -44,13 +53,36 @@ impl Composition {
         self.app.update();
     }
 
-    pub fn spawn<B: Bundle + std::fmt::Debug>(&mut self, bundle: B) -> Entity {
-        return self.app.world.spawn::<B>(bundle).id();
+    pub fn spawn<B: Bundle + std::fmt::Debug>(
+        &mut self,
+        bundle: B,
+        maybe_parent_id: Option<Entity>,
+    ) -> Entity {
+        let entity = self.app.world.spawn::<B>(bundle).id();
+
+        // If no parent id provided the root node will become the parent
+        let maybe_parent_id = maybe_parent_id.or_else(|| {
+            self.app
+                .world
+                .query_filtered::<Entity, With<Root>>()
+                .iter(&self.app.world)
+                .next()
+        });
+
+        // Establish potential parent child relation
+        if let Some(parent_id) = maybe_parent_id {
+            self.app
+                .world
+                .entity_mut(parent_id)
+                .push_children(&vec![entity]);
+        }
+
+        return entity;
     }
 
     pub fn register_events<T: InputEvent>(&mut self, events: Vec<T>) {
         for event in events {
-            self.register_event(event)
+            self.register_event(event);
         }
     }
 

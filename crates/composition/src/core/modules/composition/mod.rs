@@ -8,6 +8,8 @@ use self::{
     events::{EntityMoved, EntitySetPosition},
 };
 
+use super::node::components::types::Root;
+
 pub mod components;
 pub mod events;
 
@@ -36,6 +38,7 @@ fn insert_dtif(world: &mut World, dtif: &DTIFComposition) {
     let root_node_entity = dtif_processor
         .process_node(&root_node_eid, world, &dtif.nodes)
         .unwrap();
+    world.entity_mut(root_node_entity).insert(Root);
 
     // Apply changes
     if let Some(changes) = &dtif.changes {
@@ -45,8 +48,7 @@ fn insert_dtif(world: &mut World, dtif: &DTIFComposition) {
     }
 
     // Spawn composition as entity (only one should exist).
-    // Why entity? Because I see it as part of the "game" world,
-    // and to spawn it with values passed from JS.
+    // Why entity? Because we see it as part of the "game" world.
     world.spawn(CompositionMixin {
         version: dtif.version.clone(),
         name: dtif.name.clone(),
