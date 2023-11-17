@@ -20,6 +20,7 @@ impl SVGStyle {
         match self {
             Self::Display { display } => match display {
                 SVGDisplayStyle::Block => String::from("block"),
+                SVGDisplayStyle::None => String::from("none"),
             },
         }
     }
@@ -29,4 +30,5 @@ impl SVGStyle {
 #[serde(tag = "type")]
 pub enum SVGDisplayStyle {
     Block,
+    None,
 }

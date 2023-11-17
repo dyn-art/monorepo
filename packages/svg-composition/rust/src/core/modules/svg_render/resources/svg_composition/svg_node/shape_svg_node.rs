@@ -3,12 +3,13 @@ use bevy_ecs::entity::Entity;
 use crate::core::modules::svg_render::{
     mixin_change::MixinChange,
     resources::svg_composition::{
-        svg_composition::SVGComposition,
         svg_element::{
             attributes::SVGAttribute,
             helper::{construct_svg_path, mat3_to_svg_transform},
+            styles::{SVGDisplayStyle, SVGStyle},
             SVGElement, SVGTag,
         },
+        SVGComposition,
     },
 };
 
@@ -82,15 +83,21 @@ impl SVGNode for ShapeSVGNode {
                         opacity: mixin.opacity,
                     }]);
                 }
+                MixinChange::Composition(mixin) => {
+                    let base = self.get_base_mut();
+                    base.set_styles(vec![SVGStyle::Display {
+                        display: if mixin.is_visible {
+                            SVGDisplayStyle::Block
+                        } else {
+                            SVGDisplayStyle::None
+                        },
+                    }])
+                }
                 _ => {
                     // do nothing
                 }
             }
         }
-    }
-
-    fn append_external_child(&mut self, entity: Entity) -> () {
-        // do nothing as not supported
     }
 
     fn get_external_child_append_id(&self) -> Option<&ElementReference> {

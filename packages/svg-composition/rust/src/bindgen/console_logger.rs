@@ -34,7 +34,6 @@ impl Formatter {
 // Logger
 // =============================================================================
 
-/// Logs messages to the Web browser's console
 pub struct ConsoleLogger {
     formatter: Formatter,
     log_level: Level,

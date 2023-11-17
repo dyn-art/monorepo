@@ -4,17 +4,17 @@ use bevy_ecs::entity::Entity;
 
 use self::{attributes::SVGAttribute, styles::SVGStyle};
 
-use super::{svg_composition::SVGComposition, svg_node::base_svg_node::BaseSVGNode};
+use super::{svg_node::base_svg_node::BaseSVGNode, SVGComposition};
 
 pub mod attributes;
 pub mod events;
 pub mod helper;
 pub mod styles;
 
-// Defines an individual SVG element
+/// Defines an individual SVG element
 #[derive(Debug)]
 pub struct SVGElement {
-    // Unique identifier for the SVGElement
+    // Unique identifier of the SVGElement
     id: u32,
     // The type of SVG element (e.g., circle, rect)
     tag_name: SVGTag,
@@ -46,6 +46,10 @@ impl SVGElement {
             children: vec![],
         }
     }
+
+    // =============================================================================
+    // Getter & Setter
+    // =============================================================================
 
     pub fn set_attribute(&mut self, attribute: SVGAttribute) {
         self.attributes.insert(attribute.key(), attribute);
@@ -83,10 +87,6 @@ impl SVGElement {
         self.styles.values().cloned().collect()
     }
 
-    pub fn append_child(&mut self, identifier: SVGChildElementIdentifier) {
-        self.children.push(identifier);
-    }
-
     pub fn get_id(&self) -> u32 {
         self.id
     }
@@ -95,30 +95,45 @@ impl SVGElement {
         &self.tag_name
     }
 
+    // =============================================================================
+    // Children
+    // =============================================================================
+
+    pub fn append_child(&mut self, identifier: SVGChildElementIdentifier) {
+        self.children.push(identifier);
+    }
+
+    // =============================================================================
+    // Other
+    // =============================================================================
+
     pub fn to_string(&self, node: &BaseSVGNode, composition: &SVGComposition) -> String {
-        // Start with the opening tag and the tag name
-        let mut result = format!("<{}", self.tag_name.as_str());
+        let mut result = String::new();
 
-        // Append attributes from the hash map, including 'id'
-        for (key, value) in &self.attributes {
-            result.push_str(&format!(" {}=\"{}\"", key, value.to_svg_string()));
+        // Open the SVG tag
+        {
+            result.push_str(&format!("<{}", self.tag_name.as_str()));
+
+            // Append attributes
+            for (key, value) in &self.attributes {
+                result.push_str(&format!(" {}=\"{}\"", key, value.to_svg_string()));
+            }
+
+            // Append styles as a single 'style' attribute
+            if !self.styles.is_empty() {
+                let style_string: String = self
+                    .styles
+                    .iter()
+                    .map(|(key, value)| format!("{}: {}", key, value.to_svg_string()))
+                    .collect::<Vec<String>>()
+                    .join("; ");
+                result.push_str(&format!(" style=\"{}\"", style_string));
+            }
+
+            result.push('>');
         }
 
-        // Append styles as a single 'style' attribute
-        if !self.styles.is_empty() {
-            let style_string: String = self
-                .styles
-                .iter()
-                .map(|(key, value)| format!("{}: {}", key, value.to_svg_string()))
-                .collect::<Vec<String>>()
-                .join("; ");
-            result.push_str(&format!(" style=\"{}\"", style_string));
-        }
-
-        // Add the closing bracket of the opening tag
-        result.push('>');
-
-        // Handle children
+        // Append children
         for child in &self.children {
             match child {
                 SVGChildElementIdentifier::InContext(child_index) => {
@@ -134,7 +149,7 @@ impl SVGElement {
             }
         }
 
-        // Close the tag
+        // Close the SVG tag
         result.push_str(&format!("</{}>", self.tag_name.as_str()));
 
         return result;

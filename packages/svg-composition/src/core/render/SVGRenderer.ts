@@ -127,32 +127,40 @@ export class SVGRenderer extends Renderer {
 				return ['opacity', attribute.opacity.toString()];
 			case 'Transform': {
 				const transform = attribute.transform;
-				const matrix = `matrix(${transform.a}, ${transform.b}, ${transform.c}, ${transform.d}, ${transform.tx}, ${transform.ty})`;
-				return ['transform', matrix];
+				switch (transform.type) {
+					case 'Matrix':
+						return [
+							'transform',
+							`matrix(${transform.a}, ${transform.b}, ${transform.c}, ${transform.d}, ${transform.tx}, ${transform.ty})`
+						];
+					default:
+						return ['', ''];
+				}
 			}
-			case 'D': {
-				const d = attribute.d
-					.map((command) => {
-						switch (command.type) {
-							case 'MoveTo':
-								return `M${command.x} ${command.y}`;
-							case 'LineTo':
-								return `L${command.x} ${command.y}`;
-							case 'CurveTo':
-								return `C${command.cx1} ${command.cy1} ${command.cx2} ${command.cy2} ${command.x} ${command.y}`;
-							case 'ArcTo':
-								return `A${command.rx} ${command.ry} ${command.xAxisRotation} ${
-									command.largeArcFlag ? 1 : 0
-								} ${command.sweepFlag ? 1 : 0} ${command.x} ${command.y}`;
-							case 'ClosePath':
-								return 'Z';
-							default:
-								return '';
-						}
-					})
-					.join(' ');
-				return ['d', d];
-			}
+			case 'D':
+				return [
+					'd',
+					attribute.d
+						.map((command) => {
+							switch (command.type) {
+								case 'MoveTo':
+									return `M${command.x} ${command.y}`;
+								case 'LineTo':
+									return `L${command.x} ${command.y}`;
+								case 'CurveTo':
+									return `C${command.cx1} ${command.cy1} ${command.cx2} ${command.cy2} ${command.x} ${command.y}`;
+								case 'ArcTo':
+									return `A${command.rx} ${command.ry} ${command.xAxisRotation} ${
+										command.largeArcFlag ? 1 : 0
+									} ${command.sweepFlag ? 1 : 0} ${command.x} ${command.y}`;
+								case 'ClosePath':
+									return 'Z';
+								default:
+									return '';
+							}
+						})
+						.join(' ')
+				];
 			case 'ClipPath':
 				return ['clip-path', `url(#${attribute.clipPath})`];
 			case 'Fill':
@@ -166,8 +174,17 @@ export class SVGRenderer extends Renderer {
 
 	private parseSVGStyle(style: SVGStyle): [string, string] {
 		switch (style.type) {
-			case 'Display':
-				return ['display', 'block'];
+			case 'Display': {
+				const display = style.display;
+				switch (display.type) {
+					case 'Block':
+						return ['display', 'block'];
+					case 'None':
+						return ['display', 'none'];
+					default:
+						return ['', ''];
+				}
+			}
 			default:
 				return ['', ''];
 		}
