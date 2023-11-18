@@ -159,7 +159,24 @@ impl SVGElement {
                         result.push_str(&fill.to_string(node, composition))
                     }
                 }
-                _ => {} // TODO
+                SVGChildElementIdentifier::InFillContext(paint_index) => {
+                    if let Some(fill) = node.get_fill() {
+                        if let Some(paint) = fill.get_paint_at(*paint_index) {
+                            result.push_str(&paint.to_string(node, composition))
+                        }
+                    }
+                }
+                SVGChildElementIdentifier::InPaintContext(paint_index, child_index) => {
+                    if let Some(fill) = node.get_fill() {
+                        if let Some(paint) = fill.get_paint_at(*paint_index) {
+                            if let Some(child_element) =
+                                paint.get_bundle().get_children().get(*child_index)
+                            {
+                                result.push_str(&child_element.to_string(node, composition));
+                            }
+                        }
+                    }
+                }
             }
         }
 

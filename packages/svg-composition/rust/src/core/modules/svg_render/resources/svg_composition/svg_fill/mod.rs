@@ -48,6 +48,10 @@ impl SVGFill {
         }
     }
 
+    pub fn get_paint_at(&self, index: usize) -> Option<&Box<dyn SVGPaint>> {
+        self.paints.get(index)
+    }
+
     pub fn apply_mixin_change(&mut self, mixin: &FillMixin) {
         let mut updated_paints: Vec<Box<dyn SVGPaint>> = Vec::new();
 
