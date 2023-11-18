@@ -1,4 +1,8 @@
-use self::svg_paint::SVGPaint;
+use dyn_composition::core::modules::node::components::mixins::{FillMixin, Paint};
+
+use crate::core::events::output_event::RenderUpdateEvent;
+
+use self::svg_paint::{solid_svg_paint::SolidSVGPaint, SVGPaint};
 
 use super::{
     svg_bundle::{BaseSVGBundle, SVGBundle},
@@ -26,7 +30,7 @@ impl SVGBundle for SVGFill {
 }
 
 impl SVGFill {
-    pub fn new(parent_id: u32, clip_path_id: u32) -> Self {
+    pub fn new(parent_element_id: u32, clip_path_id: u32) -> Self {
         // Create root element and apply it to the SVG fill
         let mut element = SVGElement::new(SVGTag::Group);
         #[cfg(feature = "trace")]
@@ -36,12 +40,37 @@ impl SVGFill {
         element.set_attribute(SVGAttribute::ClipPath {
             clip_path: clip_path_id,
         });
-        let bundle = BaseSVGBundle::new(element, Some(parent_id));
+        let bundle = BaseSVGBundle::new(element, Some(parent_element_id));
 
         Self {
             bundle,
             paints: vec![],
         }
+    }
+
+    pub fn apply_mixin_change(&mut self, mixin: &FillMixin) {
+        let mut updated_paints: Vec<Box<dyn SVGPaint>> = Vec::new();
+
+        for mixin_paint in &mixin.paints {
+            match mixin_paint {
+                Paint::Solid(solid_paint) => {
+                    let mut new_solid_svg_paint =
+                        SolidSVGPaint::new(self.bundle.get_element().get_id());
+                    new_solid_svg_paint.apply_paint_change(solid_paint);
+                    updated_paints.push(Box::new(new_solid_svg_paint));
+                }
+            }
+        }
+
+        self.paints = updated_paints;
+    }
+
+    pub fn drain_updates(&mut self) -> Vec<RenderUpdateEvent> {
+        let mut updates = self.get_bundle_mut().drain_updates();
+        for paint in &mut self.paints {
+            updates.extend(paint.get_bundle_mut().drain_updates());
+        }
+        return updates;
     }
 
     pub fn to_string(&self, node: &dyn SVGNode, composition: &SVGComposition) -> String {

@@ -1,5 +1,3 @@
-use dyn_composition::core::modules::node::components::mixins::Paint;
-
 use crate::core::{
     events::output_event::RenderUpdateEvent,
     mixin_change::MixinChange,
@@ -84,29 +82,10 @@ impl SVGNode for ShapeSVGNode {
                         } else {
                             SVGDisplayStyle::None
                         },
-                    }])
+                    }]);
                 }
                 MixinChange::Fill(mixin) => {
-                    for paint in &mixin.paints {
-                        match paint {
-                            Paint::Solid(solid_paint) => {
-                                // TODO
-                            }
-                        }
-                    }
-
-                    // TODO:
-                    // Create SVG Fill which soly manages the paints
-                    // -> Check whether paint added or removed
-                    // -> Keeps reference
-                    // -> Fill is directly referenced in SVGNode (but not base) as it belongs to it
-                    // -> FillWrapper already belongs to Fill
-                    // -> SVGChildElementIdentifier which references the Fill called Fill or so?
-                    //    because there is no point in centrally collecting the Fill
-                    //    since it directly belongs to a Node and has no hierachy
-                    //    and don't need to be indexed and stuff
-                    // -> Fill is then owner of the Paint structs which manage their own representation
-                    // ->
+                    self.fill.apply_mixin_change(mixin);
                 }
                 _ => {
                     // do nothing
@@ -121,7 +100,7 @@ impl SVGNode for ShapeSVGNode {
 
     fn drain_updates(&mut self) -> Vec<RenderUpdateEvent> {
         let mut updates = self.get_bundle_mut().drain_updates();
-        updates.extend(self.fill.get_bundle_mut().drain_updates());
+        updates.extend(self.fill.drain_updates());
         return updates;
     }
 

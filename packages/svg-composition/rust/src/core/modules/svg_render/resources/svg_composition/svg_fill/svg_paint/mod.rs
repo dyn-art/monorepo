@@ -1,12 +1,11 @@
-use crate::core::modules::svg_render::resources::svg_composition::SVGComposition;
+use crate::core::modules::svg_render::resources::svg_composition::{
+    svg_bundle::SVGBundle, svg_node::SVGNode, SVGComposition,
+};
 
-use self::base_svg_paint::BaseSVGPaint;
 use std::fmt::Debug;
 
-pub mod base_svg_paint;
+pub mod solid_svg_paint;
 
-pub trait SVGPaint: Sync + Send + Debug {
-    fn get_base(&self) -> &BaseSVGPaint;
-    fn get_base_mut(&mut self) -> &mut BaseSVGPaint;
-    fn to_string(&self, composition: &SVGComposition) -> String;
+pub trait SVGPaint: SVGBundle + Sync + Send + Debug {
+    fn to_string(&self, node: &dyn SVGNode, composition: &SVGComposition) -> String;
 }

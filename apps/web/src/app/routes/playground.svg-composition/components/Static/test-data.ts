@@ -33,6 +33,18 @@ export const COMPOSITION_WITH_ONE_RECT = (width: number, height: number): DTIFCo
 				bottomRightRadius: 0,
 				topLeftRadius: 0,
 				topRightRadius: 0
+			},
+			fill: {
+				paints: [
+					{
+						Solid: {
+							blendMode: 'Normal',
+							color: [0, 0, 0],
+							isVisible: true,
+							opacity: 1
+						}
+					}
+				]
 			}
 		}
 	},
