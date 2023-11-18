@@ -139,17 +139,15 @@ impl Default for NodeCompositionMixin {
 #[derive(Component, Serialize, Deserialize, Clone, Debug, Type)]
 pub struct BlendMixin {
     /// Specifies the blend mode for the node.
-    /// Blend mode determines how the node's color blends with colors beneath it,
-    /// affecting the overall visual output.
+    /// Blend mode determines how the node's color blends with colors beneath it.
     #[serde(rename = "blendMode")]
     pub blend_mode: BlendMode,
 
-    /// The opacity level of the node, ranging from 0.0 to 1.0.
-    /// A value of 0.0 makes the node fully transparent, while 1.0 makes it fully opaque.
+    /// The opacity of the node,
+    /// ranging from 0.0 (completely transparent) to 1.0 (completely opaque).
     pub opacity: f32,
 
     /// Indicates whether the node is used as a mask.
-    /// If set to `true`, the node acts as a mask, controlling the visibility of content underneath it.
     #[serde(rename = "isMask")]
     pub is_mask: bool,
 }
@@ -164,7 +162,122 @@ impl Default for BlendMixin {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Type)]
+// =============================================================================
+// Path Mixin
+// =============================================================================
+
+/// Represents a path in a graphical composition, defined by a series of vertices.
+/// Each vertex is an anchor point, and the path is constructed by connecting these points.
+#[derive(Component, Serialize, Deserialize, Clone, Debug, Type)]
+pub struct PathMixin {
+    /// A collection of `Anchor` points that define the shape of the path.
+    /// These vertices determine the path's outline through various commands.
+    pub vertices: Vec<Anchor>,
+}
+
+impl Default for PathMixin {
+    fn default() -> Self {
+        Self { vertices: vec![] }
+    }
+}
+
+/// Represents an anchor point in a path, defining a specific location and command.
+#[derive(Serialize, Deserialize, Clone, Debug, Type)]
+pub struct Anchor {
+    /// The position of the anchor point in 2D space.
+    pub position: Vec2,
+
+    /// The command associated with the anchor point,
+    /// defining how the path should proceed from this point.
+    pub command: AnchorCommand,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, Type)]
+pub enum AnchorCommand {
+    /// Moves the path to a new location without drawing anything.
+    MoveTo,
+    /// Draws a straight line from the current position to the anchor point.
+    LineTo,
+    /// Draws a curve to the anchor point using two control points.
+    CurveTo {
+        /// The first control point for the curve.
+        #[serde(rename = "controlPoint1")]
+        control_point_1: Vec2,
+
+        /// The second control point for the curve.
+        #[serde(rename = "controlPoint2")]
+        control_point_2: Vec2,
+    },
+    /// Draws an arc to the anchor point.
+    ArcTo {
+        /// The radius of the arc in 2D space.
+        radius: Vec2,
+
+        /// The rotation of the arc's x-axis, in degrees.
+        #[serde(rename = "xAxisRotation")]
+        x_axis_rotation: f32,
+
+        /// A flag to determine if the arc should be the larger of the two possible arcs.
+        #[serde(rename = "largeArcFlag")]
+        large_arc_flag: bool,
+
+        /// A flag to determine the direction of the arc sweep.
+        #[serde(rename = "sweepFlag")]
+        sweep_flag: bool,
+    },
+    /// Closes the path by drawing a line to the start point.
+    ClosePath,
+}
+
+// =============================================================================
+// Fill Mixin
+// =============================================================================
+
+/// Manages the fill properties of a graphical object.
+#[derive(Component, Serialize, Deserialize, Clone, Debug, Type)]
+pub struct FillMixin {
+    /// A collection of `Paint` objects,
+    /// each defining a different aspect of how the object is filled.
+    pub paints: Vec<Paint>,
+}
+
+impl Default for FillMixin {
+    fn default() -> Self {
+        Self { paints: vec![] }
+    }
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, Type)]
+pub enum Paint {
+    /// Represents a solid color paint.
+    Solid(SolidPaint),
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, Type)]
+pub struct SolidPaint {
+    /// The color of the paint, represented as an RGB array
+    /// where each component ranges from 0 to 255.
+    color: [u8; 3],
+
+    /// The opacity of the paint,
+    /// ranging from 0.0 (completely transparent) to 1.0 (completely opaque).
+    opacity: f32,
+
+    /// The blend mode used when applying the paint,
+    /// which determines how the paint's color blends with colors underneath it.
+    #[serde(rename = "blendMode")]
+    blend_mode: BlendMode,
+
+    /// Determines whether the paint is visible.
+    #[serde(rename = "isVisible")]
+    is_visible: bool,
+}
+
+// =============================================================================
+// Effects
+// =============================================================================
+
+#[derive(Serialize, Deserialize, Clone, Debug, Type)]
 pub enum BlendMode {
     Normal,
     Multiply,
@@ -183,54 +296,3 @@ pub enum BlendMode {
     Color,
     Luminosity,
 }
-
-// =============================================================================
-// Path Mixin
-// =============================================================================
-
-#[derive(Component, Serialize, Deserialize, Clone, Debug, Type)]
-pub struct PathMixin {
-    pub vertices: Vec<Anchor>,
-}
-
-impl Default for PathMixin {
-    fn default() -> Self {
-        Self { vertices: vec![] }
-    }
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug, Type)]
-pub struct Anchor {
-    pub position: Vec2,
-    pub command: AnchorCommand,
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug, Type)]
-pub enum AnchorCommand {
-    MoveTo,
-    LineTo,
-    CurveTo {
-        #[serde(rename = "controlPoint1")]
-        control_point_1: Vec2,
-
-        #[serde(rename = "controlPoint2")]
-        control_point_2: Vec2,
-    },
-    ArcTo {
-        radius: Vec2,
-
-        #[serde(rename = "xAxisRotation")]
-        x_axis_rotation: f32,
-
-        #[serde(rename = "largeArcFlag")]
-        large_arc_flag: bool,
-
-        #[serde(rename = "sweepFlag")]
-        sweep_flag: bool,
-    },
-    ClosePath,
-}
-
-// =============================================================================
-// Effects
-// =============================================================================

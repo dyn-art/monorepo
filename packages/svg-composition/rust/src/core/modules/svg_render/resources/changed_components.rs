@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use bevy_ecs::{entity::Entity, system::Resource};
 use dyn_composition::core::modules::node::components::types::NodeType;
 
-use crate::core::modules::svg_render::mixin_change::MixinChange;
+use crate::core::mixin_change::MixinChange;
 
 #[derive(Resource, Debug, Default)]
 pub struct ChangedComponents {

@@ -2,7 +2,7 @@ use std::ops::Deref;
 
 use bevy_hierarchy::Children;
 use dyn_composition::core::modules::node::components::mixins::{
-    BlendMixin, ChildrenMixin, DimensionMixin, NodeCompositionMixin, PathMixin,
+    BlendMixin, ChildrenMixin, DimensionMixin, FillMixin, NodeCompositionMixin, PathMixin,
     RectangleCornerMixin, RelativeTransformMixin,
 };
 use serde::Serialize;
@@ -18,6 +18,7 @@ pub enum MixinChange {
     Composition(NodeCompositionMixin),
     Blend(BlendMixin),
     Path(PathMixin),
+    Fill(FillMixin),
 }
 
 pub trait ToMixinChange {
@@ -84,5 +85,11 @@ impl ToMixinChange for PathMixin {
 impl ToMixinChange for RectangleCornerMixin {
     fn to_mixin_change(&self) -> MixinChange {
         MixinChange::RectangleCorner(self.clone())
+    }
+}
+
+impl ToMixinChange for FillMixin {
+    fn to_mixin_change(&self) -> MixinChange {
+        MixinChange::Fill(self.clone())
     }
 }

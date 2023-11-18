@@ -4,8 +4,8 @@ use specta::Type;
 
 use super::{
     mixins::{
-        BlendMixin, ChildrenMixin, DimensionMixin, NodeCompositionMixin, RectangleCornerMixin,
-        RelativeTransformMixin,
+        BlendMixin, ChildrenMixin, DimensionMixin, FillMixin, NodeCompositionMixin,
+        RectangleCornerMixin, RelativeTransformMixin,
     },
     types::{Frame, Group, Node, NodeType, Rectangle},
 };
@@ -42,6 +42,10 @@ pub struct FrameNodeBundle {
     #[serde(default)]
     #[serde(rename = "blendMixin")]
     pub blend_mixin: BlendMixin,
+
+    #[serde(default)]
+    #[serde(rename = "fill")]
+    pub fill_mixin: FillMixin,
 }
 
 #[inline]
@@ -63,6 +67,7 @@ impl Default for FrameNodeBundle {
             relative_transform: RelativeTransformMixin::default(),
             dimension: DimensionMixin::default(),
             blend_mixin: BlendMixin::default(),
+            fill_mixin: FillMixin::default(),
         }
     }
 }
@@ -95,6 +100,10 @@ pub struct GroupNodeBundle {
     #[serde(default)]
     #[serde(rename = "blendMixin")]
     pub blend_mixin: BlendMixin,
+
+    #[serde(default)]
+    #[serde(rename = "fill")]
+    pub fill_mixin: FillMixin,
 }
 
 #[inline]
@@ -115,6 +124,7 @@ impl Default for GroupNodeBundle {
             relative_transform: RelativeTransformMixin::default(),
             dimension: DimensionMixin::default(),
             blend_mixin: BlendMixin::default(),
+            fill_mixin: FillMixin::default(),
         }
     }
 }
@@ -148,6 +158,10 @@ pub struct RectangleNodeBundle {
     #[serde(default)]
     #[serde(rename = "blendMixin")]
     pub blend_mixin: BlendMixin,
+
+    #[serde(default)]
+    #[serde(rename = "fill")]
+    pub fill_mixin: FillMixin,
 }
 
 #[inline]
@@ -168,6 +182,7 @@ impl Default for RectangleNodeBundle {
             relative_transform: RelativeTransformMixin::default(),
             dimension: DimensionMixin::default(),
             blend_mixin: BlendMixin::default(),
+            fill_mixin: FillMixin::default(),
         }
     }
 }

@@ -1,6 +1,6 @@
-use crate::core::modules::svg_render::{
+use crate::core::{
     mixin_change::MixinChange,
-    resources::svg_composition::{
+    modules::svg_render::resources::svg_composition::{
         svg_element::{
             attributes::SVGAttribute,
             helper::{construct_svg_path, mat3_to_svg_transform},

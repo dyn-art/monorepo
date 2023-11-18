@@ -8,9 +8,9 @@ use bevy_hierarchy::Parent;
 use dyn_bevy_render_skeleton::extract_param::Extract;
 use dyn_composition::core::modules::node::components::types::Node;
 
-use crate::core::modules::svg_render::{
+use crate::core::{
     mixin_change::ToMixinChange,
-    resources::changed_components::{ChangedComponent, ChangedComponents},
+    modules::svg_render::resources::changed_components::{ChangedComponent, ChangedComponents},
 };
 
 pub fn extract_mixin_generic<T: Component + ToMixinChange>(
