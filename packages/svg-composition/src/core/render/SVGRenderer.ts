@@ -49,11 +49,18 @@ export class SVGRenderer extends Renderer {
 						// Create element
 						const newElement: SVGElement = document.createElementNS(NS, update.tagName);
 						for (const attribute of update.attributes) {
-							const [key, value] = this.parseSVGAttribute(attribute);
-							newElement.setAttribute(key, value);
+							const parsedAttribute = this.parseSVGAttribute(attribute);
+							if (parsedAttribute != null) {
+								const [key, value] = parsedAttribute;
+								newElement.setAttribute(key, value);
+							}
 						}
-						for (const [key, value] of update.styles as unknown as [string, string][]) {
-							newElement.style.setProperty(key, `${value}`);
+						for (const style of update.styles) {
+							const parsedStyle = this.parseSVGStyle(style);
+							if (parsedStyle != null) {
+								const [key, value] = parsedStyle;
+								newElement.style.setProperty(key, `${value}`);
+							}
 						}
 
 						this._svgElementMap.set(elementId, newElement);
@@ -82,8 +89,11 @@ export class SVGRenderer extends Renderer {
 					case 'AttributeUpdated': {
 						const elementToUpdate = getElement();
 						if (elementToUpdate != null) {
-							const [key, value] = this.parseSVGAttribute(update.newValue);
-							elementToUpdate.setAttribute(key, value);
+							const parsedAttribute = this.parseSVGAttribute(update.newValue);
+							if (parsedAttribute != null) {
+								const [key, value] = parsedAttribute;
+								elementToUpdate.setAttribute(key, value);
+							}
 						}
 						break;
 					}
@@ -97,8 +107,11 @@ export class SVGRenderer extends Renderer {
 					case 'StyleUpdated': {
 						const elementToUpdate = getElement();
 						if (elementToUpdate != null) {
-							const [key, value] = this.parseSVGStyle(update.newValue);
-							elementToUpdate.style.setProperty(key, value);
+							const parsedStyle = this.parseSVGStyle(update.newValue);
+							if (parsedStyle != null) {
+								const [key, value] = parsedStyle;
+								elementToUpdate.style.setProperty(key, value);
+							}
 						}
 						break;
 					}
@@ -115,7 +128,7 @@ export class SVGRenderer extends Renderer {
 		return this;
 	}
 
-	private parseSVGAttribute(attribute: SVGAttribute): [string, string] {
+	private parseSVGAttribute(attribute: SVGAttribute): [string, string] | null {
 		switch (attribute.type) {
 			case 'Id':
 				return ['id', attribute.id.toString()];
@@ -168,11 +181,11 @@ export class SVGRenderer extends Renderer {
 			case 'Name':
 				return ['name', attribute.name];
 			default:
-				return ['', ''];
+				return null;
 		}
 	}
 
-	private parseSVGStyle(style: SVGStyle): [string, string] {
+	private parseSVGStyle(style: SVGStyle): [string, string] | null {
 		switch (style.type) {
 			case 'Display': {
 				const display = style.display;
@@ -182,11 +195,50 @@ export class SVGRenderer extends Renderer {
 					case 'None':
 						return ['display', 'none'];
 					default:
-						return ['', ''];
+						return null;
+				}
+			}
+			case 'BlendMode': {
+				const blendMode = style.blendMode;
+				switch (blendMode.type) {
+					case 'Normal':
+						return null; // 'mix-blend-mode: normal' is the default
+					case 'Multiply':
+						return ['mix-blend-mode', 'multiply'];
+					case 'Screen':
+						return ['mix-blend-mode', 'screen'];
+					case 'Overlay':
+						return ['mix-blend-mode', 'overlay'];
+					case 'Darken':
+						return ['mix-blend-mode', 'darken'];
+					case 'Lighten':
+						return ['mix-blend-mode', 'lighten'];
+					case 'ColorDodge':
+						return ['mix-blend-mode', 'color-dodge'];
+					case 'ColorBurn':
+						return ['mix-blend-mode', 'color-burn'];
+					case 'HardLight':
+						return ['mix-blend-mode', 'hard-light'];
+					case 'SoftLight':
+						return ['mix-blend-mode', 'soft-light'];
+					case 'Difference':
+						return ['mix-blend-mode', 'difference'];
+					case 'Exclusion':
+						return ['mix-blend-mode', 'exclusion'];
+					case 'Hue':
+						return ['mix-blend-mode', 'hue'];
+					case 'Saturation':
+						return ['mix-blend-mode', 'saturation'];
+					case 'Color':
+						return ['mix-blend-mode', 'color'];
+					case 'Luminosity':
+						return ['mix-blend-mode', 'luminosity'];
+					default:
+						return null;
 				}
 			}
 			default:
-				return ['', ''];
+				return null;
 		}
 	}
 

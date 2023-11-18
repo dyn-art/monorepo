@@ -1,7 +1,7 @@
 use bevy_app::Plugin;
 use bevy_ecs::world::World;
 
-use crate::core::dtif::{DTIFComposition, DTIFProcessor};
+use crate::core::dtif::{dtif_processor::DTIFProcessor, DTIFComposition};
 
 use self::{
     components::CompositionMixin,

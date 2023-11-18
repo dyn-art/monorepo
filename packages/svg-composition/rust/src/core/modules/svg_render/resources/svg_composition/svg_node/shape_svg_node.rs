@@ -1,11 +1,10 @@
-use bevy_ecs::entity::Entity;
-
 use crate::core::modules::svg_render::{
     mixin_change::MixinChange,
     resources::svg_composition::{
         svg_element::{
             attributes::SVGAttribute,
             helper::{construct_svg_path, mat3_to_svg_transform},
+            mapper::map_blend_mode,
             styles::{SVGDisplayStyle, SVGStyle},
             SVGElement, SVGTag,
         },
@@ -81,6 +80,9 @@ impl SVGNode for ShapeSVGNode {
                     let base = self.get_base_mut();
                     base.set_attributes(vec![SVGAttribute::Opacity {
                         opacity: mixin.opacity,
+                    }]);
+                    base.set_styles(vec![SVGStyle::BlendMode {
+                        blend_mode: map_blend_mode(&mixin.blend_mode),
                     }]);
                 }
                 MixinChange::Composition(mixin) => {

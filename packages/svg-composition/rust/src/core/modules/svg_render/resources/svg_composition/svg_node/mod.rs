@@ -1,5 +1,3 @@
-use bevy_ecs::entity::Entity;
-
 use crate::core::modules::svg_render::mixin_change::MixinChange;
 
 use self::base_svg_node::BaseSVGNode;

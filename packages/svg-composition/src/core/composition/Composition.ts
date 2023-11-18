@@ -71,7 +71,7 @@ export class Composition {
 	// WASM interface
 	// =========================================================================
 
-	public onWasmEvents(events: OutputEvent[]) {
+	public onWasmEvents(events: OutputEvent[]): void {
 		const groupedEvents = groupByType(events);
 		for (const eventType of Object.keys(groupedEvents) as (keyof typeof groupedEvents)[]) {
 			const groupedEvent = groupedEvents[eventType];
@@ -97,11 +97,11 @@ export class Composition {
 		this._eventQueue = [];
 	}
 
-	public emitCoreEvents(events: CoreInputEvent[]) {
+	public emitCoreEvents(events: CoreInputEvent[]): void {
 		this._eventQueue.push({ type: 'Core', events });
 	}
 
-	public emitInteractionEvents(events: InteractionInputEvent[]) {
+	public emitInteractionEvents(events: InteractionInputEvent[]): void {
 		this._eventQueue.push({ type: 'Interaction', events });
 	}
 

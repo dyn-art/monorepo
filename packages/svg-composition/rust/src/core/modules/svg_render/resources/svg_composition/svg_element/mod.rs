@@ -9,6 +9,7 @@ use super::{svg_node::base_svg_node::BaseSVGNode, SVGComposition};
 pub mod attributes;
 pub mod events;
 pub mod helper;
+pub mod mapper;
 pub mod styles;
 
 /// Defines an individual SVG element

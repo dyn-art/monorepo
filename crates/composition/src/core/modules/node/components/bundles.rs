@@ -10,9 +10,13 @@ use super::{
     types::{Frame, Group, Node, NodeType, Rectangle},
 };
 
+// =============================================================================
+// Frame
+// =============================================================================
+
 #[derive(Bundle, Debug, Serialize, Deserialize, Clone, Type)]
 pub struct FrameNodeBundle {
-    #[serde(default = "frame_node_bundle_node_default")]
+    #[serde(default = "default_frame_node_bundle")]
     pub node: Node,
 
     #[serde(default)]
@@ -40,16 +44,18 @@ pub struct FrameNodeBundle {
     pub blend_mixin: BlendMixin,
 }
 
-fn frame_node_bundle_node_default() -> Node {
+#[inline]
+fn default_frame_node_bundle() -> Node {
     Node {
         node_type: NodeType::Frame,
+        name: None,
     }
 }
 
 impl Default for FrameNodeBundle {
     fn default() -> Self {
         Self {
-            node: frame_node_bundle_node_default(),
+            node: default_frame_node_bundle(),
             frame: Frame::default(),
             rectangle_corner_mixin: RectangleCornerMixin::default(),
             children_mixin: ChildrenMixin::default(),
@@ -61,9 +67,13 @@ impl Default for FrameNodeBundle {
     }
 }
 
+// =============================================================================
+// Group
+// =============================================================================
+
 #[derive(Bundle, Debug, Serialize, Deserialize, Clone, Type)]
 pub struct GroupNodeBundle {
-    #[serde(default = "group_node_bundle_node_default")]
+    #[serde(default = "default_group_node_bundle")]
     pub node: Node,
 
     #[serde(default)]
@@ -87,16 +97,18 @@ pub struct GroupNodeBundle {
     pub blend_mixin: BlendMixin,
 }
 
-fn group_node_bundle_node_default() -> Node {
+#[inline]
+fn default_group_node_bundle() -> Node {
     Node {
         node_type: NodeType::Group,
+        name: None,
     }
 }
 
 impl Default for GroupNodeBundle {
     fn default() -> Self {
         Self {
-            node: group_node_bundle_node_default(),
+            node: default_group_node_bundle(),
             group: Group::default(),
             children_mixin: ChildrenMixin::default(),
             composition_mixin: NodeCompositionMixin::default(),
@@ -107,9 +119,13 @@ impl Default for GroupNodeBundle {
     }
 }
 
+// =============================================================================
+// Rectangle
+// =============================================================================
+
 #[derive(Bundle, Debug, Serialize, Deserialize, Clone, Type)]
 pub struct RectangleNodeBundle {
-    #[serde(default = "rectangle_node_bundle_node_default")]
+    #[serde(default = "default_rectangle_node_bundle")]
     pub node: Node,
 
     #[serde(default)]
@@ -134,16 +150,18 @@ pub struct RectangleNodeBundle {
     pub blend_mixin: BlendMixin,
 }
 
-fn rectangle_node_bundle_node_default() -> Node {
+#[inline]
+fn default_rectangle_node_bundle() -> Node {
     Node {
         node_type: NodeType::Rectangle,
+        name: None,
     }
 }
 
 impl Default for RectangleNodeBundle {
     fn default() -> Self {
         Self {
-            node: rectangle_node_bundle_node_default(),
+            node: default_rectangle_node_bundle(),
             recangle: Rectangle::default(),
             rectangle_corner_mixin: RectangleCornerMixin::default(),
             composition_mixin: NodeCompositionMixin::default(),
