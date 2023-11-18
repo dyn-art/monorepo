@@ -10,7 +10,9 @@ use self::{
     svg_node::{frame_svg_node::FrameSVGNode, shape_svg_node::ShapeSVGNode, SVGNode},
 };
 
+pub mod svg_bundle;
 pub mod svg_element;
+pub mod svg_fill;
 pub mod svg_node;
 
 #[derive(Resource, Debug)]
@@ -82,10 +84,11 @@ impl SVGComposition {
                     let child_append_index =
                         parent_node.get_external_child_append_id().unwrap().index;
                     if let Some(svg_element) = parent_node
-                        .get_base_mut()
+                        .get_bundle_mut()
                         .get_child_element_at_mut(child_append_index)
                     {
-                        svg_element.append_child(SVGChildElementIdentifier::OutOfContext(entity));
+                        svg_element
+                            .append_child(SVGChildElementIdentifier::OutOfNodeContext(entity));
                     }
                 }
             }
@@ -102,7 +105,11 @@ impl SVGComposition {
     ) -> Option<Box<dyn SVGNode>> {
         let maybe_parent_element_id = maybe_parent_id
             .and_then(|parent_id| self.get_node(&parent_id))
-            .and_then(|parent| parent.get_external_child_append_id());
+            .and_then(|parent| {
+                parent
+                    .get_external_child_append_id()
+                    .map(|child_append_id| child_append_id.id)
+            });
 
         return match node_type {
             NodeType::Rectangle => Some(Box::new(ShapeSVGNode::new(maybe_parent_element_id))),
@@ -129,7 +136,7 @@ impl SVGComposition {
         // Construct SVG string
         for id in self.root_ids.iter() {
             if let Some(root) = self.get_node(id) {
-                let element = root.get_base().get_element();
+                let element = root.get_bundle().get_element();
                 let mut result = String::new();
 
                 // Open the SVG tag

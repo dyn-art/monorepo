@@ -63,7 +63,7 @@ fn process_entity(
         node.apply_mixin_changes(&changed_component.changes);
 
         // Drain and forward render updates from the node
-        let updates = node.get_base_mut().drain_updates();
+        let updates = node.drain_updates();
         svg_composition.forward_node_updates(updates);
     }
 }

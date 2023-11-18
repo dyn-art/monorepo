@@ -1,33 +1,33 @@
-use bevy_utils::HashMap;
+use std::collections::HashMap;
 
-use crate::core::{
-    events::output_event::RenderUpdateEvent,
-    modules::svg_render::resources::svg_composition::{
-        svg_element::{
-            attributes::SVGAttribute,
-            events::{AttributeUpdated, ElementCreated, RenderChange, StyleUpdated},
-            styles::SVGStyle,
-            SVGChildElementIdentifier, SVGElement,
-        },
-        SVGComposition,
+use crate::core::events::output_event::RenderUpdateEvent;
+
+use super::{
+    svg_element::{
+        attributes::SVGAttribute,
+        events::{AttributeUpdated, ElementCreated, RenderChange, StyleUpdated},
+        styles::SVGStyle,
+        SVGChildElementIdentifier, SVGElement,
     },
+    svg_node::SVGNode,
+    SVGComposition,
 };
 
-use super::ElementReference;
+pub trait SVGBundle {
+    fn get_bundle(&self) -> &BaseSVGBundle;
+    fn get_bundle_mut(&mut self) -> &mut BaseSVGBundle;
+}
 
-/// Defines an ECS node in the SVG structure.
-/// Consists of multiple SVGElements.
+// Wrapped SVGElement with its static children (are known from compile time) for quick access
 #[derive(Debug)]
-pub struct BaseSVGNode {
-    // Unique identifier of the SVGNode
-    id: u32,
-    // The primary SVG element associated with this node
+pub struct BaseSVGBundle {
+    // The primary SVG element associated with this bundle
     element: SVGElement,
-    // Children that are directly related to this node's context.
+    // Children that are directly related to this bundles's context.
     // Using a Vector for child_elements as:
-    // - The size is known at compile time, minimizing dynamic changes.
-    // - Offers efficient O(1) access by index, suitable for our use case.
-    // - More memory-efficient and simpler than a HashMap for fixed-size collections.
+    // - The size is known at compile time, minimizing dynamic changes
+    // - Offers efficient O(1) access by index, suitable for this use case
+    // - More memory-efficient and simpler than a HashMap for fixed-size collections
     child_elements: Vec<SVGElement>,
     // Maps element ids to a list of render changes.
     // Group here by element id to avoid grouping or frequent lookups of elements on the JS site.
@@ -35,21 +35,20 @@ pub struct BaseSVGNode {
     updates_order: Vec<u32>,
 }
 
-impl BaseSVGNode {
-    pub fn new(element: SVGElement, maybe_parent_element_id: Option<&ElementReference>) -> Self {
+impl BaseSVGBundle {
+    pub fn new(element: SVGElement, maybe_parent_element_id: Option<u32>) -> Self {
         let element_id = element.get_id();
         let initial_updates = HashMap::from([(
             element_id,
             vec![RenderChange::ElementCreated(ElementCreated {
-                parent_id: maybe_parent_element_id.map(|reference| reference.id),
+                parent_id: maybe_parent_element_id,
                 tag_name: element.get_tag_name().as_str(),
                 attributes: element.get_attributes().clone(),
                 styles: element.get_styles().clone(),
             })],
         )]);
 
-        return BaseSVGNode {
-            id: rand::random(),
+        return Self {
             element,
             child_elements: vec![],
             updates: initial_updates,
@@ -76,6 +75,10 @@ impl BaseSVGNode {
     pub fn get_child_element_at_mut(&mut self, index: usize) -> Option<&mut SVGElement> {
         self.child_elements.get_mut(index)
     }
+
+    // =============================================================================
+    // Attributes
+    // =============================================================================
 
     pub fn set_attributes_at(&mut self, index: usize, attributes: Vec<SVGAttribute>) {
         if let Some(element) = self.get_child_element_at_mut(index) {
@@ -110,6 +113,10 @@ impl BaseSVGNode {
             self.element.set_attribute(attribute);
         }
     }
+
+    // =============================================================================
+    // Styles
+    // =============================================================================
 
     pub fn set_styles_at(&mut self, index: usize, styles: Vec<SVGStyle>) {
         if let Some(element) = self.get_child_element_at_mut(index) {
@@ -157,7 +164,7 @@ impl BaseSVGNode {
         let next_index = self.get_next_child_index();
         if let Some(target_element) = self.child_elements.get_mut(index) {
             let target_element_id = target_element.get_id();
-            target_element.append_child(SVGChildElementIdentifier::InContext(next_index));
+            target_element.append_child(SVGChildElementIdentifier::InNodeContext(next_index));
             self.register_element_creation_render_change(&element, Some(target_element_id));
             self.child_elements.push(element);
             return Ok(next_index);
@@ -171,7 +178,7 @@ impl BaseSVGNode {
         self.register_element_creation_render_change(&element, Some(self.element.get_id()));
         self.child_elements.push(element);
         self.element
-            .append_child(SVGChildElementIdentifier::InContext(next_index));
+            .append_child(SVGChildElementIdentifier::InNodeContext(next_index));
         return next_index;
     }
 
@@ -181,7 +188,7 @@ impl BaseSVGNode {
     }
 
     // =============================================================================
-    // Other
+    // Render Updates
     // =============================================================================
 
     pub fn drain_updates(&mut self) -> Vec<RenderUpdateEvent> {
@@ -195,14 +202,6 @@ impl BaseSVGNode {
 
         return drained_updates;
     }
-
-    pub fn to_string(&self, composition: &SVGComposition) -> String {
-        self.element.to_string(&self, composition)
-    }
-
-    // =============================================================================
-    // Helper
-    // =============================================================================
 
     fn register_element_creation_render_change(
         &mut self,
@@ -225,5 +224,13 @@ impl BaseSVGNode {
             self.updates_order.push(id);
         }
         self.updates.get_mut(&id).unwrap().push(change);
+    }
+
+    // =============================================================================
+    // Other
+    // =============================================================================
+
+    pub fn to_string(&self, node: &dyn SVGNode, composition: &SVGComposition) -> String {
+        self.element.to_string(node, composition)
     }
 }

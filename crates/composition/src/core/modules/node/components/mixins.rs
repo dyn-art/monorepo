@@ -257,20 +257,20 @@ pub enum Paint {
 pub struct SolidPaint {
     /// The color of the paint, represented as an RGB array
     /// where each component ranges from 0 to 255.
-    color: [u8; 3],
+    pub color: [u8; 3],
 
     /// The opacity of the paint,
     /// ranging from 0.0 (completely transparent) to 1.0 (completely opaque).
-    opacity: f32,
+    pub opacity: f32,
 
     /// The blend mode used when applying the paint,
     /// which determines how the paint's color blends with colors underneath it.
     #[serde(rename = "blendMode")]
-    blend_mode: BlendMode,
+    pub blend_mode: BlendMode,
 
     /// Determines whether the paint is visible.
     #[serde(rename = "isVisible")]
-    is_visible: bool,
+    pub is_visible: bool,
 }
 
 // =============================================================================
