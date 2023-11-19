@@ -1,14 +1,17 @@
 use dyn_composition::core::modules::node::components::mixins::{Paint, SolidPaint};
 
-use crate::core::modules::svg_render::resources::svg_composition::{
-    svg_bundle::{BaseSVGBundle, SVGBundle},
-    svg_element::{
-        attributes::{SVGAttribute, SVGMeasurementUnit},
-        styles::{SVGDisplayStyle, SVGStyle},
-        SVGElement, SVGTag,
+use crate::core::{
+    events::output_event::RenderUpdateEvent,
+    modules::svg_render::resources::svg_composition::{
+        svg_bundle::{BaseSVGBundle, SVGBundle},
+        svg_element::{
+            attributes::{SVGAttribute, SVGMeasurementUnit},
+            styles::{SVGDisplayStyle, SVGStyle},
+            SVGElement, SVGTag,
+        },
+        svg_node::{ElementReference, SVGNode},
+        SVGComposition,
     },
-    svg_node::{ElementReference, SVGNode},
-    SVGComposition,
 };
 
 use super::SVGPaint;
@@ -74,6 +77,10 @@ impl SVGPaint for SolidSVGPaint {
                 );
             }
         }
+    }
+
+    fn drain_updates(&mut self) -> Vec<RenderUpdateEvent> {
+        self.bundle.drain_updates()
     }
 
     fn to_string(&self, node: &dyn SVGNode, composition: &SVGComposition) -> String {

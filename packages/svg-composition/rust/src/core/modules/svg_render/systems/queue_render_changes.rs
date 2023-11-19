@@ -18,8 +18,12 @@ pub fn queue_render_changes(
     let changed_nodes = take(&mut changed.changed_nodes);
     let changed_paints = take(&mut changed.changed_paints);
 
-    process_paints(changed_paints, &mut svg_composition);
+    // TODO
+    // First collect node bundle updates
+    // Then the paint bundle updates
+
     process_nodes(changed_nodes, &mut svg_composition);
+    process_paints(changed_paints, &mut svg_composition);
 }
 
 fn process_paints(changed_paints: HashMap<Entity, Paint>, svg_composition: &mut SVGComposition) {
@@ -33,7 +37,12 @@ fn process_paint(entity: Entity, paint: &Paint, svg_composition: &mut SVGComposi
     let maybe_paint = svg_composition.get_or_create_paint(entity, &paint);
 
     if let Some(svg_paint) = maybe_paint {
+        // Apply collected changes to the SVG paint
         svg_paint.apply_paint_change(paint);
+
+        // Drain and forward render updates from the paint
+        let updates = svg_paint.drain_updates();
+        svg_composition.forward_render_updates(updates);
     }
 }
 
@@ -90,6 +99,6 @@ fn process_node(
 
         // Drain and forward render updates from the node
         let updates = node.drain_updates();
-        svg_composition.forward_node_updates(updates);
+        svg_composition.forward_render_updates(updates);
     }
 }

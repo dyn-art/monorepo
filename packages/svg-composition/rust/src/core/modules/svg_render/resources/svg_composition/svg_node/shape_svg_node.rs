@@ -2,7 +2,6 @@ use crate::core::{
     events::output_event::RenderUpdateEvent,
     mixin_change::MixinChange,
     modules::svg_render::resources::svg_composition::{
-        self,
         svg_bundle::{BaseSVGBundle, SVGBundle},
         svg_element::{
             attributes::{SVGAttribute, SVGMeasurementUnit},

@@ -147,7 +147,7 @@ impl SVGComposition {
     // Other
     // =============================================================================
 
-    pub fn forward_node_updates(&mut self, updates: Vec<RenderUpdateEvent>) {
+    pub fn forward_render_updates(&mut self, updates: Vec<RenderUpdateEvent>) {
         for update in updates {
             let _ = self
                 .output_event_sender
