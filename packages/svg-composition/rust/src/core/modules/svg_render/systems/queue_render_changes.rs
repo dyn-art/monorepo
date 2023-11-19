@@ -4,9 +4,10 @@ use std::{
 };
 
 use bevy_ecs::{entity::Entity, system::ResMut};
+use dyn_composition::core::modules::node::components::mixins::Paint;
 
 use crate::core::modules::svg_render::resources::{
-    changed_components::{ChangedComponent, ChangedComponents},
+    changed_components::{ChangedComponents, ChangedNode},
     svg_composition::SVGComposition,
 };
 
@@ -14,24 +15,38 @@ pub fn queue_render_changes(
     mut changed: ResMut<ChangedComponents>,
     mut svg_composition: ResMut<SVGComposition>,
 ) {
-    let changes = take(&mut changed.changes);
+    let changed_nodes = take(&mut changed.changed_nodes);
+    let changed_paints = take(&mut changed.changed_paints);
+
+    process_paints(changed_paints, &mut svg_composition);
+    process_nodes(changed_nodes, &mut svg_composition);
+}
+
+fn process_paints(changed_paints: HashMap<Entity, Paint>, svg_composition: &mut SVGComposition) {
+    // Attempt to get or create the paint associated with the entity
+}
+
+fn process_nodes(
+    changed_nodes: HashMap<Entity, ChangedNode>,
+    svg_composition: &mut SVGComposition,
+) {
     let mut processed = HashSet::new();
 
     // Recursive function to process an entity and its parents
     fn process_with_parents(
         entity: Entity,
-        changes: &HashMap<Entity, ChangedComponent>,
+        changed_nodes: &HashMap<Entity, ChangedNode>, // TODO: can I pass here changed node directly?
         processed: &mut HashSet<Entity>,
-        svg_composition: &mut ResMut<SVGComposition>,
+        svg_composition: &mut SVGComposition,
     ) {
         if !processed.insert(entity) {
             return;
         }
 
-        if let Some(change) = changes.get(&entity) {
+        if let Some(change) = changed_nodes.get(&entity) {
             // Process parent first
             if let Some(parent_id) = change.parent_id {
-                process_with_parents(parent_id, changes, processed, svg_composition);
+                process_with_parents(parent_id, changed_nodes, processed, svg_composition);
             }
 
             // Process the current entity
@@ -40,15 +55,15 @@ pub fn queue_render_changes(
     }
 
     // Iterate over and process each entity
-    for &entity in changes.keys() {
-        process_with_parents(entity, &changes, &mut processed, &mut svg_composition);
+    for &entity in changed_nodes.keys() {
+        process_with_parents(entity, &changed_nodes, &mut processed, svg_composition);
     }
 }
 
 /// Processes an entity by updating its corresponding SVG node based on the provided changes.
 fn process_entity(
     entity: Entity,
-    changed_component: &ChangedComponent,
+    changed_component: &ChangedNode,
     svg_composition: &mut SVGComposition,
 ) {
     // Attempt to get or create the node associated with the entity

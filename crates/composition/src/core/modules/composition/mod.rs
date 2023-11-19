@@ -36,7 +36,7 @@ fn insert_dtif(world: &mut World, dtif: &DTIFComposition) {
 
     // Spawn and process nodes recursively
     let root_node_entity = dtif_processor
-        .process_node(&root_node_eid, world, &dtif.nodes)
+        .process_node(&root_node_eid, world, dtif)
         .unwrap();
     world.entity_mut(root_node_entity).insert(Root);
 

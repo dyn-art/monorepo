@@ -8,9 +8,8 @@ use crate::core::{
             helper::mat3_to_svg_transform,
             mapper::map_blend_mode,
             styles::{SVGDisplayStyle, SVGStyle},
-            InNodeContextType, SVGChildElementIdentifier, SVGElement, SVGTag,
+            InCompositionContextType, SVGChildElementIdentifier, SVGElement, SVGTag,
         },
-        svg_fill::SVGFill,
         SVGComposition,
     },
 };
@@ -34,8 +33,7 @@ pub struct FrameSVGNode {
     fill_clip_path: ElementReference,
     fill_clip_path_defs: ElementReference,
     fill_clipped_shape: ElementReference,
-
-    fill: SVGFill,
+    fill_wrapper: ElementReference,
 }
 
 impl SVGBundle for FrameSVGNode {
@@ -106,7 +104,16 @@ impl SVGNode for FrameSVGNode {
                     }]);
                 }
                 MixinChange::Fill(mixin) => {
-                    self.fill.apply_mixin_change(mixin);
+                    let fill_wrapper_index = self.fill_wrapper.index;
+                    if let Some(element) = self.bundle.get_child_element_at_mut(fill_wrapper_index)
+                    {
+                        element.clear_children();
+                        for paint_id in &mixin.paints {
+                            element.append_child(SVGChildElementIdentifier::InCompositionContext(
+                                InCompositionContextType::Paint(paint_id.clone()),
+                            ));
+                        }
+                    }
                 }
                 _ => {
                     // do nothing
@@ -120,13 +127,7 @@ impl SVGNode for FrameSVGNode {
     }
 
     fn drain_updates(&mut self) -> Vec<RenderUpdateEvent> {
-        let mut updates = self.get_bundle_mut().drain_updates();
-        updates.extend(self.fill.drain_updates());
-        return updates;
-    }
-
-    fn get_fill(&self) -> Option<&SVGFill> {
-        Some(&self.fill)
+        self.get_bundle_mut().drain_updates()
     }
 
     fn to_string(&self, composition: &SVGComposition) -> String {
@@ -249,13 +250,18 @@ impl FrameSVGNode {
             .append_child_element_to(fill_clip_path_index, fill_clipped_shape_element)
             .unwrap();
 
-        // Create and append fill to node
-        let fill = SVGFill::new(element_id, fill_clip_path_id);
-        bundle
-            .get_element_mut()
-            .append_child(SVGChildElementIdentifier::InNodeContext(
-                InNodeContextType::Fill,
-            ));
+        let mut fill_wrapper_element = SVGElement::new(SVGTag::Group);
+        let fill_wrapper_id = fill_wrapper_element.get_id();
+        #[cfg(feature = "trace")]
+        fill_wrapper_element.set_attribute(SVGAttribute::Name {
+            name: FrameSVGNode::create_element_name(fill_wrapper_id, String::from("fill"), false),
+        });
+        fill_wrapper_element.set_attribute(SVGAttribute::ClipPath {
+            clip_path: fill_clip_path_id,
+        });
+        let fill_wrapper_index = bundle
+            .append_child_element_to(content_wrapper_index, fill_wrapper_element)
+            .unwrap();
 
         // Create children wrapper element
         let mut children_wrapper = SVGElement::new(SVGTag::Group);
@@ -312,8 +318,10 @@ impl FrameSVGNode {
                 id: fill_clipped_shape_id,
                 index: fill_clipped_shape_index,
             },
-
-            fill,
+            fill_wrapper: ElementReference {
+                id: fill_wrapper_id,
+                index: fill_wrapper_index,
+            },
         }
     }
 

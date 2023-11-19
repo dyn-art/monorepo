@@ -39,21 +39,14 @@ pub enum SVGChildElementIdentifier {
     InBundleContext(usize),
     // Child element is owned by SVGComposition and can be found there
     InCompositionContext(InCompositionContextType),
-    // Child element is owned by SVGNode and can be found there
-    InNodeContext(InNodeContextType),
-    // Child element belongs to paint in the same SVGNode (query by index in "paints")
-    InFillContext(usize),
 }
 
 #[derive(Debug)]
 pub enum InCompositionContextType {
     // Query by entity id in "nodes"
     Node(Entity),
-}
-
-#[derive(Debug)]
-pub enum InNodeContextType {
-    Fill,
+    // Query by entity id in "paints"
+    Paint(Entity),
 }
 
 impl SVGElement {
@@ -125,6 +118,10 @@ impl SVGElement {
         self.children.push(identifier);
     }
 
+    pub fn clear_children(&mut self) {
+        self.children.clear()
+    }
+
     // =============================================================================
     // Other
     // =============================================================================
@@ -175,21 +172,12 @@ impl SVGElement {
                             result.push_str(&child_element.to_string(composition));
                         }
                     }
-                },
-                SVGChildElementIdentifier::InNodeContext(context_type) => match context_type {
-                    InNodeContextType::Fill => {
-                        if let Some(fill) = node.get_fill() {
-                            result.push_str(&fill.to_string(node, composition))
+                    InCompositionContextType::Paint(entity) => {
+                        if let Some(child_element) = composition.get_paint(entity) {
+                            result.push_str(&child_element.to_string(node, composition));
                         }
                     }
                 },
-                SVGChildElementIdentifier::InFillContext(paint_index) => {
-                    if let Some(fill) = node.get_fill() {
-                        if let Some(paint) = fill.get_paint_at(*paint_index) {
-                            result.push_str(&paint.to_string(node, composition))
-                        }
-                    }
-                }
             }
         }
 

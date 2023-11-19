@@ -238,7 +238,7 @@ pub enum AnchorCommand {
 pub struct FillMixin {
     /// A collection of `Paint` objects,
     /// each defining a different aspect of how the object is filled.
-    pub paints: Vec<Paint>,
+    pub paints: Vec<Entity>,
 }
 
 impl Default for FillMixin {
@@ -247,7 +247,7 @@ impl Default for FillMixin {
     }
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug, Type)]
+#[derive(Component, Serialize, Deserialize, Clone, Debug, Type)]
 pub enum Paint {
     /// Represents a solid color paint.
     Solid(SolidPaint),

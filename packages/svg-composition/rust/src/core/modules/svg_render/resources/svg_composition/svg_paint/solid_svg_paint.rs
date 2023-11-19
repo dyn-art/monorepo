@@ -13,6 +13,16 @@ use crate::core::modules::svg_render::resources::svg_composition::{
 
 use super::SVGPaint;
 
+// TODO:
+// - Extract Paint as separate Entity
+// - Update FillMixin to only hold Entity ids to Paints
+// - Update DTIF load logic ("simply" go through fill mixin paints array
+//   and lookup corresponding Paint in paints hashmap of DTIF)
+// - Add system to detect Paint entity changes
+// - Create paint mixins to change from JS site
+// - Update fill paints array change logic in SVGComposition
+// ..
+
 #[derive(Debug)]
 pub struct SolidSVGPaint {
     bundle: BaseSVGBundle,
@@ -38,14 +48,14 @@ impl SVGPaint for SolidSVGPaint {
 }
 
 impl SolidSVGPaint {
-    pub fn new(parent_element_id: u32) -> Self {
+    pub fn new(maybe_parent_element_id: Option<u32>) -> Self {
         // Create root element and apply it to the solid SVG paint
         let mut element = SVGElement::new(SVGTag::Group);
         #[cfg(feature = "trace")]
         element.set_attribute(SVGAttribute::Name {
             name: SolidSVGPaint::create_element_name(element.get_id(), String::from("root"), false),
         });
-        let mut bundle = BaseSVGBundle::new(element, Some(parent_element_id));
+        let mut bundle = BaseSVGBundle::new(element, maybe_parent_element_id);
 
         // Create paint elements
         let mut paint_shape_element = SVGElement::new(SVGTag::Rect);

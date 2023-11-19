@@ -47,7 +47,7 @@ impl BaseSVGBundle {
                 attributes: element.get_attributes().clone(),
                 styles: element.get_styles().clone(),
             })],
-        )]);
+        )]); // TODO send this if append_child because otherwise it won't work for paint
 
         return Self {
             element,
