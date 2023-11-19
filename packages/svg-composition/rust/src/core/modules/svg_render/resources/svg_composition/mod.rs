@@ -69,7 +69,7 @@ impl SVGComposition {
     ) -> Option<&mut Box<dyn SVGPaint>> {
         if !self.paints.contains_key(&entity) {
             if let Some(new_paint) = self.create_paint(paint) {
-                // TODO
+                self.paints.insert(entity, new_paint);
             } else {
                 return None;
             }
@@ -115,6 +115,7 @@ impl SVGComposition {
                 let child_append_reference = parent_node.get_external_child_append_id().unwrap();
                 let child_append_index = child_append_reference.index;
                 let child_append_id = child_append_reference.id;
+
                 if let Some(svg_element) = parent_node
                     .get_bundle_mut()
                     .get_child_element_at_mut(child_append_index)

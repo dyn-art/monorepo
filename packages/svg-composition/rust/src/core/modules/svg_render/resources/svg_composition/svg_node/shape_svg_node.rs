@@ -2,6 +2,7 @@ use crate::core::{
     events::output_event::RenderUpdateEvent,
     mixin_change::MixinChange,
     modules::svg_render::resources::svg_composition::{
+        self,
         svg_bundle::{BaseSVGBundle, SVGBundle},
         svg_element::{
             attributes::SVGAttribute,
@@ -38,7 +39,7 @@ impl SVGBundle for ShapeSVGNode {
 }
 
 impl SVGNode for ShapeSVGNode {
-    fn apply_mixin_changes(&mut self, changes: &[MixinChange]) {
+    fn apply_mixin_changes(&mut self, changes: &[MixinChange], svg_composition: &SVGComposition) {
         for change in changes {
             match change {
                 MixinChange::Dimension(mixin) => {
@@ -84,6 +85,7 @@ impl SVGNode for ShapeSVGNode {
                 }
                 MixinChange::Fill(mixin) => {
                     let fill_wrapper_index = self.fill_wrapper.index;
+                    let fill_wrapper_id = self.fill_wrapper.id;
                     if let Some(element) = self.bundle.get_child_element_at_mut(fill_wrapper_index)
                     {
                         element.clear_children();
@@ -91,6 +93,7 @@ impl SVGNode for ShapeSVGNode {
                             element.append_child(SVGChildElementIdentifier::InCompositionContext(
                                 InCompositionContextType::Paint(paint_id.clone()),
                             ));
+                            // TODO: paint.get_bundle_mut().append_to_parent(fill_wrapper_id);
                         }
                     }
                 }

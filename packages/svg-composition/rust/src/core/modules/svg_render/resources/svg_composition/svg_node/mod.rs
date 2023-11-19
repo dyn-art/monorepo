@@ -13,7 +13,11 @@ pub struct ElementReference {
 }
 
 pub trait SVGNode: SVGBundle + Sync + Send + Debug {
-    fn apply_mixin_changes(&mut self, changes: &[MixinChange]) -> ();
+    fn apply_mixin_changes(
+        &mut self,
+        changes: &[MixinChange],
+        svg_composition: &SVGComposition,
+    ) -> ();
     fn get_external_child_append_id(&self) -> Option<&ElementReference>;
     fn drain_updates(&mut self) -> Vec<RenderUpdateEvent>;
     fn to_string(&self, composition: &SVGComposition) -> String;

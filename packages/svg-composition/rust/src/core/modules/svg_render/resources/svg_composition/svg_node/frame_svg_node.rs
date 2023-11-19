@@ -2,6 +2,7 @@ use crate::core::{
     events::output_event::RenderUpdateEvent,
     mixin_change::MixinChange,
     modules::svg_render::resources::svg_composition::{
+        self,
         svg_bundle::{BaseSVGBundle, SVGBundle},
         svg_element::{
             attributes::SVGAttribute,
@@ -47,7 +48,7 @@ impl SVGBundle for FrameSVGNode {
 }
 
 impl SVGNode for FrameSVGNode {
-    fn apply_mixin_changes(&mut self, changes: &[MixinChange]) {
+    fn apply_mixin_changes(&mut self, changes: &[MixinChange], svg_composition: &SVGComposition) {
         for change in changes {
             match change {
                 MixinChange::Dimension(mixin) => {

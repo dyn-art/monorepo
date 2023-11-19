@@ -23,7 +23,18 @@ pub fn queue_render_changes(
 }
 
 fn process_paints(changed_paints: HashMap<Entity, Paint>, svg_composition: &mut SVGComposition) {
+    for (entity, paint) in changed_paints {
+        process_paint(entity, &paint, svg_composition);
+    }
+}
+
+fn process_paint(entity: Entity, paint: &Paint, svg_composition: &mut SVGComposition) {
     // Attempt to get or create the paint associated with the entity
+    let maybe_paint = svg_composition.get_or_create_paint(entity, &paint);
+
+    if let Some(paint) = maybe_paint {
+        // TODO
+    }
 }
 
 fn process_nodes(
@@ -50,7 +61,7 @@ fn process_nodes(
             }
 
             // Process the current entity
-            process_entity(entity, change, svg_composition);
+            process_node(entity, change, svg_composition);
         }
     }
 
@@ -61,7 +72,7 @@ fn process_nodes(
 }
 
 /// Processes an entity by updating its corresponding SVG node based on the provided changes.
-fn process_entity(
+fn process_node(
     entity: Entity,
     changed_component: &ChangedNode,
     svg_composition: &mut SVGComposition,
@@ -75,7 +86,7 @@ fn process_entity(
 
     if let Some(node) = maybe_node {
         // Apply collected changes to the SVG node
-        node.apply_mixin_changes(&changed_component.changes);
+        node.apply_mixin_changes(&changed_component.changes, &svg_composition);
 
         // Drain and forward render updates from the node
         let updates = node.drain_updates();
