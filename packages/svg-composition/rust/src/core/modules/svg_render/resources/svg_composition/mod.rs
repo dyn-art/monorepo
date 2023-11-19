@@ -78,9 +78,8 @@ impl SVGComposition {
     }
 
     fn create_paint(&self, paint: &Paint) -> Option<Box<dyn SVGPaint>> {
-        // TODO need parent id
         match paint {
-            Paint::Solid(..) => Some(Box::new(SolidSVGPaint::new(None))),
+            Paint::Solid(..) => Some(Box::new(SolidSVGPaint::new())),
         }
     }
 
@@ -95,7 +94,7 @@ impl SVGComposition {
         maybe_parent_id: &Option<Entity>,
     ) -> Option<&mut Box<dyn SVGNode>> {
         if !self.nodes.contains_key(&entity) {
-            if let Some(new_node) = self.create_node(node_type, maybe_parent_id) {
+            if let Some(new_node) = self.create_node(node_type) {
                 self.insert_node(entity, new_node, maybe_parent_id);
             } else {
                 return None;
@@ -107,15 +106,15 @@ impl SVGComposition {
     pub fn insert_node(
         &mut self,
         entity: Entity,
-        node: Box<dyn SVGNode>,
+        mut node: Box<dyn SVGNode>,
         maybe_parent_id: &Option<Entity>,
     ) {
-        self.nodes.insert(entity, node);
-
         // If the parent id exists, append this node as a child
         if let Some(parent_id) = maybe_parent_id {
             if let Some(parent_node) = self.get_node_mut(parent_id) {
-                let child_append_index = parent_node.get_external_child_append_id().unwrap().index;
+                let child_append_reference = parent_node.get_external_child_append_id().unwrap();
+                let child_append_index = child_append_reference.index;
+                let child_append_id = child_append_reference.id;
                 if let Some(svg_element) = parent_node
                     .get_bundle_mut()
                     .get_child_element_at_mut(child_append_index)
@@ -123,6 +122,7 @@ impl SVGComposition {
                     svg_element.append_child(SVGChildElementIdentifier::InCompositionContext(
                         InCompositionContextType::Node(entity),
                     ));
+                    node.get_bundle_mut().append_to_parent(child_append_id);
                 }
             }
         }
@@ -130,26 +130,16 @@ impl SVGComposition {
         else {
             self.root_ids.push(entity);
         }
+
+        self.nodes.insert(entity, node);
     }
 
-    fn create_node(
-        &self,
-        node_type: &NodeType,
-        maybe_parent_id: &Option<Entity>,
-    ) -> Option<Box<dyn SVGNode>> {
-        let maybe_parent_element_id = maybe_parent_id
-            .and_then(|parent_id| self.get_node(&parent_id))
-            .and_then(|parent| {
-                parent
-                    .get_external_child_append_id()
-                    .map(|child_append_id| child_append_id.id)
-            });
-
-        return match node_type {
-            NodeType::Rectangle => Some(Box::new(ShapeSVGNode::new(maybe_parent_element_id))),
-            NodeType::Frame => Some(Box::new(FrameSVGNode::new(maybe_parent_element_id))),
+    fn create_node(&self, node_type: &NodeType) -> Option<Box<dyn SVGNode>> {
+        match node_type {
+            NodeType::Rectangle => Some(Box::new(ShapeSVGNode::new())),
+            NodeType::Frame => Some(Box::new(FrameSVGNode::new())),
             _ => None,
-        };
+        }
     }
 
     // =============================================================================

@@ -37,17 +37,17 @@ pub struct BaseSVGBundle {
 }
 
 impl BaseSVGBundle {
-    pub fn new(element: SVGElement, maybe_parent_element_id: Option<u32>) -> Self {
+    pub fn new(element: SVGElement) -> Self {
         let element_id = element.get_id();
         let initial_updates = HashMap::from([(
             element_id,
             vec![RenderChange::ElementCreated(ElementCreated {
-                parent_id: maybe_parent_element_id,
+                parent_id: None, // Set in append_to_parent() if required
                 tag_name: element.get_tag_name().as_str(),
                 attributes: element.get_attributes().clone(),
                 styles: element.get_styles().clone(),
             })],
-        )]); // TODO send this if append_child because otherwise it won't work for paint
+        )]);
 
         return Self {
             element,
@@ -207,12 +207,12 @@ impl BaseSVGBundle {
     fn register_element_creation_render_change(
         &mut self,
         element: &SVGElement,
-        parent_id: Option<u32>,
+        maybe_parent_id: Option<u32>,
     ) {
         self.register_render_change(
             element.get_id(),
             RenderChange::ElementCreated(ElementCreated {
-                parent_id,
+                parent_id: maybe_parent_id,
                 tag_name: element.get_tag_name().as_str(),
                 attributes: element.get_attributes(),
                 styles: element.get_styles().clone(),
@@ -230,6 +230,29 @@ impl BaseSVGBundle {
     // =============================================================================
     // Other
     // =============================================================================
+
+    pub fn append_to_parent(&mut self, parent_id: u32) {
+        let element_id = self.element.get_id();
+        let mut updated = false;
+
+        // Attempt to set the parent id of the first 'ElementCreated' render change for the element.
+        // This ensures the element is correctly attached to its parent during the initial rendering.
+        if let Some(updates) = self.updates.get_mut(&element_id) {
+            if let Some(update) = updates.first_mut() {
+                match update {
+                    RenderChange::ElementCreated(element_created) => {
+                        element_created.parent_id = Some(parent_id);
+                        updated = true;
+                    }
+                    _ => {}
+                }
+            }
+        }
+
+        if !updated {
+            // TODO Append element to parent after intial render
+        }
+    }
 
     pub fn to_string(&self, node: &dyn SVGNode, composition: &SVGComposition) -> String {
         self.element.to_string(self, node, composition)

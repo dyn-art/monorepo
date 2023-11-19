@@ -48,14 +48,14 @@ impl SVGPaint for SolidSVGPaint {
 }
 
 impl SolidSVGPaint {
-    pub fn new(maybe_parent_element_id: Option<u32>) -> Self {
+    pub fn new() -> Self {
         // Create root element and apply it to the solid SVG paint
         let mut element = SVGElement::new(SVGTag::Group);
         #[cfg(feature = "trace")]
         element.set_attribute(SVGAttribute::Name {
             name: SolidSVGPaint::create_element_name(element.get_id(), String::from("root"), false),
         });
-        let mut bundle = BaseSVGBundle::new(element, maybe_parent_element_id);
+        let mut bundle = BaseSVGBundle::new(element);
 
         // Create paint elements
         let mut paint_shape_element = SVGElement::new(SVGTag::Rect);

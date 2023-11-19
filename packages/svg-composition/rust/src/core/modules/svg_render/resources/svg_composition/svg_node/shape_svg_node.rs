@@ -115,7 +115,7 @@ impl SVGNode for ShapeSVGNode {
 }
 
 impl ShapeSVGNode {
-    pub fn new(maybe_parent_element_id: Option<u32>) -> Self {
+    pub fn new() -> Self {
         // Create root element and apply it to SVG node
         let mut element = SVGElement::new(SVGTag::Group);
         let element_id = element.get_id();
@@ -123,7 +123,7 @@ impl ShapeSVGNode {
         element.set_attribute(SVGAttribute::Name {
             name: ShapeSVGNode::create_element_name(element.get_id(), String::from("root"), false),
         });
-        let mut bundle = BaseSVGBundle::new(element, maybe_parent_element_id);
+        let mut bundle = BaseSVGBundle::new(element);
 
         // Create fill elements
         let mut fill_clip_path_defs = SVGElement::new(SVGTag::Defs);
