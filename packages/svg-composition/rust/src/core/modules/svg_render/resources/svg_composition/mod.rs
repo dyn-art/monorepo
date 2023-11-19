@@ -88,7 +88,7 @@ impl SVGComposition {
                         .get_child_element_at_mut(child_append_index)
                     {
                         svg_element
-                            .append_child(SVGChildElementIdentifier::OutOfNodeContext(entity));
+                            .append_child(SVGChildElementIdentifier::InCompositionContext(entity));
                     }
                 }
             }

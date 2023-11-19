@@ -164,7 +164,7 @@ impl BaseSVGBundle {
         let next_index = self.get_next_child_index();
         if let Some(target_element) = self.child_elements.get_mut(index) {
             let target_element_id = target_element.get_id();
-            target_element.append_child(SVGChildElementIdentifier::InNodeContext(next_index));
+            target_element.append_child(SVGChildElementIdentifier::InBundleContext(next_index));
             self.register_element_creation_render_change(&element, Some(target_element_id));
             self.child_elements.push(element);
             return Ok(next_index);
@@ -178,7 +178,7 @@ impl BaseSVGBundle {
         self.register_element_creation_render_change(&element, Some(self.element.get_id()));
         self.child_elements.push(element);
         self.element
-            .append_child(SVGChildElementIdentifier::InNodeContext(next_index));
+            .append_child(SVGChildElementIdentifier::InBundleContext(next_index)); // TODO: in bundle context
         return next_index;
     }
 
@@ -231,6 +231,6 @@ impl BaseSVGBundle {
     // =============================================================================
 
     pub fn to_string(&self, node: &dyn SVGNode, composition: &SVGComposition) -> String {
-        self.element.to_string(node, composition)
+        self.element.to_string(self, node, composition)
     }
 }

@@ -6,7 +6,7 @@ use self::svg_paint::{solid_svg_paint::SolidSVGPaint, SVGPaint};
 
 use super::{
     svg_bundle::{BaseSVGBundle, SVGBundle},
-    svg_element::{attributes::SVGAttribute, SVGElement, SVGTag},
+    svg_element::{attributes::SVGAttribute, SVGChildElementIdentifier, SVGElement, SVGTag},
     svg_node::SVGNode,
     SVGComposition,
 };
@@ -60,6 +60,9 @@ impl SVGFill {
                 Paint::Solid(solid_paint) => {
                     let mut new_solid_svg_paint =
                         SolidSVGPaint::new(self.bundle.get_element().get_id());
+                    self.bundle
+                        .get_element_mut()
+                        .append_child(SVGChildElementIdentifier::InFillContext(0));
                     new_solid_svg_paint.apply_paint_change(solid_paint);
                     updated_paints.push(Box::new(new_solid_svg_paint));
                 }

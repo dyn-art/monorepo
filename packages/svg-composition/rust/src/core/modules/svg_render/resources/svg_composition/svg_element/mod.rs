@@ -4,7 +4,7 @@ use bevy_ecs::entity::Entity;
 
 use self::{attributes::SVGAttribute, styles::SVGStyle};
 
-use super::{svg_node::SVGNode, SVGComposition};
+use super::{svg_bundle::BaseSVGBundle, svg_node::SVGNode, SVGComposition};
 
 pub mod attributes;
 pub mod events;
@@ -30,15 +30,13 @@ pub struct SVGElement {
 #[derive(Debug)]
 pub enum SVGChildElementIdentifier {
     // Child element is within the same SVGNode context (query by index in "child_elements")
-    InNodeContext(usize),
+    InBundleContext(usize),
     // Child element belongs to a different entity (query by entity in "nodes")
-    OutOfNodeContext(Entity),
+    InCompositionContext(Entity),
     // Child element belongs to fill in the same SVGNode
     Fill,
     // Child element belongs to paint in the same SVGNode (query by index in "paints")
     InFillContext(usize),
-    // Child element belongs to paint in the same SVGNode (query by index in "paints")
-    InPaintContext(usize, usize), // paints vec index in fill & child element index in paint
 }
 
 impl SVGElement {
@@ -114,7 +112,12 @@ impl SVGElement {
     // Other
     // =============================================================================
 
-    pub fn to_string(&self, node: &dyn SVGNode, composition: &SVGComposition) -> String {
+    pub fn to_string(
+        &self,
+        bundle: &BaseSVGBundle,
+        node: &dyn SVGNode,
+        composition: &SVGComposition,
+    ) -> String {
         let mut result = String::new();
 
         // Open the SVG tag
@@ -143,13 +146,12 @@ impl SVGElement {
         // Append children
         for child in &self.children {
             match child {
-                SVGChildElementIdentifier::InNodeContext(child_index) => {
-                    if let Some(child_element) = node.get_bundle().get_children().get(*child_index)
-                    {
-                        result.push_str(&child_element.to_string(node, composition));
+                SVGChildElementIdentifier::InBundleContext(child_index) => {
+                    if let Some(child_element) = bundle.get_children().get(*child_index) {
+                        result.push_str(&child_element.to_string(bundle, node, composition));
                     }
                 }
-                SVGChildElementIdentifier::OutOfNodeContext(entity) => {
+                SVGChildElementIdentifier::InCompositionContext(entity) => {
                     if let Some(child_element) = composition.get_node(entity) {
                         result.push_str(&child_element.to_string(composition));
                     }
@@ -166,17 +168,7 @@ impl SVGElement {
                         }
                     }
                 }
-                SVGChildElementIdentifier::InPaintContext(paint_index, child_index) => {
-                    if let Some(fill) = node.get_fill() {
-                        if let Some(paint) = fill.get_paint_at(*paint_index) {
-                            if let Some(child_element) =
-                                paint.get_bundle().get_children().get(*child_index)
-                            {
-                                result.push_str(&child_element.to_string(node, composition));
-                            }
-                        }
-                    }
-                }
+                _ => {}
             }
         }
 
