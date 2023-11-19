@@ -27,16 +27,33 @@ pub struct SVGElement {
     children: Vec<SVGChildElementIdentifier>,
 }
 
+/// Used to efficiently locate SVG child elements within various SVG structures.
+///
+/// This approach is designed to reduce the reliance on hash map lookups,
+/// which can be expensive in terms of performance.
+/// Instead, it categorizes SVG child elements based on their location in the SVG structure,
+/// allowing for more direct and efficient retrieval.
 #[derive(Debug)]
 pub enum SVGChildElementIdentifier {
-    // Child element is within the same SVGNode context (query by index in "child_elements")
+    // Child element is owned by SVGBundle (query by index in "child_elements")
     InBundleContext(usize),
-    // Child element belongs to a different entity (query by entity in "nodes")
-    InCompositionContext(Entity),
-    // Child element belongs to fill in the same SVGNode
-    Fill,
+    // Child element is owned by SVGComposition and can be found there
+    InCompositionContext(InCompositionContextType),
+    // Child element is owned by SVGNode and can be found there
+    InNodeContext(InNodeContextType),
     // Child element belongs to paint in the same SVGNode (query by index in "paints")
     InFillContext(usize),
+}
+
+#[derive(Debug)]
+pub enum InCompositionContextType {
+    // Query by entity id in "nodes"
+    Node(Entity),
+}
+
+#[derive(Debug)]
+pub enum InNodeContextType {
+    Fill,
 }
 
 impl SVGElement {
@@ -151,16 +168,21 @@ impl SVGElement {
                         result.push_str(&child_element.to_string(bundle, node, composition));
                     }
                 }
-                SVGChildElementIdentifier::InCompositionContext(entity) => {
-                    if let Some(child_element) = composition.get_node(entity) {
-                        result.push_str(&child_element.to_string(composition));
+                SVGChildElementIdentifier::InCompositionContext(context_type) => match context_type
+                {
+                    InCompositionContextType::Node(entity) => {
+                        if let Some(child_element) = composition.get_node(entity) {
+                            result.push_str(&child_element.to_string(composition));
+                        }
                     }
-                }
-                SVGChildElementIdentifier::Fill => {
-                    if let Some(fill) = node.get_fill() {
-                        result.push_str(&fill.to_string(node, composition))
+                },
+                SVGChildElementIdentifier::InNodeContext(context_type) => match context_type {
+                    InNodeContextType::Fill => {
+                        if let Some(fill) = node.get_fill() {
+                            result.push_str(&fill.to_string(node, composition))
+                        }
                     }
-                }
+                },
                 SVGChildElementIdentifier::InFillContext(paint_index) => {
                     if let Some(fill) = node.get_fill() {
                         if let Some(paint) = fill.get_paint_at(*paint_index) {
@@ -168,7 +190,6 @@ impl SVGElement {
                         }
                     }
                 }
-                _ => {}
             }
         }
 

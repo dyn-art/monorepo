@@ -8,7 +8,7 @@ use crate::core::{
             helper::{construct_svg_path, mat3_to_svg_transform},
             mapper::map_blend_mode,
             styles::{SVGDisplayStyle, SVGStyle},
-            SVGChildElementIdentifier, SVGElement, SVGTag,
+            InNodeContextType, SVGChildElementIdentifier, SVGElement, SVGTag,
         },
         svg_fill::SVGFill,
         SVGComposition,
@@ -169,7 +169,9 @@ impl ShapeSVGNode {
         let fill = SVGFill::new(element_id, fill_clip_path_id);
         bundle
             .get_element_mut()
-            .append_child(SVGChildElementIdentifier::Fill);
+            .append_child(SVGChildElementIdentifier::InNodeContext(
+                InNodeContextType::Fill,
+            ));
 
         Self {
             bundle,

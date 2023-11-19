@@ -6,7 +6,7 @@ use dyn_composition::core::modules::node::components::types::NodeType;
 use crate::core::events::output_event::{OutputEvent, RenderUpdateEvent};
 
 use self::{
-    svg_element::SVGChildElementIdentifier,
+    svg_element::{InCompositionContextType, SVGChildElementIdentifier},
     svg_node::{frame_svg_node::FrameSVGNode, shape_svg_node::ShapeSVGNode, SVGNode},
 };
 
@@ -87,8 +87,9 @@ impl SVGComposition {
                         .get_bundle_mut()
                         .get_child_element_at_mut(child_append_index)
                     {
-                        svg_element
-                            .append_child(SVGChildElementIdentifier::InCompositionContext(entity));
+                        svg_element.append_child(SVGChildElementIdentifier::InCompositionContext(
+                            InCompositionContextType::Node(entity),
+                        ));
                     }
                 }
             }

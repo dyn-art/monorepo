@@ -23,7 +23,8 @@ pub trait SVGBundle {
 pub struct BaseSVGBundle {
     // The primary SVG element associated with this bundle
     element: SVGElement,
-    // Children that are directly related to this bundles's context.
+    // Children that are directly related to this bundles's context
+    // whose order doesn't change.
     // Using a Vector for child_elements as:
     // - The size is known at compile time, minimizing dynamic changes
     // - Offers efficient O(1) access by index, suitable for this use case
