@@ -32,8 +32,8 @@ fn process_paint(entity: Entity, paint: &Paint, svg_composition: &mut SVGComposi
     // Attempt to get or create the paint associated with the entity
     let maybe_paint = svg_composition.get_or_create_paint(entity, &paint);
 
-    if let Some(paint) = maybe_paint {
-        // TODO
+    if let Some(svg_paint) = maybe_paint {
+        svg_paint.apply_paint_change(paint);
     }
 }
 
@@ -86,7 +86,7 @@ fn process_node(
 
     if let Some(node) = maybe_node {
         // Apply collected changes to the SVG node
-        node.apply_mixin_changes(&changed_component.changes, &svg_composition);
+        node.apply_mixin_changes(&changed_component.changes);
 
         // Drain and forward render updates from the node
         let updates = node.drain_updates();

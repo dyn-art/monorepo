@@ -5,7 +5,7 @@ use crate::core::{
         self,
         svg_bundle::{BaseSVGBundle, SVGBundle},
         svg_element::{
-            attributes::SVGAttribute,
+            attributes::{SVGAttribute, SVGMeasurementUnit},
             helper::{construct_svg_path, mat3_to_svg_transform},
             mapper::map_blend_mode,
             styles::{SVGDisplayStyle, SVGStyle},
@@ -39,14 +39,18 @@ impl SVGBundle for ShapeSVGNode {
 }
 
 impl SVGNode for ShapeSVGNode {
-    fn apply_mixin_changes(&mut self, changes: &[MixinChange], svg_composition: &SVGComposition) {
+    fn apply_mixin_changes(&mut self, changes: &[MixinChange]) {
         for change in changes {
             match change {
                 MixinChange::Dimension(mixin) => {
                     self.bundle.set_attributes(vec![
-                        SVGAttribute::Width { width: mixin.width },
+                        SVGAttribute::Width {
+                            width: mixin.width,
+                            unit: SVGMeasurementUnit::Pixel,
+                        },
                         SVGAttribute::Height {
                             height: mixin.height,
+                            unit: SVGMeasurementUnit::Pixel,
                         },
                     ]);
                 }

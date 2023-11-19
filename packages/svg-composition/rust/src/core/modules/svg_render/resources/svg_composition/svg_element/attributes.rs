@@ -2,6 +2,13 @@ use serde::Serialize;
 use specta::Type;
 
 #[derive(Debug, Serialize, Clone, Type)]
+#[serde(tag = "type")]
+pub enum SVGMeasurementUnit {
+    Pixel,
+    Percent,
+}
+
+#[derive(Debug, Serialize, Clone, Type)]
 // Using struct variants over tuples to use serde tag feature which enables efficient property access in TypeScript,
 // allowing for faster and simpler type checks, e.g., `change.type === "Width"`
 #[serde(tag = "type")]
@@ -11,9 +18,11 @@ pub enum SVGAttribute {
     },
     Width {
         width: u32,
+        unit: SVGMeasurementUnit,
     },
     Height {
         height: u32,
+        unit: SVGMeasurementUnit,
     },
     Opacity {
         opacity: f32,
@@ -54,8 +63,14 @@ impl SVGAttribute {
     pub fn to_svg_string(&self) -> String {
         match self {
             Self::Id { id } => id.to_string(),
-            Self::Width { width } => width.to_string(),
-            Self::Height { height } => height.to_string(),
+            Self::Width { width, unit } => match unit {
+                SVGMeasurementUnit::Pixel => width.to_string(),
+                SVGMeasurementUnit::Percent => format!("{width}%")
+            },
+            Self::Height { height , unit} => match unit {
+                SVGMeasurementUnit::Pixel => height.to_string(),
+                SVGMeasurementUnit::Percent => format!("{height}%")
+            },
             Self::Opacity { opacity } => opacity.to_string(),
             Self::Transform { transform } => match transform {
                 SVGTransformAttribute::Matrix { a, b, c, d, tx, ty } => {

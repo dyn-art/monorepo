@@ -5,7 +5,7 @@ use crate::core::{
         self,
         svg_bundle::{BaseSVGBundle, SVGBundle},
         svg_element::{
-            attributes::SVGAttribute,
+            attributes::{SVGAttribute, SVGMeasurementUnit},
             helper::mat3_to_svg_transform,
             mapper::map_blend_mode,
             styles::{SVGDisplayStyle, SVGStyle},
@@ -48,7 +48,7 @@ impl SVGBundle for FrameSVGNode {
 }
 
 impl SVGNode for FrameSVGNode {
-    fn apply_mixin_changes(&mut self, changes: &[MixinChange], svg_composition: &SVGComposition) {
+    fn apply_mixin_changes(&mut self, changes: &[MixinChange]) {
         for change in changes {
             match change {
                 MixinChange::Dimension(mixin) => {
@@ -56,26 +56,38 @@ impl SVGNode for FrameSVGNode {
                     let fill_clipped_shape_index = self.fill_clipped_shape.index;
 
                     self.bundle.set_attributes(vec![
-                        SVGAttribute::Width { width: mixin.width },
+                        SVGAttribute::Width {
+                            width: mixin.width,
+                            unit: SVGMeasurementUnit::Pixel,
+                        },
                         SVGAttribute::Height {
                             height: mixin.height,
+                            unit: SVGMeasurementUnit::Pixel,
                         },
                     ]);
                     self.bundle.set_attributes_at(
                         fill_clipped_shape_index,
                         vec![
-                            SVGAttribute::Width { width: mixin.width },
+                            SVGAttribute::Width {
+                                width: mixin.width,
+                                unit: SVGMeasurementUnit::Pixel,
+                            },
                             SVGAttribute::Height {
                                 height: mixin.height,
+                                unit: SVGMeasurementUnit::Pixel,
                             },
                         ],
                     );
                     self.bundle.set_attributes_at(
                         content_clipped_shape_index,
                         vec![
-                            SVGAttribute::Width { width: mixin.width },
+                            SVGAttribute::Width {
+                                width: mixin.width,
+                                unit: SVGMeasurementUnit::Pixel,
+                            },
                             SVGAttribute::Height {
                                 height: mixin.height,
+                                unit: SVGMeasurementUnit::Pixel,
                             },
                         ],
                     );
