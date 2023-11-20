@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use bevy_ecs::{
     component::Component,
     entity::Entity,
@@ -27,8 +25,9 @@ pub fn extract_mixin_generic<T: Component + ToMixinChange>(
 ) {
     query.for_each(|(entity, node, mixin)| {
         let changed_component = changed.changed_nodes.entry(entity).or_insert_with(|| {
-            // Try to get the parent entity id
             let mut parent_id: Option<Entity> = None;
+
+            // Try to get the parent entity id
             if let Ok(parent) = parent_query.get(entity) {
                 parent_id = Some(parent.get());
             }
@@ -47,23 +46,22 @@ pub fn extract_paint(
     mut changed: ResMut<ChangedComponents>,
     query: Extract<Query<(Entity, &Paint), Changed<Paint>>>,
     parent_query: Extract<Query<&Parent>>,
-    dimension_query: Extract<Query<(Entity, &DimensionMixin), Changed<DimensionMixin>>>,
+    dimension_query: Extract<Query<&DimensionMixin>>,
 ) {
-    // Collect all entities with changed DimensionMixin for quick lookup
-    let changed_dimensions: HashMap<Entity, &DimensionMixin> =
-        dimension_query.iter().map(|(e, d)| (e, d)).collect();
-
     query.for_each(|(entity, paint)| {
         changed.changed_paints.entry(entity).or_insert_with(|| {
             let mut parent_id: Option<Entity> = None;
             let mut parent_dimension: Option<DimensionMixin> = None;
 
-            // Try to get parent entity id and dimensions
+            // Try to get the parent entity id and its DimensionMixin
             if let Ok(parent) = parent_query.get(entity) {
                 let parent_entity = parent.get();
                 parent_id = Some(parent_entity);
-                if let Some(dimension) = changed_dimensions.get(&parent_entity) {
-                    parent_dimension = Some(dimension.clone().clone());
+
+                if let Ok(dimension_mixin) =
+                    dimension_query.get_component::<DimensionMixin>(parent_entity)
+                {
+                    parent_dimension = Some(dimension_mixin.clone());
                 }
             }
 
