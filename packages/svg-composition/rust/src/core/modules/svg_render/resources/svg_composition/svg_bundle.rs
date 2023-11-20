@@ -1,13 +1,8 @@
-use std::collections::HashMap;
-
 use crate::core::events::output_event::RenderUpdateEvent;
 
 use super::{
     svg_element::{
-        attributes::SVGAttribute,
-        events::{AttributeUpdated, ElementCreated, RenderChange, StyleUpdated},
-        styles::SVGStyle,
-        SVGChildElementIdentifier, SVGElement,
+        attributes::SVGAttribute, styles::SVGStyle, SVGChildElementIdentifier, SVGElement,
     },
     svg_node::SVGNode,
     SVGComposition,
@@ -30,31 +25,14 @@ pub struct BaseSVGBundle {
     // - Offers efficient O(1) access by index, suitable for this use case
     // - More memory-efficient and simpler than a HashMap for fixed-size collections
     child_elements: Vec<SVGElement>,
-    // Maps element ids to a list of render changes.
-    // Group here by element id to avoid grouping or frequent lookups of elements on the JS site.
-    updates: HashMap<u32, Vec<RenderChange>>,
-    updates_order: Vec<u32>,
 }
 
 impl BaseSVGBundle {
     pub fn new(element: SVGElement) -> Self {
-        let element_id = element.get_id();
-        let initial_updates = HashMap::from([(
-            element_id,
-            vec![RenderChange::ElementCreated(ElementCreated {
-                parent_id: None, // Set in append_to_parent() if required
-                tag_name: element.get_tag_name().as_str(),
-                attributes: element.get_attributes().clone(),
-                styles: element.get_styles().clone(),
-            })],
-        )]);
-
-        return Self {
+        Self {
             element,
-            child_elements: vec![],
-            updates: initial_updates,
-            updates_order: vec![element_id],
-        };
+            child_elements: Vec::new(),
+        }
     }
 
     // =============================================================================
@@ -83,34 +61,14 @@ impl BaseSVGBundle {
 
     pub fn set_attributes_at(&mut self, index: usize, attributes: Vec<SVGAttribute>) {
         if let Some(element) = self.get_child_element_at_mut(index) {
-            let mut render_changes: Vec<RenderChange> = vec![];
-            let element_id = element.get_id();
-
             for attribute in attributes {
-                // Record the attribute update as a render change
-                render_changes.push(RenderChange::AttributeUpdated(AttributeUpdated {
-                    new_value: attribute.clone(),
-                }));
-
                 element.set_attribute(attribute);
-            }
-
-            for render_change in render_changes {
-                self.register_render_change(element_id, render_change);
             }
         }
     }
 
     pub fn set_attributes(&mut self, attributes: Vec<SVGAttribute>) {
         for attribute in attributes {
-            // Record the attribute update as a render change
-            self.register_render_change(
-                self.element.get_id(),
-                RenderChange::AttributeUpdated(AttributeUpdated {
-                    new_value: attribute.clone(),
-                }),
-            );
-
             self.element.set_attribute(attribute);
         }
     }
@@ -121,34 +79,14 @@ impl BaseSVGBundle {
 
     pub fn set_styles_at(&mut self, index: usize, styles: Vec<SVGStyle>) {
         if let Some(element) = self.get_child_element_at_mut(index) {
-            let mut render_changes: Vec<RenderChange> = vec![];
-            let element_id = element.get_id();
-
             for style in styles {
-                // Record the style update as a render change
-                render_changes.push(RenderChange::StyleUpdated(StyleUpdated {
-                    new_value: style.clone(),
-                }));
-
                 element.set_style(style);
-            }
-
-            for render_change in render_changes {
-                self.register_render_change(element_id, render_change);
             }
         }
     }
 
     pub fn set_styles(&mut self, styles: Vec<SVGStyle>) {
         for style in styles {
-            // Record the style update as a render change
-            self.register_render_change(
-                self.element.get_id(),
-                RenderChange::StyleUpdated(StyleUpdated {
-                    new_value: style.clone(),
-                }),
-            );
-
             self.element.set_style(style);
         }
     }
@@ -160,26 +98,28 @@ impl BaseSVGBundle {
     pub fn append_child_element_to(
         &mut self,
         index: usize,
-        element: SVGElement,
-    ) -> Result<usize, String> {
+        mut element: SVGElement,
+    ) -> Option<usize> {
         let next_index = self.get_next_child_index();
         if let Some(target_element) = self.child_elements.get_mut(index) {
             let target_element_id = target_element.get_id();
-            target_element.append_child(SVGChildElementIdentifier::InBundleContext(next_index));
-            self.register_element_creation_render_change(&element, Some(target_element_id));
+            target_element.append_child(
+                &mut element,
+                SVGChildElementIdentifier::InBundleContext(next_index),
+            );
             self.child_elements.push(element);
-            return Ok(next_index);
-        } else {
-            return Err(String::from("Invalid parent index"));
+            return Some(next_index);
         }
+        return None;
     }
 
-    pub fn append_child_element(&mut self, element: SVGElement) -> usize {
+    pub fn append_child_element(&mut self, mut element: SVGElement) -> usize {
         let next_index = self.get_next_child_index();
-        self.register_element_creation_render_change(&element, Some(self.element.get_id()));
+        self.element.append_child(
+            &mut element,
+            SVGChildElementIdentifier::InBundleContext(next_index),
+        );
         self.child_elements.push(element);
-        self.element
-            .append_child(SVGChildElementIdentifier::InBundleContext(next_index)); // TODO: in bundle context
         return next_index;
     }
 
@@ -195,64 +135,29 @@ impl BaseSVGBundle {
     pub fn drain_updates(&mut self) -> Vec<RenderUpdateEvent> {
         let mut drained_updates = Vec::new();
 
-        for id in self.updates_order.drain(..) {
-            if let Some(updates) = self.updates.remove(&id) {
-                drained_updates.push(RenderUpdateEvent { id, updates });
+        // Drain updates from root
+        drained_updates.push(RenderUpdateEvent {
+            id: self.element.get_id(),
+            updates: self.element.drain_updates(),
+        });
+
+        // Drain updates from children
+        for child in &mut self.child_elements {
+            let updates = child.drain_updates();
+            if !updates.is_empty() {
+                drained_updates.push(RenderUpdateEvent {
+                    id: child.get_id(),
+                    updates: updates,
+                })
             }
         }
 
         return drained_updates;
     }
 
-    fn register_element_creation_render_change(
-        &mut self,
-        element: &SVGElement,
-        maybe_parent_id: Option<u32>,
-    ) {
-        self.register_render_change(
-            element.get_id(),
-            RenderChange::ElementCreated(ElementCreated {
-                parent_id: maybe_parent_id,
-                tag_name: element.get_tag_name().as_str(),
-                attributes: element.get_attributes(),
-                styles: element.get_styles().clone(),
-            }),
-        );
-    }
-
-    fn register_render_change(&mut self, id: u32, change: RenderChange) {
-        if self.updates.entry(id).or_insert_with(Vec::new).is_empty() {
-            self.updates_order.push(id);
-        }
-        self.updates.get_mut(&id).unwrap().push(change);
-    }
-
     // =============================================================================
     // Other
     // =============================================================================
-
-    pub fn append_to_parent(&mut self, parent_id: u32) {
-        let element_id = self.element.get_id();
-        let mut updated = false;
-
-        // Attempt to set the parent id of the first 'ElementCreated' render change for the element.
-        // This ensures the element is correctly attached to its parent during the initial rendering.
-        if let Some(updates) = self.updates.get_mut(&element_id) {
-            if let Some(update) = updates.first_mut() {
-                match update {
-                    RenderChange::ElementCreated(element_created) => {
-                        element_created.parent_id = Some(parent_id);
-                        updated = true;
-                    }
-                    _ => {}
-                }
-            }
-        }
-
-        if !updated {
-            // TODO Append element to parent after intial render
-        }
-    }
 
     pub fn to_string(&self, node: &dyn SVGNode, composition: &SVGComposition) -> String {
         self.element.to_string(self, node, composition)

@@ -2,7 +2,11 @@ use std::collections::HashMap;
 
 use bevy_ecs::entity::Entity;
 
-use self::{attributes::SVGAttribute, styles::SVGStyle};
+use self::{
+    attributes::SVGAttribute,
+    events::{AttributeUpdated, ElementAppended, ElementCreated, RenderChange, StyleUpdated},
+    styles::SVGStyle,
+};
 
 use super::{svg_bundle::BaseSVGBundle, svg_node::SVGNode, SVGComposition};
 
@@ -25,6 +29,7 @@ pub struct SVGElement {
     styles: HashMap<&'static str, SVGStyle>,
     // Identifiers for child elements, supporting both in-context and out-of-context children
     children: Vec<SVGChildElementIdentifier>,
+    updates: Vec<RenderChange>,
 }
 
 /// Used to efficiently locate SVG child elements within various SVG structures.
@@ -53,13 +58,24 @@ impl SVGElement {
     pub fn new(tag_name: SVGTag) -> Self {
         let id: u32 = rand::random();
         let id_attribute = SVGAttribute::Id { id };
-        SVGElement {
+        let inital_attributes: HashMap<&'static str, SVGAttribute> =
+            HashMap::from([(id_attribute.key(), id_attribute)]);
+        let intial_styles: HashMap<&'static str, SVGStyle> = HashMap::new();
+        let initial_updates = vec![RenderChange::ElementCreated(ElementCreated {
+            parent_id: None,
+            tag_name: tag_name.as_str(),
+            attributes: inital_attributes.values().cloned().collect(),
+            styles: intial_styles.values().cloned().collect(),
+        })];
+
+        return Self {
             id,
             tag_name,
-            attributes: HashMap::from([(id_attribute.key(), id_attribute)]),
-            styles: HashMap::new(),
-            children: vec![],
-        }
+            attributes: inital_attributes,
+            styles: intial_styles,
+            children: Vec::new(),
+            updates: initial_updates,
+        };
     }
 
     // =============================================================================
@@ -67,6 +83,10 @@ impl SVGElement {
     // =============================================================================
 
     pub fn set_attribute(&mut self, attribute: SVGAttribute) {
+        self.updates
+            .push(RenderChange::AttributeUpdated(AttributeUpdated {
+                new_value: attribute.clone(),
+            }));
         self.attributes.insert(attribute.key(), attribute);
     }
 
@@ -85,6 +105,9 @@ impl SVGElement {
     }
 
     pub fn set_style(&mut self, style: SVGStyle) {
+        self.updates.push(RenderChange::StyleUpdated(StyleUpdated {
+            new_value: style.clone(),
+        }));
         self.styles.insert(style.key(), style);
     }
 
@@ -114,7 +137,12 @@ impl SVGElement {
     // Children
     // =============================================================================
 
-    pub fn append_child(&mut self, identifier: SVGChildElementIdentifier) {
+    pub fn append_child(
+        &mut self,
+        element: &mut SVGElement,
+        identifier: SVGChildElementIdentifier,
+    ) {
+        element.append_to_parent(self.id);
         self.children.push(identifier);
     }
 
@@ -125,6 +153,33 @@ impl SVGElement {
     // =============================================================================
     // Other
     // =============================================================================
+
+    fn append_to_parent(&mut self, parent_id: u32) {
+        let mut updated = false;
+
+        // Attempt to set the parent id of the first 'ElementCreated' render change for the element.
+        // This ensures the element is correctly attached to its parent during the initial rendering.
+        if let Some(update) = self.updates.first_mut() {
+            match update {
+                RenderChange::ElementCreated(element_created) => {
+                    if element_created.parent_id.is_none() {
+                        element_created.parent_id = Some(parent_id);
+                        updated = true;
+                    }
+                }
+                _ => {}
+            }
+        }
+
+        if !updated {
+            self.updates
+                .push(RenderChange::ElementAppended(ElementAppended { parent_id }))
+        }
+    }
+
+    pub fn drain_updates(&mut self) -> Vec<RenderChange> {
+        self.updates.drain(..).collect()
+    }
 
     pub fn to_string(
         &self,
@@ -188,7 +243,7 @@ impl SVGElement {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum SVGTag {
     Circle,
     Rect,

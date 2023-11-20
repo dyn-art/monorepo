@@ -56,7 +56,7 @@ pub struct ChildrenMixin(pub Vec<Entity>);
 
 impl Default for ChildrenMixin {
     fn default() -> Self {
-        Self(vec![])
+        Self(Vec::new())
     }
 }
 
@@ -177,7 +177,9 @@ pub struct PathMixin {
 
 impl Default for PathMixin {
     fn default() -> Self {
-        Self { vertices: vec![] }
+        Self {
+            vertices: Vec::new(),
+        }
     }
 }
 
@@ -243,7 +245,7 @@ pub struct FillMixin {
 
 impl Default for FillMixin {
     fn default() -> Self {
-        Self { paints: vec![] }
+        Self { paints: Vec::new() }
     }
 }
 

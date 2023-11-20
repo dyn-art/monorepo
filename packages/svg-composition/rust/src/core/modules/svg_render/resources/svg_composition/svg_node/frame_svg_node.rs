@@ -2,7 +2,6 @@ use crate::core::{
     events::output_event::RenderUpdateEvent,
     mixin_change::MixinChange,
     modules::svg_render::resources::svg_composition::{
-        self,
         svg_bundle::{BaseSVGBundle, SVGBundle},
         svg_element::{
             attributes::{SVGAttribute, SVGMeasurementUnit},
@@ -122,9 +121,9 @@ impl SVGNode for FrameSVGNode {
                     {
                         element.clear_children();
                         for paint_id in &mixin.paints {
-                            element.append_child(SVGChildElementIdentifier::InCompositionContext(
-                                InCompositionContextType::Paint(paint_id.clone()),
-                            ));
+                            // element.append_child(SVGChildElementIdentifier::InCompositionContext(
+                            //     InCompositionContextType::Paint(paint_id.clone()),
+                            // ));
                         }
                     }
                 }

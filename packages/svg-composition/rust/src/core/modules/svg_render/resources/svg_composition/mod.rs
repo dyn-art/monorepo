@@ -31,7 +31,7 @@ pub struct SVGComposition {
 impl SVGComposition {
     pub fn new(output_event_sender: Sender<OutputEvent>) -> Self {
         SVGComposition {
-            root_ids: vec![],
+            root_ids: Vec::new(),
             nodes: HashMap::new(),
             paints: HashMap::new(),
             output_event_sender,
@@ -109,21 +109,21 @@ impl SVGComposition {
         mut node: Box<dyn SVGNode>,
         maybe_parent_id: &Option<Entity>,
     ) {
-        // If the parent id exists, append this node as a child
+        // If the parent id exists, append this node element as a child to the parent element
         if let Some(parent_id) = maybe_parent_id {
             if let Some(parent_node) = self.get_node_mut(parent_id) {
-                let child_append_reference = parent_node.get_external_child_append_id().unwrap();
-                let child_append_index = child_append_reference.index;
-                let child_append_id = child_append_reference.id;
-
-                if let Some(svg_element) = parent_node
+                let parent_child_append_index =
+                    parent_node.get_external_child_append_id().unwrap().index;
+                if let Some(parent_child_append_element) = parent_node
                     .get_bundle_mut()
-                    .get_child_element_at_mut(child_append_index)
+                    .get_child_element_at_mut(parent_child_append_index)
                 {
-                    svg_element.append_child(SVGChildElementIdentifier::InCompositionContext(
-                        InCompositionContextType::Node(entity),
-                    ));
-                    node.get_bundle_mut().append_to_parent(child_append_id);
+                    parent_child_append_element.append_child(
+                        &mut node.get_bundle_mut().get_element_mut(),
+                        SVGChildElementIdentifier::InCompositionContext(
+                            InCompositionContextType::Node(entity),
+                        ),
+                    );
                 }
             }
         }

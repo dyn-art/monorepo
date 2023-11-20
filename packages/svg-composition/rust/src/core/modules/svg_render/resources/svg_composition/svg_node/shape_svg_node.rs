@@ -86,6 +86,7 @@ impl SVGNode for ShapeSVGNode {
                         },
                     }]);
                 }
+                // TODO: REMOVE and establish parent child relation for Fill with Node
                 MixinChange::Fill(mixin) => {
                     let fill_wrapper_index = self.fill_wrapper.index;
                     let fill_wrapper_id = self.fill_wrapper.id;
@@ -93,9 +94,9 @@ impl SVGNode for ShapeSVGNode {
                     {
                         element.clear_children();
                         for paint_id in &mixin.paints {
-                            element.append_child(SVGChildElementIdentifier::InCompositionContext(
-                                InCompositionContextType::Paint(paint_id.clone()),
-                            ));
+                            // element.append_child(SVGChildElementIdentifier::InCompositionContext(
+                            //     InCompositionContextType::Paint(paint_id.clone()),
+                            // ));
                             // TODO: paint.get_bundle_mut().append_to_parent(fill_wrapper_id);
                         }
                     }

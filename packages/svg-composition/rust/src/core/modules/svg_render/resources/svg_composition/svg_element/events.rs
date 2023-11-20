@@ -22,6 +22,7 @@ use super::{attributes::SVGAttribute, styles::SVGStyle};
 pub enum RenderChange {
     ElementCreated(ElementCreated),
     ElementDeleted(ElementDeleted),
+    ElementAppended(ElementAppended),
     AttributeUpdated(AttributeUpdated),
     AttributeRemoved(AttributeRemoved),
     StyleUpdated(StyleUpdated),
@@ -43,6 +44,13 @@ pub struct ElementCreated {
 /// Emitted when a SVGElement is deleted
 #[derive(Debug, Serialize, Clone, Type)]
 pub struct ElementDeleted {}
+
+/// Emitted when a SVGElement (child) is append to another SVGElement (parent)
+#[derive(Debug, Serialize, Clone, Type)]
+pub struct ElementAppended {
+    #[serde(rename = "parentId")]
+    pub parent_id: u32,
+}
 
 /// Emitted when an attribute of an SVGElement is updated
 #[derive(Debug, Serialize, Clone, Type)]

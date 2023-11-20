@@ -28,7 +28,7 @@ pub fn extract_mixin_generic<T: Component + ToMixinChange>(
 
             return ChangedNode {
                 node_type: node.node_type.clone(),
-                changes: vec![],
+                changes: Vec::new(),
                 parent_id,
             };
         });
