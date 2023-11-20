@@ -260,7 +260,7 @@ pub enum Paint {
 pub struct SolidPaint {
     /// The color of the paint, represented as an RGB array
     /// where each component ranges from 0 to 255.
-    pub color: [u8; 3],
+    pub color: (u8, u8, u8),
 
     /// The opacity of the paint,
     /// ranging from 0.0 (completely transparent) to 1.0 (completely opaque).

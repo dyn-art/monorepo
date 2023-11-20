@@ -82,10 +82,6 @@ impl SVGElement {
     // Getter & Setter
     // =============================================================================
 
-    pub fn get_children(&self) -> &Vec<SVGChildElementIdentifier> {
-        &self.children
-    }
-
     pub fn set_attribute(&mut self, attribute: SVGAttribute) {
         self.updates
             .push(RenderChange::AttributeUpdated(AttributeUpdated {
@@ -154,10 +150,6 @@ impl SVGElement {
         self.children.clear()
     }
 
-    // =============================================================================
-    // Other
-    // =============================================================================
-
     fn append_to_parent(&mut self, parent_id: u32) {
         let mut updated = false;
 
@@ -180,6 +172,10 @@ impl SVGElement {
                 .push(RenderChange::ElementAppended(ElementAppended { parent_id }))
         }
     }
+
+    // =============================================================================
+    // Other
+    // =============================================================================
 
     pub fn drain_updates(&mut self) -> Vec<RenderChange> {
         self.updates.drain(..).collect()

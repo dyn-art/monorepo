@@ -45,7 +45,7 @@ impl SVGNode for ShapeSVGNode {
         for change in &changed_node.changes {
             match change {
                 MixinChange::Dimension(mixin) => {
-                    self.bundle.set_attributes(vec![
+                    self.bundle.get_root_mut().set_attributes(vec![
                         SVGAttribute::Width {
                             width: mixin.width,
                             unit: SVGMeasurementUnit::Pixel,
@@ -57,37 +57,38 @@ impl SVGNode for ShapeSVGNode {
                     ]);
                 }
                 MixinChange::RelativeTransform(mixin) => {
-                    self.bundle.set_attributes(vec![
+                    self.bundle.get_root_mut().set_attributes(vec![
                         (SVGAttribute::Transform {
                             transform: mat3_to_svg_transform(mixin.relative_transform.0),
                         }),
                     ]);
                 }
-                MixinChange::Path(mixin) => {
-                    let fill_clipped_shape_index = self.fill_clipped_shape.index;
-                    self.bundle.set_attributes_at(
-                        fill_clipped_shape_index,
-                        vec![SVGAttribute::D {
-                            d: construct_svg_path(&mixin.vertices),
-                        }],
-                    )
-                }
+                MixinChange::Path(mixin) => self
+                    .bundle
+                    .get_child_mut(self.fill_clipped_shape.index)
+                    .unwrap()
+                    .set_attributes(vec![SVGAttribute::D {
+                        d: construct_svg_path(&mixin.vertices),
+                    }]),
                 MixinChange::Blend(mixin) => {
-                    self.bundle.set_attributes(vec![SVGAttribute::Opacity {
+                    let root_element = self.bundle.get_root_mut();
+                    root_element.set_attributes(vec![SVGAttribute::Opacity {
                         opacity: mixin.opacity,
                     }]);
-                    self.bundle.set_styles(vec![SVGStyle::BlendMode {
+                    root_element.set_styles(vec![SVGStyle::BlendMode {
                         blend_mode: map_blend_mode(&mixin.blend_mode),
                     }]);
                 }
                 MixinChange::Composition(mixin) => {
-                    self.bundle.set_styles(vec![SVGStyle::Display {
-                        display: if mixin.is_visible {
-                            SVGDisplayStyle::Block
-                        } else {
-                            SVGDisplayStyle::None
-                        },
-                    }]);
+                    self.bundle
+                        .get_root_mut()
+                        .set_styles(vec![SVGStyle::Display {
+                            display: if mixin.is_visible {
+                                SVGDisplayStyle::Block
+                            } else {
+                                SVGDisplayStyle::None
+                            },
+                        }]);
                 }
                 _ => {
                     // do nothing
@@ -96,7 +97,7 @@ impl SVGNode for ShapeSVGNode {
         }
     }
 
-    fn get_external_child_append_id(&self) -> Option<&ElementReference> {
+    fn get_child_append_id(&self) -> Option<&ElementReference> {
         None
     }
 
@@ -135,7 +136,7 @@ impl ShapeSVGNode {
                 false,
             ),
         });
-        let fill_clip_path_defs_index = bundle.append_child_element(fill_clip_path_defs);
+        let fill_clip_path_defs_index = bundle.append_child(fill_clip_path_defs);
 
         let mut fill_clip_path_element = SVGElement::new(SVGTag::ClipPath);
         let fill_clip_path_id = fill_clip_path_element.get_id();
@@ -148,7 +149,7 @@ impl ShapeSVGNode {
             ),
         });
         let fill_clip_path_index = bundle
-            .append_child_element_to(fill_clip_path_defs_index, fill_clip_path_element)
+            .append_child_to(fill_clip_path_defs_index, fill_clip_path_element)
             .unwrap();
 
         let mut fill_clipped_shape_element = SVGElement::new(SVGTag::Path);
@@ -162,7 +163,7 @@ impl ShapeSVGNode {
             ),
         });
         let fill_clipped_shape_index = bundle
-            .append_child_element_to(fill_clip_path_index, fill_clipped_shape_element)
+            .append_child_to(fill_clip_path_index, fill_clipped_shape_element)
             .unwrap();
 
         let mut fill_wrapper_element = SVGElement::new(SVGTag::Group);
@@ -174,7 +175,7 @@ impl ShapeSVGNode {
         fill_wrapper_element.set_attribute(SVGAttribute::ClipPath {
             clip_path: fill_clip_path_id,
         });
-        let fill_wrapper_index = bundle.append_child_element(fill_wrapper_element);
+        let fill_wrapper_index = bundle.append_child(fill_wrapper_element);
 
         Self {
             bundle,

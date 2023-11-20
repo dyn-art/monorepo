@@ -54,10 +54,7 @@ impl SVGNode for FrameSVGNode {
         for change in &changed_node.changes {
             match change {
                 MixinChange::Dimension(mixin) => {
-                    let content_clipped_shape_index = self.content_clipped_shape.index;
-                    let fill_clipped_shape_index = self.fill_clipped_shape.index;
-
-                    self.bundle.set_attributes(vec![
+                    self.bundle.get_root_mut().set_attributes(vec![
                         SVGAttribute::Width {
                             width: mixin.width,
                             unit: SVGMeasurementUnit::Pixel,
@@ -67,9 +64,10 @@ impl SVGNode for FrameSVGNode {
                             unit: SVGMeasurementUnit::Pixel,
                         },
                     ]);
-                    self.bundle.set_attributes_at(
-                        fill_clipped_shape_index,
-                        vec![
+                    self.bundle
+                        .get_child_mut(self.fill_clipped_shape.index)
+                        .unwrap()
+                        .set_attributes(vec![
                             SVGAttribute::Width {
                                 width: mixin.width,
                                 unit: SVGMeasurementUnit::Pixel,
@@ -78,11 +76,11 @@ impl SVGNode for FrameSVGNode {
                                 height: mixin.height,
                                 unit: SVGMeasurementUnit::Pixel,
                             },
-                        ],
-                    );
-                    self.bundle.set_attributes_at(
-                        content_clipped_shape_index,
-                        vec![
+                        ]);
+                    self.bundle
+                        .get_child_mut(self.content_clipped_shape.index)
+                        .unwrap()
+                        .set_attributes(vec![
                             SVGAttribute::Width {
                                 width: mixin.width,
                                 unit: SVGMeasurementUnit::Pixel,
@@ -91,32 +89,34 @@ impl SVGNode for FrameSVGNode {
                                 height: mixin.height,
                                 unit: SVGMeasurementUnit::Pixel,
                             },
-                        ],
-                    );
+                        ]);
                 }
                 MixinChange::RelativeTransform(mixin) => {
-                    self.bundle.set_attributes(vec![
+                    self.bundle.get_root_mut().set_attributes(vec![
                         (SVGAttribute::Transform {
                             transform: mat3_to_svg_transform(mixin.relative_transform.0),
                         }),
                     ]);
                 }
                 MixinChange::Blend(mixin) => {
-                    self.bundle.set_attributes(vec![SVGAttribute::Opacity {
+                    let root_element = self.bundle.get_root_mut();
+                    root_element.set_attributes(vec![SVGAttribute::Opacity {
                         opacity: mixin.opacity,
                     }]);
-                    self.bundle.set_styles(vec![SVGStyle::BlendMode {
+                    root_element.set_styles(vec![SVGStyle::BlendMode {
                         blend_mode: map_blend_mode(&mixin.blend_mode),
                     }]);
                 }
                 MixinChange::Composition(mixin) => {
-                    self.bundle.set_styles(vec![SVGStyle::Display {
-                        display: if mixin.is_visible {
-                            SVGDisplayStyle::Block
-                        } else {
-                            SVGDisplayStyle::None
-                        },
-                    }]);
+                    self.bundle
+                        .get_root_mut()
+                        .set_styles(vec![SVGStyle::Display {
+                            display: if mixin.is_visible {
+                                SVGDisplayStyle::Block
+                            } else {
+                                SVGDisplayStyle::None
+                            },
+                        }]);
                 }
                 _ => {
                     // do nothing
@@ -125,7 +125,7 @@ impl SVGNode for FrameSVGNode {
         }
     }
 
-    fn get_external_child_append_id(&self) -> Option<&ElementReference> {
+    fn get_child_append_id(&self) -> Option<&ElementReference> {
         Some(&self.children_wrapper)
     }
 
@@ -168,8 +168,7 @@ impl FrameSVGNode {
                 false,
             ),
         });
-        let content_clip_path_defs_index =
-            bundle.append_child_element(content_clip_path_defs_element);
+        let content_clip_path_defs_index = bundle.append_child(content_clip_path_defs_element);
 
         let mut content_clip_path_element = SVGElement::new(SVGTag::ClipPath);
         let content_clip_path_id = content_clip_path_element.get_id();
@@ -182,7 +181,7 @@ impl FrameSVGNode {
             ),
         });
         let content_clip_path_index = bundle
-            .append_child_element_to(content_clip_path_defs_index, content_clip_path_element)
+            .append_child_to(content_clip_path_defs_index, content_clip_path_element)
             .unwrap();
 
         let mut content_clipped_shape_element = SVGElement::new(SVGTag::Rect);
@@ -196,7 +195,7 @@ impl FrameSVGNode {
             ),
         });
         let content_clipped_shape_index = bundle
-            .append_child_element_to(content_clip_path_index, content_clipped_shape_element)
+            .append_child_to(content_clip_path_index, content_clipped_shape_element)
             .unwrap();
 
         let mut content_wrapper = SVGElement::new(SVGTag::Group);
@@ -212,7 +211,7 @@ impl FrameSVGNode {
         content_wrapper.set_attribute(SVGAttribute::ClipPath {
             clip_path: content_clip_path_id,
         });
-        let content_wrapper_index = bundle.append_child_element(content_wrapper);
+        let content_wrapper_index = bundle.append_child(content_wrapper);
 
         // Create fill elements
         let mut fill_clip_path_defs = SVGElement::new(SVGTag::Defs);
@@ -226,7 +225,7 @@ impl FrameSVGNode {
             ),
         });
         let fill_clip_path_defs_index = bundle
-            .append_child_element_to(content_wrapper_index, fill_clip_path_defs)
+            .append_child_to(content_wrapper_index, fill_clip_path_defs)
             .unwrap();
 
         let mut fill_clip_path_element = SVGElement::new(SVGTag::ClipPath);
@@ -240,7 +239,7 @@ impl FrameSVGNode {
             ),
         });
         let fill_clip_path_index = bundle
-            .append_child_element_to(fill_clip_path_defs_index, fill_clip_path_element)
+            .append_child_to(fill_clip_path_defs_index, fill_clip_path_element)
             .unwrap();
 
         let mut fill_clipped_shape_element = SVGElement::new(SVGTag::Rect);
@@ -254,7 +253,7 @@ impl FrameSVGNode {
             ),
         });
         let fill_clipped_shape_index = bundle
-            .append_child_element_to(fill_clip_path_index, fill_clipped_shape_element)
+            .append_child_to(fill_clip_path_index, fill_clipped_shape_element)
             .unwrap();
 
         let mut fill_wrapper_element = SVGElement::new(SVGTag::Group);
@@ -267,7 +266,7 @@ impl FrameSVGNode {
             clip_path: fill_clip_path_id,
         });
         let fill_wrapper_index = bundle
-            .append_child_element_to(content_wrapper_index, fill_wrapper_element)
+            .append_child_to(content_wrapper_index, fill_wrapper_element)
             .unwrap();
 
         // Create children wrapper element
@@ -282,7 +281,7 @@ impl FrameSVGNode {
             ),
         });
         let children_wrapper_index = bundle
-            .append_child_element_to(content_wrapper_index, children_wrapper)
+            .append_child_to(content_wrapper_index, children_wrapper)
             .unwrap();
 
         Self {

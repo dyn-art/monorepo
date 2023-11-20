@@ -1,9 +1,7 @@
 use crate::core::events::output_event::RenderUpdateEvent;
 
 use super::{
-    svg_element::{
-        attributes::SVGAttribute, styles::SVGStyle, SVGChildElementIdentifier, SVGElement,
-    },
+    svg_element::{SVGChildElementIdentifier, SVGElement},
     svg_node::SVGNode,
     SVGComposition,
 };
@@ -43,70 +41,29 @@ impl BaseSVGBundle {
         &self.child_elements
     }
 
-    pub fn get_element(&self) -> &SVGElement {
+    pub fn get_root(&self) -> &SVGElement {
         &self.element
     }
 
-    pub fn get_element_mut(&mut self) -> &mut SVGElement {
+    pub fn get_root_mut(&mut self) -> &mut SVGElement {
         &mut self.element
     }
 
-    pub fn get_child_element_at(&self, index: usize) -> Option<&SVGElement> {
+    pub fn get_child(&self, index: usize) -> Option<&SVGElement> {
         self.child_elements.get(index)
     }
 
-    pub fn get_child_element_at_mut(&mut self, index: usize) -> Option<&mut SVGElement> {
+    pub fn get_child_mut(&mut self, index: usize) -> Option<&mut SVGElement> {
         self.child_elements.get_mut(index)
-    }
-
-    // =============================================================================
-    // Attributes
-    // =============================================================================
-
-    pub fn set_attributes_at(&mut self, index: usize, attributes: Vec<SVGAttribute>) {
-        if let Some(element) = self.get_child_element_at_mut(index) {
-            for attribute in attributes {
-                element.set_attribute(attribute);
-            }
-        }
-    }
-
-    pub fn set_attributes(&mut self, attributes: Vec<SVGAttribute>) {
-        for attribute in attributes {
-            self.element.set_attribute(attribute);
-        }
-    }
-
-    // =============================================================================
-    // Styles
-    // =============================================================================
-
-    pub fn set_styles_at(&mut self, index: usize, styles: Vec<SVGStyle>) {
-        if let Some(element) = self.get_child_element_at_mut(index) {
-            for style in styles {
-                element.set_style(style);
-            }
-        }
-    }
-
-    pub fn set_styles(&mut self, styles: Vec<SVGStyle>) {
-        for style in styles {
-            self.element.set_style(style);
-        }
     }
 
     // =============================================================================
     // Children
     // =============================================================================
 
-    pub fn append_child_element_to(
-        &mut self,
-        index: usize,
-        mut element: SVGElement,
-    ) -> Option<usize> {
+    pub fn append_child_to(&mut self, index: usize, mut element: SVGElement) -> Option<usize> {
         let next_index = self.get_next_child_index();
         if let Some(target_element) = self.child_elements.get_mut(index) {
-            let target_element_id = target_element.get_id();
             target_element.append_child(
                 &mut element,
                 SVGChildElementIdentifier::InBundleContext(next_index),
@@ -117,7 +74,7 @@ impl BaseSVGBundle {
         return None;
     }
 
-    pub fn append_child_element(&mut self, mut element: SVGElement) -> usize {
+    pub fn append_child(&mut self, mut element: SVGElement) -> usize {
         let next_index = self.get_next_child_index();
         self.element.append_child(
             &mut element,
@@ -133,19 +90,19 @@ impl BaseSVGBundle {
     }
 
     // =============================================================================
-    // Render Updates
+    // Other
     // =============================================================================
 
     pub fn drain_updates(&mut self) -> Vec<RenderUpdateEvent> {
         let mut drained_updates = Vec::new();
 
-        // Drain updates from root
+        // Drain updates from root element
         drained_updates.push(RenderUpdateEvent {
             id: self.element.get_id(),
             updates: self.element.drain_updates(),
         });
 
-        // Drain updates from children
+        // Drain updates from child elements
         for child in &mut self.child_elements {
             let updates = child.drain_updates();
             if !updates.is_empty() {
@@ -158,10 +115,6 @@ impl BaseSVGBundle {
 
         return drained_updates;
     }
-
-    // =============================================================================
-    // Other
-    // =============================================================================
 
     pub fn to_string(&self, node: &dyn SVGNode, composition: &SVGComposition) -> String {
         self.element.to_string(self, node, composition)

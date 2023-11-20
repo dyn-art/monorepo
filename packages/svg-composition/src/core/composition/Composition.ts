@@ -42,10 +42,21 @@ export class Composition {
 							width,
 							height
 						},
-						relativeTransform: mat3(vec3(1, 0, 0), vec3(0, 1, 0), vec3(0, 0, 1))
+						relativeTransform: mat3(vec3(1, 0, 0), vec3(0, 1, 0), vec3(0, 0, 1)),
+						fill: {
+							paints: [10]
+						}
 					}
 				},
-				paints: {}
+				paints: {
+					10: {
+						type: 'Solid',
+						blendMode: 'Normal',
+						color: [0, 191, 255],
+						isVisible: true,
+						opacity: 1
+					}
+				}
 			}
 		} = config;
 		this._renderer = renderer;
@@ -119,7 +130,7 @@ export class Composition {
 		const paintId = this.registerPaint({
 			type: 'Solid',
 			blendMode: 'Normal',
-			color: [0, 0, 0],
+			color: [240, 128, 128],
 			isVisible: true,
 			opacity: 1
 		}); // TODO: add string ids with pattern 'p-{id}' for paint and 'n-{id}' for node (readability)

@@ -43,7 +43,7 @@ export const COMPOSITION_WITH_ONE_RECT = (width: number, height: number): DTIFCo
 		5: {
 			type: 'Solid',
 			blendMode: 'Normal',
-			color: [0, 0, 0],
+			color: [189, 183, 107],
 			isVisible: true,
 			opacity: 1
 		}

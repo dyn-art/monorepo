@@ -1,7 +1,8 @@
-use dyn_composition::core::modules::node::components::mixins::{DimensionMixin, Paint};
+use dyn_composition::core::modules::node::components::mixins::Paint;
 
 use crate::core::{
     events::output_event::RenderUpdateEvent,
+    helper::rgb_to_hex,
     modules::svg_render::resources::{
         changed_components::ChangedPaint,
         svg_composition::{
@@ -41,37 +42,34 @@ impl SVGPaint for SolidSVGPaint {
     fn apply_paint_change(&mut self, changed_paint: &ChangedPaint) {
         match &changed_paint.paint {
             Paint::Solid(paint) => {
-                let paint_shape_index = self.paint_shape.index;
-                self.bundle.set_attributes(vec![SVGAttribute::Opacity {
+                let root_element = self.bundle.get_root_mut();
+                root_element.set_attributes(vec![SVGAttribute::Opacity {
                     opacity: paint.opacity,
                 }]);
-                self.bundle.set_styles(vec![SVGStyle::Display {
+                root_element.set_styles(vec![SVGStyle::Display {
                     display: if paint.is_visible {
                         SVGDisplayStyle::Block
                     } else {
                         SVGDisplayStyle::None
                     },
                 }]);
-                self.bundle.set_attributes_at(
-                    paint_shape_index,
-                    vec![SVGAttribute::Fill {
-                        fill: String::from("red"), // TODO
-                    }],
-                );
+
+                let paint_shape_element =
+                    self.bundle.get_child_mut(self.paint_shape.index).unwrap();
+                paint_shape_element.set_attributes(vec![SVGAttribute::Fill {
+                    fill: rgb_to_hex(paint.color),
+                }]);
                 if let Some(dimension) = &changed_paint.parent_dimension {
-                    self.bundle.set_attributes_at(
-                        paint_shape_index,
-                        vec![
-                            SVGAttribute::Width {
-                                width: dimension.width,
-                                unit: SVGMeasurementUnit::Pixel,
-                            },
-                            SVGAttribute::Height {
-                                height: dimension.height,
-                                unit: SVGMeasurementUnit::Pixel,
-                            },
-                        ],
-                    )
+                    paint_shape_element.set_attributes(vec![
+                        SVGAttribute::Width {
+                            width: dimension.width,
+                            unit: SVGMeasurementUnit::Pixel,
+                        },
+                        SVGAttribute::Height {
+                            height: dimension.height,
+                            unit: SVGMeasurementUnit::Pixel,
+                        },
+                    ])
                 }
             }
         }
@@ -107,7 +105,7 @@ impl SolidSVGPaint {
                 false,
             ),
         });
-        let paint_shape_element_index = bundle.append_child_element(paint_shape_element);
+        let paint_shape_element_index = bundle.append_child(paint_shape_element);
 
         Self {
             bundle,

@@ -93,10 +93,10 @@ impl SVGComposition {
                 {
                     if let Some(parent_paint_append_element) = parent_node
                         .get_bundle_mut()
-                        .get_child_element_at_mut(parent_paint_append_index)
+                        .get_child_mut(parent_paint_append_index)
                     {
                         parent_paint_append_element.append_child(
-                            &mut paint.get_bundle_mut().get_element_mut(),
+                            &mut paint.get_bundle_mut().get_root_mut(),
                             SVGChildElementIdentifier::InCompositionContext(
                                 InCompositionContextType::Paint(entity),
                             ),
@@ -144,14 +144,13 @@ impl SVGComposition {
         // If the parent id exists, append this node element as a child to the parent element
         if let Some(parent_id) = maybe_parent_id {
             if let Some(parent_node) = self.get_node_mut(parent_id) {
-                let parent_child_append_index =
-                    parent_node.get_external_child_append_id().unwrap().index;
+                let parent_child_append_index = parent_node.get_child_append_id().unwrap().index;
                 if let Some(parent_child_append_element) = parent_node
                     .get_bundle_mut()
-                    .get_child_element_at_mut(parent_child_append_index)
+                    .get_child_mut(parent_child_append_index)
                 {
                     parent_child_append_element.append_child(
-                        &mut node.get_bundle_mut().get_element_mut(),
+                        &mut node.get_bundle_mut().get_root_mut(),
                         SVGChildElementIdentifier::InCompositionContext(
                             InCompositionContextType::Node(entity),
                         ),
@@ -193,7 +192,7 @@ impl SVGComposition {
         // Construct SVG string
         for id in self.root_ids.iter() {
             if let Some(root) = self.get_node(id) {
-                let element = root.get_bundle().get_element();
+                let element = root.get_bundle().get_root();
                 let mut result = String::new();
 
                 // Open the SVG tag
