@@ -1,30 +1,23 @@
-use dyn_composition::core::modules::node::components::mixins::Paint;
+use dyn_composition::core::modules::node::components::mixins::{DimensionMixin, Paint};
 
 use crate::core::{
     events::output_event::RenderUpdateEvent,
-    modules::svg_render::resources::svg_composition::{
-        svg_bundle::{BaseSVGBundle, SVGBundle},
-        svg_element::{
-            attributes::{SVGAttribute, SVGMeasurementUnit},
-            styles::{SVGDisplayStyle, SVGStyle},
-            SVGElement, SVGTag,
+    modules::svg_render::resources::{
+        changed_components::ChangedPaint,
+        svg_composition::{
+            svg_bundle::{BaseSVGBundle, SVGBundle},
+            svg_element::{
+                attributes::{SVGAttribute, SVGMeasurementUnit},
+                styles::{SVGDisplayStyle, SVGStyle},
+                SVGElement, SVGTag,
+            },
+            svg_node::{ElementReference, SVGNode},
+            SVGComposition,
         },
-        svg_node::{ElementReference, SVGNode},
-        SVGComposition,
     },
 };
 
 use super::SVGPaint;
-
-// TODO:
-// - Extract Paint as separate Entity
-// - Update FillMixin to only hold Entity ids to Paints
-// - Update DTIF load logic ("simply" go through fill mixin paints array
-//   and lookup corresponding Paint in paints hashmap of DTIF)
-// - Add system to detect Paint entity changes
-// - Create paint mixins to change from JS site
-// - Update fill paints array change logic in SVGComposition
-// ..
 
 #[derive(Debug)]
 pub struct SolidSVGPaint {
@@ -45,8 +38,8 @@ impl SVGBundle for SolidSVGPaint {
 }
 
 impl SVGPaint for SolidSVGPaint {
-    fn apply_paint_change(&mut self, paint: &Paint) {
-        match paint {
+    fn apply_paint_change(&mut self, changed_paint: &ChangedPaint) {
+        match &changed_paint.paint {
             Paint::Solid(paint) => {
                 let paint_shape_index = self.paint_shape.index;
                 self.bundle.set_attributes(vec![SVGAttribute::Opacity {
@@ -61,20 +54,25 @@ impl SVGPaint for SolidSVGPaint {
                 }]);
                 self.bundle.set_attributes_at(
                     paint_shape_index,
-                    vec![
-                        SVGAttribute::Fill {
-                            fill: String::from("red"), // TODO
-                        },
-                        SVGAttribute::Width {
-                            width: 100,
-                            unit: SVGMeasurementUnit::Percent,
-                        },
-                        SVGAttribute::Height {
-                            height: 100,
-                            unit: SVGMeasurementUnit::Percent,
-                        },
-                    ],
+                    vec![SVGAttribute::Fill {
+                        fill: String::from("red"), // TODO
+                    }],
                 );
+                if let Some(dimension) = &changed_paint.parent_dimension {
+                    self.bundle.set_attributes_at(
+                        paint_shape_index,
+                        vec![
+                            SVGAttribute::Width {
+                                width: dimension.width,
+                                unit: SVGMeasurementUnit::Pixel,
+                            },
+                            SVGAttribute::Height {
+                                height: dimension.height,
+                                unit: SVGMeasurementUnit::Pixel,
+                            },
+                        ],
+                    )
+                }
             }
         }
     }

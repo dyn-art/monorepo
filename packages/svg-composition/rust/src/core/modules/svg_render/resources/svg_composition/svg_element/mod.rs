@@ -82,6 +82,10 @@ impl SVGElement {
     // Getter & Setter
     // =============================================================================
 
+    pub fn get_children(&self) -> &Vec<SVGChildElementIdentifier> {
+        &self.children
+    }
+
     pub fn set_attribute(&mut self, attribute: SVGAttribute) {
         self.updates
             .push(RenderChange::AttributeUpdated(AttributeUpdated {

@@ -1,16 +1,19 @@
 use crate::core::{
     events::output_event::RenderUpdateEvent,
     mixin_change::MixinChange,
-    modules::svg_render::resources::svg_composition::{
-        svg_bundle::{BaseSVGBundle, SVGBundle},
-        svg_element::{
-            attributes::{SVGAttribute, SVGMeasurementUnit},
-            helper::mat3_to_svg_transform,
-            mapper::map_blend_mode,
-            styles::{SVGDisplayStyle, SVGStyle},
-            SVGElement, SVGTag,
+    modules::svg_render::resources::{
+        changed_components::ChangedNode,
+        svg_composition::{
+            svg_bundle::{BaseSVGBundle, SVGBundle},
+            svg_element::{
+                attributes::{SVGAttribute, SVGMeasurementUnit},
+                helper::mat3_to_svg_transform,
+                mapper::map_blend_mode,
+                styles::{SVGDisplayStyle, SVGStyle},
+                SVGElement, SVGTag,
+            },
+            SVGComposition,
         },
-        SVGComposition,
     },
 };
 
@@ -47,8 +50,8 @@ impl SVGBundle for FrameSVGNode {
 }
 
 impl SVGNode for FrameSVGNode {
-    fn apply_mixin_changes(&mut self, changes: &[MixinChange]) {
-        for change in changes {
+    fn apply_node_change(&mut self, changed_node: &ChangedNode) {
+        for change in &changed_node.changes {
             match change {
                 MixinChange::Dimension(mixin) => {
                     let content_clipped_shape_index = self.content_clipped_shape.index;

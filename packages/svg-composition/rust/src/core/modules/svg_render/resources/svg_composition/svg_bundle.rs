@@ -51,6 +51,10 @@ impl BaseSVGBundle {
         &mut self.element
     }
 
+    pub fn get_child_element_at(&self, index: usize) -> Option<&SVGElement> {
+        self.child_elements.get(index)
+    }
+
     pub fn get_child_element_at_mut(&mut self, index: usize) -> Option<&mut SVGElement> {
         self.child_elements.get_mut(index)
     }

@@ -21,39 +21,36 @@ pub fn queue_render_changes(
     let changed_paints = take(&mut changed.changed_paints);
     let mut updates: Vec<RenderUpdateEvent> = Vec::new();
 
-    updates.extend(process_nodes(changed_nodes, &mut svg_composition));
-    updates.extend(process_paints(changed_paints, &mut svg_composition));
+    updates.extend(process_nodes(&changed_nodes, &mut svg_composition));
+    updates.extend(process_paints(&changed_paints, &mut svg_composition));
     svg_composition.forward_render_updates(updates);
 }
 
 fn process_paints(
-    changed_paints: HashMap<Entity, ChangedPaint>,
+    changed_paints: &HashMap<Entity, ChangedPaint>,
     svg_composition: &mut SVGComposition,
 ) -> Vec<RenderUpdateEvent> {
     let mut updates: Vec<RenderUpdateEvent> = Vec::new();
     for (entity, paint) in changed_paints {
-        updates.extend(process_paint(entity, &paint, svg_composition));
+        updates.extend(process_paint(*entity, &paint, svg_composition));
     }
     return updates;
 }
 
 fn process_paint(
     entity: Entity,
-    changed_component: &ChangedPaint,
+    changed_paint: &ChangedPaint,
     svg_composition: &mut SVGComposition,
 ) -> Vec<RenderUpdateEvent> {
     let mut updates: Vec<RenderUpdateEvent> = Vec::new();
 
     // Attempt to get or create the paint associated with the entity
-    let maybe_paint = svg_composition.get_or_create_paint(
-        entity,
-        &changed_component.paint,
-        &changed_component.parent_id,
-    );
+    let maybe_paint =
+        svg_composition.get_or_create_paint(entity, &changed_paint.paint, &changed_paint.parent_id);
 
     // Apply collected changes to the SVG paint and drain updates
     if let Some(svg_paint) = maybe_paint {
-        svg_paint.apply_paint_change(&changed_component.paint);
+        svg_paint.apply_paint_change(&changed_paint);
         updates.extend(svg_paint.drain_updates());
     }
 
@@ -61,7 +58,7 @@ fn process_paint(
 }
 
 fn process_nodes(
-    changed_nodes: HashMap<Entity, ChangedNode>,
+    changed_nodes: &HashMap<Entity, ChangedNode>,
     svg_composition: &mut SVGComposition,
 ) -> Vec<RenderUpdateEvent> {
     let mut processed: HashSet<Entity> = HashSet::new();
@@ -83,7 +80,7 @@ fn process_nodes(
 /// Recursively process an entity and its parents
 fn process_with_parents(
     entity: Entity,
-    changed_nodes: &HashMap<Entity, ChangedNode>, // TODO: can I pass here changed node directly?
+    changed_nodes: &HashMap<Entity, ChangedNode>,
     processed: &mut HashSet<Entity>,
     svg_composition: &mut SVGComposition,
 ) -> Vec<RenderUpdateEvent> {
@@ -114,7 +111,7 @@ fn process_with_parents(
 /// Processes an entity by updating its corresponding SVG node based on the provided changes.
 fn process_node(
     entity: Entity,
-    changed_component: &ChangedNode,
+    changed_node: &ChangedNode,
     svg_composition: &mut SVGComposition,
 ) -> Vec<RenderUpdateEvent> {
     let mut updates: Vec<RenderUpdateEvent> = Vec::new();
@@ -122,13 +119,13 @@ fn process_node(
     // Attempt to get or create the node associated with the entity
     let maybe_node = svg_composition.get_or_create_node(
         entity,
-        &changed_component.node_type,
-        &changed_component.parent_id,
+        &changed_node.node_type,
+        &changed_node.parent_id,
     );
 
     // Apply collected changes to the SVG node and drain updates
     if let Some(node) = maybe_node {
-        node.apply_mixin_changes(&changed_component.changes);
+        node.apply_node_change(&changed_node);
         updates.extend(node.drain_updates());
     }
 

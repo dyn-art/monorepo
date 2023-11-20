@@ -87,17 +87,21 @@ impl SVGComposition {
         // If the parent id exists, append this paint element as a child to the parent element
         if let Some(parent_id) = maybe_parent_id {
             if let Some(parent_node) = self.get_node_mut(parent_id) {
-                let parent_paint_append_index = parent_node.get_paint_append_id().unwrap().index;
-                if let Some(parent_paint_append_element) = parent_node
-                    .get_bundle_mut()
-                    .get_child_element_at_mut(parent_paint_append_index)
+                if let Some(parent_paint_append_index) = parent_node
+                    .get_paint_append_id()
+                    .and_then(|paint_append_id| Some(paint_append_id.index))
                 {
-                    parent_paint_append_element.append_child(
-                        &mut paint.get_bundle_mut().get_element_mut(),
-                        SVGChildElementIdentifier::InCompositionContext(
-                            InCompositionContextType::Paint(entity),
-                        ),
-                    );
+                    if let Some(parent_paint_append_element) = parent_node
+                        .get_bundle_mut()
+                        .get_child_element_at_mut(parent_paint_append_index)
+                    {
+                        parent_paint_append_element.append_child(
+                            &mut paint.get_bundle_mut().get_element_mut(),
+                            SVGChildElementIdentifier::InCompositionContext(
+                                InCompositionContextType::Paint(entity),
+                            ),
+                        );
+                    }
                 }
             }
         }
