@@ -8,7 +8,7 @@ use crate::core::{
             helper::{construct_svg_path, mat3_to_svg_transform},
             mapper::map_blend_mode,
             styles::{SVGDisplayStyle, SVGStyle},
-            InCompositionContextType, SVGChildElementIdentifier, SVGElement, SVGTag,
+            SVGElement, SVGTag,
         },
         SVGComposition,
     },
@@ -86,21 +86,6 @@ impl SVGNode for ShapeSVGNode {
                         },
                     }]);
                 }
-                // TODO: REMOVE and establish parent child relation for Fill with Node
-                MixinChange::Fill(mixin) => {
-                    let fill_wrapper_index = self.fill_wrapper.index;
-                    let fill_wrapper_id = self.fill_wrapper.id;
-                    if let Some(element) = self.bundle.get_child_element_at_mut(fill_wrapper_index)
-                    {
-                        element.clear_children();
-                        for paint_id in &mixin.paints {
-                            // element.append_child(SVGChildElementIdentifier::InCompositionContext(
-                            //     InCompositionContextType::Paint(paint_id.clone()),
-                            // ));
-                            // TODO: paint.get_bundle_mut().append_to_parent(fill_wrapper_id);
-                        }
-                    }
-                }
                 _ => {
                     // do nothing
                 }
@@ -110,6 +95,10 @@ impl SVGNode for ShapeSVGNode {
 
     fn get_external_child_append_id(&self) -> Option<&ElementReference> {
         None
+    }
+
+    fn get_paint_append_id(&self) -> Option<&ElementReference> {
+        Some(&self.fill_wrapper)
     }
 
     fn drain_updates(&mut self) -> Vec<RenderUpdateEvent> {

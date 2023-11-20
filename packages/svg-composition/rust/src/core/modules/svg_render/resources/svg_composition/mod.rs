@@ -66,15 +66,43 @@ impl SVGComposition {
         &mut self,
         entity: Entity,
         paint: &Paint,
+        maybe_parent_id: &Option<Entity>,
     ) -> Option<&mut Box<dyn SVGPaint>> {
         if !self.paints.contains_key(&entity) {
             if let Some(new_paint) = self.create_paint(paint) {
-                self.paints.insert(entity, new_paint);
+                self.insert_paint(entity, new_paint, maybe_parent_id);
             } else {
                 return None;
             }
         }
         return self.paints.get_mut(&entity);
+    }
+
+    pub fn insert_paint(
+        &mut self,
+        entity: Entity,
+        mut paint: Box<dyn SVGPaint>,
+        maybe_parent_id: &Option<Entity>,
+    ) {
+        // If the parent id exists, append this paint element as a child to the parent element
+        if let Some(parent_id) = maybe_parent_id {
+            if let Some(parent_node) = self.get_node_mut(parent_id) {
+                let parent_paint_append_index = parent_node.get_paint_append_id().unwrap().index;
+                if let Some(parent_paint_append_element) = parent_node
+                    .get_bundle_mut()
+                    .get_child_element_at_mut(parent_paint_append_index)
+                {
+                    parent_paint_append_element.append_child(
+                        &mut paint.get_bundle_mut().get_element_mut(),
+                        SVGChildElementIdentifier::InCompositionContext(
+                            InCompositionContextType::Paint(entity),
+                        ),
+                    );
+                }
+            }
+        }
+
+        self.paints.insert(entity, paint);
     }
 
     fn create_paint(&self, paint: &Paint) -> Option<Box<dyn SVGPaint>> {

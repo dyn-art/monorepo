@@ -1,4 +1,4 @@
-use dyn_composition::core::modules::node::components::mixins::{Paint, SolidPaint};
+use dyn_composition::core::modules::node::components::mixins::Paint;
 
 use crate::core::{
     events::output_event::RenderUpdateEvent,

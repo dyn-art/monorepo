@@ -4,13 +4,11 @@ use std::{
 };
 
 use bevy_ecs::{entity::Entity, system::ResMut};
-use dyn_composition::core::modules::node::components::mixins::Paint;
-use log::info;
 
 use crate::core::{
     events::output_event::RenderUpdateEvent,
     modules::svg_render::resources::{
-        changed_components::{ChangedComponents, ChangedNode},
+        changed_components::{ChangedComponents, ChangedNode, ChangedPaint},
         svg_composition::SVGComposition,
     },
 };
@@ -25,12 +23,11 @@ pub fn queue_render_changes(
 
     updates.extend(process_nodes(changed_nodes, &mut svg_composition));
     updates.extend(process_paints(changed_paints, &mut svg_composition));
-    info!("queue_render_changes: {:#?}", updates);
     svg_composition.forward_render_updates(updates);
 }
 
 fn process_paints(
-    changed_paints: HashMap<Entity, Paint>,
+    changed_paints: HashMap<Entity, ChangedPaint>,
     svg_composition: &mut SVGComposition,
 ) -> Vec<RenderUpdateEvent> {
     let mut updates: Vec<RenderUpdateEvent> = Vec::new();
@@ -42,17 +39,21 @@ fn process_paints(
 
 fn process_paint(
     entity: Entity,
-    paint: &Paint,
+    changed_component: &ChangedPaint,
     svg_composition: &mut SVGComposition,
 ) -> Vec<RenderUpdateEvent> {
     let mut updates: Vec<RenderUpdateEvent> = Vec::new();
 
     // Attempt to get or create the paint associated with the entity
-    let maybe_paint = svg_composition.get_or_create_paint(entity, &paint);
+    let maybe_paint = svg_composition.get_or_create_paint(
+        entity,
+        &changed_component.paint,
+        &changed_component.parent_id,
+    );
 
     // Apply collected changes to the SVG paint and drain updates
     if let Some(svg_paint) = maybe_paint {
-        svg_paint.apply_paint_change(paint);
+        svg_paint.apply_paint_change(&changed_component.paint);
         updates.extend(svg_paint.drain_updates());
     }
 

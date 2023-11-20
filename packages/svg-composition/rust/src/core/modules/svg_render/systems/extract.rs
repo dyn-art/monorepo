@@ -10,7 +10,9 @@ use dyn_composition::core::modules::node::components::{mixins::Paint, types::Nod
 
 use crate::core::{
     mixin_change::ToMixinChange,
-    modules::svg_render::resources::changed_components::{ChangedComponents, ChangedNode},
+    modules::svg_render::resources::changed_components::{
+        ChangedComponents, ChangedNode, ChangedPaint,
+    },
 };
 
 pub fn extract_mixin_generic<T: Component + ToMixinChange>(
@@ -39,11 +41,20 @@ pub fn extract_mixin_generic<T: Component + ToMixinChange>(
 pub fn extract_paint(
     mut changed: ResMut<ChangedComponents>,
     query: Extract<Query<(Entity, &Paint), Changed<Paint>>>,
+    parent_query: Extract<Query<&Parent>>,
 ) {
     query.for_each(|(entity, paint)| {
-        changed
-            .changed_paints
-            .entry(entity)
-            .or_insert_with(|| paint.clone());
+        changed.changed_paints.entry(entity).or_insert_with(|| {
+            // Try to get the parent entity id
+            let mut parent_id: Option<Entity> = None;
+            if let Ok(parent) = parent_query.get(entity) {
+                parent_id = Some(parent.get());
+            }
+
+            return ChangedPaint {
+                paint: paint.clone(),
+                parent_id,
+            };
+        });
     })
 }
