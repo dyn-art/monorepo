@@ -250,6 +250,7 @@ impl Default for FillMixin {
 }
 
 #[derive(Component, Serialize, Deserialize, Clone, Debug, Type)]
+#[serde(tag = "type")]
 pub enum Paint {
     /// Represents a solid color paint.
     Solid(SolidPaint),

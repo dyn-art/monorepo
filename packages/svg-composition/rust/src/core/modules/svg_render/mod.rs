@@ -4,7 +4,7 @@ use bevy_app::{App, Plugin};
 use bevy_ecs::schedule::IntoSystemConfigs;
 use dyn_bevy_render_skeleton::{ExtractSchedule, Render, RenderApp, RenderSet};
 use dyn_composition::core::modules::node::components::mixins::{
-    BlendMixin, DimensionMixin, FillMixin, NodeCompositionMixin, PathMixin, RelativeTransformMixin,
+    BlendMixin, DimensionMixin, NodeCompositionMixin, PathMixin, RelativeTransformMixin,
 };
 
 use crate::core::events::output_event::OutputEvent;
@@ -45,7 +45,6 @@ impl Plugin for SvgRenderPlugin {
                     extract_mixin_generic::<NodeCompositionMixin>,
                     extract_mixin_generic::<BlendMixin>,
                     extract_mixin_generic::<PathMixin>,
-                    extract_mixin_generic::<FillMixin>,
                     extract_paint,
                 ),
             )

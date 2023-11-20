@@ -41,12 +41,11 @@ export const COMPOSITION_WITH_ONE_RECT = (width: number, height: number): DTIFCo
 	},
 	paints: {
 		5: {
-			Solid: {
-				blendMode: 'Normal',
-				color: [0, 0, 0],
-				isVisible: true,
-				opacity: 1
-			}
+			type: 'Solid',
+			blendMode: 'Normal',
+			color: [0, 0, 0],
+			isVisible: true,
+			opacity: 1
 		}
 	},
 	changes: [
