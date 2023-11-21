@@ -7,7 +7,8 @@ import type {
 	InteractionInputEvent,
 	OutputEvent,
 	Paint,
-	RectangleNodeBundle
+	RectangleNodeBundle,
+	RenderUpdateEvent
 } from '@/rust/dyn_composition_api/bindings';
 
 import { groupByType, mat3, vec3 } from '../helper';
@@ -16,18 +17,17 @@ import type { Renderer } from '../render';
 export class Composition {
 	private readonly _compositionHandle: JsCompositionHandle;
 
+	private _renderer: Renderer[] = [];
+
 	protected _width: number;
 	protected _height: number;
 
 	private _eventQueue: AnyInputEvent[] = [];
 
-	private readonly _renderer: Renderer;
-
 	constructor(config: TCompositionConfig) {
 		const {
 			width,
 			height,
-			renderer,
 			dtif = {
 				version: '0.0.1',
 				name: 'Test',
@@ -59,8 +59,6 @@ export class Composition {
 				}
 			}
 		} = config;
-		this._renderer = renderer;
-		this._renderer.setSize(width, height);
 		this._compositionHandle = new JsCompositionHandle(dtif, (events: OutputEvent[]) => {
 			this.onWasmEvents(events);
 		});
@@ -81,7 +79,7 @@ export class Composition {
 	}
 
 	// =========================================================================
-	// WASM interface
+	// WASM
 	// =========================================================================
 
 	public onWasmEvents(events: OutputEvent[]): void {
@@ -91,18 +89,34 @@ export class Composition {
 			if (groupedEvent != null) {
 				switch (eventType) {
 					case 'RenderUpdate':
-						this._renderer.render(groupedEvent);
+						this.onRenderUpdate(groupedEvent);
 						break;
 					default:
 						console.warn(`Unknown event: ${eventType as string}`);
-						break;
 				}
 			}
 		}
 	}
 
+	private onRenderUpdate(events: RenderUpdateEvent[]): this {
+		this._renderer.forEach((renderer) => {
+			renderer.render(events);
+		});
+		return this;
+	}
+
 	// =========================================================================
-	// Interface
+	// Renderer
+	// =========================================================================
+
+	public registerRenderer(renderer: Renderer): this {
+		renderer.setSize(this._width, this._height);
+		this._renderer.push(renderer);
+		return this;
+	}
+
+	// =========================================================================
+	// Cycle
 	// =========================================================================
 
 	public update(): void {
@@ -110,17 +124,30 @@ export class Composition {
 		this._eventQueue = [];
 	}
 
+	// =========================================================================
+	// Event
+	// =========================================================================
+
 	public emitCoreEvents(events: CoreInputEvent[]): void {
 		this._eventQueue.push({ type: 'Core', events });
 	}
 
 	public emitInteractionEvents(events: InteractionInputEvent[]): void {
 		this._eventQueue.push({ type: 'Interaction', events });
+		this.update(); // TODO: somehow group interaction events that are very close like 100ms and then udpate only once
 	}
+
+	// =========================================================================
+	// Paint
+	// =========================================================================
 
 	public registerPaint(paint: Paint): Entity {
 		return this._compositionHandle.spawnPaint(paint);
 	}
+
+	// =========================================================================
+	// Entity Creation
+	// =========================================================================
 
 	public createRectangle(
 		config: {
@@ -170,6 +197,10 @@ export class Composition {
 		);
 	}
 
+	// =========================================================================
+	// Entity Interaction
+	// =========================================================================
+
 	public moveEntity(entity: Entity, dx: number, dy: number): void {
 		this.emitCoreEvents([{ type: 'EntityMoved', entity, dx, dy }]);
 	}
@@ -178,8 +209,14 @@ export class Composition {
 		this.emitCoreEvents([{ type: 'EntitySetPosition', entity, x, y }]);
 	}
 
+	// =========================================================================
+	// Other
+	// =========================================================================
+
 	public clear(): void {
-		this._renderer.clear();
+		this._renderer.forEach((renderer) => {
+			renderer.clear();
+		});
 	}
 
 	public toString(): string | null {
@@ -190,6 +227,5 @@ export class Composition {
 export interface TCompositionConfig {
 	width: number;
 	height: number;
-	renderer: Renderer;
 	dtif?: DTIFComposition;
 }

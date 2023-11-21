@@ -39,6 +39,8 @@ pub struct ElementCreated {
     pub styles: Vec<SVGStyle>,
     #[serde(rename = "parentId")]
     pub parent_id: Option<u32>,
+    #[serde(rename = "isBundleRoot")]
+    pub is_bundle_root: bool,
 }
 
 /// Emitted when a SVGElement is deleted.

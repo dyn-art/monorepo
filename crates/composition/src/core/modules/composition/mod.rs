@@ -1,4 +1,4 @@
-use bevy_app::Plugin;
+use bevy_app::{Plugin, Update};
 use bevy_ecs::world::World;
 
 use crate::core::dtif::{dtif_processor::DTIFProcessor, DTIFComposition};
@@ -6,12 +6,14 @@ use crate::core::dtif::{dtif_processor::DTIFProcessor, DTIFComposition};
 use self::{
     components::CompositionMixin,
     events::{EntityMoved, EntitySetPosition},
+    systems::layout::{handle_entity_moved_events, handle_entity_set_position_events},
 };
 
 use super::node::components::types::Root;
 
 pub mod components;
 pub mod events;
+mod systems;
 
 pub struct CompositionPlugin {
     pub dtif: Option<DTIFComposition>,
@@ -22,6 +24,15 @@ impl Plugin for CompositionPlugin {
         // Register events
         app.add_event::<EntityMoved>();
         app.add_event::<EntitySetPosition>();
+
+        // Register systems
+        app.add_systems(
+            Update,
+            (
+                handle_entity_moved_events,
+                handle_entity_set_position_events,
+            ),
+        );
 
         // Load DTIF
         if let Some(dtif) = &self.dtif {
@@ -47,8 +58,7 @@ fn insert_dtif_into_world(world: &mut World, dtif: &DTIFComposition) {
         }
     }
 
-    // Spawn composition as entity (only one can exist).
-    // Why entity? Because we see it as part of the "game" world.
+    // Spawn composition entity
     world.spawn(CompositionMixin {
         version: dtif.version.clone(),
         name: dtif.name.clone(),

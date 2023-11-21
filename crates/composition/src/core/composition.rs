@@ -1,5 +1,5 @@
 use bevy_app::{App, Plugins};
-use bevy_ecs::{bundle::Bundle, entity::Entity, query::With, world::EntityWorldMut};
+use bevy_ecs::{bundle::Bundle, entity::Entity, query::With};
 use bevy_hierarchy::BuildWorldChildren;
 use dyn_bevy_render_skeleton::RenderPlugin;
 
@@ -11,11 +11,7 @@ use super::{
     dtif::DTIFComposition,
     events::input_event::InputEvent,
     modules::node::{
-        components::{
-            bundles::RectangleNodeBundle,
-            mixins::Paint,
-            types::{Rectangle, Root},
-        },
+        components::{bundles::RectangleNodeBundle, types::Root},
         NodePlugin,
     },
 };

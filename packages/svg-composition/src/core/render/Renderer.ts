@@ -1,9 +1,28 @@
 import type { RenderUpdateEvent } from '@/rust/dyn_composition_api/bindings';
 
+import type { Composition } from '../composition';
+
 export abstract class Renderer {
-	public abstract setSize(width: number, height: number): this;
+	private _composition: () => Composition; // TODO: Bad practice?
 
-	public abstract render(events: RenderUpdateEvent[]): this;
+	constructor(composition: Composition) {
+		this._composition = () => composition;
+	}
 
-	public abstract clear(): this;
+	// =========================================================================
+	// Getter & Setter
+	// =========================================================================
+
+	protected get composition(): Composition {
+		return this._composition();
+	}
+
+	// =========================================================================
+	// Abstract
+	// =========================================================================
+	public abstract setSize(width: number, height: number): void;
+
+	public abstract render(events: RenderUpdateEvent[]): void;
+
+	public abstract clear(): void;
 }

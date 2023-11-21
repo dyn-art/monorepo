@@ -23,14 +23,16 @@ pub struct SVGElement {
     id: u32,
     /// The type of SVG element (e.g., circle, rect)
     tag_name: SVGTag,
-    /// Attributes of the SVG element
+    /// The attributes of the SVG element
     attributes: HashMap<&'static str, SVGAttribute>,
-    /// Style properties of the SVG element
+    /// The style properties of the SVG element
     styles: HashMap<&'static str, SVGStyle>,
-    /// Identifiers for child elements, supporting both in-context and out-of-context children
+    /// Identifiers for child elements, supporting both in-context and out-of-context children.
     children: Vec<SVGChildElementIdentifier>,
     /// Render change updates
     updates: Vec<RenderChange>,
+    /// Whether the SVG element is the root of a SVG bundle.
+    is_bundle_root: bool,
 }
 
 /// Used to efficiently locate SVG child elements within various SVG structures.
@@ -67,6 +69,7 @@ impl SVGElement {
             tag_name: tag_name.as_str(),
             attributes: inital_attributes.values().cloned().collect(),
             styles: intial_styles.values().cloned().collect(),
+            is_bundle_root: false,
         })];
 
         return Self {
@@ -76,12 +79,13 @@ impl SVGElement {
             styles: intial_styles,
             children: Vec::new(),
             updates: initial_updates,
+            is_bundle_root: false,
         };
     }
 
-    // =============================================================================
+    // =========================================================================
     // Getter & Setter
-    // =============================================================================
+    // =========================================================================
 
     pub fn set_attribute(&mut self, attribute: SVGAttribute) {
         self.updates
@@ -134,9 +138,9 @@ impl SVGElement {
         &self.tag_name
     }
 
-    // =============================================================================
+    // =========================================================================
     // Children
-    // =============================================================================
+    // =========================================================================
 
     pub fn append_child(
         &mut self,
@@ -174,9 +178,21 @@ impl SVGElement {
         }
     }
 
-    // =============================================================================
+    // =========================================================================
     // Other
-    // =============================================================================
+    // =========================================================================
+
+    pub fn set_bundle_root(&mut self, is_bundle_root: bool) {
+        self.is_bundle_root = is_bundle_root;
+        if let Some(update) = self.updates.first_mut() {
+            match update {
+                RenderChange::ElementCreated(element_created) => {
+                    element_created.is_bundle_root = is_bundle_root;
+                }
+                _ => {}
+            }
+        }
+    }
 
     pub fn drain_updates(&mut self) -> Vec<RenderChange> {
         self.updates.drain(..).collect()

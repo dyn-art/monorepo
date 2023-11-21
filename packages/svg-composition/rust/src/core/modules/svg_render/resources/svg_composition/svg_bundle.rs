@@ -25,16 +25,17 @@ pub struct BaseSVGBundle {
 }
 
 impl BaseSVGBundle {
-    pub fn new(element: SVGElement) -> Self {
+    pub fn new(mut element: SVGElement) -> Self {
+        element.set_bundle_root(true);
         Self {
             element,
             child_elements: Vec::new(),
         }
     }
 
-    // =============================================================================
+    // =========================================================================
     // Getter & Setter
-    // =============================================================================
+    // =========================================================================
 
     pub fn get_children(&self) -> &Vec<SVGElement> {
         &self.child_elements
@@ -56,9 +57,9 @@ impl BaseSVGBundle {
         self.child_elements.get_mut(index)
     }
 
-    // =============================================================================
+    // =========================================================================
     // Children
-    // =============================================================================
+    // =========================================================================
 
     pub fn append_child_to(&mut self, index: usize, mut element: SVGElement) -> Option<usize> {
         let next_index = self.get_next_child_index();
@@ -88,9 +89,9 @@ impl BaseSVGBundle {
         self.child_elements.len()
     }
 
-    // =============================================================================
+    // =========================================================================
     // Other
-    // =============================================================================
+    // =========================================================================
 
     pub fn drain_updates(&mut self) -> Vec<RenderUpdateEvent> {
         let mut drained_updates = Vec::new();
