@@ -69,7 +69,7 @@ impl SVGComposition {
         maybe_parent_id: &Option<Entity>,
     ) -> Option<&mut Box<dyn SVGPaint>> {
         if !self.paints.contains_key(&entity) {
-            if let Some(new_paint) = self.create_paint(paint) {
+            if let Some(new_paint) = self.create_paint(paint, entity.clone()) {
                 self.insert_paint(entity, new_paint, maybe_parent_id);
             } else {
                 return None;
@@ -109,9 +109,9 @@ impl SVGComposition {
         self.paints.insert(entity, paint);
     }
 
-    fn create_paint(&self, paint: &Paint) -> Option<Box<dyn SVGPaint>> {
+    fn create_paint(&self, paint: &Paint, entity: Entity) -> Option<Box<dyn SVGPaint>> {
         match paint {
-            Paint::Solid(..) => Some(Box::new(SolidSVGPaint::new())),
+            Paint::Solid(..) => Some(Box::new(SolidSVGPaint::new(entity))),
         }
     }
 
@@ -126,7 +126,7 @@ impl SVGComposition {
         maybe_parent_id: &Option<Entity>,
     ) -> Option<&mut Box<dyn SVGNode>> {
         if !self.nodes.contains_key(&entity) {
-            if let Some(new_node) = self.create_node(node_type) {
+            if let Some(new_node) = self.create_node(node_type, entity.clone()) {
                 self.insert_node(entity, new_node, maybe_parent_id);
             } else {
                 return None;
@@ -166,10 +166,10 @@ impl SVGComposition {
         self.nodes.insert(entity, node);
     }
 
-    fn create_node(&self, node_type: &NodeType) -> Option<Box<dyn SVGNode>> {
+    fn create_node(&self, node_type: &NodeType, entity: Entity) -> Option<Box<dyn SVGNode>> {
         match node_type {
-            NodeType::Rectangle => Some(Box::new(ShapeSVGNode::new())),
-            NodeType::Frame => Some(Box::new(FrameSVGNode::new())),
+            NodeType::Rectangle => Some(Box::new(ShapeSVGNode::new(entity))),
+            NodeType::Frame => Some(Box::new(FrameSVGNode::new(entity))),
             _ => None,
         }
     }

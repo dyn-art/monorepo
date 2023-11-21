@@ -66,11 +66,10 @@ export class SVGRenderer extends Renderer {
 						}
 
 						// Register callbacks
-						if (update.isBundleRoot) {
+						const entity = update.entity;
+						if (update.isBundleRoot && entity != null) {
 							newElement.addEventListener('pointerdown', () => {
-								this.composition.emitInteractionEvents([
-									{ type: 'CursorDownOnEntity', entity: renderUpdate.id }
-								]);
+								this.composition.emitInteractionEvents([{ type: 'CursorDownOnEntity', entity }]);
 							});
 						}
 

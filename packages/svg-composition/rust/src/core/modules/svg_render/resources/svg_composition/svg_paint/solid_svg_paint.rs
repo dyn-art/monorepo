@@ -1,3 +1,4 @@
+use bevy_ecs::entity::Entity;
 use dyn_composition::core::modules::node::components::mixins::Paint;
 
 use crate::core::{
@@ -85,14 +86,14 @@ impl SVGPaint for SolidSVGPaint {
 }
 
 impl SolidSVGPaint {
-    pub fn new() -> Self {
+    pub fn new(entity: Entity) -> Self {
         // Create root element
         let mut element = SVGElement::new(SVGTag::Group);
         #[cfg(feature = "trace")]
         element.set_attribute(SVGAttribute::Name {
             name: SolidSVGPaint::create_element_name(element.get_id(), String::from("root"), false),
         });
-        let mut bundle = BaseSVGBundle::new(element);
+        let mut bundle = BaseSVGBundle::new(element, entity);
 
         // Create paint elements
         let mut paint_shape_element = SVGElement::new(SVGTag::Rect);

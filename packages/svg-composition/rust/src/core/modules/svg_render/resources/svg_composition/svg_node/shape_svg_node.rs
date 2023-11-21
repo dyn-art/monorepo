@@ -1,3 +1,5 @@
+use bevy_ecs::entity::Entity;
+
 use crate::core::{
     events::output_event::RenderUpdateEvent,
     mixin_change::MixinChange,
@@ -115,7 +117,7 @@ impl SVGNode for ShapeSVGNode {
 }
 
 impl ShapeSVGNode {
-    pub fn new() -> Self {
+    pub fn new(entity: Entity) -> Self {
         // Create root element
         let mut element = SVGElement::new(SVGTag::Group);
         let element_id = element.get_id();
@@ -123,7 +125,7 @@ impl ShapeSVGNode {
         element.set_attribute(SVGAttribute::Name {
             name: ShapeSVGNode::create_element_name(element.get_id(), String::from("root"), false),
         });
-        let mut bundle = BaseSVGBundle::new(element);
+        let mut bundle = BaseSVGBundle::new(element, entity);
 
         // Create fill elements
         let mut fill_clip_path_defs = SVGElement::new(SVGTag::Defs);

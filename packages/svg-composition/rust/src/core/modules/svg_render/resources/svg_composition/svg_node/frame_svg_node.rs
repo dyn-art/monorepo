@@ -1,3 +1,5 @@
+use bevy_ecs::entity::Entity;
+
 use crate::core::{
     events::output_event::RenderUpdateEvent,
     mixin_change::MixinChange,
@@ -143,7 +145,7 @@ impl SVGNode for FrameSVGNode {
 }
 
 impl FrameSVGNode {
-    pub fn new() -> Self {
+    pub fn new(entity: Entity) -> Self {
         // TODO: implment clip path without having to remove or add elements
         // as the size should be known at compile time so that we can use Vector
         // over Hashmap for storing SVGElements
@@ -155,7 +157,7 @@ impl FrameSVGNode {
         element.set_attribute(SVGAttribute::Name {
             name: FrameSVGNode::create_element_name(element.get_id(), String::from("root"), false),
         });
-        let mut bundle = BaseSVGBundle::new(element);
+        let mut bundle = BaseSVGBundle::new(element, entity);
 
         // Create content elements
         let mut content_clip_path_defs_element = SVGElement::new(SVGTag::Defs);

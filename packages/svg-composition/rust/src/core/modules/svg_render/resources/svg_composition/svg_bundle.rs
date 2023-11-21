@@ -1,3 +1,5 @@
+use bevy_ecs::entity::Entity;
+
 use crate::core::events::output_event::RenderUpdateEvent;
 
 use super::{
@@ -25,8 +27,8 @@ pub struct BaseSVGBundle {
 }
 
 impl BaseSVGBundle {
-    pub fn new(mut element: SVGElement) -> Self {
-        element.set_bundle_root(true);
+    pub fn new(mut element: SVGElement, entity: Entity) -> Self {
+        element.set_as_bundle_root(entity);
         Self {
             element,
             child_elements: Vec::new(),

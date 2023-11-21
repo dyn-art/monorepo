@@ -1,3 +1,4 @@
+use bevy_ecs::entity::Entity;
 use serde::Serialize;
 use serde_with::serde_as;
 use specta::Type;
@@ -41,6 +42,7 @@ pub struct ElementCreated {
     pub parent_id: Option<u32>,
     #[serde(rename = "isBundleRoot")]
     pub is_bundle_root: bool,
+    pub entity: Option<Entity>,
 }
 
 /// Emitted when a SVGElement is deleted.

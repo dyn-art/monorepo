@@ -70,6 +70,7 @@ impl SVGElement {
             attributes: inital_attributes.values().cloned().collect(),
             styles: intial_styles.values().cloned().collect(),
             is_bundle_root: false,
+            entity: None,
         })];
 
         return Self {
@@ -182,12 +183,13 @@ impl SVGElement {
     // Other
     // =========================================================================
 
-    pub fn set_bundle_root(&mut self, is_bundle_root: bool) {
-        self.is_bundle_root = is_bundle_root;
+    pub fn set_as_bundle_root(&mut self, entity: Entity) {
+        self.is_bundle_root = true;
         if let Some(update) = self.updates.first_mut() {
             match update {
                 RenderChange::ElementCreated(element_created) => {
-                    element_created.is_bundle_root = is_bundle_root;
+                    element_created.is_bundle_root = true;
+                    element_created.entity = Some(entity);
                 }
                 _ => {}
             }
