@@ -24,6 +24,10 @@ export class Composition {
 
 	private _eventQueue: AnyInputEvent[] = [];
 
+	// Interaction events debounce
+	private debounceTimeout: number | null = null;
+	private readonly debounceDelay: number = 100; // ms
+
 	constructor(config: TCompositionConfig) {
 		const {
 			width,
@@ -134,7 +138,14 @@ export class Composition {
 
 	public emitInteractionEvents(events: InteractionInputEvent[]): void {
 		this._eventQueue.push({ type: 'Interaction', events });
-		this.update(); // TODO: somehow group interaction events that are very close like 100ms and then udpate only once
+
+		// Debounce: Delay update call, resetting timer on new events within debounceDelay
+		if (this.debounceTimeout != null) {
+			clearTimeout(this.debounceTimeout);
+		}
+		this.debounceTimeout = setTimeout(() => {
+			this.update();
+		}, this.debounceDelay) as unknown as number;
 	}
 
 	// =========================================================================
