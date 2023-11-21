@@ -56,7 +56,7 @@ pub struct ChildrenMixin(pub Vec<Entity>);
 
 impl Default for ChildrenMixin {
     fn default() -> Self {
-        Self(vec![])
+        Self(Vec::new())
     }
 }
 
@@ -177,7 +177,9 @@ pub struct PathMixin {
 
 impl Default for PathMixin {
     fn default() -> Self {
-        Self { vertices: vec![] }
+        Self {
+            vertices: Vec::new(),
+        }
     }
 }
 
@@ -238,16 +240,17 @@ pub enum AnchorCommand {
 pub struct FillMixin {
     /// A collection of `Paint` objects,
     /// each defining a different aspect of how the object is filled.
-    pub paints: Vec<Paint>,
+    pub paints: Vec<Entity>,
 }
 
 impl Default for FillMixin {
     fn default() -> Self {
-        Self { paints: vec![] }
+        Self { paints: Vec::new() }
     }
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug, Type)]
+#[derive(Component, Serialize, Deserialize, Clone, Debug, Type)]
+#[serde(tag = "type")]
 pub enum Paint {
     /// Represents a solid color paint.
     Solid(SolidPaint),
@@ -257,20 +260,20 @@ pub enum Paint {
 pub struct SolidPaint {
     /// The color of the paint, represented as an RGB array
     /// where each component ranges from 0 to 255.
-    color: [u8; 3],
+    pub color: (u8, u8, u8),
 
     /// The opacity of the paint,
     /// ranging from 0.0 (completely transparent) to 1.0 (completely opaque).
-    opacity: f32,
+    pub opacity: f32,
 
     /// The blend mode used when applying the paint,
     /// which determines how the paint's color blends with colors underneath it.
     #[serde(rename = "blendMode")]
-    blend_mode: BlendMode,
+    pub blend_mode: BlendMode,
 
     /// Determines whether the paint is visible.
     #[serde(rename = "isVisible")]
-    is_visible: bool,
+    pub is_visible: bool,
 }
 
 // =============================================================================

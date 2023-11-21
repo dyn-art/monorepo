@@ -133,9 +133,23 @@ export class SVGRenderer extends Renderer {
 			case 'Id':
 				return ['id', attribute.id.toString()];
 			case 'Width':
-				return ['width', attribute.width.toString()];
+				switch (attribute.unit.type) {
+					case 'Pixel':
+						return ['width', attribute.width.toString()];
+					case 'Percent':
+						return ['width', `${attribute.width}%`];
+					default:
+						return null;
+				}
 			case 'Height':
-				return ['height', attribute.height.toString()];
+				switch (attribute.unit.type) {
+					case 'Pixel':
+						return ['height', attribute.height.toString()];
+					case 'Percent':
+						return ['height', `${attribute.height}%`];
+					default:
+						return null;
+				}
 			case 'Opacity':
 				return ['opacity', attribute.opacity.toString()];
 			case 'Transform': {

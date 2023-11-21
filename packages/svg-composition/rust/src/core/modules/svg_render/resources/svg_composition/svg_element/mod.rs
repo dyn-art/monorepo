@@ -2,9 +2,13 @@ use std::collections::HashMap;
 
 use bevy_ecs::entity::Entity;
 
-use self::{attributes::SVGAttribute, styles::SVGStyle};
+use self::{
+    attributes::SVGAttribute,
+    events::{AttributeUpdated, ElementAppended, ElementCreated, RenderChange, StyleUpdated},
+    styles::SVGStyle,
+};
 
-use super::{svg_node::base_svg_node::BaseSVGNode, SVGComposition};
+use super::{svg_bundle::BaseSVGBundle, SVGComposition};
 
 pub mod attributes;
 pub mod events;
@@ -12,40 +16,67 @@ pub mod helper;
 pub mod mapper;
 pub mod styles;
 
-/// Defines an individual SVG element
+/// An individual SVG element
 #[derive(Debug)]
 pub struct SVGElement {
-    // Unique identifier of the SVGElement
+    /// Unique identifier of the SVGElement
     id: u32,
-    // The type of SVG element (e.g., circle, rect)
+    /// The type of SVG element (e.g., circle, rect)
     tag_name: SVGTag,
-    // Attributes of the SVG element
+    /// Attributes of the SVG element
     attributes: HashMap<&'static str, SVGAttribute>,
-    // Style properties of the SVG element
+    /// Style properties of the SVG element
     styles: HashMap<&'static str, SVGStyle>,
-    // Identifiers for child elements, supporting both in-context and out-of-context children
+    /// Identifiers for child elements, supporting both in-context and out-of-context children
     children: Vec<SVGChildElementIdentifier>,
+    /// Render change updates
+    updates: Vec<RenderChange>,
+}
+
+/// Used to efficiently locate SVG child elements within various SVG structures.
+///
+/// This approach is designed to reduce the reliance on hash map lookups,
+/// which can be expensive in terms of performance.
+/// Instead, it categorizes SVG child elements based on their location in the SVG structure,
+/// allowing for more direct and efficient retrieval.
+#[derive(Debug)]
+pub enum SVGChildElementIdentifier {
+    // Child element is owned by SVGBundle (query by index in "child_elements")
+    InBundleContext(usize),
+    // Child element is owned by SVGComposition and can be found there
+    InCompositionContext(InCompositionContextType),
 }
 
 #[derive(Debug)]
-pub enum SVGChildElementIdentifier {
-    // Child element is within the same SVGNode context (query by index)
-    InContext(usize),
-    // Child element belongs to a different entity (query by entity)
-    OutOfContext(Entity),
+pub enum InCompositionContextType {
+    // Query by entity id in "nodes"
+    Node(Entity),
+    // Query by entity id in "paints"
+    Paint(Entity),
 }
 
 impl SVGElement {
     pub fn new(tag_name: SVGTag) -> Self {
         let id: u32 = rand::random();
         let id_attribute = SVGAttribute::Id { id };
-        SVGElement {
+        let inital_attributes: HashMap<&'static str, SVGAttribute> =
+            HashMap::from([(id_attribute.key(), id_attribute)]);
+        let intial_styles: HashMap<&'static str, SVGStyle> = HashMap::new();
+        let initial_updates = vec![RenderChange::ElementCreated(ElementCreated {
+            parent_id: None,
+            tag_name: tag_name.as_str(),
+            attributes: inital_attributes.values().cloned().collect(),
+            styles: intial_styles.values().cloned().collect(),
+        })];
+
+        return Self {
             id,
             tag_name,
-            attributes: HashMap::from([(id_attribute.key(), id_attribute)]),
-            styles: HashMap::new(),
-            children: vec![],
-        }
+            attributes: inital_attributes,
+            styles: intial_styles,
+            children: Vec::new(),
+            updates: initial_updates,
+        };
     }
 
     // =============================================================================
@@ -53,6 +84,10 @@ impl SVGElement {
     // =============================================================================
 
     pub fn set_attribute(&mut self, attribute: SVGAttribute) {
+        self.updates
+            .push(RenderChange::AttributeUpdated(AttributeUpdated {
+                new_value: attribute.clone(),
+            }));
         self.attributes.insert(attribute.key(), attribute);
     }
 
@@ -71,6 +106,9 @@ impl SVGElement {
     }
 
     pub fn set_style(&mut self, style: SVGStyle) {
+        self.updates.push(RenderChange::StyleUpdated(StyleUpdated {
+            new_value: style.clone(),
+        }));
         self.styles.insert(style.key(), style);
     }
 
@@ -100,15 +138,51 @@ impl SVGElement {
     // Children
     // =============================================================================
 
-    pub fn append_child(&mut self, identifier: SVGChildElementIdentifier) {
+    pub fn append_child(
+        &mut self,
+        element: &mut SVGElement,
+        identifier: SVGChildElementIdentifier,
+    ) {
+        element.append_to_parent(self.id);
         self.children.push(identifier);
+    }
+
+    pub fn clear_children(&mut self) {
+        self.children.clear()
+    }
+
+    fn append_to_parent(&mut self, parent_id: u32) {
+        let mut updated = false;
+
+        // Attempt to set the parent id of the first 'ElementCreated' render change for the element.
+        // This ensures the element is correctly attached to its parent during the initial rendering.
+        if let Some(update) = self.updates.first_mut() {
+            match update {
+                RenderChange::ElementCreated(element_created) => {
+                    if element_created.parent_id.is_none() {
+                        element_created.parent_id = Some(parent_id);
+                        updated = true;
+                    }
+                }
+                _ => {}
+            }
+        }
+
+        if !updated {
+            self.updates
+                .push(RenderChange::ElementAppended(ElementAppended { parent_id }))
+        }
     }
 
     // =============================================================================
     // Other
     // =============================================================================
 
-    pub fn to_string(&self, node: &BaseSVGNode, composition: &SVGComposition) -> String {
+    pub fn drain_updates(&mut self) -> Vec<RenderChange> {
+        self.updates.drain(..).collect()
+    }
+
+    pub fn to_string(&self, bundle: &BaseSVGBundle, composition: &SVGComposition) -> String {
         let mut result = String::new();
 
         // Open the SVG tag
@@ -137,16 +211,24 @@ impl SVGElement {
         // Append children
         for child in &self.children {
             match child {
-                SVGChildElementIdentifier::InContext(child_index) => {
-                    if let Some(child_element) = node.get_children().get(*child_index) {
-                        result.push_str(&child_element.to_string(node, composition));
+                SVGChildElementIdentifier::InBundleContext(child_index) => {
+                    if let Some(child_element) = bundle.get_children().get(*child_index) {
+                        result.push_str(&child_element.to_string(bundle, composition));
                     }
                 }
-                SVGChildElementIdentifier::OutOfContext(entity) => {
-                    if let Some(child_element) = composition.get_node(entity) {
-                        result.push_str(&child_element.to_string(composition));
+                SVGChildElementIdentifier::InCompositionContext(context_type) => match context_type
+                {
+                    InCompositionContextType::Node(entity) => {
+                        if let Some(child_element) = composition.get_node(entity) {
+                            result.push_str(&child_element.to_string(composition));
+                        }
                     }
-                }
+                    InCompositionContextType::Paint(entity) => {
+                        if let Some(child_element) = composition.get_paint(entity) {
+                            result.push_str(&child_element.to_string(composition));
+                        }
+                    }
+                },
             }
         }
 
@@ -157,7 +239,7 @@ impl SVGElement {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum SVGTag {
     Circle,
     Rect,

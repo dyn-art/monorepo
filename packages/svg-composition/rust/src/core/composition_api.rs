@@ -5,6 +5,7 @@ use dyn_bevy_render_skeleton::RenderApp;
 use dyn_composition::core::composition::Composition;
 use dyn_composition::core::dtif::DTIFComposition;
 use dyn_composition::core::modules::node::components::bundles::RectangleNodeBundle;
+use dyn_composition::core::modules::node::components::mixins::Paint;
 use wasm_bindgen::prelude::wasm_bindgen;
 use wasm_bindgen::JsValue;
 
@@ -85,6 +86,19 @@ impl JsCompositionHandle {
         }
     }
 
+    #[wasm_bindgen(js_name = spawnPaint)]
+    pub fn spawn_paint(&mut self, paint: JsValue) -> JsValue {
+        let paint: Paint = match serde_wasm_bindgen::from_value(paint) {
+            Ok(mixin) => mixin,
+            Err(_) => return JsValue::NULL,
+        };
+
+        // Spawn a new paint in the composition
+        let entity = self.composition.spawn(paint, None);
+
+        return serde_wasm_bindgen::to_value(&entity).unwrap_or(JsValue::NULL);
+    }
+
     #[wasm_bindgen(js_name = spawnRectangleNode)]
     pub fn spawn_rectangle_node(&mut self, mixin: JsValue, maybe_parent_id: JsValue) -> JsValue {
         let mixin: RectangleNodeBundle = match serde_wasm_bindgen::from_value(mixin) {
@@ -94,7 +108,9 @@ impl JsCompositionHandle {
         let maybe_parent_id = convert_optional_jsvalue::<Entity>(maybe_parent_id);
 
         // Spawn a new rectangle node in the composition
-        let entity = self.composition.spawn(mixin, maybe_parent_id);
+        let entity = self
+            .composition
+            .spawn_rectangle_node(mixin, maybe_parent_id);
 
         return serde_wasm_bindgen::to_value(&entity).unwrap_or(JsValue::NULL);
     }

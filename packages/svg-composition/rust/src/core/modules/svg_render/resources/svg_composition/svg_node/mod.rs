@@ -1,11 +1,11 @@
-use crate::core::mixin_change::MixinChange;
+use crate::core::{
+    events::output_event::RenderUpdateEvent,
+    modules::svg_render::resources::changed_components::ChangedNode,
+};
 
-use self::base_svg_node::BaseSVGNode;
-
-use super::SVGComposition;
+use super::{svg_bundle::SVGBundle, SVGComposition};
 use std::fmt::Debug;
 
-pub mod base_svg_node;
 pub mod frame_svg_node;
 pub mod shape_svg_node;
 
@@ -15,10 +15,10 @@ pub struct ElementReference {
     pub index: usize,
 }
 
-pub trait SVGNode: Sync + Send + Debug {
-    fn get_base(&self) -> &BaseSVGNode;
-    fn get_base_mut(&mut self) -> &mut BaseSVGNode;
+pub trait SVGNode: SVGBundle + Sync + Send + Debug {
+    fn apply_node_change(&mut self, changed_node: &ChangedNode) -> ();
+    fn get_child_append_id(&self) -> Option<&ElementReference>;
+    fn get_paint_append_id(&self) -> Option<&ElementReference>;
+    fn drain_updates(&mut self) -> Vec<RenderUpdateEvent>;
     fn to_string(&self, composition: &SVGComposition) -> String;
-    fn apply_mixin_changes(&mut self, changes: &[MixinChange]) -> ();
-    fn get_external_child_append_id(&self) -> Option<&ElementReference>;
 }

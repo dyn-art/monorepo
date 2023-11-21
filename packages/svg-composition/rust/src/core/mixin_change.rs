@@ -1,6 +1,3 @@
-use std::ops::Deref;
-
-use bevy_hierarchy::Children;
 use dyn_composition::core::modules::node::components::mixins::{
     BlendMixin, ChildrenMixin, DimensionMixin, FillMixin, NodeCompositionMixin, PathMixin,
     RectangleCornerMixin, RelativeTransformMixin,
@@ -34,14 +31,6 @@ pub trait ToMixinChange {
 #[derive(Serialize, Clone, Debug, Type)]
 pub struct MixinChangeChildrenMixin {
     children: ChildrenMixin,
-}
-
-impl ToMixinChange for Children {
-    fn to_mixin_change(&self) -> MixinChange {
-        MixinChange::Children(MixinChangeChildrenMixin {
-            children: ChildrenMixin(self.deref().to_vec()),
-        })
-    }
 }
 
 impl ToMixinChange for DimensionMixin {
@@ -85,11 +74,5 @@ impl ToMixinChange for PathMixin {
 impl ToMixinChange for RectangleCornerMixin {
     fn to_mixin_change(&self) -> MixinChange {
         MixinChange::RectangleCorner(self.clone())
-    }
-}
-
-impl ToMixinChange for FillMixin {
-    fn to_mixin_change(&self) -> MixinChange {
-        MixinChange::Fill(self.clone())
     }
 }

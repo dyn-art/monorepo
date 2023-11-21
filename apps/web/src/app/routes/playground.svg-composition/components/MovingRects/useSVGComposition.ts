@@ -68,7 +68,13 @@ function startLoop(config: { count: number; composition: Composition }) {
 			y,
 			size,
 			speed,
-			entity: composition.createRectangle({ x, y, width: size, height: size })
+			entity: composition.createRectangle({
+				x,
+				y,
+				width: size,
+				height: size,
+				color: generateRandomRGBColor()
+			})
 		};
 	}
 
@@ -104,6 +110,15 @@ function startLoop(config: { count: number; composition: Composition }) {
 
 	// Start animation loop
 	requestAnimationFrame(animate);
+}
+
+function generateRandomRGBColor(): [number, number, number] {
+	// Generate a random integer between 0 and 255 for each color component
+	const r = Math.floor(Math.random() * 256); // Red
+	const g = Math.floor(Math.random() * 256); // Green
+	const b = Math.floor(Math.random() * 256); // Blue
+
+	return [r, g, b];
 }
 
 type UseSVGCompositionProps = {

@@ -6,6 +6,7 @@ import type {
 	Entity,
 	InteractionInputEvent,
 	OutputEvent,
+	Paint,
 	RectangleNodeBundle
 } from '@/rust/dyn_composition_api/bindings';
 
@@ -41,7 +42,19 @@ export class Composition {
 							width,
 							height
 						},
-						relativeTransform: mat3(vec3(1, 0, 0), vec3(0, 1, 0), vec3(0, 0, 1))
+						relativeTransform: mat3(vec3(1, 0, 0), vec3(0, 1, 0), vec3(0, 0, 1)),
+						fill: {
+							paints: [10]
+						}
+					}
+				},
+				paints: {
+					10: {
+						type: 'Solid',
+						blendMode: 'Normal',
+						color: [0, 191, 255],
+						isVisible: true,
+						opacity: 1
 					}
 				}
 			}
@@ -105,11 +118,28 @@ export class Composition {
 		this._eventQueue.push({ type: 'Interaction', events });
 	}
 
+	public registerPaint(paint: Paint): Entity {
+		return this._compositionHandle.spawnPaint(paint);
+	}
+
 	public createRectangle(
-		config: { x: number; y: number; width: number; height: number },
+		config: {
+			x: number;
+			y: number;
+			width: number;
+			height: number;
+			color?: [number, number, number];
+		},
 		parentId?: Entity
 	): Entity {
-		const { x, y, width, height } = config;
+		const { x, y, width, height, color = [0, 0, 0] } = config;
+		const paintId = this.registerPaint({
+			type: 'Solid',
+			blendMode: 'Normal',
+			color,
+			isVisible: true,
+			opacity: 1
+		});
 		return this._compositionHandle.spawnRectangleNode(
 			{
 				compositionMixin: {
@@ -131,6 +161,9 @@ export class Composition {
 					bottomRightRadius: 0,
 					topLeftRadius: 0,
 					topRightRadius: 0
+				},
+				fill: {
+					paints: [paintId]
 				}
 			} as RectangleNodeBundle,
 			parentId

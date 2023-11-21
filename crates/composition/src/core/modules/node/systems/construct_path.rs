@@ -21,7 +21,9 @@ pub fn construct_rectangle_path(
     mut commands: Commands,
 ) {
     for (_entity, corners, dimension) in query.iter() {
-        let mut path = PathMixin { vertices: vec![] };
+        let mut path = PathMixin {
+            vertices: Vec::new(),
+        };
         let max_radius = std::cmp::min(dimension.width, dimension.height) as f32 / 2.0;
 
         let min_radius =
