@@ -2,7 +2,6 @@ use crate::core::events::output_event::RenderUpdateEvent;
 
 use super::{
     svg_element::{SVGChildElementIdentifier, SVGElement},
-    svg_node::SVGNode,
     SVGComposition,
 };
 
@@ -11,7 +10,7 @@ pub trait SVGBundle {
     fn get_bundle_mut(&mut self) -> &mut BaseSVGBundle;
 }
 
-// Wrapped SVGElement with its static children (are known from compile time) for quick access
+/// Wrapped SVGElement with static children (known from compile time) for quick access.
 #[derive(Debug)]
 pub struct BaseSVGBundle {
     // The primary SVG element associated with this bundle
@@ -116,7 +115,7 @@ impl BaseSVGBundle {
         return drained_updates;
     }
 
-    pub fn to_string(&self, node: &dyn SVGNode, composition: &SVGComposition) -> String {
-        self.element.to_string(self, node, composition)
+    pub fn to_string(&self, composition: &SVGComposition) -> String {
+        self.element.to_string(self, composition)
     }
 }

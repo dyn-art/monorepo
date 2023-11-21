@@ -37,12 +37,12 @@ pub struct DTIFComposition {
     pub root_node_id: Entity,
 
     /// A mapping of node identifiers to their corresponding nodes within the composition.
-    /// Note: Planned to use `Entity` as a key once a specific serde issue is resolved.
+    /// Note: Planned to directly use `Entity` as a key once a specific serde issue is resolved.
     ///       https://github.com/serde-rs/serde/issues/1183
     pub nodes: HashMap<String, DTIFNode>,
 
     /// A mapping of paint identifiers to their corresponding paints within the composition.
-    /// Note: Planned to use `Entity` as a key once a specific serde issue is resolved.
+    /// Note: Planned to directly use `Entity` as a key once a specific serde issue is resolved.
     ///       https://github.com/serde-rs/serde/issues/1183
     pub paints: HashMap<String, Paint>,
 

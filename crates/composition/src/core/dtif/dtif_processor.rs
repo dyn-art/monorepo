@@ -14,6 +14,7 @@ use crate::core::modules::{
 use super::{DTIFComposition, DTIFNode};
 
 pub struct DTIFProcessor {
+    /// Maps DTIF entity to actual spawned entity in ECS world.
     eid_to_entity: HashMap<String, Entity>,
 }
 
@@ -24,32 +25,36 @@ impl DTIFProcessor {
         }
     }
 
-    /// Processes a single DTIF node and its children, updating internal mappings
-    /// to track relationships between DTIF eids and ECS entity IDs
+    // =============================================================================
+    // Node
+    // =============================================================================
+
+    /// Processes a single DTIF node and its children.
     pub fn process_node(
         &mut self,
-        node_eid: &str,
+        node_eid: String,
         world: &mut World,
         dtif: &DTIFComposition,
     ) -> Option<Entity> {
-        dtif.nodes.get(node_eid).map(|dtif_node| {
+        dtif.nodes.get(&node_eid).map(|dtif_node| {
+            // Spawn node
             let node_entity = self.spawn_node(world, dtif_node);
-            self.eid_to_entity.insert(node_eid.to_string(), node_entity);
+            self.eid_to_entity.insert(node_eid, node_entity);
 
-            self.process_fill(world, dtif, dtif_node, node_entity);
-            self.process_children(world, dtif, dtif_node, node_entity);
+            self.process_fill(node_entity, world, dtif, dtif_node);
+            self.process_children(node_entity, world, dtif, dtif_node);
 
             return node_entity;
         })
     }
 
-    /// Processes the fill mixin of a DTIF node, if present
+    /// Processes the fill mixin of a DTIF node, if present.
     fn process_fill(
-        &self,
+        &mut self,
+        node_entity: Entity,
         world: &mut World,
         dtif: &DTIFComposition,
         dtif_node: &DTIFNode,
-        node_entity: Entity,
     ) {
         if let DTIFNode::Frame(FrameNodeBundle { fill_mixin, .. })
         | DTIFNode::Rectangle(RectangleNodeBundle { fill_mixin, .. }) = dtif_node
@@ -60,9 +65,7 @@ impl DTIFProcessor {
                 .iter()
                 .filter_map(|paint_entity| {
                     let paint_eid = DTIFProcessor::entity_to_eid(paint_entity);
-                    dtif.paints
-                        .get(&paint_eid)
-                        .map(|paint| world.spawn(paint.clone()).id())
+                    return self.process_paint(paint_eid, world, dtif);
                 })
                 .collect();
 
@@ -79,14 +82,13 @@ impl DTIFProcessor {
         }
     }
 
-    /// Processes the children of a DTIF node, if any, by processing each child and establishing
-    /// parent-child relationships in the ECS world
+    /// Processes the children of a DTIF node, if any.
     fn process_children(
         &mut self,
+        node_entity: Entity,
         world: &mut World,
         dtif: &DTIFComposition,
         dtif_node: &DTIFNode,
-        node_entity: Entity,
     ) {
         if let DTIFNode::Frame(FrameNodeBundle { children_mixin, .. })
         | DTIFNode::Group(GroupNodeBundle { children_mixin, .. }) = dtif_node
@@ -96,7 +98,8 @@ impl DTIFProcessor {
                 .0
                 .iter()
                 .filter_map(|child_entity| {
-                    self.process_node(&DTIFProcessor::entity_to_eid(child_entity), world, dtif)
+                    let child_eid = DTIFProcessor::entity_to_eid(child_entity);
+                    return self.process_node(child_eid, world, dtif);
                 })
                 .collect();
 
@@ -113,7 +116,7 @@ impl DTIFProcessor {
         }
     }
 
-    /// Spawns a DTIF node into the ECS world
+    /// Spawns a DTIF node into the ECS world.
     fn spawn_node(&self, world: &mut World, node: &DTIFNode) -> Entity {
         match node {
             DTIFNode::Frame(bundle) => world.spawn(bundle.clone()).id(),
@@ -122,23 +125,41 @@ impl DTIFProcessor {
         }
     }
 
-    /// Translate an entity id from the event to the actual entity
-    pub fn translate_event_entity(&self, event_entity_id: &Entity) -> Option<Entity> {
-        let eid = DTIFProcessor::entity_to_eid(event_entity_id);
-        self.eid_to_entity.get(&eid).cloned()
+    // =============================================================================
+    // Paint
+    // =============================================================================
+
+    /// Processes a single DTIF paint.
+    pub fn process_paint(
+        &mut self,
+        paint_eid: String,
+        world: &mut World,
+        dtif: &DTIFComposition,
+    ) -> Option<Entity> {
+        dtif.paints.get(&paint_eid).map(|paint| {
+            // Spawn paint
+            let paint_entity = world.spawn(paint.clone()).id();
+            self.eid_to_entity.insert(paint_eid, paint_entity);
+
+            return paint_entity;
+        })
     }
 
-    /// Process and send the event to the ECS
-    pub fn send_event_to_ecs(&self, world: &mut World, event: CoreInputEvent) {
+    // =============================================================================
+    // Event
+    // =============================================================================
+
+    /// Processes and sends the event into the ECS world.
+    pub fn send_event_into_world(&self, event: CoreInputEvent, world: &mut World) {
         match event {
             CoreInputEvent::EntityMoved(mut event) => {
-                if let Some(entity) = self.translate_event_entity(&event.entity) {
+                if let Some(entity) = self.find_entity(&event.entity) {
                     event.entity = entity;
                     world.send_event(event);
                 }
             }
             CoreInputEvent::EntitySetPosition(mut event) => {
-                if let Some(entity) = self.translate_event_entity(&event.entity) {
+                if let Some(entity) = self.find_entity(&event.entity) {
                     event.entity = entity;
                     world.send_event(event);
                 }
@@ -146,10 +167,20 @@ impl DTIFProcessor {
         }
     }
 
-    /// Converts an Entity to a string we called "eid".
+    // =============================================================================
+    // Helper
+    // =============================================================================
+
+    /// Tries to find the actual spawned entity for a DTIF entity.
+    fn find_entity(&self, dtif_entity: &Entity) -> Option<Entity> {
+        let eid = DTIFProcessor::entity_to_eid(dtif_entity);
+        self.eid_to_entity.get(&eid).cloned()
+    }
+
+    /// Converts an entity to a String we call DTIF entity (eid).
     ///
     /// Why?
-    /// Due to an issue we have to work with a stringified Enitity in the Hashmap.
+    /// Due to an issue we have to work with a stringified enitity in the hashmap.
     /// https://github.com/serde-rs/serde/issues/1183
     #[inline]
     pub fn entity_to_eid(entity: &Entity) -> String {

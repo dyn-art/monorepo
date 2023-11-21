@@ -123,17 +123,23 @@ export class Composition {
 	}
 
 	public createRectangle(
-		config: { x: number; y: number; width: number; height: number },
+		config: {
+			x: number;
+			y: number;
+			width: number;
+			height: number;
+			color?: [number, number, number];
+		},
 		parentId?: Entity
 	): Entity {
-		const { x, y, width, height } = config;
+		const { x, y, width, height, color = [0, 0, 0] } = config;
 		const paintId = this.registerPaint({
 			type: 'Solid',
 			blendMode: 'Normal',
-			color: [240, 128, 128],
+			color,
 			isVisible: true,
 			opacity: 1
-		}); // TODO: add string ids with pattern 'p-{id}' for paint and 'n-{id}' for node (readability)
+		});
 		return this._compositionHandle.spawnRectangleNode(
 			{
 				compositionMixin: {

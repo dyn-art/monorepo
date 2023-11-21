@@ -110,13 +110,13 @@ impl SVGNode for ShapeSVGNode {
     }
 
     fn to_string(&self, composition: &SVGComposition) -> String {
-        self.bundle.to_string(self, composition)
+        self.bundle.to_string(composition)
     }
 }
 
 impl ShapeSVGNode {
     pub fn new() -> Self {
-        // Create root element and apply it to SVG node
+        // Create root element
         let mut element = SVGElement::new(SVGTag::Group);
         let element_id = element.get_id();
         #[cfg(feature = "trace")]

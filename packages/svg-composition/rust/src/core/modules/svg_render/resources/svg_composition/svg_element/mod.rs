@@ -8,7 +8,7 @@ use self::{
     styles::SVGStyle,
 };
 
-use super::{svg_bundle::BaseSVGBundle, svg_node::SVGNode, SVGComposition};
+use super::{svg_bundle::BaseSVGBundle, SVGComposition};
 
 pub mod attributes;
 pub mod events;
@@ -16,19 +16,20 @@ pub mod helper;
 pub mod mapper;
 pub mod styles;
 
-/// Defines an individual SVG element
+/// An individual SVG element
 #[derive(Debug)]
 pub struct SVGElement {
-    // Unique identifier of the SVGElement
+    /// Unique identifier of the SVGElement
     id: u32,
-    // The type of SVG element (e.g., circle, rect)
+    /// The type of SVG element (e.g., circle, rect)
     tag_name: SVGTag,
-    // Attributes of the SVG element
+    /// Attributes of the SVG element
     attributes: HashMap<&'static str, SVGAttribute>,
-    // Style properties of the SVG element
+    /// Style properties of the SVG element
     styles: HashMap<&'static str, SVGStyle>,
-    // Identifiers for child elements, supporting both in-context and out-of-context children
+    /// Identifiers for child elements, supporting both in-context and out-of-context children
     children: Vec<SVGChildElementIdentifier>,
+    /// Render change updates
     updates: Vec<RenderChange>,
 }
 
@@ -181,12 +182,7 @@ impl SVGElement {
         self.updates.drain(..).collect()
     }
 
-    pub fn to_string(
-        &self,
-        bundle: &BaseSVGBundle,
-        node: &dyn SVGNode,
-        composition: &SVGComposition,
-    ) -> String {
+    pub fn to_string(&self, bundle: &BaseSVGBundle, composition: &SVGComposition) -> String {
         let mut result = String::new();
 
         // Open the SVG tag
@@ -217,7 +213,7 @@ impl SVGElement {
             match child {
                 SVGChildElementIdentifier::InBundleContext(child_index) => {
                     if let Some(child_element) = bundle.get_children().get(*child_index) {
-                        result.push_str(&child_element.to_string(bundle, node, composition));
+                        result.push_str(&child_element.to_string(bundle, composition));
                     }
                 }
                 SVGChildElementIdentifier::InCompositionContext(context_type) => match context_type
@@ -229,7 +225,7 @@ impl SVGElement {
                     }
                     InCompositionContextType::Paint(entity) => {
                         if let Some(child_element) = composition.get_paint(entity) {
-                            result.push_str(&child_element.to_string(node, composition));
+                            result.push_str(&child_element.to_string(composition));
                         }
                     }
                 },

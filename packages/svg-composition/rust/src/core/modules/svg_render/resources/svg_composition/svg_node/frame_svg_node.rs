@@ -138,7 +138,7 @@ impl SVGNode for FrameSVGNode {
     }
 
     fn to_string(&self, composition: &SVGComposition) -> String {
-        self.bundle.to_string(self, composition)
+        self.bundle.to_string(composition)
     }
 }
 
@@ -148,7 +148,7 @@ impl FrameSVGNode {
         // as the size should be known at compile time so that we can use Vector
         // over Hashmap for storing SVGElements
 
-        // Create root element and apply it to SVG node
+        // Create root element
         let mut element = SVGElement::new(SVGTag::Group);
         let element_id = element.get_id();
         #[cfg(feature = "trace")]

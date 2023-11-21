@@ -25,29 +25,29 @@ impl Plugin for CompositionPlugin {
 
         // Load DTIF
         if let Some(dtif) = &self.dtif {
-            insert_dtif(&mut app.world, dtif);
+            insert_dtif_into_world(&mut app.world, dtif);
         }
     }
 }
 
-fn insert_dtif(world: &mut World, dtif: &DTIFComposition) {
+fn insert_dtif_into_world(world: &mut World, dtif: &DTIFComposition) {
     let root_node_eid = DTIFProcessor::entity_to_eid(&dtif.root_node_id);
     let mut dtif_processor = DTIFProcessor::new();
 
     // Spawn and process nodes recursively
     let root_node_entity = dtif_processor
-        .process_node(&root_node_eid, world, dtif)
+        .process_node(root_node_eid, world, dtif)
         .unwrap();
     world.entity_mut(root_node_entity).insert(Root);
 
-    // Apply changes
+    // Apply DTIF changes
     if let Some(changes) = &dtif.changes {
         for change in changes {
-            dtif_processor.send_event_to_ecs(world, change.clone())
+            dtif_processor.send_event_into_world(change.clone(), world)
         }
     }
 
-    // Spawn composition as entity (only one should exist).
+    // Spawn composition as entity (only one can exist).
     // Why entity? Because we see it as part of the "game" world.
     world.spawn(CompositionMixin {
         version: dtif.version.clone(),

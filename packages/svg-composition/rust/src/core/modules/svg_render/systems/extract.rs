@@ -42,6 +42,7 @@ pub fn extract_mixin_generic<T: Component + ToMixinChange>(
     });
 }
 
+// TODO: won't detect DimensionChange?
 pub fn extract_paint(
     mut changed: ResMut<ChangedComponents>,
     query: Extract<Query<(Entity, &Paint), Changed<Paint>>>,
@@ -53,7 +54,7 @@ pub fn extract_paint(
             let mut parent_id: Option<Entity> = None;
             let mut parent_dimension: Option<DimensionMixin> = None;
 
-            // Try to get the parent entity id and its DimensionMixin
+            // Try to get the parent entity id and its dimension mixin
             if let Ok(parent) = parent_query.get(entity) {
                 let parent_entity = parent.get();
                 parent_id = Some(parent_entity);

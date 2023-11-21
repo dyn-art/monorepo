@@ -12,7 +12,7 @@ use crate::core::{
                 styles::{SVGDisplayStyle, SVGStyle},
                 SVGElement, SVGTag,
             },
-            svg_node::{ElementReference, SVGNode},
+            svg_node::ElementReference,
             SVGComposition,
         },
     },
@@ -79,14 +79,14 @@ impl SVGPaint for SolidSVGPaint {
         self.bundle.drain_updates()
     }
 
-    fn to_string(&self, node: &dyn SVGNode, composition: &SVGComposition) -> String {
-        self.bundle.to_string(node, composition)
+    fn to_string(&self, composition: &SVGComposition) -> String {
+        self.bundle.to_string(composition)
     }
 }
 
 impl SolidSVGPaint {
     pub fn new() -> Self {
-        // Create root element and apply it to the solid SVG paint
+        // Create root element
         let mut element = SVGElement::new(SVGTag::Group);
         #[cfg(feature = "trace")]
         element.set_attribute(SVGAttribute::Name {
