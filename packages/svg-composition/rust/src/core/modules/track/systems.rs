@@ -1,4 +1,7 @@
-use bevy_ecs::system::{Query, Res, ResMut};
+use bevy_ecs::{
+    query::Changed,
+    system::{Query, Res, ResMut},
+};
 use dyn_composition::core::modules::node::components::mixins::{
     DimensionMixin, RelativeTransformMixin,
 };
@@ -13,11 +16,12 @@ use crate::core::{
 
 use super::resources::{TrackableMixinType, TrackedEntities};
 
+// TODO: Group changes
 pub fn track_changes(
     tracked_entities: Res<TrackedEntities>,
     mut output_event_queue: ResMut<OutputEventQueue>,
-    query_dimension: Query<&DimensionMixin>,
-    query_transform: Query<&RelativeTransformMixin>,
+    query_dimension: Query<&DimensionMixin, Changed<DimensionMixin>>,
+    query_transform: Query<&RelativeTransformMixin, Changed<RelativeTransformMixin>>,
 ) {
     for (entity, component_types) in tracked_entities.entities.iter() {
         for component_type in component_types {

@@ -6,7 +6,6 @@ export type GroupedByType<T extends TypeWithDiscriminator<string>> = {
 	[K in T['type']]?: Extract<T, { type: K }>[];
 };
 
-// groupByType function
 export function groupByType<T extends TypeWithDiscriminator<string>[]>(
 	elements: T
 ): GroupedByType<T[number]> {

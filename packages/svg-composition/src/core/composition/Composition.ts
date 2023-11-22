@@ -8,7 +8,9 @@ import type {
 	OutputEvent,
 	Paint,
 	RectangleNodeBundle,
-	RenderUpdateEvent
+	RenderUpdateEvent,
+	TrackableMixinType,
+	TrackUpdateEvent
 } from '@/rust/dyn_composition_api/bindings';
 
 import { groupByType, mat3, vec3 } from '../helper';
@@ -96,7 +98,10 @@ export class Composition {
 			if (groupedEvent != null) {
 				switch (eventType) {
 					case 'RenderUpdate':
-						this.onRenderUpdate(groupedEvent);
+						this.onRenderUpdate(groupedEvent as RenderUpdateEvent[]);
+						break;
+					case 'TrackUpdate':
+						this.onTrackUpdate(groupedEvent as TrackUpdateEvent[]);
 						break;
 					default:
 						console.warn(`Unknown event: ${eventType as string}`);
@@ -109,17 +114,32 @@ export class Composition {
 	// Renderer
 	// =========================================================================
 
-	public registerRenderer(renderer: Renderer): this {
+	public registerRenderer(renderer: Renderer): void {
 		renderer.setSize(this._width, this._height);
 		this._renderer.push(renderer);
-		return this;
 	}
 
-	private onRenderUpdate(events: RenderUpdateEvent[]): this {
+	private onRenderUpdate(events: RenderUpdateEvent[]): void {
 		this._renderer.forEach((renderer) => {
 			renderer.render(events);
 		});
-		return this;
+	}
+
+	// =========================================================================
+	// Tracking
+	// =========================================================================
+
+	public trackEntity(entity: EntityDef, toTrackMixins: TrackableMixinType[]): boolean {
+		return this._compositionHandle.trackEntity(entity, toTrackMixins);
+	}
+
+	public untrackEntity(entity: EntityDef): boolean {
+		return this._compositionHandle.untrackEntity(entity);
+	}
+
+	private onTrackUpdate(events: TrackUpdateEvent[]): void {
+		// TODO
+		console.log('onTrackUpdate', { events });
 	}
 
 	// =========================================================================
