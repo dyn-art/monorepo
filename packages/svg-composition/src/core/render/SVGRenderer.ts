@@ -21,10 +21,26 @@ export class SVGRenderer extends Renderer {
 		super(composition);
 		const { domElement = document.body } = options;
 		this._domElement = domElement;
+
+		// Create SVG root
 		this._svgElement = document.createElementNS(NS, 'svg');
 		this._svgElement.setAttribute('version', VERSION);
 		this._svgElement.style.setProperty('overflow', 'hidden');
 		this._domElement.appendChild(this._svgElement);
+
+		// Register SVG root callbacks
+		this._svgElement.addEventListener('pointermove', (e) => {
+			this.composition.emitInteractionEvents(
+				[{ type: 'CursorMovedOnComposition', position: [e.clientX, e.clientY] }],
+				false
+			);
+		});
+		this._svgElement.addEventListener('pointerenter', () => {
+			this.composition.emitInteractionEvents([{ type: 'CursorEnteredComposition' }]);
+		});
+		this._svgElement.addEventListener('pointerleave', () => {
+			this.composition.emitInteractionEvents([{ type: 'CursorExitedComposition' }]);
+		});
 	}
 
 	public setSize(width: number, height: number): void {

@@ -6,7 +6,10 @@ use self::{
         CursorDownOnEntity, CursorEnteredComposition, CursorExitedComposition,
         CursorMovedOnComposition,
     },
-    systems::handle_cursor_down_on_entity_event,
+    systems::{
+        handle_cursor_down_on_entity_event, handle_cursor_entered_composition,
+        handle_cursor_exited_composition, handle_cursor_moved_on_composition,
+    },
 };
 
 pub mod components;
@@ -24,7 +27,15 @@ impl Plugin for InteractiveCompositionPlugin {
         app.add_event::<CursorDownOnEntity>();
 
         // Register systems
-        app.add_systems(Update, handle_cursor_down_on_entity_event);
+        app.add_systems(
+            Update,
+            (
+                handle_cursor_entered_composition,
+                handle_cursor_exited_composition,
+                handle_cursor_moved_on_composition,
+                handle_cursor_down_on_entity_event,
+            ),
+        );
 
         // Spawn interactive composition entity
         app.world.spawn(InteractiveCompositionMixin::default());

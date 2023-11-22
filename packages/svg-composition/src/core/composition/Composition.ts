@@ -136,16 +136,20 @@ export class Composition {
 		this._eventQueue.push({ type: 'Core', events });
 	}
 
-	public emitInteractionEvents(events: InteractionInputEvent[]): void {
+	public emitInteractionEvents(events: InteractionInputEvent[], debounce = true): void {
 		this._eventQueue.push({ type: 'Interaction', events });
 
 		// Debounce: Delay update call, resetting timer on new events within debounceDelay
 		if (this.debounceTimeout != null) {
 			clearTimeout(this.debounceTimeout);
 		}
-		this.debounceTimeout = setTimeout(() => {
+		if (debounce) {
+			this.debounceTimeout = setTimeout(() => {
+				this.update();
+			}, this.debounceDelay) as unknown as number;
+		} else {
 			this.update();
-		}, this.debounceDelay) as unknown as number;
+		}
 	}
 
 	// =========================================================================
