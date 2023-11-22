@@ -9,6 +9,7 @@ pub struct NodePlugin;
 
 impl Plugin for NodePlugin {
     fn build(&self, app: &mut App) {
+        // Register systems
         app.add_systems(PostUpdate, construct_rectangle_path);
     }
 }

@@ -2,9 +2,11 @@ use std::collections::HashMap;
 
 use bevy_ecs::entity::Entity;
 
+use crate::core::modules::svg_render::render_change::RenderChange;
+
 use self::{
     attributes::SVGAttribute,
-    events::{AttributeUpdated, ElementAppended, ElementCreated, RenderChange, StyleUpdated},
+    events::{AttributeUpdated, ElementAppended, ElementCreated, StyleUpdated},
     styles::SVGStyle,
 };
 

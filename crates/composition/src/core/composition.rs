@@ -1,4 +1,4 @@
-use bevy_app::{App, Plugins};
+use bevy_app::App;
 use bevy_ecs::{bundle::Bundle, entity::Entity, query::With};
 use bevy_hierarchy::BuildWorldChildren;
 use dyn_bevy_render_skeleton::RenderPlugin;
@@ -32,29 +32,32 @@ impl Composition {
             NodePlugin,
         ));
 
-        // Register resources
-        // TODO
-
-        // Register systems
-        // TODO
-
-        // Register events
-        // TODO
-
         return Self { app };
     }
+
+    // =========================================================================
+    // Getter & Setter
+    // =========================================================================
 
     pub fn get_app(&self) -> &App {
         &self.app
     }
 
-    pub fn add_plugins<M>(&mut self, plugins: impl Plugins<M>) {
-        self.app.add_plugins(plugins);
+    pub fn get_app_mut(&mut self) -> &mut App {
+        &mut self.app
     }
+
+    // =========================================================================
+    // Lifecycle
+    // =========================================================================
 
     pub fn update(&mut self) {
         self.app.update();
     }
+
+    // =========================================================================
+    // Spawn
+    // =========================================================================
 
     pub fn spawn_rectangle_node(
         &mut self,
@@ -62,7 +65,7 @@ impl Composition {
         maybe_parent_id: Option<Entity>,
     ) -> Entity {
         let paint_ids = bundle.fill_mixin.paints.clone();
-        let entity_id = self.spawn(bundle, maybe_parent_id);
+        let entity_id = self.spawn_node(bundle, maybe_parent_id);
 
         // TODO
         if let Some(mut entity) = self.app.world.get_entity_mut(entity_id) {
@@ -72,7 +75,7 @@ impl Composition {
         return entity_id;
     }
 
-    pub fn spawn<B: Bundle + std::fmt::Debug>(
+    pub fn spawn_node<B: Bundle + std::fmt::Debug>(
         &mut self,
         bundle: B,
         maybe_parent_id: Option<Entity>,
@@ -98,6 +101,10 @@ impl Composition {
         return entity_id;
     }
 
+    // =========================================================================
+    // Events
+    // =========================================================================
+
     pub fn register_events<T: InputEvent>(&mut self, events: Vec<T>) {
         for event in events {
             self.register_event(event);
@@ -107,6 +114,10 @@ impl Composition {
     pub fn register_event<T: InputEvent>(&mut self, event: T) {
         event.send_to_ecs(&mut self.app.world);
     }
+
+    // =========================================================================
+    // Other
+    // =========================================================================
 
     pub fn clear(&mut self) {
         self.app.world.clear_all();

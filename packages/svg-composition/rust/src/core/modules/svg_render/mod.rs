@@ -17,6 +17,7 @@ use self::{
     },
 };
 
+pub mod render_change;
 pub mod resources;
 mod systems;
 
