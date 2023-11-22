@@ -19,8 +19,9 @@ export class Composition {
 
 	private _renderer: Renderer[] = [];
 
-	protected _width: number;
-	protected _height: number;
+	private _width: number;
+	private _height: number;
+	private readonly _isCallbackBased: boolean;
 
 	private _eventQueue: AnyInputEvent[] = [];
 
@@ -61,13 +62,15 @@ export class Composition {
 						opacity: 1
 					}
 				}
-			}
+			},
+			isCallbackBased = true
 		} = config;
 		this._compositionHandle = new JsCompositionHandle(dtif, (events: OutputEvent[]) => {
 			this.onWasmEvents(events);
 		});
 		this._width = width;
 		this._height = height;
+		this._isCallbackBased = isCallbackBased;
 	}
 
 	// =========================================================================
@@ -139,16 +142,18 @@ export class Composition {
 	public emitInteractionEvents(events: InteractionInputEvent[], debounce = true): void {
 		this._eventQueue.push({ type: 'Interaction', events });
 
-		// Debounce: Delay update call, resetting timer on new events within debounceDelay
-		if (this.debounceTimeout != null) {
-			clearTimeout(this.debounceTimeout);
-		}
-		if (debounce) {
-			this.debounceTimeout = setTimeout(() => {
+		// Delay update call, resetting timer on new events within debounceDelay
+		if (this._isCallbackBased) {
+			if (this.debounceTimeout != null) {
+				clearTimeout(this.debounceTimeout);
+			}
+			if (debounce) {
+				this.debounceTimeout = setTimeout(() => {
+					this.update();
+				}, this.debounceDelay) as unknown as number;
+			} else {
 				this.update();
-			}, this.debounceDelay) as unknown as number;
-		} else {
-			this.update();
+			}
 		}
 	}
 
@@ -243,4 +248,5 @@ export interface TCompositionConfig {
 	width: number;
 	height: number;
 	dtif?: DTIFComposition;
+	isCallbackBased?: boolean;
 }
