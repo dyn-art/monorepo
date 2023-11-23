@@ -14,12 +14,13 @@ use crate::core::events::input_event::AnyInputEvent;
 use crate::core::helper::convert_optional_jsvalue;
 use crate::core::modules::svg_render::resources::svg_composition::SVGComposition;
 use crate::core::modules::svg_render::SvgRenderPlugin;
-use crate::core::modules::track::resources::TrackedEntities;
+use crate::core::modules::track::resources::trackable_entities::{
+    TrackableMixinType, TrackedEntities,
+};
 use crate::core::modules::track::TrackPlugin;
 
 use super::events::output_event::OutputEvent;
 use super::events::output_event_queue::OutputEventQueue;
-use super::modules::track::resources::TrackableMixinType;
 
 #[wasm_bindgen]
 pub struct JsCompositionHandle {
@@ -132,7 +133,7 @@ impl JsCompositionHandle {
         tracked_entities
             .entities
             .entry(entity)
-            .or_insert_with(|| HashSet::new())
+            .or_insert_with(HashSet::new)
             .extend(to_track_mixins);
 
         return true;

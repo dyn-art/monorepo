@@ -1,5 +1,5 @@
 import React from 'react';
-import { Composition, createSVGComposition, EntityDef, initWasm } from '@dyn/svg-composition';
+import { Composition, createSVGComposition, Entity, initWasm } from '@dyn/svg-composition';
 
 export const useSVGComposition = (props: UseSVGCompositionProps) => {
 	const { width, height, count = 50 } = props;
@@ -56,7 +56,7 @@ function startLoop(config: { count: number; composition: Composition }) {
 	const rectHeight = 50;
 
 	// Set up your rectangles
-	const rects: Record<EntityDef, { x: number; y: number; dx: number; dy: number }> = {};
+	const rects: Record<Entity, { x: number; y: number; dx: number; dy: number }> = {};
 	for (let i = 0; i < count; i++) {
 		const x = Math.random() * (composition.width - rectWidth);
 		const y = Math.random() * (composition.height - rectHeight);

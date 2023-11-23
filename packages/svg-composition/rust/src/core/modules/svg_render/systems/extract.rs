@@ -18,9 +18,9 @@ use crate::core::{
     },
 };
 
-pub fn extract_mixin_generic<T: Component + ToMixinChange>(
+pub fn extract_mixin_generic<C: Component + ToMixinChange>(
     mut changed: ResMut<ChangedComponents>,
-    query: Extract<Query<(Entity, &Node, &T), (With<Node>, Changed<T>)>>,
+    query: Extract<Query<(Entity, &Node, &C), (With<Node>, Changed<C>)>>,
     parent_query: Extract<Query<&Parent>>,
 ) {
     query.for_each(|(entity, node, mixin)| {

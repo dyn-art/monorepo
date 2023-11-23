@@ -1,4 +1,4 @@
-use bevy_app::{Plugin, Update};
+use bevy_app::{Plugin, PreUpdate};
 use bevy_ecs::world::World;
 
 use crate::core::dtif::{dtif_processor::DTIFProcessor, DTIFComposition};
@@ -27,7 +27,7 @@ impl Plugin for CompositionPlugin {
 
         // Register systems
         app.add_systems(
-            Update,
+            PreUpdate,
             (
                 handle_entity_moved_events,
                 handle_entity_set_position_events,

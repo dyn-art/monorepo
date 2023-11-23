@@ -1,4 +1,4 @@
-use bevy_app::{Plugin, Update};
+use bevy_app::{Plugin, PreUpdate};
 
 use self::{
     components::InteractiveCompositionMixin,
@@ -28,7 +28,7 @@ impl Plugin for InteractiveCompositionPlugin {
 
         // Register systems
         app.add_systems(
-            Update,
+            PreUpdate,
             (
                 handle_cursor_entered_composition,
                 handle_cursor_exited_composition,

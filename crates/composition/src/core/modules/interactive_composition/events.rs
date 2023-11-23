@@ -43,10 +43,10 @@ pub struct CursorMovedOnComposition {
 }
 
 #[derive(Event, Debug, Deserialize, Type, Clone)]
-pub struct CursorEnteredComposition {} // TODO: Change back to Unit struct when https://github.com/oscartbeaumont/specta/issues/174 fixed
+pub struct CursorEnteredComposition;
 
 #[derive(Event, Debug, Deserialize, Type, Clone)]
-pub struct CursorExitedComposition {} // TODO: Change back to Unit struct when https://github.com/oscartbeaumont/specta/issues/174 fixed
+pub struct CursorExitedComposition;
 
 #[derive(Event, Debug, Serialize, Deserialize, Type, Clone)]
 pub struct CursorDownOnEntity {

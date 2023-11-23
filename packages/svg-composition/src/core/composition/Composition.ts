@@ -3,7 +3,7 @@ import type {
 	AnyInputEvent,
 	CoreInputEvent,
 	DTIFComposition,
-	EntityDef,
+	Entity,
 	InteractionInputEvent,
 	OutputEvent,
 	Paint,
@@ -129,11 +129,11 @@ export class Composition {
 	// Tracking
 	// =========================================================================
 
-	public trackEntity(entity: EntityDef, toTrackMixins: TrackableMixinType[]): boolean {
+	public trackEntity(entity: Entity, toTrackMixins: TrackableMixinType[]): boolean {
 		return this._compositionHandle.trackEntity(entity, toTrackMixins);
 	}
 
-	public untrackEntity(entity: EntityDef): boolean {
+	public untrackEntity(entity: Entity): boolean {
 		return this._compositionHandle.untrackEntity(entity);
 	}
 
@@ -181,7 +181,7 @@ export class Composition {
 	// Paint
 	// =========================================================================
 
-	public registerPaint(paint: Paint): EntityDef {
+	public registerPaint(paint: Paint): Entity {
 		return this._compositionHandle.spawnPaint(paint);
 	}
 
@@ -197,8 +197,8 @@ export class Composition {
 			height: number;
 			color?: [number, number, number];
 		},
-		parentId?: EntityDef
-	): EntityDef {
+		parentId?: Entity
+	): Entity {
 		const { x, y, width, height, color = [0, 0, 0] } = config;
 		const paintId = this.registerPaint({
 			type: 'Solid',
@@ -241,11 +241,11 @@ export class Composition {
 	// Entity Interaction
 	// =========================================================================
 
-	public moveEntity(entity: EntityDef, dx: number, dy: number): void {
+	public moveEntity(entity: Entity, dx: number, dy: number): void {
 		this.emitCoreEvents([{ type: 'EntityMoved', entity, dx, dy }]);
 	}
 
-	public setEntityPosition(entity: EntityDef, x: number, y: number): void {
+	public setEntityPosition(entity: Entity, x: number, y: number): void {
 		this.emitCoreEvents([{ type: 'EntitySetPosition', entity, x, y }]);
 	}
 

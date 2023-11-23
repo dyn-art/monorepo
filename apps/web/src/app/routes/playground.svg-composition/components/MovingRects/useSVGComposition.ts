@@ -1,5 +1,5 @@
 import React from 'react';
-import { Composition, createSVGComposition, EntityDef, initWasm } from '@dyn/svg-composition';
+import { Composition, createSVGComposition, Entity, initWasm } from '@dyn/svg-composition';
 
 export const useSVGComposition = (props: UseSVGCompositionProps) => {
 	const { width, height, count = 50 } = props;
@@ -56,7 +56,7 @@ function startLoop(config: { count: number; composition: Composition }) {
 	// Set up your rectangles
 	const rects: Record<
 		string,
-		{ x: number; y: number; size: number; speed: number; entity: EntityDef }
+		{ x: number; y: number; size: number; speed: number; entity: Entity }
 	> = {};
 	for (let i = 0; i < count; i++) {
 		const x = Math.random() * composition.width;
@@ -80,7 +80,7 @@ function startLoop(config: { count: number; composition: Composition }) {
 	}
 
 	// Entity tracking experiment
-	const toTrackEntityIndexes: number[] = [];
+	const toTrackEntityIndexes: number[] = [1, 2];
 	for (const index of toTrackEntityIndexes) {
 		const toTrackEntity = rects[index]?.entity;
 		if (toTrackEntity != null) {
