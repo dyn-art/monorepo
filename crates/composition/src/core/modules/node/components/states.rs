@@ -6,3 +6,6 @@ use specta::Type;
 
 #[derive(Component, Serialize, Clone, Default, Debug, Type)]
 pub struct Selected;
+
+#[derive(Component, Serialize, Clone, Default, Debug, Type)]
+pub struct Locked;
