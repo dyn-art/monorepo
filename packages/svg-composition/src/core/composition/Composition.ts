@@ -1,3 +1,4 @@
+import { shortId } from '@dyn/utils';
 import { JsCompositionHandle } from '@/rust/dyn_composition_api';
 import type {
 	AnyInputEvent,
@@ -5,6 +6,7 @@ import type {
 	DTIFComposition,
 	Entity,
 	InteractionInputEvent,
+	MixinChange,
 	OutputEvent,
 	Paint,
 	RectangleNodeBundle,
@@ -13,6 +15,7 @@ import type {
 	TrackUpdateEvent
 } from '@/rust/dyn_composition_api/bindings';
 
+import type { TRustEnumKeyArray } from '../../wasm';
 import { groupByType, mat3, vec3 } from '../helper';
 import type { Renderer } from '../render';
 
@@ -26,6 +29,9 @@ export class Composition {
 	private readonly _isCallbackBased: boolean;
 
 	private _eventQueue: AnyInputEvent[] = [];
+
+	// https://www.zhenghao.io/posts/object-vs-map
+	private readonly _watchEntityCallbacks = new Map<Entity, Map<string, TWatchEntityCallback>>();
 
 	// Interaction events debounce
 	private debounceTimeout: number | null = null;
@@ -91,7 +97,7 @@ export class Composition {
 	// WASM
 	// =========================================================================
 
-	public onWasmEvents(events: OutputEvent[]): void {
+	private onWasmEvents(events: OutputEvent[]): void {
 		const groupedEvents = groupByType(events);
 		for (const eventType of Object.keys(groupedEvents) as (keyof typeof groupedEvents)[]) {
 			const groupedEvent = groupedEvents[eventType];
@@ -129,17 +135,63 @@ export class Composition {
 	// Tracking
 	// =========================================================================
 
-	public trackEntity(entity: Entity, toTrackMixins: TrackableMixinType[]): boolean {
+	public watchEntity(
+		entity: Entity,
+		toTrackMixins: TRustEnumKeyArray<TrackableMixinType>[],
+		callback: TWatchEntityCallback
+	): string | null {
+		// Enable tracking of entity in composition
+		const success = this.trackEntity(
+			entity,
+			toTrackMixins.map((v) => ({ type: v }))
+		);
+
+		// Register callback
+		if (success) {
+			const callbackId = shortId();
+			let callbacks = this._watchEntityCallbacks.get(entity);
+			if (!callbacks) {
+				callbacks = new Map<string, TWatchEntityCallback>();
+				this._watchEntityCallbacks.set(entity, callbacks);
+			}
+			callbacks.set(callbackId, callback);
+			return callbackId;
+		}
+
+		return null;
+	}
+
+	public unwatchEntity(entity: Entity, callbackId: string): void {
+		const callbacks = this._watchEntityCallbacks.get(entity);
+		if (callbacks && callbacks.has(callbackId)) {
+			// Unregister callback
+			callbacks.delete(callbackId);
+
+			// Disable tracking of entity in composition
+			if (callbacks.size === 0) {
+				this._watchEntityCallbacks.delete(entity);
+				this.untrackEntity(entity);
+			}
+		}
+	}
+
+	private trackEntity(entity: Entity, toTrackMixins: TrackableMixinType[]): boolean {
 		return this._compositionHandle.trackEntity(entity, toTrackMixins);
 	}
 
-	public untrackEntity(entity: Entity): boolean {
+	private untrackEntity(entity: Entity): boolean {
 		return this._compositionHandle.untrackEntity(entity);
 	}
 
 	private onTrackUpdate(events: TrackUpdateEvent[]): void {
-		// TODO
-		console.log('onTrackUpdate', { events });
+		for (const event of events) {
+			const callbacks = this._watchEntityCallbacks.get(event.id);
+			if (callbacks != null) {
+				callbacks.forEach((callback) => {
+					callback(event.id, event.updates);
+				});
+			}
+		}
 	}
 
 	// =========================================================================
@@ -270,3 +322,5 @@ export interface TCompositionConfig {
 	dtif?: DTIFComposition;
 	isCallbackBased?: boolean;
 }
+
+type TWatchEntityCallback = (entity: Entity, changes: MixinChange[]) => void;

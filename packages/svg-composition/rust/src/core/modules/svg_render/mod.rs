@@ -13,7 +13,7 @@ use self::{
     resources::{changed_components::ChangedComponents, svg_composition::SVGComposition},
     systems::{
         extract::{extract_mixin_generic, extract_paint},
-        queue_render_changes::queue_render_changes,
+        queue::queue_render_changes,
     },
 };
 

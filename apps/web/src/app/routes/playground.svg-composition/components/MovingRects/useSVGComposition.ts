@@ -84,10 +84,9 @@ function startLoop(config: { count: number; composition: Composition }) {
 	for (const index of toTrackEntityIndexes) {
 		const toTrackEntity = rects[index]?.entity;
 		if (toTrackEntity != null) {
-			composition.trackEntity(toTrackEntity, [
-				{ type: 'RelativeTransform' },
-				{ type: 'Dimension' }
-			]);
+			composition.watchEntity(toTrackEntity, ['Dimension'], (entity, changes) => {
+				console.log(`Entity: ${entity}`, changes);
+			});
 		}
 	}
 
