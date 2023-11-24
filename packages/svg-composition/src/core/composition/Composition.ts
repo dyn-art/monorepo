@@ -11,6 +11,7 @@ import type {
 	Paint,
 	RectangleNodeBundle,
 	RenderUpdateEvent,
+	SelectionChangeEvent,
 	TrackableMixinType,
 	TrackUpdateEvent
 } from '@/rust/dyn_composition_api/bindings';
@@ -109,6 +110,9 @@ export class Composition {
 					case 'TrackUpdate':
 						this.onTrackUpdate(groupedEvent as TrackUpdateEvent[]);
 						break;
+					case 'SelectionChange':
+						this.onSelectionChange(groupedEvent as SelectionChangeEvent[]);
+						break;
 					default:
 						console.warn(`Unknown event: ${eventType as string}`);
 				}
@@ -192,6 +196,10 @@ export class Composition {
 				});
 			}
 		}
+	}
+
+	private onSelectionChange(events: SelectionChangeEvent[]): void {
+		console.log('onSelectionChange', { events });
 	}
 
 	// =========================================================================

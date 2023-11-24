@@ -1,14 +1,21 @@
+use std::collections::HashSet;
+
 use bevy_ecs::{
     component::Component,
     entity::Entity,
-    query::Changed,
-    system::{Query, Res, ResMut},
+    query::{Changed, With},
+    system::{Local, Query, Res, ResMut},
 };
-use dyn_composition::core::modules::node::components::mixins::{
-    DimensionMixin, RelativeTransformMixin,
+use dyn_composition::core::modules::node::components::{
+    mixins::{DimensionMixin, RelativeTransformMixin},
+    states::Selected,
 };
 
 use crate::core::{
+    events::{
+        output_event::{OutputEvent, SelectionChangeEvent},
+        output_event_queue::OutputEventQueue,
+    },
     mixin_change::ToMixinChange,
     modules::track::resources::{
         changed_components::ChangedComponents,
@@ -47,5 +54,23 @@ fn handle_component_change<T: Component + ToMixinChange>(
             .entry(entity)
             .or_insert_with(Vec::new);
         changed_component.push(component.to_mixin_change());
+    }
+}
+
+pub fn check_selected_changes(
+    query: Query<Entity, With<Selected>>,
+    mut last_selected: Local<HashSet<Entity>>,
+    mut output_event_queue: ResMut<OutputEventQueue>,
+) {
+    let current_selected: HashSet<Entity> = query.iter().collect();
+
+    // Check if the set of selected entities has changed
+    if *last_selected != current_selected {
+        output_event_queue.push_event(OutputEvent::SelectionChange(SelectionChangeEvent {
+            selected: current_selected.clone().into_iter().collect(),
+        }));
+
+        // Update the local tracking set
+        *last_selected = current_selected;
     }
 }

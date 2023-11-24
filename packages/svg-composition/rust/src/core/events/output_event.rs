@@ -9,6 +9,7 @@ use crate::core::{mixin_change::MixinChange, modules::svg_render::render_change:
 pub enum OutputEvent {
     RenderUpdate(RenderUpdateEvent),
     TrackUpdate(TrackUpdateEvent),
+    SelectionChange(SelectionChangeEvent),
 }
 
 #[derive(Debug, Serialize, Clone, Type)]
@@ -21,4 +22,9 @@ pub struct RenderUpdateEvent {
 pub struct TrackUpdateEvent {
     pub id: Entity,
     pub updates: Vec<MixinChange>,
+}
+
+#[derive(Debug, Serialize, Clone, Type)]
+pub struct SelectionChangeEvent {
+    pub selected: Vec<Entity>,
 }

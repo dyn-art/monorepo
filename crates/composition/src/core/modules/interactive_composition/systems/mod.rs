@@ -48,7 +48,7 @@ pub fn handle_cursor_down_on_entity_event(
         if !selected_node_entities.contains(&next_entity) {
             commands.entity(next_entity).insert(Selected);
             selected_node_entities.push(next_entity);
-            info!("Selected entity: {:#?}", next_entity);
+            info!("+ Selected entity: {:#?}", next_entity);
         }
     }
 
@@ -56,6 +56,7 @@ pub fn handle_cursor_down_on_entity_event(
     for entity in selected_nodes_query.iter_mut() {
         if !raycast_entities.contains(&entity) {
             commands.entity(entity).remove::<Selected>();
+            info!("- Unselected entity: {:#?}", entity);
         }
     }
 

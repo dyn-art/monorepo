@@ -3,7 +3,10 @@ use bevy_ecs::schedule::{IntoSystemConfigs, SystemSet};
 
 use self::{
     resources::{changed_components::ChangedComponents, trackable_entities::TrackedEntities},
-    systems::{extract::extract_tracked_mixin_changes, queue::queue_tracked_changes},
+    systems::{
+        extract::{check_selected_changes, extract_tracked_mixin_changes},
+        queue::queue_tracked_changes,
+    },
 };
 
 pub mod resources;
@@ -29,6 +32,7 @@ impl Plugin for TrackPlugin {
             Last,
             (
                 extract_tracked_mixin_changes.in_set(TrackSet::Extract),
+                check_selected_changes.in_set(TrackSet::Extract),
                 queue_tracked_changes
                     .in_set(TrackSet::Queue)
                     .after(TrackSet::Extract),
