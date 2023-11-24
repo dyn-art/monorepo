@@ -5,11 +5,17 @@ export const useSVGComposition = (props: UseSVGCompositionProps) => {
 	const { width, height, count = 50 } = props;
 	const svgContainerRef = React.useRef<HTMLDivElement>(null);
 	const [composition, setComposition] = React.useState<Composition | null>(null);
+	const [selectedEntities, setSelectedEntities] = React.useState<Entity[]>([]);
+	const [prevSelectedEntities, setPrevSelectedEntities] = React.useState<Entity[]>([]);
+	const [selectedEntityData, setSelectedEntityData] = React.useState<{
+		x: number;
+		y: number;
+	} | null>(null);
 
 	let isMounted = true; // https://github.com/facebook/react/issues/24502
 	React.useEffect(() => {
 		(async () => {
-			if (svgContainerRef.current && composition == null && isMounted) {
+			if (svgContainerRef.current != null && composition == null && isMounted) {
 				const newComposition = await createComposition({
 					width,
 					height,
@@ -17,6 +23,10 @@ export const useSVGComposition = (props: UseSVGCompositionProps) => {
 				});
 				setComposition(newComposition);
 				startLoop({ composition: newComposition, count });
+
+				newComposition.onSelectionChange((selected) => {
+					setSelectedEntities(selected);
+				});
 			}
 		})();
 		return () => {
@@ -27,7 +37,39 @@ export const useSVGComposition = (props: UseSVGCompositionProps) => {
 		};
 	}, [width, height, count, svgContainerRef.current]);
 
-	return { svgContainerRef, composition };
+	React.useEffect(() => {
+		const selectedEntity = selectedEntities.length > 0 ? (selectedEntities[0] as Entity) : null;
+		const prevSelectedEntity =
+			prevSelectedEntities.length > 0 ? (prevSelectedEntities[0] as Entity) : null;
+
+		// Unwatch previous selected entity
+		if (prevSelectedEntity != null) {
+			composition?.unwatchEntity(prevSelectedEntity);
+		}
+
+		// Watch newly selected entity
+		if (selectedEntity != prevSelectedEntity && selectedEntity != null) {
+			// TODO: when selecting a new entity that is static (-> no transform event)
+			//  it won't update x and y (e.g. Root Frame)
+			composition?.watchEntity(selectedEntity, ['RelativeTransform'], (_, changes) => {
+				for (const change of changes) {
+					switch (change.type) {
+						case 'RelativeTransform':
+							setSelectedEntityData({
+								x: Math.round(change.relativeTransform[6]),
+								y: Math.round(change.relativeTransform[7])
+							});
+							break;
+						default:
+						// do nothing
+					}
+				}
+			});
+			setPrevSelectedEntities(selectedEntities);
+		}
+	}, [selectedEntities, composition]);
+
+	return { svgContainerRef, composition, selectedEntityData, selectedEntities };
 };
 
 async function createComposition(config: {
@@ -77,17 +119,6 @@ function startLoop(config: { count: number; composition: Composition }) {
 				color: generateRandomRGBColor()
 			})
 		};
-	}
-
-	// Entity tracking experiment
-	const toTrackEntityIndexes: number[] = [1, 2];
-	for (const index of toTrackEntityIndexes) {
-		const toTrackEntity = rects[index]?.entity;
-		if (toTrackEntity != null) {
-			composition.watchEntity(toTrackEntity, ['Dimension'], (entity, changes) => {
-				console.log(`Entity: ${entity}`, changes);
-			});
-		}
 	}
 
 	// Animation loop

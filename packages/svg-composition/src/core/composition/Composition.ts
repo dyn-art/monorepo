@@ -33,6 +33,7 @@ export class Composition {
 
 	// https://www.zhenghao.io/posts/object-vs-map
 	private readonly _watchEntityCallbacks = new Map<Entity, Map<string, TWatchEntityCallback>>();
+	private readonly _onSelectionChangeCallbacks = new Map<string, TOnSelectionChangeCallback>();
 
 	// Interaction events debounce
 	private debounceTimeout: number | null = null;
@@ -105,13 +106,13 @@ export class Composition {
 			if (groupedEvent != null) {
 				switch (eventType) {
 					case 'RenderUpdate':
-						this.onRenderUpdate(groupedEvent as RenderUpdateEvent[]);
+						this.handleRenderUpdates(groupedEvent as RenderUpdateEvent[]);
 						break;
 					case 'TrackUpdate':
-						this.onTrackUpdate(groupedEvent as TrackUpdateEvent[]);
+						this.handleTrackUpdates(groupedEvent as TrackUpdateEvent[]);
 						break;
 					case 'SelectionChange':
-						this.onSelectionChange(groupedEvent as SelectionChangeEvent[]);
+						this.handleSelectionChanges(groupedEvent as SelectionChangeEvent[]);
 						break;
 					default:
 						console.warn(`Unknown event: ${eventType as string}`);
@@ -129,7 +130,7 @@ export class Composition {
 		this._renderer.push(renderer);
 	}
 
-	private onRenderUpdate(events: RenderUpdateEvent[]): void {
+	private handleRenderUpdates(events: RenderUpdateEvent[]): void {
 		this._renderer.forEach((renderer) => {
 			renderer.render(events);
 		});
@@ -165,17 +166,21 @@ export class Composition {
 		return null;
 	}
 
-	public unwatchEntity(entity: Entity, callbackId: string): void {
-		const callbacks = this._watchEntityCallbacks.get(entity);
-		if (callbacks && callbacks.has(callbackId)) {
-			// Unregister callback
-			callbacks.delete(callbackId);
+	public unwatchEntity(entity: Entity, callbackId?: string): void {
+		if (callbackId != null) {
+			const callbacks = this._watchEntityCallbacks.get(entity);
+			if (callbacks != null && callbacks.has(callbackId)) {
+				// Unregister callback
+				callbacks.delete(callbackId);
 
-			// Disable tracking of entity in composition
-			if (callbacks.size === 0) {
-				this._watchEntityCallbacks.delete(entity);
-				this.untrackEntity(entity);
+				// Disable tracking of entity in composition
+				if (callbacks.size === 0) {
+					this._watchEntityCallbacks.delete(entity);
+					this.untrackEntity(entity);
+				}
 			}
+		} else {
+			this._watchEntityCallbacks.delete(entity);
 		}
 	}
 
@@ -187,7 +192,7 @@ export class Composition {
 		return this._compositionHandle.untrackEntity(entity);
 	}
 
-	private onTrackUpdate(events: TrackUpdateEvent[]): void {
+	private handleTrackUpdates(events: TrackUpdateEvent[]): void {
 		for (const event of events) {
 			const callbacks = this._watchEntityCallbacks.get(event.id);
 			if (callbacks != null) {
@@ -198,8 +203,24 @@ export class Composition {
 		}
 	}
 
-	private onSelectionChange(events: SelectionChangeEvent[]): void {
-		console.log('onSelectionChange', { events });
+	public onSelectionChange(callback: TOnSelectionChangeCallback): string {
+		const callbackId = shortId();
+		this._onSelectionChangeCallbacks.set(callbackId, callback);
+		return callbackId;
+	}
+
+	public unregisterOnSelectionChangeCallback(callbackId: string): void {
+		if (this._onSelectionChangeCallbacks.has(callbackId)) {
+			this._onSelectionChangeCallbacks.delete(callbackId);
+		}
+	}
+
+	private handleSelectionChanges(events: SelectionChangeEvent[]): void {
+		if (events.length > 0) {
+			this._onSelectionChangeCallbacks.forEach((callback) => {
+				callback(events[events.length - 1]?.selected as unknown as Entity[]);
+			});
+		}
 	}
 
 	// =========================================================================
@@ -332,3 +353,4 @@ export interface TCompositionConfig {
 }
 
 type TWatchEntityCallback = (entity: Entity, changes: MixinChange[]) => void;
+type TOnSelectionChangeCallback = (selected: Entity[]) => void;
