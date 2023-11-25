@@ -144,7 +144,7 @@ export class Composition {
 		entity: Entity,
 		toTrackMixins: TRustEnumKeyArray<TrackableMixinType>[],
 		callback: TWatchEntityCallback
-	): string | null {
+	): (() => void) | null {
 		// Enable tracking of entity in composition
 		const success = this.trackEntity(
 			entity,
@@ -160,7 +160,9 @@ export class Composition {
 				this._watchEntityCallbacks.set(entity, callbacks);
 			}
 			callbacks.set(callbackId, callback);
-			return callbackId;
+			return () => {
+				this.unwatchEntity(entity, callbackId);
+			};
 		}
 
 		return null;
@@ -203,13 +205,15 @@ export class Composition {
 		}
 	}
 
-	public onSelectionChange(callback: TOnSelectionChangeCallback): string {
+	public onSelectionChange(callback: TOnSelectionChangeCallback): () => void {
 		const callbackId = shortId();
 		this._onSelectionChangeCallbacks.set(callbackId, callback);
-		return callbackId;
+		return () => {
+			this.unregisterOnSelectionChangeCallback(callbackId);
+		};
 	}
 
-	public unregisterOnSelectionChangeCallback(callbackId: string): void {
+	private unregisterOnSelectionChangeCallback(callbackId: string): void {
 		if (this._onSelectionChangeCallbacks.has(callbackId)) {
 			this._onSelectionChangeCallbacks.delete(callbackId);
 		}

@@ -3,7 +3,7 @@ import { Card, CONTENT_WIDTH, MaxWidthWrapper } from '@/components/layout';
 import { FPSStats } from '@/components/monitoring';
 import { Button, Separator } from '@/components/primitive';
 
-import { MovingRects, MovingRectsLegacy, Static } from './components';
+import { Interactive, MovingRects, MovingRectsLegacy, Static } from './components';
 
 const DTOM: React.FC = () => {
 	const [canvasState, setCanvasState] = React.useState(CANVAS_STATE.NONE);
@@ -23,6 +23,10 @@ const DTOM: React.FC = () => {
 					Static
 				</Button>
 				<Separator orientation="vertical" />
+				<Button variant={'link'} onClick={() => setCanvasState(CANVAS_STATE.INTERACTIVE)}>
+					Interactive
+				</Button>
+				<Separator orientation="vertical" />
 				<Button variant={'link'} onClick={() => setCanvasState(CANVAS_STATE.MOVING_RECTS)}>
 					Moving Rects
 				</Button>
@@ -33,10 +37,13 @@ const DTOM: React.FC = () => {
 			</div>
 			<Card
 				style={{ maxWidth: CONTENT_WIDTH, height: CONTENT_WIDTH }}
-				className="flex items-center justify-center"
+				className="flex items-center justify-center overflow-hidden"
 			>
 				{/* Static */}
 				{canvasState === CANVAS_STATE.STATIC && <Static size={CONTENT_WIDTH} />}
+
+				{/* Interactive */}
+				{canvasState === CANVAS_STATE.INTERACTIVE && <Interactive size={CONTENT_WIDTH} />}
 
 				{/* Moving Rects */}
 				{canvasState === CANVAS_STATE.MOVING_RECTS && <MovingRects size={CONTENT_WIDTH} />}
@@ -58,6 +65,7 @@ export default DTOM;
 enum CANVAS_STATE {
 	NONE,
 	STATIC,
+	INTERACTIVE,
 	MOVING_RECTS,
 	MOVING_RECTS_LEGACY
 }
