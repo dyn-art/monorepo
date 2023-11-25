@@ -1,7 +1,7 @@
 use bevy_ecs::{
     entity::Entity,
     event::EventReader,
-    query::With,
+    query::{With, Without},
     system::{Commands, Query},
 };
 use log::info;
@@ -27,65 +27,94 @@ use super::events::{
 pub fn handle_cursor_down_on_entity_event(
     mut event_reader: EventReader<CursorDownOnEntity>,
     mut commands: Commands,
-    mut selected_nodes_query: Query<Entity, With<Selected>>,
-    frame_query: Query<Entity, With<Frame>>,
-    locked_query: Query<Entity, With<Locked>>,
-    node_query: Query<Entity, With<Node>>,
-    root_node_query: Query<Entity, With<Root>>,
+    selected_nodes_query: Query<Entity, With<Selected>>,
+    frame_query: Query<
+        Entity,
+        (
+            With<Frame>,
+            Without<Locked>,
+            Without<Root>,
+            Without<Selected>,
+        ),
+    >,
+    node_query: Query<
+        Entity,
+        (
+            With<Node>,
+            Without<Locked>,
+            Without<Frame>,
+            Without<Selected>,
+        ),
+    >,
 ) {
     let raycast_entities: Vec<Entity> = event_reader.read().map(|event| event.entity).collect();
-    let mut selected_node_entities: Vec<Entity> = selected_nodes_query.iter_mut().collect();
-
-    if raycast_entities.len() == 0 {
+    if raycast_entities.is_empty() {
         return;
     }
 
-    // Iterate through raycast entities and determine the next selection
-    if let Some(next_entity) = select_next_node(
-        &raycast_entities,
-        &frame_query,
-        &locked_query,
-        &node_query,
-        &root_node_query,
-    ) {
-        if !selected_node_entities.contains(&next_entity) {
-            commands.entity(next_entity).insert(Selected);
-            selected_node_entities.push(next_entity);
-            info!("Selected Entity: {:#?}", next_entity);
-        }
+    // Find the next best node to select
+    let selected_entity = select_next_node(&raycast_entities, &frame_query, &node_query);
+
+    // Select new entity if it's not already selected
+    if let Some(entity) = selected_entity {
+        commands.entity(entity).insert(Selected);
+        #[cfg(trace)]
+        info!("Selected Entity: {:#?}", entity);
     }
 
-    // Unselect previously selected nodes if they are not in the raycast entities
-    for entity in selected_nodes_query.iter_mut() {
-        if !raycast_entities.contains(&entity) {
+    // Unselect previously selected nodes that are no longer selected
+    selected_nodes_query.for_each(|entity| {
+        if selected_entity.map_or(true, |selected| selected != entity) {
             commands.entity(entity).remove::<Selected>();
+            #[cfg(trace)]
             info!("Unselected Entity: {:#?}", entity);
         }
-    }
+    });
 }
 
 fn select_next_node(
-    raycast_entities: &[Entity],
-    frame_query: &Query<Entity, With<Frame>>,
-    locked_query: &Query<Entity, With<Locked>>,
-    node_query: &Query<Entity, With<Node>>,
-    root_node_query: &Query<Entity, With<Root>>,
+    raycast_entities: &Vec<Entity>,
+    frame_query: &Query<
+        Entity,
+        (
+            With<Frame>,
+            Without<Locked>,
+            Without<Root>,
+            Without<Selected>,
+        ),
+    >,
+    node_query: &Query<
+        Entity,
+        (
+            With<Node>,
+            Without<Locked>,
+            Without<Frame>,
+            Without<Selected>,
+        ),
+    >,
 ) -> Option<Entity> {
-    for &entity in raycast_entities.iter().rev() {
-        if node_query.contains(entity)
-            && !frame_query.contains(entity)
-            && !locked_query.contains(entity)
-        {
-            return Some(entity);
-        }
-    }
-
-    // If only Frames are left or all nodes are locked, select the deepest Frame
-    return raycast_entities
+    // First, attempt to find a non-Frame, non-Locked, non-Selected Node
+    raycast_entities
         .iter()
         .rev()
-        .find(|&&entity| frame_query.contains(entity) && !root_node_query.contains(entity))
-        .copied();
+        .find_map(|&entity| {
+            if node_query.contains(entity) {
+                Some(entity)
+            } else {
+                None
+            }
+        })
+        // If no such Node is found, try to find a Frame that is not a Root,
+        // not Selected and not Locked
+        .or_else(|| {
+            raycast_entities.iter().rev().find_map(|&entity| {
+                if frame_query.contains(entity) {
+                    Some(entity)
+                } else {
+                    None
+                }
+            })
+        })
 }
 
 pub fn handle_cursor_moved_on_composition(mut event_reader: EventReader<CursorMovedOnComposition>) {
