@@ -8,7 +8,7 @@ use log::info;
 
 use crate::core::modules::node::components::{
     states::{Locked, Selected},
-    types::Frame,
+    types::{Frame, Node, Root},
 };
 
 use super::events::{
@@ -30,6 +30,8 @@ pub fn handle_cursor_down_on_entity_event(
     mut selected_nodes_query: Query<Entity, With<Selected>>,
     frame_query: Query<Entity, With<Frame>>,
     locked_query: Query<Entity, With<Locked>>,
+    node_query: Query<Entity, With<Node>>,
+    root_node_query: Query<Entity, With<Root>>,
 ) {
     let raycast_entities: Vec<Entity> = event_reader.read().map(|event| event.entity).collect();
     let mut selected_node_entities: Vec<Entity> = selected_nodes_query.iter_mut().collect();
@@ -39,7 +41,13 @@ pub fn handle_cursor_down_on_entity_event(
     }
 
     // Iterate through raycast entities and determine the next selection
-    if let Some(next_entity) = select_next_node(&raycast_entities, &frame_query, &locked_query) {
+    if let Some(next_entity) = select_next_node(
+        &raycast_entities,
+        &frame_query,
+        &locked_query,
+        &node_query,
+        &root_node_query,
+    ) {
         if !selected_node_entities.contains(&next_entity) {
             commands.entity(next_entity).insert(Selected);
             selected_node_entities.push(next_entity);
@@ -54,26 +62,20 @@ pub fn handle_cursor_down_on_entity_event(
             info!("Unselected Entity: {:#?}", entity);
         }
     }
-
-    // TODO: Can't do it that way as the system is ofc called more often
-    //  since it has multipe queries
-    // and thus this would clear all selected entities on system run
-    //
-    // If no raycast entities are present, clear all selections
-    // if raycast_entities.is_empty() {
-    //     for entity in selected_nodes_query.iter_mut() {
-    //         commands.entity(entity).remove::<Selected>();
-    //     }
-    // }
 }
 
 fn select_next_node(
     raycast_entities: &[Entity],
     frame_query: &Query<Entity, With<Frame>>,
     locked_query: &Query<Entity, With<Locked>>,
+    node_query: &Query<Entity, With<Node>>,
+    root_node_query: &Query<Entity, With<Root>>,
 ) -> Option<Entity> {
     for &entity in raycast_entities.iter().rev() {
-        if !frame_query.contains(entity) && !locked_query.contains(entity) {
+        if node_query.contains(entity)
+            && !frame_query.contains(entity)
+            && !locked_query.contains(entity)
+        {
             return Some(entity);
         }
     }
@@ -82,7 +84,7 @@ fn select_next_node(
     return raycast_entities
         .iter()
         .rev()
-        .find(|&&entity| frame_query.contains(entity))
+        .find(|&&entity| frame_query.contains(entity) && !root_node_query.contains(entity))
         .copied();
 }
 
