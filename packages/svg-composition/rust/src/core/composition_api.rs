@@ -15,15 +15,15 @@ use wasm_bindgen::JsValue;
 use crate::core::events::input_event::AnyInputEvent;
 use crate::core::helper::convert_optional_jsvalue;
 use crate::core::mixin_change::MixinChangeRelativeTransformMixin;
-use crate::core::modules::svg_render::resources::svg_composition::SVGComposition;
+use crate::core::modules::svg_render::resources::svg_composition::SVGCompositionRes;
 use crate::core::modules::svg_render::SvgRenderPlugin;
 use crate::core::modules::track::resources::trackable_entities::{
-    TrackableMixinType, TrackedEntities,
+    TrackableMixinType, TrackedEntitiesRes,
 };
 use crate::core::modules::track::TrackPlugin;
 
 use super::events::output_event::OutputEvent;
-use super::events::output_event_queue::OutputEventQueue;
+use super::events::output_event_queue::OutputEventQueueRes;
 use super::mixin_change::MixinChange;
 
 #[wasm_bindgen]
@@ -60,7 +60,7 @@ impl JsCompositionHandle {
 
         // Register resources
         app.world
-            .insert_resource(OutputEventQueue::new(output_event_sender.clone()));
+            .insert_resource(OutputEventQueueRes::new(output_event_sender.clone()));
 
         return Self {
             composition,
@@ -161,7 +161,7 @@ impl JsCompositionHandle {
         }
 
         // Update tracked entities
-        let mut tracked_entities = app.world.get_resource_mut::<TrackedEntities>().unwrap();
+        let mut tracked_entities = app.world.get_resource_mut::<TrackedEntitiesRes>().unwrap();
         tracked_entities
             .entities
             .entry(entity)
@@ -186,7 +186,7 @@ impl JsCompositionHandle {
             .composition
             .get_app_mut()
             .world
-            .get_resource_mut::<TrackedEntities>()
+            .get_resource_mut::<TrackedEntitiesRes>()
             .unwrap();
 
         // Remove entity from the tracked entities
@@ -255,9 +255,9 @@ impl JsCompositionHandle {
     // Helper
     // =========================================================================
 
-    fn get_svg_composition(&self) -> Option<&SVGComposition> {
+    fn get_svg_composition(&self) -> Option<&SVGCompositionRes> {
         let app = self.composition.get_app();
         let sub_app = app.get_sub_app(RenderApp).ok()?;
-        return sub_app.world.get_resource::<SVGComposition>();
+        return sub_app.world.get_resource::<SVGCompositionRes>();
     }
 }

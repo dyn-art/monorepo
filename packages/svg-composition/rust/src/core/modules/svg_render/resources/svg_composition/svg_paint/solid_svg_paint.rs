@@ -14,7 +14,7 @@ use crate::core::{
                 SVGElement, SVGTag,
             },
             svg_node::ElementReference,
-            SVGComposition,
+            SVGCompositionRes,
         },
     },
 };
@@ -80,7 +80,7 @@ impl SVGPaint for SolidSVGPaint {
         self.bundle.drain_updates()
     }
 
-    fn to_string(&self, composition: &SVGComposition) -> String {
+    fn to_string(&self, composition: &SVGCompositionRes) -> String {
         self.bundle.to_string(composition)
     }
 }

@@ -6,7 +6,7 @@ use specta::Type;
 use std::collections::HashSet;
 
 #[derive(Resource, Debug, Default)]
-pub struct TrackedEntities {
+pub struct TrackedEntitiesRes {
     pub entities: HashMap<Entity, HashSet<TrackableMixinType>>,
 }
 

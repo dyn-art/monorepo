@@ -5,14 +5,14 @@ use bevy_ecs::system::ResMut;
 use crate::core::{
     events::{
         output_event::{OutputEvent, TrackUpdateEvent},
-        output_event_queue::OutputEventQueue,
+        output_event_queue::OutputEventQueueRes,
     },
-    modules::track::resources::changed_components::ChangedComponents,
+    modules::track::resources::changed_components::ChangedComponentsRes,
 };
 
 pub fn queue_tracked_changes(
-    mut changed: ResMut<ChangedComponents>,
-    mut output_event_queue: ResMut<OutputEventQueue>,
+    mut changed: ResMut<ChangedComponentsRes>,
+    mut output_event_queue: ResMut<OutputEventQueueRes>,
 ) {
     let mut changed_entities = take(&mut changed.changed_entities);
     for (key, value) in changed_entities.drain() {

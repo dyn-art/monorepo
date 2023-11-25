@@ -1,7 +1,7 @@
-use bevy_ecs::{component::Component, entity::Entity};
+use bevy_ecs::{entity::Entity, system::Resource};
 
-#[derive(Component, Debug)]
-pub struct CompositionMixin {
+#[derive(Resource, Debug)]
+pub struct CompositionRes {
     pub version: String,
     pub name: String,
     pub width: f32,

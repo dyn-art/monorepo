@@ -4,7 +4,7 @@ use crate::core::events::output_event::RenderUpdateEvent;
 
 use super::{
     svg_element::{SVGChildElementIdentifier, SVGElement},
-    SVGComposition,
+    SVGCompositionRes,
 };
 
 pub trait SVGBundle {
@@ -118,7 +118,7 @@ impl BaseSVGBundle {
         return drained_updates;
     }
 
-    pub fn to_string(&self, composition: &SVGComposition) -> String {
+    pub fn to_string(&self, composition: &SVGCompositionRes) -> String {
         self.element.to_string(self, composition)
     }
 }

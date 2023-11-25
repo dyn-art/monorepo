@@ -10,7 +10,7 @@ use dyn_composition::core::modules::node::components::mixins::{
 use crate::core::events::output_event::OutputEvent;
 
 use self::{
-    resources::{changed_components::ChangedComponents, svg_composition::SVGComposition},
+    resources::{changed_components::ChangedComponentsRes, svg_composition::SVGCompositionRes},
     systems::{
         extract::{extract_mixin_generic, extract_paint},
         queue::queue_render_changes,
@@ -33,8 +33,8 @@ impl Plugin for SvgRenderPlugin {
         };
 
         // Register resources
-        render_app.init_resource::<ChangedComponents>();
-        render_app.insert_resource(SVGComposition::new(self.output_event_sender.clone()));
+        render_app.init_resource::<ChangedComponentsRes>();
+        render_app.insert_resource(SVGCompositionRes::new(self.output_event_sender.clone()));
 
         // Register systems
         render_app

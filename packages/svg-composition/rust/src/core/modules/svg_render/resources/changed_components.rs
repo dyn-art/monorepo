@@ -9,7 +9,7 @@ use dyn_composition::core::modules::node::components::{
 use crate::core::mixin_change::MixinChange;
 
 #[derive(Resource, Debug, Default)]
-pub struct ChangedComponents {
+pub struct ChangedComponentsRes {
     pub changed_nodes: HashMap<Entity, ChangedNode>,
     pub changed_paints: HashMap<Entity, ChangedPaint>,
 }

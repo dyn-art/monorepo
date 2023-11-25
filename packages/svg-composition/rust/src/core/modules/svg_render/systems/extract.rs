@@ -14,12 +14,12 @@ use dyn_composition::core::modules::node::components::{
 use crate::core::{
     mixin_change::ToMixinChange,
     modules::svg_render::resources::changed_components::{
-        ChangedComponents, ChangedNode, ChangedPaint,
+        ChangedComponentsRes, ChangedNode, ChangedPaint,
     },
 };
 
 pub fn extract_mixin_generic<C: Component + ToMixinChange>(
-    mut changed: ResMut<ChangedComponents>,
+    mut changed: ResMut<ChangedComponentsRes>,
     query: Extract<Query<(Entity, &Node, &C), (With<Node>, Changed<C>)>>,
     parent_query: Extract<Query<&Parent>>,
 ) {
@@ -44,7 +44,7 @@ pub fn extract_mixin_generic<C: Component + ToMixinChange>(
 
 // TODO: won't detect DimensionChange?
 pub fn extract_paint(
-    mut changed: ResMut<ChangedComponents>,
+    mut changed: ResMut<ChangedComponentsRes>,
     query: Extract<Query<(Entity, &Paint), Changed<Paint>>>,
     parent_query: Extract<Query<&Parent>>,
     dimension_query: Extract<Query<&DimensionMixin>>,

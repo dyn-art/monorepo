@@ -10,7 +10,7 @@ use self::{
     styles::SVGStyle,
 };
 
-use super::{svg_bundle::BaseSVGBundle, SVGComposition};
+use super::{svg_bundle::BaseSVGBundle, SVGCompositionRes};
 
 pub mod attributes;
 pub mod events;
@@ -202,7 +202,7 @@ impl SVGElement {
         self.updates.drain(..).collect()
     }
 
-    pub fn to_string(&self, bundle: &BaseSVGBundle, composition: &SVGComposition) -> String {
+    pub fn to_string(&self, bundle: &BaseSVGBundle, composition: &SVGCompositionRes) -> String {
         let mut result = String::new();
 
         // Open the SVG tag

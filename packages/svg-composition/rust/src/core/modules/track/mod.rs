@@ -2,7 +2,7 @@ use bevy_app::{App, Last, Plugin};
 use bevy_ecs::schedule::{IntoSystemConfigs, SystemSet};
 
 use self::{
-    resources::{changed_components::ChangedComponents, trackable_entities::TrackedEntities},
+    resources::{changed_components::ChangedComponentsRes, trackable_entities::TrackedEntitiesRes},
     systems::{
         extract::{check_selected_changes, extract_tracked_mixin_changes},
         queue::queue_tracked_changes,
@@ -24,8 +24,8 @@ enum TrackSet {
 impl Plugin for TrackPlugin {
     fn build(&self, app: &mut App) {
         // Register resources
-        app.init_resource::<TrackedEntities>();
-        app.init_resource::<ChangedComponents>();
+        app.init_resource::<TrackedEntitiesRes>();
+        app.init_resource::<ChangedComponentsRes>();
 
         // Register systems
         app.add_systems(

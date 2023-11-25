@@ -17,7 +17,7 @@ pub mod svg_node;
 pub mod svg_paint;
 
 #[derive(Resource, Debug)]
-pub struct SVGComposition {
+pub struct SVGCompositionRes {
     // All nodes of the SVGComposition
     nodes: HashMap<Entity, Box<dyn SVGNode>>,
     // All paints of the SVGComposition
@@ -28,9 +28,9 @@ pub struct SVGComposition {
     output_event_sender: Sender<OutputEvent>,
 }
 
-impl SVGComposition {
+impl SVGCompositionRes {
     pub fn new(output_event_sender: Sender<OutputEvent>) -> Self {
-        SVGComposition {
+        SVGCompositionRes {
             root_ids: Vec::new(),
             nodes: HashMap::new(),
             paints: HashMap::new(),

@@ -14,7 +14,7 @@ use crate::core::{
                 styles::{SVGDisplayStyle, SVGStyle},
                 SVGElement, SVGTag,
             },
-            SVGComposition,
+            SVGCompositionRes,
         },
     },
 };
@@ -111,7 +111,7 @@ impl SVGNode for ShapeSVGNode {
         self.get_bundle_mut().drain_updates()
     }
 
-    fn to_string(&self, composition: &SVGComposition) -> String {
+    fn to_string(&self, composition: &SVGCompositionRes) -> String {
         self.bundle.to_string(composition)
     }
 }

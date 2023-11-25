@@ -4,15 +4,15 @@ use bevy_ecs::world::World;
 use crate::core::dtif::{dtif_processor::DTIFProcessor, DTIFComposition};
 
 use self::{
-    components::CompositionMixin,
     events::{EntityMoved, EntitySetPosition},
+    resources::CompositionRes,
     systems::layout::{handle_entity_moved_events, handle_entity_set_position_events},
 };
 
 use super::node::components::types::Root;
 
-pub mod components;
 pub mod events;
+pub mod resources;
 mod systems;
 
 pub struct CompositionPlugin {
@@ -58,8 +58,8 @@ fn insert_dtif_into_world(world: &mut World, dtif: &DTIFComposition) {
         }
     }
 
-    // Spawn composition entity
-    world.spawn(CompositionMixin {
+    // Register composition resource
+    world.insert_resource(CompositionRes {
         version: dtif.version.clone(),
         name: dtif.name.clone(),
         width: dtif.width,

@@ -3,7 +3,7 @@ use crate::core::{
     modules::svg_render::resources::changed_components::ChangedNode,
 };
 
-use super::{svg_bundle::SVGBundle, SVGComposition};
+use super::{svg_bundle::SVGBundle, SVGCompositionRes};
 use std::fmt::Debug;
 
 pub mod frame_svg_node;
@@ -20,5 +20,5 @@ pub trait SVGNode: SVGBundle + Sync + Send + Debug {
     fn get_child_append_id(&self) -> Option<&ElementReference>;
     fn get_paint_append_id(&self) -> Option<&ElementReference>;
     fn drain_updates(&mut self) -> Vec<RenderUpdateEvent>;
-    fn to_string(&self, composition: &SVGComposition) -> String;
+    fn to_string(&self, composition: &SVGCompositionRes) -> String;
 }

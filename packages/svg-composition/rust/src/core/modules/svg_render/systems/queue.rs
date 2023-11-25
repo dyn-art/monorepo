@@ -8,14 +8,14 @@ use bevy_ecs::{entity::Entity, system::ResMut};
 use crate::core::{
     events::output_event::RenderUpdateEvent,
     modules::svg_render::resources::{
-        changed_components::{ChangedComponents, ChangedNode, ChangedPaint},
-        svg_composition::SVGComposition,
+        changed_components::{ChangedComponentsRes, ChangedNode, ChangedPaint},
+        svg_composition::SVGCompositionRes,
     },
 };
 
 pub fn queue_render_changes(
-    mut changed: ResMut<ChangedComponents>,
-    mut svg_composition: ResMut<SVGComposition>,
+    mut changed: ResMut<ChangedComponentsRes>,
+    mut svg_composition: ResMut<SVGCompositionRes>,
 ) {
     let changed_nodes = take(&mut changed.changed_nodes);
     let changed_paints = take(&mut changed.changed_paints);
@@ -35,7 +35,7 @@ pub fn queue_render_changes(
 
 fn process_paints(
     changed_paints: &HashMap<Entity, ChangedPaint>,
-    svg_composition: &mut SVGComposition,
+    svg_composition: &mut SVGCompositionRes,
     updates: &mut Vec<RenderUpdateEvent>,
 ) {
     for (entity, paint) in changed_paints {
@@ -47,7 +47,7 @@ fn process_paints(
 fn process_paint(
     entity: Entity,
     changed_paint: &ChangedPaint,
-    svg_composition: &mut SVGComposition,
+    svg_composition: &mut SVGCompositionRes,
     updates: &mut Vec<RenderUpdateEvent>,
 ) {
     // Attempt to get or create the paint associated with the entity
@@ -67,7 +67,7 @@ fn process_paint(
 
 fn process_nodes(
     changed_nodes: &HashMap<Entity, ChangedNode>,
-    svg_composition: &mut SVGComposition,
+    svg_composition: &mut SVGCompositionRes,
     updates: &mut Vec<RenderUpdateEvent>,
 ) {
     let mut processed: HashSet<Entity> = HashSet::new();
@@ -87,7 +87,7 @@ fn process_with_parents(
     entity: Entity,
     changed_nodes: &HashMap<Entity, ChangedNode>,
     processed: &mut HashSet<Entity>,
-    svg_composition: &mut SVGComposition,
+    svg_composition: &mut SVGCompositionRes,
     updates: &mut Vec<RenderUpdateEvent>,
 ) {
     if !processed.insert(entity) {
@@ -115,7 +115,7 @@ fn process_with_parents(
 fn process_node(
     entity: Entity,
     changed_node: &ChangedNode,
-    svg_composition: &mut SVGComposition,
+    svg_composition: &mut SVGCompositionRes,
     updates: &mut Vec<RenderUpdateEvent>,
 ) {
     // Attempt to get or create the node associated with the entity

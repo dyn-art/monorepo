@@ -2,7 +2,7 @@ use bevy_ecs::{
     entity::Entity,
     event::EventReader,
     query::{With, Without},
-    system::{Commands, Query},
+    system::{Commands, Query, ResMut},
 };
 use log::info;
 
@@ -11,8 +11,12 @@ use crate::core::modules::node::components::{
     types::{Frame, Node, Root},
 };
 
-use super::events::{
-    CursorDownOnEntity, CursorEnteredComposition, CursorExitedComposition, CursorMovedOnComposition,
+use super::{
+    events::{
+        CursorDownOnEntity, CursorEnteredComposition, CursorExitedComposition,
+        CursorMovedOnComposition,
+    },
+    resources::InteractiveCompositionRes,
 };
 
 // Logs:
@@ -26,6 +30,7 @@ use super::events::{
 
 pub fn handle_cursor_down_on_entity_event(
     mut event_reader: EventReader<CursorDownOnEntity>,
+    interactive_composition: ResMut<InteractiveCompositionRes>,
     mut commands: Commands,
     selected_nodes_query: Query<Entity, With<Selected>>,
     frame_query: Query<

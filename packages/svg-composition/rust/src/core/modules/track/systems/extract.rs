@@ -14,18 +14,18 @@ use dyn_composition::core::modules::node::components::{
 use crate::core::{
     events::{
         output_event::{OutputEvent, SelectionChangeEvent},
-        output_event_queue::OutputEventQueue,
+        output_event_queue::OutputEventQueueRes,
     },
     mixin_change::ToMixinChange,
     modules::track::resources::{
-        changed_components::ChangedComponents,
-        trackable_entities::{TrackableMixinType, TrackedEntities},
+        changed_components::ChangedComponentsRes,
+        trackable_entities::{TrackableMixinType, TrackedEntitiesRes},
     },
 };
 
 pub fn extract_tracked_mixin_changes(
-    tracked_entities: Res<TrackedEntities>,
-    mut changed: ResMut<ChangedComponents>,
+    tracked_entities: Res<TrackedEntitiesRes>,
+    mut changed: ResMut<ChangedComponentsRes>,
     query_dimension: Query<&DimensionMixin, Changed<DimensionMixin>>,
     query_relative_transform: Query<&RelativeTransformMixin, Changed<RelativeTransformMixin>>,
 ) {
@@ -46,7 +46,7 @@ pub fn extract_tracked_mixin_changes(
 fn handle_component_change<T: Component + ToMixinChange>(
     entity: Entity,
     query: &Query<&T, Changed<T>>,
-    changed_components: &mut ChangedComponents,
+    changed_components: &mut ChangedComponentsRes,
 ) {
     if let Ok(component) = query.get(entity) {
         let changed_component = changed_components
@@ -60,7 +60,7 @@ fn handle_component_change<T: Component + ToMixinChange>(
 pub fn check_selected_changes(
     query: Query<Entity, With<Selected>>,
     mut last_selected: Local<HashSet<Entity>>,
-    mut output_event_queue: ResMut<OutputEventQueue>,
+    mut output_event_queue: ResMut<OutputEventQueueRes>,
 ) {
     let current_selected: HashSet<Entity> = query.iter().collect();
 
