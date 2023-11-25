@@ -10,6 +10,7 @@ authors = ["@bennoinbeta"]
 
 [features]
 default = []
+trace = []
 
 [dependencies]
 bevy_ecs = "0.12"

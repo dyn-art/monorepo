@@ -20,7 +20,7 @@ path = "src/bin.rs"
 [features]
 default = []
 console_log = ["console_error_panic_hook", "once_cell"]
-trace = ["console_log"]
+trace = ["console_log", "dyn_composition/trace"]
 cli = ["clap", "specta/export"]
 
 [dependencies]

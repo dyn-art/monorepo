@@ -130,6 +130,11 @@ impl JsCompositionHandle {
                 Ok(to_track_mixins) => to_track_mixins,
                 Err(_) => return JsValue::FALSE,
             };
+
+        // TODO: REMOVE
+        #[cfg(feature = "trace")]
+        self.composition.log_entity_components(entity);
+
         let app = self.composition.get_app_mut();
 
         // Collect intial values
@@ -221,6 +226,20 @@ impl JsCompositionHandle {
             .spawn_rectangle_node(mixin, maybe_parent_id);
 
         return serde_wasm_bindgen::to_value(&entity).unwrap_or(JsValue::NULL);
+    }
+
+    // =========================================================================
+    // Debug
+    // =========================================================================
+
+    #[wasm_bindgen(js_name = logEntityComponents)]
+    pub fn log_entity_components(&self, entity: JsValue) {
+        let entity: Entity = match serde_wasm_bindgen::from_value(entity) {
+            Ok(entity) => entity,
+            Err(_) => return,
+        };
+        #[cfg(feature = "trace")]
+        self.composition.log_entity_components(entity);
     }
 
     // =========================================================================
