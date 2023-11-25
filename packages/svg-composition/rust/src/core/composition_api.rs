@@ -6,12 +6,15 @@ use dyn_bevy_render_skeleton::RenderApp;
 use dyn_composition::core::composition::Composition;
 use dyn_composition::core::dtif::DTIFComposition;
 use dyn_composition::core::modules::node::components::bundles::RectangleNodeBundle;
-use dyn_composition::core::modules::node::components::mixins::Paint;
+use dyn_composition::core::modules::node::components::mixins::{
+    DimensionMixin, Paint, RelativeTransformMixin,
+};
 use wasm_bindgen::prelude::wasm_bindgen;
 use wasm_bindgen::JsValue;
 
 use crate::core::events::input_event::AnyInputEvent;
 use crate::core::helper::convert_optional_jsvalue;
+use crate::core::mixin_change::MixinChangeRelativeTransformMixin;
 use crate::core::modules::svg_render::resources::svg_composition::SVGComposition;
 use crate::core::modules::svg_render::SvgRenderPlugin;
 use crate::core::modules::track::resources::trackable_entities::{
@@ -21,6 +24,7 @@ use crate::core::modules::track::TrackPlugin;
 
 use super::events::output_event::OutputEvent;
 use super::events::output_event_queue::OutputEventQueue;
+use super::mixin_change::MixinChange;
 
 #[wasm_bindgen]
 pub struct JsCompositionHandle {
@@ -111,32 +115,59 @@ impl JsCompositionHandle {
     // =========================================================================
 
     #[wasm_bindgen(js_name = trackEntity)]
-    pub fn track_entity(&mut self, entity: JsValue, to_track_mixins: JsValue) -> bool {
+    pub fn track_entity(
+        &mut self,
+        entity: JsValue,
+        to_track_mixins: JsValue,
+        initial_value: bool,
+    ) -> JsValue {
         let entity: Entity = match serde_wasm_bindgen::from_value(entity) {
             Ok(entity) => entity,
-            Err(_) => return false,
+            Err(_) => return JsValue::FALSE,
         };
         let to_track_mixins: Vec<TrackableMixinType> =
             match serde_wasm_bindgen::from_value(to_track_mixins) {
                 Ok(to_track_mixins) => to_track_mixins,
-                Err(_) => return false,
+                Err(_) => return JsValue::FALSE,
             };
+        let app = self.composition.get_app_mut();
 
-        let mut tracked_entities = self
-            .composition
-            .get_app_mut()
-            .world
-            .get_resource_mut::<TrackedEntities>()
-            .unwrap();
+        // Collect intial values
+        let mut changes: Vec<MixinChange> = Vec::with_capacity(to_track_mixins.len());
+        if initial_value {
+            for component_type in &to_track_mixins {
+                match component_type {
+                    TrackableMixinType::Dimension => {
+                        if let Some(mixin) = app.world.get::<DimensionMixin>(entity) {
+                            changes.push(MixinChange::Dimension(mixin.clone()))
+                        }
+                    }
+                    TrackableMixinType::RelativeTransform => {
+                        if let Some(mixin) = app.world.get::<RelativeTransformMixin>(entity) {
+                            changes.push(MixinChange::RelativeTransform(
+                                MixinChangeRelativeTransformMixin {
+                                    relative_transform: mixin.clone(),
+                                },
+                            ))
+                        }
+                    }
+                }
+            }
+        }
 
-        // Add new mixins to tracked entity
+        // Update tracked entities
+        let mut tracked_entities = app.world.get_resource_mut::<TrackedEntities>().unwrap();
         tracked_entities
             .entities
             .entry(entity)
             .or_insert_with(HashSet::new)
             .extend(to_track_mixins);
 
-        return true;
+        if initial_value {
+            return serde_wasm_bindgen::to_value(&changes).unwrap_or_else(|_| JsValue::TRUE);
+        } else {
+            return JsValue::TRUE;
+        }
     }
 
     #[wasm_bindgen(js_name = untrackEntity)]

@@ -10,18 +10,23 @@ import {
 export function useWatchEntity<T extends TTrackableMixinKey[]>(
 	composition: Composition,
 	entity: Entity,
-	...toTrackMixinKeyss: T
+	toTrackMixinKeys: T
 ): TCombinedMixin<T> {
 	const initialState: TCombinedMixin<T> = {};
 	const [changes, dispatch] = React.useReducer(changesReducer<T>, initialState);
 
 	React.useEffect(() => {
-		const unwatch = composition.watchEntity(entity, toTrackMixinKeyss, (_, changesArray) => {
-			for (const change of changesArray) {
-				dispatch(change);
-			}
-		});
-		if (unwatch == null) {
+		const unwatch = composition.watchEntity(
+			entity,
+			toTrackMixinKeys,
+			(_, changesArray) => {
+				for (const change of changesArray) {
+					dispatch(change);
+				}
+			},
+			true
+		);
+		if (!unwatch) {
 			console.warn(`Failed to watch Entity: ${entity}!`);
 			return;
 		}
@@ -29,7 +34,7 @@ export function useWatchEntity<T extends TTrackableMixinKey[]>(
 		return () => {
 			unwatch();
 		};
-	}, [composition, entity, toTrackMixinKeyss]);
+	}, [entity, composition]); // Not active effect on toTrackMixinKeys as its an inline array and thus endless loop
 
 	return changes;
 }

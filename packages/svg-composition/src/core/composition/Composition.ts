@@ -143,16 +143,23 @@ export class Composition {
 	public watchEntity(
 		entity: Entity,
 		toTrackMixins: TRustEnumKeyArray<TrackableMixinType>[],
-		callback: TWatchEntityCallback
-	): (() => void) | null {
+		callback: TWatchEntityCallback,
+		initalValue = true
+	): (() => void) | false {
 		// Enable tracking of entity in composition
-		const success = this.trackEntity(
+		const intialChanges = this.trackEntity(
 			entity,
-			toTrackMixins.map((v) => ({ type: v }))
+			toTrackMixins.map((v) => ({ type: v })),
+			initalValue
 		);
 
+		// Apply intal changes if found
+		if (Array.isArray(intialChanges)) {
+			callback(entity, intialChanges);
+		}
+
 		// Register callback
-		if (success) {
+		if (intialChanges) {
 			const callbackId = shortId();
 			let callbacks = this._watchEntityCallbacks.get(entity);
 			if (!callbacks) {
@@ -165,7 +172,7 @@ export class Composition {
 			};
 		}
 
-		return null;
+		return false;
 	}
 
 	public unwatchEntity(entity: Entity, callbackId?: string): void {
@@ -186,8 +193,12 @@ export class Composition {
 		}
 	}
 
-	private trackEntity(entity: Entity, toTrackMixins: TrackableMixinType[]): boolean {
-		return this._compositionHandle.trackEntity(entity, toTrackMixins);
+	private trackEntity(
+		entity: Entity,
+		toTrackMixins: TrackableMixinType[],
+		intialValue = true
+	): MixinChange[] | boolean {
+		return this._compositionHandle.trackEntity(entity, toTrackMixins, intialValue);
 	}
 
 	private untrackEntity(entity: Entity): boolean {

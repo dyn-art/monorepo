@@ -1,1 +1,1 @@
-export * from './SelectionBox';
+export * from './CanvasControl';

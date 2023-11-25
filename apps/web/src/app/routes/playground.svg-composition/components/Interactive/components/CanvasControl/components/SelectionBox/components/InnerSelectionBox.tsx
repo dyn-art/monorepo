@@ -1,9 +1,9 @@
 import React from 'react';
 import { Composition, Entity } from '@dyn/svg-composition';
 
-import { useMatrixTransform } from '../../useMatrixTransform';
-import { useWatchEntity } from '../../useWatchEntity';
-import { Handle } from './Handle';
+import { useMatrixTransform } from '../../../../../useMatrixTransform';
+import { useWatchEntity } from '../../../../../useWatchEntity';
+import { Handle } from '../components/Handle';
 
 const HANDLE_SIZE = 8; // px
 
@@ -12,7 +12,7 @@ export const InnerSelectionBox: React.FC<TProps> = React.memo((props) => {
 	const {
 		Dimension: { width = undefined, height = undefined } = {},
 		RelativeTransform: { relativeTransform = undefined } = {}
-	} = useWatchEntity(composition, entity, 'Dimension', 'RelativeTransform');
+	} = useWatchEntity(composition, entity, ['Dimension', 'RelativeTransform']);
 	const { tx: x, ty: y, rotation } = useMatrixTransform(relativeTransform);
 
 	const handlePositions = React.useMemo(() => {
@@ -72,7 +72,7 @@ export const InnerSelectionBox: React.FC<TProps> = React.memo((props) => {
 		];
 	}, [width, height]);
 
-	// TODO: Not updated becase Entity didn't move and thus didn't emit these events
+	// TODO: REMOVE
 	console.log(`SelectionBox for Entity: ${entity}`, { width, height, x, y, rotation });
 
 	if (

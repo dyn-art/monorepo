@@ -1,8 +1,8 @@
 import React from 'react';
 import { Composition } from '@dyn/svg-composition';
 
-import { useSelectedNodes } from '../../useSelectedNodes';
-import { EHandleSide, InnerSelectionBox, TXYWH } from './InnerSelectionBox';
+import { useSelectedNodes } from '../../../../useSelectedNodes';
+import { EHandleSide, InnerSelectionBox, TXYWH } from './components/InnerSelectionBox';
 
 export const SelectionBox: React.FC<TProps> = (props) => {
 	const { composition, onResizeHandlePointerDown } = props;

@@ -2,8 +2,7 @@ import { jsPDF } from 'jspdf';
 import React from 'react';
 import { Button } from '@/components/primitive';
 
-import { SelectionBox } from './components';
-import { EHandleSide, TXYWH } from './components/SelectionBox/InnerSelectionBox';
+import { CanvasControl } from './components';
 import { useSVGComposition } from './useSVGComposition';
 
 export const Interactive: React.FC<TProps> = (props) => {
@@ -50,14 +49,7 @@ export const Interactive: React.FC<TProps> = (props) => {
 
 	return (
 		<div className="relative h-full w-full">
-			{composition && (
-				<SelectionBox
-					composition={composition}
-					onResizeHandlePointerDown={function (corner: EHandleSide, initialBounds: TXYWH): void {
-						console.log({ corner, initialBounds });
-					}}
-				/>
-			)}
+			{composition && <CanvasControl composition={composition} />}
 			<div ref={svgContainerRef} />
 			<div className="absolute left-4 top-4 z-50 flex flex-row gap-x-2">
 				<Button onClick={handleDownloadPDF}>To PDF</Button>
