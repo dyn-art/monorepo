@@ -18,6 +18,8 @@ export class SVGRenderer extends Renderer {
 
 	private _svgElementMap = new Map<number, SVGElement>();
 
+	private _isCursorOutOfComposion = true;
+
 	constructor(composition: Composition, options: TSVGRendererOptions = {}) {
 		super(composition);
 		const { domElement = document.body } = options;
@@ -51,11 +53,26 @@ export class SVGRenderer extends Renderer {
 				}
 			]);
 		});
-		this._svgElement.addEventListener('pointerenter', () => {
-			this.composition.emitInteractionEvents([{ type: 'CursorEnteredComposition' }]);
+		this._svgElement.addEventListener('pointerup', (e) => {
+			this.composition.emitInteractionEvents([
+				{ type: 'CursorUpOnComposition', position: this.pointerEventToCompositionPoint(e) }
+			]);
 		});
-		this._svgElement.addEventListener('pointerleave', () => {
-			this.composition.emitInteractionEvents([{ type: 'CursorExitedComposition' }]);
+		this._svgElement.addEventListener('pointerenter', () => {
+			if (this._isCursorOutOfComposion) {
+				this.composition.emitInteractionEvents([{ type: 'CursorEnteredComposition' }]);
+				this._isCursorOutOfComposion = false;
+			}
+		});
+		this._svgElement.addEventListener('pointerleave', (e) => {
+			const compositionPoint = this.pointerEventToCompositionPoint(e);
+			// Check whether cursor actually left composition
+			// or whether its just on some UI layer like the selection box
+			// TODO: Or put UI layers into the composition SVG?
+			if (compositionPoint[0] < 0 || compositionPoint[1] < 0) {
+				this.composition.emitInteractionEvents([{ type: 'CursorExitedComposition' }]);
+				this._isCursorOutOfComposion = true;
+			}
 		});
 	}
 

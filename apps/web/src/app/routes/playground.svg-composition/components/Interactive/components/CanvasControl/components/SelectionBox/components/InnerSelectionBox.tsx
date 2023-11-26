@@ -72,9 +72,6 @@ export const InnerSelectionBox: React.FC<TProps> = React.memo((props) => {
 		];
 	}, [width, height]);
 
-	// TODO: REMOVE
-	console.log(`SelectionBox for Entity: ${entity}`, { width, height, x, y, rotation });
-
 	if (
 		width == null ||
 		height == null ||

@@ -18,8 +18,8 @@ use crate::core::modules::{
 
 use super::{
     events::{
-        CursorDownOnEntity, CursorEnteredComposition, CursorExitedComposition,
-        CursorMovedOnComposition,
+        CursorDownOnComposition, CursorDownOnEntity, CursorEnteredComposition,
+        CursorExitedComposition, CursorMovedOnComposition, CursorUpOnComposition,
     },
     resources::InteractiveCompositionRes,
 };
@@ -158,19 +158,50 @@ pub fn handle_cursor_moved_on_composition(
             }
             _ => {}
         }
-
-        // info!("handle_cursor_moved_on_composition: {:#?}", position);
     }
 }
 
-pub fn handle_cursor_entered_composition(mut event_reader: EventReader<CursorEnteredComposition>) {
+pub fn handle_cursor_down_on_composition(
+    mut event_reader: EventReader<CursorDownOnComposition>,
+    mut interactive_composition: ResMut<InteractiveCompositionRes>,
+) {
     for event in event_reader.read() {
+        #[cfg(feature = "trace")]
+        info!("handle_cursor_down_on_composition: {:#?}", event.position);
+
+        interactive_composition.interaction_mode = InteractionMode::Pressing {
+            origin: event.position,
+        };
+    }
+}
+
+pub fn handle_cursor_up_on_composition(
+    event_reader: EventReader<CursorUpOnComposition>,
+    mut interactive_composition: ResMut<InteractiveCompositionRes>,
+) {
+    if event_reader.len() > 0 {
+        #[cfg(feature = "trace")]
+        info!("handle_cursor_up_on_composition");
+
+        interactive_composition.interaction_mode = InteractionMode::None;
+    }
+}
+
+pub fn handle_cursor_entered_composition(event_reader: EventReader<CursorEnteredComposition>) {
+    if event_reader.len() > 0 {
+        #[cfg(feature = "trace")]
         info!("handle_cursor_entered_composition");
     }
 }
 
-pub fn handle_cursor_exited_composition(mut event_reader: EventReader<CursorExitedComposition>) {
-    for event in event_reader.read() {
+pub fn handle_cursor_exited_composition(
+    event_reader: EventReader<CursorExitedComposition>,
+    mut interactive_composition: ResMut<InteractiveCompositionRes>,
+) {
+    if event_reader.len() > 0 {
+        #[cfg(feature = "trace")]
         info!("handle_cursor_exited_composition");
+
+        interactive_composition.interaction_mode = InteractionMode::None;
     }
 }
