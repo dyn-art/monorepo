@@ -4,11 +4,16 @@ use bevy_ecs::{
     query::{With, Without},
     system::{Commands, Query, ResMut},
 };
+use glam::{Mat3, Vec2};
 use log::info;
 
-use crate::core::modules::node::components::{
-    states::{Locked, Selected},
-    types::{Frame, Node, Root},
+use crate::core::modules::{
+    interactive_composition::resources::InteractionMode,
+    node::components::{
+        mixins::RelativeTransformMixin,
+        states::{Locked, Selected},
+        types::{Frame, Node, Root},
+    },
 };
 
 use super::{
@@ -30,7 +35,7 @@ use super::{
 
 pub fn handle_cursor_down_on_entity_event(
     mut event_reader: EventReader<CursorDownOnEntity>,
-    interactive_composition: ResMut<InteractiveCompositionRes>,
+    mut interactive_composition: ResMut<InteractiveCompositionRes>,
     mut commands: Commands,
     selected_nodes_query: Query<Entity, With<Selected>>,
     frame_query: Query<
@@ -52,7 +57,10 @@ pub fn handle_cursor_down_on_entity_event(
         ),
     >,
 ) {
-    let raycast_entities: Vec<Entity> = event_reader.read().map(|event| event.entity).collect();
+    let raycast_entities: Vec<(Entity, Vec2)> = event_reader
+        .read()
+        .map(|event| (event.entity, event.position))
+        .collect();
     if raycast_entities.is_empty() {
         return;
     }
@@ -61,24 +69,30 @@ pub fn handle_cursor_down_on_entity_event(
     let selected_entity = select_next_node(&raycast_entities, &frame_query, &node_query);
 
     // Select new entity if it's not already selected
-    if let Some(entity) = selected_entity {
+    if let Some((entity, pos)) = selected_entity {
         commands.entity(entity).insert(Selected);
-        #[cfg(trace)]
-        info!("Selected Entity: {:#?}", entity);
+
+        interactive_composition.interaction_mode = InteractionMode::Translating {
+            origin: pos,
+            current: pos,
+        };
+
+        #[cfg(feature = "trace")]
+        info!("Selected Entity {:#?} at {:#?}", entity, pos);
     }
 
     // Unselect previously selected nodes that are no longer selected
     selected_nodes_query.for_each(|entity| {
-        if selected_entity.map_or(true, |selected| selected != entity) {
+        if selected_entity.map_or(true, |(selected, _)| selected != entity) {
             commands.entity(entity).remove::<Selected>();
-            #[cfg(trace)]
+            #[cfg(feature = "trace")]
             info!("Unselected Entity: {:#?}", entity);
         }
     });
 }
 
 fn select_next_node(
-    raycast_entities: &Vec<Entity>,
+    raycast_entities: &Vec<(Entity, Vec2)>,
     frame_query: &Query<
         Entity,
         (
@@ -97,14 +111,14 @@ fn select_next_node(
             Without<Selected>,
         ),
     >,
-) -> Option<Entity> {
+) -> Option<(Entity, Vec2)> {
     // First, attempt to find a non-Frame, non-Locked, non-Selected Node
     raycast_entities
         .iter()
         .rev()
-        .find_map(|&entity| {
+        .find_map(|&(entity, pos)| {
             if node_query.contains(entity) {
-                Some(entity)
+                Some((entity, pos))
             } else {
                 None
             }
@@ -112,9 +126,9 @@ fn select_next_node(
         // If no such Node is found, try to find a Frame that is not a Root,
         // not Selected and not Locked
         .or_else(|| {
-            raycast_entities.iter().rev().find_map(|&entity| {
+            raycast_entities.iter().rev().find_map(|&(entity, pos)| {
                 if frame_query.contains(entity) {
-                    Some(entity)
+                    Some((entity, pos))
                 } else {
                     None
                 }
@@ -122,9 +136,29 @@ fn select_next_node(
         })
 }
 
-pub fn handle_cursor_moved_on_composition(mut event_reader: EventReader<CursorMovedOnComposition>) {
+pub fn handle_cursor_moved_on_composition(
+    mut event_reader: EventReader<CursorMovedOnComposition>,
+    mut interactive_composition: ResMut<InteractiveCompositionRes>,
+    mut selected_nodes_query: Query<(Entity, &mut RelativeTransformMixin), With<Selected>>,
+) {
     for event in event_reader.read() {
-        let CursorMovedOnComposition { position } = event;
+        let CursorMovedOnComposition { position } = *event;
+        match interactive_composition.interaction_mode {
+            InteractionMode::Translating {
+                ref mut current, ..
+            } => {
+                let offset = position - *current;
+
+                selected_nodes_query.for_each_mut(|(_, mut relative_transform_mixin)| {
+                    let translation = Mat3::from_translation(offset);
+                    relative_transform_mixin.0 = relative_transform_mixin.0 * translation;
+                });
+
+                *current = position;
+            }
+            _ => {}
+        }
+
         // info!("handle_cursor_moved_on_composition: {:#?}", position);
     }
 }

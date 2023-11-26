@@ -12,6 +12,7 @@ pub enum InteractionInputEvent {
     CursorMovedOnComposition(CursorMovedOnComposition),
     CursorEnteredComposition(CursorEnteredComposition),
     CursorExitedComposition(CursorExitedComposition),
+    CursorDownOnComposition(CursorDownOnComposition),
 }
 
 impl InputEvent for InteractionInputEvent {
@@ -28,7 +29,10 @@ impl InputEvent for InteractionInputEvent {
             }
             InteractionInputEvent::CursorDownOnEntity(event) => {
                 world.send_event(event);
-            } // ... other interaction events
+            }
+            InteractionInputEvent::CursorDownOnComposition(event) => {
+                world.send_event(event);
+            }
         }
     }
 }
@@ -51,4 +55,10 @@ pub struct CursorExitedComposition;
 #[derive(Event, Debug, Serialize, Deserialize, Type, Clone)]
 pub struct CursorDownOnEntity {
     pub entity: Entity,
+    pub position: Vec2,
+}
+
+#[derive(Event, Debug, Serialize, Deserialize, Type, Clone)]
+pub struct CursorDownOnComposition {
+    pub position: Vec2,
 }

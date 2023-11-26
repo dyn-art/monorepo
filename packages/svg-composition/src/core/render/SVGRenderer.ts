@@ -1,7 +1,8 @@
 import type {
 	RenderUpdateEvent,
 	SVGAttribute,
-	SVGStyle
+	SVGStyle,
+	Vec2
 } from '@/rust/dyn_composition_api/bindings';
 
 import type { Composition } from '../composition';
@@ -30,10 +31,25 @@ export class SVGRenderer extends Renderer {
 
 		// Register SVG root callbacks
 		this._svgElement.addEventListener('pointermove', (e) => {
+			e.preventDefault();
 			this.composition.emitInteractionEvents(
-				[{ type: 'CursorMovedOnComposition', position: [e.clientX, e.clientY] }],
+				[
+					{
+						type: 'CursorMovedOnComposition',
+						position: this.pointerEventToCompositionPoint(e)
+					}
+				],
 				false
 			);
+		});
+		this._svgElement.addEventListener('pointerdown', (e) => {
+			e.preventDefault();
+			this.composition.emitInteractionEvents([
+				{
+					type: 'CursorDownOnComposition',
+					position: this.pointerEventToCompositionPoint(e)
+				}
+			]);
 		});
 		this._svgElement.addEventListener('pointerenter', () => {
 			this.composition.emitInteractionEvents([{ type: 'CursorEnteredComposition' }]);
@@ -84,8 +100,15 @@ export class SVGRenderer extends Renderer {
 						// Register callbacks
 						const entity = update.entity;
 						if (update.isBundleRoot && entity != null) {
-							newElement.addEventListener('pointerdown', () => {
-								this.composition.emitInteractionEvents([{ type: 'CursorDownOnEntity', entity }]);
+							newElement.addEventListener('pointerdown', (e) => {
+								e.preventDefault();
+								this.composition.emitInteractionEvents([
+									{
+										type: 'CursorDownOnEntity',
+										entity,
+										position: this.pointerEventToCompositionPoint(e)
+									}
+								]);
 							});
 						}
 
@@ -287,6 +310,19 @@ export class SVGRenderer extends Renderer {
 			default:
 				return null;
 		}
+	}
+
+	public clientWindowPointToCompositionPoint(clientProint: Vec2): Vec2 {
+		const rect = this._svgElement.getBoundingClientRect();
+
+		const x = clientProint[0] - rect.left;
+		const y = clientProint[1] - rect.top;
+
+		return [x, y];
+	}
+
+	public pointerEventToCompositionPoint(e: PointerEvent): Vec2 {
+		return this.clientWindowPointToCompositionPoint([e.clientX, e.clientY]);
 	}
 
 	public clear(): void {
