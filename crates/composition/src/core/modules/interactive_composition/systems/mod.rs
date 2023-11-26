@@ -56,6 +56,7 @@ pub fn handle_cursor_down_on_entity_event(
             Without<Selected>,
         ),
     >,
+    node_query_with_selected: Query<Entity, (With<Node>, Without<Locked>, Without<Root>)>,
 ) {
     let raycast_entities: Vec<(Entity, Vec2)> = event_reader
         .read()
@@ -66,24 +67,32 @@ pub fn handle_cursor_down_on_entity_event(
     }
 
     // Find the next best node to select
-    let selected_entity = select_next_node(&raycast_entities, &frame_query, &node_query);
+    let selected_entity = select_next_node(
+        &raycast_entities,
+        &frame_query,
+        &node_query,
+        &node_query_with_selected,
+    );
 
     // Select new entity if it's not already selected
-    if let Some((entity, pos)) = selected_entity {
-        commands.entity(entity).insert(Selected);
+    if let Some((entity, pos, is_new)) = selected_entity {
+        // Mark node as selected
+        if is_new {
+            commands.entity(entity).insert(Selected);
+
+            #[cfg(feature = "trace")]
+            info!("Selected Entity {:#?} at {:#?}", entity, pos);
+        }
 
         interactive_composition.interaction_mode = InteractionMode::Translating {
             origin: pos,
             current: pos,
         };
-
-        #[cfg(feature = "trace")]
-        info!("Selected Entity {:#?} at {:#?}", entity, pos);
     }
 
     // Unselect previously selected nodes that are no longer selected
     selected_nodes_query.for_each(|entity| {
-        if selected_entity.map_or(true, |(selected, _)| selected != entity) {
+        if selected_entity.map_or(true, |(selected, _, _)| selected != entity) {
             commands.entity(entity).remove::<Selected>();
             #[cfg(feature = "trace")]
             info!("Unselected Entity: {:#?}", entity);
@@ -111,24 +120,35 @@ fn select_next_node(
             Without<Selected>,
         ),
     >,
-) -> Option<(Entity, Vec2)> {
-    // First, attempt to find a non-Frame, non-Locked, non-Selected Node
+    node_query_with_selected: &Query<Entity, (With<Node>, Without<Locked>, Without<Root>)>,
+) -> Option<(Entity, Vec2, bool)> {
+    // First, attempt to find a non-Frame, non-locked, non-selected node
     raycast_entities
         .iter()
         .rev()
         .find_map(|&(entity, pos)| {
             if node_query.contains(entity) {
-                Some((entity, pos))
+                Some((entity, pos, true))
             } else {
                 None
             }
         })
-        // If no such Node is found, try to find a Frame that is not a Root,
-        // not Selected and not Locked
+        // If no such node is found, try to find a frame that is not a root,
+        // not selected and not locked
         .or_else(|| {
             raycast_entities.iter().rev().find_map(|&(entity, pos)| {
                 if frame_query.contains(entity) {
-                    Some((entity, pos))
+                    Some((entity, pos, true))
+                } else {
+                    None
+                }
+            })
+        })
+        // If still no new node found, select already selected node
+        .or_else(|| {
+            raycast_entities.iter().rev().find_map(|&(entity, pos)| {
+                if node_query_with_selected.contains(entity) {
+                    Some((entity, pos, false))
                 } else {
                     None
                 }
