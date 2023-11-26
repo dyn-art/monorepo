@@ -1,14 +1,14 @@
 import React from 'react';
 import { Composition } from '@dyn/svg-composition';
 
+import { useInteractionMode } from '../../../../useInteractionMode';
 import { useSelectedNodes } from '../../../../useSelectedNodes';
 import { EHandleSide, InnerSelectionBox, TXYWH } from './components/InnerSelectionBox';
 
 export const SelectionBox: React.FC<TProps> = (props) => {
 	const { composition, onResizeHandlePointerDown } = props;
 	const selectedEntities = useSelectedNodes(composition);
-
-	// TODO: Hide handles when translating
+	const interactionMode = useInteractionMode(composition);
 
 	return (
 		<>
@@ -17,7 +17,7 @@ export const SelectionBox: React.FC<TProps> = (props) => {
 					key={selectedEntity}
 					composition={composition}
 					entity={selectedEntity}
-					showHandles={true}
+					showHandles={interactionMode !== 'Translating'}
 					onResizeHandlePointerDown={onResizeHandlePointerDown}
 				/>
 			))}

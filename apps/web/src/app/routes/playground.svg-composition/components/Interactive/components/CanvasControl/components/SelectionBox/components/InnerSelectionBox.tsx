@@ -5,7 +5,9 @@ import { useMatrixTransform } from '../../../../../useMatrixTransform';
 import { useWatchEntity } from '../../../../../useWatchEntity';
 import { Handle } from '../components/Handle';
 
-const HANDLE_SIZE = 8; // px
+const MIDDLE_HANDLE_WIDTH = 8; // px
+const MIDDLE_HANDLE_HEIGHT = 16; // px
+const CORNER_HANDLE_SIZE = 8; // px
 
 export const InnerSelectionBox: React.FC<TProps> = React.memo((props) => {
 	const { entity, composition, showHandles, onResizeHandlePointerDown } = props;
@@ -22,50 +24,50 @@ export const InnerSelectionBox: React.FC<TProps> = React.memo((props) => {
 
 		return [
 			{
-				x: -HANDLE_SIZE / 2,
-				y: -HANDLE_SIZE / 2,
+				x: -CORNER_HANDLE_SIZE / 2,
+				y: -CORNER_HANDLE_SIZE / 2,
 				cursor: 'nwse-resize',
 				resizeHandle: EHandleSide.Top + EHandleSide.Left
 			},
 			{
-				x: width / 2 - HANDLE_SIZE / 2,
-				y: -HANDLE_SIZE / 2,
+				x: width / 2 - MIDDLE_HANDLE_HEIGHT / 2,
+				y: -MIDDLE_HANDLE_WIDTH / 2,
 				cursor: 'ns-resize',
 				resizeHandle: EHandleSide.Top
 			},
 			{
-				x: width - HANDLE_SIZE / 2,
-				y: -HANDLE_SIZE / 2,
+				x: width - CORNER_HANDLE_SIZE / 2,
+				y: -CORNER_HANDLE_SIZE / 2,
 				cursor: 'nesw-resize',
 				resizeHandle: EHandleSide.Top + EHandleSide.Right
 			},
 			{
-				x: width - HANDLE_SIZE / 2,
-				y: height / 2 - HANDLE_SIZE / 2,
+				x: width - MIDDLE_HANDLE_WIDTH / 2,
+				y: height / 2 - MIDDLE_HANDLE_HEIGHT / 2,
 				cursor: 'ew-resize',
 				resizeHandle: EHandleSide.Right
 			},
 			{
-				x: width - HANDLE_SIZE / 2,
-				y: height - HANDLE_SIZE / 2,
+				x: width - CORNER_HANDLE_SIZE / 2,
+				y: height - CORNER_HANDLE_SIZE / 2,
 				cursor: 'nwse-resize',
 				resizeHandle: EHandleSide.Bottom + EHandleSide.Right
 			},
 			{
-				x: width / 2 - HANDLE_SIZE / 2,
-				y: height - HANDLE_SIZE / 2,
+				x: width / 2 - MIDDLE_HANDLE_HEIGHT / 2,
+				y: height - MIDDLE_HANDLE_WIDTH / 2,
 				cursor: 'ns-resize',
 				resizeHandle: EHandleSide.Bottom
 			},
 			{
-				x: -HANDLE_SIZE / 2,
-				y: height - HANDLE_SIZE / 2,
+				x: -CORNER_HANDLE_SIZE / 2,
+				y: height - CORNER_HANDLE_SIZE / 2,
 				cursor: 'nesw-resize',
 				resizeHandle: EHandleSide.Bottom + EHandleSide.Left
 			},
 			{
-				x: -HANDLE_SIZE / 2,
-				y: height / 2 - HANDLE_SIZE / 2,
+				x: -MIDDLE_HANDLE_WIDTH / 2,
+				y: height / 2 - MIDDLE_HANDLE_HEIGHT / 2,
 				cursor: 'ew-resize',
 				resizeHandle: EHandleSide.Left
 			}
@@ -85,6 +87,7 @@ export const InnerSelectionBox: React.FC<TProps> = React.memo((props) => {
 
 	return (
 		<g style={{ transform: `translate(${x}px, ${y}px) rotate(${-rotation}deg)` }}>
+			{/* Border */}
 			<rect
 				className={'pointer-events-none fill-transparent stroke-blue-400 stroke-1'}
 				x={0}
@@ -92,33 +95,56 @@ export const InnerSelectionBox: React.FC<TProps> = React.memo((props) => {
 				width={width}
 				height={height}
 			/>
+
+			{/* Dimension Indicator */}
+			{showHandles && (
+				<foreignObject x={0} y={height} width={width} height="40">
+					<div className="flex h-full items-center justify-center">
+						<div className="rounded-sm bg-blue-500 px-2 py-1 text-center text-xs text-white">
+							{width} x {height}
+						</div>
+					</div>
+				</foreignObject>
+			)}
+
+			{/* Handles */}
 			{showHandles &&
 				handlePositions.map((pos, index) => {
 					let handleRotation = 0;
+					let handleWidth = CORNER_HANDLE_SIZE;
+					let handleHeight = CORNER_HANDLE_SIZE;
 					switch (pos.resizeHandle) {
 						case EHandleSide.Top + EHandleSide.Left:
 							handleRotation = -135;
 							break;
 						case EHandleSide.Top:
 							handleRotation = 90;
+							handleWidth = MIDDLE_HANDLE_HEIGHT;
+							handleHeight = MIDDLE_HANDLE_WIDTH;
 							break;
 						case EHandleSide.Top + EHandleSide.Right:
 							handleRotation = 135;
 							break;
 						case EHandleSide.Right:
 							handleRotation = 0;
+							handleWidth = MIDDLE_HANDLE_WIDTH;
+							handleHeight = MIDDLE_HANDLE_HEIGHT;
 							break;
 						case EHandleSide.Bottom + EHandleSide.Right:
 							handleRotation = 45;
 							break;
 						case EHandleSide.Bottom:
 							handleRotation = 90;
+							handleWidth = MIDDLE_HANDLE_HEIGHT;
+							handleHeight = MIDDLE_HANDLE_WIDTH;
 							break;
 						case EHandleSide.Bottom + EHandleSide.Left:
 							handleRotation = -45;
 							break;
 						case EHandleSide.Left:
 							handleRotation = 0;
+							handleWidth = MIDDLE_HANDLE_WIDTH;
+							handleHeight = MIDDLE_HANDLE_HEIGHT;
 							break;
 					}
 
@@ -132,8 +158,8 @@ export const InnerSelectionBox: React.FC<TProps> = React.memo((props) => {
 							key={index}
 							x={pos.x}
 							y={pos.y}
-							width={HANDLE_SIZE}
-							height={HANDLE_SIZE}
+							width={handleWidth}
+							height={handleHeight}
 							cursor={cursor}
 							onPointerDown={(e) => {
 								e.stopPropagation();

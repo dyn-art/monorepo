@@ -7,6 +7,8 @@ export const Handle: React.FC<TProps> = (props) => {
 		<rect
 			x={x}
 			y={y}
+			rx={4}
+			ry={4}
 			width={width}
 			height={height}
 			className={'fill-white stroke-blue-400 stroke-1'}

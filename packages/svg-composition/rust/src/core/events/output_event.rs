@@ -1,4 +1,5 @@
 use bevy_ecs::entity::Entity;
+use dyn_composition::core::modules::interactive_composition::resources::InteractionMode;
 use serde::Serialize;
 use specta::Type;
 
@@ -10,6 +11,7 @@ pub enum OutputEvent {
     RenderUpdate(RenderUpdateEvent),
     TrackUpdate(TrackUpdateEvent),
     SelectionChange(SelectionChangeEvent),
+    InteractionModeChange(InteractionModeChangeEvent),
 }
 
 #[derive(Debug, Serialize, Clone, Type)]
@@ -27,4 +29,24 @@ pub struct TrackUpdateEvent {
 #[derive(Debug, Serialize, Clone, Type)]
 pub struct SelectionChangeEvent {
     pub selected: Vec<Entity>,
+}
+
+#[derive(Debug, Serialize, Clone, Type)]
+pub struct InteractionModeChangeEvent {
+    #[serde(rename = "interactionMode")]
+    pub interaction_mode: RawInteractionMode,
+}
+
+#[derive(Debug, Serialize, Clone, Type, Eq, PartialEq)]
+#[serde(tag = "type")]
+pub enum RawInteractionMode {
+    None,
+    Translating,
+    Pressing,
+}
+
+impl Default for RawInteractionMode {
+    fn default() -> Self {
+        Self::None
+    }
 }

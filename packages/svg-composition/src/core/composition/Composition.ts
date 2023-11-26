@@ -6,9 +6,11 @@ import type {
 	DTIFComposition,
 	Entity,
 	InteractionInputEvent,
+	InteractionModeChangeEvent,
 	MixinChange,
 	OutputEvent,
 	Paint,
+	RawInteractionMode,
 	RectangleNodeBundle,
 	RenderUpdateEvent,
 	SelectionChangeEvent,
@@ -34,6 +36,10 @@ export class Composition {
 	// https://www.zhenghao.io/posts/object-vs-map
 	private readonly _watchEntityCallbacks = new Map<Entity, Map<string, TWatchEntityCallback>>();
 	private readonly _onSelectionChangeCallbacks = new Map<string, TOnSelectionChangeCallback>();
+	private readonly _onInteractionModeChangeCallbacks = new Map<
+		string,
+		TOnInteractionModeChangeCallback
+	>();
 
 	// Interaction events debounce
 	private debounceTimeout: number | null = null;
@@ -113,6 +119,9 @@ export class Composition {
 						break;
 					case 'SelectionChange':
 						this.handleSelectionChanges(groupedEvent as SelectionChangeEvent[]);
+						break;
+					case 'InteractionModeChange':
+						this.handleInteractionModeChanges(groupedEvent as InteractionModeChangeEvent[]);
 						break;
 					default:
 						console.warn(`Unknown event: ${eventType as string}`);
@@ -216,6 +225,10 @@ export class Composition {
 		}
 	}
 
+	// =========================================================================
+	// Selection
+	// =========================================================================
+
 	public onSelectionChange(callback: TOnSelectionChangeCallback): () => void {
 		const callbackId = shortId();
 		this._onSelectionChangeCallbacks.set(callbackId, callback);
@@ -234,6 +247,35 @@ export class Composition {
 		if (events.length > 0) {
 			this._onSelectionChangeCallbacks.forEach((callback) => {
 				callback(events[events.length - 1]?.selected as unknown as Entity[]);
+			});
+		}
+	}
+
+	// =========================================================================
+	// Interaction Mode
+	// =========================================================================
+
+	public onInteractionModeChange(callback: TOnInteractionModeChangeCallback): () => void {
+		const callbackId = shortId();
+		this._onInteractionModeChangeCallbacks.set(callbackId, callback);
+		return () => {
+			this.unregisterInteractionModeChangeCallback(callbackId);
+		};
+	}
+
+	private unregisterInteractionModeChangeCallback(callbackId: string): void {
+		if (this._onInteractionModeChangeCallbacks.has(callbackId)) {
+			this._onInteractionModeChangeCallbacks.delete(callbackId);
+		}
+	}
+
+	private handleInteractionModeChanges(events: InteractionModeChangeEvent[]): void {
+		if (events.length > 0) {
+			this._onInteractionModeChangeCallbacks.forEach((callback) => {
+				callback(
+					events[events.length - 1]?.interactionMode
+						.type as unknown as TRustEnumKeyArray<RawInteractionMode>
+				);
 			});
 		}
 	}
@@ -369,3 +411,6 @@ export interface TCompositionConfig {
 
 type TWatchEntityCallback = (entity: Entity, changes: MixinChange[]) => void;
 type TOnSelectionChangeCallback = (selected: Entity[]) => void;
+type TOnInteractionModeChangeCallback = (
+	interactionMode: TRustEnumKeyArray<RawInteractionMode>
+) => void;

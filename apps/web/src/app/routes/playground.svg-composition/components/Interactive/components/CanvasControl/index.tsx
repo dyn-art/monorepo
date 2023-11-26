@@ -14,8 +14,8 @@ export const CanvasControl: React.FC<TProps> = (props) => {
 		>
 			<SelectionBox
 				composition={composition}
-				onResizeHandlePointerDown={() => {
-					// TODO
+				onResizeHandlePointerDown={(corner, initialBounds) => {
+					console.log({ corner, initialBounds });
 				}}
 			/>
 		</svg>
