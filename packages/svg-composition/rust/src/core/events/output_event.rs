@@ -41,8 +41,9 @@ pub struct InteractionModeChangeEvent {
 #[serde(tag = "type")]
 pub enum RawInteractionMode {
     None,
-    Translating,
     Pressing,
+    Translating,
+    Resizing,
 }
 
 impl Default for RawInteractionMode {

@@ -10,7 +10,7 @@ use log::info;
 use crate::core::modules::{
     interactive_composition::resources::InteractionMode,
     node::components::{
-        mixins::RelativeTransformMixin,
+        mixins::{DimensionMixin, RelativeTransformMixin},
         states::{Locked, Selected},
         types::{Frame, Node, Root},
     },
@@ -18,10 +18,11 @@ use crate::core::modules::{
 
 use super::{
     events::{
-        CursorDownOnComposition, CursorDownOnEntity, CursorEnteredComposition,
-        CursorExitedComposition, CursorMovedOnComposition, CursorUpOnComposition,
+        CursorDownOnComposition, CursorDownOnEntity, CursorDownOnResizeHandle,
+        CursorEnteredComposition, CursorExitedComposition, CursorMovedOnComposition,
+        CursorUpOnComposition,
     },
-    resources::InteractiveCompositionRes,
+    resources::{HandleSide, InteractiveCompositionRes, XYWH},
 };
 
 // Logs:
@@ -32,7 +33,6 @@ use super::{
 // INFO: End: handle_cursor_down_on_entity_event
 //
 // Frame (0v0) -> Rectangle (1v0) -> Paint (2v0)
-
 pub fn handle_cursor_down_on_entity_event(
     mut event_reader: EventReader<CursorDownOnEntity>,
     mut interactive_composition: ResMut<InteractiveCompositionRes>,
@@ -159,26 +159,68 @@ fn select_next_node(
 pub fn handle_cursor_moved_on_composition(
     mut event_reader: EventReader<CursorMovedOnComposition>,
     mut interactive_composition: ResMut<InteractiveCompositionRes>,
-    mut selected_nodes_query: Query<(Entity, &mut RelativeTransformMixin), With<Selected>>,
+    mut selected_nodes_query: Query<
+        (Entity, &mut RelativeTransformMixin, &mut DimensionMixin),
+        With<Selected>,
+    >,
 ) {
     for event in event_reader.read() {
         let CursorMovedOnComposition { position } = *event;
-        match interactive_composition.interaction_mode {
-            InteractionMode::Translating {
-                ref mut current, ..
-            } => {
+        match &mut interactive_composition.interaction_mode {
+            InteractionMode::Translating { current, .. } => {
                 let offset = position - *current;
 
-                selected_nodes_query.for_each_mut(|(_, mut relative_transform_mixin)| {
+                selected_nodes_query.for_each_mut(|(_, mut relative_transform_mixin, _)| {
                     let translation = Mat3::from_translation(offset);
                     relative_transform_mixin.0 = relative_transform_mixin.0 * translation;
                 });
 
                 *current = position;
             }
+            InteractionMode::Resizing {
+                corner,
+                inital_bounds,
+            } => {
+                let new_bounds = resize_bounds(&inital_bounds, *corner, position);
+
+                selected_nodes_query.for_each_mut(
+                    |(_, mut relative_transform_mixin, mut dimension_mixin)| {
+                        relative_transform_mixin.0.col_mut(2).x = new_bounds.position.x;
+                        relative_transform_mixin.0.col_mut(2).y = new_bounds.position.y;
+                        dimension_mixin.width = new_bounds.width;
+                        dimension_mixin.height = new_bounds.height
+                    },
+                );
+            }
             _ => {}
         }
     }
+}
+
+pub fn resize_bounds(bounds: &XYWH, corner: u8, point: Vec2) -> XYWH {
+    let mut result = bounds.clone();
+
+    if (corner & HandleSide::Left as u8) == HandleSide::Left as u8 {
+        result.position.x = result.position.x.min(point.x);
+        result.width = (result.position.x + bounds.width as f32 - point.x).abs() as u32;
+    }
+
+    if (corner & HandleSide::Right as u8) == HandleSide::Right as u8 {
+        result.position.x = point.x.min(result.position.x);
+        result.width = (point.x - bounds.position.x).abs() as u32;
+    }
+
+    if (corner & HandleSide::Top as u8) == HandleSide::Top as u8 {
+        result.position.y = result.position.y.min(point.y);
+        result.height = (result.position.y + bounds.height as f32 - point.y).abs() as u32;
+    }
+
+    if (corner & HandleSide::Bottom as u8) == HandleSide::Bottom as u8 {
+        result.position.y = point.y.min(result.position.y);
+        result.height = (point.y - bounds.position.y).abs() as u32;
+    }
+
+    return result;
 }
 
 pub fn handle_cursor_down_on_composition(
@@ -187,7 +229,7 @@ pub fn handle_cursor_down_on_composition(
 ) {
     for event in event_reader.read() {
         #[cfg(feature = "trace")]
-        info!("handle_cursor_down_on_composition: {:#?}", event.position);
+        info!("handle_cursor_down_on_composition: {:#?}", event);
 
         interactive_composition.interaction_mode = InteractionMode::Pressing {
             origin: event.position,
@@ -196,32 +238,47 @@ pub fn handle_cursor_down_on_composition(
 }
 
 pub fn handle_cursor_up_on_composition(
-    event_reader: EventReader<CursorUpOnComposition>,
+    mut event_reader: EventReader<CursorUpOnComposition>,
     mut interactive_composition: ResMut<InteractiveCompositionRes>,
 ) {
-    if event_reader.len() > 0 {
+    for event in event_reader.read() {
         #[cfg(feature = "trace")]
-        info!("handle_cursor_up_on_composition");
+        info!("handle_cursor_up_on_composition: {:#?}", event);
 
         interactive_composition.interaction_mode = InteractionMode::None;
     }
 }
 
-pub fn handle_cursor_entered_composition(event_reader: EventReader<CursorEnteredComposition>) {
-    if event_reader.len() > 0 {
+pub fn handle_cursor_entered_composition(mut event_reader: EventReader<CursorEnteredComposition>) {
+    for event in event_reader.read() {
         #[cfg(feature = "trace")]
         info!("handle_cursor_entered_composition");
     }
 }
 
 pub fn handle_cursor_exited_composition(
-    event_reader: EventReader<CursorExitedComposition>,
+    mut event_reader: EventReader<CursorExitedComposition>,
     mut interactive_composition: ResMut<InteractiveCompositionRes>,
 ) {
-    if event_reader.len() > 0 {
+    for event in event_reader.read() {
         #[cfg(feature = "trace")]
         info!("handle_cursor_exited_composition");
 
         interactive_composition.interaction_mode = InteractionMode::None;
+    }
+}
+
+pub fn handle_cursor_down_on_resize_handle(
+    mut event_reader: EventReader<CursorDownOnResizeHandle>,
+    mut interactive_composition: ResMut<InteractiveCompositionRes>,
+) {
+    for event in event_reader.read() {
+        #[cfg(feature = "trace")]
+        info!("handle_cursor_down_on_resize_handle: {:#?}", event);
+
+        interactive_composition.interaction_mode = InteractionMode::Resizing {
+            corner: event.corner,
+            inital_bounds: event.inital_bounds.clone(),
+        };
     }
 }

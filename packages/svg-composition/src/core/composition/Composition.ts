@@ -101,6 +101,10 @@ export class Composition {
 		return this._height;
 	}
 
+	public get renderer(): Renderer[] {
+		return this._renderer;
+	}
+
 	// =========================================================================
 	// WASM
 	// =========================================================================

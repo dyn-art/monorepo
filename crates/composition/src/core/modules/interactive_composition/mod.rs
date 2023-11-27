@@ -3,14 +3,16 @@ use bevy_ecs::schedule::{IntoSystemConfigs, IntoSystemSetConfigs, SystemSet};
 
 use self::{
     events::{
-        CursorDownOnComposition, CursorDownOnEntity, CursorEnteredComposition,
-        CursorExitedComposition, CursorMovedOnComposition, CursorUpOnComposition,
+        CursorDownOnComposition, CursorDownOnEntity, CursorDownOnResizeHandle,
+        CursorEnteredComposition, CursorExitedComposition, CursorMovedOnComposition,
+        CursorUpOnComposition,
     },
     resources::InteractiveCompositionRes,
     systems::{
         handle_cursor_down_on_composition, handle_cursor_down_on_entity_event,
-        handle_cursor_entered_composition, handle_cursor_exited_composition,
-        handle_cursor_moved_on_composition, handle_cursor_up_on_composition,
+        handle_cursor_down_on_resize_handle, handle_cursor_entered_composition,
+        handle_cursor_exited_composition, handle_cursor_moved_on_composition,
+        handle_cursor_up_on_composition,
     },
 };
 
@@ -38,6 +40,7 @@ impl Plugin for InteractiveCompositionPlugin {
         app.add_event::<CursorDownOnEntity>();
         app.add_event::<CursorDownOnComposition>();
         app.add_event::<CursorUpOnComposition>();
+        app.add_event::<CursorDownOnResizeHandle>();
 
         // Register resources
         app.world.init_resource::<InteractiveCompositionRes>();
@@ -62,6 +65,9 @@ impl Plugin for InteractiveCompositionPlugin {
                 handle_cursor_entered_composition.in_set(InteractionSet::First),
                 handle_cursor_down_on_composition.in_set(InteractionSet::Initial),
                 handle_cursor_down_on_entity_event
+                    .in_set(InteractionSet::Initial)
+                    .after(handle_cursor_down_on_composition),
+                handle_cursor_down_on_resize_handle
                     .in_set(InteractionSet::Initial)
                     .after(handle_cursor_down_on_composition),
                 handle_cursor_moved_on_composition.in_set(InteractionSet::Continuous),

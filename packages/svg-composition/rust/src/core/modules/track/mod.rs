@@ -4,10 +4,8 @@ use bevy_ecs::schedule::{IntoSystemConfigs, IntoSystemSetConfigs, SystemSet};
 use self::{
     resources::{changed_components::ChangedComponentsRes, trackable_entities::TrackedEntitiesRes},
     systems::{
-        extract::{
-            check_interactive_composition_changes, check_selected_changes,
-            extract_tracked_mixin_changes,
-        },
+        check::{check_interactive_composition_changes, check_selection_changes},
+        extract::extract_tracked_mixin_changes,
         queue::queue_tracked_changes,
     },
 };
@@ -20,6 +18,7 @@ pub struct TrackPlugin;
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, SystemSet)]
 enum TrackSet {
     Extract,
+    Check,
     Queue,
 }
 
@@ -31,15 +30,18 @@ impl Plugin for TrackPlugin {
         app.init_resource::<ChangedComponentsRes>();
 
         // Configure system sets
-        app.configure_sets(Last, (TrackSet::Extract, TrackSet::Queue).chain());
+        app.configure_sets(
+            Last,
+            (TrackSet::Extract, TrackSet::Check, TrackSet::Queue).chain(),
+        );
 
         // Register systems
         app.add_systems(
             Last,
             (
                 extract_tracked_mixin_changes.in_set(TrackSet::Extract),
-                check_selected_changes.in_set(TrackSet::Extract),
-                check_interactive_composition_changes.in_set(TrackSet::Extract),
+                check_selection_changes.in_set(TrackSet::Check),
+                check_interactive_composition_changes.in_set(TrackSet::Check),
                 queue_tracked_changes.in_set(TrackSet::Queue),
             ),
         );

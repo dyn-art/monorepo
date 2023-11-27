@@ -5,6 +5,8 @@ use specta::Type;
 
 use crate::core::events::input_event::InputEvent;
 
+use super::resources::XYWH;
+
 #[derive(Debug, Deserialize, Type, Clone)]
 #[serde(tag = "type")]
 pub enum InteractionInputEvent {
@@ -14,6 +16,7 @@ pub enum InteractionInputEvent {
     CursorExitedComposition(CursorExitedComposition),
     CursorDownOnComposition(CursorDownOnComposition),
     CursorUpOnComposition(CursorUpOnComposition),
+    CursorDownOnResizeHandle(CursorDownOnResizeHandle),
 }
 
 impl InputEvent for InteractionInputEvent {
@@ -35,6 +38,9 @@ impl InputEvent for InteractionInputEvent {
                 world.send_event(event);
             }
             InteractionInputEvent::CursorUpOnComposition(event) => {
+                world.send_event(event);
+            }
+            InteractionInputEvent::CursorDownOnResizeHandle(event) => {
                 world.send_event(event);
             }
         }
@@ -70,4 +76,11 @@ pub struct CursorDownOnComposition {
 #[derive(Event, Debug, Serialize, Deserialize, Type, Clone)]
 pub struct CursorUpOnComposition {
     pub position: Vec2,
+}
+
+#[derive(Event, Debug, Serialize, Deserialize, Type, Clone)]
+pub struct CursorDownOnResizeHandle {
+    #[serde(rename = "initialBounds")]
+    pub inital_bounds: XYWH,
+    pub corner: u8,
 }

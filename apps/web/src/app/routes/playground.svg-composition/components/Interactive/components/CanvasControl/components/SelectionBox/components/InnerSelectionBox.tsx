@@ -1,5 +1,5 @@
 import React from 'react';
-import { Composition, Entity } from '@dyn/svg-composition';
+import { Composition, Entity, SVGRenderer, Vec2, XYWH } from '@dyn/svg-composition';
 
 import { useMatrixTransform } from '../../../../../useMatrixTransform';
 import { useWatchEntity } from '../../../../../useWatchEntity';
@@ -10,7 +10,8 @@ const MIDDLE_HANDLE_HEIGHT = 16; // px
 const CORNER_HANDLE_SIZE = 8; // px
 
 export const InnerSelectionBox: React.FC<TProps> = React.memo((props) => {
-	const { entity, composition, showHandles, onResizeHandlePointerDown } = props;
+	const { entity, composition, showHandles, onResizeHandlePointerDown, onResizeHandlePointerUp } =
+		props;
 	const {
 		Dimension: { width = undefined, height = undefined } = {},
 		RelativeTransform: { relativeTransform = undefined } = {}
@@ -98,9 +99,12 @@ export const InnerSelectionBox: React.FC<TProps> = React.memo((props) => {
 
 			{/* Dimension Indicator */}
 			{showHandles && (
-				<foreignObject x={0} y={height} width={width} height="40">
+				<foreignObject x={0} y={height} width={width} height="40" className="overflow-visible">
 					<div className="flex h-full items-center justify-center">
-						<div className="rounded-sm bg-blue-500 px-2 py-1 text-center text-xs text-white">
+						<div
+							className="whitespace-nowrap rounded-sm bg-blue-500 px-2 py-1 text-center text-xs text-white"
+							style={{ minWidth: 'min-content' }}
+						>
 							{width} x {height}
 						</div>
 					</div>
@@ -164,11 +168,19 @@ export const InnerSelectionBox: React.FC<TProps> = React.memo((props) => {
 							onPointerDown={(e) => {
 								e.stopPropagation();
 								onResizeHandlePointerDown(pos.resizeHandle, {
-									x,
-									y,
+									position: [x, y],
 									height,
 									width
 								});
+							}}
+							onPointerUp={(e) => {
+								e.stopPropagation();
+								// TODO: Can this be done more typesafe?
+								onResizeHandlePointerUp(
+									(composition.renderer[0] as SVGRenderer).pointerEventToCompositionPoint(
+										e as unknown as PointerEvent
+									)
+								);
 							}}
 						/>
 					);
@@ -181,14 +193,8 @@ type TProps = {
 	entity: Entity;
 	composition: Composition;
 	showHandles: boolean;
-	onResizeHandlePointerDown: (corner: EHandleSide, initialBounds: TXYWH) => void;
-};
-
-export type TXYWH = {
-	width: number;
-	height: number;
-	x: number;
-	y: number;
+	onResizeHandlePointerDown: (corner: EHandleSide, initialBounds: XYWH) => void;
+	onResizeHandlePointerUp: (position: Vec2) => void;
 };
 
 export enum EHandleSide {

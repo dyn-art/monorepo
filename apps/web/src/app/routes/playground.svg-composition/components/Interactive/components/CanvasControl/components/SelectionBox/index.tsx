@@ -1,12 +1,12 @@
 import React from 'react';
-import { Composition } from '@dyn/svg-composition';
+import { Composition, Vec2, XYWH } from '@dyn/svg-composition';
 
 import { useInteractionMode } from '../../../../useInteractionMode';
 import { useSelectedNodes } from '../../../../useSelectedNodes';
-import { EHandleSide, InnerSelectionBox, TXYWH } from './components/InnerSelectionBox';
+import { EHandleSide, InnerSelectionBox } from './components/InnerSelectionBox';
 
 export const SelectionBox: React.FC<TProps> = (props) => {
-	const { composition, onResizeHandlePointerDown } = props;
+	const { composition, onResizeHandlePointerDown, onResizeHandlePointerUp } = props;
 	const selectedEntities = useSelectedNodes(composition);
 	const interactionMode = useInteractionMode(composition);
 
@@ -19,6 +19,7 @@ export const SelectionBox: React.FC<TProps> = (props) => {
 					entity={selectedEntity}
 					showHandles={interactionMode !== 'Translating'}
 					onResizeHandlePointerDown={onResizeHandlePointerDown}
+					onResizeHandlePointerUp={onResizeHandlePointerUp}
 				/>
 			))}
 		</>
@@ -27,5 +28,6 @@ export const SelectionBox: React.FC<TProps> = (props) => {
 
 type TProps = {
 	composition: Composition;
-	onResizeHandlePointerDown: (corner: EHandleSide, initialBounds: TXYWH) => void;
+	onResizeHandlePointerDown: (corner: EHandleSide, initialBounds: XYWH) => void;
+	onResizeHandlePointerUp: (position: Vec2) => void;
 };
