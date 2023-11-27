@@ -1,8 +1,8 @@
 import React from 'react';
 import { Composition, Vec2, XYWH } from '@dyn/svg-composition';
 
-import { useInteractionMode } from '../../../../useInteractionMode';
-import { useSelectedNodes } from '../../../../useSelectedNodes';
+import { useInteractionMode } from '../../../../../../useInteractionMode';
+import { useSelectedNodes } from '../../../../../../useSelectedNodes';
 import { EHandleSide, InnerSelectionBox } from './components/InnerSelectionBox';
 
 export const SelectionBox: React.FC<TProps> = (props) => {
@@ -17,7 +17,7 @@ export const SelectionBox: React.FC<TProps> = (props) => {
 					key={selectedEntity}
 					composition={composition}
 					entity={selectedEntity}
-					showHandles={interactionMode !== 'Translating'}
+					showHandles={interactionMode.type !== 'Translating'}
 					onResizeHandlePointerDown={onResizeHandlePointerDown}
 					onResizeHandlePointerUp={onResizeHandlePointerUp}
 				/>

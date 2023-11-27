@@ -7,10 +7,10 @@ import type {
 	Entity,
 	InteractionInputEvent,
 	InteractionModeChangeEvent,
+	InteractionModeForFrontend,
 	MixinChange,
 	OutputEvent,
 	Paint,
-	RawInteractionMode,
 	RectangleNodeBundle,
 	RenderUpdateEvent,
 	SelectionChangeEvent,
@@ -277,8 +277,7 @@ export class Composition {
 		if (events.length > 0) {
 			this._onInteractionModeChangeCallbacks.forEach((callback) => {
 				callback(
-					events[events.length - 1]?.interactionMode
-						.type as unknown as TRustEnumKeyArray<RawInteractionMode>
+					events[events.length - 1]?.interactionMode as unknown as InteractionModeForFrontend
 				);
 			});
 		}
@@ -415,6 +414,4 @@ export interface TCompositionConfig {
 
 type TWatchEntityCallback = (entity: Entity, changes: MixinChange[]) => void;
 type TOnSelectionChangeCallback = (selected: Entity[]) => void;
-type TOnInteractionModeChangeCallback = (
-	interactionMode: TRustEnumKeyArray<RawInteractionMode>
-) => void;
+type TOnInteractionModeChangeCallback = (interactionMode: InteractionModeForFrontend) => void;

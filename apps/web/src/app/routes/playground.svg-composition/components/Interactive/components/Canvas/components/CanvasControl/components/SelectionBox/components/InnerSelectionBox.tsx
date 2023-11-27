@@ -1,9 +1,9 @@
 import React from 'react';
 import { Composition, Entity, SVGRenderer, Vec2, XYWH } from '@dyn/svg-composition';
 
-import { useMatrixTransform } from '../../../../../useMatrixTransform';
-import { useWatchEntity } from '../../../../../useWatchEntity';
-import { Handle } from '../components/Handle';
+import { useMatrixTransform } from '../../../../../../../useMatrixTransform';
+import { useWatchEntity } from '../../../../../../../useWatchEntity';
+import { Handle } from './Handle';
 
 const MIDDLE_HANDLE_WIDTH = 8; // px
 const MIDDLE_HANDLE_HEIGHT = 16; // px

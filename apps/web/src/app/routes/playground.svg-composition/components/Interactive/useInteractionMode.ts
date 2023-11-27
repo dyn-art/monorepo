@@ -1,19 +1,20 @@
 import React from 'react';
-import { Composition, RawInteractionMode, TRustEnumKeyArray } from '@dyn/svg-composition';
+import { Composition, InteractionModeForFrontend } from '@dyn/svg-composition';
 
-export function useInteractionMode(
-	composition: Composition
-): TRustEnumKeyArray<RawInteractionMode> {
-	const [interactionMode, setInteractionMode] =
-		React.useState<TRustEnumKeyArray<RawInteractionMode>>('None');
+export function useInteractionMode(composition?: Composition): InteractionModeForFrontend {
+	const [interactionMode, setInteractionMode] = React.useState<InteractionModeForFrontend>({
+		type: 'None'
+	});
 
 	React.useEffect(() => {
-		const unwatch = composition.onInteractionModeChange((interactionMode) => {
-			setInteractionMode(interactionMode);
-		});
-		return () => {
-			unwatch();
-		};
+		if (composition) {
+			const unwatch = composition.onInteractionModeChange((interactionMode) => {
+				setInteractionMode(interactionMode);
+			});
+			return () => {
+				unwatch();
+			};
+		}
 	}, [composition]);
 
 	return interactionMode;

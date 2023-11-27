@@ -11,6 +11,7 @@ export const CanvasControl: React.FC<TProps> = (props) => {
 			id={'canvas-control'}
 			className="pointer-events-none absolute h-full w-full"
 			overflow={'visible'}
+			style={{ cursor: 'crosshair' }}
 		>
 			<SelectionBox
 				composition={composition}

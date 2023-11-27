@@ -13,7 +13,7 @@ use dyn_composition::core::modules::{
 
 use crate::core::events::{
     output_event::{
-        InteractionModeChangeEvent, OutputEvent, RawInteractionMode, SelectionChangeEvent,
+        InteractionModeChangeEvent, InteractionModeForFrontend, OutputEvent, SelectionChangeEvent,
     },
     output_event_queue::OutputEventQueueRes,
 };
@@ -38,15 +38,20 @@ pub fn check_selection_changes(
 
 pub fn check_interactive_composition_changes(
     mut output_event_queue: ResMut<OutputEventQueueRes>,
-    mut last_raw_interaction_mode: Local<RawInteractionMode>,
+    mut last_raw_interaction_mode: Local<InteractionModeForFrontend>,
     interactive_composition: Res<InteractiveCompositionRes>,
 ) {
     if interactive_composition.is_changed() {
+        // Map InteractionMode to InteractionModeChange.
+        // Node: Not passing InteractionMode itself as it contains inrelevant data
+        // that would trigger a re-render too often
         let current_raw_interaction_mode = match interactive_composition.interaction_mode {
-            InteractionMode::None => RawInteractionMode::None,
-            InteractionMode::Pressing { .. } => RawInteractionMode::Pressing,
-            InteractionMode::Translating { .. } => RawInteractionMode::Translating,
-            InteractionMode::Resizing { .. } => RawInteractionMode::Resizing,
+            InteractionMode::None => InteractionModeForFrontend::None,
+            InteractionMode::Pressing { .. } => InteractionModeForFrontend::Pressing,
+            InteractionMode::Translating { .. } => InteractionModeForFrontend::Translating,
+            InteractionMode::Resizing { corner, .. } => {
+                InteractionModeForFrontend::Resizing { corner }
+            }
         };
 
         // Check whether the interaction mode has changed

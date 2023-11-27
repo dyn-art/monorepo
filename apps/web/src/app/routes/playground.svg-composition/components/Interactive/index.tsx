@@ -2,7 +2,7 @@ import { jsPDF } from 'jspdf';
 import React from 'react';
 import { Button } from '@/components/primitive';
 
-import { CanvasControl } from './components';
+import { Canvas } from './components';
 import { useSVGComposition } from './useSVGComposition';
 
 export const Interactive: React.FC<TProps> = (props) => {
@@ -49,8 +49,7 @@ export const Interactive: React.FC<TProps> = (props) => {
 
 	return (
 		<div className="relative h-full w-full">
-			{composition && <CanvasControl composition={composition} />}
-			<div ref={svgContainerRef} />
+			<Canvas composition={composition ?? undefined} svgContainerRef={svgContainerRef} />
 			<div className="absolute left-4 top-4 z-50 flex flex-row gap-x-2">
 				<Button onClick={handleDownloadPDF}>To PDF</Button>
 				<Button onClick={handleToString}>To String</Button>

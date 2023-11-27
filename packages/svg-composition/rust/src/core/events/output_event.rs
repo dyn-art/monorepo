@@ -34,19 +34,19 @@ pub struct SelectionChangeEvent {
 #[derive(Debug, Serialize, Clone, Type)]
 pub struct InteractionModeChangeEvent {
     #[serde(rename = "interactionMode")]
-    pub interaction_mode: RawInteractionMode,
+    pub interaction_mode: InteractionModeForFrontend,
 }
 
 #[derive(Debug, Serialize, Clone, Type, Eq, PartialEq)]
 #[serde(tag = "type")]
-pub enum RawInteractionMode {
+pub enum InteractionModeForFrontend {
     None,
     Pressing,
     Translating,
-    Resizing,
+    Resizing { corner: u8 },
 }
 
-impl Default for RawInteractionMode {
+impl Default for InteractionModeForFrontend {
     fn default() -> Self {
         Self::None
     }
