@@ -201,22 +201,22 @@ pub fn resize_bounds(bounds: &XYWH, corner: u8, point: Vec2) -> XYWH {
     let mut result = bounds.clone();
 
     if (corner & HandleSide::Left as u8) == HandleSide::Left as u8 {
-        result.position.x = result.position.x.min(point.x);
-        result.width = (result.position.x + bounds.width as f32 - point.x).abs() as u32;
+        result.position.x = point.x.min(bounds.position.x + bounds.width as f32);
+        result.width = (bounds.position.x + bounds.width as f32 - point.x).abs() as u32;
     }
 
     if (corner & HandleSide::Right as u8) == HandleSide::Right as u8 {
-        result.position.x = point.x.min(result.position.x);
+        result.position.x = point.x.min(bounds.position.x);
         result.width = (point.x - bounds.position.x).abs() as u32;
     }
 
     if (corner & HandleSide::Top as u8) == HandleSide::Top as u8 {
-        result.position.y = result.position.y.min(point.y);
-        result.height = (result.position.y + bounds.height as f32 - point.y).abs() as u32;
+        result.position.y = point.y.min(bounds.position.y + bounds.height as f32);
+        result.height = (bounds.position.y + bounds.height as f32 - point.y).abs() as u32;
     }
 
     if (corner & HandleSide::Bottom as u8) == HandleSide::Bottom as u8 {
-        result.position.y = point.y.min(result.position.y);
+        result.position.y = point.y.min(bounds.position.y);
         result.height = (point.y - bounds.position.y).abs() as u32;
     }
 
