@@ -14,7 +14,7 @@ export const COMPOSITION_WITH_ONE_RECT = (width: number, height: number): DTIFCo
 				width,
 				height
 			},
-			relativeTransform: mat3(vec3(1, 0, 0), vec3(0, 1, 0), vec3(0, 0, 1)),
+			relativeTransform: createTransformMatrix(0, 0, 0),
 			fill: {
 				paints: [6]
 			}
@@ -26,11 +26,7 @@ export const COMPOSITION_WITH_ONE_RECT = (width: number, height: number): DTIFCo
 				width: 100,
 				height: 100
 			},
-			relativeTransform: mat3(
-				vec3(1, 0, 0),
-				vec3(0, 1, 0),
-				vec3((width - 100) / 2, (height - 100) / 2, 1)
-			),
+			relativeTransform: createTransformMatrix((width - 100) / 2, (height - 100) / 2, 35),
 			rectangleCornerMixin: {
 				bottomLeftRadius: 20,
 				bottomRightRadius: 0,
@@ -59,3 +55,13 @@ export const COMPOSITION_WITH_ONE_RECT = (width: number, height: number): DTIFCo
 		}
 	}
 });
+
+function createTransformMatrix(x: number, y: number, angleDegrees: number) {
+	const angleRadians = (angleDegrees * Math.PI) / 180; // Convert angle to radians
+
+	return mat3(
+		vec3(Math.cos(angleRadians), -Math.sin(angleRadians), 0),
+		vec3(Math.sin(angleRadians), Math.cos(angleRadians), 0),
+		vec3(x, y, 1)
+	);
+}

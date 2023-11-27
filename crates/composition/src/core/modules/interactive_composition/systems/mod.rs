@@ -172,7 +172,7 @@ pub fn handle_cursor_moved_on_composition(
 
                 selected_nodes_query.for_each_mut(|(_, mut relative_transform_mixin, _)| {
                     let translation = Mat3::from_translation(offset);
-                    relative_transform_mixin.0 = relative_transform_mixin.0 * translation;
+                    relative_transform_mixin.0 = translation * relative_transform_mixin.0;
                 });
 
                 *current = position;
