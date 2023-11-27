@@ -7,13 +7,14 @@ use bevy_ecs::{
     system::{Local, Query, Res, ResMut},
 };
 use dyn_composition::core::modules::{
-    interactive_composition::resources::{InteractionMode, InteractiveCompositionRes},
+    interactive_composition::resources::{HandleSide, InteractionMode, InteractiveCompositionRes},
     node::components::states::Selected,
 };
 
 use crate::core::events::{
     output_event::{
-        InteractionModeChangeEvent, InteractionModeForFrontend, OutputEvent, SelectionChangeEvent,
+        CursorChangeEvent, CursorForFrontend, InteractionModeChangeEvent,
+        InteractionModeForFrontend, OutputEvent, SelectionChangeEvent,
     },
     output_event_queue::OutputEventQueueRes,
 };
@@ -21,9 +22,9 @@ use crate::core::events::{
 pub fn check_selection_changes(
     mut output_event_queue: ResMut<OutputEventQueueRes>,
     mut last_selected: Local<HashSet<Entity>>,
-    query: Query<Entity, With<Selected>>,
+    selected_query: Query<Entity, With<Selected>>,
 ) {
-    let current_selected: HashSet<Entity> = query.iter().collect();
+    let current_selected: HashSet<Entity> = selected_query.iter().collect();
 
     // Check if the set of selected entities has changed
     if *last_selected != current_selected {
@@ -36,34 +37,93 @@ pub fn check_selection_changes(
     }
 }
 
-pub fn check_interactive_composition_changes(
+pub fn check_interaction_mode_changes(
     mut output_event_queue: ResMut<OutputEventQueueRes>,
-    mut last_raw_interaction_mode: Local<InteractionModeForFrontend>,
     interactive_composition: Res<InteractiveCompositionRes>,
+    mut last_interaction_mode: Local<InteractionModeForFrontend>,
 ) {
     if interactive_composition.is_changed() {
         // Map InteractionMode to InteractionModeChange.
         // Node: Not passing InteractionMode itself as it contains inrelevant data
-        // that would trigger a re-render too often
-        let current_raw_interaction_mode = match interactive_composition.interaction_mode {
+        // that would trigger unnecessary re-renders
+        let current_interaction_mode = match interactive_composition.interaction_mode {
             InteractionMode::None => InteractionModeForFrontend::None,
             InteractionMode::Pressing { .. } => InteractionModeForFrontend::Pressing,
             InteractionMode::Translating { .. } => InteractionModeForFrontend::Translating,
-            InteractionMode::Resizing { corner, .. } => {
-                InteractionModeForFrontend::Resizing { corner }
-            }
+            InteractionMode::Resizing { .. } => InteractionModeForFrontend::Resizing,
         };
 
         // Check whether the interaction mode has changed
-        if *last_raw_interaction_mode != current_raw_interaction_mode {
+        if *last_interaction_mode != current_interaction_mode {
             output_event_queue.push_event(OutputEvent::InteractionModeChange(
                 InteractionModeChangeEvent {
-                    interaction_mode: current_raw_interaction_mode.clone(),
+                    interaction_mode: current_interaction_mode.clone(),
                 },
             ));
 
             // Update the local tracking of the interaction mode
-            *last_raw_interaction_mode = current_raw_interaction_mode;
+            *last_interaction_mode = current_interaction_mode;
+        }
+    }
+}
+
+pub fn check_cursor_changes(
+    mut output_event_queue: ResMut<OutputEventQueueRes>,
+    interactive_composition: Res<InteractiveCompositionRes>,
+    mut last_cursor: Local<CursorForFrontend>,
+) {
+    if interactive_composition.is_changed() {
+        let current_cursor = match interactive_composition.interaction_mode {
+            InteractionMode::Resizing {
+                corner, rotation, ..
+            } => {
+                let mut cursor_rotation = 0.0;
+
+                match corner {
+                    _ if corner == (HandleSide::Top as u8 | HandleSide::Left as u8) => {
+                        cursor_rotation = -135.0;
+                    }
+                    _ if corner == HandleSide::Top as u8 => {
+                        cursor_rotation = 90.0;
+                    }
+                    _ if corner == (HandleSide::Top as u8 | HandleSide::Right as u8) => {
+                        cursor_rotation = 135.0;
+                    }
+                    _ if corner == HandleSide::Right as u8 => {
+                        cursor_rotation = 0.0;
+                    }
+                    _ if corner == (HandleSide::Bottom as u8 | HandleSide::Right as u8) => {
+                        cursor_rotation = 45.0;
+                    }
+                    _ if corner == HandleSide::Bottom as u8 => {
+                        cursor_rotation = 90.0;
+                    }
+                    _ if corner == (HandleSide::Bottom as u8 | HandleSide::Left as u8) => {
+                        cursor_rotation = -45.0;
+                    }
+                    _ if corner == HandleSide::Left as u8 => {
+                        cursor_rotation = 0.0;
+                    }
+                    _ => {}
+                }
+
+                cursor_rotation -= rotation;
+
+                CursorForFrontend::Resize {
+                    rotation: cursor_rotation,
+                }
+            }
+            _ => CursorForFrontend::Default,
+        };
+
+        // Check whether the cursor has changed
+        if *last_cursor != current_cursor {
+            output_event_queue.push_event(OutputEvent::CursorChange(CursorChangeEvent {
+                cursor: current_cursor.clone(),
+            }));
+
+            // Update the local tracking of the cursor
+            *last_cursor = current_cursor;
         }
     }
 }

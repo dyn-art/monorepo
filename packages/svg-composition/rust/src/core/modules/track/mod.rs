@@ -4,7 +4,7 @@ use bevy_ecs::schedule::{IntoSystemConfigs, IntoSystemSetConfigs, SystemSet};
 use self::{
     resources::{changed_components::ChangedComponentsRes, trackable_entities::TrackedEntitiesRes},
     systems::{
-        check::{check_interactive_composition_changes, check_selection_changes},
+        check::{check_cursor_changes, check_interaction_mode_changes, check_selection_changes},
         extract::extract_tracked_mixin_changes,
         queue::queue_tracked_changes,
     },
@@ -41,7 +41,8 @@ impl Plugin for TrackPlugin {
             (
                 extract_tracked_mixin_changes.in_set(TrackSet::Extract),
                 check_selection_changes.in_set(TrackSet::Check),
-                check_interactive_composition_changes.in_set(TrackSet::Check),
+                check_interaction_mode_changes.in_set(TrackSet::Check),
+                check_cursor_changes.in_set(TrackSet::Check),
                 queue_tracked_changes.in_set(TrackSet::Queue),
             ),
         );

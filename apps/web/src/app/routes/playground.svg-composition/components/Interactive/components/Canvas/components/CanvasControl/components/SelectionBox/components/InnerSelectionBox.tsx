@@ -1,6 +1,7 @@
 import React from 'react';
 import { Composition, Entity, SVGRenderer, Vec2, XYWH } from '@dyn/svg-composition';
 
+import { useInteractionMode } from '../../../../../../../useInteractionMode';
 import { useMatrixTransform } from '../../../../../../../useMatrixTransform';
 import { useWatchEntity } from '../../../../../../../useWatchEntity';
 import { Handle } from './Handle';
@@ -17,6 +18,7 @@ export const InnerSelectionBox: React.FC<TProps> = React.memo((props) => {
 		RelativeTransform: { relativeTransform = undefined } = {}
 	} = useWatchEntity(composition, entity, ['Dimension', 'RelativeTransform']);
 	const { tx: x, ty: y, rotation } = useMatrixTransform(relativeTransform);
+	const interactionMode = useInteractionMode(composition);
 
 	const handlePositions = React.useMemo(() => {
 		if (width == null || height == null) {
@@ -165,6 +167,7 @@ export const InnerSelectionBox: React.FC<TProps> = React.memo((props) => {
 							width={handleWidth}
 							height={handleHeight}
 							cursor={cursor}
+							pointerEvents={interactionMode.type === 'Resizing' ? 'none' : 'auto'}
 							onPointerDown={(e) => {
 								e.stopPropagation();
 								onResizeHandlePointerDown(pos.resizeHandle, {

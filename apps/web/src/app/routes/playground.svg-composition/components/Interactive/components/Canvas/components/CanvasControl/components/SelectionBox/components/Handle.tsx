@@ -1,7 +1,7 @@
 import React from 'react';
 
 export const Handle: React.FC<TProps> = (props) => {
-	const { x, y, width, height, cursor, onPointerDown, onPointerUp } = props;
+	const { x, y, width, height, cursor, pointerEvents, onPointerDown, onPointerUp } = props;
 
 	return (
 		<rect
@@ -12,7 +12,7 @@ export const Handle: React.FC<TProps> = (props) => {
 			width={width}
 			height={height}
 			className={'fill-white stroke-blue-400 stroke-1'}
-			style={{ cursor, pointerEvents: 'auto' }}
+			style={{ cursor, pointerEvents }}
 			onPointerDown={onPointerDown}
 			onPointerUp={onPointerUp}
 		/>
@@ -27,4 +27,5 @@ type TProps = {
 	cursor: string;
 	onPointerDown: (e: React.PointerEvent<SVGElement>) => void;
 	onPointerUp: (e: React.PointerEvent<SVGElement>) => void;
+	pointerEvents: 'auto' | 'none';
 };

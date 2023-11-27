@@ -1,5 +1,4 @@
 use bevy_ecs::entity::Entity;
-use dyn_composition::core::modules::interactive_composition::resources::InteractionMode;
 use serde::Serialize;
 use specta::Type;
 
@@ -12,6 +11,7 @@ pub enum OutputEvent {
     TrackUpdate(TrackUpdateEvent),
     SelectionChange(SelectionChangeEvent),
     InteractionModeChange(InteractionModeChangeEvent),
+    CursorChange(CursorChangeEvent),
 }
 
 #[derive(Debug, Serialize, Clone, Type)]
@@ -37,17 +37,35 @@ pub struct InteractionModeChangeEvent {
     pub interaction_mode: InteractionModeForFrontend,
 }
 
-#[derive(Debug, Serialize, Clone, Type, Eq, PartialEq)]
+#[derive(Debug, Serialize, Clone, Type, PartialEq)]
 #[serde(tag = "type")]
 pub enum InteractionModeForFrontend {
     None,
     Pressing,
     Translating,
-    Resizing { corner: u8 },
+    Resizing,
 }
 
 impl Default for InteractionModeForFrontend {
     fn default() -> Self {
         Self::None
+    }
+}
+
+#[derive(Debug, Serialize, Clone, Type)]
+pub struct CursorChangeEvent {
+    pub cursor: CursorForFrontend,
+}
+
+#[derive(Debug, Serialize, Clone, Type, PartialEq)]
+#[serde(tag = "type")]
+pub enum CursorForFrontend {
+    Default,
+    Resize { rotation: f32 },
+}
+
+impl Default for CursorForFrontend {
+    fn default() -> Self {
+        Self::Default
     }
 }

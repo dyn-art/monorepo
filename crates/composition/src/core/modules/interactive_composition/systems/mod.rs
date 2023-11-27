@@ -180,6 +180,7 @@ pub fn handle_cursor_moved_on_composition(
             InteractionMode::Resizing {
                 corner,
                 inital_bounds,
+                ..
             } => {
                 let new_bounds = resize_bounds(&inital_bounds, *corner, position);
 
@@ -279,6 +280,7 @@ pub fn handle_cursor_down_on_resize_handle(
         interactive_composition.interaction_mode = InteractionMode::Resizing {
             corner: event.corner,
             inital_bounds: event.inital_bounds.clone(),
+            rotation: 0.0, // TODO: Get and update rotation of selected elements
         };
     }
 }

@@ -3,6 +3,8 @@ import { JsCompositionHandle } from '@/rust/dyn_composition_api';
 import type {
 	AnyInputEvent,
 	CoreInputEvent,
+	CursorChangeEvent,
+	CursorForFrontend,
 	DTIFComposition,
 	Entity,
 	InteractionInputEvent,
@@ -40,6 +42,7 @@ export class Composition {
 		string,
 		TOnInteractionModeChangeCallback
 	>();
+	private readonly _onCursorChangeCallbacks = new Map<string, TOnCursorChangeCallback>();
 
 	// Interaction events debounce
 	private debounceTimeout: number | null = null;
@@ -126,6 +129,9 @@ export class Composition {
 						break;
 					case 'InteractionModeChange':
 						this.handleInteractionModeChanges(groupedEvent as InteractionModeChangeEvent[]);
+						break;
+					case 'CursorChange':
+						this.handleCursorChanges(groupedEvent as CursorChangeEvent[]);
 						break;
 					default:
 						console.warn(`Unknown event: ${eventType as string}`);
@@ -284,6 +290,32 @@ export class Composition {
 	}
 
 	// =========================================================================
+	// Cursor
+	// =========================================================================
+
+	public onCursorChange(callback: TOnCursorChangeCallback): () => void {
+		const callbackId = shortId();
+		this._onCursorChangeCallbacks.set(callbackId, callback);
+		return () => {
+			this.unregisterCursorChangeCallback(callbackId);
+		};
+	}
+
+	private unregisterCursorChangeCallback(callbackId: string): void {
+		if (this._onCursorChangeCallbacks.has(callbackId)) {
+			this._onCursorChangeCallbacks.delete(callbackId);
+		}
+	}
+
+	private handleCursorChanges(events: CursorChangeEvent[]): void {
+		if (events.length > 0) {
+			this._onCursorChangeCallbacks.forEach((callback) => {
+				callback(events[events.length - 1]?.cursor as unknown as CursorForFrontend);
+			});
+		}
+	}
+
+	// =========================================================================
 	// Lifecycle
 	// =========================================================================
 
@@ -415,3 +447,4 @@ export interface TCompositionConfig {
 type TWatchEntityCallback = (entity: Entity, changes: MixinChange[]) => void;
 type TOnSelectionChangeCallback = (selected: Entity[]) => void;
 type TOnInteractionModeChangeCallback = (interactionMode: InteractionModeForFrontend) => void;
+type TOnCursorChangeCallback = (cursor: CursorForFrontend) => void;
