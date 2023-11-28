@@ -1,31 +1,26 @@
 import React from 'react';
+import { Vec2 } from '@dyn/svg-composition';
+
+import { ResizeHandle, TResizeHandleProps } from './ResizeHandle';
+import { RotateHandle, TRotateHandleProps } from './RotateHandle';
 
 export const Handle: React.FC<TProps> = (props) => {
-	const { x, y, width, height, cursor, pointerEvents, onPointerDown, onPointerUp } = props;
+	const { position, pointerEvents, resizeHandle, rotateHandle = false } = props;
 
 	return (
-		<rect
-			x={x}
-			y={y}
-			rx={4}
-			ry={4}
-			width={width}
-			height={height}
-			className={'fill-white stroke-blue-400 stroke-1'}
-			style={{ cursor, pointerEvents }}
-			onPointerDown={onPointerDown}
-			onPointerUp={onPointerUp}
-		/>
+		<g
+			key={'resize-handler'}
+			style={{ transform: `translate(${position[0]}px, ${position[1]}px)`, pointerEvents }}
+		>
+			<ResizeHandle {...resizeHandle} />
+			{rotateHandle && <RotateHandle {...rotateHandle} />}
+		</g>
 	);
 };
 
 type TProps = {
-	x: number;
-	y: number;
-	width: number;
-	height: number;
-	cursor: string;
-	onPointerDown: (e: React.PointerEvent<SVGElement>) => void;
-	onPointerUp: (e: React.PointerEvent<SVGElement>) => void;
+	position: Vec2;
 	pointerEvents: 'auto' | 'none';
+	resizeHandle: TResizeHandleProps;
+	rotateHandle?: TRotateHandleProps | false;
 };

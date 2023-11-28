@@ -20,6 +20,12 @@ export const SelectionBox: React.FC<TProps> = (props) => {
 					showHandles={interactionMode.type !== 'Translating'}
 					onResizeHandlePointerDown={onResizeHandlePointerDown}
 					onResizeHandlePointerUp={onResizeHandlePointerUp}
+					onRotateHandlePointerDown={() => {
+						// TODO
+					}}
+					onRotateHandlePointerUp={() => {
+						// TODO
+					}}
 				/>
 			))}
 		</>
