@@ -22,6 +22,7 @@ use super::{
         CursorEnteredComposition, CursorExitedComposition, CursorMovedOnComposition,
         CursorUpOnComposition,
     },
+    helper::{extract_transform_data, rotate_point},
     resources::{HandleSide, InteractiveCompositionRes, XYWH},
 };
 
@@ -188,6 +189,7 @@ pub fn handle_cursor_moved_on_composition(
                             extract_transform_data(&relative_transform_mixin.0);
                         let new_bounds =
                             resize_bounds(&inital_bounds, *corner, position, node_angle);
+
                         relative_transform_mixin.0.col_mut(2).x = new_bounds.position.x;
                         relative_transform_mixin.0.col_mut(2).y = new_bounds.position.y;
                         dimension_mixin.width = new_bounds.width;
@@ -202,97 +204,39 @@ pub fn handle_cursor_moved_on_composition(
 
 pub fn resize_bounds(bounds: &XYWH, corner: u8, cursor_point: Vec2, node_angle: f32) -> XYWH {
     let mut result = bounds.clone();
+    let pivot = bounds.position;
 
-    // Determine the pivot based on the corner being resized
-    let pivot = match corner {
-        _ if corner & (HandleSide::Top as u8 | HandleSide::Left as u8)
-            == (HandleSide::Top as u8 | HandleSide::Left as u8) =>
-        {
-            // Bottom-right is the pivot for top-left resizing
-            Vec2::new(
-                bounds.position.x + bounds.width as f32,
-                bounds.position.y + bounds.height as f32,
-            )
-        }
-        _ if corner & (HandleSide::Top as u8 | HandleSide::Right as u8)
-            == (HandleSide::Top as u8 | HandleSide::Right as u8) =>
-        {
-            // Bottom-left is the pivot for top-right resizing
-            Vec2::new(bounds.position.x, bounds.position.y + bounds.height as f32)
-        }
-        _ if corner & (HandleSide::Bottom as u8 | HandleSide::Left as u8)
-            == (HandleSide::Bottom as u8 | HandleSide::Left as u8) =>
-        {
-            // Top-right is the pivot for bottom-left resizing
-            Vec2::new(bounds.position.x + bounds.width as f32, bounds.position.y)
-        }
-        _ => {
-            // Top-left is the pivot for bottom-right and side-only resizing
-            bounds.position
-        }
-    };
+    // Calculate the unrotated position of the cursor
+    let unrotated_cursor_point = rotate_point(cursor_point, pivot, node_angle);
 
-    // Rotating cursor point to align with the rectangle's rotation
-    let aligned_cursor_point = rotate_point(cursor_point, pivot, node_angle);
-
-    // TODO: not working when angle != 0.0
-    // If I drag to right the corner right handle moves down
-    // If I drag to left the corner right handle moves up
+    // Adjust the bounds based on the unrotated cursor position
     if (corner & HandleSide::Left as u8) == HandleSide::Left as u8 {
-        result.position.x = aligned_cursor_point
+        result.position.x = unrotated_cursor_point
             .x
             .min(bounds.position.x + bounds.width as f32);
         result.width =
-            (bounds.position.x + bounds.width as f32 - aligned_cursor_point.x).abs() as u32;
+            (bounds.position.x + bounds.width as f32 - unrotated_cursor_point.x).abs() as u32;
     }
-
     if (corner & HandleSide::Right as u8) == HandleSide::Right as u8 {
-        result.position.x = aligned_cursor_point.x.min(bounds.position.x);
-        result.width = (aligned_cursor_point.x - bounds.position.x).abs() as u32;
+        result.position.x = unrotated_cursor_point.x.min(bounds.position.x);
+        result.width = (unrotated_cursor_point.x - bounds.position.x).abs() as u32;
     }
-
-    // TODO: not working when angle != 0.0
-    // If I drag to top the corner right handle moves right
-    // If I drag to bottom the corner right handle moves left
     if (corner & HandleSide::Top as u8) == HandleSide::Top as u8 {
-        result.position.y = aligned_cursor_point
+        result.position.y = unrotated_cursor_point
             .y
             .min(bounds.position.y + bounds.height as f32);
         result.height =
-            (bounds.position.y + bounds.height as f32 - aligned_cursor_point.y).abs() as u32;
+            (bounds.position.y + bounds.height as f32 - unrotated_cursor_point.y).abs() as u32;
+    }
+    if (corner & HandleSide::Bottom as u8) == HandleSide::Bottom as u8 {
+        result.position.y = unrotated_cursor_point.y.min(bounds.position.y);
+        result.height = (unrotated_cursor_point.y - bounds.position.y).abs() as u32;
     }
 
-    if (corner & HandleSide::Bottom as u8) == HandleSide::Bottom as u8 {
-        result.position.y = aligned_cursor_point.y.min(bounds.position.y);
-        result.height = (aligned_cursor_point.y - bounds.position.y).abs() as u32;
-    }
+    // Rotate the bounds back to the original angle
+    result.position = rotate_point(result.position, pivot, -node_angle);
 
     return result;
-}
-
-fn extract_transform_data(matrix: &Mat3) -> (f32, Vec2, Vec2) {
-    let a = matrix.x_axis.x;
-    let b = matrix.y_axis.x;
-    let d = matrix.x_axis.y;
-    let e = matrix.y_axis.y;
-    let tx = matrix.z_axis.x;
-    let ty = matrix.z_axis.y;
-
-    // Calculate rotation
-    let rotation = f32::atan2(b, a);
-
-    // Calculate scale
-    let scale_x = Vec2::new(a, d).length();
-    let scale_y = Vec2::new(b, e).length();
-
-    return (rotation, Vec2::new(scale_x, scale_y), Vec2::new(tx, ty));
-}
-
-fn rotate_point(point: Vec2, center: Vec2, angle: f32) -> Vec2 {
-    Vec2::new(
-        (point.x - center.x) * angle.cos() - (point.y - center.y) * angle.sin() + center.x,
-        (point.x - center.x) * angle.sin() + (point.y - center.y) * angle.cos() + center.y,
-    )
 }
 
 pub fn handle_cursor_down_on_composition(

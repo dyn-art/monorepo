@@ -9,14 +9,14 @@ export const COMPOSITION_WITH_ONE_RECT = (width: number, height: number): DTIFCo
 	nodes: {
 		0: {
 			type: 'Frame',
-			children: [1],
+			children: [1, 2],
 			dimension: {
-				width,
-				height
+				width: 500,
+				height: 500
 			},
 			relativeTransform: createTransformMatrix(0, 0, 0),
 			fill: {
-				paints: [6]
+				paints: [10]
 			}
 		},
 		1: {
@@ -26,30 +26,43 @@ export const COMPOSITION_WITH_ONE_RECT = (width: number, height: number): DTIFCo
 				width: 100,
 				height: 100
 			},
-			relativeTransform: createTransformMatrix((width - 100) / 2, (height - 100) / 2, 35),
-			rectangleCornerMixin: {
-				bottomLeftRadius: 20,
-				bottomRightRadius: 0,
-				topLeftRadius: 0,
-				topRightRadius: 0
-			},
+			relativeTransform: createTransformMatrix((500 - 100) / 2, (500 - 100) / 2, 10),
 			fill: {
-				paints: [5]
+				paints: [11]
+			}
+		},
+		2: {
+			type: 'Rectangle',
+			compositionMixin: { isVisible: true, isLocked: false },
+			dimension: {
+				width: 100,
+				height: 100
+			},
+			relativeTransform: createTransformMatrix((500 - 100) / 2, (500 - 100) / 2, 0),
+			fill: {
+				paints: [12]
 			}
 		}
 	},
 	paints: {
-		5: {
+		10: {
+			type: 'Solid',
+			blendMode: 'Normal',
+			color: [169, 169, 169],
+			isVisible: true,
+			opacity: 1
+		},
+		11: {
 			type: 'Solid',
 			blendMode: 'Normal',
 			color: [255, 0, 0],
 			isVisible: true,
 			opacity: 1
 		},
-		6: {
+		12: {
 			type: 'Solid',
 			blendMode: 'Normal',
-			color: [169, 169, 169],
+			color: [0, 0, 139],
 			isVisible: true,
 			opacity: 1
 		}

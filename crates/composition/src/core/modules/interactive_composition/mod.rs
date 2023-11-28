@@ -17,6 +17,7 @@ use self::{
 };
 
 pub mod events;
+mod helper;
 pub mod resources;
 mod systems;
 
