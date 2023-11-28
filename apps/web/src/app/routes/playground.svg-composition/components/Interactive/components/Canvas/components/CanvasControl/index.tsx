@@ -15,9 +15,9 @@ export const CanvasControl: React.FC<TProps> = (props) => {
 		>
 			<SelectionBox
 				composition={composition}
-				onResizeHandlePointerDown={(corner, initialBounds) => {
+				onResizeHandlePointerDown={(corner, initialBounds, rotation) => {
 					composition.emitInteractionEvents([
-						{ type: 'CursorDownOnResizeHandle', corner, initialBounds }
+						{ type: 'CursorDownOnResizeHandle', corner, initialBounds, rotation }
 					]);
 				}}
 				onResizeHandlePointerUp={(position) => {

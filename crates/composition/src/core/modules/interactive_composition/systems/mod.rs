@@ -295,7 +295,7 @@ pub fn handle_cursor_down_on_resize_handle(
         interactive_composition.interaction_mode = InteractionMode::Resizing {
             corner: event.corner,
             inital_bounds: event.inital_bounds.clone(),
-            rotation: 0.0, // TODO: Get and update rotation of selected elements
+            rotation: event.rotation,
         };
     }
 }

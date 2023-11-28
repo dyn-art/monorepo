@@ -170,11 +170,15 @@ export const InnerSelectionBox: React.FC<TProps> = React.memo((props) => {
 							pointerEvents={interactionMode.type === 'Resizing' ? 'none' : 'auto'}
 							onPointerDown={(e) => {
 								e.stopPropagation();
-								onResizeHandlePointerDown(pos.resizeHandle, {
-									position: [x, y],
-									height,
-									width
-								});
+								onResizeHandlePointerDown(
+									pos.resizeHandle,
+									{
+										position: [x, y],
+										height,
+										width
+									},
+									rotation
+								);
 							}}
 							onPointerUp={(e) => {
 								e.stopPropagation();
@@ -196,7 +200,7 @@ type TProps = {
 	entity: Entity;
 	composition: Composition;
 	showHandles: boolean;
-	onResizeHandlePointerDown: (corner: EHandleSide, initialBounds: XYWH) => void;
+	onResizeHandlePointerDown: (corner: EHandleSide, initialBounds: XYWH, rotation: number) => void;
 	onResizeHandlePointerUp: (position: Vec2) => void;
 };
 

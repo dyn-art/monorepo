@@ -83,4 +83,5 @@ pub struct CursorDownOnResizeHandle {
     #[serde(rename = "initialBounds")]
     pub inital_bounds: XYWH,
     pub corner: u8,
+    pub rotation: f32,
 }

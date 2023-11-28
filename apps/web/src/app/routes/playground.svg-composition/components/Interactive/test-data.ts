@@ -26,7 +26,7 @@ export const COMPOSITION_WITH_ONE_RECT = (width: number, height: number): DTIFCo
 				width: 100,
 				height: 100
 			},
-			relativeTransform: createTransformMatrix((500 - 100) / 2, (500 - 100) / 2, 10),
+			relativeTransform: createTransformMatrix((500 - 100) / 2, (500 - 100) / 2, 30),
 			fill: {
 				paints: [11]
 			}

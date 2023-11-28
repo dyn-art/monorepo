@@ -28,6 +28,6 @@ export const SelectionBox: React.FC<TProps> = (props) => {
 
 type TProps = {
 	composition: Composition;
-	onResizeHandlePointerDown: (corner: EHandleSide, initialBounds: XYWH) => void;
+	onResizeHandlePointerDown: (corner: EHandleSide, initialBounds: XYWH, rotation: number) => void;
 	onResizeHandlePointerUp: (position: Vec2) => void;
 };
