@@ -23,7 +23,9 @@ export const SelectionBox: React.FC<TProps> = (props) => {
 					key={selectedEntity}
 					composition={composition}
 					entity={selectedEntity}
-					showHandles={interactionMode.type !== 'Translating'}
+					showHandles={
+						interactionMode.type !== 'Translating' && interactionMode.type !== 'Rotating'
+					}
 					onResizeHandlePointerDown={onResizeHandlePointerDown}
 					onResizeHandlePointerUp={onResizeHandlePointerUp}
 					onRotateHandlePointerDown={onRotateHandlePointerDown}

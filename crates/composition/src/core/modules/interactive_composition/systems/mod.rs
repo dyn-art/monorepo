@@ -4,7 +4,7 @@ use bevy_ecs::{
     query::{With, Without},
     system::{Commands, Query, ResMut},
 };
-use glam::{Mat3, Vec2};
+use glam::{Mat3, Vec2, Vec3};
 use log::info;
 
 use crate::core::modules::{
@@ -200,13 +200,91 @@ pub fn handle_cursor_moved_on_composition(
             InteractionMode::Rotating {
                 corner,
                 initial_rotation,
-                rotation,
+                ..
             } => {
-                // TODO
+                selected_nodes_query.for_each_mut(
+                    |(_, mut relative_transform_mixin, dimension_mixin)| {
+                        let center = Vec2::new(
+                            dimension_mixin.width as f32 / 2.0,
+                            dimension_mixin.height as f32 / 2.0,
+                        );
+
+                        // Calculate rotation based on the corner
+                        match corner {
+                            _ if *corner == (HandleSide::Top as u8 | HandleSide::Left as u8) => {
+                                let rotation_angle =
+                                    calculate_rotation(*initial_rotation, position, center);
+                                relative_transform_mixin.0 = apply_centered_rotation(
+                                    relative_transform_mixin.0,
+                                    rotation_angle,
+                                    center,
+                                );
+                            }
+                            _ if *corner == (HandleSide::Top as u8 | HandleSide::Right as u8) => {
+                                // TODO
+                            }
+                            _ if *corner
+                                == (HandleSide::Bottom as u8 | HandleSide::Right as u8) =>
+                            {
+                                // TODO
+                            }
+                            _ if *corner == (HandleSide::Bottom as u8 | HandleSide::Left as u8) => {
+                                // TODO
+                            }
+                            _ => {}
+                        }
+                    },
+                );
             }
             _ => {}
         }
     }
+}
+
+// TODO: need to consider starting rotation based on corner
+fn calculate_rotation(initial_angle_in_degrees: f32, current_position: Vec2, center: Vec2) -> f32 {
+    let initial_angle = initial_angle_in_degrees.to_radians();
+
+    // Calculate the angle from the center to the current cursor position
+    let current_angle = (current_position.y - center.y).atan2(current_position.x - center.x);
+
+    // Calculate the raw angle difference
+    let mut angle_diff = current_angle - initial_angle;
+
+    // Normalize the angle difference to be within -π to π
+    angle_diff = if angle_diff > std::f32::consts::PI {
+        angle_diff - 2.0 * std::f32::consts::PI
+    } else if angle_diff < -std::f32::consts::PI {
+        angle_diff + 2.0 * std::f32::consts::PI
+    } else {
+        angle_diff
+    };
+
+    info!(
+        "calculate_rotation: \n inital_angle: {} \n current_angle: {} \n angle_diff: {}",
+        initial_angle_in_degrees,
+        current_angle.to_degrees(),
+        angle_diff.to_degrees()
+    );
+
+    return angle_diff;
+}
+
+fn apply_centered_rotation(relative_transform: Mat3, angle_in_radians: f32, center: Vec2) -> Mat3 {
+    // Translation matrices for moving to/from the origin
+    let translate_to_origin = Mat3::from_translation(-center);
+    let translate_back = Mat3::from_translation(center);
+
+    // Rotation matrix around the origin
+    let cos = angle_in_radians.cos();
+    let sin = angle_in_radians.sin();
+    let rotation_matrix =
+        Mat3::from_cols_array_2d(&[[cos, -sin, 0.0], [sin, cos, 0.0], [0.0, 0.0, 1.0]]);
+
+    // Combine translation and rotation matrices for centered rotation
+    let combined_matrix = translate_back * rotation_matrix * translate_to_origin;
+
+    return relative_transform * combined_matrix;
 }
 
 pub fn resize_bounds(bounds: &XYWH, corner: u8, cursor_point: Vec2, node_angle: f32) -> XYWH {
