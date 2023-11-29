@@ -51,6 +51,7 @@ pub fn check_interaction_mode_changes(
             InteractionMode::Pressing { .. } => InteractionModeForFrontend::Pressing,
             InteractionMode::Translating { .. } => InteractionModeForFrontend::Translating,
             InteractionMode::Resizing { .. } => InteractionModeForFrontend::Resizing,
+            InteractionMode::Rotating { .. } => InteractionModeForFrontend::Rotating,
         };
 
         // Check whether the interaction mode has changed
@@ -110,6 +111,33 @@ pub fn check_cursor_changes(
                 cursor_rotation -= rotation;
 
                 CursorForFrontend::Resize {
+                    rotation: cursor_rotation,
+                }
+            }
+            InteractionMode::Rotating {
+                corner, rotation, ..
+            } => {
+                let mut cursor_rotation = 0.0;
+
+                match corner {
+                    _ if corner == (HandleSide::Top as u8 | HandleSide::Left as u8) => {
+                        cursor_rotation = 90.0;
+                    }
+                    _ if corner == (HandleSide::Top as u8 | HandleSide::Right as u8) => {
+                        cursor_rotation = 180.0;
+                    }
+                    _ if corner == (HandleSide::Bottom as u8 | HandleSide::Right as u8) => {
+                        cursor_rotation = 270.0;
+                    }
+                    _ if corner == (HandleSide::Bottom as u8 | HandleSide::Left as u8) => {
+                        cursor_rotation = 360.0;
+                    }
+                    _ => {}
+                }
+
+                cursor_rotation -= rotation;
+
+                CursorForFrontend::Rotate {
                     rotation: cursor_rotation,
                 }
             }

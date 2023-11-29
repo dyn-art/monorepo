@@ -72,7 +72,11 @@ export const InnerSelectionBox: React.FC<TProps> = React.memo((props) => {
 						<Handle
 							key={index}
 							position={handle.position}
-							pointerEvents={interactionMode.type === 'Resizing' ? 'none' : 'auto'}
+							pointerEvents={
+								interactionMode.type === 'Resizing' || interactionMode.type === 'Rotating'
+									? 'none'
+									: 'auto'
+							}
 							resizeHandle={{
 								width: handle.resizeHandle.width,
 								height: handle.resizeHandle.height,
@@ -109,7 +113,7 @@ export const InnerSelectionBox: React.FC<TProps> = React.memo((props) => {
 											offset: handle.rotateHandle.offset,
 											onPointerDown: (e) => {
 												e.stopPropagation();
-												onRotateHandlePointerDown(handle.corner);
+												onRotateHandlePointerDown(handle.corner, rotation);
 											},
 											onPointerUp: (e) => {
 												e.stopPropagation();
@@ -136,6 +140,6 @@ type TProps = {
 	showHandles: boolean;
 	onResizeHandlePointerDown: (corner: EHandleSide, initialBounds: XYWH, rotation: number) => void;
 	onResizeHandlePointerUp: (position: Vec2) => void;
-	onRotateHandlePointerDown: (corner: EHandleSide) => void;
+	onRotateHandlePointerDown: (corner: EHandleSide, rotation: number) => void;
 	onRotateHandlePointerUp: (position: Vec2) => void;
 };

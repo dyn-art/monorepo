@@ -19,8 +19,8 @@ use crate::core::modules::{
 use super::{
     events::{
         CursorDownOnComposition, CursorDownOnEntity, CursorDownOnResizeHandle,
-        CursorEnteredComposition, CursorExitedComposition, CursorMovedOnComposition,
-        CursorUpOnComposition,
+        CursorDownOnRotateHandle, CursorEnteredComposition, CursorExitedComposition,
+        CursorMovedOnComposition, CursorUpOnComposition,
     },
     helper::{extract_transform_data, rotate_point},
     resources::{HandleSide, InteractiveCompositionRes, XYWH},
@@ -180,7 +180,7 @@ pub fn handle_cursor_moved_on_composition(
             }
             InteractionMode::Resizing {
                 corner,
-                inital_bounds,
+                initial_bounds,
                 ..
             } => {
                 selected_nodes_query.for_each_mut(
@@ -188,7 +188,7 @@ pub fn handle_cursor_moved_on_composition(
                         let (node_angle, _, _) =
                             extract_transform_data(&relative_transform_mixin.0);
                         let new_bounds =
-                            resize_bounds(&inital_bounds, *corner, position, node_angle);
+                            resize_bounds(&initial_bounds, *corner, position, node_angle);
 
                         relative_transform_mixin.0.col_mut(2).x = new_bounds.position.x;
                         relative_transform_mixin.0.col_mut(2).y = new_bounds.position.y;
@@ -196,6 +196,13 @@ pub fn handle_cursor_moved_on_composition(
                         dimension_mixin.height = new_bounds.height;
                     },
                 );
+            }
+            InteractionMode::Rotating {
+                corner,
+                initial_rotation,
+                rotation,
+            } => {
+                // TODO
             }
             _ => {}
         }
@@ -294,8 +301,24 @@ pub fn handle_cursor_down_on_resize_handle(
 
         interactive_composition.interaction_mode = InteractionMode::Resizing {
             corner: event.corner,
-            inital_bounds: event.inital_bounds.clone(),
+            initial_bounds: event.initial_bounds.clone(),
             rotation: event.rotation,
+        };
+    }
+}
+
+pub fn handle_cursor_down_on_rotate_handle(
+    mut event_reader: EventReader<CursorDownOnRotateHandle>,
+    mut interactive_composition: ResMut<InteractiveCompositionRes>,
+) {
+    for event in event_reader.read() {
+        #[cfg(feature = "trace")]
+        info!("handle_cursor_down_on_rotate_handle: {:#?}", event);
+
+        interactive_composition.interaction_mode = InteractionMode::Rotating {
+            corner: event.corner,
+            initial_rotation: event.initial_rotation,
+            rotation: event.initial_rotation,
         };
     }
 }

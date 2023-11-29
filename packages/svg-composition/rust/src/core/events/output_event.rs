@@ -44,6 +44,7 @@ pub enum InteractionModeForFrontend {
     Pressing,
     Translating,
     Resizing,
+    Rotating,
 }
 
 impl Default for InteractionModeForFrontend {
@@ -62,6 +63,7 @@ pub struct CursorChangeEvent {
 pub enum CursorForFrontend {
     Default,
     Resize { rotation: f32 },
+    Rotate { rotation: f32 },
 }
 
 impl Default for CursorForFrontend {
