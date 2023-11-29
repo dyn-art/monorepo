@@ -6,8 +6,9 @@ export const RESIZE_MIDDLE_HANDLE_WIDTH = 16; // px
 export const RESIZE_MIDDLE_HANDLE_HEIGHT = 8; // px
 export const RESIZE_CORNER_HANDLE_WIDTH = 8; // px
 export const RESIZE_CORNER_HANDLE_HEIGHT = 8; // px
-export const RESIZE_POINTER_AREA_OFFSET = 5; // px
-export const ROTATE_HANDLE_SIZE = 20; // px
+export const RESIZE_POINTER_AREA_OFFSET = 10; // px
+export const ROTATE_HANDLE_WIDTH = 15; // px
+export const ROTATE_HANDLE_HEIGHT = 15; // px
 
 export function getHandleMetaData(width: number, height: number): THandleMetaData[] {
 	return [
@@ -21,10 +22,11 @@ export function getHandleMetaData(width: number, height: number): THandleMetaDat
 				cursor: new ResizeCursor(-135)
 			},
 			rotateHandle: {
-				size: ROTATE_HANDLE_SIZE,
+				width: ROTATE_HANDLE_WIDTH,
+				height: ROTATE_HANDLE_HEIGHT,
 				offset: [
-					-ROTATE_HANDLE_SIZE - RESIZE_POINTER_AREA_OFFSET,
-					-ROTATE_HANDLE_SIZE - RESIZE_POINTER_AREA_OFFSET
+					-ROTATE_HANDLE_WIDTH + RESIZE_POINTER_AREA_OFFSET / 2,
+					-ROTATE_HANDLE_HEIGHT + RESIZE_POINTER_AREA_OFFSET / 2
 				],
 				cursor: new RotateCursor(90)
 			}
@@ -50,10 +52,11 @@ export function getHandleMetaData(width: number, height: number): THandleMetaDat
 				cursor: new ResizeCursor(135)
 			},
 			rotateHandle: {
-				size: ROTATE_HANDLE_SIZE,
+				width: ROTATE_HANDLE_WIDTH,
+				height: ROTATE_HANDLE_HEIGHT,
 				offset: [
-					RESIZE_CORNER_HANDLE_WIDTH + RESIZE_POINTER_AREA_OFFSET,
-					-ROTATE_HANDLE_SIZE - RESIZE_POINTER_AREA_OFFSET
+					RESIZE_CORNER_HANDLE_HEIGHT - RESIZE_POINTER_AREA_OFFSET / 2,
+					-ROTATE_HANDLE_WIDTH + RESIZE_POINTER_AREA_OFFSET / 2
 				],
 				cursor: new RotateCursor(180)
 			}
@@ -82,10 +85,11 @@ export function getHandleMetaData(width: number, height: number): THandleMetaDat
 				cursor: new ResizeCursor(45)
 			},
 			rotateHandle: {
-				size: ROTATE_HANDLE_SIZE,
+				width: ROTATE_HANDLE_WIDTH,
+				height: ROTATE_HANDLE_HEIGHT,
 				offset: [
-					RESIZE_CORNER_HANDLE_WIDTH + RESIZE_POINTER_AREA_OFFSET,
-					RESIZE_MIDDLE_HANDLE_HEIGHT + RESIZE_POINTER_AREA_OFFSET
+					RESIZE_CORNER_HANDLE_WIDTH - RESIZE_POINTER_AREA_OFFSET / 2,
+					RESIZE_MIDDLE_HANDLE_HEIGHT - RESIZE_POINTER_AREA_OFFSET / 2
 				],
 				cursor: new RotateCursor(270)
 			}
@@ -114,10 +118,11 @@ export function getHandleMetaData(width: number, height: number): THandleMetaDat
 				cursor: new ResizeCursor(135)
 			},
 			rotateHandle: {
-				size: ROTATE_HANDLE_SIZE,
+				width: ROTATE_HANDLE_WIDTH,
+				height: ROTATE_HANDLE_HEIGHT,
 				offset: [
-					-ROTATE_HANDLE_SIZE - RESIZE_POINTER_AREA_OFFSET,
-					RESIZE_CORNER_HANDLE_HEIGHT + RESIZE_POINTER_AREA_OFFSET
+					-ROTATE_HANDLE_WIDTH + RESIZE_POINTER_AREA_OFFSET / 2,
+					RESIZE_CORNER_HANDLE_HEIGHT - RESIZE_POINTER_AREA_OFFSET / 2
 				],
 				cursor: new RotateCursor(360)
 			}
@@ -147,8 +152,9 @@ export type THandleMetaData = {
 	};
 	rotateHandle:
 		| {
+				width: number;
+				height: number;
 				offset: Vec2;
-				size: number;
 				cursor: RotateCursor;
 		  }
 		| false;

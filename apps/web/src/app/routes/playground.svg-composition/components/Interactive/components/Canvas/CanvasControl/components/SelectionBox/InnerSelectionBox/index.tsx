@@ -103,7 +103,8 @@ export const InnerSelectionBox: React.FC<TProps> = React.memo((props) => {
 							rotateHandle={
 								handle.rotateHandle
 									? {
-											size: handle.rotateHandle.size,
+											width: handle.rotateHandle.width,
+											height: handle.rotateHandle.height,
 											cursor: handle.rotateHandle.cursor.toString(rotation),
 											offset: handle.rotateHandle.offset,
 											onPointerDown: (e) => {

@@ -2,14 +2,16 @@ import React from 'react';
 import { Vec2 } from '@dyn/svg-composition';
 
 export const RotateHandle: React.FC<TRotateHandleProps> = (props) => {
-	const { size, offset, cursor, onPointerDown, onPointerUp } = props;
+	const { width, height, offset, cursor, onPointerDown, onPointerUp } = props;
 
 	return (
 		<rect
 			x={offset[0]}
 			y={offset[1]}
-			width={size}
-			height={size}
+			width={width}
+			height={height}
+			rx={360}
+			ry={360}
 			className="stroke-0"
 			style={{ cursor, fill: 'rgba(0, 0, 0, 0)' }}
 			onPointerDown={onPointerDown}
@@ -19,7 +21,8 @@ export const RotateHandle: React.FC<TRotateHandleProps> = (props) => {
 };
 
 export type TRotateHandleProps = {
-	size: number;
+	width: number;
+	height: number;
 	offset: Vec2;
 	cursor: string;
 	onPointerDown: (e: React.PointerEvent<SVGElement>) => void;

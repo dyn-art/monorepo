@@ -14,6 +14,8 @@ export const ResizeHandle: React.FC<TResizeHandleProps> = (props) => {
 			<rect
 				x={-pointerAreaOffset}
 				y={-pointerAreaOffset}
+				rx={360}
+				ry={360}
 				width={width + pointerAreaOffset * 2}
 				height={height + pointerAreaOffset * 2}
 				className="stroke-0"
