@@ -1,8 +1,8 @@
 import React from 'react';
 import { Composition } from '@dyn/svg-composition';
 
-import { useCursorStyle } from '../../useCursorStyle';
-import { CanvasControl } from './components';
+import { useCursorStyle } from '../../hooks';
+import { CanvasControl } from './CanvasControl';
 
 export const Canvas: React.FC<TProps> = (props) => {
 	const { composition, svgContainerRef } = props;

@@ -10,7 +10,10 @@ export const Handle: React.FC<TProps> = (props) => {
 	return (
 		<g
 			key={'resize-handler'}
-			style={{ transform: `translate(${position[0]}px, ${position[1]}px)`, pointerEvents }}
+			style={{
+				transform: `translate(${position[0]}px, ${position[1]}px)`,
+				pointerEvents
+			}}
 		>
 			<ResizeHandle {...resizeHandle} />
 			{rotateHandle && <RotateHandle {...rotateHandle} />}

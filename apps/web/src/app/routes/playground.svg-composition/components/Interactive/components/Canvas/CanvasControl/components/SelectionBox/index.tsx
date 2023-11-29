@@ -1,9 +1,9 @@
 import React from 'react';
 import { Composition, Vec2, XYWH } from '@dyn/svg-composition';
 
-import { useInteractionMode } from '../../../../../../useInteractionMode';
-import { useSelectedNodes } from '../../../../../../useSelectedNodes';
-import { EHandleSide, InnerSelectionBox } from './components/InnerSelectionBox';
+import { useInteractionMode, useSelectedNodes } from '../../../../../hooks';
+import { InnerSelectionBox } from './InnerSelectionBox';
+import { EHandleSide } from './InnerSelectionBox/controller';
 
 export const SelectionBox: React.FC<TProps> = (props) => {
 	const { composition, onResizeHandlePointerDown, onResizeHandlePointerUp } = props;

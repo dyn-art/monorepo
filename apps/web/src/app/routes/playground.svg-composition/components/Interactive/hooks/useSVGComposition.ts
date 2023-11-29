@@ -1,7 +1,7 @@
 import React from 'react';
 import { Composition, createSVGComposition, initWasm } from '@dyn/svg-composition';
 
-import { COMPOSITION_WITH_ONE_RECT } from './test-data';
+import { COMPOSITION_WITH_ONE_RECT } from '../test-data';
 
 export const useSVGComposition = (props: UseSVGCompositionProps) => {
 	const { width, height } = props;

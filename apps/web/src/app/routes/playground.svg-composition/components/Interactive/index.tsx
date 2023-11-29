@@ -3,7 +3,7 @@ import React from 'react';
 import { Button } from '@/components/primitive';
 
 import { Canvas } from './components';
-import { useSVGComposition } from './useSVGComposition';
+import { useSVGComposition } from './hooks';
 
 export const Interactive: React.FC<TProps> = (props) => {
 	const { size } = props;

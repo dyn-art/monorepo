@@ -1,11 +1,11 @@
 import React from 'react';
 import { Composition, Entity, SVGRenderer, Vec2, XYWH } from '@dyn/svg-composition';
 
-import { Handle } from '..';
-import { useInteractionMode } from '../../../../../../../../useInteractionMode';
-import { useMatrixTransform } from '../../../../../../../../useMatrixTransform';
-import { useWatchEntity } from '../../../../../../../../useWatchEntity';
+import { useInteractionMode } from '../../../../../../hooks/useInteractionMode';
+import { useMatrixTransform } from '../../../../../../hooks/useMatrixTransform';
+import { useWatchEntity } from '../../../../../../hooks/useWatchEntity';
 import { EHandleSide, getHandleMetaData as getHandlePositions } from './controller';
+import { Handle } from './Handle';
 
 export const InnerSelectionBox: React.FC<TProps> = React.memo((props) => {
 	const {
@@ -71,11 +71,12 @@ export const InnerSelectionBox: React.FC<TProps> = React.memo((props) => {
 					return (
 						<Handle
 							key={index}
-							position={[handle.x, handle.y]}
+							position={handle.position}
 							pointerEvents={interactionMode.type === 'Resizing' ? 'none' : 'auto'}
 							resizeHandle={{
-								width: handle.width,
-								height: handle.height,
+								width: handle.resizeHandle.width,
+								height: handle.resizeHandle.height,
+								pointerAreaOffset: handle.resizeHandle.pointerAreaOffset,
 								cursor: handle.resizeHandle.cursor.toString(rotation),
 								onPointerDown: (e) => {
 									e.stopPropagation();
@@ -99,24 +100,28 @@ export const InnerSelectionBox: React.FC<TProps> = React.memo((props) => {
 									);
 								}
 							}}
-							rotateHandle={{
-								size: 20,
-								cursor: handle.resizeHandle.cursor.toString(rotation),
-								offset: 5,
-								onPointerDown: (e) => {
-									e.stopPropagation();
-									onRotateHandlePointerDown(handle.corner);
-								},
-								onPointerUp: (e) => {
-									e.stopPropagation();
-									// TODO: Can this be done more typesafe?
-									onRotateHandlePointerUp(
-										(composition.renderer[0] as SVGRenderer).pointerEventToCompositionPoint(
-											e as unknown as PointerEvent
-										)
-									);
-								}
-							}}
+							rotateHandle={
+								handle.rotateHandle
+									? {
+											size: handle.rotateHandle.size,
+											cursor: handle.rotateHandle.cursor.toString(rotation),
+											offset: handle.rotateHandle.offset,
+											onPointerDown: (e) => {
+												e.stopPropagation();
+												onRotateHandlePointerDown(handle.corner);
+											},
+											onPointerUp: (e) => {
+												e.stopPropagation();
+												// TODO: Can this be done more typesafe?
+												onRotateHandlePointerUp(
+													(composition.renderer[0] as SVGRenderer).pointerEventToCompositionPoint(
+														e as unknown as PointerEvent
+													)
+												);
+											}
+									  }
+									: false
+							}
 						/>
 					);
 				})}
