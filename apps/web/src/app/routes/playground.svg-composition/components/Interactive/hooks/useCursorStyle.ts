@@ -12,9 +12,9 @@ export function useCursorStyle(composition?: Composition): string {
 	return React.useMemo(() => {
 		switch (cursor.type) {
 			case 'Resize':
-				return ResizeCursor.constructString(cursor.rotation);
+				return ResizeCursor.constructString(cursor.rotationInDegrees);
 			case 'Rotate':
-				return RotateCursor.constructString(cursor.rotation);
+				return RotateCursor.constructString(cursor.rotationInDegrees);
 			case 'Default':
 			default:
 				return 'Default';

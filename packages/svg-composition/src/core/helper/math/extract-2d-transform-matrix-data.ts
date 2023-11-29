@@ -6,7 +6,7 @@ export function extract2DTransformMatrixData(matrix: T3x3Matrix): T2DMatrixData 
 	const [a, b, , d, e, , tx, ty] = matrix;
 
 	// Extract rotation
-	const rotation = Math.atan2(d, a);
+	const rotationInRadians = Math.atan2(d, a);
 
 	// Extract scale values (scaleX and scaleY)
 	// Use the Euclidean norm (length) of each basis vector
@@ -18,7 +18,7 @@ export function extract2DTransformMatrixData(matrix: T3x3Matrix): T2DMatrixData 
 		ty,
 		scaleX,
 		scaleY,
-		rotation: rotation * (180 / Math.PI) // Convert rotation from radians to degrees
+		rotationInRadians
 	};
 }
 
@@ -27,7 +27,7 @@ export interface T2DMatrixData {
 	ty: number;
 	scaleX: number;
 	scaleY: number;
-	rotation: number;
+	rotationInRadians: number;
 }
 
 export type T3x3Matrix = [number, number, number, number, number, number, number, number, number];

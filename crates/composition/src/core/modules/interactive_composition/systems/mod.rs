@@ -199,26 +199,45 @@ pub fn handle_cursor_moved_on_composition(
             }
             InteractionMode::Rotating {
                 corner,
-                initial_rotation,
+                initial_rotation_in_radians: initial_rotation,
                 ..
             } => {
                 selected_nodes_query.for_each_mut(
                     |(_, mut relative_transform_mixin, dimension_mixin)| {
-                        let center = Vec2::new(
+                        let mut relative_transform = relative_transform_mixin.0;
+
+                        // Calculate absolute (relative to composition) pivot point
+                        // TODO: ofc only if there is no nesting then I have to add an absolute_transform to each node
+                        let relative_pivot_point = Vec2::new(
                             dimension_mixin.width as f32 / 2.0,
                             dimension_mixin.height as f32 / 2.0,
                         );
+                        let transformed_point = relative_transform
+                            * Vec3::new(relative_pivot_point.x, relative_pivot_point.y, 1.0);
+                        let absolute_pivot_point =
+                            Vec2::new(transformed_point.x, transformed_point.y);
+                        info!("relative_pivot_point: {:?}", relative_pivot_point);
+                        info!("absolute_pivot_point: {:?}", absolute_pivot_point);
+
+                        let (_, _, node_position) =
+                            extract_transform_data(&relative_transform_mixin.0);
 
                         // Calculate rotation based on the corner
                         match corner {
                             _ if *corner == (HandleSide::Top as u8 | HandleSide::Left as u8) => {
-                                let rotation_angle =
-                                    calculate_rotation(*initial_rotation, position, center);
-                                relative_transform_mixin.0 = apply_centered_rotation(
-                                    relative_transform_mixin.0,
-                                    rotation_angle,
-                                    center,
+                                let rotation_angle = calculate_rotation(
+                                    *initial_rotation,
+                                    position,
+                                    Vec2::new(
+                                        relative_pivot_point.x + node_position.x,
+                                        relative_pivot_point.y + node_position.y,
+                                    ),
                                 );
+                                // relative_transform_mixin.0 = apply_rotation(
+                                //     relative_transform_mixin.0,
+                                //     rotation_angle,
+                                //     relative_pivot_point,
+                                // );
                             }
                             _ if *corner == (HandleSide::Top as u8 | HandleSide::Right as u8) => {
                                 // TODO
@@ -242,14 +261,12 @@ pub fn handle_cursor_moved_on_composition(
 }
 
 // TODO: need to consider starting rotation based on corner
-fn calculate_rotation(initial_angle_in_degrees: f32, current_position: Vec2, center: Vec2) -> f32 {
-    let initial_angle = initial_angle_in_degrees.to_radians();
-
+fn calculate_rotation(initial_angle_in_radians: f32, cursor_point: Vec2, center: Vec2) -> f32 {
     // Calculate the angle from the center to the current cursor position
-    let current_angle = (current_position.y - center.y).atan2(current_position.x - center.x);
+    let current_angle = (cursor_point.y - center.y).atan2(cursor_point.x - center.x);
 
     // Calculate the raw angle difference
-    let mut angle_diff = current_angle - initial_angle;
+    let mut angle_diff = current_angle - initial_angle_in_radians;
 
     // Normalize the angle difference to be within -π to π
     angle_diff = if angle_diff > std::f32::consts::PI {
@@ -261,8 +278,9 @@ fn calculate_rotation(initial_angle_in_degrees: f32, current_position: Vec2, cen
     };
 
     info!(
-        "calculate_rotation: \n inital_angle: {} \n current_angle: {} \n angle_diff: {}",
-        initial_angle_in_degrees,
+        "calculate_rotation: \n center: {:?} \n inital_angle: {} \n current_angle: {} \n angle_diff: {}",
+        center,
+        initial_angle_in_radians.to_degrees(),
         current_angle.to_degrees(),
         angle_diff.to_degrees()
     );
@@ -270,10 +288,12 @@ fn calculate_rotation(initial_angle_in_degrees: f32, current_position: Vec2, cen
     return angle_diff;
 }
 
-fn apply_centered_rotation(relative_transform: Mat3, angle_in_radians: f32, center: Vec2) -> Mat3 {
-    // Translation matrices for moving to/from the origin
-    let translate_to_origin = Mat3::from_translation(-center);
-    let translate_back = Mat3::from_translation(center);
+// Note: The pivot point is relative to the relative_transform matrix,
+//  and thus the nodes top left corner
+fn apply_rotation(relative_transform: Mat3, angle_in_radians: f32, pivot_point: Vec2) -> Mat3 {
+    // Translation matrices for moving to the pivot point and back to the origin
+    let translate_to_pivot = Mat3::from_translation(pivot_point);
+    let translate_to_origin = Mat3::from_translation(-pivot_point);
 
     // Rotation matrix around the origin
     let cos = angle_in_radians.cos();
@@ -281,12 +301,13 @@ fn apply_centered_rotation(relative_transform: Mat3, angle_in_radians: f32, cent
     let rotation_matrix =
         Mat3::from_cols_array_2d(&[[cos, -sin, 0.0], [sin, cos, 0.0], [0.0, 0.0, 1.0]]);
 
-    // Combine translation and rotation matrices for centered rotation
-    let combined_matrix = translate_back * rotation_matrix * translate_to_origin;
+    // Combine translation and rotation matrices for rotation around pivot point
+    let combined_matrix = translate_to_pivot * rotation_matrix * translate_to_origin;
 
     return relative_transform * combined_matrix;
 }
 
+// TODO: Refactor and solve with matrix
 pub fn resize_bounds(bounds: &XYWH, corner: u8, cursor_point: Vec2, node_angle: f32) -> XYWH {
     let mut result = bounds.clone();
     let pivot = bounds.position;
@@ -380,7 +401,7 @@ pub fn handle_cursor_down_on_resize_handle(
         interactive_composition.interaction_mode = InteractionMode::Resizing {
             corner: event.corner,
             initial_bounds: event.initial_bounds.clone(),
-            rotation: event.rotation,
+            rotation_in_degrees: event.rotation_in_radians.to_degrees(),
         };
     }
 }
@@ -395,8 +416,8 @@ pub fn handle_cursor_down_on_rotate_handle(
 
         interactive_composition.interaction_mode = InteractionMode::Rotating {
             corner: event.corner,
-            initial_rotation: event.initial_rotation,
-            rotation: event.initial_rotation,
+            initial_rotation_in_radians: event.initial_rotation_in_radians,
+            rotation_in_degrees: event.initial_rotation_in_radians.to_degrees(),
         };
     }
 }

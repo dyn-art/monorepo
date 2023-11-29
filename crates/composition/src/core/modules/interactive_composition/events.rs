@@ -87,12 +87,13 @@ pub struct CursorDownOnResizeHandle {
     #[serde(rename = "initialBounds")]
     pub initial_bounds: XYWH,
     pub corner: u8,
-    pub rotation: f32,
+    #[serde(rename = "rotationInRadians")]
+    pub rotation_in_radians: f32,
 }
 
 #[derive(Event, Debug, Serialize, Deserialize, Type, Clone)]
 pub struct CursorDownOnRotateHandle {
     pub corner: u8,
-    #[serde(rename = "initialRotation")]
-    pub initial_rotation: f32,
+    #[serde(rename = "initialRotationInRadians")]
+    pub initial_rotation_in_radians: f32,
 }

@@ -38,8 +38,12 @@ export const SelectionBox: React.FC<TProps> = (props) => {
 
 type TProps = {
 	composition: Composition;
-	onResizeHandlePointerDown: (corner: EHandleSide, initialBounds: XYWH, rotation: number) => void;
+	onResizeHandlePointerDown: (
+		corner: EHandleSide,
+		initialBounds: XYWH,
+		rotationInRadians: number
+	) => void;
 	onResizeHandlePointerUp: (position: Vec2) => void;
-	onRotateHandlePointerDown: (corner: EHandleSide, rotation: number) => void;
+	onRotateHandlePointerDown: (corner: EHandleSide, rotationInRadians: number) => void;
 	onRotateHandlePointerUp: (position: Vec2) => void;
 };

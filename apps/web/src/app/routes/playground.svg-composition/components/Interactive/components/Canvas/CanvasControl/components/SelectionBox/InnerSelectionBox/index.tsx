@@ -1,5 +1,12 @@
 import React from 'react';
-import { Composition, Entity, SVGRenderer, Vec2, XYWH } from '@dyn/svg-composition';
+import {
+	Composition,
+	Entity,
+	radiansToDegrees,
+	SVGRenderer,
+	Vec2,
+	XYWH
+} from '@dyn/svg-composition';
 
 import { useInteractionMode } from '../../../../../../hooks/useInteractionMode';
 import { useMatrixTransform } from '../../../../../../hooks/useMatrixTransform';
@@ -21,7 +28,7 @@ export const InnerSelectionBox: React.FC<TProps> = React.memo((props) => {
 		Dimension: { width = undefined, height = undefined } = {},
 		RelativeTransform: { relativeTransform = undefined } = {}
 	} = useWatchEntity(composition, entity, ['Dimension', 'RelativeTransform']);
-	const { tx: x, ty: y, rotation } = useMatrixTransform(relativeTransform);
+	const { tx: x, ty: y, rotationInRadians } = useMatrixTransform(relativeTransform);
 	const interactionMode = useInteractionMode(composition);
 	const handlePositions = React.useMemo(() => {
 		if (width == null || height == null) {
@@ -35,14 +42,15 @@ export const InnerSelectionBox: React.FC<TProps> = React.memo((props) => {
 		height == null ||
 		x == null ||
 		y == null ||
-		rotation == null ||
+		rotationInRadians == null ||
 		handlePositions == null
 	) {
 		return null;
 	}
+	const rotationInDegrees = radiansToDegrees(rotationInRadians);
 
 	return (
-		<g style={{ transform: `translate(${x}px, ${y}px) rotate(${-rotation}deg)` }}>
+		<g style={{ transform: `translate(${x}px, ${y}px) rotate(${-rotationInDegrees}deg)` }}>
 			{/* Border */}
 			<rect
 				className={'pointer-events-none fill-transparent stroke-blue-400 stroke-1'}
@@ -81,7 +89,7 @@ export const InnerSelectionBox: React.FC<TProps> = React.memo((props) => {
 								width: handle.resizeHandle.width,
 								height: handle.resizeHandle.height,
 								pointerAreaOffset: handle.resizeHandle.pointerAreaOffset,
-								cursor: handle.resizeHandle.cursor.toString(rotation),
+								cursor: handle.resizeHandle.cursor.toString(rotationInDegrees),
 								onPointerDown: (e) => {
 									e.stopPropagation();
 									onResizeHandlePointerDown(
@@ -91,7 +99,7 @@ export const InnerSelectionBox: React.FC<TProps> = React.memo((props) => {
 											height,
 											width
 										},
-										rotation
+										rotationInRadians
 									);
 								},
 								onPointerUp: (e) => {
@@ -109,11 +117,11 @@ export const InnerSelectionBox: React.FC<TProps> = React.memo((props) => {
 									? {
 											width: handle.rotateHandle.width,
 											height: handle.rotateHandle.height,
-											cursor: handle.rotateHandle.cursor.toString(rotation),
+											cursor: handle.rotateHandle.cursor.toString(rotationInDegrees),
 											offset: handle.rotateHandle.offset,
 											onPointerDown: (e) => {
 												e.stopPropagation();
-												onRotateHandlePointerDown(handle.corner, rotation);
+												onRotateHandlePointerDown(handle.corner, rotationInRadians);
 											},
 											onPointerUp: (e) => {
 												e.stopPropagation();
@@ -138,8 +146,12 @@ type TProps = {
 	entity: Entity;
 	composition: Composition;
 	showHandles: boolean;
-	onResizeHandlePointerDown: (corner: EHandleSide, initialBounds: XYWH, rotation: number) => void;
+	onResizeHandlePointerDown: (
+		corner: EHandleSide,
+		initialBounds: XYWH,
+		rotationInRadians: number
+	) => void;
 	onResizeHandlePointerUp: (position: Vec2) => void;
-	onRotateHandlePointerDown: (corner: EHandleSide, rotation: number) => void;
+	onRotateHandlePointerDown: (corner: EHandleSide, rotationInRadians: number) => void;
 	onRotateHandlePointerUp: (position: Vec2) => void;
 };

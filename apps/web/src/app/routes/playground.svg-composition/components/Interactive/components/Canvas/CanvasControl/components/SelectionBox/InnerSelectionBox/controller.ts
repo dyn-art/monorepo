@@ -7,6 +7,7 @@ export const RESIZE_MIDDLE_HANDLE_HEIGHT = 8; // px
 export const RESIZE_CORNER_HANDLE_WIDTH = 8; // px
 export const RESIZE_CORNER_HANDLE_HEIGHT = 8; // px
 export const RESIZE_POINTER_AREA_OFFSET = 10; // px
+
 export const ROTATE_HANDLE_WIDTH = 15; // px
 export const ROTATE_HANDLE_HEIGHT = 15; // px
 

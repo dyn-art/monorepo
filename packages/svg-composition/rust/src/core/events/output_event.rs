@@ -62,8 +62,14 @@ pub struct CursorChangeEvent {
 #[serde(tag = "type")]
 pub enum CursorForFrontend {
     Default,
-    Resize { rotation: f32 },
-    Rotate { rotation: f32 },
+    Resize {
+        #[serde(rename = "rotationInDegrees")]
+        rotation_in_degrees: f32,
+    },
+    Rotate {
+        #[serde(rename = "rotationInDegrees")]
+        rotation_in_degrees: f32,
+    },
 }
 
 impl Default for CursorForFrontend {

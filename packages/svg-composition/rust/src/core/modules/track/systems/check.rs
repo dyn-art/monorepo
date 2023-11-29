@@ -76,7 +76,9 @@ pub fn check_cursor_changes(
     if interactive_composition.is_changed() {
         let current_cursor = match interactive_composition.interaction_mode {
             InteractionMode::Resizing {
-                corner, rotation, ..
+                corner,
+                rotation_in_degrees,
+                ..
             } => {
                 let mut cursor_rotation = 0.0;
 
@@ -108,14 +110,16 @@ pub fn check_cursor_changes(
                     _ => {}
                 }
 
-                cursor_rotation -= rotation;
+                cursor_rotation -= rotation_in_degrees;
 
                 CursorForFrontend::Resize {
-                    rotation: cursor_rotation,
+                    rotation_in_degrees: cursor_rotation,
                 }
             }
             InteractionMode::Rotating {
-                corner, rotation, ..
+                corner,
+                rotation_in_degrees,
+                ..
             } => {
                 let mut cursor_rotation = 0.0;
 
@@ -135,10 +139,10 @@ pub fn check_cursor_changes(
                     _ => {}
                 }
 
-                cursor_rotation -= rotation;
+                cursor_rotation -= rotation_in_degrees;
 
                 CursorForFrontend::Rotate {
-                    rotation: cursor_rotation,
+                    rotation_in_degrees: cursor_rotation,
                 }
             }
             _ => CursorForFrontend::Default,
