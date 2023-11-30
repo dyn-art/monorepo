@@ -11,15 +11,33 @@ export const CanvasControl: React.FC<TProps> = (props) => {
 			id={'canvas-control'}
 			className="pointer-events-none absolute h-full w-full"
 			overflow={'visible'}
+			style={{ cursor: 'crosshair' }}
 		>
 			<SelectionBox
 				composition={composition}
-				onResizeHandlePointerDown={(corner, initialBounds) => {
+				onResizeHandlePointerDown={(corner, initialBounds, rotationInRadians) => {
 					composition.emitInteractionEvents([
-						{ type: 'CursorDownOnResizeHandle', corner, initialBounds }
+						{
+							type: 'CursorDownOnResizeHandle',
+							corner,
+							initialBounds,
+							rotationInRadians: rotationInRadians
+						}
 					]);
 				}}
 				onResizeHandlePointerUp={(position) => {
+					composition.emitInteractionEvents([{ type: 'CursorUpOnComposition', position }]);
+				}}
+				onRotateHandlePointerDown={(corner, rotationInRadians) => {
+					composition.emitInteractionEvents([
+						{
+							type: 'CursorDownOnRotateHandle',
+							corner,
+							initialRotationInRadians: rotationInRadians
+						}
+					]);
+				}}
+				onRotateHandlePointerUp={(position) => {
 					composition.emitInteractionEvents([{ type: 'CursorUpOnComposition', position }]);
 				}}
 			/>

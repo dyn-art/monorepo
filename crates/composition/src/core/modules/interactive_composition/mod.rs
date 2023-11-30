@@ -4,19 +4,28 @@ use bevy_ecs::schedule::{IntoSystemConfigs, IntoSystemSetConfigs, SystemSet};
 use self::{
     events::{
         CursorDownOnComposition, CursorDownOnEntity, CursorDownOnResizeHandle,
-        CursorEnteredComposition, CursorExitedComposition, CursorMovedOnComposition,
-        CursorUpOnComposition,
+        CursorDownOnRotateHandle, CursorEnteredComposition, CursorExitedComposition,
+        CursorMovedOnComposition, CursorUpOnComposition,
     },
     resources::InteractiveCompositionRes,
-    systems::{
-        handle_cursor_down_on_composition, handle_cursor_down_on_entity_event,
-        handle_cursor_down_on_resize_handle, handle_cursor_entered_composition,
-        handle_cursor_exited_composition, handle_cursor_moved_on_composition,
-        handle_cursor_up_on_composition,
+    systems::cursor::{
+        composition::{
+            cursor_down::handle_cursor_down_on_composition,
+            cursor_entered::handle_cursor_entered_composition,
+            cursor_exited::handle_cursor_exited_composition,
+            cursor_move::handle_cursor_moved_on_composition,
+            cursor_up::handle_cursor_up_on_composition,
+        },
+        entity::cursor_down::handle_cursor_down_on_entity_event,
+        ui::{
+            resize_handle::handle_cursor_down_on_resize_handle,
+            rotate_handle::handle_cursor_down_on_rotate_handle,
+        },
     },
 };
 
 pub mod events;
+mod helper;
 pub mod resources;
 mod systems;
 
@@ -41,6 +50,7 @@ impl Plugin for InteractiveCompositionPlugin {
         app.add_event::<CursorDownOnComposition>();
         app.add_event::<CursorUpOnComposition>();
         app.add_event::<CursorDownOnResizeHandle>();
+        app.add_event::<CursorDownOnRotateHandle>();
 
         // Register resources
         app.world.init_resource::<InteractiveCompositionRes>();
@@ -68,6 +78,9 @@ impl Plugin for InteractiveCompositionPlugin {
                     .in_set(InteractionSet::Initial)
                     .after(handle_cursor_down_on_composition),
                 handle_cursor_down_on_resize_handle
+                    .in_set(InteractionSet::Initial)
+                    .after(handle_cursor_down_on_composition),
+                handle_cursor_down_on_rotate_handle
                     .in_set(InteractionSet::Initial)
                     .after(handle_cursor_down_on_composition),
                 handle_cursor_moved_on_composition.in_set(InteractionSet::Continuous),

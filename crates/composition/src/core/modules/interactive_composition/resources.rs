@@ -16,8 +16,18 @@ pub enum InteractionMode {
     Pressing { origin: Vec2 },
     /// When the user is moving selected nodes.
     Translating { origin: Vec2, current: Vec2 },
-    /// When the user is resizing selected nodes.
-    Resizing { corner: u8, inital_bounds: XYWH },
+    /// When the user is resizing the selected nodes.
+    Resizing {
+        corner: u8,
+        initial_bounds: XYWH,
+        rotation_in_degrees: f32, // For cursor
+    },
+    /// When the user is rotating the selected nodes.
+    Rotating {
+        corner: u8,
+        initial_rotation_in_radians: f32,
+        rotation_in_degrees: f32, // For cursor
+    },
 }
 
 impl Default for InteractionMode {

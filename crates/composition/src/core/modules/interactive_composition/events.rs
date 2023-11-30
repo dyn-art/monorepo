@@ -17,6 +17,7 @@ pub enum InteractionInputEvent {
     CursorDownOnComposition(CursorDownOnComposition),
     CursorUpOnComposition(CursorUpOnComposition),
     CursorDownOnResizeHandle(CursorDownOnResizeHandle),
+    CursorDownOnRotateHandle(CursorDownOnRotateHandle),
 }
 
 impl InputEvent for InteractionInputEvent {
@@ -41,6 +42,9 @@ impl InputEvent for InteractionInputEvent {
                 world.send_event(event);
             }
             InteractionInputEvent::CursorDownOnResizeHandle(event) => {
+                world.send_event(event);
+            }
+            InteractionInputEvent::CursorDownOnRotateHandle(event) => {
                 world.send_event(event);
             }
         }
@@ -81,6 +85,15 @@ pub struct CursorUpOnComposition {
 #[derive(Event, Debug, Serialize, Deserialize, Type, Clone)]
 pub struct CursorDownOnResizeHandle {
     #[serde(rename = "initialBounds")]
-    pub inital_bounds: XYWH,
+    pub initial_bounds: XYWH,
     pub corner: u8,
+    #[serde(rename = "rotationInRadians")]
+    pub rotation_in_radians: f32,
+}
+
+#[derive(Event, Debug, Serialize, Deserialize, Type, Clone)]
+pub struct CursorDownOnRotateHandle {
+    pub corner: u8,
+    #[serde(rename = "initialRotationInRadians")]
+    pub initial_rotation_in_radians: f32,
 }

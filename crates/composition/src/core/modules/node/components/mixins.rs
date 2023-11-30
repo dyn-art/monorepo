@@ -105,6 +105,25 @@ impl Default for RelativeTransformMixin {
 }
 
 // =============================================================================
+// Absolute Transform Mixin
+// =============================================================================
+
+/// Represents the absolute position and orientation of a node within the composition's coordinate system.
+/// This mixin stores the transformation as a 3x3 matrix (Mat3),
+/// which includes translation, rotation, and skew.
+///
+/// Note: This transformation does not include scaling.
+/// For scaling, refer to the `DimensionMixin`.
+#[derive(Component, Serialize, Deserialize, Clone, Debug, Type)]
+pub struct AbsoluteTransformMixin(pub Mat3);
+
+impl Default for AbsoluteTransformMixin {
+    fn default() -> Self {
+        Self(Mat3::default())
+    }
+}
+
+// =============================================================================
 // Node Composition Mixin
 // =============================================================================
 

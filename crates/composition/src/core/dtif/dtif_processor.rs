@@ -2,19 +2,20 @@ use std::collections::HashMap;
 
 use bevy_ecs::{entity::Entity, world::World};
 use bevy_hierarchy::BuildWorldChildren;
+use glam::Mat3;
 
 use crate::core::modules::{
     composition::events::CoreInputEvent,
     node::components::{
         bundles::{FrameNodeBundle, GroupNodeBundle, RectangleNodeBundle},
-        mixins::{ChildrenMixin, FillMixin},
+        mixins::{AbsoluteTransformMixin, ChildrenMixin, FillMixin, RelativeTransformMixin},
     },
 };
 
 use super::{DTIFComposition, DTIFNode};
 
 pub struct DTIFProcessor {
-    /// Maps DTIF entity to actual spawned entity in ECS world.
+    /// Maps DTIF entity (eid) to actual spawned Bevy entity.
     eid_to_entity: HashMap<String, Entity>,
 }
 
@@ -29,17 +30,44 @@ impl DTIFProcessor {
     // Node
     // =========================================================================
 
-    /// Processes a single DTIF node and its children.
-    pub fn process_node(
+    /// Processes the root DTIF node and its children.
+    pub fn process_root(
         &mut self,
         node_eid: String,
         world: &mut World,
         dtif: &DTIFComposition,
     ) -> Option<Entity> {
+        self.process_node(node_eid, world, dtif, true)
+    }
+
+    /// Processes a single DTIF node and its children.
+    fn process_node(
+        &mut self,
+        node_eid: String,
+        world: &mut World,
+        dtif: &DTIFComposition,
+        is_root: bool,
+    ) -> Option<Entity> {
         dtif.nodes.get(&node_eid).map(|dtif_node| {
-            // Spawn node
+            // Spawn a new node entity from a DTIF node
+            // and maintain a mapping from entity id to Bevy entity
             let node_entity = self.spawn_node(world, dtif_node);
             self.eid_to_entity.insert(node_eid, node_entity);
+
+            // Set absolute transform for root node
+            if is_root {
+                let mut relative_transform: Option<Mat3> = None;
+                if let Some(relative_transform_mixin) =
+                    world.entity(node_entity).get::<RelativeTransformMixin>()
+                {
+                    relative_transform = Some(relative_transform_mixin.0.clone());
+                }
+                if let Some(relative_transform) = relative_transform {
+                    world
+                        .entity_mut(node_entity)
+                        .insert(AbsoluteTransformMixin(relative_transform));
+                }
+            }
 
             self.process_fill(node_entity, world, dtif, dtif_node);
             self.process_children(node_entity, world, dtif, dtif_node);
@@ -69,15 +97,17 @@ impl DTIFProcessor {
                 })
                 .collect();
 
-            // Establish Bevy parent-child relationships. Bevy's hierarchy system allows for
-            // more optimized and feature-rich parent-child interactions within the ECS
-            // https://bevy-cheatbook.github.io/fundamentals/hierarchy.html
+            // Establish Bevy parent-child relationships for optimized interactions within the ECS.
+            // For details, refer to: https://bevy-cheatbook.github.io/fundamentals/hierarchy.html
             if !new_paints.is_empty() {
                 world.entity_mut(node_entity).push_children(&new_paints);
             }
 
-            // Now that Bevy's own parent-child relationship is established, we remove the
-            // `FillMixin` as it was only a temporary measure to transition from the DTIF format
+            // Remove the temporary `ChildrenMixin` component.
+            // Explanation:
+            // After successfully establishing Bevy's internal parent-child relationships,
+            // the `FillMixin` component, initially used to manage child entities
+            // during the transition from the DTIF format, is no longer necessary.
             world.entity_mut(node_entity).remove::<FillMixin>();
         }
     }
@@ -99,19 +129,42 @@ impl DTIFProcessor {
                 .iter()
                 .filter_map(|child_entity| {
                     let child_eid = DTIFProcessor::entity_to_eid(child_entity);
-                    return self.process_node(child_eid, world, dtif);
+                    return self.process_node(child_eid, world, dtif, false);
                 })
                 .collect();
 
-            // Establish Bevy parent-child relationships. Bevy's hierarchy system allows for
-            // more optimized and feature-rich parent-child interactions within the ECS
-            // https://bevy-cheatbook.github.io/fundamentals/hierarchy.html
+            // Establish Bevy parent-child relationships for optimized interactions within the ECS.
+            // For details, refer to: https://bevy-cheatbook.github.io/fundamentals/hierarchy.html
             if !new_children.is_empty() {
                 world.entity_mut(node_entity).push_children(&new_children);
+
+                // Calculate & apply absolute transform to children based on the parents absolute transform
+                let mut transform_updates = Vec::new();
+                if let Some(parent_absolute_transform) =
+                    world.entity(node_entity).get::<AbsoluteTransformMixin>()
+                {
+                    for &child in &new_children {
+                        if let Some(child_relative_transform) =
+                            world.entity(child).get::<RelativeTransformMixin>()
+                        {
+                            let child_absolute_transform =
+                                parent_absolute_transform.0 * child_relative_transform.0;
+                            transform_updates.push((child, child_absolute_transform));
+                        }
+                    }
+                }
+                for (child, absolute_transform) in transform_updates {
+                    world
+                        .entity_mut(child)
+                        .insert(AbsoluteTransformMixin(absolute_transform));
+                }
             }
 
-            // Now that Bevy's own parent-child relationship is established, we remove the
-            // `ChildrenMixin` as it was only a temporary measure to transition from the DTIF format
+            // Remove the temporary `ChildrenMixin` component.
+            // Explanation:
+            // After successfully establishing Bevy's internal parent-child relationships,
+            // the `ChildrenMixin` component, initially used to manage child entities
+            // during the transition from the DTIF format, is no longer necessary.
             world.entity_mut(node_entity).remove::<ChildrenMixin>();
         }
     }
@@ -177,11 +230,17 @@ impl DTIFProcessor {
         self.eid_to_entity.get(&eid).cloned()
     }
 
-    /// Converts an entity to a String we call DTIF entity (eid).
+    /// Converts an `Entity` to a String representation, referred to as a DTIF entity (eid).
     ///
-    /// Why?
-    /// Due to an issue we have to work with a stringified enitity in the hashmap.
-    /// https://github.com/serde-rs/serde/issues/1183
+    /// # Why this conversion?
+    /// This function is necessary due to a specific limitation encountered when working
+    /// with serialization in Rust. Specifically, the `Entity` type cannot be directly
+    /// serialized due to its internal structure and the limitations of the serde library.
+    /// Reference issue: https://github.com/serde-rs/serde/issues/1183
+    ///
+    /// By converting the `Entity` to its bit representation and then to a string,
+    /// this function enables the use of `Entity` instances as keys in a hashmap,
+    /// facilitating serialization and deserialization processes.
     #[inline]
     pub fn entity_to_eid(entity: &Entity) -> String {
         entity.to_bits().to_string()

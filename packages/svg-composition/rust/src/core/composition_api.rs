@@ -131,10 +131,6 @@ impl JsCompositionHandle {
                 Err(_) => return JsValue::FALSE,
             };
 
-        // TODO: REMOVE
-        #[cfg(feature = "trace")]
-        self.composition.log_entity_components(entity);
-
         let app = self.composition.get_app_mut();
 
         // Collect intial values
@@ -234,6 +230,7 @@ impl JsCompositionHandle {
 
     #[wasm_bindgen(js_name = logEntityComponents)]
     pub fn log_entity_components(&self, entity: JsValue) {
+        #[cfg(feature = "trace")]
         let entity: Entity = match serde_wasm_bindgen::from_value(entity) {
             Ok(entity) => entity,
             Err(_) => return,
