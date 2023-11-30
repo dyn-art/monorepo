@@ -1,9 +1,17 @@
-use bevy_ecs::{event::EventReader, system::Query};
+use std::collections::HashSet;
+
+use bevy_ecs::{
+    entity::Entity,
+    event::EventReader,
+    query::Changed,
+    system::{Commands, Query},
+};
+use bevy_hierarchy::Parent;
 use glam::{Mat3, Vec2};
 
 use crate::core::modules::{
     composition::events::{EntityMoved, EntitySetPosition},
-    node::components::mixins::RelativeTransformMixin,
+    node::components::mixins::{AbsoluteTransformMixin, RelativeTransformMixin},
 };
 
 pub fn handle_entity_moved_events(
@@ -28,6 +36,46 @@ pub fn handle_entity_set_position_events(
         if let Ok(mut mixin) = query.get_mut(*entity) {
             mixin.0.col_mut(2).x = *x;
             mixin.0.col_mut(2).y = *y;
+        }
+    }
+}
+
+pub fn calculate_absolute_transform(
+    mut commands: Commands,
+    query_children: Query<
+        (Entity, &Parent, &RelativeTransformMixin),
+        Changed<RelativeTransformMixin>,
+    >,
+    query_parents: Query<(Entity, &AbsoluteTransformMixin), Changed<AbsoluteTransformMixin>>,
+    query_all_children: Query<(Entity, &Parent)>,
+) {
+    let mut children_to_update = HashSet::new();
+
+    // Add children with changed relative transforms
+    for (child_entity, _, _) in query_children.iter() {
+        children_to_update.insert(child_entity);
+    }
+
+    // Add all children of parents with changed absolute transforms
+    for (parent_entity, _) in query_parents.iter() {
+        for (child_entity, parent) in query_all_children.iter() {
+            if parent.get() == parent_entity {
+                children_to_update.insert(child_entity);
+            }
+        }
+    }
+
+    // Apply updates
+    for child_entity in children_to_update {
+        if let Ok((_, parent, child_transform)) = query_children.get(child_entity) {
+            if let Ok(parent_transform) =
+                query_parents.get_component::<AbsoluteTransformMixin>(parent.get())
+            {
+                let absolute_transform = parent_transform.0 * child_transform.0;
+                commands
+                    .entity(child_entity)
+                    .insert(AbsoluteTransformMixin(absolute_transform));
+            }
         }
     }
 }

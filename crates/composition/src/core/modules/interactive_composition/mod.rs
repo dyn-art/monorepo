@@ -8,11 +8,19 @@ use self::{
         CursorMovedOnComposition, CursorUpOnComposition,
     },
     resources::InteractiveCompositionRes,
-    systems::{
-        handle_cursor_down_on_composition, handle_cursor_down_on_entity_event,
-        handle_cursor_down_on_resize_handle, handle_cursor_down_on_rotate_handle,
-        handle_cursor_entered_composition, handle_cursor_exited_composition,
-        handle_cursor_moved_on_composition, handle_cursor_up_on_composition,
+    systems::cursor::{
+        composition::{
+            cursor_down::handle_cursor_down_on_composition,
+            cursor_entered::handle_cursor_entered_composition,
+            cursor_exited::handle_cursor_exited_composition,
+            cursor_move::handle_cursor_moved_on_composition,
+            cursor_up::handle_cursor_up_on_composition,
+        },
+        entity::cursor_down::handle_cursor_down_on_entity_event,
+        ui::{
+            resize_handle::handle_cursor_down_on_resize_handle,
+            rotate_handle::handle_cursor_down_on_rotate_handle,
+        },
     },
 };
 

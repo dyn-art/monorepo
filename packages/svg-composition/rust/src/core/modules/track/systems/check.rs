@@ -96,13 +96,13 @@ pub fn check_cursor_changes(
                         cursor_rotation = 0.0;
                     }
                     _ if corner == (HandleSide::Bottom as u8 | HandleSide::Right as u8) => {
-                        cursor_rotation = 45.0;
+                        cursor_rotation = -135.0;
                     }
                     _ if corner == HandleSide::Bottom as u8 => {
                         cursor_rotation = 90.0;
                     }
                     _ if corner == (HandleSide::Bottom as u8 | HandleSide::Left as u8) => {
-                        cursor_rotation = -45.0;
+                        cursor_rotation = 135.0;
                     }
                     _ if corner == HandleSide::Left as u8 => {
                         cursor_rotation = 0.0;
@@ -134,7 +134,7 @@ pub fn check_cursor_changes(
                         cursor_rotation = 270.0;
                     }
                     _ if corner == (HandleSide::Bottom as u8 | HandleSide::Left as u8) => {
-                        cursor_rotation = 360.0;
+                        cursor_rotation = 0.0;
                     }
                     _ => {}
                 }

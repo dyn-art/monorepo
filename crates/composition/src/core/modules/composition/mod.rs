@@ -1,4 +1,4 @@
-use bevy_app::{Plugin, PreUpdate};
+use bevy_app::{Plugin, PostUpdate, PreUpdate};
 use bevy_ecs::world::World;
 
 use crate::core::dtif::{dtif_processor::DTIFProcessor, DTIFComposition};
@@ -6,7 +6,9 @@ use crate::core::dtif::{dtif_processor::DTIFProcessor, DTIFComposition};
 use self::{
     events::{EntityMoved, EntitySetPosition},
     resources::CompositionRes,
-    systems::layout::{handle_entity_moved_events, handle_entity_set_position_events},
+    systems::layout::{
+        calculate_absolute_transform, handle_entity_moved_events, handle_entity_set_position_events,
+    },
 };
 
 use super::node::components::types::Root;
@@ -33,6 +35,7 @@ impl Plugin for CompositionPlugin {
                 handle_entity_set_position_events,
             ),
         );
+        app.add_systems(PostUpdate, calculate_absolute_transform);
 
         // Load DTIF
         if let Some(dtif) = &self.dtif {
@@ -47,7 +50,7 @@ fn insert_dtif_into_world(world: &mut World, dtif: &DTIFComposition) {
 
     // Spawn and process nodes recursively
     let root_node_entity = dtif_processor
-        .process_node(root_node_eid, world, dtif)
+        .process_root(root_node_eid, world, dtif)
         .unwrap();
     world.entity_mut(root_node_entity).insert(Root);
 

@@ -83,7 +83,7 @@ export function getHandleMetaData(width: number, height: number): THandleMetaDat
 				width: RESIZE_CORNER_HANDLE_WIDTH,
 				height: RESIZE_CORNER_HANDLE_HEIGHT,
 				pointerAreaOffset: RESIZE_POINTER_AREA_OFFSET,
-				cursor: new ResizeCursor(45)
+				cursor: new ResizeCursor(-135)
 			},
 			rotateHandle: {
 				width: ROTATE_HANDLE_WIDTH,
@@ -125,7 +125,7 @@ export function getHandleMetaData(width: number, height: number): THandleMetaDat
 					-ROTATE_HANDLE_WIDTH + RESIZE_POINTER_AREA_OFFSET / 2,
 					RESIZE_CORNER_HANDLE_HEIGHT - RESIZE_POINTER_AREA_OFFSET / 2
 				],
-				cursor: new RotateCursor(360)
+				cursor: new RotateCursor(0)
 			}
 		},
 		{
