@@ -4,7 +4,7 @@ use bevy_ecs::{
     query::{Changed, With},
     system::{Query, ResMut},
 };
-use bevy_hierarchy::Parent;
+use bevy_hierarchy::{Children, Parent};
 use dyn_bevy_render_skeleton::extract_param::Extract;
 use dyn_composition::core::modules::node::components::{
     mixins::{DimensionMixin, Paint},
@@ -14,13 +14,13 @@ use dyn_composition::core::modules::node::components::{
 use crate::core::{
     mixin_change::ToMixinChange,
     modules::svg_render::resources::changed_components::{
-        ChangedComponents, ChangedNode, ChangedPaint,
+        ChangedComponentsRes, ChangedNode, ChangedPaint,
     },
 };
 
-pub fn extract_mixin_generic<T: Component + ToMixinChange>(
-    mut changed: ResMut<ChangedComponents>,
-    query: Extract<Query<(Entity, &Node, &T), (With<Node>, Changed<T>)>>,
+pub fn extract_mixin_generic<C: Component + ToMixinChange>(
+    mut changed: ResMut<ChangedComponentsRes>,
+    query: Extract<Query<(Entity, &Node, &C), (With<Node>, Changed<C>)>>,
     parent_query: Extract<Query<&Parent>>,
 ) {
     query.for_each(|(entity, node, mixin)| {
@@ -42,14 +42,16 @@ pub fn extract_mixin_generic<T: Component + ToMixinChange>(
     });
 }
 
-// TODO: won't detect DimensionChange?
 pub fn extract_paint(
-    mut changed: ResMut<ChangedComponents>,
-    query: Extract<Query<(Entity, &Paint), Changed<Paint>>>,
+    mut changed: ResMut<ChangedComponentsRes>,
+    changed_paint_query: Extract<Query<(Entity, &Paint), Changed<Paint>>>,
     parent_query: Extract<Query<&Parent>>,
-    dimension_query: Extract<Query<&DimensionMixin>>,
+    children_query: Extract<Query<&Children>>,
+    changed_dimension_query: Extract<Query<(Entity, &DimensionMixin), Changed<DimensionMixin>>>,
+    paint_query: Extract<Query<(Entity, &Paint)>>,
 ) {
-    query.for_each(|(entity, paint)| {
+    // Query changed paints
+    changed_paint_query.for_each(|(entity, paint)| {
         changed.changed_paints.entry(entity).or_insert_with(|| {
             let mut parent_id: Option<Entity> = None;
             let mut parent_dimension: Option<DimensionMixin> = None;
@@ -60,17 +62,36 @@ pub fn extract_paint(
                 parent_id = Some(parent_entity);
 
                 if let Ok(dimension_mixin) =
-                    dimension_query.get_component::<DimensionMixin>(parent_entity)
+                    changed_dimension_query.get_component::<DimensionMixin>(parent_entity)
                 {
                     parent_dimension = Some(dimension_mixin.clone());
                 }
             }
 
-            ChangedPaint {
+            return ChangedPaint {
                 paint: paint.clone(),
                 parent_id,
                 parent_dimension,
-            }
+            };
         });
+    });
+
+    // Query changed parent dimensions
+    // TODO: Improve
+    changed_dimension_query.for_each(|(parent_entity, dimension_mixin)| {
+        if let Ok(children) = children_query.get_component::<Children>(parent_entity) {
+            for child in children.iter() {
+                if let Ok(paint) = paint_query.get_component::<Paint>(*child) {
+                    changed
+                        .changed_paints
+                        .entry(*child)
+                        .or_insert_with(|| ChangedPaint {
+                            paint: paint.clone(),
+                            parent_id: Some(parent_entity),
+                            parent_dimension: Some(dimension_mixin.clone()),
+                        });
+                }
+            }
+        }
     });
 }

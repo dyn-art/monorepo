@@ -43,7 +43,8 @@ async function createComposition(config: {
 		height,
 		renderer: {
 			domElement: element
-		}
+		},
+		isCallbackBased: false
 	});
 
 	return composition;

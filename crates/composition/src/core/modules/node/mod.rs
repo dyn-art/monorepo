@@ -1,24 +1,16 @@
-use bevy_app::{App, Plugin, PostUpdate, Update};
+use bevy_app::{App, Plugin, PostUpdate};
 
-use self::systems::{
-    construct_path::construct_rectangle_path,
-    layout::{handle_entity_moved_events, handle_entity_set_position_events},
-};
+use self::systems::construct_path::construct_rectangle_path;
 
 pub mod components;
 mod systems;
+pub mod utils;
 
 pub struct NodePlugin;
 
 impl Plugin for NodePlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(
-            Update,
-            (
-                handle_entity_moved_events,
-                handle_entity_set_position_events,
-            ),
-        )
-        .add_systems(PostUpdate, construct_rectangle_path);
+        // Register systems
+        app.add_systems(PostUpdate, construct_rectangle_path);
     }
 }

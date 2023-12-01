@@ -1,9 +1,11 @@
 import type {
 	RenderUpdateEvent,
 	SVGAttribute,
-	SVGStyle
+	SVGStyle,
+	Vec2
 } from '@/rust/dyn_composition_api/bindings';
 
+import type { Composition } from '../composition';
 import { Renderer } from './Renderer';
 
 export const VERSION = '1.1';
@@ -16,29 +18,75 @@ export class SVGRenderer extends Renderer {
 
 	private _svgElementMap = new Map<number, SVGElement>();
 
-	constructor(options: TSVGRendererOptions = {}) {
-		super();
+	private _isCursorOutOfComposion = true;
+
+	constructor(composition: Composition, options: TSVGRendererOptions = {}) {
+		super(composition);
 		const { domElement = document.body } = options;
 		this._domElement = domElement;
+
+		// Create SVG root
 		this._svgElement = document.createElementNS(NS, 'svg');
 		this._svgElement.setAttribute('version', VERSION);
 		this._svgElement.style.setProperty('overflow', 'hidden');
 		this._domElement.appendChild(this._svgElement);
+
+		// Register SVG root callbacks
+		this._svgElement.addEventListener('pointermove', (e) => {
+			e.preventDefault();
+			this.composition.emitInteractionEvents(
+				[
+					{
+						type: 'CursorMovedOnComposition',
+						position: this.pointerEventToCompositionPoint(e)
+					}
+				],
+				false
+			);
+		});
+		this._svgElement.addEventListener('pointerdown', (e) => {
+			e.preventDefault();
+			this.composition.emitInteractionEvents([
+				{
+					type: 'CursorDownOnComposition',
+					position: this.pointerEventToCompositionPoint(e)
+				}
+			]);
+		});
+		this._svgElement.addEventListener('pointerup', (e) => {
+			this.composition.emitInteractionEvents([
+				{ type: 'CursorUpOnComposition', position: this.pointerEventToCompositionPoint(e) }
+			]);
+		});
+		this._svgElement.addEventListener('pointerenter', () => {
+			if (this._isCursorOutOfComposion) {
+				this.composition.emitInteractionEvents([{ type: 'CursorEnteredComposition' }]);
+				this._isCursorOutOfComposion = false;
+			}
+		});
+		this._svgElement.addEventListener('pointerleave', (e) => {
+			const compositionPoint = this.pointerEventToCompositionPoint(e);
+			// Check whether cursor actually left composition
+			// or whether its just on some UI layer like the selection box
+			// TODO: Or put UI layers into the composition SVG?
+			if (compositionPoint[0] < 0 || compositionPoint[1] < 0) {
+				this.composition.emitInteractionEvents([{ type: 'CursorExitedComposition' }]);
+				this._isCursorOutOfComposion = true;
+			}
+		});
 	}
 
-	public setSize(width: number, height: number): this {
+	public setSize(width: number, height: number): void {
 		this._svgElement.setAttribute('width', `${width}px`);
 		this._svgElement.setAttribute('height', `${height}px`);
-		return this;
 	}
 
-	public render(events: RenderUpdateEvent[]): this {
+	public render(events: RenderUpdateEvent[]): void {
 		for (const renderUpdate of events) {
-			const elementId = renderUpdate.id;
 			let element: SVGElement | null = null;
 			const getElement = (): SVGElement | null => {
 				if (element == null) {
-					element = this._svgElementMap.get(elementId) ?? null;
+					element = this._svgElementMap.get(renderUpdate.id) ?? null;
 				}
 				return element;
 			};
@@ -46,8 +94,9 @@ export class SVGRenderer extends Renderer {
 			for (const update of renderUpdate.updates) {
 				switch (update.type) {
 					case 'ElementCreated': {
-						// Create element
 						const newElement: SVGElement = document.createElementNS(NS, update.tagName);
+
+						// Apply attributes
 						for (const attribute of update.attributes) {
 							const parsedAttribute = this.parseSVGAttribute(attribute);
 							if (parsedAttribute != null) {
@@ -55,6 +104,8 @@ export class SVGRenderer extends Renderer {
 								newElement.setAttribute(key, value);
 							}
 						}
+
+						// Apply styles
 						for (const style of update.styles) {
 							const parsedStyle = this.parseSVGStyle(style);
 							if (parsedStyle != null) {
@@ -63,7 +114,22 @@ export class SVGRenderer extends Renderer {
 							}
 						}
 
-						this._svgElementMap.set(elementId, newElement);
+						// Register callbacks
+						const entity = update.entity;
+						if (update.isBundleRoot && entity != null) {
+							newElement.addEventListener('pointerdown', (e) => {
+								e.preventDefault();
+								this.composition.emitInteractionEvents([
+									{
+										type: 'CursorDownOnEntity',
+										entity,
+										position: this.pointerEventToCompositionPoint(e)
+									}
+								]);
+							});
+						}
+
+						this._svgElementMap.set(renderUpdate.id, newElement);
 
 						// Append element to parent
 						if (update.parentId != null) {
@@ -82,7 +148,15 @@ export class SVGRenderer extends Renderer {
 						const elementToDelete = getElement();
 						if (elementToDelete?.parentNode != null) {
 							elementToDelete.parentNode.removeChild(elementToDelete);
-							this._svgElementMap.delete(elementId);
+							this._svgElementMap.delete(renderUpdate.id);
+						}
+						break;
+					}
+					case 'ElementAppended': {
+						const toAppendElement = getElement();
+						const parentElement = this._svgElementMap.get(renderUpdate.id);
+						if (parentElement != null && toAppendElement != null) {
+							parentElement.appendChild(toAppendElement);
 						}
 						break;
 					}
@@ -125,7 +199,6 @@ export class SVGRenderer extends Renderer {
 				}
 			}
 		}
-		return this;
 	}
 
 	private parseSVGAttribute(attribute: SVGAttribute): [string, string] | null {
@@ -256,11 +329,23 @@ export class SVGRenderer extends Renderer {
 		}
 	}
 
-	public clear(): this {
+	public clientWindowPointToCompositionPoint(clientProint: Vec2): Vec2 {
+		const rect = this._svgElement.getBoundingClientRect();
+
+		const x = clientProint[0] - rect.left;
+		const y = clientProint[1] - rect.top;
+
+		return [x, y];
+	}
+
+	public pointerEventToCompositionPoint(e: PointerEvent): Vec2 {
+		return this.clientWindowPointToCompositionPoint([e.clientX, e.clientY]);
+	}
+
+	public clear(): void {
 		while (this._domElement.firstChild) {
 			this._domElement.removeChild(this._domElement.firstChild);
 		}
-		return this;
 	}
 }
 

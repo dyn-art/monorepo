@@ -17,7 +17,7 @@ pub mod svg_node;
 pub mod svg_paint;
 
 #[derive(Resource, Debug)]
-pub struct SVGComposition {
+pub struct SVGCompositionRes {
     // All nodes of the SVGComposition
     nodes: HashMap<Entity, Box<dyn SVGNode>>,
     // All paints of the SVGComposition
@@ -28,9 +28,9 @@ pub struct SVGComposition {
     output_event_sender: Sender<OutputEvent>,
 }
 
-impl SVGComposition {
+impl SVGCompositionRes {
     pub fn new(output_event_sender: Sender<OutputEvent>) -> Self {
-        SVGComposition {
+        SVGCompositionRes {
             root_ids: Vec::new(),
             nodes: HashMap::new(),
             paints: HashMap::new(),
@@ -38,9 +38,9 @@ impl SVGComposition {
         }
     }
 
-    // =============================================================================
+    // =========================================================================
     // Getter & Setter
-    // =============================================================================
+    // =========================================================================
 
     pub fn get_node(&self, entity: &Entity) -> Option<&Box<dyn SVGNode>> {
         self.nodes.get(&entity)
@@ -58,9 +58,9 @@ impl SVGComposition {
         self.paints.get_mut(entity)
     }
 
-    // =============================================================================
+    // =========================================================================
     // Paint
-    // =============================================================================
+    // =========================================================================
 
     pub fn get_or_create_paint(
         &mut self,
@@ -69,7 +69,7 @@ impl SVGComposition {
         maybe_parent_id: &Option<Entity>,
     ) -> Option<&mut Box<dyn SVGPaint>> {
         if !self.paints.contains_key(&entity) {
-            if let Some(new_paint) = self.create_paint(paint) {
+            if let Some(new_paint) = self.create_paint(paint, entity.clone()) {
                 self.insert_paint(entity, new_paint, maybe_parent_id);
             } else {
                 return None;
@@ -109,15 +109,15 @@ impl SVGComposition {
         self.paints.insert(entity, paint);
     }
 
-    fn create_paint(&self, paint: &Paint) -> Option<Box<dyn SVGPaint>> {
+    fn create_paint(&self, paint: &Paint, entity: Entity) -> Option<Box<dyn SVGPaint>> {
         match paint {
-            Paint::Solid(..) => Some(Box::new(SolidSVGPaint::new())),
+            Paint::Solid(..) => Some(Box::new(SolidSVGPaint::new(entity))),
         }
     }
 
-    // =============================================================================
+    // =========================================================================
     // Node
-    // =============================================================================
+    // =========================================================================
 
     pub fn get_or_create_node(
         &mut self,
@@ -126,7 +126,7 @@ impl SVGComposition {
         maybe_parent_id: &Option<Entity>,
     ) -> Option<&mut Box<dyn SVGNode>> {
         if !self.nodes.contains_key(&entity) {
-            if let Some(new_node) = self.create_node(node_type) {
+            if let Some(new_node) = self.create_node(node_type, entity.clone()) {
                 self.insert_node(entity, new_node, maybe_parent_id);
             } else {
                 return None;
@@ -166,17 +166,17 @@ impl SVGComposition {
         self.nodes.insert(entity, node);
     }
 
-    fn create_node(&self, node_type: &NodeType) -> Option<Box<dyn SVGNode>> {
+    fn create_node(&self, node_type: &NodeType, entity: Entity) -> Option<Box<dyn SVGNode>> {
         match node_type {
-            NodeType::Rectangle => Some(Box::new(ShapeSVGNode::new())),
-            NodeType::Frame => Some(Box::new(FrameSVGNode::new())),
+            NodeType::Rectangle => Some(Box::new(ShapeSVGNode::new(entity))),
+            NodeType::Frame => Some(Box::new(FrameSVGNode::new(entity))),
             _ => None,
         }
     }
 
-    // =============================================================================
+    // =========================================================================
     // Other
-    // =============================================================================
+    // =========================================================================
 
     pub fn forward_render_updates(&mut self, updates: Vec<RenderUpdateEvent>) {
         for update in updates {

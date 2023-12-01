@@ -5,6 +5,8 @@ use specta::Type;
 
 use crate::core::events::input_event::InputEvent;
 
+use super::resources::XYWH;
+
 #[derive(Debug, Deserialize, Type, Clone)]
 #[serde(tag = "type")]
 pub enum InteractionInputEvent {
@@ -12,6 +14,10 @@ pub enum InteractionInputEvent {
     CursorMovedOnComposition(CursorMovedOnComposition),
     CursorEnteredComposition(CursorEnteredComposition),
     CursorExitedComposition(CursorExitedComposition),
+    CursorDownOnComposition(CursorDownOnComposition),
+    CursorUpOnComposition(CursorUpOnComposition),
+    CursorDownOnResizeHandle(CursorDownOnResizeHandle),
+    CursorDownOnRotateHandle(CursorDownOnRotateHandle),
 }
 
 impl InputEvent for InteractionInputEvent {
@@ -28,7 +34,19 @@ impl InputEvent for InteractionInputEvent {
             }
             InteractionInputEvent::CursorDownOnEntity(event) => {
                 world.send_event(event);
-            } // ... other interaction events
+            }
+            InteractionInputEvent::CursorDownOnComposition(event) => {
+                world.send_event(event);
+            }
+            InteractionInputEvent::CursorUpOnComposition(event) => {
+                world.send_event(event);
+            }
+            InteractionInputEvent::CursorDownOnResizeHandle(event) => {
+                world.send_event(event);
+            }
+            InteractionInputEvent::CursorDownOnRotateHandle(event) => {
+                world.send_event(event);
+            }
         }
     }
 }
@@ -51,4 +69,31 @@ pub struct CursorExitedComposition;
 #[derive(Event, Debug, Serialize, Deserialize, Type, Clone)]
 pub struct CursorDownOnEntity {
     pub entity: Entity,
+    pub position: Vec2,
+}
+
+#[derive(Event, Debug, Serialize, Deserialize, Type, Clone)]
+pub struct CursorDownOnComposition {
+    pub position: Vec2,
+}
+
+#[derive(Event, Debug, Serialize, Deserialize, Type, Clone)]
+pub struct CursorUpOnComposition {
+    pub position: Vec2,
+}
+
+#[derive(Event, Debug, Serialize, Deserialize, Type, Clone)]
+pub struct CursorDownOnResizeHandle {
+    #[serde(rename = "initialBounds")]
+    pub initial_bounds: XYWH,
+    pub corner: u8,
+    #[serde(rename = "rotationInRadians")]
+    pub rotation_in_radians: f32,
+}
+
+#[derive(Event, Debug, Serialize, Deserialize, Type, Clone)]
+pub struct CursorDownOnRotateHandle {
+    pub corner: u8,
+    #[serde(rename = "initialRotationInRadians")]
+    pub initial_rotation_in_radians: f32,
 }

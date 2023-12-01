@@ -1,8 +1,8 @@
+use bevy_ecs::entity::Entity;
 use dyn_composition::core::modules::node::components::mixins::Paint;
 
 use crate::core::{
     events::output_event::RenderUpdateEvent,
-    helper::rgb_to_hex,
     modules::svg_render::resources::{
         changed_components::ChangedPaint,
         svg_composition::{
@@ -13,12 +13,12 @@ use crate::core::{
                 SVGElement, SVGTag,
             },
             svg_node::ElementReference,
-            SVGComposition,
+            SVGCompositionRes,
         },
     },
 };
 
-use super::SVGPaint;
+use super::{utils::rgb_to_hex, SVGPaint};
 
 #[derive(Debug)]
 pub struct SolidSVGPaint {
@@ -79,20 +79,20 @@ impl SVGPaint for SolidSVGPaint {
         self.bundle.drain_updates()
     }
 
-    fn to_string(&self, composition: &SVGComposition) -> String {
+    fn to_string(&self, composition: &SVGCompositionRes) -> String {
         self.bundle.to_string(composition)
     }
 }
 
 impl SolidSVGPaint {
-    pub fn new() -> Self {
+    pub fn new(entity: Entity) -> Self {
         // Create root element
         let mut element = SVGElement::new(SVGTag::Group);
         #[cfg(feature = "trace")]
         element.set_attribute(SVGAttribute::Name {
             name: SolidSVGPaint::create_element_name(element.get_id(), String::from("root"), false),
         });
-        let mut bundle = BaseSVGBundle::new(element);
+        let mut bundle = BaseSVGBundle::new(element, entity);
 
         // Create paint elements
         let mut paint_shape_element = SVGElement::new(SVGTag::Rect);

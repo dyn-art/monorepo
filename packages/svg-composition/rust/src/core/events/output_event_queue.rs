@@ -5,11 +5,11 @@ use bevy_ecs::system::Resource;
 use super::output_event::OutputEvent;
 
 #[derive(Resource, Debug)]
-pub struct OutputEventQueue {
+pub struct OutputEventQueueRes {
     output_event_sender: Sender<OutputEvent>,
 }
 
-impl OutputEventQueue {
+impl OutputEventQueueRes {
     pub fn new(output_event_sender: Sender<OutputEvent>) -> Self {
         Self {
             output_event_sender,

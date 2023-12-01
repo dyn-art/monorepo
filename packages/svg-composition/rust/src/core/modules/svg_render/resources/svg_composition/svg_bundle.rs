@@ -1,8 +1,10 @@
+use bevy_ecs::entity::Entity;
+
 use crate::core::events::output_event::RenderUpdateEvent;
 
 use super::{
     svg_element::{SVGChildElementIdentifier, SVGElement},
-    SVGComposition,
+    SVGCompositionRes,
 };
 
 pub trait SVGBundle {
@@ -25,16 +27,17 @@ pub struct BaseSVGBundle {
 }
 
 impl BaseSVGBundle {
-    pub fn new(element: SVGElement) -> Self {
+    pub fn new(mut element: SVGElement, entity: Entity) -> Self {
+        element.set_as_bundle_root(entity);
         Self {
             element,
             child_elements: Vec::new(),
         }
     }
 
-    // =============================================================================
+    // =========================================================================
     // Getter & Setter
-    // =============================================================================
+    // =========================================================================
 
     pub fn get_children(&self) -> &Vec<SVGElement> {
         &self.child_elements
@@ -56,9 +59,9 @@ impl BaseSVGBundle {
         self.child_elements.get_mut(index)
     }
 
-    // =============================================================================
+    // =========================================================================
     // Children
-    // =============================================================================
+    // =========================================================================
 
     pub fn append_child_to(&mut self, index: usize, mut element: SVGElement) -> Option<usize> {
         let next_index = self.get_next_child_index();
@@ -88,9 +91,9 @@ impl BaseSVGBundle {
         self.child_elements.len()
     }
 
-    // =============================================================================
+    // =========================================================================
     // Other
-    // =============================================================================
+    // =========================================================================
 
     pub fn drain_updates(&mut self) -> Vec<RenderUpdateEvent> {
         let mut drained_updates = Vec::new();
@@ -115,7 +118,7 @@ impl BaseSVGBundle {
         return drained_updates;
     }
 
-    pub fn to_string(&self, composition: &SVGComposition) -> String {
+    pub fn to_string(&self, composition: &SVGCompositionRes) -> String {
         self.element.to_string(self, composition)
     }
 }

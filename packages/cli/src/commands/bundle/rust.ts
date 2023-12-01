@@ -23,6 +23,12 @@ export default class Rust extends Command {
 			description: 'Analyze bundle',
 			required: false,
 			default: false
+		}),
+		verbose: Flags.boolean({
+			char: 'v',
+			description: 'More detailed logs',
+			required: false,
+			default: false
 		})
 	};
 
@@ -59,7 +65,8 @@ export default class Rust extends Command {
 			],
 			{
 				command: this,
-				cwd: rustInputDirPath // Set the cwd to the ./rust directory
+				cwd: rustInputDirPath, // Set the cwd to the ./rust directory
+				verbose: flags.verbose
 			}
 		);
 		this.log(
@@ -83,7 +90,8 @@ export default class Rust extends Command {
 			],
 			{
 				command: this,
-				cwd: rustInputDirPath
+				cwd: rustInputDirPath,
+				verbose: flags.verbose
 			}
 		);
 		this.log(
