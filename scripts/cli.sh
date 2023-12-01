@@ -10,14 +10,15 @@
 # Exit immediately if a command exits with a non-zero status
 set -e
 
+DIR="$(dirname "$0")"
+
 # Check if we are running on Vercel (https://vercel.com/docs/projects/environment-variables/system-environment-variables)
 if [ "$VERCEL" = "1" ]; then
-    echo "Detected Vercel environment. Setting up..."
-    DIR="$(dirname "$0")"
-    chmod +x "$DIR/vercel/cli_setup.sh"
-    source "$DIR/vercel/cli_setup.sh"
+    echo "🔄 - ⬛️ Detected Vercel environment. Setting up..."
+    chmod +x "$DIR/vercel/setup_cli.sh"
+    source "$DIR/vercel/setup_cli.sh"
 else
-    echo "Running locally..."
+    echo "🔶 Running locally..."
 fi
 
 # Find the absolute path to the monorepo's root directory

@@ -16,7 +16,6 @@ const ERROR = 2;
 module.exports = {
 	extends: [
 		require.resolve('@remix-run/eslint-config'),
-		require.resolve('@remix-run/eslint-config/node'),
 		require.resolve('@vercel/style-guide/eslint/node'),
 		require.resolve('@vercel/style-guide/eslint/browser'),
 		require.resolve('@vercel/style-guide/eslint/react'),

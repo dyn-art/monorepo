@@ -6,5 +6,6 @@ export default {
 	// publicPath: "/build/",
 	// serverBuildPath: "build/index.js",
 	tailwind: true,
-	postcss: true
+	postcss: true,
+	watchPaths: ['./node_modules/@dyn/svg-composition/dist/**/*']
 };

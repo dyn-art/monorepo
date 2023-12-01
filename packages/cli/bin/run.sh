@@ -1,2 +1,5 @@
 #!/bin/sh
-node "$(dirname "$0")/run.js" "$@"
+
+DIR="$(dirname "$0")"
+
+node "$DIR/run.js" "$@"

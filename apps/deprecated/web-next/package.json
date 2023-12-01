@@ -23,7 +23,7 @@
 	"bugs": {
 		"url": "https://issues.dyn.art/"
 	},
-	"homepage": "https://github.com/dyndotart/monorepo",
+	"homepage": "https://dyn.art/github",
 	"dependencies": {
 		"@dyn/dtom": "workspace:*",
 		"@radix-ui/react-icons": "^1.3.0",

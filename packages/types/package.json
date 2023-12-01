@@ -33,7 +33,7 @@
 	"bugs": {
 		"url": "https://issues.dyn.art/"
 	},
-	"homepage": "https://github.com/dyndotart/monorepo",
+	"homepage": "https://dyn.art/github",
 	"devDependencies": {
 		"@dyn/config": "workspace:*"
 	},

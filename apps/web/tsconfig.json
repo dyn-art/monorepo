@@ -5,6 +5,7 @@
 		"paths": {
 			"@/core/*": ["./src/core/*"],
 			"@/components/*": ["./src/components/*"],
+			"@/components/temp/shadcn": ["./src/components/temp/shadcn"],
 			"@/app/*": ["./src/app/*"]
 		}
 	},

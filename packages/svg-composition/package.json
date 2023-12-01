@@ -1,0 +1,52 @@
+{
+	"name": "@dyn/svg-composition",
+	"description": "SVG based canvas engine for dyn.art",
+	"version": "0.0.1",
+	"private": true,
+	"scripts": {
+		"build": "pnpm run build:rust && pnpm run build:ts",
+		"build:dev": "pnpm run build:rust:dev && pnpm run build:ts:dev",
+		"build:rust": "pnpm run clean:rust && ../../scripts/cli.sh bundle rust -p",
+		"build:rust:dev": "pnpm run clean:rust && ../../scripts/cli.sh bundle rust",
+		"build:ts": "pnpm run clean:ts && ../../scripts/cli.sh bundle -p",
+		"build:ts:dev": "pnpm run clean:ts && ../../scripts/cli.sh bundle",
+		"clean:rust": "shx rm -rf src/rust_modules",
+		"clean:ts": "shx rm -rf dist",
+		"start:dev": "pnpm run watch:rust",
+		"watch:rust": "cd rust && cargo watch -i \"target/*\" -s \"cd .. && pnpm run build\"",
+		"lint": "eslint --ext .js,.ts src/",
+		"clean": "pnpm run clean:ts && shx rm -rf node_modules && pnpm run clean:rust && shx rm -rf rust/target && shx rm -rf .turbo",
+		"install:clean": "pnpm run clean && pnpm install",
+		"test": "vitest run",
+		"update:deps": "pnpm update --latest"
+	},
+	"source": "./src/index.ts",
+	"main": "./dist/cjs/index.js",
+	"module": "./dist/esm/index.js",
+	"types": "./dist/types/index.d.ts",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/dyndotart/monorepo.git"
+	},
+	"keywords": [],
+	"author": "@bennoinbeta",
+	"license": "AGPL-3.0-or-later",
+	"bugs": {
+		"url": "https://issues.dyn.art/"
+	},
+	"homepage": "https://dyn.art/github",
+	"dependencies": {
+		"@dyn/utils": "workspace:*"
+	},
+	"devDependencies": {
+		"@dyn/config": "workspace:*",
+		"@dyn/types": "workspace:*",
+		"@rollup/plugin-wasm": "^6.2.2",
+		"@types/node": "^20.8.10",
+		"@types/react": "^18.2.33"
+	},
+	"files": [
+		"dist",
+		"README.md"
+	]
+}

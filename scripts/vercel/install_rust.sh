@@ -3,10 +3,7 @@
 # Exit immediately if a command exits with a non-zero status
 set -e
 
-echo "Installing Rustup..."
-
-# Explicitly set the HOME environment variable to the euid-obtained home directory
-export HOME=/root
+echo "🔄 - 🦀 Installing Rustup..."
 
 # Install Rustup (the Rust toolchain installer)
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
@@ -16,7 +13,7 @@ RUST_PROFILE="$HOME/.cargo/env"
 if [ -f "$RUST_PROFILE" ]; then
     source "$RUST_PROFILE"
 else
-    echo "Rust profile script does not exist. The installation may have failed."
+    echo "🛑 - 🦀 Rust profile script does not exist. The installation may have failed."
     exit 1
 fi
 
@@ -24,4 +21,4 @@ fi
 rustc --version
 cargo --version
 
-echo "Rust installation complete."
+echo "✅ - 🦀 Rust installation complete."

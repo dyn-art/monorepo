@@ -16,7 +16,7 @@
 	"bugs": {
 		"url": "https://issues.dyn.art/"
 	},
-	"homepage": "https://github.com/dyndotart/monorepo",
+	"homepage": "https://dyn.art/github",
 	"dependencies": {
 		"@vercel/style-guide": "^5.0.1",
 		"eslint-config-turbo": "^1.10.16",

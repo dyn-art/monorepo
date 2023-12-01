@@ -1,5 +1,3 @@
-// @ts-check
-
 /**
  * @type {import("@ianvs/prettier-plugin-sort-imports").PrettierConfig}
  */
@@ -12,7 +10,7 @@ module.exports = {
 	bracketSameLine: false,
 	semi: true,
 	quoteProps: 'consistent',
-	plugins: ['@ianvs/prettier-plugin-sort-imports'],
+	plugins: ['@ianvs/prettier-plugin-sort-imports', 'prettier-plugin-tailwindcss'],
 
 	// prettier-plugin-sort-imports options
 	// https://github.com/IanVS/prettier-plugin-sort-imports
@@ -23,7 +21,6 @@ module.exports = {
 		'^@dyn/',
 		// Internal packages
 		'^@/',
-		'^~/',
 		'',
 		// Relative
 		'^[../]',
