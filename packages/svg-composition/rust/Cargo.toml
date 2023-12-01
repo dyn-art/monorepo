@@ -28,7 +28,7 @@ cli = ["clap", "specta/export"]
 # Core dependencies
 dyn_composition = { path = "../../../crates/composition" }
 dyn_bevy_render_skeleton = { path = "../../../crates/bevy_render_skeleton" }
-specta = { path = "/Users/benno/Desktop/workspace/contribution/code/specta", features = [
+specta = { git = "https://github.com/oscartbeaumont/specta.git", branch = "main", features = [
     "typescript",
     "serde",
     "glam",

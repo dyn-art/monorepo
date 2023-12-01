@@ -782,6 +782,7 @@ dependencies = [
 [[package]]
 name = "specta"
 version = "2.0.0-rc.6"
+source = "git+https://github.com/oscartbeaumont/specta.git?branch=main#b22cf4bb42db3b8ebdae991329f1d59849323a7e"
 dependencies = [
  "bevy_ecs",
  "glam",
@@ -795,6 +796,7 @@ dependencies = [
 [[package]]
 name = "specta-macros"
 version = "2.0.0-rc.6"
+source = "git+https://github.com/oscartbeaumont/specta.git?branch=main#b22cf4bb42db3b8ebdae991329f1d59849323a7e"
 dependencies = [
  "Inflector",
  "proc-macro2",

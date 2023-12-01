@@ -21,7 +21,7 @@ serde = { version = "1.0.189", features = ["derive"] }
 glam = { version = "0.24.2", features = ["serde"] }
 log = "0.4.20"
 dyn_bevy_render_skeleton = { path = "../bevy_render_skeleton" }
-specta = { path = "/Users/benno/Desktop/workspace/contribution/code/specta", features = [
+specta = { git = "https://github.com/oscartbeaumont/specta.git", branch = "main", features = [
     "typescript",
     "serde",
     "glam",
