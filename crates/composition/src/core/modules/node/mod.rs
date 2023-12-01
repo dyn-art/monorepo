@@ -4,6 +4,7 @@ use self::systems::construct_path::construct_rectangle_path;
 
 pub mod components;
 mod systems;
+pub mod utils;
 
 pub struct NodePlugin;
 
