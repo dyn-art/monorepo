@@ -7,7 +7,7 @@ use self::{
     events::{EntityMoved, EntitySetPosition},
     resources::CompositionRes,
     systems::layout::{
-        calculate_absolute_transform, handle_entity_moved_events, handle_entity_set_position_events,
+        calculate_absolute_transform, handle_entity_moved, handle_entity_set_position,
     },
 };
 
@@ -28,13 +28,7 @@ impl Plugin for CompositionPlugin {
         app.add_event::<EntitySetPosition>();
 
         // Register systems
-        app.add_systems(
-            PreUpdate,
-            (
-                handle_entity_moved_events,
-                handle_entity_set_position_events,
-            ),
-        );
+        app.add_systems(PreUpdate, (handle_entity_moved, handle_entity_set_position));
         app.add_systems(PostUpdate, calculate_absolute_transform);
 
         // Load DTIF

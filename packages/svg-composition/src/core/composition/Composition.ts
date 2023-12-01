@@ -21,8 +21,8 @@ import type {
 } from '@/rust/dyn_composition_api/bindings';
 
 import type { TRustEnumKeyArray } from '../../wasm';
-import { groupByType, mat3, vec3 } from '../helper';
 import type { Renderer } from '../render';
+import { groupByType, mat3, vec3 } from '../utils';
 
 export class Composition {
 	private readonly _compositionHandle: JsCompositionHandle;

@@ -3,7 +3,6 @@ use dyn_composition::core::modules::node::components::mixins::Paint;
 
 use crate::core::{
     events::output_event::RenderUpdateEvent,
-    helper::rgb_to_hex,
     modules::svg_render::resources::{
         changed_components::ChangedPaint,
         svg_composition::{
@@ -19,7 +18,7 @@ use crate::core::{
     },
 };
 
-use super::SVGPaint;
+use super::{utils::rgb_to_hex, SVGPaint};
 
 #[derive(Debug)]
 pub struct SolidSVGPaint {

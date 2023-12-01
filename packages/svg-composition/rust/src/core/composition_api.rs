@@ -12,12 +12,12 @@ use dyn_composition::core::modules::node::components::mixins::{
 use wasm_bindgen::prelude::wasm_bindgen;
 use wasm_bindgen::JsValue;
 
+use crate::bindgen::utils::convert_optional_jsvalue;
 use crate::core::events::input_event::AnyInputEvent;
-use crate::core::helper::convert_optional_jsvalue;
 use crate::core::mixin_change::MixinChangeRelativeTransformMixin;
 use crate::core::modules::svg_render::resources::svg_composition::SVGCompositionRes;
 use crate::core::modules::svg_render::SvgRenderPlugin;
-use crate::core::modules::track::resources::trackable_entities::{
+use crate::core::modules::track::resources::tracked_entities::{
     TrackableMixinType, TrackedEntitiesRes,
 };
 use crate::core::modules::track::TrackPlugin;
@@ -159,7 +159,7 @@ impl JsCompositionHandle {
         // Update tracked entities
         let mut tracked_entities = app.world.get_resource_mut::<TrackedEntitiesRes>().unwrap();
         tracked_entities
-            .entities
+            .tracked_entities
             .entry(entity)
             .or_insert_with(HashSet::new)
             .extend(to_track_mixins);
@@ -186,7 +186,7 @@ impl JsCompositionHandle {
             .unwrap();
 
         // Remove entity from the tracked entities
-        let removed = tracked_entities.entities.remove(&entity).is_some();
+        let removed = tracked_entities.tracked_entities.remove(&entity).is_some();
 
         return removed;
     }

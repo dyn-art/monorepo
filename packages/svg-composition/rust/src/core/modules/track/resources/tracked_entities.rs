@@ -7,7 +7,7 @@ use std::collections::HashSet;
 
 #[derive(Resource, Debug, Default)]
 pub struct TrackedEntitiesRes {
-    pub entities: HashMap<Entity, HashSet<TrackableMixinType>>,
+    pub tracked_entities: HashMap<Entity, HashSet<TrackableMixinType>>,
 }
 
 #[derive(Debug, Deserialize, Clone, PartialEq, Eq, Hash, Type)]

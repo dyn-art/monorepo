@@ -14,7 +14,7 @@ use crate::core::modules::{
     node::components::mixins::{AbsoluteTransformMixin, RelativeTransformMixin},
 };
 
-pub fn handle_entity_moved_events(
+pub fn handle_entity_moved(
     mut event_reader: EventReader<EntityMoved>,
     mut query: Query<&mut RelativeTransformMixin>,
 ) {
@@ -27,7 +27,7 @@ pub fn handle_entity_moved_events(
     }
 }
 
-pub fn handle_entity_set_position_events(
+pub fn handle_entity_set_position(
     mut event_reader: EventReader<EntitySetPosition>,
     mut query: Query<&mut RelativeTransformMixin>,
 ) {

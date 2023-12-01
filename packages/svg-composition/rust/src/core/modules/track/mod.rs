@@ -2,7 +2,7 @@ use bevy_app::{App, Last, Plugin};
 use bevy_ecs::schedule::{IntoSystemConfigs, IntoSystemSetConfigs, SystemSet};
 
 use self::{
-    resources::{changed_components::ChangedComponentsRes, trackable_entities::TrackedEntitiesRes},
+    resources::{changed_components::ChangedComponentsRes, tracked_entities::TrackedEntitiesRes},
     systems::{
         check::{check_cursor_changes, check_interaction_mode_changes, check_selection_changes},
         extract::extract_tracked_mixin_changes,

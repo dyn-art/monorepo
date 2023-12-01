@@ -12,7 +12,7 @@ use crate::core::{
     mixin_change::ToMixinChange,
     modules::track::resources::{
         changed_components::ChangedComponentsRes,
-        trackable_entities::{TrackableMixinType, TrackedEntitiesRes},
+        tracked_entities::{TrackableMixinType, TrackedEntitiesRes},
     },
 };
 
@@ -22,7 +22,7 @@ pub fn extract_tracked_mixin_changes(
     query_dimension: Query<&DimensionMixin, Changed<DimensionMixin>>,
     query_relative_transform: Query<&RelativeTransformMixin, Changed<RelativeTransformMixin>>,
 ) {
-    for (entity, component_types) in tracked_entities.entities.iter() {
+    for (entity, component_types) in tracked_entities.tracked_entities.iter() {
         for component_type in component_types {
             match component_type {
                 TrackableMixinType::Dimension => {

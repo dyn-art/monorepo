@@ -72,6 +72,8 @@ impl Composition {
             entity.push_children(&paint_ids);
         }
 
+        // TOOD: Set absolute position
+
         return entity_id;
     }
 

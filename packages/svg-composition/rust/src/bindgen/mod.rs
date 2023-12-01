@@ -2,6 +2,7 @@ use wasm_bindgen::{prelude::wasm_bindgen, JsValue};
 
 mod console_logger;
 mod js_bindings;
+pub mod utils;
 
 /// Initializes the Rust-JavaScript connection
 #[wasm_bindgen(start)]
