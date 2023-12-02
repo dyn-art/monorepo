@@ -187,13 +187,13 @@ pub struct TextSection {
 #[derive(Serialize, Deserialize, Clone, Default, Debug, Type)]
 pub struct TextStyle {
     /// Height of rasterized glyphs in pixels, influenced by window scale.
-    font_size: u32,
+    pub font_size: u32,
     /// Primary font identifier.
-    font_hash: String,
+    pub font_hash: u64,
     /// Spacing between characters.
-    letter_spacing: LetterSpacing,
+    pub letter_spacing: LetterSpacing,
     /// Vertical spacing between lines of text.
-    line_height: LineHeight,
+    pub line_height: LineHeight,
 }
 
 /// Horizontal alignment options for text within its container.

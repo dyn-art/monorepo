@@ -1,12 +1,17 @@
 use bevy_ecs::{
     entity::Entity,
     query::{Changed, Or},
-    system::{Commands, Query},
+    system::{Commands, Query, Res},
 };
 use glam::Vec2;
+use log::info;
 
-use crate::core::modules::node::components::mixins::{
-    Anchor, AnchorCommand, DimensionMixin, PathMixin, RectangleCornerMixin,
+use crate::core::modules::{
+    composition::resources::font_cache::FontCacheRes,
+    node::components::{
+        mixins::{Anchor, AnchorCommand, DimensionMixin, PathMixin, RectangleCornerMixin},
+        types::Text,
+    },
 };
 
 // =============================================================================
@@ -14,13 +19,13 @@ use crate::core::modules::node::components::mixins::{
 // =============================================================================
 
 pub fn construct_rectangle_path(
+    mut commands: Commands,
     query: Query<
         (Entity, &RectangleCornerMixin, &DimensionMixin),
         Or<(Changed<RectangleCornerMixin>, Changed<DimensionMixin>)>,
     >,
-    mut commands: Commands,
 ) {
-    for (_entity, corners, dimension) in query.iter() {
+    for (entity, corners, dimension) in query.iter() {
         let mut path = PathMixin {
             vertices: Vec::new(),
         };
@@ -129,12 +134,28 @@ pub fn construct_rectangle_path(
         });
 
         // Insert or update the PathMixin component for the entity
-        commands.entity(_entity).insert(path);
+        commands.entity(entity).insert(path);
     }
 }
 
 // =============================================================================
-// Ellipse
+// Text
 // =============================================================================
 
-// TODO
+pub fn construct_text_path(
+    mut commands: Commands,
+    mut font_cache: Res<FontCacheRes>,
+    query: Query<(Entity, &Text), Changed<Text>>,
+) {
+    for (entity, text) in query.iter() {
+        // TODO
+        info!("construct_text_path for {:?} - {:#?}", entity, text);
+        for section in &text.sections {
+            if let Some(cached_font) = font_cache.get(&section.style.font_hash) {
+                let font_face = cached_font.get_or_create_face();
+                // TODO
+                info!("Fontface loaded");
+            }
+        }
+    }
+}
