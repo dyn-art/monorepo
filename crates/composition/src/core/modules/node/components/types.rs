@@ -189,9 +189,7 @@ pub struct TextStyle {
     /// Height of rasterized glyphs in pixels, influenced by window scale.
     font_size: u32,
     /// Primary font identifier.
-    font_id: String,
-    /// Identifiers for fallback fonts.
-    fallback_font_ids: Vec<String>,
+    font_hash: String,
     /// Spacing between characters.
     letter_spacing: LetterSpacing,
     /// Vertical spacing between lines of text.

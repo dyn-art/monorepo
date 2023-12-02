@@ -27,9 +27,9 @@ impl Composition {
         // Register plugins
         app.add_plugins((
             RenderPlugin,
+            NodePlugin,
             CompositionPlugin { dtif },
             InteractiveCompositionPlugin, // TODO: only include if "interaction" feature active?
-            NodePlugin,
         ));
 
         return Self { app };

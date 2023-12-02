@@ -5,13 +5,10 @@ use serde::{Deserialize, Serialize};
 use specta::Type;
 
 use super::modules::{
-    composition::events::CoreInputEvent,
-    node::{
-        components::{
-            bundles::{FrameNodeBundle, GroupNodeBundle, RectangleNodeBundle},
-            mixins::Paint,
-        },
-        resources::font_cache::font::FontWithContent,
+    composition::{events::CoreInputEvent, resources::font_cache::font::FontWithContent},
+    node::components::{
+        bundles::{FrameNodeBundle, GroupNodeBundle, RectangleNodeBundle},
+        mixins::Paint,
     },
 };
 
@@ -50,7 +47,7 @@ pub struct DTIFComposition {
     pub paints: HashMap<String, Paint>,
 
     /// A mapping of font hashes to their corresponding font data within the composition.
-    pub fonts: HashMap<String, FontWithContent>,
+    pub fonts: Vec<FontWithContent>,
 
     /// Optional list of changes represented as core input events.
     /// This field is optional and defaults to `None` if not provided.
