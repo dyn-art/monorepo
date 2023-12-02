@@ -46,13 +46,15 @@ fn insert_dtif_into_world(world: &mut World, dtif: &DTIFComposition) {
     let mut dtif_processor = DTIFProcessor::new();
 
     // Load fonts into cache
-    for font_with_content in dtif.fonts.clone() {
-        if let Some(mut font_cache) = world.get_resource_mut::<FontCacheRes>() {
-            font_cache.insert_with_hash(
-                font_with_content.hash,
-                font_with_content.font,
-                font_with_content.content,
-            );
+    if let Some(fonts) = &dtif.fonts {
+        for font_with_content in fonts.clone() {
+            if let Some(mut font_cache) = world.get_resource_mut::<FontCacheRes>() {
+                font_cache.insert_with_hash(
+                    font_with_content.hash,
+                    font_with_content.font,
+                    font_with_content.content,
+                );
+            }
         }
     }
 

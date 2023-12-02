@@ -66,7 +66,8 @@ export const COMPOSITION_WITH_ONE_RECT = (width: number, height: number): DTIFCo
 			isVisible: true,
 			opacity: 1
 		}
-	}
+	},
+	fonts: []
 });
 
 function createTransformMatrix(x: number, y: number, angleDegrees: number) {

@@ -63,6 +63,7 @@ pub struct Frame {
     /// Indicates whether the frame clips its content to its bounding box.
     /// When set to `true`, content that extends beyond the frame's boundaries will be clipped.
     /// When `false`, content can extend beyond the frame's boundaries without being clipped.
+    #[serde(rename = "clipContent")]
     clip_content: bool,
 }
 
@@ -110,6 +111,7 @@ pub struct Ellipse {
     /// Contains the arc data for the ellipse,
     /// which includes the starting angle, ending angle, and the inner radius ratio.
     /// These properties are used to create arcs and donuts shapes.
+    #[serde(rename = "arcData")]
     pub arc_data: EllipseArcData,
 }
 
@@ -119,13 +121,16 @@ pub struct Ellipse {
 #[derive(Default, Serialize, Deserialize, Clone, Debug, Type)]
 pub struct EllipseArcData {
     /// The starting angle of the ellipse's arc.
+    #[serde(rename = "startingAngle")]
     pub starting_angle: f32,
 
     /// The ending angle of the ellipse's arc.
+    #[serde(rename = "endingAngle")]
     pub ending_angle: f32,
 
     /// The ratio of the inner radius to the outer radius of the ellipse.
     /// A value of 0 indicates a full ellipse, while higher values create a 'donut' shape.
+    #[serde(rename = "innerRadiusRatio")]
     pub inner_radius_ratio: f32,
 }
 
@@ -138,10 +143,12 @@ pub struct EllipseArcData {
 pub struct Star {
     /// The number of "spikes", or outer points of the star.
     /// This value must be an integer greater than or equal to 3.
+    #[serde(rename = "pointCount")]
     pub point_count: u8,
 
     /// The ratio of the inner radius to the outer radius of the star.
     /// This value is used to define the sharpness of the star's points.
+    #[serde(rename = "innerRadiusRatio")]
     pub inner_radius_ratio: f32,
 }
 
@@ -154,6 +161,7 @@ pub struct Star {
 pub struct Polygon {
     /// The number of sides of the polygon.
     /// This value must be an integer greater than or equal to 3.
+    #[serde(rename = "pointCount")]
     pub point_count: u8,
 }
 
@@ -166,11 +174,20 @@ pub struct Polygon {
 pub struct Text {
     /// Sections of the text, each with its own style.
     pub sections: Vec<TextSection>,
+
     /// Horizontal alignment of the text within its container.
+    #[serde(default)]
+    #[serde(rename = "horizontalTextAlignment")]
     pub horizontal_text_alignment: HorizontalTextAlignment,
+
     /// Vertical alignment of the text within its container.
+    #[serde(default)]
+    #[serde(rename = "verticalTextAlignment")]
     pub vertical_text_alignment: VerticalTextAlignment,
+
     /// Behavior of text line breaking at the bounds of its container.
+    #[serde(default)]
+    #[serde(rename = "linebreakBehaviour")]
     pub linebreak_behavior: BreakLineOn,
 }
 
@@ -187,12 +204,21 @@ pub struct TextSection {
 #[derive(Serialize, Deserialize, Clone, Default, Debug, Type)]
 pub struct TextStyle {
     /// Height of rasterized glyphs in pixels, influenced by window scale.
+    #[serde(rename = "fontSize")]
     pub font_size: u32,
+
     /// Primary font identifier.
+    #[serde(rename = "fontHash")]
     pub font_hash: u64,
+
     /// Spacing between characters.
+    #[serde(default)]
+    #[serde(rename = "letterSpacing")]
     pub letter_spacing: LetterSpacing,
+
     /// Vertical spacing between lines of text.
+    #[serde(default)]
+    #[serde(rename = "lineHeight")]
     pub line_height: LineHeight,
 }
 

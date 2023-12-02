@@ -7,7 +7,7 @@ use specta::Type;
 use super::modules::{
     composition::{events::CoreInputEvent, resources::font_cache::font::FontWithContent},
     node::components::{
-        bundles::{FrameNodeBundle, GroupNodeBundle, RectangleNodeBundle},
+        bundles::{FrameNodeBundle, GroupNodeBundle, RectangleNodeBundle, TextNodeBundle},
         mixins::Paint,
     },
 };
@@ -47,7 +47,8 @@ pub struct DTIFComposition {
     pub paints: HashMap<String, Paint>,
 
     /// A mapping of font hashes to their corresponding font data within the composition.
-    pub fonts: Vec<FontWithContent>,
+    #[serde(default)]
+    pub fonts: Option<Vec<FontWithContent>>,
 
     /// Optional list of changes represented as core input events.
     /// This field is optional and defaults to `None` if not provided.
@@ -62,7 +63,8 @@ fn default_dtif_version() -> String {
 #[derive(Serialize, Deserialize, Clone, Debug, Type)]
 #[serde(tag = "type")]
 pub enum DTIFNode {
-    Rectangle(RectangleNodeBundle),
     Frame(FrameNodeBundle),
     Group(GroupNodeBundle),
+    Rectangle(RectangleNodeBundle),
+    Text(TextNodeBundle),
 }

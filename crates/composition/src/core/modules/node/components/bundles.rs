@@ -196,7 +196,6 @@ pub struct TextNodeBundle {
     #[serde(default = "default_text_node_bundle")]
     pub node: Node,
 
-    #[serde(default)]
     pub text: Text,
 
     #[serde(default)]
