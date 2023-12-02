@@ -1,7 +1,7 @@
 use bevy_ecs::{
     entity::Entity,
     query::{Changed, Or},
-    system::{Commands, Query, Res},
+    system::{Commands, Query, ResMut},
 };
 use glam::Vec2;
 use log::info;
@@ -144,17 +144,20 @@ pub fn construct_rectangle_path(
 
 pub fn construct_text_path(
     mut commands: Commands,
-    mut font_cache: Res<FontCacheRes>,
+    mut font_cache: ResMut<FontCacheRes>,
     query: Query<(Entity, &Text), Changed<Text>>,
 ) {
     for (entity, text) in query.iter() {
         // TODO
         info!("construct_text_path for {:?} - {:#?}", entity, text);
         for section in &text.sections {
-            if let Some(cached_font) = font_cache.get(&section.style.font_hash) {
-                let font_face = cached_font.get_or_create_face();
-                // TODO
-                info!("Fontface loaded");
+            if let Some(cached_font) = font_cache.get_mut(&section.style.font_hash) {
+                if let Some(font_face) = cached_font.get_or_create_face() {
+                    info!(
+                        "Fontface loaded with {} glyphs",
+                        font_face.number_of_glyphs()
+                    );
+                }
             }
         }
     }

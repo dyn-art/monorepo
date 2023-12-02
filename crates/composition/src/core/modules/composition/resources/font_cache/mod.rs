@@ -1,5 +1,5 @@
 use bevy_ecs::system::Resource;
-use rustybuzz::Face;
+use owned_ttf_parser::AsFaceRef;
 use std::hash::Hash;
 use std::{
     collections::{hash_map::DefaultHasher, HashMap},
@@ -22,8 +22,14 @@ impl FontCacheRes {
 
     pub fn insert_with_hash(&mut self, hash: Option<u64>, font: Font, content: Vec<u8>) {
         let hash = hash.or_else(|| Some(FontCacheRes::calculate_hash(&font)));
-        self.font_content
-            .insert(hash.unwrap(), CachedFont { content, font });
+        self.font_content.insert(
+            hash.unwrap(),
+            CachedFont {
+                content,
+                font,
+                face: None,
+            },
+        );
     }
 
     pub fn get(&self, hash: &u64) -> Option<&CachedFont> {
@@ -48,19 +54,24 @@ impl FontCacheRes {
 #[derive(Default)]
 pub struct CachedFont {
     pub content: Vec<u8>,
-    // pub face: Option<Face>, // TODO: figure out how to cache the font face
+    // https://github.com/RazrFalcon/ttf-parser/issues/37
+    pub face: Option<owned_ttf_parser::OwnedFace>,
     pub font: Font,
 }
 
 impl CachedFont {
-    // pub fn get_or_create_face(&'a mut self) -> &'a Face<'a> {
-    //     if self.face.is_none() {
-    //         self.face = Face::from_slice(&self.content, 0);
-    //     }
-    //     self.face.as_ref().unwrap()
-    // }
+    // TODO: Figure out whether cloning or reconstructing the ttf_face is more performant
+    pub fn get_or_create_face(&mut self) -> Option<rustybuzz::Face> {
+        if self.face.is_none() {
+            self.face = owned_ttf_parser::OwnedFace::from_vec(self.content.clone(), 0).ok();
+        }
+        return self.face.as_ref().and_then(|owned_face| {
+            let face_ref = owned_face.as_face_ref();
+            Some(rustybuzz::Face::from_face(face_ref.clone()))
+        });
+    }
 
-    pub fn get_or_create_face(&self) -> Face {
-        Face::from_slice(&self.content, 0).expect("Loading font failed")
+    pub fn create_face(&self) -> Option<rustybuzz::Face> {
+        rustybuzz::Face::from_slice(&self.content, 0)
     }
 }

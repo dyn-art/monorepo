@@ -28,3 +28,4 @@ specta = { git = "https://github.com/oscartbeaumont/specta.git", branch = "main"
     "bevy_ecs",
 ] }
 rustybuzz = "0.11.0"
+owned_ttf_parser = "0.20.0"

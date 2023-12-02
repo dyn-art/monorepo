@@ -599,6 +599,7 @@ dependencies = [
  "dyn_bevy_render_skeleton",
  "glam",
  "log",
+ "owned_ttf_parser",
  "rustybuzz",
  "serde",
  "specta",
@@ -904,6 +905,15 @@ name = "overload"
 version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b15813163c1d831bf4a13c3610c05c0d03b39feb07f7e09fa234dac9b15aaf39"
+
+[[package]]
+name = "owned_ttf_parser"
+version = "0.20.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d4586edfe4c648c71797a74c84bacb32b52b212eff5dfe2bb9f2c599844023e7"
+dependencies = [
+ "ttf-parser",
+]
 
 [[package]]
 name = "parking"
