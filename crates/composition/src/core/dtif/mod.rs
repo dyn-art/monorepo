@@ -11,7 +11,7 @@ use super::modules::{
             bundles::{FrameNodeBundle, GroupNodeBundle, RectangleNodeBundle},
             mixins::Paint,
         },
-        resources::font_cache::FontWithContent,
+        resources::font_cache::font::FontWithContent,
     },
 };
 

@@ -27,3 +27,4 @@ specta = { git = "https://github.com/oscartbeaumont/specta.git", branch = "main"
     "glam",
     "bevy_ecs",
 ] }
+rustybuzz = "0.11.0"
