@@ -3,6 +3,8 @@ use bevy_app::{App, Plugin, PostUpdate};
 use self::systems::construct_path::construct_rectangle_path;
 
 pub mod components;
+pub mod helper;
+pub mod resources;
 mod systems;
 pub mod utils;
 

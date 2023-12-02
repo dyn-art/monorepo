@@ -299,8 +299,9 @@ pub struct SolidPaint {
 // Effects
 // =============================================================================
 
-#[derive(Serialize, Deserialize, Clone, Debug, Type)]
+#[derive(Default, Serialize, Deserialize, Clone, Debug, Type)]
 pub enum BlendMode {
+    #[default]
     Normal,
     Multiply,
     Screen,

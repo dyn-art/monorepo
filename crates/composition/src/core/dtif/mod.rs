@@ -6,9 +6,12 @@ use specta::Type;
 
 use super::modules::{
     composition::events::CoreInputEvent,
-    node::components::{
-        bundles::{FrameNodeBundle, GroupNodeBundle, RectangleNodeBundle},
-        mixins::Paint,
+    node::{
+        components::{
+            bundles::{FrameNodeBundle, GroupNodeBundle, RectangleNodeBundle},
+            mixins::Paint,
+        },
+        resources::font_cache::FontWithContent,
     },
 };
 
@@ -45,6 +48,9 @@ pub struct DTIFComposition {
     /// Note: Planned to directly use `Entity` as a key once a specific serde issue is resolved.
     ///       https://github.com/serde-rs/serde/issues/1183
     pub paints: HashMap<String, Paint>,
+
+    /// A mapping of font hashes to their corresponding font data within the composition.
+    pub fonts: HashMap<String, FontWithContent>,
 
     /// Optional list of changes represented as core input events.
     /// This field is optional and defaults to `None` if not provided.
