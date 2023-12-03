@@ -1,6 +1,8 @@
 use bevy_app::{App, Plugin, PostUpdate};
 
-use self::systems::construct_path::{construct_rectangle_path, construct_text_path};
+use self::systems::construct_path::{
+    rectangle::construct_rectangle_path, text::construct_text_path,
+};
 
 pub mod components;
 pub mod helper;

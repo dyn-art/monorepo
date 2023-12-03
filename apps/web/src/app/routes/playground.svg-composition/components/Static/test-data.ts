@@ -1,6 +1,7 @@
 import { DTIFComposition, FontWithContent } from '@dyn/svg-composition';
 
 import { createTransformMatrix } from '../../utils';
+import { ABEEZEE_ITALIC, INTER_REGULAR } from './font';
 
 export const COMPOSITION_WITH_ONE_RECT = (
 	width: number,
@@ -47,7 +48,7 @@ export const COMPOSITION_WITH_ONE_RECT = (
 				width: 150,
 				height: 150
 			},
-			relativeTransform: createTransformMatrix((width - 100) / 4, (height - 100) / 4, 0),
+			relativeTransform: createTransformMatrix((width - 100) / 1.5, (height - 100) / 1.5, 0),
 			rectangleCornerMixin: {
 				bottomLeftRadius: 10,
 				bottomRightRadius: 20,
@@ -65,7 +66,14 @@ export const COMPOSITION_WITH_ONE_RECT = (
 					{
 						value: 'Hello there',
 						style: {
-							fontHash: 123,
+							fontHash: INTER_REGULAR.hash,
+							fontSize: 48
+						}
+					},
+					{
+						value: 'Jeff',
+						style: {
+							fontHash: ABEEZEE_ITALIC.hash,
 							fontSize: 70
 						}
 					}
@@ -76,7 +84,7 @@ export const COMPOSITION_WITH_ONE_RECT = (
 				width: 500,
 				height: 200
 			},
-			relativeTransform: createTransformMatrix(20, 20, 0),
+			relativeTransform: createTransformMatrix((width - 100) / 4, (height - 100) / 4, 0),
 			fill: {
 				paints: [5]
 			}
