@@ -17,8 +17,6 @@ use self::text_builder::TextBuilder;
 
 mod text_builder;
 
-/// Constructs a path representation of text for rendering.
-/// Processes each text section, line, and word, converting them into graphical path data.
 pub fn construct_text_path(
     mut commands: Commands,
     mut font_cache: ResMut<FontCacheRes>,
@@ -29,6 +27,7 @@ pub fn construct_text_path(
             vertices: Vec::new(),
         };
 
+        // Process text sections
         for section in &text.sections {
             let verticies = process_section(&mut font_cache, section, dimension);
             path.vertices.extend(verticies);
@@ -38,7 +37,6 @@ pub fn construct_text_path(
     }
 }
 
-/// Processes a section of text.
 fn process_section(
     font_cache: &mut FontCacheRes,
     section: &TextSection,
