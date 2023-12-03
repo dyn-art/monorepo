@@ -26,11 +26,12 @@ pub fn construct_text_path(
         let mut path = PathMixin {
             vertices: Vec::new(),
         };
+        let mut text_builder = TextBuilder::initial();
 
         // Process text sections
         for section in &text.sections {
-            let verticies = process_section(&mut font_cache, section, dimension);
-            path.vertices.extend(verticies);
+            let vertices = process_section(&mut font_cache, &mut text_builder, section, dimension);
+            path.vertices.extend(vertices);
         }
 
         commands.entity(entity).insert(path);
@@ -39,17 +40,20 @@ pub fn construct_text_path(
 
 fn process_section(
     font_cache: &mut FontCacheRes,
+    text_builder: &mut TextBuilder,
     section: &TextSection,
     dimension: &DimensionMixin,
 ) -> Vec<Anchor> {
     if let Some(cached_font) = font_cache.get_mut(&section.style.font_hash) {
         if let Some(font_face) = cached_font.get_or_create_face() {
             let font_size = section.style.font_size;
-            let mut text_builder = TextBuilder::new(&font_face, font_size);
             let mut unicode_buffer = UnicodeBuffer::new();
+            text_builder.update_for_new_section(&font_face, font_size);
 
-            // Process each line of the section
-            for line in section.value.split('\n') {
+            // Process each line of the section, maintaining continuity
+            let lines: Vec<&str> = section.value.split('\n').collect();
+            let total_lines = lines.len();
+            for (index, line) in lines.iter().enumerate() {
                 unicode_buffer = text_builder.process_line(
                     unicode_buffer,
                     line,
@@ -57,6 +61,11 @@ fn process_section(
                     font_size as f32,
                     &font_face,
                 );
+
+                // Move to a new line only if it's not the last line in the section
+                if index < total_lines - 1 {
+                    text_builder.move_to_new_line(font_size as f32);
+                }
             }
 
             return text_builder.into_vertices();

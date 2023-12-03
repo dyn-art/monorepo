@@ -17,18 +17,23 @@ pub struct TextBuilder {
 }
 
 impl TextBuilder {
-    pub fn new(font_face: &rustybuzz::Face, font_size: u32) -> Self {
-        let font_height = font_face.height();
-        let ascender = font_face.ascender();
-        let scale = (font_face.units_per_em() as f32).recip() * font_size as f32;
+    pub fn initial() -> Self {
         Self {
             current_subpath: Vec::new(),
             subpaths: Vec::new(),
             pos: Vec2::ZERO,
             offset: Vec2::ZERO,
-            ascender: (ascender as f32 / font_height as f32) * font_size as f32 / scale,
-            scale,
+            ascender: 0.0,
+            scale: 0.0,
         }
+    }
+
+    // Update TextBuilder for a new section
+    pub fn update_for_new_section(&mut self, font_face: &rustybuzz::Face, font_size: u32) {
+        let font_height = font_face.height();
+        let ascender = font_face.ascender();
+        self.scale = (font_face.units_per_em() as f32).recip() * font_size as f32;
+        self.ascender = (ascender as f32 / font_height as f32) * font_size as f32 / self.scale;
     }
 
     /// Converts a point from local to global coordinates, scaling accordingly.
@@ -45,7 +50,7 @@ impl TextBuilder {
     }
 
     /// Moves the current position to the start of a new line.
-    fn move_to_new_line(&mut self, line_height: f32) {
+    pub fn move_to_new_line(&mut self, line_height: f32) {
         self.pos = Vec2::new(0.0, self.pos.y + line_height);
     }
 
@@ -139,14 +144,12 @@ impl TextBuilder {
             unicode_buffer = glyph_buffer.clear();
         }
 
-        self.move_to_new_line(line_height);
-
         return unicode_buffer;
     }
 
     /// Converts the constructed paths into a flat vector of vertices.
-    pub fn into_vertices(self) -> Vec<Anchor> {
-        self.subpaths.into_iter().flatten().collect()
+    pub fn into_vertices(&mut self) -> Vec<Anchor> {
+        self.subpaths.drain(..).flatten().collect()
     }
 }
 
