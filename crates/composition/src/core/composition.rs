@@ -12,6 +12,7 @@ use super::{
     events::input_event::InputEvent,
     modules::node::{
         components::{bundles::RectangleNodeBundle, types::Root},
+        utils::logging::log_entity_components,
         NodePlugin,
     },
 };
@@ -127,24 +128,6 @@ impl Composition {
 
     #[cfg(feature = "trace")]
     pub fn log_entity_components(&self, entity: Entity) {
-        use log::info;
-
-        let component_names = self
-            .app
-            .world
-            .inspect_entity(entity)
-            .iter()
-            .map(|info| info.name())
-            .collect::<Vec<_>>();
-
-        if component_names.is_empty() {
-            info!("Entity ({:?}) has no components.", entity);
-        } else {
-            info!(
-                "Entity ({:?}) Components:\n - {}",
-                entity,
-                component_names.join("\n - ")
-            );
-        }
+        log_entity_components(&self.app.world, entity);
     }
 }
