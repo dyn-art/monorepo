@@ -64,7 +64,7 @@ export const COMPOSITION_WITH_ONE_RECT = (
 			text: {
 				sections: [
 					{
-						value: 'Hello there',
+						value: 'Hello \n there',
 						style: {
 							fontHash: INTER_REGULAR.hash,
 							fontSize: 48

@@ -1,6 +1,6 @@
 use glam::Vec2;
 use owned_ttf_parser::{GlyphId, OutlineBuilder};
-use rustybuzz::GlyphBuffer;
+use rustybuzz::{GlyphBuffer, UnicodeBuffer};
 
 use crate::core::modules::node::components::mixins::{Anchor, AnchorCommand};
 
@@ -9,7 +9,7 @@ use crate::core::modules::node::components::mixins::{Anchor, AnchorCommand};
 /// managing paths and bezier curves.
 pub struct TextBuilder {
     pub current_subpath: Vec<Anchor>,
-    pub other_subpaths: Vec<Vec<Anchor>>,
+    pub subpaths: Vec<Vec<Anchor>>,
     pub pos: Vec2,
     pub offset: Vec2,
     pub ascender: f32,
@@ -17,10 +17,13 @@ pub struct TextBuilder {
 }
 
 impl TextBuilder {
-    pub fn new(scale: f32, ascender: i16, font_height: i16, font_size: u32) -> Self {
+    pub fn new(font_face: &rustybuzz::Face, font_size: u32) -> Self {
+        let font_height = font_face.height();
+        let ascender = font_face.ascender();
+        let scale = (font_face.units_per_em() as f32).recip() * font_size as f32;
         Self {
             current_subpath: Vec::new(),
-            other_subpaths: Vec::new(),
+            subpaths: Vec::new(),
             pos: Vec2::ZERO,
             offset: Vec2::ZERO,
             ascender: (ascender as f32 / font_height as f32) * font_size as f32 / scale,
@@ -36,7 +39,7 @@ impl TextBuilder {
     /// Flushes the current subpath into other subpaths if it's not empty.
     pub fn flush_current_subpath(&mut self) {
         if !self.current_subpath.is_empty() {
-            self.other_subpaths
+            self.subpaths
                 .push(std::mem::take(&mut self.current_subpath));
         }
     }
@@ -76,7 +79,7 @@ impl TextBuilder {
             ) * self.scale;
             font_face.outline_glyph(GlyphId(glyph_info.glyph_id as u16), self);
             if !self.current_subpath.is_empty() {
-                self.other_subpaths
+                self.subpaths
                     .push(core::mem::replace(&mut self.current_subpath, Vec::new()));
             }
 
@@ -87,14 +90,63 @@ impl TextBuilder {
         }
     }
 
+    /// Processes a line of text, breaking it into words and constructing their paths.
+    pub fn process_line(
+        &mut self,
+        mut unicode_buffer: UnicodeBuffer,
+        line: &str,
+        line_width: f32,
+        line_height: f32,
+        font_face: &rustybuzz::Face,
+    ) -> UnicodeBuffer {
+        let words = line.split(' ');
+        let word_count = words.clone().count();
+
+        for (index, word) in words.enumerate() {
+            unicode_buffer.push_str(word);
+            if index != word_count - 1 {
+                unicode_buffer.push_str(" ");
+            }
+
+            let glyph_buffer = rustybuzz::shape(&font_face, &[], unicode_buffer);
+            if TextBuilder::should_wrap_word(line_width, &glyph_buffer, self.scale, self.pos.x) {
+                self.move_to_new_line(line_height);
+            }
+
+            self.process_glyphs(&glyph_buffer, line_width, line_height, font_face);
+            unicode_buffer = glyph_buffer.clear();
+        }
+
+        self.move_to_new_line(line_height);
+
+        return unicode_buffer;
+    }
+
     /// Converts the constructed paths into a flat vector of vertices.
     pub fn into_vertices(self) -> Vec<Anchor> {
-        self.other_subpaths.into_iter().flatten().collect()
+        self.subpaths.into_iter().flatten().collect()
     }
 
     /// Moves the current position to the start of a new line.
     pub fn move_to_new_line(&mut self, line_height: f32) {
         self.pos = Vec2::new(0.0, self.pos.y + line_height);
+    }
+
+    /// Decides if a word should be wrapped to the next line based on the available width.
+    pub fn should_wrap_word(
+        line_width: f32,
+        glyph_buffer: &GlyphBuffer,
+        scale: f32,
+        x_pos: f32,
+    ) -> bool {
+        let word_length: i32 = glyph_buffer
+            .glyph_positions()
+            .iter()
+            .map(|pos| pos.x_advance)
+            .sum();
+        let scaled_word_length = word_length as f32 * scale;
+
+        scaled_word_length + x_pos > line_width
     }
 }
 
