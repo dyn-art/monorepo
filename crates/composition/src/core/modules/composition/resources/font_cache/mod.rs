@@ -6,42 +6,47 @@ use std::{
     hash::Hasher,
 };
 
-use self::font::Font;
+use self::font::FontMetadata;
 
 pub mod font;
 
 #[derive(Resource, Default)]
 pub struct FontCacheRes {
-    font_content: HashMap<u64, CachedFont>,
+    fonts: HashMap<u64, CachedFont>,
 }
 
 impl FontCacheRes {
-    pub fn insert(&mut self, font: Font, content: Vec<u8>) {
-        self.insert_with_hash(None, font, content)
+    pub fn insert(&mut self, font_metadata: FontMetadata, content: Vec<u8>) {
+        self.insert_with_hash(None, font_metadata, content)
     }
 
-    pub fn insert_with_hash(&mut self, hash: Option<u64>, font: Font, content: Vec<u8>) {
-        let hash = hash.or_else(|| Some(FontCacheRes::calculate_hash(&font)));
-        self.font_content.insert(
+    pub fn insert_with_hash(
+        &mut self,
+        hash: Option<u64>,
+        font_metadata: FontMetadata,
+        content: Vec<u8>,
+    ) {
+        let hash = hash.or_else(|| Some(FontCacheRes::calculate_hash(&font_metadata)));
+        self.fonts.insert(
             hash.unwrap(),
             CachedFont {
                 content,
-                font,
+                metadata: font_metadata,
                 face: None,
             },
         );
     }
 
     pub fn get(&self, hash: &u64) -> Option<&CachedFont> {
-        self.font_content.get(hash)
+        self.fonts.get(hash)
     }
 
     pub fn get_mut(&mut self, hash: &u64) -> Option<&mut CachedFont> {
-        self.font_content.get_mut(hash)
+        self.fonts.get_mut(hash)
     }
 
     pub fn is_cached(&self, hash: &u64) -> bool {
-        self.font_content.contains_key(hash)
+        self.fonts.contains_key(hash)
     }
 
     fn calculate_hash<T: Hash>(value: &T) -> u64 {
@@ -56,7 +61,7 @@ pub struct CachedFont {
     pub content: Vec<u8>,
     // https://github.com/RazrFalcon/ttf-parser/issues/37
     pub face: Option<owned_ttf_parser::OwnedFace>,
-    pub font: Font,
+    pub metadata: FontMetadata,
 }
 
 impl CachedFont {

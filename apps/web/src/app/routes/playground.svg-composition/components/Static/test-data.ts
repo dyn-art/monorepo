@@ -1,4 +1,6 @@
-import { DTIFComposition, FontWithContent, mat3, vec3 } from '@dyn/svg-composition';
+import { DTIFComposition, FontWithContent } from '@dyn/svg-composition';
+
+import { createTransformMatrix } from '../../utils';
 
 export const COMPOSITION_WITH_ONE_RECT = (
 	width: number,
@@ -13,12 +15,12 @@ export const COMPOSITION_WITH_ONE_RECT = (
 	nodes: {
 		0: {
 			type: 'Frame',
-			children: [1, 2],
+			children: [1, 2, 3],
 			dimension: {
 				width,
 				height
 			},
-			relativeTransform: mat3(vec3(1, 0, 0), vec3(0, 1, 0), vec3(0, 0, 1))
+			relativeTransform: createTransformMatrix(0, 0, 0)
 		},
 		1: {
 			type: 'Rectangle',
@@ -27,11 +29,7 @@ export const COMPOSITION_WITH_ONE_RECT = (
 				width: 100,
 				height: 100
 			},
-			relativeTransform: mat3(
-				vec3(1, 0, 0),
-				vec3(0, 1, 0),
-				vec3((width - 100) / 2, (height - 100) / 2, 1)
-			),
+			relativeTransform: createTransformMatrix((width - 100) / 2, (height - 100) / 2, 30),
 			rectangleCornerMixin: {
 				bottomLeftRadius: 20,
 				bottomRightRadius: 0,
@@ -43,6 +41,24 @@ export const COMPOSITION_WITH_ONE_RECT = (
 			}
 		},
 		2: {
+			type: 'Rectangle',
+			compositionMixin: { isVisible: true, isLocked: false },
+			dimension: {
+				width: 150,
+				height: 150
+			},
+			relativeTransform: createTransformMatrix((width - 100) / 4, (height - 100) / 4, 0),
+			rectangleCornerMixin: {
+				bottomLeftRadius: 10,
+				bottomRightRadius: 20,
+				topLeftRadius: 40,
+				topRightRadius: 80
+			},
+			fill: {
+				paints: [5]
+			}
+		},
+		3: {
 			type: 'Text',
 			text: {
 				sections: [
@@ -50,21 +66,17 @@ export const COMPOSITION_WITH_ONE_RECT = (
 						value: 'Hello there',
 						style: {
 							fontHash: 123,
-							fontSize: 10
+							fontSize: 70
 						}
 					}
 				]
 			},
 			compositionMixin: { isVisible: true, isLocked: false },
 			dimension: {
-				width: 100,
-				height: 100
+				width: 500,
+				height: 200
 			},
-			relativeTransform: mat3(
-				vec3(1, 0, 0),
-				vec3(0, 1, 0),
-				vec3((width - 100) / 2, (height - 100) / 2, 1)
-			),
+			relativeTransform: createTransformMatrix(20, 20, 0),
 			fill: {
 				paints: [5]
 			}
@@ -81,11 +93,11 @@ export const COMPOSITION_WITH_ONE_RECT = (
 	},
 	fonts,
 	changes: [
-		{
-			type: 'EntityMoved',
-			entity: 1,
-			dx: 100,
-			dy: -300
-		}
+		// {
+		// 	type: 'EntityMoved',
+		// 	entity: 1,
+		// 	dx: 100,
+		// 	dy: -300
+		// }
 	]
 });

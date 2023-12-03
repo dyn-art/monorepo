@@ -51,7 +51,7 @@ fn insert_dtif_into_world(world: &mut World, dtif: &DTIFComposition) {
             if let Some(mut font_cache) = world.get_resource_mut::<FontCacheRes>() {
                 font_cache.insert_with_hash(
                     font_with_content.hash,
-                    font_with_content.font,
+                    font_with_content.metadata,
                     font_with_content.content,
                 );
             }

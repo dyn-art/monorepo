@@ -4,7 +4,7 @@ use specta::Type;
 /// Represents a font with specific characteristics.
 /// Used for text rendering and styling.
 #[derive(Serialize, Deserialize, Eq, PartialEq, Hash, Clone, Default, Debug, Type)]
-pub struct Font {
+pub struct FontMetadata {
     /// The name of the font, often used for display purposes.
     pub name: String,
     /// The font family to which this font belongs.
@@ -20,7 +20,7 @@ pub struct Font {
 #[derive(Serialize, Deserialize, Eq, PartialEq, Hash, Clone, Debug, Type)]
 pub struct FontWithContent {
     /// The base font information.
-    pub font: Font,
+    pub metadata: FontMetadata,
     /// The actual content of the font, either as a URL or binary data.
     pub content: Vec<u8>,
     /// Optional hash for uniquely identifying a font.

@@ -1,8 +1,8 @@
-import { Font, FontWithContent } from '@dyn/svg-composition';
+import { FontMetadata, FontWithContent } from '@dyn/svg-composition';
 
 export const INTER_REGULAR: TFont = {
 	hash: 123,
-	meta: {
+	metadata: {
 		name: 'Inter Regular',
 		family: 'Inter',
 		style: 'Normal',
@@ -15,14 +15,14 @@ export async function loadFont(font: TFont): Promise<FontWithContent> {
 	const response = await fetch(font.url);
 	const arrayBuffer = await response.arrayBuffer();
 	return {
-		font: font.meta,
+		metadata: font.metadata,
 		content: Array.from(new Uint8Array(arrayBuffer)),
 		hash: font.hash
 	};
 }
 
 type TFont = {
-	meta: Font;
+	metadata: FontMetadata;
 	url: string;
 	hash: number;
 };

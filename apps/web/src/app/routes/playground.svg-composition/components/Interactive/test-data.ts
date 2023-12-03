@@ -1,4 +1,6 @@
-import { DTIFComposition, mat3, vec3 } from '@dyn/svg-composition';
+import { DTIFComposition } from '@dyn/svg-composition';
+
+import { createTransformMatrix } from '../../utils';
 
 export const COMPOSITION_WITH_ONE_RECT = (width: number, height: number): DTIFComposition => ({
 	version: '0.0.1',
@@ -69,13 +71,3 @@ export const COMPOSITION_WITH_ONE_RECT = (width: number, height: number): DTIFCo
 	},
 	fonts: []
 });
-
-function createTransformMatrix(x: number, y: number, angleDegrees: number) {
-	const angleRadians = (angleDegrees * Math.PI) / 180; // Convert angle to radians
-
-	return mat3(
-		vec3(Math.cos(angleRadians), -Math.sin(angleRadians), 0),
-		vec3(Math.sin(angleRadians), Math.cos(angleRadians), 0),
-		vec3(x, y, 1)
-	);
-}
