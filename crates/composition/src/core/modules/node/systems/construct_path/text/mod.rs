@@ -12,11 +12,9 @@ use crate::core::modules::{
     },
 };
 
-use self::text_builder_v3::TextBuilder;
+use self::text_builder::TextBuilder;
 
-mod current_line;
 mod text_builder;
-mod text_builder_v3;
 
 pub fn construct_text_path(
     mut commands: Commands,

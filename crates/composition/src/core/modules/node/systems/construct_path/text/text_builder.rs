@@ -1,3 +1,4 @@
+use bevy_utils::HashMap;
 use glam::Vec2;
 use owned_ttf_parser::{GlyphId, OutlineBuilder};
 use rustybuzz::{GlyphBuffer, UnicodeBuffer};
@@ -6,87 +7,72 @@ use crate::core::modules::{
     composition::resources::font_cache::FontCacheRes,
     node::components::{
         mixins::{Anchor, AnchorCommand},
-        types::{Text, TextSection},
+        types::{Text, TextStyle},
     },
 };
 
-use super::current_line::CurrentLine;
-
 pub struct TextBuilder {
     subpaths: Vec<Vec<Anchor>>,
+    max_line_width: f32,
+
+    // Current
+    // TODO: improve
     current_subpath: Vec<Anchor>,
     current_pos: Vec2,
     current_offset: Vec2,
     current_ascender: f32,
     current_scale: f32,
-    max_line_width: f32,
 }
 
 impl TextBuilder {
-    pub fn new(line_width: f32) -> Self {
+    pub fn new(max_line_width: f32) -> Self {
         Self {
-            current_subpath: Vec::new(),
             subpaths: Vec::new(),
+            max_line_width,
+            current_subpath: Vec::new(),
             current_pos: Vec2::ZERO,
             current_offset: Vec2::ZERO,
             current_ascender: 0.0,
             current_scale: 0.0,
-            max_line_width: line_width,
         }
     }
 
     pub fn process_text(&mut self, text: &Text, font_cache: &mut FontCacheRes) {
-        let lines: Vec<Vec<TextSection>> = TextBuilder::create_lines_from_sections(&text.sections);
+        let token_stream = TokenStream::from_text(text, font_cache);
+        let lines = token_stream.into_lines();
 
-        // Process lines
         for line in &lines {
-            self.process_line(line, font_cache);
+            self.process_line(line, &token_stream);
         }
     }
 
-    /// Converts the constructed paths into a flat vector of vertices.
-    pub fn into_vertices(&mut self) -> Vec<Anchor> {
-        self.subpaths.drain(..).flatten().collect()
-    }
-
-    fn process_line(&mut self, line: &Vec<TextSection>, font_cache: &mut FontCacheRes) {
-        let mut current_line = CurrentLine::new();
-
-        // Build the current line with text and styles
-        for section in line {
-            current_line.add_section(&section.value, section.style.clone(), font_cache);
-        }
-        self.current_ascender = current_line.max_ascender;
-
+    pub fn process_line(&mut self, line: &Vec<&Token>, token_stream: &TokenStream) {
         let mut unicode_buffer = UnicodeBuffer::new();
+        let line_style_metric = TokenStream::compute_line_style_metric(line);
+        self.current_ascender = line_style_metric.ascender;
 
-        // Process each styled range in the line
-        for style_range in &current_line.style_ranges {
-            let text_slice = &current_line.text[style_range.start..style_range.end];
-            let font_hash = &style_range.style.font_hash;
-            self.current_scale = style_range.metric.scale;
+        for token in line {
+            if let Token::Space { style, metric } | Token::TextFragment { style, metric, .. } =
+                token
+            {
+                if let Some(font_face) = token_stream.get_buzz_face(style.font_hash) {
+                    self.current_scale = metric.scale;
 
-            if let Some(font_face) = font_cache.get_buzz_face(font_hash) {
-                let space = " ";
-                let words = text_slice.split(space);
-                let word_count = words.clone().count();
-
-                // Process words
-                for (index, word) in words.enumerate() {
-                    // Append to render word to the unicode buffer
-                    unicode_buffer.push_str(word);
-                    if index != word_count - 1 {
-                        unicode_buffer.push_str(space);
-                    }
+                    // Append to render string to the unicode buffer
+                    unicode_buffer.push_str(match token {
+                        Token::Space { .. } => " ",
+                        Token::TextFragment { value, .. } => value.as_str(),
+                        _ => "",
+                    });
 
                     // Shape the accumulated text in the unicode buffer
                     let glyph_buffer = rustybuzz::shape(&font_face, &[], unicode_buffer);
 
                     // Wrap to a new line if the current word exceeds the line width
-                    if self.should_wrap_word(&glyph_buffer, style_range.metric.scale) {
+                    if self.should_wrap_word(&glyph_buffer, self.current_scale) {
                         // TODO: Recalculate current line as the max_height might have change
                         //  because complete style_ranges might have already been processed
-                        self.move_to_new_line(current_line.max_height);
+                        self.move_to_new_line(line_style_metric.height);
                     }
 
                     // Render the glyphs and prepare the unicode buffer for the next iteration
@@ -98,7 +84,7 @@ impl TextBuilder {
     }
 
     /// Processes the glyphs of a text and constructs their paths.
-    pub fn process_glyphs(&mut self, glyph_buffer: &GlyphBuffer, font_face: &rustybuzz::Face) {
+    fn process_glyphs(&mut self, glyph_buffer: &GlyphBuffer, font_face: &rustybuzz::Face) {
         for (glyph_position, glyph_info) in glyph_buffer
             .glyph_positions()
             .iter()
@@ -125,10 +111,6 @@ impl TextBuilder {
         }
     }
 
-    pub fn move_to_new_line(&mut self, line_height: f32) {
-        self.current_pos = Vec2::new(0.0, self.current_pos.y + line_height);
-    }
-
     /// Decides if a word should be wrapped to the next line based on the available width.
     fn should_wrap_word(&self, glyph_buffer: &GlyphBuffer, scale: f32) -> bool {
         let word_width: i32 = glyph_buffer
@@ -139,6 +121,11 @@ impl TextBuilder {
         let scaled_word_width = word_width as f32 * scale;
 
         return scaled_word_width + self.current_pos.x > self.max_line_width;
+    }
+
+    /// Moves the current position to the start of a new line.
+    fn move_to_new_line(&mut self, line_height: f32) {
+        self.current_pos = Vec2::new(0.0, self.current_pos.y + line_height);
     }
 
     /// Converts a point from local to global coordinates, scaling accordingly.
@@ -156,41 +143,9 @@ impl TextBuilder {
         }
     }
 
-    /// Converts a series of text sections into a vector of lines
-    /// based on hard coded line breaks like `\n`.
-    fn create_lines_from_sections(text_sections: &[TextSection]) -> Vec<Vec<TextSection>> {
-        let mut lines = Vec::new();
-        let mut current_line = Vec::new();
-
-        for section in text_sections {
-            let section_lines: Vec<&str> = section.value.split('\n').collect();
-            let total_section_lines = section_lines.len();
-
-            for (index, section_line) in section_lines.iter().enumerate() {
-                let text_section = TextSection {
-                    value: String::from(*section_line),
-                    style: section.style.clone(),
-                };
-
-                // If it's not the last part, push to current_line and then to lines
-                if index < total_section_lines - 1 {
-                    current_line.push(text_section);
-                    lines.push(current_line.drain(..).collect());
-                }
-                // If it's the last part, just append to the current line
-                // so that next section can append to it
-                else {
-                    current_line.push(text_section);
-                }
-            }
-        }
-
-        // Adding the last line if it's not empty
-        if !current_line.is_empty() {
-            lines.push(current_line);
-        }
-
-        return lines;
+    /// Converts the constructed paths into a flat vector of vertices.
+    pub fn into_vertices(&mut self) -> Vec<Anchor> {
+        self.subpaths.drain(..).flatten().collect()
     }
 }
 
@@ -254,4 +209,154 @@ impl OutlineBuilder for TextBuilder {
         }
         self.flush_current_subpath();
     }
+}
+
+#[derive(Debug)]
+pub enum Token {
+    TextFragment {
+        value: String,
+        style: TextStyle,
+        metric: TokenStyleMetric,
+    },
+    Space {
+        style: TextStyle,
+        metric: TokenStyleMetric,
+    },
+    Linebreak,
+}
+
+pub struct TokenStream<'a> {
+    tokens: Vec<Token>,
+    buzz_face_cache: HashMap<u64, rustybuzz::Face<'a>>,
+}
+
+impl<'a> TokenStream<'a> {
+    pub fn from_text(text: &Text, font_cache: &'a mut FontCacheRes) -> Self {
+        let mut tokens: Vec<Token> = Vec::new();
+        let mut font_face_cache: HashMap<u64, rustybuzz::Face<'a>> = HashMap::new();
+
+        // Preload required faces to avoid mutable borrow conflicts during local font face caching
+        for section in &text.sections {
+            font_cache.load_ttfp_face(&section.style.font_hash);
+        }
+
+        // Iterate through text sections, creating tokens
+        for section in &text.sections {
+            let font_hash = section.style.font_hash;
+            let font_size = section.style.font_size as f32;
+
+            // Cache rustybuzz font face locally
+            if !font_face_cache.contains_key(&font_hash) {
+                if let Some(face) = font_cache.get_buzz_face(&section.style.font_hash) {
+                    font_face_cache.insert(section.style.font_hash, face.clone());
+                }
+            }
+            let buzz_face = font_face_cache.get(&font_hash).unwrap();
+
+            // Tokenize the text, considering spaces and line breaks
+            let mut start = 0;
+            for (index, match_str) in section
+                .value
+                .match_indices(|c: char| c.is_whitespace() || c == '\n')
+            {
+                // Create a text fragment token for non-whitespace sections
+                if start != index {
+                    tokens.push(Token::TextFragment {
+                        value: String::from(&section.value[start..index]),
+                        style: section.style.clone(),
+                        metric: Self::compute_token_style_metric(buzz_face, font_size),
+                    });
+                }
+
+                // Create a token for each space or line break
+                tokens.push(match match_str {
+                    "\n" => Token::Linebreak,
+                    _ => Token::Space {
+                        style: section.style.clone(),
+                        metric: Self::compute_token_style_metric(buzz_face, font_size),
+                    },
+                });
+
+                start = index + match_str.len();
+            }
+
+            // Handle the last word in the section, if any
+            if start < section.value.len() {
+                tokens.push(Token::TextFragment {
+                    value: String::from(&section.value[start..]),
+                    style: section.style.clone(),
+                    metric: Self::compute_token_style_metric(buzz_face, font_size),
+                });
+            }
+        }
+
+        return Self {
+            tokens,
+            buzz_face_cache: font_face_cache,
+        };
+    }
+
+    pub fn into_lines(&self) -> Vec<Vec<&Token>> {
+        let mut lines: Vec<Vec<&Token>> = Vec::new();
+
+        let mut current_line: Vec<&Token> = Vec::new();
+        for token in &self.tokens {
+            if let Token::Linebreak = token {
+                lines.push(current_line.drain(..).collect());
+            } else {
+                current_line.push(token);
+            }
+        }
+
+        return lines;
+    }
+
+    pub fn get_buzz_face(&self, hash: u64) -> Option<&rustybuzz::Face> {
+        self.buzz_face_cache.get(&hash)
+    }
+
+    pub fn compute_line_style_metric(line: &Vec<&Token>) -> LineStyleMetric {
+        line.iter().fold(
+            LineStyleMetric {
+                height: 0.0,
+                ascender: 0.0,
+            },
+            |mut metrics, token| {
+                match token {
+                    Token::TextFragment { metric, .. } | Token::Space { metric, .. } => {
+                        metrics.height = metrics.height.max(metric.height);
+                        metrics.ascender = metrics.ascender.max(metric.ascender);
+                    }
+                    _ => {}
+                }
+                metrics
+            },
+        )
+    }
+
+    fn compute_token_style_metric(
+        buzz_face: &rustybuzz::Face<'a>,
+        font_size: f32,
+    ) -> TokenStyleMetric {
+        let scale = (buzz_face.units_per_em() as f32).recip() * font_size;
+        let font_height = buzz_face.height() as f32;
+        return TokenStyleMetric {
+            ascender: (buzz_face.ascender() as f32 / font_height) * font_size / scale,
+            height: font_height,
+            scale,
+        };
+    }
+}
+
+#[derive(Debug)]
+pub struct TokenStyleMetric {
+    pub height: f32,
+    pub ascender: f32,
+    pub scale: f32,
+}
+
+#[derive(Debug)]
+pub struct LineStyleMetric {
+    pub height: f32,
+    pub ascender: f32,
 }
