@@ -48,23 +48,23 @@ impl FontCacheRes {
         self.fonts.contains_key(hash)
     }
 
-    pub fn get_font_face(&self, hash: &u64) -> Option<rustybuzz::Face> {
+    pub fn get_buzz_face(&self, hash: &u64) -> Option<rustybuzz::Face> {
         if let Some(cached_font) = self.fonts.get(hash) {
-            return cached_font.get_face();
+            return cached_font.get_buzz_face();
         }
         return None;
     }
 
-    pub fn get_or_create_font_face(&mut self, hash: &u64) -> Option<rustybuzz::Face> {
+    pub fn get_or_create_buzz_face(&mut self, hash: &u64) -> Option<rustybuzz::Face> {
         if let Some(cached_font) = self.fonts.get_mut(hash) {
-            return cached_font.get_or_create_face();
+            return cached_font.get_or_create_buzz_face();
         }
         return None;
     }
 
-    pub fn load_font_face(&mut self, hash: &u64) {
+    pub fn load_ttfp_face(&mut self, hash: &u64) {
         if let Some(cached_font) = self.fonts.get_mut(hash) {
-            return cached_font.load_face();
+            return cached_font.load_ttfp_face();
         }
     }
 
@@ -96,7 +96,7 @@ impl Default for CachedFontData {
 impl CachedFont {
     /// Function to retrieve or create a RustyBuzz face from cached font data.
     /// TODO: Figure out whether cloning or reconstructing the ttf_face is more performant
-    pub fn get_or_create_face(&mut self) -> Option<rustybuzz::Face> {
+    pub fn get_or_create_buzz_face(&mut self) -> Option<rustybuzz::Face> {
         if let CachedFontData::Face(ref owned_face) = self.data {
             return Some(rustybuzz::Face::from_face(owned_face.as_face_ref().clone()));
         }
@@ -115,7 +115,7 @@ impl CachedFont {
         return None;
     }
 
-    pub fn load_face(&mut self) {
+    pub fn load_ttfp_face(&mut self) {
         if let CachedFontData::Content(ref content) = self.data {
             if let Ok(owned_face) = owned_ttf_parser::OwnedFace::from_vec(content.clone(), 0) {
                 self.data = CachedFontData::Face(owned_face);
@@ -123,7 +123,7 @@ impl CachedFont {
         }
     }
 
-    pub fn get_face(&self) -> Option<rustybuzz::Face> {
+    pub fn get_buzz_face(&self) -> Option<rustybuzz::Face> {
         return match &self.data {
             CachedFontData::Face(owned_face) => {
                 Some(rustybuzz::Face::from_face(owned_face.as_face_ref().clone()))
@@ -132,7 +132,7 @@ impl CachedFont {
         };
     }
 
-    pub fn create_face_from_content(&self) -> Option<rustybuzz::Face> {
+    pub fn create_buzz_face_from_content(&self) -> Option<rustybuzz::Face> {
         return match &self.data {
             CachedFontData::Content(content) => rustybuzz::Face::from_slice(&content, 0),
             _ => None,

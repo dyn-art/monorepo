@@ -66,7 +66,7 @@ impl TextBuilder {
             let font_hash = &style_range.style.font_hash;
             self.current_scale = style_range.metric.scale;
 
-            if let Some(font_face) = font_cache.get_font_face(font_hash) {
+            if let Some(font_face) = font_cache.get_buzz_face(font_hash) {
                 let space = " ";
                 let words = text_slice.split(space);
                 let word_count = words.clone().count();

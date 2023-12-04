@@ -56,7 +56,7 @@ impl CurrentLine {
         let font_size = style.font_size as f32;
         let font_hash = style.font_hash;
         font_cache
-            .get_or_create_font_face(&font_hash)
+            .get_or_create_buzz_face(&font_hash)
             .map(|font_face| {
                 let scale = (font_face.units_per_em() as f32).recip() * font_size;
                 let font_height = font_face.height() as f32;
