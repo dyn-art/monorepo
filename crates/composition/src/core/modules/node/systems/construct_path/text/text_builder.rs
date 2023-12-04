@@ -15,11 +15,11 @@ use super::current_line::CurrentLine;
 pub struct TextBuilder {
     subpaths: Vec<Vec<Anchor>>,
     current_subpath: Vec<Anchor>,
-    pos: Vec2,
-    offset: Vec2,
-    ascender: f32,
-    scale: f32,
-    line_width: f32,
+    current_pos: Vec2,
+    current_offset: Vec2,
+    current_ascender: f32,
+    current_scale: f32,
+    max_line_width: f32,
 }
 
 impl TextBuilder {
@@ -27,11 +27,11 @@ impl TextBuilder {
         Self {
             current_subpath: Vec::new(),
             subpaths: Vec::new(),
-            pos: Vec2::ZERO,
-            offset: Vec2::ZERO,
-            ascender: 0.0,
-            scale: 0.0,
-            line_width,
+            current_pos: Vec2::ZERO,
+            current_offset: Vec2::ZERO,
+            current_ascender: 0.0,
+            current_scale: 0.0,
+            max_line_width: line_width,
         }
     }
 
@@ -56,7 +56,7 @@ impl TextBuilder {
         for section in line {
             current_line.add_section(&section.value, section.style.clone(), font_cache);
         }
-        self.ascender = current_line.max_ascender;
+        self.current_ascender = current_line.max_ascender;
 
         let mut unicode_buffer = UnicodeBuffer::new();
 
@@ -64,7 +64,7 @@ impl TextBuilder {
         for style_range in &current_line.style_ranges {
             let text_slice = &current_line.text[style_range.start..style_range.end];
             let font_hash = &style_range.style.font_hash;
-            self.scale = style_range.metric.scale;
+            self.current_scale = style_range.metric.scale;
 
             if let Some(font_face) = font_cache.get_font_face(font_hash) {
                 let space = " ";
@@ -105,10 +105,10 @@ impl TextBuilder {
             .zip(glyph_buffer.glyph_infos())
         {
             // Calculate and set the glyph offset for positioning
-            self.offset = Vec2::new(
+            self.current_offset = Vec2::new(
                 glyph_position.x_offset as f32,
                 glyph_position.y_offset as f32,
-            ) * self.scale;
+            ) * self.current_scale;
 
             // Outline the glyph and add it to the current path
             font_face.outline_glyph(GlyphId(glyph_info.glyph_id as u16), self);
@@ -118,15 +118,15 @@ impl TextBuilder {
             }
 
             // Update the position for the next glyph
-            self.pos += Vec2::new(
+            self.current_pos += Vec2::new(
                 glyph_position.x_advance as f32,
                 glyph_position.y_advance as f32,
-            ) * self.scale;
+            ) * self.current_scale;
         }
     }
 
     pub fn move_to_new_line(&mut self, line_height: f32) {
-        self.pos = Vec2::new(0.0, self.pos.y + line_height);
+        self.current_pos = Vec2::new(0.0, self.current_pos.y + line_height);
     }
 
     /// Decides if a word should be wrapped to the next line based on the available width.
@@ -138,12 +138,14 @@ impl TextBuilder {
             .sum();
         let scaled_word_width = word_width as f32 * scale;
 
-        return scaled_word_width + self.pos.x > self.line_width;
+        return scaled_word_width + self.current_pos.x > self.max_line_width;
     }
 
     /// Converts a point from local to global coordinates, scaling accordingly.
     fn point(&self, x: f32, y: f32) -> Vec2 {
-        self.pos + self.offset + Vec2::new(x, self.ascender - y) * self.scale
+        self.current_pos
+            + self.current_offset
+            + Vec2::new(x, self.current_ascender - y) * self.current_scale
     }
 
     /// Flushes the current subpath into other subpaths if it's not empty.

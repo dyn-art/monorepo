@@ -1,7 +1,6 @@
 use bevy_ecs::system::Resource;
 use owned_ttf_parser::AsFaceRef;
 use std::hash::Hash;
-use std::mem;
 use std::{
     collections::{hash_map::DefaultHasher, HashMap},
     hash::Hasher,
@@ -63,6 +62,12 @@ impl FontCacheRes {
         return None;
     }
 
+    pub fn load_font_face(&mut self, hash: &u64) {
+        if let Some(cached_font) = self.fonts.get_mut(hash) {
+            return cached_font.load_face();
+        }
+    }
+
     fn calculate_hash<T: Hash>(value: &T) -> u64 {
         let mut hasher = DefaultHasher::new();
         value.hash(&mut hasher);
@@ -108,6 +113,14 @@ impl CachedFont {
         }
 
         return None;
+    }
+
+    pub fn load_face(&mut self) {
+        if let CachedFontData::Content(ref content) = self.data {
+            if let Ok(owned_face) = owned_ttf_parser::OwnedFace::from_vec(content.clone(), 0) {
+                self.data = CachedFontData::Face(owned_face);
+            }
+        }
     }
 
     pub fn get_face(&self) -> Option<rustybuzz::Face> {

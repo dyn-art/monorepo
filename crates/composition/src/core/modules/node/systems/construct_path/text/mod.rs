@@ -3,20 +3,20 @@ use bevy_ecs::{
     query::{Changed, Or},
     system::{Commands, Query, ResMut},
 };
-use rustybuzz::UnicodeBuffer;
 
 use crate::core::modules::{
     composition::resources::font_cache::FontCacheRes,
     node::components::{
-        mixins::{Anchor, DimensionMixin, PathMixin},
-        types::{Text, TextSection},
+        mixins::{DimensionMixin, PathMixin},
+        types::Text,
     },
 };
 
-use self::text_builder::TextBuilder;
+use self::text_builder_v3::TextBuilder;
 
 mod current_line;
 mod text_builder;
+mod text_builder_v3;
 
 pub fn construct_text_path(
     mut commands: Commands,
