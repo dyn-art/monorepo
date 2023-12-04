@@ -2,22 +2,28 @@ use glam::Vec2;
 use owned_ttf_parser::{GlyphId, OutlineBuilder};
 use rustybuzz::{GlyphBuffer, UnicodeBuffer};
 
-use crate::core::modules::node::components::mixins::{Anchor, AnchorCommand};
+use crate::core::modules::{
+    composition::resources::font_cache::FontCacheRes,
+    node::components::{
+        mixins::{Anchor, AnchorCommand},
+        types::{Text, TextSection},
+    },
+};
 
-/// TextBuilder constructs text outlines for rendering.
-/// It translates TTF parser's commands into a series of anchors,
-/// managing paths and bezier curves.
+use super::current_line::CurrentLine;
+
 pub struct TextBuilder {
-    current_subpath: Vec<Anchor>,
     subpaths: Vec<Vec<Anchor>>,
+    current_subpath: Vec<Anchor>,
     pos: Vec2,
     offset: Vec2,
     ascender: f32,
     scale: f32,
+    line_width: f32,
 }
 
 impl TextBuilder {
-    pub fn initial() -> Self {
+    pub fn new(line_width: f32) -> Self {
         Self {
             current_subpath: Vec::new(),
             subpaths: Vec::new(),
@@ -25,70 +31,79 @@ impl TextBuilder {
             offset: Vec2::ZERO,
             ascender: 0.0,
             scale: 0.0,
+            line_width,
         }
     }
 
-    // Update TextBuilder for a new section
-    pub fn update_for_new_section(&mut self, font_face: &rustybuzz::Face, font_size: u32) {
-        let font_height = font_face.height();
-        let ascender = font_face.ascender();
-        self.scale = (font_face.units_per_em() as f32).recip() * font_size as f32;
-        self.ascender = (ascender as f32 / font_height as f32) * font_size as f32 / self.scale;
-    }
+    pub fn process_text(&mut self, text: &Text, font_cache: &mut FontCacheRes) {
+        let lines: Vec<Vec<TextSection>> = TextBuilder::create_lines_from_sections(&text.sections);
 
-    /// Converts a point from local to global coordinates, scaling accordingly.
-    fn point(&self, x: f32, y: f32) -> Vec2 {
-        self.pos + self.offset + Vec2::new(x, self.ascender - y) * self.scale
-    }
-
-    /// Flushes the current subpath into other subpaths if it's not empty.
-    fn flush_current_subpath(&mut self) {
-        if !self.current_subpath.is_empty() {
-            self.subpaths
-                .push(std::mem::take(&mut self.current_subpath));
+        // Process lines
+        for line in &lines {
+            self.process_line(line, font_cache);
         }
     }
 
-    /// Moves the current position to the start of a new line.
-    pub fn move_to_new_line(&mut self, line_height: f32) {
-        self.pos = Vec2::new(0.0, self.pos.y + line_height);
+    /// Converts the constructed paths into a flat vector of vertices.
+    pub fn into_vertices(&mut self) -> Vec<Anchor> {
+        self.subpaths.drain(..).flatten().collect()
     }
 
-    /// Decides if a word should be wrapped to the next line based on the available width.
-    pub fn should_wrap_word(
-        line_width: f32,
-        glyph_buffer: &GlyphBuffer,
-        scale: f32,
-        x_pos: f32,
-    ) -> bool {
-        let word_length: i32 = glyph_buffer
-            .glyph_positions()
-            .iter()
-            .map(|pos| pos.x_advance)
-            .sum();
-        let scaled_word_length = word_length as f32 * scale;
+    fn process_line(&mut self, line: &Vec<TextSection>, font_cache: &mut FontCacheRes) {
+        let mut current_line = CurrentLine::new();
 
-        return scaled_word_length + x_pos > line_width;
+        // Build the current line with text and styles
+        for section in line {
+            current_line.add_section(&section.value, section.style.clone(), font_cache);
+        }
+        self.ascender = current_line.max_ascender;
+
+        let mut unicode_buffer = UnicodeBuffer::new();
+
+        // Process each styled range in the line
+        for style_range in &current_line.style_ranges {
+            let text_slice = &current_line.text[style_range.start..style_range.end];
+            let font_hash = &style_range.style.font_hash;
+            self.scale = style_range.metric.scale;
+
+            if let Some(font_face) = font_cache.get_font_face(font_hash) {
+                let space = " ";
+                let words = text_slice.split(space);
+                let word_count = words.clone().count();
+
+                // Process words
+                for (index, word) in words.enumerate() {
+                    // Append to render word to the unicode buffer
+                    unicode_buffer.push_str(word);
+                    if index != word_count - 1 {
+                        unicode_buffer.push_str(space);
+                    }
+
+                    // Shape the accumulated text in the unicode buffer
+                    let glyph_buffer = rustybuzz::shape(&font_face, &[], unicode_buffer);
+
+                    // Wrap to a new line if the current word exceeds the line width
+                    if self.should_wrap_word(&glyph_buffer, style_range.metric.scale) {
+                        // TODO: Recalculate current line as the max_height might have change
+                        //  because complete style_ranges might have already been processed
+                        self.move_to_new_line(current_line.max_height);
+                    }
+
+                    // Render the glyphs and prepare the unicode buffer for the next iteration
+                    self.process_glyphs(&glyph_buffer, &font_face);
+                    unicode_buffer = glyph_buffer.clear();
+                }
+            }
+        }
     }
 
     /// Processes the glyphs of a text and constructs their paths.
-    pub fn process_glyphs(
-        &mut self,
-        glyph_buffer: &GlyphBuffer,
-        line_width: f32,
-        line_height: f32,
-        font_face: &rustybuzz::Face,
-    ) {
+    pub fn process_glyphs(&mut self, glyph_buffer: &GlyphBuffer, font_face: &rustybuzz::Face) {
         for (glyph_position, glyph_info) in glyph_buffer
             .glyph_positions()
             .iter()
             .zip(glyph_buffer.glyph_infos())
         {
-            // Check if glyph exceeds line width and move to new line if needed
-            if self.pos.x + (glyph_position.x_advance as f32 * self.scale) >= line_width {
-                self.move_to_new_line(line_height);
-            }
-
             // Calculate and set the glyph offset for positioning
             self.offset = Vec2::new(
                 glyph_position.x_offset as f32,
@@ -110,46 +125,70 @@ impl TextBuilder {
         }
     }
 
-    /// Processes a line of text, breaking it into words and constructing their paths.
-    pub fn process_line(
-        &mut self,
-        mut unicode_buffer: UnicodeBuffer, // Note: No reference as UnicodeBuffer can't be cloned
-        line: &str,
-        line_width: f32,
-        line_height: f32,
-        font_face: &rustybuzz::Face,
-    ) -> UnicodeBuffer {
-        let space = " ";
-        let words = line.split(space);
-        let word_count = words.clone().count();
-
-        // Process words
-        for (index, word) in words.enumerate() {
-            // Append to render word to the unicode buffer
-            unicode_buffer.push_str(word);
-            if index != word_count - 1 {
-                unicode_buffer.push_str(space);
-            }
-
-            // Shape the accumulated text in the unicode buffer
-            let glyph_buffer = rustybuzz::shape(&font_face, &[], unicode_buffer);
-
-            // Wrap to a new line if the current word exceeds the line width
-            if TextBuilder::should_wrap_word(line_width, &glyph_buffer, self.scale, self.pos.x) {
-                self.move_to_new_line(line_height);
-            }
-
-            // Render the glyphs and prepare the unicode buffer for the next iteration
-            self.process_glyphs(&glyph_buffer, line_width, line_height, font_face);
-            unicode_buffer = glyph_buffer.clear();
-        }
-
-        return unicode_buffer;
+    pub fn move_to_new_line(&mut self, line_height: f32) {
+        self.pos = Vec2::new(0.0, self.pos.y + line_height);
     }
 
-    /// Converts the constructed paths into a flat vector of vertices.
-    pub fn into_vertices(&mut self) -> Vec<Anchor> {
-        self.subpaths.drain(..).flatten().collect()
+    /// Decides if a word should be wrapped to the next line based on the available width.
+    fn should_wrap_word(&self, glyph_buffer: &GlyphBuffer, scale: f32) -> bool {
+        let word_width: i32 = glyph_buffer
+            .glyph_positions()
+            .iter()
+            .map(|pos| pos.x_advance)
+            .sum();
+        let scaled_word_width = word_width as f32 * scale;
+
+        return scaled_word_width + self.pos.x > self.line_width;
+    }
+
+    /// Converts a point from local to global coordinates, scaling accordingly.
+    fn point(&self, x: f32, y: f32) -> Vec2 {
+        self.pos + self.offset + Vec2::new(x, self.ascender - y) * self.scale
+    }
+
+    /// Flushes the current subpath into other subpaths if it's not empty.
+    fn flush_current_subpath(&mut self) {
+        if !self.current_subpath.is_empty() {
+            self.subpaths
+                .push(std::mem::take(&mut self.current_subpath));
+        }
+    }
+
+    /// Converts a series of text sections into a vector of lines
+    /// based on hard coded line breaks like `\n`.
+    fn create_lines_from_sections(text_sections: &[TextSection]) -> Vec<Vec<TextSection>> {
+        let mut lines = Vec::new();
+        let mut current_line = Vec::new();
+
+        for section in text_sections {
+            let section_lines: Vec<&str> = section.value.split('\n').collect();
+            let total_section_lines = section_lines.len();
+
+            for (index, section_line) in section_lines.iter().enumerate() {
+                let text_section = TextSection {
+                    value: String::from(*section_line),
+                    style: section.style.clone(),
+                };
+
+                // If it's not the last part, push to current_line and then to lines
+                if index < total_section_lines - 1 {
+                    current_line.push(text_section);
+                    lines.push(current_line.drain(..).collect());
+                }
+                // If it's the last part, just append to the current line
+                // so that next section can append to it
+                else {
+                    current_line.push(text_section);
+                }
+            }
+        }
+
+        // Adding the last line if it's not empty
+        if !current_line.is_empty() {
+            lines.push(current_line);
+        }
+
+        return lines;
     }
 }
 
