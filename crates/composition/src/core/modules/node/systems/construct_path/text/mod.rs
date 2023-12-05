@@ -15,6 +15,7 @@ use crate::core::modules::{
 use self::text_builder::TextBuilder;
 
 mod text_builder;
+mod token_stream;
 
 pub fn construct_text_path(
     mut commands: Commands,
