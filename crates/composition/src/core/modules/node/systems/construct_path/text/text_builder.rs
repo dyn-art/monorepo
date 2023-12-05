@@ -1,6 +1,6 @@
 use glam::Vec2;
 use owned_ttf_parser::{GlyphId, OutlineBuilder};
-use rustybuzz::{GlyphBuffer, UnicodeBuffer};
+use rustybuzz::GlyphBuffer;
 
 use crate::core::modules::{
     composition::resources::font_cache::FontCacheRes,
@@ -10,7 +10,13 @@ use crate::core::modules::{
     },
 };
 
-use super::token_stream::{Token, TokenStream};
+use super::{
+    current_line::CurrentLine,
+    line_break_strategy::{BreakOnWordLineBreakStrategy, LineBreakStrategy},
+    token::Token,
+    token_stream::{LineStyleMetric, TokenStream},
+    token_with_shape::TokenWithShape,
+};
 
 pub struct TextBuilder {
     subpaths: Vec<Vec<Anchor>>,
@@ -43,51 +49,68 @@ impl TextBuilder {
     pub fn process_text(&mut self, text: &Text, font_cache: &mut FontCacheRes) {
         let token_stream = TokenStream::from_text(text, font_cache);
         let lines = token_stream.into_lines();
+        let line_break_strategy = BreakOnWordLineBreakStrategy;
 
-        for line in &lines {
-            self.process_line(line, &token_stream);
+        for line in lines {
+            self.process_line(line, &token_stream, &line_break_strategy);
         }
     }
 
-    pub fn process_line(&mut self, line: &[&Token], token_stream: &TokenStream) {
-        let mut unicode_buffer = UnicodeBuffer::new();
-
-        // Compute line style metric
-        let mut line_style_metric = TokenStream::compute_line_style_metric(line);
-        self.current_max_ascender = line_style_metric.max_ascender;
+    fn process_line(
+        &mut self,
+        line: Vec<&Token>,
+        token_stream: &TokenStream,
+        line_break_strategy: &dyn LineBreakStrategy,
+    ) {
+        let mut line_style_metric = self.compute_line_style_metric(&line);
 
         // Move to a new line initially to ensure text
         // is within the view box and aligned at the common baseline
         self.move_to_new_line(line_style_metric.height);
 
+        let mut current_line = CurrentLine::new(self.max_line_width);
         for (index, token) in line.iter().enumerate() {
-            if let Token::Space { style, metric } | Token::TextFragment { style, metric, .. } =
-                token
-            {
+            if let Token::Space { style, .. } | Token::TextFragment { style, .. } = token {
                 if let Some(font_face) = token_stream.get_buzz_face(style.font_hash) {
-                    self.current_scale = metric.scale;
-                    self.current_ascender = metric.ascender;
-
-                    // Append to render string to the unicode buffer
-                    unicode_buffer.push_str(match token {
-                        Token::Space { .. } => " ",
-                        Token::TextFragment { value, .. } => value.as_str(),
-                        _ => "",
-                    });
-
-                    // Shape the accumulated text in the unicode buffer
-                    let glyph_buffer = rustybuzz::shape(&font_face, &[], unicode_buffer);
+                    let mut token_with_shape = TokenWithShape::new(token, &font_face);
 
                     // Wrap to a new line if the current word exceeds the line width
-                    if self.should_wrap_word(&glyph_buffer, self.current_scale) {
-                        line_style_metric = TokenStream::compute_line_style_metric(&line[index..]);
-                        self.current_max_ascender = line_style_metric.max_ascender;
+                    if line_break_strategy.should_break(&current_line, &mut token_with_shape) {
+                        // Render the glyphs of the current line
+                        self.process_current_line(&mut current_line);
+
+                        // Move to new line
+                        line_style_metric = self.compute_line_style_metric(&line[index..]);
                         self.move_to_new_line(line_style_metric.height);
                     }
 
-                    // Render the glyphs and prepare the unicode buffer for the next iteration
-                    self.process_glyphs(&glyph_buffer, &font_face);
-                    unicode_buffer = glyph_buffer.clear();
+                    current_line.append(token_with_shape);
+                }
+            }
+        }
+
+        // Render the glyphs of the last line
+        self.process_current_line(&mut current_line);
+    }
+
+    fn compute_line_style_metric(&mut self, tokens: &[&Token]) -> LineStyleMetric {
+        let line_style_metric = TokenStream::compute_line_style_metric(tokens);
+        self.current_max_ascender = line_style_metric.max_ascender;
+        return line_style_metric;
+    }
+
+    fn process_current_line(&mut self, current_line: &mut CurrentLine) {
+        if !current_line.is_empty() {
+            for token_with_shape in current_line.drain() {
+                if let Token::Space { metric, .. } | Token::TextFragment { metric, .. } =
+                    token_with_shape.token
+                {
+                    self.current_scale = metric.scale;
+                    self.current_ascender = metric.ascender;
+                    self.process_glyphs(
+                        &token_with_shape.glyph_buffer,
+                        &token_with_shape.font_face,
+                    );
                 }
             }
         }
@@ -121,18 +144,6 @@ impl TextBuilder {
                 glyph_position.y_advance as f32,
             ) * self.current_scale;
         }
-    }
-
-    /// Decides if a word should be wrapped to the next line based on the available width.
-    fn should_wrap_word(&self, glyph_buffer: &GlyphBuffer, scale: f32) -> bool {
-        let word_width: i32 = glyph_buffer
-            .glyph_positions()
-            .iter()
-            .map(|pos| pos.x_advance)
-            .sum();
-        let scaled_word_width = word_width as f32 * scale;
-
-        return scaled_word_width + self.current_pos.x > self.max_line_width;
     }
 
     /// Moves the current position to the start of a new line.

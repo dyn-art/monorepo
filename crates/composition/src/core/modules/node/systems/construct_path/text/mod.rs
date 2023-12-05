@@ -14,8 +14,12 @@ use crate::core::modules::{
 
 use self::text_builder::TextBuilder;
 
+mod current_line;
+mod line_break_strategy;
 mod text_builder;
+mod token;
 mod token_stream;
+mod token_with_shape;
 
 pub fn construct_text_path(
     mut commands: Commands,

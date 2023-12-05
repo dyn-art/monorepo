@@ -1,23 +1,10 @@
 use std::collections::HashMap;
 
 use crate::core::modules::{
-    composition::resources::font_cache::FontCacheRes,
-    node::components::types::{Text, TextStyle},
+    composition::resources::font_cache::FontCacheRes, node::components::types::Text,
 };
 
-#[derive(Debug)]
-pub enum Token {
-    TextFragment {
-        value: String,
-        style: TextStyle,
-        metric: TokenStyleMetric,
-    },
-    Space {
-        style: TextStyle,
-        metric: TokenStyleMetric,
-    },
-    Linebreak,
-}
+use super::token::{Token, TokenStyleMetric};
 
 pub struct TokenStream<'a> {
     tokens: Vec<Token>,
@@ -151,14 +138,6 @@ impl<'a> TokenStream<'a> {
             scale,
         }
     }
-}
-
-#[derive(Clone, Debug)]
-pub struct TokenStyleMetric {
-    pub height: f32,
-    pub ascender: f32,
-    pub descender: f32,
-    pub scale: f32,
 }
 
 #[derive(Debug)]
