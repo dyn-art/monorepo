@@ -1,5 +1,6 @@
 use bevy_utils::HashMap;
 use glam::Vec2;
+use log::info;
 use owned_ttf_parser::{GlyphId, OutlineBuilder};
 use rustybuzz::{GlyphBuffer, UnicodeBuffer};
 
@@ -49,7 +50,9 @@ impl TextBuilder {
     pub fn process_line(&mut self, line: &Vec<&Token>, token_stream: &TokenStream) {
         let mut unicode_buffer = UnicodeBuffer::new();
         let line_style_metric = TokenStream::compute_line_style_metric(line);
-        self.current_ascender = line_style_metric.ascender;
+
+        info!("process_line {:#?}", line); // TODO: REMOVE
+        info!("line_style_metric: {:#?}", line_style_metric);
 
         for token in line {
             if let Token::Space { style, metric } | Token::TextFragment { style, metric, .. } =
@@ -57,6 +60,7 @@ impl TextBuilder {
             {
                 if let Some(font_face) = token_stream.get_buzz_face(style.font_hash) {
                     self.current_scale = metric.scale;
+                    self.current_ascender = metric.ascender; // TODO
 
                     // Append to render string to the unicode buffer
                     unicode_buffer.push_str(match token {
@@ -252,6 +256,7 @@ impl<'a> TokenStream<'a> {
                 }
             }
             let buzz_face = font_face_cache.get(&font_hash).unwrap();
+            let token_metric = Self::compute_token_style_metric(buzz_face, font_size);
 
             // Tokenize the text, considering spaces and line breaks
             let mut start = 0;
@@ -264,7 +269,7 @@ impl<'a> TokenStream<'a> {
                     tokens.push(Token::TextFragment {
                         value: String::from(&section.value[start..index]),
                         style: section.style.clone(),
-                        metric: Self::compute_token_style_metric(buzz_face, font_size),
+                        metric: token_metric.clone(),
                     });
                 }
 
@@ -273,7 +278,7 @@ impl<'a> TokenStream<'a> {
                     "\n" => Token::Linebreak,
                     _ => Token::Space {
                         style: section.style.clone(),
-                        metric: Self::compute_token_style_metric(buzz_face, font_size),
+                        metric: token_metric.clone(),
                     },
                 });
 
@@ -285,7 +290,7 @@ impl<'a> TokenStream<'a> {
                 tokens.push(Token::TextFragment {
                     value: String::from(&section.value[start..]),
                     style: section.style.clone(),
-                    metric: Self::compute_token_style_metric(buzz_face, font_size),
+                    metric: token_metric,
                 });
             }
         }
@@ -299,13 +304,20 @@ impl<'a> TokenStream<'a> {
     pub fn into_lines(&self) -> Vec<Vec<&Token>> {
         let mut lines: Vec<Vec<&Token>> = Vec::new();
 
+        // Split tokens into lines at each Linebreak token
         let mut current_line: Vec<&Token> = Vec::new();
         for token in &self.tokens {
-            if let Token::Linebreak = token {
-                lines.push(current_line.drain(..).collect());
-            } else {
-                current_line.push(token);
+            match token {
+                Token::Linebreak => {
+                    lines.push(current_line.drain(..).collect());
+                }
+                _ => current_line.push(token),
             }
+        }
+
+        // Add the last line if it contains any tokens
+        if !current_line.is_empty() {
+            lines.push(current_line);
         }
 
         return lines;
@@ -316,22 +328,16 @@ impl<'a> TokenStream<'a> {
     }
 
     pub fn compute_line_style_metric(line: &Vec<&Token>) -> LineStyleMetric {
-        line.iter().fold(
-            LineStyleMetric {
-                height: 0.0,
-                ascender: 0.0,
-            },
-            |mut metrics, token| {
+        line.iter()
+            .fold(LineStyleMetric { height: 0.0 }, |mut metrics, token| {
                 match token {
                     Token::TextFragment { metric, .. } | Token::Space { metric, .. } => {
                         metrics.height = metrics.height.max(metric.height);
-                        metrics.ascender = metrics.ascender.max(metric.ascender);
                     }
                     _ => {}
                 }
                 metrics
-            },
-        )
+            })
     }
 
     fn compute_token_style_metric(
@@ -348,7 +354,7 @@ impl<'a> TokenStream<'a> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct TokenStyleMetric {
     pub height: f32,
     pub ascender: f32,
@@ -358,5 +364,4 @@ pub struct TokenStyleMetric {
 #[derive(Debug)]
 pub struct LineStyleMetric {
     pub height: f32,
-    pub ascender: f32,
 }
