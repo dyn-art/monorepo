@@ -1,5 +1,4 @@
 use glam::Vec2;
-use log::info;
 use owned_ttf_parser::{GlyphId, OutlineBuilder};
 use rustybuzz::GlyphBuffer;
 
@@ -57,45 +56,45 @@ impl TextBuilder {
     }
 
     fn process_line(&mut self, line: Vec<Token>, token_stream: &TokenStream) {
+        let mut to_process_tokens = line;
+        to_process_tokens.reverse(); // TODO: Performance
         let mut line_break_strategy = BreakOnWordLineBreakStrategy::new();
-        let mut line_style_metric = self.compute_line_style_metric(&line);
+        let mut line_style_metric = self.compute_line_style_metric(&to_process_tokens);
 
         // Move to a new line initially to ensure text
         // is within the view box and aligned at the common baseline
         self.move_to_new_line(line_style_metric.height);
 
         let mut current_line = CurrentLine::new(self.max_line_width);
-        for (index, token) in line.iter().enumerate() {
-            if let Token::Space { style, .. } | Token::TextFragment { style, .. } = token {
+        while let Some(token) = to_process_tokens.pop() {
+            // Process each token
+            if let Token::Space { style, .. } | Token::TextFragment { style, .. } = &token {
                 if let Some(font_face) = token_stream.get_buzz_face(style.font_hash) {
                     let mut token_with_shape = TokenWithShape::new(token.clone(), &font_face);
 
-                    // Wrap to a new line if the current word exceeds the line width
+                    // Check if a line break is needed
                     if let ShouldLineBreak::True {
                         maybe_overflown_tokens,
                     } =
                         line_break_strategy.should_break(&mut current_line, &mut token_with_shape)
                     {
-                        let overflown_tokens = maybe_overflown_tokens.unwrap_or_else(|| Vec::new());
-                        info!("break_line: \n - overflown_tokens: {:#?}", overflown_tokens);
+                        let overflown_tokens = maybe_overflown_tokens.unwrap_or_else(Vec::new);
 
                         // Render the glyphs of the current line
                         self.process_current_line(&mut current_line, &token_stream);
 
-                        // Move to new line
-                        // TODO
-                        // let concatenated_tokens: Vec<&Token> = overflown_tokens
-                        //     .iter()
-                        //     .map(|token_shape| token_shape.token)
-                        //     .chain(line[index..].iter().collect())
-                        //     .collect();
-                        line_style_metric = self.compute_line_style_metric(&line[index..]);
-                        self.move_to_new_line(line_style_metric.height);
-
-                        // Append overflown tokens to new line
-                        for overflow_token in overflown_tokens {
-                            current_line.append(overflow_token);
+                        // Push overflown tokens back to to_process_tokens
+                        for overflow_token in overflown_tokens
+                            .into_iter()
+                            .map(|token_with_shape| token_with_shape.token.clone())
+                            .rev()
+                        {
+                            to_process_tokens.push(overflow_token);
                         }
+
+                        // Move to new line and adjust line style metrics
+                        line_style_metric = self.compute_line_style_metric(&to_process_tokens);
+                        self.move_to_new_line(line_style_metric.height);
                     }
 
                     current_line.append(token_with_shape);
