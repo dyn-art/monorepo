@@ -52,14 +52,14 @@ impl TextBuilder {
         let mut unicode_buffer = UnicodeBuffer::new();
 
         // Compute line style metric
-        let line_style_metric = TokenStream::compute_line_style_metric(line);
+        let mut line_style_metric = TokenStream::compute_line_style_metric(line);
         self.current_max_ascender = line_style_metric.max_ascender;
 
         // Move to a new line initially to ensure text
         // is within the view box and aligned at the common baseline
         self.move_to_new_line(line_style_metric.height);
 
-        for token in line {
+        for (index, token) in line.iter().enumerate() {
             if let Token::Space { style, metric } | Token::TextFragment { style, metric, .. } =
                 token
             {
@@ -79,8 +79,8 @@ impl TextBuilder {
 
                     // Wrap to a new line if the current word exceeds the line width
                     if self.should_wrap_word(&glyph_buffer, self.current_scale) {
-                        // TODO: Recalculate current line as the max_height might have change
-                        //  because complete style_ranges might have already been processed
+                        line_style_metric = TokenStream::compute_line_style_metric(&line[index..]);
+                        self.current_max_ascender = line_style_metric.max_ascender;
                         self.move_to_new_line(line_style_metric.height);
                     }
 
@@ -334,7 +334,7 @@ impl<'a> TokenStream<'a> {
         self.buzz_face_cache.get(&hash)
     }
 
-    pub fn compute_line_style_metric(line: &Vec<&Token>) -> LineStyleMetric {
+    pub fn compute_line_style_metric(line: &[&Token]) -> LineStyleMetric {
         line.iter().fold(
             LineStyleMetric {
                 height: 0.0,

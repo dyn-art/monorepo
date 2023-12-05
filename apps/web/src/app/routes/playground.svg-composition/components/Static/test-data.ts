@@ -78,10 +78,17 @@ export const COMPOSITION_WITH_ONE_RECT = (
 						}
 					},
 					{
-						value: '!',
+						value: '! Long line test testtest',
 						style: {
 							fontHash: INTER_REGULAR.hash,
 							fontSize: 48
+						}
+					},
+					{
+						value: 'Extra small',
+						style: {
+							fontHash: INTER_REGULAR.hash,
+							fontSize: 24
 						}
 					}
 				]
@@ -89,7 +96,7 @@ export const COMPOSITION_WITH_ONE_RECT = (
 			compositionMixin: { isVisible: true, isLocked: false },
 			dimension: {
 				width: 500,
-				height: 200
+				height: 300
 			},
 			relativeTransform: createTransformMatrix((width - 100) / 4, (height - 100) / 4, 0),
 			fill: {
