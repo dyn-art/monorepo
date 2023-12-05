@@ -2,17 +2,18 @@ use rustybuzz::{GlyphBuffer, UnicodeBuffer};
 
 use super::token::Token;
 
-pub struct TokenWithShape<'a> {
-    pub token: &'a Token,
+#[derive(Debug)]
+pub struct TokenWithShape {
+    pub token: Token,
     pub glyph_buffer: GlyphBuffer,
-    pub font_face: &'a rustybuzz::Face<'a>,
+    // pub font_face: &'a rustybuzz::Face<'a>,
     width: Option<f32>,
 }
 
-impl<'a> TokenWithShape<'a> {
-    pub fn new(token: &'a Token, font_face: &'a rustybuzz::Face<'a>) -> Self {
+impl TokenWithShape {
+    pub fn new(token: Token, font_face: &rustybuzz::Face) -> Self {
         let mut unicode_buffer = UnicodeBuffer::new();
-        unicode_buffer.push_str(Self::get_token_str(token));
+        unicode_buffer.push_str(Self::get_token_str(&token));
 
         // Shape the accumulated text in the unicode buffer
         let glyph_buffer = rustybuzz::shape(&font_face, &[], unicode_buffer);
@@ -20,7 +21,6 @@ impl<'a> TokenWithShape<'a> {
         return Self {
             token,
             glyph_buffer,
-            font_face,
             width: None,
         };
     }
@@ -44,7 +44,7 @@ impl<'a> TokenWithShape<'a> {
             .iter()
             .map(|pos| pos.x_advance)
             .sum();
-        let scale = match self.token {
+        let scale = match &self.token {
             Token::Space { metric, .. } | Token::TextFragment { metric, .. } => metric.scale,
             _ => 1.0,
         };

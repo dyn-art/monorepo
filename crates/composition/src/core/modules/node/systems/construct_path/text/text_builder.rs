@@ -1,4 +1,5 @@
 use glam::Vec2;
+use log::info;
 use owned_ttf_parser::{GlyphId, OutlineBuilder};
 use rustybuzz::GlyphBuffer;
 
@@ -12,7 +13,7 @@ use crate::core::modules::{
 
 use super::{
     current_line::CurrentLine,
-    line_break_strategy::{BreakOnWordLineBreakStrategy, LineBreakStrategy},
+    line_break_strategy::{BreakOnWordLineBreakStrategy, LineBreakStrategy, ShouldLineBreak},
     token::Token,
     token_stream::{LineStyleMetric, TokenStream},
     token_with_shape::TokenWithShape,
@@ -47,21 +48,16 @@ impl TextBuilder {
     }
 
     pub fn process_text(&mut self, text: &Text, font_cache: &mut FontCacheRes) {
-        let token_stream = TokenStream::from_text(text, font_cache);
-        let lines = token_stream.into_lines();
-        let line_break_strategy = BreakOnWordLineBreakStrategy;
+        let mut token_stream = TokenStream::from_text(text, font_cache);
+        let lines = token_stream.drain_into_lines();
 
         for line in lines {
-            self.process_line(line, &token_stream, &line_break_strategy);
+            self.process_line(line, &token_stream);
         }
     }
 
-    fn process_line(
-        &mut self,
-        line: Vec<&Token>,
-        token_stream: &TokenStream,
-        line_break_strategy: &dyn LineBreakStrategy,
-    ) {
+    fn process_line(&mut self, line: Vec<Token>, token_stream: &TokenStream) {
+        let mut line_break_strategy = BreakOnWordLineBreakStrategy::new();
         let mut line_style_metric = self.compute_line_style_metric(&line);
 
         // Move to a new line initially to ensure text
@@ -72,16 +68,34 @@ impl TextBuilder {
         for (index, token) in line.iter().enumerate() {
             if let Token::Space { style, .. } | Token::TextFragment { style, .. } = token {
                 if let Some(font_face) = token_stream.get_buzz_face(style.font_hash) {
-                    let mut token_with_shape = TokenWithShape::new(token, &font_face);
+                    let mut token_with_shape = TokenWithShape::new(token.clone(), &font_face);
 
                     // Wrap to a new line if the current word exceeds the line width
-                    if line_break_strategy.should_break(&current_line, &mut token_with_shape) {
+                    if let ShouldLineBreak::True {
+                        maybe_overflown_tokens,
+                    } =
+                        line_break_strategy.should_break(&mut current_line, &mut token_with_shape)
+                    {
+                        let overflown_tokens = maybe_overflown_tokens.unwrap_or_else(|| Vec::new());
+                        info!("break_line: \n - overflown_tokens: {:#?}", overflown_tokens);
+
                         // Render the glyphs of the current line
-                        self.process_current_line(&mut current_line);
+                        self.process_current_line(&mut current_line, &token_stream);
 
                         // Move to new line
+                        // TODO
+                        // let concatenated_tokens: Vec<&Token> = overflown_tokens
+                        //     .iter()
+                        //     .map(|token_shape| token_shape.token)
+                        //     .chain(line[index..].iter().collect())
+                        //     .collect();
                         line_style_metric = self.compute_line_style_metric(&line[index..]);
                         self.move_to_new_line(line_style_metric.height);
+
+                        // Append overflown tokens to new line
+                        for overflow_token in overflown_tokens {
+                            current_line.append(overflow_token);
+                        }
                     }
 
                     current_line.append(token_with_shape);
@@ -90,27 +104,26 @@ impl TextBuilder {
         }
 
         // Render the glyphs of the last line
-        self.process_current_line(&mut current_line);
+        self.process_current_line(&mut current_line, &token_stream);
     }
 
-    fn compute_line_style_metric(&mut self, tokens: &[&Token]) -> LineStyleMetric {
+    fn compute_line_style_metric(&mut self, tokens: &[Token]) -> LineStyleMetric {
         let line_style_metric = TokenStream::compute_line_style_metric(tokens);
         self.current_max_ascender = line_style_metric.max_ascender;
         return line_style_metric;
     }
 
-    fn process_current_line(&mut self, current_line: &mut CurrentLine) {
+    fn process_current_line(&mut self, current_line: &mut CurrentLine, token_stream: &TokenStream) {
         if !current_line.is_empty() {
-            for token_with_shape in current_line.drain() {
-                if let Token::Space { metric, .. } | Token::TextFragment { metric, .. } =
-                    token_with_shape.token
+            for token_with_shape in current_line.drain(..) {
+                if let Token::Space { metric, style, .. }
+                | Token::TextFragment { metric, style, .. } = token_with_shape.token
                 {
-                    self.current_scale = metric.scale;
-                    self.current_ascender = metric.ascender;
-                    self.process_glyphs(
-                        &token_with_shape.glyph_buffer,
-                        &token_with_shape.font_face,
-                    );
+                    if let Some(font_face) = token_stream.get_buzz_face(style.font_hash) {
+                        self.current_scale = metric.scale;
+                        self.current_ascender = metric.ascender;
+                        self.process_glyphs(&token_with_shape.glyph_buffer, font_face);
+                    }
                 }
             }
         }

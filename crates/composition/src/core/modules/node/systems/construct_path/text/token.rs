@@ -1,6 +1,6 @@
 use crate::core::modules::node::components::types::TextStyle;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Token {
     TextFragment {
         value: String,

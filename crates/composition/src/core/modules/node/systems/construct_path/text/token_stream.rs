@@ -78,12 +78,12 @@ impl<'a> TokenStream<'a> {
         };
     }
 
-    pub fn into_lines(&self) -> Vec<Vec<&Token>> {
-        let mut lines: Vec<Vec<&Token>> = Vec::new();
+    pub fn drain_into_lines(&mut self) -> Vec<Vec<Token>> {
+        let mut lines: Vec<Vec<Token>> = Vec::new();
 
         // Split tokens into lines at each Linebreak token
-        let mut current_line: Vec<&Token> = Vec::new();
-        for token in &self.tokens {
+        let mut current_line: Vec<Token> = Vec::new();
+        for token in self.tokens.drain(..) {
             match token {
                 Token::Linebreak => {
                     lines.push(current_line.drain(..).collect());
@@ -104,7 +104,7 @@ impl<'a> TokenStream<'a> {
         self.buzz_face_cache.get(&hash)
     }
 
-    pub fn compute_line_style_metric(line: &[&Token]) -> LineStyleMetric {
+    pub fn compute_line_style_metric(line: &[Token]) -> LineStyleMetric {
         line.iter().fold(
             LineStyleMetric {
                 height: 0.0,
@@ -131,12 +131,12 @@ impl<'a> TokenStream<'a> {
         let ascender = buzz_face.ascender() as f32 * scale;
         let descender = buzz_face.descender() as f32 * scale;
         buzz_face.height();
-        TokenStyleMetric {
+        return TokenStyleMetric {
             ascender,
             descender,
             height: ascender - descender,
             scale,
-        }
+        };
     }
 }
 
