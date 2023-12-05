@@ -1,6 +1,5 @@
 use bevy_utils::HashMap;
 use glam::Vec2;
-use log::info;
 use owned_ttf_parser::{GlyphId, OutlineBuilder};
 use rustybuzz::{GlyphBuffer, UnicodeBuffer};
 
@@ -22,6 +21,7 @@ pub struct TextBuilder {
     current_pos: Vec2,
     current_offset: Vec2,
     current_ascender: f32,
+    current_max_ascender: f32,
     current_scale: f32,
 }
 
@@ -34,6 +34,7 @@ impl TextBuilder {
             current_pos: Vec2::ZERO,
             current_offset: Vec2::ZERO,
             current_ascender: 0.0,
+            current_max_ascender: 0.0,
             current_scale: 0.0,
         }
     }
@@ -49,10 +50,14 @@ impl TextBuilder {
 
     pub fn process_line(&mut self, line: &Vec<&Token>, token_stream: &TokenStream) {
         let mut unicode_buffer = UnicodeBuffer::new();
-        let line_style_metric = TokenStream::compute_line_style_metric(line);
 
-        info!("process_line {:#?}", line); // TODO: REMOVE
-        info!("line_style_metric: {:#?}", line_style_metric);
+        // Compute line style metric
+        let line_style_metric = TokenStream::compute_line_style_metric(line);
+        self.current_max_ascender = line_style_metric.max_ascender;
+
+        // Move to a new line initially to ensure text
+        // is within the view box and aligned at the common baseline
+        self.move_to_new_line(line_style_metric.height);
 
         for token in line {
             if let Token::Space { style, metric } | Token::TextFragment { style, metric, .. } =
@@ -60,7 +65,7 @@ impl TextBuilder {
             {
                 if let Some(font_face) = token_stream.get_buzz_face(style.font_hash) {
                     self.current_scale = metric.scale;
-                    self.current_ascender = metric.ascender; // TODO
+                    self.current_ascender = metric.ascender;
 
                     // Append to render string to the unicode buffer
                     unicode_buffer.push_str(match token {
@@ -89,6 +94,8 @@ impl TextBuilder {
 
     /// Processes the glyphs of a text and constructs their paths.
     fn process_glyphs(&mut self, glyph_buffer: &GlyphBuffer, font_face: &rustybuzz::Face) {
+        let baseline_adjustment = self.current_max_ascender - self.current_ascender;
+
         for (glyph_position, glyph_info) in glyph_buffer
             .glyph_positions()
             .iter()
@@ -97,7 +104,7 @@ impl TextBuilder {
             // Calculate and set the glyph offset for positioning
             self.current_offset = Vec2::new(
                 glyph_position.x_offset as f32,
-                glyph_position.y_offset as f32,
+                glyph_position.y_offset as f32 - baseline_adjustment,
             ) * self.current_scale;
 
             // Outline the glyph and add it to the current path
@@ -328,29 +335,38 @@ impl<'a> TokenStream<'a> {
     }
 
     pub fn compute_line_style_metric(line: &Vec<&Token>) -> LineStyleMetric {
-        line.iter()
-            .fold(LineStyleMetric { height: 0.0 }, |mut metrics, token| {
+        line.iter().fold(
+            LineStyleMetric {
+                height: 0.0,
+                max_ascender: 0.0,
+            },
+            |mut metrics, token| {
                 match token {
                     Token::TextFragment { metric, .. } | Token::Space { metric, .. } => {
                         metrics.height = metrics.height.max(metric.height);
+                        metrics.max_ascender = metrics.max_ascender.max(metric.ascender);
                     }
                     _ => {}
                 }
                 metrics
-            })
+            },
+        )
     }
 
     fn compute_token_style_metric(
         buzz_face: &rustybuzz::Face<'a>,
         font_size: f32,
     ) -> TokenStyleMetric {
-        let scale = (buzz_face.units_per_em() as f32).recip() * font_size;
-        let font_height = buzz_face.height() as f32;
-        return TokenStyleMetric {
-            ascender: (buzz_face.ascender() as f32 / font_height) * font_size / scale,
-            height: font_height,
+        let scale = font_size / (buzz_face.units_per_em() as f32);
+        let ascender = buzz_face.ascender() as f32 * scale;
+        let descender = buzz_face.descender() as f32 * scale;
+        buzz_face.height();
+        TokenStyleMetric {
+            ascender,
+            descender,
+            height: ascender - descender,
             scale,
-        };
+        }
     }
 }
 
@@ -358,10 +374,12 @@ impl<'a> TokenStream<'a> {
 pub struct TokenStyleMetric {
     pub height: f32,
     pub ascender: f32,
+    pub descender: f32,
     pub scale: f32,
 }
 
 #[derive(Debug)]
 pub struct LineStyleMetric {
     pub height: f32,
+    pub max_ascender: f32,
 }
