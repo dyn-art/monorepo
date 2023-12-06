@@ -2,7 +2,7 @@ use crate::core::modules::node::systems::construct_path::text::{
     current_line::CurrentLine, token_with_shape::TokenWithShape,
 };
 
-use super::{LineBreakStrategy, ShouldLineBreak};
+use super::{LineBreakBehavior, LineBreakStrategy, ShouldBreakLine};
 
 pub struct SimpleBreakOnWordLineBreakStrategy;
 
@@ -17,16 +17,16 @@ impl LineBreakStrategy for SimpleBreakOnWordLineBreakStrategy {
         &mut self,
         current_line: &mut CurrentLine,
         next_token_in_line: &mut TokenWithShape,
-    ) -> ShouldLineBreak {
+    ) -> ShouldBreakLine {
         let should_break =
             current_line.current_width + next_token_in_line.get_width() > current_line.max_width;
 
         return if should_break {
-            ShouldLineBreak::True {
-                maybe_overflown_tokens: None,
+            ShouldBreakLine::True {
+                line_break_behavior: LineBreakBehavior::AppendNextToken(true),
             }
         } else {
-            ShouldLineBreak::False
+            ShouldBreakLine::False
         };
     }
 }

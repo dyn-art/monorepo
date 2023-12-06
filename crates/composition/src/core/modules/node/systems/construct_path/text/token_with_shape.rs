@@ -26,9 +26,9 @@ impl TokenWithShape {
 
     fn get_token_str(token: &Token) -> &str {
         match token {
-            Token::Space { .. } => "_",
+            Token::Space { .. } => " ",
             Token::TextFragment { value, .. } => value.as_str(),
-            _ => "_",
+            _ => " ",
         }
     }
 

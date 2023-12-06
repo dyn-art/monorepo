@@ -15,7 +15,8 @@ use crate::core::modules::{
 use super::{
     current_line::CurrentLine,
     line_break_strategy::{
-        break_on_word::BreakOnWordLineBreakStrategy, LineBreakStrategy, ShouldLineBreak,
+        break_on_word::BreakOnWordLineBreakStrategy, LineBreakBehavior, LineBreakStrategy,
+        ShouldBreakLine,
     },
     token::Token,
     token_stream::{LineStyleMetric, TokenStream},
@@ -76,27 +77,32 @@ impl TextBuilder {
                     let mut token_with_shape = TokenWithShape::new(token, &font_face);
 
                     // Check if a line break is needed
-                    if let ShouldLineBreak::True {
-                        maybe_overflown_tokens,
+                    if let ShouldBreakLine::True {
+                        line_break_behavior,
                     } =
                         line_break_strategy.should_break(&mut current_line, &mut token_with_shape)
                     {
                         // Render the glyphs of the current line
                         self.process_current_line(&mut current_line, &token_stream);
 
-                        // Requeue overflown tokens to `to_process_tokens`, followed by the current token.
-                        // This ensures that overflown tokens are processed first in the next line.
-                        if let Some(overflown_tokens) = maybe_overflown_tokens {
-                            to_process_tokens.push_front(token_with_shape.token);
-                            for overflown_token in overflown_tokens
-                                .into_iter()
-                                .map(|token_with_shape| token_with_shape.token)
-                                .rev()
-                            {
-                                to_process_tokens.push_front(overflown_token);
+                        match line_break_behavior {
+                            // Requeue overflown tokens to `to_process_tokens`, followed by the current token.
+                            // This ensures that overflown tokens are processed first in the next line.
+                            LineBreakBehavior::OverflownTokens(overflown_tokens) => {
+                                to_process_tokens.push_front(token_with_shape.token);
+                                for overflown_token in overflown_tokens
+                                    .into_iter()
+                                    .map(|token_with_shape| token_with_shape.token)
+                                    .rev()
+                                {
+                                    to_process_tokens.push_front(overflown_token);
+                                }
                             }
-                        } else {
-                            current_line.append(token_with_shape);
+                            LineBreakBehavior::AppendNextToken(should_append_next_token) => {
+                                if should_append_next_token {
+                                    current_line.append(token_with_shape);
+                                }
+                            }
                         }
 
                         // Move to new line and adjust line style metrics
