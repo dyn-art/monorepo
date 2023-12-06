@@ -25,6 +25,7 @@ import type { Renderer } from '../render';
 import { groupByType, mat3, vec3 } from '../utils';
 
 export class Composition {
+	public readonly id: string;
 	private readonly _compositionHandle: JsCompositionHandle;
 
 	private _renderer: Renderer[] = [];
@@ -84,6 +85,7 @@ export class Composition {
 			},
 			isCallbackBased = true
 		} = config;
+		this.id = shortId();
 		this._compositionHandle = new JsCompositionHandle(dtif, (events: OutputEvent[]) => {
 			this.onWasmEvents(events);
 		});
@@ -430,6 +432,11 @@ export class Composition {
 		this._renderer.forEach((renderer) => {
 			renderer.clear();
 		});
+	}
+
+	public unmount(): void {
+		this.clear();
+		this._compositionHandle.free();
 	}
 
 	public toString(): string | null {
