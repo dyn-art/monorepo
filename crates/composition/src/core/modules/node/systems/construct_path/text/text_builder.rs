@@ -65,58 +65,64 @@ impl TextBuilder {
         let mut line_break_strategy = BreakOnWordLineBreakStrategy::new();
         let mut line_style_metric = self.compute_line_style_metric(&to_process_tokens);
 
-        // Move to a new line initially to ensure text
-        // is within the view box and aligned at the common baseline
+        // Move to a new line initially for proper alignment
         self.move_to_new_line(line_style_metric.height);
 
         let mut current_line = CurrentLine::new(self.max_line_width);
         while let Some(token) = to_process_tokens.pop_front() {
-            // Process each token
+            // Process Space and TextFragment tokens
             if let Token::Space { style, .. } | Token::TextFragment { style, .. } = &token {
                 if let Some(font_face) = token_stream.get_buzz_face(style.font_hash) {
                     let mut token_with_shape = TokenWithShape::new(token, &font_face);
 
-                    // Check if a line break is needed
-                    if let ShouldBreakLine::True {
-                        line_break_behavior,
-                    } =
-                        line_break_strategy.should_break(&mut current_line, &mut token_with_shape)
+                    // Check for line break requirement
+                    match line_break_strategy.should_break(&mut current_line, &mut token_with_shape)
                     {
-                        // Render the glyphs of the current line
-                        self.process_current_line(&mut current_line, &token_stream);
+                        // Handle line break
+                        ShouldBreakLine::True {
+                            line_break_behavior,
+                        } => {
+                            // Process the current line
+                            self.process_current_line(&mut current_line, token_stream);
 
-                        match line_break_behavior {
-                            // Requeue overflown tokens to `to_process_tokens`, followed by the current token.
-                            // This ensures that overflown tokens are processed first in the next line.
-                            LineBreakBehavior::OverflownTokens(overflown_tokens) => {
-                                to_process_tokens.push_front(token_with_shape.token);
-                                for overflown_token in overflown_tokens
-                                    .into_iter()
-                                    .map(|token_with_shape| token_with_shape.token)
-                                    .rev()
-                                {
-                                    to_process_tokens.push_front(overflown_token);
+                            // Handle line break behavior
+                            match line_break_behavior {
+                                // Requeue overflown tokens and the current token
+                                LineBreakBehavior::OverflownTokens(overflown_tokens) => {
+                                    to_process_tokens.push_front(token_with_shape.token);
+                                    for overflown_token in overflown_tokens
+                                        .into_iter()
+                                        .map(|token_with_shape| token_with_shape.token)
+                                        .rev()
+                                    {
+                                        to_process_tokens.push_front(overflown_token);
+                                    }
+                                }
+
+                                // Append token to the current line
+                                LineBreakBehavior::AppendNextToken(should_append_to_new_line) => {
+                                    if should_append_to_new_line {
+                                        current_line.append(token_with_shape);
+                                    }
                                 }
                             }
-                            LineBreakBehavior::AppendNextToken(should_append_next_token) => {
-                                if should_append_next_token {
-                                    current_line.append(token_with_shape);
-                                }
-                            }
+
+                            // Adjust for a new line
+                            line_style_metric = self.compute_line_style_metric(&to_process_tokens);
+                            self.move_to_new_line(line_style_metric.height);
                         }
 
-                        // Move to new line and adjust line style metrics
-                        line_style_metric = self.compute_line_style_metric(&to_process_tokens);
-                        self.move_to_new_line(line_style_metric.height);
-                    } else {
-                        current_line.append(token_with_shape);
+                        // Append token to the current line
+                        ShouldBreakLine::False => {
+                            current_line.append(token_with_shape);
+                        }
                     }
                 }
             }
         }
 
-        // Render the glyphs of the last line
-        self.process_current_line(&mut current_line, &token_stream);
+        // Process the final line
+        self.process_current_line(&mut current_line, token_stream);
     }
 
     fn compute_line_style_metric(&mut self, tokens: &VecDeque<Token>) -> LineStyleMetric {
