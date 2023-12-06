@@ -95,6 +95,8 @@ impl TextBuilder {
                             {
                                 to_process_tokens.push_front(overflown_token);
                             }
+                        } else {
+                            current_line.append(token_with_shape);
                         }
 
                         // Move to new line and adjust line style metrics
