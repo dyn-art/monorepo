@@ -64,7 +64,7 @@ export const COMPOSITION_WITH_ONE_RECT = (
 			text: {
 				sections: [
 					{
-						value: 'Hello\nthere',
+						value: 'Hello there ',
 						style: {
 							fontHash: INTER_REGULAR.hash,
 							fontSize: 48
@@ -76,13 +76,27 @@ export const COMPOSITION_WITH_ONE_RECT = (
 							fontHash: ABEEZEE_ITALIC.hash,
 							fontSize: 70
 						}
+					},
+					{
+						value: '! Long line test testtest',
+						style: {
+							fontHash: INTER_REGULAR.hash,
+							fontSize: 48
+						}
+					},
+					{
+						value: 'Extra small',
+						style: {
+							fontHash: INTER_REGULAR.hash,
+							fontSize: 24
+						}
 					}
 				]
 			},
 			compositionMixin: { isVisible: true, isLocked: false },
 			dimension: {
 				width: 500,
-				height: 200
+				height: 300
 			},
 			relativeTransform: createTransformMatrix((width - 100) / 4, (height - 100) / 4, 0),
 			fill: {
