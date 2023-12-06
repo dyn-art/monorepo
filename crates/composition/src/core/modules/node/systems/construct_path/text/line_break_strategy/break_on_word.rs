@@ -16,7 +16,6 @@ impl BreakOnWordLineBreakStrategy {
     }
 }
 
-// TODO:
 impl LineBreakStrategy for BreakOnWordLineBreakStrategy {
     fn should_break(
         &mut self,
@@ -28,22 +27,30 @@ impl LineBreakStrategy for BreakOnWordLineBreakStrategy {
 
         match next_token_in_line.token {
             Token::TextFragment { .. } => {
-                // Determine if the current line ends with a TextFragment
-                if should_break && self.start_overflow_index.is_none() {
-                    if let Some((index, _)) = current_line
-                        .tokens
-                        .iter()
-                        .enumerate()
-                        .rev()
-                        .find(|(_, token)| matches!(token.token, Token::TextFragment { .. }))
-                    {
-                        // Check if this TextFragment is directly followed by a Space or the end
-                        if index == current_line.tokens.len() - 1
-                            || matches!(current_line.tokens[index + 1].token, Token::Space { .. })
+                if should_break {
+                    // Reverse iterate over the tokens to find the start index
+                    // of the last continuous group of TextFragments
+                    if self.start_overflow_index.is_none() {
+                        let mut found_non_text_fragment = false;
+
+                        for (index, token_with_shape) in
+                            current_line.tokens.iter().enumerate().rev()
                         {
-                            // Set start_overflow_index to the index of the first TextFragment
-                            // in the last continuous group of TextFragments
-                            self.start_overflow_index = Some(index);
+                            match token_with_shape.token {
+                                Token::TextFragment { .. } if found_non_text_fragment => {
+                                    self.start_overflow_index = Some(index + 1);
+                                    break;
+                                }
+                                Token::TextFragment { .. } => {}
+                                _ => {
+                                    found_non_text_fragment = true;
+                                }
+                            }
+                        }
+
+                        // If all tokens are TextFragments, set start_overflow_index to 0
+                        if !found_non_text_fragment {
+                            self.start_overflow_index = Some(0);
                         }
                     }
                 }
@@ -54,8 +61,16 @@ impl LineBreakStrategy for BreakOnWordLineBreakStrategy {
                 if should_break {
                     let maybe_start_overflow_index = self.start_overflow_index.take();
                     ShouldLineBreak::True {
-                        maybe_overflown_tokens: maybe_start_overflow_index
-                            .map(|start_index| current_line.drain(start_index..)),
+                        maybe_overflown_tokens: maybe_start_overflow_index.map(
+                            |start_overflow_index| {
+                                current_line
+                                    .drain(start_overflow_index..)
+                                    .filter(|token_with_shape| {
+                                        matches!(token_with_shape.token, Token::TextFragment { .. })
+                                    })
+                                    .collect()
+                            },
+                        ),
                     }
                 } else {
                     ShouldLineBreak::False

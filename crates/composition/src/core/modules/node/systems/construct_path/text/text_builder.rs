@@ -15,9 +15,7 @@ use crate::core::modules::{
 use super::{
     current_line::CurrentLine,
     line_break_strategy::{
-        break_on_word::BreakOnWordLineBreakStrategy,
-        simple_break_on_word::SimpleBreakOnWordLineBreakStrategy, LineBreakStrategy,
-        ShouldLineBreak,
+        break_on_word::BreakOnWordLineBreakStrategy, LineBreakStrategy, ShouldLineBreak,
     },
     token::Token,
     token_stream::{LineStyleMetric, TokenStream},
@@ -63,7 +61,7 @@ impl TextBuilder {
 
     fn process_line(&mut self, line: VecDeque<Token>, token_stream: &TokenStream) {
         let mut to_process_tokens = line;
-        let mut line_break_strategy = SimpleBreakOnWordLineBreakStrategy::new();
+        let mut line_break_strategy = BreakOnWordLineBreakStrategy::new();
         let mut line_style_metric = self.compute_line_style_metric(&to_process_tokens);
 
         // Move to a new line initially to ensure text
@@ -83,26 +81,28 @@ impl TextBuilder {
                     } =
                         line_break_strategy.should_break(&mut current_line, &mut token_with_shape)
                     {
-                        let overflown_tokens = maybe_overflown_tokens.unwrap_or_else(Vec::new);
-
                         // Render the glyphs of the current line
                         self.process_current_line(&mut current_line, &token_stream);
 
-                        // Push overflown tokens back to to_process_tokens
-                        for overflow_token in overflown_tokens
-                            .into_iter()
-                            .map(|token_with_shape| token_with_shape.token.clone())
-                            .rev()
-                        {
-                            to_process_tokens.push_front(overflow_token);
+                        // Requeue overflown tokens to `to_process_tokens`, followed by the current token.
+                        // This ensures that overflown tokens are processed first in the next line.
+                        if let Some(overflown_tokens) = maybe_overflown_tokens {
+                            to_process_tokens.push_front(token_with_shape.token);
+                            for overflown_token in overflown_tokens
+                                .into_iter()
+                                .map(|token_with_shape| token_with_shape.token)
+                                .rev()
+                            {
+                                to_process_tokens.push_front(overflown_token);
+                            }
                         }
 
                         // Move to new line and adjust line style metrics
                         line_style_metric = self.compute_line_style_metric(&to_process_tokens);
                         self.move_to_new_line(line_style_metric.height);
+                    } else {
+                        current_line.append(token_with_shape);
                     }
-
-                    current_line.append(token_with_shape);
                 }
             }
         }

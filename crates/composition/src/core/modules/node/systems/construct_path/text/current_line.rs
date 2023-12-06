@@ -1,4 +1,4 @@
-use std::ops::RangeBounds;
+use std::{ops::RangeBounds, vec::Drain};
 
 use super::token_with_shape::TokenWithShape;
 
@@ -22,12 +22,12 @@ impl CurrentLine {
         self.tokens.push(line_token);
     }
 
-    pub fn drain<R>(&mut self, range: R) -> Vec<TokenWithShape>
+    pub fn drain<R>(&mut self, range: R) -> Drain<'_, TokenWithShape>
     where
         R: RangeBounds<usize>,
     {
         self.current_width = 0.0;
-        return self.tokens.drain(range).collect();
+        return self.tokens.drain(range);
     }
 
     pub fn is_empty(&self) -> bool {
