@@ -1,3 +1,5 @@
+use std::collections::VecDeque;
+
 use glam::Vec2;
 use owned_ttf_parser::{GlyphId, OutlineBuilder};
 use rustybuzz::GlyphBuffer;
@@ -12,7 +14,11 @@ use crate::core::modules::{
 
 use super::{
     current_line::CurrentLine,
-    line_break_strategy::{BreakOnWordLineBreakStrategy, LineBreakStrategy, ShouldLineBreak},
+    line_break_strategy::{
+        break_on_word::BreakOnWordLineBreakStrategy,
+        simple_break_on_word::SimpleBreakOnWordLineBreakStrategy, LineBreakStrategy,
+        ShouldLineBreak,
+    },
     token::Token,
     token_stream::{LineStyleMetric, TokenStream},
     token_with_shape::TokenWithShape,
@@ -51,14 +57,13 @@ impl TextBuilder {
         let lines = token_stream.drain_into_lines();
 
         for line in lines {
-            self.process_line(line, &token_stream);
+            self.process_line(VecDeque::from(line), &token_stream);
         }
     }
 
-    fn process_line(&mut self, line: Vec<Token>, token_stream: &TokenStream) {
+    fn process_line(&mut self, line: VecDeque<Token>, token_stream: &TokenStream) {
         let mut to_process_tokens = line;
-        to_process_tokens.reverse(); // TODO: Performance
-        let mut line_break_strategy = BreakOnWordLineBreakStrategy::new();
+        let mut line_break_strategy = SimpleBreakOnWordLineBreakStrategy::new();
         let mut line_style_metric = self.compute_line_style_metric(&to_process_tokens);
 
         // Move to a new line initially to ensure text
@@ -66,11 +71,11 @@ impl TextBuilder {
         self.move_to_new_line(line_style_metric.height);
 
         let mut current_line = CurrentLine::new(self.max_line_width);
-        while let Some(token) = to_process_tokens.pop() {
+        while let Some(token) = to_process_tokens.pop_front() {
             // Process each token
             if let Token::Space { style, .. } | Token::TextFragment { style, .. } = &token {
                 if let Some(font_face) = token_stream.get_buzz_face(style.font_hash) {
-                    let mut token_with_shape = TokenWithShape::new(token.clone(), &font_face);
+                    let mut token_with_shape = TokenWithShape::new(token, &font_face);
 
                     // Check if a line break is needed
                     if let ShouldLineBreak::True {
@@ -89,7 +94,7 @@ impl TextBuilder {
                             .map(|token_with_shape| token_with_shape.token.clone())
                             .rev()
                         {
-                            to_process_tokens.push(overflow_token);
+                            to_process_tokens.push_front(overflow_token);
                         }
 
                         // Move to new line and adjust line style metrics
@@ -106,7 +111,7 @@ impl TextBuilder {
         self.process_current_line(&mut current_line, &token_stream);
     }
 
-    fn compute_line_style_metric(&mut self, tokens: &[Token]) -> LineStyleMetric {
+    fn compute_line_style_metric(&mut self, tokens: &VecDeque<Token>) -> LineStyleMetric {
         let line_style_metric = TokenStream::compute_line_style_metric(tokens);
         self.current_max_ascender = line_style_metric.max_ascender;
         return line_style_metric;

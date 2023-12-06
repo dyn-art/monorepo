@@ -6,7 +6,6 @@ use super::token::Token;
 pub struct TokenWithShape {
     pub token: Token,
     pub glyph_buffer: GlyphBuffer,
-    // pub font_face: &'a rustybuzz::Face<'a>,
     width: Option<f32>,
 }
 

@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, VecDeque};
 
 use crate::core::modules::{
     composition::resources::font_cache::FontCacheRes, node::components::types::Text,
@@ -104,7 +104,7 @@ impl<'a> TokenStream<'a> {
         self.buzz_face_cache.get(&hash)
     }
 
-    pub fn compute_line_style_metric(line: &[Token]) -> LineStyleMetric {
+    pub fn compute_line_style_metric(line: &VecDeque<Token>) -> LineStyleMetric {
         line.iter().fold(
             LineStyleMetric {
                 height: 0.0,
