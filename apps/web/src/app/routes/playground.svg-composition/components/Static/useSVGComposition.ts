@@ -1,7 +1,7 @@
 import React from 'react';
 import { Composition, createSVGComposition, initWasm } from '@dyn/svg-composition';
 
-import { ABEEZEE_ITALIC, INTER_REGULAR, loadFonts } from './font';
+import { ABEEZEE_ITALIC, INTER_REGULAR, loadFonts } from '../../font';
 import { COMPOSITION_WITH_ONE_RECT } from './test-data';
 
 export const useSVGComposition = (props: UseSVGCompositionProps) => {
@@ -36,9 +36,9 @@ async function createComposition(config: {
 	element: Element;
 }): Promise<Composition> {
 	const { width, height, element } = config;
-	await initWasm();
-
 	const fonts = await loadFonts([INTER_REGULAR, ABEEZEE_ITALIC]);
+
+	await initWasm();
 
 	const composition = createSVGComposition({
 		width,

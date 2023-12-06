@@ -30,6 +30,8 @@ impl<'a> TokenStream<'a> {
             if !font_face_cache.contains_key(&font_hash) {
                 if let Some(face) = font_cache.get_buzz_face(&section.style.font_hash) {
                     font_face_cache.insert(section.style.font_hash, face.clone());
+                } else {
+                    continue;
                 }
             }
             let buzz_face = font_face_cache.get(&font_hash).unwrap();

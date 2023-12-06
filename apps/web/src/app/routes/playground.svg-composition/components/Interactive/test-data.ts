@@ -1,8 +1,13 @@
-import { DTIFComposition } from '@dyn/svg-composition';
+import { DTIFComposition, FontWithContent } from '@dyn/svg-composition';
 
+import { ABEEZEE_ITALIC, INTER_REGULAR } from '../../font';
 import { createTransformMatrix } from '../../utils';
 
-export const COMPOSITION_WITH_ONE_RECT = (width: number, height: number): DTIFComposition => ({
+export const COMPOSITION_WITH_ONE_RECT = (
+	width: number,
+	height: number,
+	fonts: FontWithContent[]
+): DTIFComposition => ({
 	version: '0.0.1',
 	name: 'Test',
 	width,
@@ -11,7 +16,7 @@ export const COMPOSITION_WITH_ONE_RECT = (width: number, height: number): DTIFCo
 	nodes: {
 		0: {
 			type: 'Frame',
-			children: [1, 2],
+			children: [1, 2, 3],
 			dimension: {
 				width,
 				height
@@ -44,6 +49,50 @@ export const COMPOSITION_WITH_ONE_RECT = (width: number, height: number): DTIFCo
 			fill: {
 				paints: [12]
 			}
+		},
+		3: {
+			type: 'Text',
+			text: {
+				sections: [
+					{
+						value: 'Hello there ',
+						style: {
+							fontHash: INTER_REGULAR.hash,
+							fontSize: 48
+						}
+					},
+					{
+						value: 'Jeff',
+						style: {
+							fontHash: ABEEZEE_ITALIC.hash,
+							fontSize: 70
+						}
+					},
+					{
+						value: '! Long line test testtest',
+						style: {
+							fontHash: INTER_REGULAR.hash,
+							fontSize: 48
+						}
+					},
+					{
+						value: 'Extra small',
+						style: {
+							fontHash: INTER_REGULAR.hash,
+							fontSize: 24
+						}
+					}
+				]
+			},
+			compositionMixin: { isVisible: true, isLocked: false },
+			dimension: {
+				width: 500,
+				height: 300
+			},
+			relativeTransform: createTransformMatrix((width - 100) / 4, (height - 100) / 4, 30),
+			fill: {
+				paints: [11]
+			}
 		}
 	},
 	paints: {
@@ -69,5 +118,5 @@ export const COMPOSITION_WITH_ONE_RECT = (width: number, height: number): DTIFCo
 			opacity: 1
 		}
 	},
-	fonts: []
+	fonts
 });
