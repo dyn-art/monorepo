@@ -43,3 +43,6 @@ dist.*
 # Wasm
 target
 pkg
+
+# Other
+*.todo
