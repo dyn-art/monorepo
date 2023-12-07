@@ -1,6 +1,6 @@
 use std::{ops::RangeBounds, vec::Drain};
 
-use super::token_with_shape::TokenWithShape;
+use super::{token::Token, token_with_shape::TokenWithShape};
 
 pub struct CurrentLine {
     pub tokens: Vec<TokenWithShape>,
@@ -33,4 +33,29 @@ impl CurrentLine {
     pub fn is_empty(&self) -> bool {
         self.tokens.is_empty()
     }
+
+    pub fn compute_line_metric(&self) -> CurrentLineMetric {
+        self.tokens.iter().fold(
+            CurrentLineMetric {
+                height: 0.0,
+                max_ascender: 0.0,
+            },
+            |mut metrics, token_with_shape| {
+                match &token_with_shape.token {
+                    Token::TextFragment { metric, .. } | Token::Space { metric, .. } => {
+                        metrics.height = metrics.height.max(metric.height);
+                        metrics.max_ascender = metrics.max_ascender.max(metric.ascender);
+                    }
+                    _ => {}
+                }
+                metrics
+            },
+        )
+    }
+}
+
+#[derive(Debug)]
+pub struct CurrentLineMetric {
+    pub height: f32,
+    pub max_ascender: f32,
 }

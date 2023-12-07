@@ -93,7 +93,7 @@ impl BreakOnWordLineBreakStrategy {
                         ShouldBreakLine::False
                     } else {
                         ShouldBreakLine::True {
-                            line_break_behavior: LineBreakBehavior::OverflownTokens(
+                            line_break_behavior: LineBreakBehavior::AppendOverflownTokens(
                                 overflown_tokens,
                             ),
                         }

@@ -4,7 +4,7 @@ use crate::core::modules::{
     composition::resources::font_cache::FontCacheRes, node::components::types::Text,
 };
 
-use super::token::{Token, TokenStyleMetric};
+use super::token::{Token, TokenMetric};
 
 pub struct TokenStream<'a> {
     tokens: Vec<Token>,
@@ -35,7 +35,7 @@ impl<'a> TokenStream<'a> {
                 }
             }
             let buzz_face = font_face_cache.get(&font_hash).unwrap();
-            let token_metric = Self::compute_token_style_metric(buzz_face, font_size);
+            let token_metric = Token::compute_token_metric(buzz_face, font_size);
 
             // Tokenize the text, considering spaces and line breaks
             let mut start = 0;
@@ -105,45 +105,4 @@ impl<'a> TokenStream<'a> {
     pub fn get_buzz_face(&self, hash: u64) -> Option<&rustybuzz::Face> {
         self.buzz_face_cache.get(&hash)
     }
-
-    pub fn compute_line_style_metric(line: &VecDeque<Token>) -> LineStyleMetric {
-        line.iter().fold(
-            LineStyleMetric {
-                height: 0.0,
-                max_ascender: 0.0,
-            },
-            |mut metrics, token| {
-                match token {
-                    Token::TextFragment { metric, .. } | Token::Space { metric, .. } => {
-                        metrics.height = metrics.height.max(metric.height);
-                        metrics.max_ascender = metrics.max_ascender.max(metric.ascender);
-                    }
-                    _ => {}
-                }
-                metrics
-            },
-        )
-    }
-
-    fn compute_token_style_metric(
-        buzz_face: &rustybuzz::Face<'a>,
-        font_size: f32,
-    ) -> TokenStyleMetric {
-        let scale = font_size / (buzz_face.units_per_em() as f32);
-        let ascender = buzz_face.ascender() as f32 * scale;
-        let descender = buzz_face.descender() as f32 * scale;
-        buzz_face.height();
-        return TokenStyleMetric {
-            ascender,
-            descender,
-            height: ascender - descender,
-            scale,
-        };
-    }
-}
-
-#[derive(Debug)]
-pub struct LineStyleMetric {
-    pub height: f32,
-    pub max_ascender: f32,
 }

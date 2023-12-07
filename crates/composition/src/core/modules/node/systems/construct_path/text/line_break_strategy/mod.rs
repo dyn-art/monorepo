@@ -11,7 +11,7 @@ pub enum ShouldBreakLine {
 }
 
 pub enum LineBreakBehavior {
-    OverflownTokens(Vec<TokenWithShape>),
+    AppendOverflownTokens(Vec<TokenWithShape>),
     AppendNextToken(bool),
 }
 

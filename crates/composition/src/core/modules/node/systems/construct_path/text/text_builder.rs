@@ -19,7 +19,7 @@ use super::{
         ShouldBreakLine,
     },
     token::Token,
-    token_stream::{LineStyleMetric, TokenStream},
+    token_stream::TokenStream,
     token_with_shape::TokenWithShape,
 };
 
@@ -63,10 +63,6 @@ impl TextBuilder {
     fn process_line(&mut self, line: VecDeque<Token>, token_stream: &TokenStream) {
         let mut to_process_tokens = line;
         let mut line_break_strategy = BreakOnWordLineBreakStrategy::new();
-        let mut line_style_metric = self.compute_line_style_metric(&to_process_tokens);
-
-        // Move to a new line initially for proper alignment
-        self.move_to_new_line(line_style_metric.height);
 
         let mut current_line = CurrentLine::new(self.max_line_width);
         while let Some(token) = to_process_tokens.pop_front() {
@@ -88,7 +84,8 @@ impl TextBuilder {
                             // Handle line break behavior
                             match line_break_behavior {
                                 // Requeue overflown tokens and the current token
-                                LineBreakBehavior::OverflownTokens(overflown_tokens) => {
+                                // to be appended in the next line
+                                LineBreakBehavior::AppendOverflownTokens(overflown_tokens) => {
                                     to_process_tokens.push_front(token_with_shape.token);
                                     for overflown_token in overflown_tokens
                                         .into_iter()
@@ -99,17 +96,13 @@ impl TextBuilder {
                                     }
                                 }
 
-                                // Append token to the current line
+                                // Requeue current token to be appended in the next line
                                 LineBreakBehavior::AppendNextToken(should_append_to_new_line) => {
                                     if should_append_to_new_line {
                                         to_process_tokens.push_front(token_with_shape.token);
                                     }
                                 }
                             }
-
-                            // Adjust for a new line
-                            line_style_metric = self.compute_line_style_metric(&to_process_tokens);
-                            self.move_to_new_line(line_style_metric.height);
                         }
 
                         // Append token to the current line
@@ -125,13 +118,10 @@ impl TextBuilder {
         self.process_current_line(&mut current_line, token_stream);
     }
 
-    fn compute_line_style_metric(&mut self, tokens: &VecDeque<Token>) -> LineStyleMetric {
-        let line_style_metric = TokenStream::compute_line_style_metric(tokens);
-        self.current_max_ascender = line_style_metric.max_ascender;
-        return line_style_metric;
-    }
-
     fn process_current_line(&mut self, current_line: &mut CurrentLine, token_stream: &TokenStream) {
+        self.move_to_new_line(&current_line);
+
+        // Process current line
         if !current_line.is_empty() {
             for token_with_shape in current_line.drain(..) {
                 if let Token::Space { metric, style, .. }
@@ -178,8 +168,10 @@ impl TextBuilder {
     }
 
     /// Moves the current position to the start of a new line.
-    fn move_to_new_line(&mut self, line_height: f32) {
-        self.current_pos = Vec2::new(0.0, self.current_pos.y + line_height);
+    fn move_to_new_line(&mut self, current_line: &CurrentLine) {
+        let current_line_metric = current_line.compute_line_metric();
+        self.current_max_ascender = current_line_metric.max_ascender;
+        self.current_pos = Vec2::new(0.0, self.current_pos.y + current_line_metric.height);
     }
 
     /// Converts a point from local to global coordinates, scaling accordingly.
