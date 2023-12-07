@@ -21,7 +21,7 @@ impl LineBreakStrategy for SimpleBreakOnWordLineBreakStrategy {
         let should_break =
             current_line.current_width + next_token_in_line.get_width() > current_line.max_width;
 
-        return if should_break {
+        return if should_break && !current_line.is_empty() {
             ShouldBreakLine::True {
                 line_break_behavior: LineBreakBehavior::AppendNextToken(true),
             }

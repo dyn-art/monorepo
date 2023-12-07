@@ -102,7 +102,7 @@ impl TextBuilder {
                                 // Append token to the current line
                                 LineBreakBehavior::AppendNextToken(should_append_to_new_line) => {
                                     if should_append_to_new_line {
-                                        current_line.append(token_with_shape);
+                                        to_process_tokens.push_front(token_with_shape.token);
                                     }
                                 }
                             }

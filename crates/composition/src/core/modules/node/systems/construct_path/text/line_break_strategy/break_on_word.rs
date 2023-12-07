@@ -25,7 +25,7 @@ impl LineBreakStrategy for BreakOnWordLineBreakStrategy {
         let exceeds_width =
             current_line.current_width + next_token_in_line.get_width() > current_line.max_width;
 
-        match next_token_in_line.token {
+        return match next_token_in_line.token {
             Token::TextFragment { .. } => {
                 if exceeds_width {
                     if self.start_overflow_index.is_none() {
@@ -39,7 +39,7 @@ impl LineBreakStrategy for BreakOnWordLineBreakStrategy {
                 current_line,
                 next_token_in_line,
             ),
-        }
+        };
     }
 }
 
@@ -65,27 +65,56 @@ impl BreakOnWordLineBreakStrategy {
         current_line: &mut CurrentLine,
         next_token_in_line: &TokenWithShape,
     ) -> ShouldBreakLine {
-        if exceeds_width {
+        if exceeds_width && !current_line.is_empty() {
             self.start_overflow_index.take().map_or_else(
+                // Case when no previous overflow index was set
+                // then append the next token to the new line
                 || ShouldBreakLine::True {
                     line_break_behavior: LineBreakBehavior::AppendNextToken(!matches!(
                         next_token_in_line.token,
                         Token::Space { .. }
                     )),
                 },
-                |start_overflow_index| ShouldBreakLine::True {
-                    line_break_behavior: LineBreakBehavior::OverflownTokens(
-                        current_line
-                            .drain(start_overflow_index..)
-                            .filter(|token_with_shape| {
-                                matches!(token_with_shape.token, Token::TextFragment { .. })
-                            })
-                            .collect(),
-                    ),
+                // Case when a previous overflow index was set
+                // then collect overflown tokens and append them to the new line
+                |start_overflow_index| {
+                    let mut overflown_tokens: Vec<TokenWithShape> = current_line
+                        .drain(start_overflow_index..)
+                        .filter(|token_with_shape| {
+                            matches!(token_with_shape.token, Token::TextFragment { .. })
+                        })
+                        .collect();
+                    let total_width =
+                        Self::reduce_to_width(&mut overflown_tokens, current_line.max_width);
+
+                    // Check if the total width of overflown tokens exceeds the maximum width.
+                    // If it does, avoid breaking the line to prevent endless loop.
+                    return if total_width > current_line.max_width {
+                        ShouldBreakLine::False
+                    } else {
+                        ShouldBreakLine::True {
+                            line_break_behavior: LineBreakBehavior::OverflownTokens(
+                                overflown_tokens,
+                            ),
+                        }
+                    };
                 },
             )
         } else {
             ShouldBreakLine::False
         }
+    }
+
+    fn reduce_to_width(tokens: &mut Vec<TokenWithShape>, max_width: f32) -> f32 {
+        let mut total_width: f32 = 0.0;
+
+        for token in tokens {
+            total_width += token.get_width();
+            if total_width > max_width {
+                return total_width;
+            }
+        }
+
+        return total_width;
     }
 }
