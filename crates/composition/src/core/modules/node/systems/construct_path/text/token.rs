@@ -1,26 +1,35 @@
 use crate::core::modules::node::components::types::TextStyle;
 
-use super::continuous_id::ContinuousId;
-
 #[derive(Debug, Clone)]
-pub enum Token {
+pub enum TokenKind {
     TextFragment {
-        id: ContinuousId,
         value: String,
         style: TextStyle,
         metric: TokenMetric,
     },
     Space {
-        id: ContinuousId,
         style: TextStyle,
         metric: TokenMetric,
     },
-    Linebreak {
-        id: ContinuousId,
-    },
+    Linebreak,
+}
+
+#[derive(Debug, Clone)]
+pub struct Token {
+    processed_count: u8,
+    max_processed_count: u8,
+    pub kind: TokenKind,
 }
 
 impl Token {
+    pub fn new(token_kind: TokenKind) -> Self {
+        Self {
+            kind: token_kind,
+            processed_count: 0,
+            max_processed_count: 100,
+        }
+    }
+
     pub fn compute_token_metric(buzz_face: &rustybuzz::Face, font_size: f32) -> TokenMetric {
         let scale = font_size / (buzz_face.units_per_em() as f32);
         let ascender = buzz_face.ascender() as f32 * scale;
@@ -35,18 +44,21 @@ impl Token {
     }
 
     pub fn get_str(&self) -> &str {
-        match self {
-            Token::Space { .. } => " ",
-            Token::TextFragment { value, .. } => value.as_str(),
-            _ => " ",
+        match &self.kind {
+            TokenKind::Space { .. } => " ",
+            TokenKind::TextFragment { value, .. } => value.as_str(),
+            TokenKind::Linebreak => "\n",
         }
     }
 
-    pub fn get_id(&self) -> ContinuousId {
-        match self {
-            Token::Space { id, .. } | Token::TextFragment { id, .. } | Token::Linebreak { id } => {
-                id.clone()
-            }
+    pub fn track_processed(&mut self) {
+        if self.processed_count < self.max_processed_count {
+            self.processed_count += 1;
+        } else {
+            panic!(
+                "Token with the value '{}' reached the max allowed processing count!",
+                self.get_str()
+            )
         }
     }
 }

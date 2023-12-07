@@ -1,5 +1,5 @@
 use crate::core::modules::node::systems::construct_path::text::{
-    current_line::CurrentLine, token::Token, token_with_shape::TokenWithShape,
+    current_line::CurrentLine, token::TokenKind, token_with_shape::TokenWithShape,
 };
 
 use super::{LineBreakBehavior, LineBreakStrategy, ShouldBreakLine};
@@ -26,8 +26,8 @@ impl LineBreakStrategy for BreakOnWordLineBreakStrategy {
         let exceeds_width =
             current_line.current_width + next_token_in_line.get_width() > current_line.max_width;
 
-        return match next_token_in_line.token {
-            Token::TextFragment { .. } => {
+        return match next_token_in_line.token.kind {
+            TokenKind::TextFragment { .. } => {
                 // Set the start overflow index only once when needed
                 if exceeds_width && self.start_overflow_index.is_none() {
                     self.start_overflow_index = self.get_start_overflow_index(current_line);
@@ -56,7 +56,7 @@ impl BreakOnWordLineBreakStrategy {
             .enumerate()
             .rev()
             .find(|(_, token_with_shape)| {
-                !matches!(token_with_shape.token, Token::TextFragment { .. })
+                !matches!(token_with_shape.token.kind, TokenKind::TextFragment { .. })
             })
             .map(|(index, _)| index + 1)
             .or(Some(0))
@@ -72,11 +72,12 @@ impl BreakOnWordLineBreakStrategy {
             self.start_overflow_index.take().map_or_else(
                 // Case when no previous overflow index was set
                 // then append the next token to the new line
-                || ShouldBreakLine::True {
-                    line_break_behavior: LineBreakBehavior::AppendNextToken(!matches!(
-                        next_token_in_line.token,
-                        Token::Space { .. }
-                    )),
+                || {
+                    if !matches!(next_token_in_line.token.kind, TokenKind::Space { .. }) {
+                        ShouldBreakLine::True(LineBreakBehavior::AppendNextToken)
+                    } else {
+                        ShouldBreakLine::True(LineBreakBehavior::None)
+                    }
                 },
                 // Case when a previous overflow index was set
                 // then collect overflown tokens and append them to the new line
@@ -84,7 +85,7 @@ impl BreakOnWordLineBreakStrategy {
                     let mut overflown_tokens: Vec<TokenWithShape> = current_line
                         .drain(start_overflow_index..)
                         .filter(|token_with_shape| {
-                            matches!(token_with_shape.token, Token::TextFragment { .. })
+                            matches!(token_with_shape.token.kind, TokenKind::TextFragment { .. })
                         })
                         .collect();
                     let total_width =
@@ -93,11 +94,9 @@ impl BreakOnWordLineBreakStrategy {
                     // Check if the total width of overflown tokens exceeds the maximum width.
                     // If it does, avoid breaking the line to prevent endless loop.
                     return if total_width < current_line.max_width {
-                        ShouldBreakLine::True {
-                            line_break_behavior: LineBreakBehavior::AppendOverflownTokens(
-                                overflown_tokens,
-                            ),
-                        }
+                        ShouldBreakLine::True(LineBreakBehavior::AppendOverflownTokens(
+                            overflown_tokens,
+                        ))
                     } else {
                         ShouldBreakLine::False
                     };

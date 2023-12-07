@@ -1,6 +1,6 @@
 use std::{ops::RangeBounds, vec::Drain};
 
-use super::{token::Token, token_with_shape::TokenWithShape};
+use super::{token::TokenKind, token_with_shape::TokenWithShape};
 
 pub struct CurrentLine {
     pub tokens: Vec<TokenWithShape>,
@@ -41,8 +41,8 @@ impl CurrentLine {
                 max_ascender: 0.0,
             },
             |mut metrics, token_with_shape| {
-                match &token_with_shape.token {
-                    Token::TextFragment { metric, .. } | Token::Space { metric, .. } => {
+                match &token_with_shape.token.kind {
+                    TokenKind::TextFragment { metric, .. } | TokenKind::Space { metric, .. } => {
                         metrics.height = metrics.height.max(metric.height);
                         metrics.max_ascender = metrics.max_ascender.max(metric.ascender);
                     }

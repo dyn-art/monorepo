@@ -1,6 +1,7 @@
 use super::{current_line::CurrentLine, token_with_shape::TokenWithShape};
 
 pub mod break_on_word;
+pub mod break_on_word_2;
 pub mod simple_break_on_word;
 
 pub enum ShouldBreakLine {

@@ -4,7 +4,10 @@ use crate::core::modules::{
     composition::resources::font_cache::FontCacheRes, node::components::types::Text,
 };
 
-use super::{continuous_id::ContinuousId, token::Token};
+use super::{
+    continuous_id::ContinuousId,
+    token::{Token, TokenKind},
+};
 
 pub struct TokenStream<'a> {
     tokens: Vec<Token>,
@@ -15,7 +18,6 @@ impl<'a> TokenStream<'a> {
     pub fn from_text(text: &Text, font_cache: &'a mut FontCacheRes) -> Self {
         let mut tokens: Vec<Token> = Vec::new();
         let mut font_face_cache: HashMap<u64, rustybuzz::Face<'a>> = HashMap::new();
-        let mut continuous_id = ContinuousId::ZERO;
 
         // Preload required faces to avoid mutable borrow conflicts during local font face caching
         for section in &text.sections {
@@ -46,24 +48,20 @@ impl<'a> TokenStream<'a> {
             {
                 // Create a text fragment token for non-whitespace sections
                 if start != index {
-                    tokens.push(Token::TextFragment {
-                        id: continuous_id.next_id(),
+                    tokens.push(Token::new(TokenKind::TextFragment {
                         value: String::from(&section.value[start..index]),
                         style: section.style.clone(),
                         metric: token_metric.clone(),
-                    });
+                    }));
                 }
 
                 // Create a token for each space or line break
                 tokens.push(match match_str {
-                    "\n" => Token::Linebreak {
-                        id: continuous_id.next_id(),
-                    },
-                    _ => Token::Space {
-                        id: continuous_id.next_id(),
+                    "\n" => Token::new(TokenKind::Linebreak),
+                    _ => Token::new(TokenKind::Space {
                         style: section.style.clone(),
                         metric: token_metric.clone(),
-                    },
+                    }),
                 });
 
                 start = index + match_str.len();
@@ -71,12 +69,11 @@ impl<'a> TokenStream<'a> {
 
             // Handle the last word in the section, if any
             if start < section.value.len() {
-                tokens.push(Token::TextFragment {
-                    id: continuous_id.next_id(),
+                tokens.push(Token::new(TokenKind::TextFragment {
                     value: String::from(&section.value[start..]),
                     style: section.style.clone(),
                     metric: token_metric,
-                });
+                }));
             }
         }
 
@@ -92,8 +89,8 @@ impl<'a> TokenStream<'a> {
         // Split tokens into lines at each Linebreak token
         let mut current_line: Vec<Token> = Vec::new();
         for token in self.tokens.drain(..) {
-            match token {
-                Token::Linebreak { .. } => {
+            match token.kind {
+                TokenKind::Linebreak { .. } => {
                     lines.push(current_line.drain(..).collect());
                 }
                 _ => current_line.push(token),

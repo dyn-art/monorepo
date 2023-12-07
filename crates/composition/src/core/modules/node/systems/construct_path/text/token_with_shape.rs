@@ -1,6 +1,6 @@
 use rustybuzz::{GlyphBuffer, UnicodeBuffer};
 
-use super::token::Token;
+use super::token::{Token, TokenKind};
 
 #[derive(Debug)]
 pub struct TokenWithShape {
@@ -43,8 +43,10 @@ impl TokenWithShape {
             .sum();
 
         // Determine the scale based on the token type
-        let scale = match &self.token {
-            Token::Space { metric, .. } | Token::TextFragment { metric, .. } => metric.scale,
+        let scale = match &self.token.kind {
+            TokenKind::Space { metric, .. } | TokenKind::TextFragment { metric, .. } => {
+                metric.scale
+            }
             _ => 1.0,
         };
 

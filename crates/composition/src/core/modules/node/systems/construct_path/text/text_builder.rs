@@ -1,14 +1,18 @@
 use std::collections::VecDeque;
 
 use glam::Vec2;
+use log::info;
 use owned_ttf_parser::{GlyphId, OutlineBuilder};
 use rustybuzz::GlyphBuffer;
 
 use crate::core::modules::{
     composition::resources::font_cache::FontCacheRes,
-    node::components::{
-        mixins::{Anchor, AnchorCommand},
-        types::Text,
+    node::{
+        components::{
+            mixins::{Anchor, AnchorCommand},
+            types::Text,
+        },
+        systems::construct_path::text::token::TokenKind,
     },
 };
 
@@ -64,10 +68,17 @@ impl TextBuilder {
         let mut to_process_tokens = line;
         let mut line_break_strategy = BreakOnWordLineBreakStrategy::new();
 
+        info!("----- Start: process_line ");
+
         let mut current_line = CurrentLine::new(self.max_line_width);
-        while let Some(token) = to_process_tokens.pop_front() {
+        while let Some(mut token) = to_process_tokens.pop_front() {
+            // Endless loop prevention
+            token.track_processed();
+
             // Process Space and TextFragment tokens
-            if let Token::Space { style, .. } | Token::TextFragment { style, .. } = &token {
+            if let TokenKind::Space { style, .. } | TokenKind::TextFragment { style, .. } =
+                &token.kind
+            {
                 if let Some(font_face) = token_stream.get_buzz_face(style.font_hash) {
                     let mut token_with_shape = TokenWithShape::new(token, &font_face);
 
@@ -78,11 +89,18 @@ impl TextBuilder {
                         to_process_tokens.is_empty(),
                     ) {
                         // Handle line break
-                        ShouldBreakLine::True {
-                            line_break_behavior,
-                        } => {
+                        ShouldBreakLine::True(line_break_behavior) => {
                             // Process the current line
                             self.process_current_line(&mut current_line, token_stream);
+
+                            info!("---- Start: should break line");
+                            info!(
+                                "to_process_tokens: {:?}",
+                                to_process_tokens
+                                    .iter()
+                                    .map(|token| token.get_str())
+                                    .collect::<Vec<_>>()
+                            ); // TODO: REMOVE
 
                             // Handle line break behavior
                             match line_break_behavior {
@@ -97,15 +115,29 @@ impl TextBuilder {
                                     {
                                         to_process_tokens.push_front(overflown_token);
                                     }
+                                    info!(
+                                        "line_break_behavior - overflow: {:?}",
+                                        to_process_tokens
+                                            .iter()
+                                            .map(|token| token.get_str())
+                                            .collect::<Vec<_>>()
+                                    ); // TODO: REMOVE
                                 }
 
                                 // Requeue current token to be appended in the next line
-                                LineBreakBehavior::AppendNextToken(should_append_to_new_line) => {
-                                    if should_append_to_new_line {
-                                        to_process_tokens.push_front(token_with_shape.token);
-                                    }
+                                LineBreakBehavior::AppendNextToken => {
+                                    to_process_tokens.push_front(token_with_shape.token);
+                                    info!(
+                                        "line_break_behavior - append: {:?}",
+                                        to_process_tokens
+                                            .iter()
+                                            .map(|token| token.get_str())
+                                            .collect::<Vec<_>>()
+                                    ); // TODO: REMOVE
                                 }
+                                _ => {}
                             }
+                            info!("---- End: should break line");
                         }
 
                         // Append token to the current line
@@ -119,16 +151,27 @@ impl TextBuilder {
 
         // Process the final line
         self.process_current_line(&mut current_line, token_stream);
+
+        info!("----- End: process_line ");
     }
 
     fn process_current_line(&mut self, current_line: &mut CurrentLine, token_stream: &TokenStream) {
         self.move_to_new_line(&current_line);
 
+        info!(
+            "---- Apply Line: {:?}",
+            current_line
+                .tokens
+                .iter()
+                .map(|t| t.token.get_str())
+                .collect::<Vec<_>>()
+        ); // TODO: REMOVE
+
         // Process current line
         if !current_line.is_empty() {
             for token_with_shape in current_line.drain(..) {
-                if let Token::Space { metric, style, .. }
-                | Token::TextFragment { metric, style, .. } = token_with_shape.token
+                if let TokenKind::Space { metric, style, .. }
+                | TokenKind::TextFragment { metric, style, .. } = token_with_shape.token.kind
                 {
                     if let Some(font_face) = token_stream.get_buzz_face(style.font_hash) {
                         self.current_scale = metric.scale;
