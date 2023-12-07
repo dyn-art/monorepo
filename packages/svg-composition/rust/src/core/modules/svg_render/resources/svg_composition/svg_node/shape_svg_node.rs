@@ -30,6 +30,9 @@ pub struct ShapeSVGNode {
     fill_clip_path_defs: ElementReference,
     fill_clipped_shape: ElementReference,
     fill_wrapper: ElementReference,
+
+    // Click area elements
+    click_area: ElementReference,
 }
 
 impl SVGBundle for ShapeSVGNode {
@@ -57,6 +60,20 @@ impl SVGNode for ShapeSVGNode {
                             unit: SVGMeasurementUnit::Pixel,
                         },
                     ]);
+
+                    self.bundle
+                        .get_child_mut(self.click_area.index)
+                        .unwrap()
+                        .set_attributes(vec![
+                            SVGAttribute::Width {
+                                width: mixin.width,
+                                unit: SVGMeasurementUnit::Pixel,
+                            },
+                            SVGAttribute::Height {
+                                height: mixin.height,
+                                unit: SVGMeasurementUnit::Pixel,
+                            },
+                        ]);
                 }
                 MixinChange::RelativeTransform(mixin) => {
                     self.bundle.get_root_mut().set_attributes(vec![
@@ -127,6 +144,28 @@ impl ShapeSVGNode {
         });
         let mut bundle = BaseSVGBundle::new(element, entity);
 
+        // Create click area element
+        let mut click_area = SVGElement::new(SVGTag::Rect);
+        let click_area_id = click_area.get_id();
+        #[cfg(feature = "trace")]
+        click_area.set_attributes(vec![
+            SVGAttribute::Name {
+                name: ShapeSVGNode::create_element_name(
+                    click_area_id,
+                    String::from("click-area"),
+                    false,
+                ),
+            },
+            SVGAttribute::Fill {
+                fill: String::from("rgba(255, 204, 203, 0.5)"),
+            },
+        ]);
+        #[cfg(not(feature = "trace"))]
+        click_area.set_attribute(SVGAttribute::Fill {
+            fill: String::from("transparent"),
+        });
+        let click_area_index = bundle.append_child(click_area);
+
         // Create fill elements
         let mut fill_clip_path_defs = SVGElement::new(SVGTag::Defs);
         let fill_clip_path_defs_id = fill_clip_path_defs.get_id();
@@ -181,6 +220,12 @@ impl ShapeSVGNode {
 
         Self {
             bundle,
+
+            // Click area element references
+            click_area: ElementReference {
+                id: click_area_id,
+                index: click_area_index,
+            },
 
             // Fill element references
             fill_clip_path_defs: ElementReference {
