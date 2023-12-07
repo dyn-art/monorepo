@@ -1,17 +1,23 @@
 use crate::core::modules::node::components::types::TextStyle;
 
+use super::continuous_id::ContinuousId;
+
 #[derive(Debug, Clone)]
 pub enum Token {
     TextFragment {
+        id: ContinuousId,
         value: String,
         style: TextStyle,
         metric: TokenMetric,
     },
     Space {
+        id: ContinuousId,
         style: TextStyle,
         metric: TokenMetric,
     },
-    Linebreak,
+    Linebreak {
+        id: ContinuousId,
+    },
 }
 
 impl Token {
@@ -26,6 +32,22 @@ impl Token {
             height: ascender - descender,
             scale,
         };
+    }
+
+    pub fn get_str(&self) -> &str {
+        match self {
+            Token::Space { .. } => " ",
+            Token::TextFragment { value, .. } => value.as_str(),
+            _ => " ",
+        }
+    }
+
+    pub fn get_id(&self) -> ContinuousId {
+        match self {
+            Token::Space { id, .. } | Token::TextFragment { id, .. } | Token::Linebreak { id } => {
+                id.clone()
+            }
+        }
     }
 }
 

@@ -4,15 +4,17 @@ pub mod break_on_word;
 pub mod simple_break_on_word;
 
 pub enum ShouldBreakLine {
+    True(LineBreakBehavior),
     False,
-    True {
-        line_break_behavior: LineBreakBehavior,
-    },
 }
 
+#[derive(Debug)]
 pub enum LineBreakBehavior {
+    /// Append overflown tokens and the `next_token_in_line` to the next line.
     AppendOverflownTokens(Vec<TokenWithShape>),
-    AppendNextToken(bool),
+    /// Append `next_token_in_line` to the new line.
+    AppendNextToken,
+    None,
 }
 
 pub trait LineBreakStrategy {
