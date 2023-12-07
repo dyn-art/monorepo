@@ -17,6 +17,7 @@ impl LineBreakStrategy for SimpleBreakOnWordLineBreakStrategy {
         &mut self,
         current_line: &mut CurrentLine,
         next_token_in_line: &mut TokenWithShape,
+        is_last_token: bool,
     ) -> ShouldBreakLine {
         let should_break =
             current_line.current_width + next_token_in_line.get_width() > current_line.max_width;

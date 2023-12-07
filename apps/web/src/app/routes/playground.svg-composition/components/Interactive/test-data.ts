@@ -89,7 +89,7 @@ export const COMPOSITION_WITH_ONE_RECT = (
 				width: 500,
 				height: 300
 			},
-			relativeTransform: createTransformMatrix((width - 100) / 4, (height - 100) / 4, 30),
+			relativeTransform: createTransformMatrix((width - 100) / 4, (height - 100) / 4, 0),
 			fill: {
 				paints: [11]
 			}

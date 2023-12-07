@@ -72,8 +72,11 @@ impl TextBuilder {
                     let mut token_with_shape = TokenWithShape::new(token, &font_face);
 
                     // Check for line break requirement
-                    match line_break_strategy.should_break(&mut current_line, &mut token_with_shape)
-                    {
+                    match line_break_strategy.should_break(
+                        &mut current_line,
+                        &mut token_with_shape,
+                        to_process_tokens.is_empty(),
+                    ) {
                         // Handle line break
                         ShouldBreakLine::True {
                             line_break_behavior,

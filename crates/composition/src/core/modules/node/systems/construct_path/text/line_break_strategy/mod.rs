@@ -21,5 +21,6 @@ pub trait LineBreakStrategy {
         &mut self,
         current_line: &mut CurrentLine,
         next_token_in_line: &mut TokenWithShape,
+        is_last_token: bool,
     ) -> ShouldBreakLine;
 }

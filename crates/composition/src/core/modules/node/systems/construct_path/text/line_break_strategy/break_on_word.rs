@@ -21,24 +21,28 @@ impl LineBreakStrategy for BreakOnWordLineBreakStrategy {
         &mut self,
         current_line: &mut CurrentLine,
         next_token_in_line: &mut TokenWithShape,
+        is_last_token: bool,
     ) -> ShouldBreakLine {
         let exceeds_width =
             current_line.current_width + next_token_in_line.get_width() > current_line.max_width;
 
         return match next_token_in_line.token {
             Token::TextFragment { .. } => {
-                if exceeds_width {
-                    if self.start_overflow_index.is_none() {
-                        self.start_overflow_index = self.get_start_overflow_index(current_line);
-                    }
+                // Set the start overflow index only once when needed
+                if exceeds_width && self.start_overflow_index.is_none() {
+                    self.start_overflow_index = self.get_start_overflow_index(current_line);
                 }
-                ShouldBreakLine::False
+
+                // Determine a line break for the last token,
+                // as no further non-text fragment token will follow
+                if is_last_token {
+                    self.determine_break(exceeds_width, current_line, next_token_in_line)
+                } else {
+                    ShouldBreakLine::False
+                }
             }
-            _ => self.determine_break_for_non_text_fragment(
-                exceeds_width,
-                current_line,
-                next_token_in_line,
-            ),
+            // For non-TextFragment tokens, directly determine line break
+            _ => self.determine_break(exceeds_width, current_line, next_token_in_line),
         };
     }
 }
@@ -58,8 +62,7 @@ impl BreakOnWordLineBreakStrategy {
             .or(Some(0))
     }
 
-    /// Determines the line break behavior for non-text fragment tokens.
-    fn determine_break_for_non_text_fragment(
+    fn determine_break(
         &mut self,
         exceeds_width: bool,
         current_line: &mut CurrentLine,
@@ -89,14 +92,14 @@ impl BreakOnWordLineBreakStrategy {
 
                     // Check if the total width of overflown tokens exceeds the maximum width.
                     // If it does, avoid breaking the line to prevent endless loop.
-                    return if total_width > current_line.max_width {
-                        ShouldBreakLine::False
-                    } else {
+                    return if total_width < current_line.max_width {
                         ShouldBreakLine::True {
                             line_break_behavior: LineBreakBehavior::AppendOverflownTokens(
                                 overflown_tokens,
                             ),
                         }
+                    } else {
+                        ShouldBreakLine::False
                     };
                 },
             )
