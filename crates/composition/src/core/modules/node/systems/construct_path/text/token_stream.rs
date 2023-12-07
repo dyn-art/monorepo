@@ -4,10 +4,7 @@ use crate::core::modules::{
     composition::resources::font_cache::FontCacheRes, node::components::types::Text,
 };
 
-use super::{
-    continuous_id::ContinuousId,
-    token::{Token, TokenKind},
-};
+use super::token::{Token, TokenKind};
 
 pub struct TokenStream<'a> {
     tokens: Vec<Token>,

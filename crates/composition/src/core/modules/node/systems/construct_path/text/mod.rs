@@ -14,7 +14,6 @@ use crate::core::modules::{
 
 use self::text_builder::TextBuilder;
 
-mod continuous_id;
 mod current_line;
 mod line_break_strategy;
 mod text_builder;
