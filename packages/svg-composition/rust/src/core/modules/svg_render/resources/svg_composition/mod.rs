@@ -170,6 +170,7 @@ impl SVGCompositionRes {
         match node_type {
             NodeType::Rectangle => Some(Box::new(ShapeSVGNode::new(entity))),
             NodeType::Frame => Some(Box::new(FrameSVGNode::new(entity))),
+            NodeType::Text => Some(Box::new(ShapeSVGNode::new(entity))),
             _ => None,
         }
     }

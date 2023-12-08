@@ -2,11 +2,16 @@ import { jsPDF } from 'jspdf';
 import React from 'react';
 import { Button } from '@/components/primitive';
 
-import { useSVGComposition } from './useSVGComposition';
+import { useSVGComposition } from '../../hooks';
+import { createComposition } from './create-composition';
 
 export const Static: React.FC<TProps> = (props) => {
 	const { size } = props;
-	const { svgContainerRef, composition } = useSVGComposition({ width: size, height: size });
+	const { svgContainerRef, composition } = useSVGComposition({
+		width: size,
+		height: size,
+		createComposition
+	});
 	const [svg2pdf, setSvg2pdf] = React.useState<any>(null);
 
 	// Dynamically import svg2pdf when the component mounts,

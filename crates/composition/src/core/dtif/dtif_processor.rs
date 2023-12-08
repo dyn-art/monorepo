@@ -7,7 +7,7 @@ use glam::Mat3;
 use crate::core::modules::{
     composition::events::CoreInputEvent,
     node::components::{
-        bundles::{FrameNodeBundle, GroupNodeBundle, RectangleNodeBundle},
+        bundles::{FrameNodeBundle, GroupNodeBundle, RectangleNodeBundle, TextNodeBundle},
         mixins::{AbsoluteTransformMixin, ChildrenMixin, FillMixin, RelativeTransformMixin},
     },
 };
@@ -85,7 +85,8 @@ impl DTIFProcessor {
         dtif_node: &DTIFNode,
     ) {
         if let DTIFNode::Frame(FrameNodeBundle { fill_mixin, .. })
-        | DTIFNode::Rectangle(RectangleNodeBundle { fill_mixin, .. }) = dtif_node
+        | DTIFNode::Rectangle(RectangleNodeBundle { fill_mixin, .. })
+        | DTIFNode::Text(TextNodeBundle { fill_mixin, .. }) = dtif_node
         {
             // Process paints and collect their Bevy entity ids
             let new_paints: Vec<Entity> = fill_mixin
@@ -175,6 +176,7 @@ impl DTIFProcessor {
             DTIFNode::Frame(bundle) => world.spawn(bundle.clone()).id(),
             DTIFNode::Rectangle(bundle) => world.spawn(bundle.clone()).id(),
             DTIFNode::Group(bundle) => world.spawn(bundle.clone()).id(),
+            DTIFNode::Text(bundle) => world.spawn(bundle.clone()).id(),
         }
     }
 

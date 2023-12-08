@@ -41,18 +41,14 @@ impl Default for Node {
     }
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug, Type)]
+#[derive(Default, Serialize, Deserialize, Clone, Debug, Type)]
 pub enum NodeType {
+    #[default]
     None,
     Group,
     Rectangle,
     Frame,
-}
-
-impl Default for NodeType {
-    fn default() -> Self {
-        Self::None
-    }
+    Text,
 }
 
 // =============================================================================
@@ -67,6 +63,7 @@ pub struct Frame {
     /// Indicates whether the frame clips its content to its bounding box.
     /// When set to `true`, content that extends beyond the frame's boundaries will be clipped.
     /// When `false`, content can extend beyond the frame's boundaries without being clipped.
+    #[serde(rename = "clipContent")]
     clip_content: bool,
 }
 
@@ -109,27 +106,31 @@ pub struct Rectangle;
 
 /// Represents a basic shape node for an ellipse.
 /// Note that a circle is a special case of an ellipse where the width equals the height.
-#[derive(Component, Serialize, Deserialize, Clone, Debug, Type)]
+#[derive(Component, Serialize, Deserialize, Clone, Default, Debug, Type)]
 pub struct Ellipse {
     /// Contains the arc data for the ellipse,
     /// which includes the starting angle, ending angle, and the inner radius ratio.
     /// These properties are used to create arcs and donuts shapes.
+    #[serde(rename = "arcData")]
     pub arc_data: EllipseArcData,
 }
 
 /// Represents the arc data for an ellipse.
 /// This includes properties for defining the sweep of the ellipse and its inner radius,
 /// which are used in UI elements to create various elliptical shapes.
-#[derive(Serialize, Deserialize, Clone, Debug, Type)]
+#[derive(Default, Serialize, Deserialize, Clone, Debug, Type)]
 pub struct EllipseArcData {
     /// The starting angle of the ellipse's arc.
+    #[serde(rename = "startingAngle")]
     pub starting_angle: f32,
 
     /// The ending angle of the ellipse's arc.
+    #[serde(rename = "endingAngle")]
     pub ending_angle: f32,
 
     /// The ratio of the inner radius to the outer radius of the ellipse.
     /// A value of 0 indicates a full ellipse, while higher values create a 'donut' shape.
+    #[serde(rename = "innerRadiusRatio")]
     pub inner_radius_ratio: f32,
 }
 
@@ -138,14 +139,16 @@ pub struct EllipseArcData {
 // =============================================================================
 
 /// Represents a basic shape node for a star with a set number of points.
-#[derive(Component, Serialize, Deserialize, Clone, Debug, Type)]
+#[derive(Component, Serialize, Deserialize, Clone, Default, Debug, Type)]
 pub struct Star {
     /// The number of "spikes", or outer points of the star.
     /// This value must be an integer greater than or equal to 3.
+    #[serde(rename = "pointCount")]
     pub point_count: u8,
 
     /// The ratio of the inner radius to the outer radius of the star.
     /// This value is used to define the sharpness of the star's points.
+    #[serde(rename = "innerRadiusRatio")]
     pub inner_radius_ratio: f32,
 }
 
@@ -154,9 +157,129 @@ pub struct Star {
 // =============================================================================
 
 /// Represents a basic shape node for a regular convex polygon with three or more sides.
-#[derive(Component, Serialize, Deserialize, Clone, Debug, Type)]
+#[derive(Component, Serialize, Deserialize, Clone, Default, Debug, Type)]
 pub struct Polygon {
     /// The number of sides of the polygon.
     /// This value must be an integer greater than or equal to 3.
+    #[serde(rename = "pointCount")]
     pub point_count: u8,
+}
+
+// =============================================================================
+// Text
+// =============================================================================
+
+/// Represents a text node with customizable style and layout properties.
+#[derive(Component, Serialize, Deserialize, Clone, Default, Debug, Type)]
+pub struct Text {
+    /// Sections of the text, each with its own style.
+    pub sections: Vec<TextSection>,
+
+    /// Horizontal alignment of the text within its container.
+    #[serde(default)]
+    #[serde(rename = "horizontalTextAlignment")]
+    pub horizontal_text_alignment: HorizontalTextAlignment,
+
+    /// Vertical alignment of the text within its container.
+    #[serde(default)]
+    #[serde(rename = "verticalTextAlignment")]
+    pub vertical_text_alignment: VerticalTextAlignment,
+
+    /// Behavior of text line breaking at the bounds of its container.
+    #[serde(default)]
+    #[serde(rename = "linebreakBehaviour")]
+    pub linebreak_behavior: BreakLineOn,
+}
+
+/// A section of text with a specific style.
+#[derive(Serialize, Deserialize, Clone, Debug, Type)]
+pub struct TextSection {
+    /// Text content of the section.
+    pub value: String,
+    /// Style properties applied to this section.
+    pub style: TextStyle,
+}
+
+/// Style properties for a text section, defining its appearance.
+#[derive(Serialize, Deserialize, Clone, Default, Debug, Type)]
+pub struct TextStyle {
+    /// Height of rasterized glyphs in pixels, influenced by window scale.
+    #[serde(rename = "fontSize")]
+    pub font_size: u32,
+
+    /// Primary font identifier.
+    #[serde(rename = "fontHash")]
+    pub font_hash: u64,
+
+    /// Spacing between characters.
+    #[serde(default)]
+    #[serde(rename = "letterSpacing")]
+    pub letter_spacing: LetterSpacing,
+
+    /// Vertical spacing between lines of text.
+    #[serde(default)]
+    #[serde(rename = "lineHeight")]
+    pub line_height: LineHeight,
+}
+
+/// Horizontal alignment options for text within its container.
+#[derive(Serialize, Deserialize, Clone, Default, Debug, Type)]
+pub enum HorizontalTextAlignment {
+    /// Aligns text to the left side of its container.
+    #[default]
+    Left,
+    /// Centers text horizontally within its container.
+    Center,
+    /// Aligns text to the right side of its container.
+    Right,
+    /// Justifies text across the container width.
+    Justified,
+}
+
+/// Vertical alignment options for text within its container.
+#[derive(Serialize, Deserialize, Clone, Default, Debug, Type)]
+pub enum VerticalTextAlignment {
+    /// Aligns text to the top of its container.
+    Top,
+    /// Centers text vertically within its container.
+    #[default]
+    Center,
+    /// Aligns text to the bottom of its container.
+    Bottom,
+}
+
+/// Options for spacing between characters in a text section.
+#[derive(Serialize, Deserialize, Clone, Default, Debug, Type)]
+pub enum LetterSpacing {
+    /// Automatic spacing based on font metrics.
+    #[default]
+    Auto,
+    /// Fixed spacing in pixels.
+    Pixels(u8),
+    /// Spacing as a percentage of font size.
+    Percent(u8),
+}
+
+/// Options for controlling line height in text.
+#[derive(Serialize, Deserialize, Clone, Default, Debug, Type)]
+pub enum LineHeight {
+    /// Automatic line height based on font metrics.
+    #[default]
+    Auto,
+    /// Fixed line height in pixels.
+    Pixels(u8),
+    /// Line height as a percentage of font size.
+    Percent(u8),
+}
+
+/// Defines how text should break lines within its container.
+#[derive(Serialize, Deserialize, Clone, Default, Debug, Type)]
+pub enum BreakLineOn {
+    /// Breaks lines at word boundaries using the Unicode Line Breaking Algorithm.
+    #[default]
+    WordBoundary,
+    /// Breaks lines at any character, possibly splitting words.
+    AnyCharacter,
+    /// Disables automatic line breaking. Respects explicit line breaks like '\n'.
+    NoWrap,
 }

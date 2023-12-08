@@ -7,7 +7,7 @@ use super::{
         BlendMixin, ChildrenMixin, DimensionMixin, FillMixin, NodeCompositionMixin,
         RectangleCornerMixin, RelativeTransformMixin,
     },
-    types::{Frame, Group, Node, NodeType, Rectangle},
+    types::{Frame, Group, Node, NodeType, Rectangle, Text},
 };
 
 // =============================================================================
@@ -178,6 +178,58 @@ impl Default for RectangleNodeBundle {
             node: default_rectangle_node_bundle(),
             recangle: Rectangle::default(),
             rectangle_corner_mixin: RectangleCornerMixin::default(),
+            composition_mixin: NodeCompositionMixin::default(),
+            relative_transform: RelativeTransformMixin::default(),
+            dimension: DimensionMixin::default(),
+            blend_mixin: BlendMixin::default(),
+            fill_mixin: FillMixin::default(),
+        }
+    }
+}
+
+// =============================================================================
+// Text
+// =============================================================================
+
+#[derive(Bundle, Debug, Serialize, Deserialize, Clone, Type)]
+pub struct TextNodeBundle {
+    #[serde(default = "default_text_node_bundle")]
+    pub node: Node,
+
+    pub text: Text,
+
+    #[serde(default)]
+    #[serde(rename = "compositionMixin")]
+    pub composition_mixin: NodeCompositionMixin,
+
+    #[serde(rename = "relativeTransform")]
+    pub relative_transform: RelativeTransformMixin,
+
+    #[serde(rename = "dimension")]
+    pub dimension: DimensionMixin,
+
+    #[serde(default)]
+    #[serde(rename = "blendMixin")]
+    pub blend_mixin: BlendMixin,
+
+    #[serde(default)]
+    #[serde(rename = "fill")]
+    pub fill_mixin: FillMixin, // TODO: Needs adjustment to work with text sections
+}
+
+#[inline]
+fn default_text_node_bundle() -> Node {
+    Node {
+        node_type: NodeType::Text,
+        name: None,
+    }
+}
+
+impl Default for TextNodeBundle {
+    fn default() -> Self {
+        Self {
+            node: default_rectangle_node_bundle(),
+            text: Text::default(),
             composition_mixin: NodeCompositionMixin::default(),
             relative_transform: RelativeTransformMixin::default(),
             dimension: DimensionMixin::default(),

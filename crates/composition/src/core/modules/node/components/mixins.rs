@@ -213,7 +213,7 @@ pub struct Anchor {
     pub command: AnchorCommand,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug, Type)]
+#[derive(Serialize, Deserialize, Clone, PartialEq, Debug, Type)]
 pub enum AnchorCommand {
     /// Moves the path to a new location without drawing anything.
     MoveTo,
@@ -299,8 +299,9 @@ pub struct SolidPaint {
 // Effects
 // =============================================================================
 
-#[derive(Serialize, Deserialize, Clone, Debug, Type)]
+#[derive(Default, Serialize, Deserialize, Clone, Debug, Type)]
 pub enum BlendMode {
+    #[default]
     Normal,
     Multiply,
     Screen,
