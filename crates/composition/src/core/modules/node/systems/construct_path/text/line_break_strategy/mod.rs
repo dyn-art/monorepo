@@ -1,7 +1,6 @@
 use super::{current_line::CurrentLine, token_with_shape::TokenWithShape};
 
 pub mod break_on_word;
-pub mod break_on_word_2;
 pub mod simple_break_on_word;
 
 pub enum ShouldBreakLine {
@@ -11,10 +10,13 @@ pub enum ShouldBreakLine {
 
 #[derive(Debug)]
 pub enum LineBreakBehavior {
-    /// Append overflown tokens and the `next_token_in_line` to the next line.
+    /// Moves tokens that exceed line width, along with the next token, to the next line.
     AppendOverflownTokens(Vec<TokenWithShape>),
-    /// Append `next_token_in_line` to the new line.
+
+    /// Shifts only the next token to the next line.
     AppendNextToken,
+
+    /// No special line breaking action required.
     None,
 }
 

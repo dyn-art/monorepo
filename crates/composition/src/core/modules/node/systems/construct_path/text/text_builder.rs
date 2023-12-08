@@ -1,7 +1,6 @@
 use std::collections::VecDeque;
 
 use glam::Vec2;
-use log::info;
 use owned_ttf_parser::{GlyphId, OutlineBuilder};
 use rustybuzz::GlyphBuffer;
 
@@ -68,8 +67,6 @@ impl TextBuilder {
         let mut to_process_tokens = line;
         let mut line_break_strategy = BreakOnWordLineBreakStrategy::new();
 
-        info!("----- Start: process_line ");
-
         let mut current_line = CurrentLine::new(self.max_line_width);
         while let Some(mut token) = to_process_tokens.pop_front() {
             // Endless loop prevention
@@ -90,23 +87,27 @@ impl TextBuilder {
                     ) {
                         // Handle line break
                         ShouldBreakLine::True(line_break_behavior) => {
-                            // Process the current line
-                            self.process_current_line(&mut current_line, token_stream);
-
-                            info!("---- Start: should break line");
-                            info!(
-                                "to_process_tokens: {:?}",
-                                to_process_tokens
-                                    .iter()
-                                    .map(|token| token.get_str())
-                                    .collect::<Vec<_>>()
-                            ); // TODO: REMOVE
-
                             // Handle line break behavior
                             match line_break_behavior {
                                 // Requeue overflown tokens and the current token
                                 // to be appended in the next line
                                 LineBreakBehavior::AppendOverflownTokens(overflown_tokens) => {
+                                    // info!(
+                                    //     "lbb (overflow): {:?}[{:?}]{:?}",
+                                    //     overflown_tokens
+                                    //         .iter()
+                                    //         .rev()
+                                    //         .map(|token_with_shape| token_with_shape
+                                    //             .token
+                                    //             .get_str())
+                                    //         .collect::<Vec<_>>(),
+                                    //     token_with_shape.token.get_str(),
+                                    //     to_process_tokens
+                                    //         .iter()
+                                    //         .map(|token| token.get_str())
+                                    //         .collect::<Vec<_>>()
+                                    // ); // TODO: REMOVE
+
                                     to_process_tokens.push_front(token_with_shape.token);
                                     for overflown_token in overflown_tokens
                                         .into_iter()
@@ -115,33 +116,34 @@ impl TextBuilder {
                                     {
                                         to_process_tokens.push_front(overflown_token);
                                     }
-                                    info!(
-                                        "line_break_behavior - overflow: {:?}",
-                                        to_process_tokens
-                                            .iter()
-                                            .map(|token| token.get_str())
-                                            .collect::<Vec<_>>()
-                                    ); // TODO: REMOVE
                                 }
 
                                 // Requeue current token to be appended in the next line
                                 LineBreakBehavior::AppendNextToken => {
+                                    // info!(
+                                    //     "lbb (append): [{:?}]{:?}",
+                                    //     token_with_shape.token.get_str(),
+                                    //     to_process_tokens
+                                    //         .iter()
+                                    //         .map(|token| token.get_str())
+                                    //         .collect::<Vec<_>>()
+                                    // ); // TODO: REMOVE
+
                                     to_process_tokens.push_front(token_with_shape.token);
-                                    info!(
-                                        "line_break_behavior - append: {:?}",
-                                        to_process_tokens
-                                            .iter()
-                                            .map(|token| token.get_str())
-                                            .collect::<Vec<_>>()
-                                    ); // TODO: REMOVE
                                 }
-                                _ => {}
+                                _ => {
+                                    // info!("lbb (none)"); // TODO: REMOVE
+                                }
                             }
-                            info!("---- End: should break line");
+
+                            // Process the current line
+                            self.process_current_line(&mut current_line, token_stream);
                         }
 
                         // Append token to the current line
                         ShouldBreakLine::False => {
+                            // info!("append: [{:?}]", token_with_shape.token.get_str()); // TODO: REMOVE
+
                             current_line.append(token_with_shape);
                         }
                     }
@@ -151,21 +153,19 @@ impl TextBuilder {
 
         // Process the final line
         self.process_current_line(&mut current_line, token_stream);
-
-        info!("----- End: process_line ");
     }
 
     fn process_current_line(&mut self, current_line: &mut CurrentLine, token_stream: &TokenStream) {
         self.move_to_new_line(&current_line);
 
-        info!(
-            "---- Apply Line: {:?}",
-            current_line
-                .tokens
-                .iter()
-                .map(|t| t.token.get_str())
-                .collect::<Vec<_>>()
-        ); // TODO: REMOVE
+        // info!(
+        //     "---- Apply Line: {:?}",
+        //     current_line
+        //         .tokens
+        //         .iter()
+        //         .map(|t| t.token.get_str())
+        //         .collect::<Vec<_>>()
+        // ); // TODO: REMOVE
 
         // Process current line
         if !current_line.is_empty() {
