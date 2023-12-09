@@ -1,6 +1,5 @@
 import React from 'react';
-import { Card, CardDescription, CardHeader, CardTitle } from '@/components/layout';
-import { Button } from '@/components/primitive';
+import { Button, Card, CardDescription, CardHeader, CardTitle } from '@dyn/ui';
 
 import { useSVGComposition } from './useSVGComposition';
 

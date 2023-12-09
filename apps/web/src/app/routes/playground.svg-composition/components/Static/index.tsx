@@ -1,6 +1,6 @@
 import { jsPDF } from 'jspdf';
 import React from 'react';
-import { Button } from '@/components/primitive';
+import { Button } from '@dyn/ui';
 
 import { useSVGComposition } from '../../hooks';
 import { createComposition } from './create-composition';

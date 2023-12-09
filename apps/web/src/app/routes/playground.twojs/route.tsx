@@ -1,7 +1,7 @@
 import React from 'react';
-import { Card, CONTENT_WIDTH, MaxWidthWrapper } from '@/components/layout';
+import { Button, Card, Separator } from '@dyn/ui';
+import { CONTENT_WIDTH, MaxWidthWrapper } from '@/components/layout';
 import { FPSStats } from '@/components/monitoring';
-import { Button, Separator } from '@/components/primitive';
 
 import { MovingRects } from './components';
 

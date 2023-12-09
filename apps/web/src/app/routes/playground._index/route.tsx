@@ -1,7 +1,7 @@
 import { Link } from '@remix-run/react';
 import React from 'react';
+import { Separator } from '@dyn/ui';
 import { MaxWidthWrapper } from '@/components/layout';
-import { Separator } from '@/components/primitive';
 
 const Playground: React.FC = () => {
 	return (
