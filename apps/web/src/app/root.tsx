@@ -7,8 +7,8 @@ import uiStyles from '@dyn/ui/dist/index.css';
 import styles from './tailwind.css';
 
 export const links: LinksFunction = () => [
-	{ rel: 'stylesheet', href: styles },
 	{ rel: 'stylesheet', href: uiStyles },
+	{ rel: 'stylesheet', href: styles },
 	...(cssBundleHref ? [{ rel: 'stylesheet', href: cssBundleHref }] : [])
 ];
 

@@ -2,8 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+
 @layer base {
 	:root {
+		--font-sans: 'Inter', sans-serif;
+
 		--background: 0 0% 100%;
 		--foreground: 222.2 47.4% 11.2%;
 
