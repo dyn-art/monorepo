@@ -1,0 +1,9 @@
+{
+	"compilerOptions": {
+		"outDir": "./dist",
+		"rootDir": "./src",
+		"declarationDir": "./dist/types"
+	},
+	"extends": "@dyn/config/react-library.tsconfig.json",
+	"include": ["src"]
+}

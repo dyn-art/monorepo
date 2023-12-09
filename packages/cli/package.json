@@ -26,9 +26,9 @@
 	"author": "@bennoinbeta",
 	"license": "AGPL-3.0-or-later",
 	"bugs": {
-		"url": "https://issues.dyn.art/"
+		"url": "https://s.dyn.art/github/issues"
 	},
-	"homepage": "https://dyn.art/github",
+	"homepage": "https://s.dyn.art/github",
 	"dependencies": {
 		"@oclif/core": "^3.9.2",
 		"@rollup/plugin-commonjs": "^25.0.7",
