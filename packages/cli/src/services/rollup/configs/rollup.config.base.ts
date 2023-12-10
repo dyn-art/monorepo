@@ -2,7 +2,7 @@ import commonjs from '@rollup/plugin-commonjs';
 import esbuild from 'rollup-plugin-esbuild';
 import nodeExternals from 'rollup-plugin-node-externals';
 
-import { isExternal as isExternalFactory } from '../is-external-factory';
+import { isExternal } from '../is-external';
 import { bundleSize, typescriptPaths } from '../plugins';
 import type { TDynRollupOptionsCallback } from '../types';
 
@@ -54,7 +54,7 @@ const config: TDynRollupOptionsCallback = async (options) => {
 		// 3. For improved security: If a security vulnerability is found in a dependency,
 		//    npm can update it without needing to update this package.
 		// 4. Auto Installation: Package managers automatically install these dependencies, so no need to bundle them.
-		external: isExternalFactory(packageJson, {
+		external: isExternal(packageJson, {
 			fileTypesAsExternal: [],
 			packageJsonDepsAsExternal: true
 		})

@@ -3,4 +3,5 @@ export * from './not-empty';
 export * from './shallow-merge';
 export * from './short-id';
 export * from './sleep';
+export * from './to-array';
 export * from './types';

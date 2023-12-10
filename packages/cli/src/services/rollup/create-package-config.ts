@@ -67,20 +67,20 @@ export async function createRollupPackageConfig(
 		};
 
 		// Parse base and client configs
-		const baseConfig = toArray(
+		const baseRollupConfig = toArray(
 			await rollupConfigBase(rollupOptionsCallbackConfig)
 		)[0] as unknown as TBaseDynRollupOptions;
-		const clientConfigs = toArray(
+		const overrideRollupOptions = toArray(
 			typeof rollupOptions === 'object'
 				? rollupOptions
 				: await rollupOptions(rollupOptionsCallbackConfig)
 		);
 
 		// Merge base config into client configs
-		for (const clientConfig of clientConfigs) {
+		for (const overrideRollupOption of overrideRollupOptions) {
 			finalConfigs.push(
 				defineConfig(
-					mergeRollupConfigs(baseConfig, clientConfig, {
+					mergeRollupConfigs(baseRollupConfig, overrideRollupOption, {
 						command,
 						pluginTemplate: 'base'
 					})
