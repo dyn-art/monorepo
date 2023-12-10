@@ -1,6 +1,6 @@
 import type { ClassValue } from 'clsx';
 import React from 'react';
-import { cn } from '@/core/utils';
+import { cn } from '@dyn/ui';
 
 const MAX_W_SCREEN = 1280; // px
 const PADDING = 160; // px

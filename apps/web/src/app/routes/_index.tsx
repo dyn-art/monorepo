@@ -7,8 +7,8 @@ export const meta: MetaFunction = () => {
 
 const Home: React.FC = () => {
 	return (
-		<main className="relative min-h-screen flex flex-col items-center justify-center p-24 bg-[#FEFCF0]">
-			<div className="absolute top-0 left-0 mt-12 ml-12 font-mono text-sm">
+		<main className="relative flex min-h-screen flex-col items-center justify-center bg-[#FEFCF0] p-24">
+			<div className="absolute left-0 top-0 ml-12 mt-12 font-mono text-sm">
 				<a
 					href="https://inbeta.group"
 					target="_blank"
@@ -19,7 +19,7 @@ const Home: React.FC = () => {
 				</a>
 			</div>
 
-			<div className="flex-grow flex items-center justify-center">
+			<div className="flex flex-grow items-center justify-center">
 				<img src="/dyndotart-blob.svg" alt="dyn.art Logo" width={709} height={625} />
 			</div>
 		</main>
