@@ -3,11 +3,17 @@ import type { Command } from '@oclif/core';
 import chalk from 'chalk';
 import { defineConfig, type OutputOptions, type RollupOptions } from 'rollup';
 import type { PackageJson } from 'type-fest';
+import { toArray } from '@dyn/utils';
 
 import { resolvePathsFromPackageJson } from '../resolve-paths-from-package-json';
 import { rollupConfigBase } from './configs';
 import { mergeRollupConfigs } from './merge-rollup-configs';
-import type { TDynRollupOptions, TDynRollupOptionsCallbackConfig, TPath } from './types';
+import type {
+	TBaseDynRollupOptions,
+	TDynRollupOptions,
+	TDynRollupOptionsCallbackConfig,
+	TPath
+} from './types';
 
 export async function createRollupPackageConfig(
 	command: Command,
@@ -30,49 +36,60 @@ export async function createRollupPackageConfig(
 		)}`
 	);
 
-	return Promise.all(
-		paths.map(async (pathItem) => {
-			const { input: inputPath, output: outputPath } = pathItem;
+	const finalConfigs: RollupOptions[] = [];
+	for (const pathItem of paths) {
+		const { input: inputPath, output: outputPath } = pathItem;
 
-			// Specific module format configuration
-			const moduleConfig: TConfigureModuleConfig = {
-				outputPath,
-				outputOptions: {
-					name: packageJson.name,
-					preserveModules,
-					sourcemap
-				}
-			};
-			const { output, visualizeFilePath } =
-				format === 'esm' ? configureESM(moduleConfig) : configureCJS(moduleConfig);
+		// Specific module format configuration
+		const moduleConfig: TConfigureModuleConfig = {
+			outputPath,
+			outputOptions: {
+				name: packageJson.name,
+				preserveModules,
+				sourcemap
+			}
+		};
+		const { output, visualizeFilePath } =
+			format === 'esm' ? configureESM(moduleConfig) : configureCJS(moduleConfig);
 
-			// Define rollup config
-			const rollupOptionsCallbackConfig: TDynRollupOptionsCallbackConfig = {
-				path: {
-					input: inputPath,
-					output: outputPath
-				},
-				output,
-				tsConfigPath,
-				packageJson,
-				isProduction,
-				command,
-				visualizeFilePath
-			};
-			return defineConfig(
-				mergeRollupConfigs(
-					await rollupConfigBase(rollupOptionsCallbackConfig),
-					typeof rollupOptions === 'object'
-						? rollupOptions
-						: await rollupOptions(rollupOptionsCallbackConfig),
-					{
+		// Define rollup config
+		const rollupOptionsCallbackConfig: TDynRollupOptionsCallbackConfig = {
+			path: {
+				input: inputPath,
+				output: outputPath
+			},
+			output,
+			tsConfigPath,
+			packageJson,
+			isProduction,
+			command,
+			visualizeFilePath
+		};
+
+		// Parse base and client configs
+		const baseConfig = toArray(
+			await rollupConfigBase(rollupOptionsCallbackConfig)
+		)[0] as unknown as TBaseDynRollupOptions;
+		const clientConfigs = toArray(
+			typeof rollupOptions === 'object'
+				? rollupOptions
+				: await rollupOptions(rollupOptionsCallbackConfig)
+		);
+
+		// Merge base config into client configs
+		for (const clientConfig of clientConfigs) {
+			finalConfigs.push(
+				defineConfig(
+					mergeRollupConfigs(baseConfig, clientConfig, {
 						command,
 						pluginTemplate: 'base'
-					}
+					})
 				)
 			);
-		})
-	);
+		}
+	}
+
+	return finalConfigs;
 }
 
 function configureESM(config: TConfigureModuleConfig): TConfigureModuleResponse {

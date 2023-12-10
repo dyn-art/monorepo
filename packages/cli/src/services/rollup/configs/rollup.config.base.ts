@@ -26,6 +26,7 @@ const config: TDynRollupOptionsCallback = async (options) => {
 				resolveDTsSource: true
 			}),
 			'import-css', // Plugin placeholder for "rollup-plugin-import-css"
+			'postcss', // Plugin placeholder for "rollup-plugin-postcss"
 			'wasm', // Plugin placeholder for "rollup-plugin-wasm"
 			// Transpile TypeScript code to JavaScript (ES6), and minify in production
 			esbuild({
@@ -34,14 +35,16 @@ const config: TDynRollupOptionsCallback = async (options) => {
 				target: 'es6',
 				exclude: [/node_modules/],
 				loaders: {
-					'.json': 'json' // Require @rollup/plugin-commonjs
+					'.json': 'json' // Requires @rollup/plugin-commonjs
 				},
 				sourceMap: false // Configured in rollup 'output' object
 			}),
-			'copy', // Plugin placeholder for "rollup-plugin-copy"
 			// typescript(/* */), // Obsolete as esbuild takes care of configuring typescript
 			// babel(/* */), // Obsolete as esbuild takes care of converting ES2015+ modules into compatible JavaScript files
 			// terser(/* */), // Obsolete as esbuild takes care of minifying
+			'html', // Plugin placeholder for "@rollup/plugin-html"
+			'copy', // Plugin placeholder for "rollup-plugin-copy"
+			'replace', // Plugin placeholder for "@rollup/plugin-replace"
 			await bundleSize(command)
 		],
 		// Exclude peer dependencies and dependencies from bundle for these reasons:

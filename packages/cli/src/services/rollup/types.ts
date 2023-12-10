@@ -10,11 +10,14 @@ export type TBaseDynRollupOptions = Omit<RollupOptions, 'plugins'> & {
 	plugins?: TDynRollupPlugin[];
 };
 
-export type TDynRollupOptions = TBaseDynRollupOptions | TDynRollupOptionsCallback;
+export type TDynRollupOptions =
+	| TBaseDynRollupOptions
+	| TBaseDynRollupOptions[]
+	| TDynRollupOptionsCallback;
 
 export type TDynRollupOptionsCallback = (
 	options: TDynRollupOptionsCallbackConfig
-) => Promise<TBaseDynRollupOptions>;
+) => Promise<TBaseDynRollupOptions | TBaseDynRollupOptions[]>;
 
 export interface TDynRollupOptionsCallbackConfig {
 	path: TPath;

@@ -63,7 +63,7 @@ function mergePlugins(
 	let template: TDynRollupPlugin[] = [];
 
 	// Helper function to collect plugin instances into the map.
-	const gatherPlugins = (plugin: TDynRollupPlugin) => {
+	const gatherPlugins = (plugin: TDynRollupPlugin): void => {
 		// We only care about Plugin objects with a name property
 		if (isPlugin(plugin) && allPluginsMap[plugin.name] == null) {
 			allPluginsMap[plugin.name] = plugin;
