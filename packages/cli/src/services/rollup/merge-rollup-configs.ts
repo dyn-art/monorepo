@@ -1,8 +1,8 @@
-import type { Command } from '@oclif/core';
 import { mergeWith } from 'lodash';
 import type { InputPluginOption, Plugin, RollupOptions } from 'rollup';
 
 import type { TBaseDynRollupOptions, TDynRollupPlugin } from '.';
+import type { DynCommand } from '../../DynCommand';
 import { isPlugin } from './is-plugin';
 
 /**
@@ -14,7 +14,7 @@ import { isPlugin } from './is-plugin';
  * @returns - The merged configuration.
  */
 export function mergeRollupConfigs(
-	command: Command,
+	command: DynCommand,
 	baseConfig: TBaseDynRollupOptions,
 	overrideConfig: TBaseDynRollupOptions
 ): RollupOptions {
@@ -51,7 +51,7 @@ export function mergeRollupConfigs(
  * @returns - The merged list of plugins.
  */
 function mergePlugins(
-	command: Command,
+	command: DynCommand,
 	basePlugins: TDynRollupPlugin[] | null,
 	overridePlugins: TDynRollupPlugin[] | null
 ): InputPluginOption {
@@ -85,7 +85,7 @@ function mergePlugins(
 			const respectivePlugin = allPluginsMap.get(plugin);
 			if (respectivePlugin != null) {
 				mergedPlugins.push(respectivePlugin);
-			} else {
+			} else if (command.isVerbose) {
 				command.warn(`Plugin placeholder "${plugin}" does not match any available plugins.`);
 			}
 		} else if (isPlugin(plugin)) {

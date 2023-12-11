@@ -1,14 +1,14 @@
 import path from 'node:path';
-import type { Command } from '@oclif/core';
 import * as ts from 'typescript';
 
+import type { DynCommand } from '../DynCommand';
 import {
 	getTsConfigCompilerOptions,
 	type TTsConfigCompilerOptions
 } from './get-ts-config-compiler-options';
 
 export function resolveTsPathsFactory(
-	command: Command,
+	command: DynCommand,
 	options: TResolveTsPathsFactoryOptions = {}
 ): TResolveTsPaths {
 	const {

@@ -1,9 +1,9 @@
-import type { Command } from '@oclif/core';
 import chalk from 'chalk';
 import { defineConfig, type RollupOptions } from 'rollup';
 import type { PackageJson } from 'type-fest';
 import { toArray } from '@dyn/utils';
 
+import type { DynCommand } from '../../../../DynCommand';
 import { resolvePaths, type TPath } from '../../../../utils';
 import { mergeRollupConfigs } from '../../merge-rollup-configs';
 import { configureCJS, configureESM, type TConfigureModuleConfig } from '../../modules';
@@ -11,7 +11,7 @@ import type { TDynRollupOptions, TDynRollupOptionsCallbackConfig } from '../../t
 import { createBaseRollupConfig } from './rollup.config.base';
 
 export async function createLibraryConfig(
-	command: Command,
+	command: DynCommand,
 	config: TCreateLibraryConfigConfig
 ): Promise<RollupOptions[]> {
 	const {
@@ -26,9 +26,9 @@ export async function createLibraryConfig(
 	const paths = resolvePaths({ paths: config.paths ?? null, packageJson, format, preserveModules });
 
 	command.log(
-		`🛣️  Resolved paths from ${chalk.underline('package.json')}'s export conditions: ${chalk.gray(
-			JSON.stringify(paths)
-		)}`
+		`🛣️  Resolved paths from ${chalk.underline('package.json')}'s export conditions${
+			command.isVerbose ? `: ${chalk.gray(JSON.stringify(paths))}` : '.'
+		}`
 	);
 
 	const finalConfigs: RollupOptions[] = [];

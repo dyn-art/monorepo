@@ -1,4 +1,3 @@
-import type { Command } from '@oclif/core';
 import chalk from 'chalk';
 import {
 	rollup,
@@ -8,26 +7,29 @@ import {
 	type RollupOutput
 } from 'rollup';
 
+import type { DynCommand } from '../../DynCommand';
 import { isPlugin } from './is-plugin';
 
 export async function bundleWithRollup(
-	command: Command,
+	command: DynCommand,
 	rollupOptions: RollupOptions
 ): Promise<RollupOutput[]> {
 	command.log(
 		'🚀 Started bundling.',
-		chalk.gray(
-			JSON.stringify({
-				args: [
-					{
-						options: {
-							...rollupOptions,
-							plugins: pluginsToKeys(rollupOptions.plugins)
-						}
-					}
-				]
-			})
-		)
+		command.isVerbose
+			? chalk.gray(
+					JSON.stringify({
+						args: [
+							{
+								options: {
+									...rollupOptions,
+									plugins: pluginsToKeys(rollupOptions.plugins)
+								}
+							}
+						]
+					})
+			  )
+			: ''
 	);
 	const build = await rollup(rollupOptions);
 	const outputs: OutputOptions[] = formatOutput(rollupOptions.output);

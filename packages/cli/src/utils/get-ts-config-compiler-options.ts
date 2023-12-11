@@ -1,11 +1,11 @@
-import type { Command } from '@oclif/core';
 import chalk from 'chalk';
 import * as ts from 'typescript';
 
+import type { DynCommand } from '../DynCommand';
 import { findNearestTsConfigPath } from './find-nearest-ts-config-path';
 
 export function getTsConfigCompilerOptions(
-	command: Command,
+	command: DynCommand,
 	tsConfigPath = findNearestTsConfigPath()
 ): TTsConfigCompilerOptions {
 	const defaultTsConfig: TTsConfigCompilerOptions = { outDir: '.' };

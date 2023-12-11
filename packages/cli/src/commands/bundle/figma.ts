@@ -1,13 +1,15 @@
+import fs from 'node:fs/promises';
 import path from 'node:path';
-import { Command, Flags } from '@oclif/core';
+import { Flags } from '@oclif/core';
 import chalk from 'chalk';
 import type { PackageJson } from 'type-fest';
 
 import { bundleAllWithRollup } from '../..';
+import { DynCommand } from '../../DynCommand';
 import { createFigmaConfig } from '../../services/rollup/configs/figma/create-figma-config';
 import { doesFileExist, promisifyFiglet, readJsonFile } from '../../utils';
 
-export default class Figma extends Command {
+export default class Figma extends DynCommand {
 	static description = 'Bundle Figma Plugin of dyn.art';
 
 	static examples = [];
@@ -30,6 +32,12 @@ export default class Figma extends Command {
 			description: 'Generate sourcemaps',
 			required: false,
 			default: false
+		}),
+		verbose: Flags.boolean({
+			char: 'v',
+			description: 'More detailed logs',
+			required: false,
+			default: false
 		})
 	};
 
@@ -37,6 +45,7 @@ export default class Figma extends Command {
 
 	public async run(): Promise<void> {
 		const { flags } = await this.parse(Figma);
+		this.isVerbose = flags.verbose;
 		const startTime = Date.now();
 
 		// Read in package.json
@@ -73,7 +82,14 @@ export default class Figma extends Command {
 			})
 		);
 
-		// TODO: Move manifest.json into dist
+		// Move manifest.json into dist
+		await fs.copyFile(
+			path.join(process.cwd(), 'manifest.json'),
+			path.join(process.cwd(), 'dist', 'manifest.json')
+		);
+
+		// Delete app.js file as its embedded in app.html
+		await fs.unlink(path.join(process.cwd(), 'dist', 'app.js'));
 
 		this.log(`\n`);
 		this.log(

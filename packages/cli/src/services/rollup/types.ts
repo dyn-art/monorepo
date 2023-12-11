@@ -1,7 +1,7 @@
-import type { Command } from '@oclif/core';
 import type { InputPluginOption, MaybePromise, OutputOptions, RollupOptions } from 'rollup';
 import type { PackageJson } from 'type-fest';
 
+import type { DynCommand } from '../../DynCommand';
 import type { TPath } from '../../utils';
 
 type Unwrap<T> = T extends Promise<infer U> ? U : T;
@@ -27,6 +27,6 @@ export interface TDynRollupOptionsCallbackConfig {
 	tsConfigPath: string;
 	packageJson: PackageJson;
 	isProduction: boolean;
-	command: Command;
+	command: DynCommand;
 	visualizeFilePath: string;
 }

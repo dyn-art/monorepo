@@ -1,14 +1,15 @@
-import type { Command } from '@oclif/core';
 import chalk from 'chalk';
+
+import type { DynCommand } from '../DynCommand';
 
 export async function execaVerbose(
 	toExecuteCommand: string,
 	args: string[],
 	config: TExecaVerboseConfig
 ): Promise<void> {
-	const { command, cwd, verbose = false } = config;
+	const { command, verbose = false, ...execaConfig } = config;
 	const { execa } = await import('execa');
-	const subprocess = execa(toExecuteCommand, args, config);
+	const subprocess = execa(toExecuteCommand, args, { verbose, ...execaConfig });
 
 	if (verbose) {
 		subprocess.stdout?.on('data', (data) => {
@@ -35,5 +36,5 @@ export async function execaVerbose(
 interface TExecaVerboseConfig {
 	cwd?: string;
 	verbose?: boolean;
-	command: Command;
+	command: DynCommand;
 }

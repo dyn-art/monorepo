@@ -1,9 +1,9 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import type { Command } from '@oclif/core';
 import chalk from 'chalk';
 import type { PackageJson } from 'type-fest';
 
+import type { DynCommand } from '../../DynCommand';
 import {
 	execaVerbose,
 	findNearestTsConfigPath,
@@ -13,7 +13,10 @@ import {
 	type TTsConfigCompilerOptions
 } from '../../utils';
 
-export async function generateDts(command: Command, options: TGenerateDtsOptions = {}) {
+export async function generateDts(
+	command: DynCommand,
+	options: TGenerateDtsOptions = {}
+): Promise<void> {
 	const {
 		tsConfigPath = findNearestTsConfigPath(),
 		packageJson,
@@ -21,11 +24,13 @@ export async function generateDts(command: Command, options: TGenerateDtsOptions
 	} = options;
 	command.log(
 		'🚀 Started generating Typescript Declaration files.',
-		chalk.gray(
-			JSON.stringify({
-				args: [{ tsconfig: tsConfigPath }]
-			})
-		)
+		command.isVerbose
+			? chalk.gray(
+					JSON.stringify({
+						args: [{ tsconfig: tsConfigPath }]
+					})
+			  )
+			: ''
 	);
 
 	// Resolve Typescript compiler options

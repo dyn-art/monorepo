@@ -1,10 +1,11 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import type { Command } from '@oclif/core';
 import chalk from 'chalk';
 import type { Plugin } from 'rollup';
 
-async function bundleSize(command: Command): Promise<Plugin> {
+import type { DynCommand } from '../../../DynCommand';
+
+async function bundleSize(command: DynCommand): Promise<Plugin> {
 	const maxmin = (await import('maxmin')).default;
 	return {
 		name: 'rollup-plugin-bundle-size',

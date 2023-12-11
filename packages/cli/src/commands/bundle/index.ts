@@ -1,8 +1,9 @@
 import path from 'node:path';
-import { Command, Flags } from '@oclif/core';
+import { Flags } from '@oclif/core';
 import chalk from 'chalk';
 import type { PackageJson } from 'type-fest';
 
+import { DynCommand } from '../../DynCommand';
 import {
 	bundleAllWithRollup,
 	bundleWithTsc,
@@ -12,7 +13,7 @@ import {
 } from '../../services';
 import { doesFileExist, promisifyFiglet, readJsFile, readJsonFile } from '../../utils';
 
-export default class Bundle extends Command {
+export default class Bundle extends DynCommand {
 	static description = 'Bundle dyn.art packages';
 
 	static examples = [];
@@ -62,6 +63,7 @@ export default class Bundle extends Command {
 
 	public async run(): Promise<void> {
 		const { flags } = await this.parse(Bundle);
+		this.isVerbose = flags.verbose;
 		const startTime = Date.now();
 
 		// Read in package.json
