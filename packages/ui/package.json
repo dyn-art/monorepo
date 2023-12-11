@@ -4,8 +4,12 @@
 	"version": "0.0.1",
 	"private": true,
 	"scripts": {
-		"build": "shx rm -rf dist && tailwindcss -i ./src/styles/root.scss -o dist/index.css && ../../scripts/cli.sh bundle",
-		"start:dev": "tailwindcss -i ./src/styles/root.scss -o ./dist/index.css --watch && tsc -w",
+		"build": "shx rm -rf dist && pnpm run build:css:tailwind && pnpm run build:css:root && ../../scripts/cli.sh bundle",
+		"build:css:root": "tailwindcss -i ./src/styles/root.scss -o ./dist/styles.css",
+		"build:css:tailwind": "tailwindcss -i ./src/styles/tailwind.scss -o ./dist/tailwind.css",
+		"start:dev": "pnpm run watch:css:tailwind && pnpm run watch:css:root && tsc -w",
+		"watch:css:root": "pnpm run build:css:root --watch",
+		"watch:css:tailwind": "pnpm build:css:tailwind --watch",
 		"lint": "eslint --ext .js,.ts src/",
 		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
 		"install:clean": "pnpm run clean && pnpm install",
@@ -54,6 +58,7 @@
 	"files": [
 		"dist",
 		"tailwind.config.js",
+		"with-dyn-ui.js",
 		"README.md"
 	]
 }
