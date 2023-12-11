@@ -1,0 +1,105 @@
+import path from 'node:path';
+import { Command, Flags } from '@oclif/core';
+import chalk from 'chalk';
+import type { PackageJson } from 'type-fest';
+
+import { bundleAllWithRollup } from '../..';
+import { createFigmaConfig } from '../../services/rollup/configs/figma/create-figma-config';
+import { doesFileExist, promisifyFiglet, readJsonFile } from '../../utils';
+
+export default class Figma extends Command {
+	static description = 'Bundle Figma Plugin of dyn.art';
+
+	static examples = [];
+
+	static flags = {
+		prod: Flags.boolean({
+			char: 'p',
+			description: 'Production mode',
+			required: false,
+			default: false
+		}),
+		analyze: Flags.boolean({
+			char: 'a',
+			description: 'Analyze bundle',
+			required: false,
+			default: false
+		}),
+		sourcemap: Flags.boolean({
+			char: 's',
+			description: 'Generate sourcemaps',
+			required: false,
+			default: false
+		})
+	};
+
+	static args = {};
+
+	public async run(): Promise<void> {
+		const { flags } = await this.parse(Figma);
+		const startTime = Date.now();
+
+		// Read in package.json
+		const packageJson = await this.getPackageJson();
+		if (packageJson == null) {
+			this.error(`No package.json file found at '${chalk.underline(process.cwd())}'!`, { exit: 1 });
+		}
+
+		this.log(chalk.yellowBright(await promisifyFiglet('dyn figler')));
+		this.log(`\n`);
+		this.log(
+			`Started bundling Figma Plugin ${chalk.magenta(
+				chalk.underline(packageJson.name ?? 'unknown-package')
+			)} for ${flags.prod ? chalk.green('production') : chalk.blue('development')}`
+		);
+		this.log(`\n`);
+
+		// Read in tsconfig.json
+		const tsConfigPath = this.getValidTsConfigJsonPath(flags.prod);
+		if (tsConfigPath == null) {
+			this.error(`No tsconfig.json file found at '${chalk.underline(process.cwd())}'!`, {
+				exit: 1
+			});
+		}
+
+		// Bundle
+		await bundleAllWithRollup(
+			this,
+			await createFigmaConfig(this, {
+				isProduction: flags.prod,
+				sourcemap: flags.sourcemap,
+				tsConfigPath,
+				packageJson
+			})
+		);
+
+		// TODO: Move manifest.json into dist
+
+		this.log(`\n`);
+		this.log(
+			`${chalk.green('→')} Figma Plugin was bundled in ${chalk.green(
+				chalk.underline(`${((Date.now() - startTime) / 1000).toFixed(2)}s`)
+			)}.`
+		);
+		this.log(`\n`);
+		this.exit(0);
+	}
+
+	private async getPackageJson(): Promise<PackageJson | null> {
+		const packageJsonPath = path.join(process.cwd(), 'package.json');
+		return readJsonFile<PackageJson>(packageJsonPath);
+	}
+
+	private getValidTsConfigJsonPath(isProduction: boolean): string | null {
+		let tsConfigPath: string;
+		if (isProduction) {
+			tsConfigPath = path.resolve(process.cwd(), 'tsconfig.prod.json');
+		} else {
+			tsConfigPath = path.resolve(process.cwd(), 'tsconfig.json');
+		}
+		if (!doesFileExist(tsConfigPath)) {
+			return isProduction ? this.getValidTsConfigJsonPath(false) : null;
+		}
+		return tsConfigPath;
+	}
+}

@@ -2,6 +2,8 @@ import type { Command } from '@oclif/core';
 import type { InputPluginOption, MaybePromise, OutputOptions, RollupOptions } from 'rollup';
 import type { PackageJson } from 'type-fest';
 
+import type { TPath } from '../../utils';
+
 type Unwrap<T> = T extends Promise<infer U> ? U : T;
 
 export type TDynRollupPlugin = MaybePromise<Unwrap<InputPluginOption> | string>;
@@ -16,7 +18,7 @@ export type TDynRollupOptions =
 	| TDynRollupOptionsCallback;
 
 export type TDynRollupOptionsCallback = (
-	options: TDynRollupOptionsCallbackConfig
+	config: TDynRollupOptionsCallbackConfig
 ) => Promise<TBaseDynRollupOptions | TBaseDynRollupOptions[]>;
 
 export interface TDynRollupOptionsCallbackConfig {
@@ -27,9 +29,4 @@ export interface TDynRollupOptionsCallbackConfig {
 	isProduction: boolean;
 	command: Command;
 	visualizeFilePath: string;
-}
-
-export interface TPath {
-	output: string;
-	input: string;
 }

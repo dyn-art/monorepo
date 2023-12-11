@@ -2,12 +2,14 @@ import commonjs from '@rollup/plugin-commonjs';
 import esbuild from 'rollup-plugin-esbuild';
 import nodeExternals from 'rollup-plugin-node-externals';
 
-import { isExternal } from '../is-external';
-import { bundleSize, typescriptPaths } from '../plugins';
-import type { TDynRollupOptionsCallback } from '../types';
+import { isExternal } from '../../../../utils';
+import { bundleSize, typescriptPaths } from '../../plugins';
+import type { TBaseDynRollupOptions, TDynRollupOptionsCallbackConfig } from '../../types';
 
-const config: TDynRollupOptionsCallback = async (options) => {
-	const { packageJson, path, output, command, tsConfigPath, isProduction } = options;
+export async function createBaseRollupConfig(
+	config: TDynRollupOptionsCallbackConfig
+): Promise<TBaseDynRollupOptions> {
+	const { packageJson, path, output, command, tsConfigPath, isProduction } = config;
 
 	return {
 		input: path.input,
@@ -26,7 +28,6 @@ const config: TDynRollupOptionsCallback = async (options) => {
 				resolveDTsSource: true
 			}),
 			'import-css', // Plugin placeholder for "rollup-plugin-import-css"
-			'postcss', // Plugin placeholder for "rollup-plugin-postcss"
 			'wasm', // Plugin placeholder for "rollup-plugin-wasm"
 			// Transpile TypeScript code to JavaScript (ES6), and minify in production
 			esbuild({
@@ -42,9 +43,7 @@ const config: TDynRollupOptionsCallback = async (options) => {
 			// typescript(/* */), // Obsolete as esbuild takes care of configuring typescript
 			// babel(/* */), // Obsolete as esbuild takes care of converting ES2015+ modules into compatible JavaScript files
 			// terser(/* */), // Obsolete as esbuild takes care of minifying
-			'html', // Plugin placeholder for "@rollup/plugin-html"
 			'copy', // Plugin placeholder for "rollup-plugin-copy"
-			'replace', // Plugin placeholder for "@rollup/plugin-replace"
 			await bundleSize(command)
 		],
 		// Exclude peer dependencies and dependencies from bundle for these reasons:
@@ -59,6 +58,4 @@ const config: TDynRollupOptionsCallback = async (options) => {
 			packageJsonDepsAsExternal: true
 		})
 	};
-};
-
-export default config;
+}

@@ -6,7 +6,7 @@ import type { PackageJson } from 'type-fest';
 import {
 	bundleAllWithRollup,
 	bundleWithTsc,
-	createRollupPackageConfig,
+	createLibraryConfig,
 	generateDts,
 	type TDynRollupOptions
 } from '../../services';
@@ -49,6 +49,12 @@ export default class Bundle extends Command {
 			required: false,
 			default: 'all',
 			options: ['all', 'esm', 'cjs']
+		}),
+		verbose: Flags.boolean({
+			char: 'v',
+			description: 'More detailed logs',
+			required: false,
+			default: false
 		})
 	};
 
@@ -90,7 +96,7 @@ export default class Bundle extends Command {
 				if (flags.format === 'all' || flags.format === 'esm') {
 					await bundleAllWithRollup(
 						this,
-						await createRollupPackageConfig(this, {
+						await createLibraryConfig(this, {
 							format: 'esm',
 							isProduction: flags.prod,
 							preserveModules: true,
@@ -104,7 +110,7 @@ export default class Bundle extends Command {
 				if (flags.format === 'all' || flags.format === 'cjs') {
 					await bundleAllWithRollup(
 						this,
-						await createRollupPackageConfig(this, {
+						await createLibraryConfig(this, {
 							format: 'cjs',
 							isProduction: flags.prod,
 							preserveModules: true,

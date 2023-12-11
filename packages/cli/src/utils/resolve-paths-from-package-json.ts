@@ -1,7 +1,7 @@
 import path from 'node:path';
 import type { PackageJson } from 'type-fest';
 
-import type { TPath } from './rollup/types';
+import type { TPath } from './resolve-paths';
 
 /**
  * Resolves the output path based on the provided export conditions.
@@ -81,7 +81,9 @@ export function resolvePathsFromPackageJson(
 								preserveModules,
 								format
 							}
-						)
+						),
+						key: exportKey,
+						exportCondition
 					});
 				}
 			}

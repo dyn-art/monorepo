@@ -1,0 +1,15 @@
+{
+	"extends": "@dyn/config/react-library.tsconfig.json",
+	"compilerOptions": {
+		"outDir": "./dist",
+		"rootDir": "./src",
+		"baseUrl": ".",
+		"paths": {
+			"@/app": ["./src/app"],
+			"@/plugin": ["./src/plugin"],
+			"@/types": ["./src/types"]
+		},
+		"typeRoots": ["./node_modules/@types", "./node_modules/@figma"]
+	},
+	"include": ["src"]
+}

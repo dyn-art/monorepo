@@ -14,15 +14,15 @@ import { isPlugin } from './is-plugin';
  * @returns - The merged configuration.
  */
 export function mergeRollupConfigs(
+	command: Command,
 	baseConfig: TBaseDynRollupOptions,
-	overrideConfig: TBaseDynRollupOptions,
-	config: TMergeRollupConfigsConfig
+	overrideConfig: TBaseDynRollupOptions
 ): RollupOptions {
 	const { plugins: basePlugins = [], ...restBaseConfig } = baseConfig;
 	const { plugins: overridePlugins = [], ...restOverrideConfig } = overrideConfig;
 
 	// Merge plugins manually as lodash customizer function didn't work out for my use case
-	const mergedPlugins = mergePlugins(basePlugins, overridePlugins, config);
+	const mergedPlugins = mergePlugins(command, basePlugins, overridePlugins);
 
 	// Use lodash mergeWith for the rest of the configuration
 	const mergedConfig: Omit<RollupOptions, 'plugins'> = mergeWith(
@@ -51,43 +51,38 @@ export function mergeRollupConfigs(
  * @returns - The merged list of plugins.
  */
 function mergePlugins(
+	command: Command,
 	basePlugins: TDynRollupPlugin[] | null,
-	overridePlugins: TDynRollupPlugin[] | null,
-	config: TMergeRollupConfigsConfig
+	overridePlugins: TDynRollupPlugin[] | null
 ): InputPluginOption {
-	const { command, pluginTemplate = 'override' } = config;
 	const basePluginsArray = basePlugins ?? [];
 	const overridePluginsArray = overridePlugins ?? [];
 
-	const allPluginsMap: Record<string, Plugin> = {};
-	let template: TDynRollupPlugin[] = [];
+	const allPluginsMap = new Map<string, Plugin[]>();
+	const template: TDynRollupPlugin[] = basePluginsArray;
 
-	// Helper function to collect plugin instances into the map.
+	// Helper function to collect plugin instances into the all plugins map
 	const gatherPlugins = (plugin: TDynRollupPlugin): void => {
 		// We only care about Plugin objects with a name property
-		if (isPlugin(plugin) && allPluginsMap[plugin.name] == null) {
-			allPluginsMap[plugin.name] = plugin;
+		if (isPlugin(plugin)) {
+			const key = plugin.name;
+			if (allPluginsMap.has(key)) {
+				allPluginsMap.get(key)?.push(plugin);
+			} else {
+				allPluginsMap.set(key, [plugin]);
+			}
 		}
 	};
 
-	// When using 'override' as a template, collect plugins from the base and use the override as the template.
-	if (pluginTemplate === 'override') {
-		basePluginsArray.forEach(gatherPlugins);
-		template = overridePluginsArray;
-	}
-
-	// When using 'base' as a template, collect plugins from the override and use the base as the template.
-	if (pluginTemplate === 'base') {
-		overridePluginsArray.forEach(gatherPlugins);
-		template = basePluginsArray;
-	}
+	// Collect plugins from the override
+	overridePluginsArray.forEach(gatherPlugins);
 
 	// Merge plugins
 	const mergedPlugins: InputPluginOption = [];
 	template.forEach((plugin) => {
-		// Replace placeholders from the template with their respective plugin instances.
+		// Replace placeholders from the template with their respective plugin instances
 		if (typeof plugin === 'string') {
-			const respectivePlugin = allPluginsMap[plugin];
+			const respectivePlugin = allPluginsMap.get(plugin);
 			if (respectivePlugin != null) {
 				mergedPlugins.push(respectivePlugin);
 			} else {
@@ -99,9 +94,4 @@ function mergePlugins(
 	});
 
 	return mergedPlugins;
-}
-
-interface TMergeRollupConfigsConfig {
-	command: Command;
-	pluginTemplate?: 'base' | 'override';
 }
