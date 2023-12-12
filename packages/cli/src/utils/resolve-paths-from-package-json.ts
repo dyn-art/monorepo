@@ -129,8 +129,7 @@ function createPathObject(
 	return {
 		input: resolveInputPathFromPackageJson(exportConditions, pathConfig),
 		output: resolveOutputPathFromPackageJson(exportConditions, pathConfig),
-		key,
-		exportConditions
+		key
 	};
 }
 

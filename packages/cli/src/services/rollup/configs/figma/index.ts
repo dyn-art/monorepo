@@ -1,1 +1,1 @@
-export * from './create-figma-config';
+export * from './create-figma-rollup-config';

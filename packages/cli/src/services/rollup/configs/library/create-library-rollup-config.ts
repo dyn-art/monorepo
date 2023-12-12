@@ -1,15 +1,15 @@
 import chalk from 'chalk';
-import { defineConfig, type RollupOptions } from 'rollup';
+import { defineConfig as rollupDefineConfig, type RollupOptions } from 'rollup';
 import type { PackageJson } from 'type-fest';
 
 import type { DynCommand } from '../../../../DynCommand';
 import { resolvePaths, toArray, type TPath } from '../../../../utils';
+import type { TDynLibraryConfig, TDynRollupOptionsCallbackConfig } from '../../../dyn';
 import { mergeRollupConfigs } from '../../merge-rollup-configs';
 import { configureCJS, configureESM, type TConfigureModuleConfig } from '../../modules';
-import type { TDynRollupOptions, TDynRollupOptionsCallbackConfig } from '../../types';
 import { createBaseRollupConfig } from './rollup.config.base';
 
-export async function createLibraryConfig(
+export async function createLibraryRollupConfig(
 	command: DynCommand,
 	config: TCreateLibraryConfigConfig
 ): Promise<RollupOptions[]> {
@@ -17,12 +17,13 @@ export async function createLibraryConfig(
 		tsConfigPath,
 		packageJson,
 		format = 'esm',
-		rollupOptions = {},
+		libraryConfig = {},
 		isProduction = false,
 		preserveModules = true,
 		sourcemap = true
 	} = config;
 	const paths = resolvePaths({ paths: config.paths ?? null, packageJson, format, preserveModules });
+	const rollupConfig = libraryConfig.rollupConfig ?? { isBase: false, options: {} };
 
 	command.log(
 		`🛣️  Resolved paths from ${chalk.underline('package.json')}'s export conditions${
@@ -43,8 +44,7 @@ export async function createLibraryConfig(
 				sourcemap
 			}
 		};
-		const { output, visualizeFilePath } =
-			format === 'esm' ? configureESM(moduleConfig) : configureCJS(moduleConfig);
+		const { output } = format === 'esm' ? configureESM(moduleConfig) : configureCJS(moduleConfig);
 
 		// Define rollup config
 		const rollupOptionsCallbackConfig: TDynRollupOptionsCallbackConfig = {
@@ -56,22 +56,25 @@ export async function createLibraryConfig(
 			tsConfigPath,
 			packageJson,
 			isProduction,
-			command,
-			visualizeFilePath
+			command
 		};
 
 		// Parse base config and override options
 		const baseRollupConfig = await createBaseRollupConfig(rollupOptionsCallbackConfig);
-		const overrideRollupOptions = toArray(
-			typeof rollupOptions === 'object'
-				? rollupOptions
-				: await rollupOptions(rollupOptionsCallbackConfig)
+		const rollupOptions = toArray(
+			typeof rollupConfig.options === 'object'
+				? rollupConfig.options
+				: await rollupConfig.options(rollupOptionsCallbackConfig)
 		);
 
-		// Merge override options into base config
-		for (const overrideRollupOption of overrideRollupOptions) {
+		// Merge rollup options and base config
+		for (const rollupOption of rollupOptions) {
 			finalConfigs.push(
-				defineConfig(mergeRollupConfigs(command, baseRollupConfig, overrideRollupOption))
+				rollupDefineConfig(
+					rollupConfig.isBase
+						? mergeRollupConfigs(command, rollupOption, baseRollupConfig)
+						: mergeRollupConfigs(command, baseRollupConfig, rollupOption)
+				)
 			);
 		}
 	}
@@ -87,5 +90,5 @@ export interface TCreateLibraryConfigConfig {
 	isProduction?: boolean;
 	preserveModules?: boolean;
 	sourcemap?: boolean;
-	rollupOptions?: TDynRollupOptions;
+	libraryConfig?: TDynLibraryConfig;
 }

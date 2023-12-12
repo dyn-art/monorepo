@@ -3,8 +3,8 @@ import esbuild from 'rollup-plugin-esbuild';
 import nodeExternals from 'rollup-plugin-node-externals';
 
 import { isExternal } from '../../../../utils';
+import type { TBaseDynRollupOptions, TDynRollupOptionsCallbackConfig } from '../../../dyn';
 import { bundleSize, typescriptPaths } from '../../plugins';
-import type { TBaseDynRollupOptions, TDynRollupOptionsCallbackConfig } from '../../types';
 
 export async function createBaseRollupConfig(
 	config: TDynRollupOptionsCallbackConfig

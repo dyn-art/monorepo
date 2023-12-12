@@ -4,9 +4,8 @@ import { Flags } from '@oclif/core';
 import chalk from 'chalk';
 import type { PackageJson } from 'type-fest';
 
-import { bundleAllWithRollup } from '../..';
 import { DynCommand } from '../../DynCommand';
-import { createFigmaConfig } from '../../services/rollup/configs/figma';
+import { bundleAllWithRollup, createFigmaRollupConfig, getDynConfig } from '../../services';
 import { doesFileExist, promisifyFiglet, readJsonFile } from '../../utils';
 
 export default class Figma extends DynCommand {
@@ -71,14 +70,22 @@ export default class Figma extends DynCommand {
 			});
 		}
 
+		// Read in dyn.config.js
+		const dynConfig = await getDynConfig(this);
+		const figmaConfig =
+			typeof dynConfig?.figma === 'function'
+				? await dynConfig.figma({ isProduction: flags.prod })
+				: dynConfig?.figma;
+
 		// Bundle
 		await bundleAllWithRollup(
 			this,
-			await createFigmaConfig(this, {
+			await createFigmaRollupConfig(this, {
 				isProduction: flags.prod,
 				sourcemap: flags.sourcemap,
 				tsConfigPath,
-				packageJson
+				packageJson,
+				figmaConfig
 			})
 		);
 

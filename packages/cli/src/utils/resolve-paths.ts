@@ -25,5 +25,4 @@ export interface TPath {
 	output: string;
 	input: string;
 	key?: string;
-	exportConditions?: PackageJson.ExportConditions;
 }

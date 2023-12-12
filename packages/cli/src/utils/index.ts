@@ -5,6 +5,7 @@ export * from './get-ts-config-compiler-options';
 export * from './is-external';
 export * from './promisify-figlet';
 export * from './read-dotenv-file';
+export * from './read-html-file';
 export * from './read-js-file';
 export * from './read-json-file';
 export * from './resolve-paths';

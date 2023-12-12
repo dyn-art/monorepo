@@ -7,11 +7,11 @@ import { DynCommand } from '../../DynCommand';
 import {
 	bundleAllWithRollup,
 	bundleWithTsc,
-	createLibraryConfig,
+	createLibraryRollupConfig,
 	generateDts,
-	type TDynRollupOptions
+	getDynConfig
 } from '../../services';
-import { doesFileExist, promisifyFiglet, readJsFile, readJsonFile } from '../../utils';
+import { doesFileExist, promisifyFiglet, readJsonFile } from '../../utils';
 
 export default class Bundle extends DynCommand {
 	static description = 'Bundle dyn.art packages';
@@ -89,8 +89,9 @@ export default class Bundle extends DynCommand {
 			});
 		}
 
-		// Read in rollup.config.js
-		const rollupConfig = await this.getRollupConfig();
+		// Read in dyn.config.js
+		const dynConfig = await getDynConfig(this);
+		const libraryConfig = dynConfig?.library;
 
 		// Bundle package based on bundle strategy
 		switch (flags.bundleStrategy) {
@@ -98,12 +99,12 @@ export default class Bundle extends DynCommand {
 				if (flags.format === 'all' || flags.format === 'esm') {
 					await bundleAllWithRollup(
 						this,
-						await createLibraryConfig(this, {
+						await createLibraryRollupConfig(this, {
 							format: 'esm',
 							isProduction: flags.prod,
 							preserveModules: true,
 							sourcemap: flags.sourcemap,
-							rollupOptions: rollupConfig ?? undefined,
+							libraryConfig,
 							tsConfigPath,
 							packageJson
 						})
@@ -112,12 +113,12 @@ export default class Bundle extends DynCommand {
 				if (flags.format === 'all' || flags.format === 'cjs') {
 					await bundleAllWithRollup(
 						this,
-						await createLibraryConfig(this, {
+						await createLibraryRollupConfig(this, {
 							format: 'cjs',
 							isProduction: flags.prod,
 							preserveModules: true,
 							sourcemap: flags.sourcemap,
-							rollupOptions: rollupConfig ?? undefined,
+							libraryConfig,
 							tsConfigPath,
 							packageJson
 						})
@@ -148,19 +149,6 @@ export default class Bundle extends DynCommand {
 	private async getPackageJson(): Promise<PackageJson | null> {
 		const packageJsonPath = path.join(process.cwd(), 'package.json');
 		return readJsonFile<PackageJson>(packageJsonPath);
-	}
-
-	private async getRollupConfig(): Promise<TDynRollupOptions | null> {
-		const rollupConfigPath = path.resolve(process.cwd(), 'rollup.config.js');
-		const rollupOptions = await readJsFile<TDynRollupOptions>(rollupConfigPath);
-		if (rollupOptions != null) {
-			this.log(
-				`🗞️  Detected ${chalk.underline('rollup.config.js')} at ${chalk.gray(
-					chalk.underline(rollupConfigPath)
-				)}`
-			);
-		}
-		return rollupOptions;
 	}
 
 	private getValidTsConfigJsonPath(isProduction: boolean): string | null {

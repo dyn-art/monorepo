@@ -1,8 +1,8 @@
 import { mergeWith } from 'lodash';
 import type { InputPluginOption, Plugin, RollupOptions } from 'rollup';
 
-import type { TBaseDynRollupOptions, TDynRollupPlugin } from '.';
 import type { DynCommand } from '../../DynCommand';
+import type { TBaseDynRollupOptions, TDynRollupPlugin } from '../dyn';
 import { isRollupPlugin } from './is-plugin';
 
 /**

@@ -1,4 +1,4 @@
-import type { TBaseDynRollupOptions, TDynRollupOptionsCallbackConfig } from '../../types';
+import type { TBaseDynRollupOptions, TDynRollupOptionsCallbackConfig } from '../../../dyn';
 
 export async function createPluginRollupConfig(
 	config: TDynRollupOptionsCallbackConfig

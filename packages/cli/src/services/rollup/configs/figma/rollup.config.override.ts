@@ -4,8 +4,8 @@ import replace from '@rollup/plugin-replace';
 import esbuild from 'rollup-plugin-esbuild';
 
 import { readDotenvFile } from '../../../../utils';
+import type { TBaseDynRollupOptions, TDynRollupOptionsCallbackConfig } from '../../../dyn';
 import { bundleSize, typescriptPaths } from '../../plugins';
-import type { TBaseDynRollupOptions, TDynRollupOptionsCallbackConfig } from '../../types';
 
 export async function createOverrideRollupConfig(
 	config: TDynBaseRollupOptionsCallbackConfig

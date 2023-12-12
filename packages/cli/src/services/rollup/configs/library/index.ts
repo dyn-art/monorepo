@@ -1,1 +1,1 @@
-export * from './create-library-config';
+export * from './create-library-rollup-config';
