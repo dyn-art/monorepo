@@ -1,7 +1,7 @@
 import type { PackageJson } from 'type-fest';
-import { toArray } from '@dyn/utils';
 
 import { resolvePathsFromPackageJson } from './resolve-paths-from-package-json';
+import { toArray } from './to-array';
 
 export function resolvePaths(config: {
 	paths: TPath | TPath[] | null;

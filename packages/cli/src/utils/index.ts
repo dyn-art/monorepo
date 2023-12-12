@@ -11,3 +11,4 @@ export * from './resolve-paths';
 export * from './resolve-paths-from-package-json';
 export * from './resolve-ts-paths-factory';
 export * from './short-id';
+export * from './to-array';

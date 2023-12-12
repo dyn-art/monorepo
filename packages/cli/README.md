@@ -1,4 +1,5 @@
 # `@dyn/cli`
+> ⚠️ Do not use `@dyn/*` packages in here as the cli is the foundation!
 
 ## > `dyn-cli bundle`
 
