@@ -23,7 +23,7 @@ export default class Bundle extends DynCommand {
 			char: 'p',
 			description: 'Production mode',
 			required: false,
-			default: false
+			default: true
 		}),
 		bundleStrategy: Flags.string({
 			char: 'b',

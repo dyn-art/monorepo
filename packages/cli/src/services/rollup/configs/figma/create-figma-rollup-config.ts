@@ -15,7 +15,7 @@ import {
 export async function createFigmaRollupConfig(
 	command: DynCommand,
 	config: TCreateFigmaConfigConfig
-): Promise<RollupOptions[]> {
+): Promise<[RollupOptions, RollupOptions]> {
 	const {
 		tsConfigPath,
 		packageJson,
@@ -94,7 +94,7 @@ export async function createFigmaRollupConfig(
 		);
 	}
 
-	return finalConfigs;
+	return finalConfigs as [RollupOptions, RollupOptions];
 }
 
 export interface TCreateFigmaConfigConfig {

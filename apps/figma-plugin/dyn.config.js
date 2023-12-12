@@ -2,16 +2,16 @@
  * @type {import('@dyn/cli').TDynConfig}
  */
 module.exports = {
-	figma: ({ isProduction }) => ({
+	figma: ({ isWatchMode }) => ({
 		app: {
-			source: isProduction ? './src/app/index.tsx' : './dev/app/index.tsx',
+			source: isWatchMode ? './src/dev/app.tsx' : './src/app/index.tsx',
 			output: './dist/app.js',
 			env: './.env.app',
 			postcssPath: './postcss.config.js',
-			rootHtmlPath: isProduction ? './index.prod.html' : './index.html'
+			rootHtmlPath: './index.app.html'
 		},
 		plugin: {
-			source: isProduction ? './src/plugin/index.ts' : './src/plugin/index.ts',
+			source: './src/plugin/index.ts',
 			output: './dist/plugin.js',
 			env: './.env.plugin'
 		}

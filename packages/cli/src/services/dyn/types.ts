@@ -58,6 +58,7 @@ export interface TDynFigmaConfig {
 
 export type TDynFigmaConfigCallback = (config: {
 	isProduction: boolean;
+	isWatchMode: boolean;
 }) => Promise<TDynFigmaConfig>;
 
 export type TDynFigmaAppModuleConfig = TDynFigmaBaseModuleConfig & {

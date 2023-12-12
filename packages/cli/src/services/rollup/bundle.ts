@@ -1,14 +1,8 @@
 import chalk from 'chalk';
-import {
-	rollup,
-	type InputPluginOption,
-	type OutputOptions,
-	type RollupOptions,
-	type RollupOutput
-} from 'rollup';
+import { rollup, type OutputOptions, type RollupOptions, type RollupOutput } from 'rollup';
 
 import type { DynCommand } from '../../DynCommand';
-import { isRollupPlugin } from './is-plugin';
+import { pluginsToKeys } from './plugins-to-keys';
 
 export async function bundleWithRollup(
 	command: DynCommand,
@@ -31,18 +25,16 @@ export async function bundleWithRollup(
 			  )
 			: ''
 	);
+
+	// https://rollupjs.org/javascript-api/#rollup-rollup
 	const build = await rollup(rollupOptions);
+
 	const outputs: OutputOptions[] = formatOutput(rollupOptions.output);
 	const response = await Promise.all(outputs.map((output) => build.write(output)));
-	command.log('🏁 Completed bundling.');
-	return response;
-}
 
-function pluginsToKeys(plugins: InputPluginOption): string[] {
-	const parsedPlugins = Array.isArray(plugins) ? plugins : [plugins];
-	return parsedPlugins.map((plugin) =>
-		isRollupPlugin(plugin) ? plugin.name : JSON.stringify(plugin)
-	);
+	command.log('🏁 Completed bundling.');
+
+	return response;
 }
 
 function formatOutput(output: RollupOptions['output']): OutputOptions[] {

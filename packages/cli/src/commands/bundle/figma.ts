@@ -5,7 +5,12 @@ import chalk from 'chalk';
 import type { PackageJson } from 'type-fest';
 
 import { DynCommand } from '../../DynCommand';
-import { bundleAllWithRollup, createFigmaRollupConfig, getDynConfig } from '../../services';
+import {
+	bundleAllWithRollup,
+	createFigmaRollupConfig,
+	getDynConfig,
+	watchWithRollup
+} from '../../services';
 import { doesFileExist, promisifyFiglet, readJsonFile } from '../../utils';
 
 export default class Figma extends DynCommand {
@@ -18,7 +23,7 @@ export default class Figma extends DynCommand {
 			char: 'p',
 			description: 'Production mode',
 			required: false,
-			default: false
+			default: true
 		}),
 		analyze: Flags.boolean({
 			char: 'a',
@@ -35,6 +40,12 @@ export default class Figma extends DynCommand {
 		verbose: Flags.boolean({
 			char: 'v',
 			description: 'More detailed logs',
+			required: false,
+			default: false
+		}),
+		watch: Flags.boolean({
+			char: 'w',
+			description: 'Watch mode',
 			required: false,
 			default: false
 		})
@@ -74,8 +85,36 @@ export default class Figma extends DynCommand {
 		const dynConfig = await getDynConfig(this);
 		const figmaConfig =
 			typeof dynConfig?.figma === 'function'
-				? await dynConfig.figma({ isProduction: flags.prod })
+				? await dynConfig.figma({ isProduction: flags.prod, isWatchMode: flags.watch })
 				: dynConfig?.figma;
+
+		// Watch
+		if (flags.watch) {
+			const rollupOptions = await createFigmaRollupConfig(this, {
+				isProduction: flags.prod,
+				sourcemap: flags.sourcemap,
+				tsConfigPath,
+				packageJson,
+				figmaConfig
+			});
+			let firstBuild = true;
+
+			// Watch on app part changes
+			watchWithRollup(this, rollupOptions[0], async ({ event }) => {
+				if (event.code === 'END') {
+					if (firstBuild) {
+						await this.moveManfiestIntoDist();
+						firstBuild = false;
+					}
+					await this.deleteAppJs();
+				}
+			});
+
+			// Watch on plugin part changes
+			watchWithRollup(this, rollupOptions[1]);
+
+			return;
+		}
 
 		// Bundle
 		await bundleAllWithRollup(
@@ -89,14 +128,8 @@ export default class Figma extends DynCommand {
 			})
 		);
 
-		// Move manifest.json into dist
-		await fs.copyFile(
-			path.join(process.cwd(), 'manifest.json'),
-			path.join(process.cwd(), 'dist', 'manifest.json')
-		);
-
-		// Delete app.js file as its embedded in app.html
-		await fs.unlink(path.join(process.cwd(), 'dist', 'app.js'));
+		await this.moveManfiestIntoDist();
+		await this.deleteAppJs();
 
 		this.log(`\n`);
 		this.log(
@@ -124,5 +157,18 @@ export default class Figma extends DynCommand {
 			return isProduction ? this.getValidTsConfigJsonPath(false) : null;
 		}
 		return tsConfigPath;
+	}
+
+	// Moves manifest.json (Figma's entry point) into dist folder
+	private async moveManfiestIntoDist() {
+		await fs.copyFile(
+			path.join(process.cwd(), 'manifest.json'),
+			path.join(process.cwd(), 'dist', 'manifest.json')
+		);
+	}
+
+	// Deletes app.js file as its embedded in app.html
+	private async deleteAppJs(): Promise<void> {
+		await fs.unlink(path.join(process.cwd(), 'dist', 'app.js'));
 	}
 }

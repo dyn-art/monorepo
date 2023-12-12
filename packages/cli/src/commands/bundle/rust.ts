@@ -17,7 +17,7 @@ export default class Rust extends DynCommand {
 			char: 'p',
 			description: 'Production mode',
 			required: false,
-			default: false
+			default: true
 		}),
 		analyze: Flags.boolean({
 			char: 'a',
