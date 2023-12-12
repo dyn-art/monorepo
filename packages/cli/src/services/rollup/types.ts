@@ -1,10 +1,9 @@
 import type { InputPluginOption, MaybePromise, OutputOptions, RollupOptions } from 'rollup';
 import type { PackageJson } from 'type-fest';
+import type { Unwrap } from '@dyn/types/utility';
 
 import type { DynCommand } from '../../DynCommand';
 import type { TPath } from '../../utils';
-
-type Unwrap<T> = T extends Promise<infer U> ? U : T;
 
 export type TDynRollupPlugin = MaybePromise<Unwrap<InputPluginOption> | string>;
 

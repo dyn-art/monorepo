@@ -1,20 +1,19 @@
 import type { PackageJson } from 'type-fest';
+import { toArray } from '@dyn/utils';
 
 import { resolvePathsFromPackageJson } from './resolve-paths-from-package-json';
 
 export function resolvePaths(config: {
 	paths: TPath | TPath[] | null;
 	packageJson: PackageJson;
-	format: 'cjs' | 'esm';
+	format: 'cjs' | 'esm' | 'types';
 	preserveModules: boolean;
 }): TPath[] {
 	const { paths, packageJson, format, preserveModules } = config;
 	const finalPaths: TPath[] = [];
 
-	if (Array.isArray(paths)) {
-		finalPaths.push(...paths);
-	} else if (typeof paths === 'object' && paths != null) {
-		finalPaths.push(paths);
+	if (paths != null) {
+		finalPaths.push(...toArray(paths));
 	} else {
 		finalPaths.push(...resolvePathsFromPackageJson(packageJson, { format, preserveModules }));
 	}
@@ -26,5 +25,5 @@ export interface TPath {
 	output: string;
 	input: string;
 	key?: string;
-	exportCondition?: PackageJson.ExportConditions;
+	exportConditions?: PackageJson.ExportConditions;
 }

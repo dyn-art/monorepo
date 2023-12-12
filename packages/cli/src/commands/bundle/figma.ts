@@ -6,7 +6,7 @@ import type { PackageJson } from 'type-fest';
 
 import { bundleAllWithRollup } from '../..';
 import { DynCommand } from '../../DynCommand';
-import { createFigmaConfig } from '../../services/rollup/configs/figma/create-figma-config';
+import { createFigmaConfig } from '../../services/rollup/configs/figma';
 import { doesFileExist, promisifyFiglet, readJsonFile } from '../../utils';
 
 export default class Figma extends DynCommand {

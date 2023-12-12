@@ -50,6 +50,7 @@
 	},
 	"devDependencies": {
 		"@dyn/config": "workspace:*",
+		"@dyn/types": "workspace:*",
 		"@types/figlet": "^1.5.7",
 		"@types/lodash": "^4.14.200",
 		"@types/node": "^20.8.10",

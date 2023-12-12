@@ -3,23 +3,23 @@ import type { InputPluginOption, Plugin, RollupOptions } from 'rollup';
 
 import type { TBaseDynRollupOptions, TDynRollupPlugin } from '.';
 import type { DynCommand } from '../../DynCommand';
-import { isPlugin } from './is-plugin';
+import { isRollupPlugin } from './is-plugin';
 
 /**
  * Merges two Rollup configurations with special handling for plugins.
  *
  * @param baseConfig - The primary/base configuration to start with.
- * @param overrideConfig - The configuration that provides overriding values.
+ * @param overrideOptions - The configuration that provides overriding values.
  * @param config - Settings for controlling placeholder behavior.
  * @returns - The merged configuration.
  */
 export function mergeRollupConfigs(
 	command: DynCommand,
 	baseConfig: TBaseDynRollupOptions,
-	overrideConfig: TBaseDynRollupOptions
+	overrideOptions: TBaseDynRollupOptions
 ): RollupOptions {
 	const { plugins: basePlugins = [], ...restBaseConfig } = baseConfig;
-	const { plugins: overridePlugins = [], ...restOverrideConfig } = overrideConfig;
+	const { plugins: overridePlugins = [], ...restOverrideConfig } = overrideOptions;
 
 	// Merge plugins manually as lodash customizer function didn't work out for my use case
 	const mergedPlugins = mergePlugins(command, basePlugins, overridePlugins);
@@ -64,7 +64,7 @@ function mergePlugins(
 	// Helper function to collect plugin instances into the all plugins map
 	const gatherPlugins = (plugin: TDynRollupPlugin): void => {
 		// We only care about Plugin objects with a name property
-		if (isPlugin(plugin)) {
+		if (isRollupPlugin(plugin)) {
 			const key = plugin.name;
 			if (allPluginsMap.has(key)) {
 				allPluginsMap.get(key)?.push(plugin);
@@ -88,7 +88,7 @@ function mergePlugins(
 			} else if (command.isVerbose) {
 				command.warn(`Plugin placeholder "${plugin}" does not match any available plugins.`);
 			}
-		} else if (isPlugin(plugin)) {
+		} else if (isRollupPlugin(plugin)) {
 			mergedPlugins.push(plugin);
 		}
 	});

@@ -5,111 +5,153 @@ import type { TPath } from './resolve-paths';
 
 /**
  * Resolves the output path based on the provided export conditions.
+ * Selects appropriate property based on format and condition type.
  *
- * Handles the format-to-property mapping and default output path.
- * Example: "main": "./dist/cjs/index.js", or "module": "./dist/esm/index.js"
+ * @param exportConditions - The export conditions from package.json.
+ * @param config - Configuration object.
+ * @returns The resolved output path.
  */
 function resolveOutputPathFromPackageJson(
 	exportConditions: PackageJson.ExportConditions,
-	config: TResolveOutputPathFromPackageJsonConfig
+	config: TResolvePathFromPackageJsonConfig
 ): string {
-	const { format, preserveModules } = config;
-	let relativeOutputPath = `./dist/${format}/index.js`;
-	const formatToPropertyMap = {
-		esm: 'module',
-		cjs: 'main'
-	};
+	const { format, preserveModules, useNestedExports, resolvePath } = config;
 
-	// Try to resolve path of specified format
-	const propertyKey = formatToPropertyMap[format];
+	const formatMap = useNestedExports
+		? { esm: 'import', cjs: 'require', types: 'types' }
+		: { esm: 'module', cjs: 'main', types: 'types' };
+
+	// Try to resolve relative output path of specified format
+	let relativeOutputPath = `./dist/${format}/index.js`;
+	const propertyKey = formatMap[format];
 	const propertyValue: unknown = exportConditions[propertyKey];
 	if (typeof propertyValue === 'string') {
 		relativeOutputPath = propertyValue;
 	}
 
 	// Remove '/index.js' if bundling to dir
-	relativeOutputPath = preserveModules
-		? relativeOutputPath.replace(/\/[^/]*\.js$/, '')
-		: relativeOutputPath;
+	if (preserveModules) {
+		relativeOutputPath = relativeOutputPath.replace(/\/[^/]*\.js$/, '');
+	}
 
-	return path.resolve(process.cwd(), relativeOutputPath);
+	return resolvePath ? path.resolve(process.cwd(), relativeOutputPath) : relativeOutputPath;
 }
 
 /**
- * Resolves the input path based on the provided export conditions.
+ * Resolves the input path for the module based on 'source' export condition.
  *
- * Handles the source property for input path.
- * Example: "source": "./src/index.ts"
+ * @param exportConditions - The export conditions from package.json.
+ * @returns The resolved input path.
  */
-function resolveInputPathFromPackageJson(exportConditions: PackageJson.ExportConditions): string {
+function resolveInputPathFromPackageJson(
+	exportConditions: PackageJson.ExportConditions,
+	config: TResolvePathFromPackageJsonConfig
+): string {
+	const { resolvePath } = config;
+
+	// Try to resolve relative input path
 	let relativeInputPath = './src/index.ts';
 	const propertyValue: unknown = exportConditions.source;
 	if (typeof propertyValue === 'string') {
 		relativeInputPath = propertyValue;
 	}
-	return path.resolve(process.cwd(), relativeInputPath);
+
+	return resolvePath ? path.resolve(process.cwd(), relativeInputPath) : relativeInputPath;
 }
 
 /**
- * Extracts paths from the package.json based on the export conditions.
+ * Extracts and resolves input and output paths from package.json export conditions.
+ * Supports both top-level and nested export conditions.
+ *
+ * @param packageJson - The package.json content.
+ * @param config - Configuration object.
+ * @returns An array of resolved paths.
  */
 export function resolvePathsFromPackageJson(
 	packageJson: PackageJson,
-	config: TResolveOutputPathFromPackageJsonConfig
+	config: TResolvePathsFromPackageJsonConfig
 ): TPath[] {
-	const { preserveModules, format } = config;
-	const paths: TPath[] = [];
+	const { resolvePath = true } = config;
 	const exportsArray = Array.isArray(packageJson.exports)
 		? packageJson.exports
 		: [packageJson.exports];
+	const paths: TPath[] = [];
 
-	for (const exportCondition of exportsArray) {
+	exportsArray.forEach((exportCondition) => {
 		// If the export condition is an object (nested conditions or subpaths)
-		if (typeof exportCondition === 'object' && exportCondition != null) {
-			for (const exportKey of Object.keys(exportCondition)) {
-				const nestedExportCondition = exportCondition[exportKey];
+		if (isExportConditionObject(exportCondition)) {
+			Object.entries(exportCondition).forEach(([exportKey, nestedExportCondition]) => {
 				// Handles nested export conditions
 				// Example: "package1": { ... }
-				if (typeof nestedExportCondition === 'object' && nestedExportCondition != null) {
-					paths.push({
-						input: resolveInputPathFromPackageJson(
-							nestedExportCondition as PackageJson.ExportConditions
-						),
-						output: resolveOutputPathFromPackageJson(
-							nestedExportCondition as PackageJson.ExportConditions,
-							{
-								preserveModules,
-								format
-							}
-						),
-						key: exportKey,
-						exportCondition
-					});
+				if (isExportConditionObject(nestedExportCondition)) {
+					paths.push(
+						createPathObject(nestedExportCondition, {
+							...config,
+							key: exportKey,
+							useNestedExports: true,
+							resolvePath
+						})
+					);
 				}
-			}
-		} else if (typeof exportCondition === 'string') {
-			// TODO: This section needs to be completed to handle export conditions as direct strings
-			// Example: "exports": "./main-entry-point.js"
+			});
 		}
-	}
+	});
 
 	// If no specific export conditions are found, the code defaults to extracting
 	// the 'source', 'main', and 'module' fields from the top level of the package.json
 	// Example: "source": "./src/index.ts", "main": "./dist/cjs/index.js", "module": "./dist/esm/index.js"
 	if (paths.length === 0) {
-		paths.push({
-			input: resolveInputPathFromPackageJson(packageJson as PackageJson.ExportConditions),
-			output: resolveOutputPathFromPackageJson(packageJson as PackageJson.ExportConditions, {
-				preserveModules,
-				format
+		paths.push(
+			createPathObject(packageJson as PackageJson.ExportConditions, {
+				...config,
+				useNestedExports: false,
+				resolvePath
 			})
-		});
+		);
 	}
 
 	return paths;
 }
 
-interface TResolveOutputPathFromPackageJsonConfig {
-	format: 'esm' | 'cjs';
+/**
+ * Creates a path object containing input, output, and other relevant information.
+ *
+ * @param exportConditions - Export conditions to resolve paths.
+ * @param config - Configuration object.
+ * @param key - Optional key for the path object.
+ * @returns A path object with resolved input and output paths.
+ */
+function createPathObject(
+	exportConditions: PackageJson.ExportConditions,
+	config: TResolvePathFromPackageJsonConfig & { key?: string }
+): TPath {
+	const { key, ...pathConfig } = config;
+	return {
+		input: resolveInputPathFromPackageJson(exportConditions, pathConfig),
+		output: resolveOutputPathFromPackageJson(exportConditions, pathConfig),
+		key,
+		exportConditions
+	};
+}
+
+/**
+ * Checks if the provided export condition is an object.
+ *
+ * @param exportCondition - The export condition to check.
+ * @returns True if the export condition is an object, false otherwise.
+ */
+function isExportConditionObject(
+	exportCondition: unknown
+): exportCondition is PackageJson.ExportConditions {
+	return typeof exportCondition === 'object' && exportCondition !== null;
+}
+
+type TResolvePathFromPackageJsonConfig = {
+	useNestedExports?: boolean;
+} & Required<TResolvePathsFromPackageJsonConfig>;
+
+interface TResolvePathsFromPackageJsonConfig {
+	format: 'esm' | 'cjs' | 'types';
 	preserveModules: boolean;
+	resolvePath?: boolean;
 }

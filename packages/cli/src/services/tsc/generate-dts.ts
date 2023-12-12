@@ -8,6 +8,7 @@ import {
 	execaVerbose,
 	findNearestTsConfigPath,
 	getTsConfigCompilerOptions,
+	resolvePathsFromPackageJson,
 	resolveTsPathsFactory,
 	type TResolveTsPaths,
 	type TTsConfigCompilerOptions
@@ -48,7 +49,7 @@ export async function generateDts(
 		const relativeDeclarationDirPath = getRelativeDeclarationDirPath(compilerOptions, packageJson);
 		const declarationFileEnding = '.d.ts';
 		const resolveTsPaths = resolveTsPathsFactory(command, {
-			compilerOptions: createResolveTsPathsCompilerOptions(
+			compilerOptions: adjustCompilerOptionsForResolvedPaths(
 				compilerOptions,
 				relativeDeclarationDirPath
 			),
@@ -71,38 +72,66 @@ export async function generateDts(
 	command.log('🏁 Completed generating Typescript Declaration files.');
 }
 
+/**
+ * Gets the relative path to the TypeScript declaration directory.
+ * Prioritizes the compilerOptions.declarationDir, falls back to packageJson paths,
+ * and defaults to './dist/types' if neither is available.
+ *
+ * @param compilerOptions - The TypeScript compiler options.
+ * @param packageJson - Optional package.json content.
+ * @returns The relative path to the declaration directory.
+ */
 function getRelativeDeclarationDirPath(
 	compilerOptions: TTsConfigCompilerOptions,
 	packageJson?: PackageJson
 ): string {
-	if (compilerOptions.declarationDir) {
+	// Use declarationDir from compilerOptions if available
+	if (typeof compilerOptions.declarationDir === 'string') {
 		return path.relative(process.cwd(), compilerOptions.declarationDir);
 	}
-	return packageJson?.types ?? './dist/types';
+
+	// Fallback to resolving paths from packageJson
+	if (packageJson) {
+		const paths = resolvePathsFromPackageJson(packageJson, {
+			format: 'types',
+			preserveModules: true,
+			resolvePath: false
+		});
+
+		if (paths.length > 0 && paths[0]?.output) {
+			return paths[0].output;
+		}
+	}
+
+	// Default path if no other options are available
+	return './dist/types';
 }
 
-function createResolveTsPathsCompilerOptions(
+/**
+ * Adjusts TypeScript compiler options to resolve paths based on a new declaration directory.
+ *
+ * @param compilerOptions - The original TypeScript compiler options.
+ * @param relativeDeclarationDirPath - The relative path to the declaration directory.
+ * @returns Adjusted TypeScript compiler options.
+ */
+function adjustCompilerOptionsForResolvedPaths(
 	compilerOptions: TTsConfigCompilerOptions,
 	relativeDeclarationDirPath: string
-) {
+): TTsConfigCompilerOptions {
 	const basePath = path.resolve(compilerOptions.pathsBasePath?.toString() ?? process.cwd());
 	const relativeRootDir = path.relative(basePath, compilerOptions.rootDir ?? './src');
 
-	// Create compiler options
-	const updatedPaths = compilerOptions.paths
-		? Object.fromEntries(
-				Object.entries(compilerOptions.paths).map(([key, value]) => [
-					key,
-					value.map((tsPath: string) =>
-						tsPath.replace(
-							new RegExp(`^\\.${path.sep}${relativeRootDir}`),
-							`.${path.sep}${relativeDeclarationDirPath}`
-						)
-					)
-				])
-		  )
-		: undefined;
+	// Update paths to reflect the new relative declaration directory
+	const updatedPaths =
+		compilerOptions.paths != null
+			? mapPathsToRelativeDeclarationDir(
+					compilerOptions.paths,
+					relativeRootDir,
+					relativeDeclarationDirPath
+			  )
+			: undefined;
 
+	// Return new compiler options with updated paths and other necessary adjustments
 	return {
 		...compilerOptions,
 		rootDir: relativeDeclarationDirPath,
@@ -110,6 +139,32 @@ function createResolveTsPathsCompilerOptions(
 		outDir: undefined,
 		declarationDir: undefined
 	};
+}
+
+/**
+ * Maps original TypeScript paths to a new relative declaration directory.
+ *
+ * @param originalPaths - The original 'paths' from TypeScript compiler options.
+ * @param relativeRootDir - The relative root directory path.
+ * @param relativeDeclarationDir - The relative declaration directory path.
+ * @returns Mapped paths object.
+ */
+function mapPathsToRelativeDeclarationDir(
+	originalPaths: Record<string, string[]>,
+	relativeRootDir: string,
+	relativeDeclarationDir: string
+): Record<string, string[]> {
+	return Object.fromEntries(
+		Object.entries(originalPaths).map(([key, value]) => [
+			key,
+			value.map((tsPath: string) =>
+				tsPath.replace(
+					new RegExp(`^\\.${path.sep}${relativeRootDir}`),
+					`.${path.sep}${relativeDeclarationDir}`
+				)
+			)
+		])
+	);
 }
 
 function updateImportPaths(

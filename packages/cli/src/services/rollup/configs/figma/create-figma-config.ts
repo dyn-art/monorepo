@@ -67,14 +67,14 @@ export async function createFigmaConfig(
 		let baseRollupConfig: TBaseDynRollupOptions;
 		if (pathItem.key === 'app') {
 			rollupOptionsCallbackConfig.envPath =
-				typeof pathItem.exportCondition?.env === 'string'
-					? pathItem.exportCondition.env
+				typeof pathItem.exportConditions?.env === 'string'
+					? pathItem.exportConditions.env
 					: './.env.app';
 			baseRollupConfig = await createAppRollupConfig(rollupOptionsCallbackConfig);
 		} else if (pathItem.key === 'plugin') {
 			rollupOptionsCallbackConfig.envPath =
-				typeof pathItem.exportCondition?.env === 'string'
-					? pathItem.exportCondition.env
+				typeof pathItem.exportConditions?.env === 'string'
+					? pathItem.exportConditions.env
 					: './.env.plugin';
 			baseRollupConfig = await createPluginRollupConfig(rollupOptionsCallbackConfig);
 		} else {

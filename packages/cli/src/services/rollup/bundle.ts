@@ -8,7 +8,7 @@ import {
 } from 'rollup';
 
 import type { DynCommand } from '../../DynCommand';
-import { isPlugin } from './is-plugin';
+import { isRollupPlugin } from './is-plugin';
 
 export async function bundleWithRollup(
 	command: DynCommand,
@@ -40,7 +40,9 @@ export async function bundleWithRollup(
 
 function pluginsToKeys(plugins: InputPluginOption): string[] {
 	const parsedPlugins = Array.isArray(plugins) ? plugins : [plugins];
-	return parsedPlugins.map((plugin) => (isPlugin(plugin) ? plugin.name : JSON.stringify(plugin)));
+	return parsedPlugins.map((plugin) =>
+		isRollupPlugin(plugin) ? plugin.name : JSON.stringify(plugin)
+	);
 }
 
 function formatOutput(output: RollupOptions['output']): OutputOptions[] {

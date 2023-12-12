@@ -16,13 +16,13 @@
 		"app": {
 			"source": "./src/app/index.tsx",
 			"previewSource": "./dev/app/index.tsx",
-			"main": "./dist/app.js",
+			"require": "./dist/app.js",
 			"env": "./.env.app"
 		},
 		"plugin": {
 			"source": "./src/plugin/index.ts",
 			"previewSource": "./src/plugin/index.ts",
-			"main": "./dist/plugin.js",
+			"require": "./dist/plugin.js",
 			"env": "./.env.plugin"
 		}
 	},
