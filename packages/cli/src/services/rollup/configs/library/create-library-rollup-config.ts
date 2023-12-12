@@ -34,8 +34,6 @@ export async function createLibraryRollupConfig(
 	const finalConfigs: RollupOptions[] = [];
 	for (const pathItem of paths) {
 		const { input: inputPath, output: outputPath } = pathItem;
-
-		// Specific module format configuration
 		const moduleConfig: TConfigureModuleConfig = {
 			outputPath,
 			outputOptions: {
@@ -44,9 +42,9 @@ export async function createLibraryRollupConfig(
 				sourcemap
 			}
 		};
+
 		const { output } = format === 'esm' ? configureESM(moduleConfig) : configureCJS(moduleConfig);
 
-		// Define rollup config
 		const rollupOptionsCallbackConfig: TDynRollupOptionsCallbackConfig = {
 			path: {
 				input: inputPath,

@@ -6,6 +6,7 @@ import { execaVerbose } from '../../utils';
 
 export async function bundleWithTsc(command: DynCommand): Promise<void> {
 	const tsconfig = path.resolve(process.cwd(), './tsconfig.json');
+
 	command.log(
 		'🚀 Started bundling Typescript files.',
 		command.isVerbose
@@ -16,6 +17,8 @@ export async function bundleWithTsc(command: DynCommand): Promise<void> {
 			  )
 			: ''
 	);
+
 	await execaVerbose('pnpm', ['tsc', '--project', tsconfig], { command });
+
 	command.log('🏁 Completed bundling Typescript files.');
 }

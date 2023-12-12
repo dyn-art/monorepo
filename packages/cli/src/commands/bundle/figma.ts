@@ -160,7 +160,7 @@ export default class Figma extends DynCommand {
 	}
 
 	// Moves manifest.json (Figma's entry point) into dist folder
-	private async moveManfiestIntoDist() {
+	private async moveManfiestIntoDist(): Promise<void> {
 		await fs.copyFile(
 			path.join(process.cwd(), 'manifest.json'),
 			path.join(process.cwd(), 'dist', 'manifest.json')

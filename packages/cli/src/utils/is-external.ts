@@ -9,6 +9,7 @@ export function isExternal(
 		...(packageJson.dependencies || {}),
 		...(packageJson.peerDependencies || {})
 	});
+
 	return (source: string) => {
 		let external = false;
 		if (packageJsonDepsAsExternal) {

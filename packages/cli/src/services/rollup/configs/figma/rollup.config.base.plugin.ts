@@ -1,8 +1,8 @@
 import type { TBaseDynRollupOptions, TDynRollupOptionsCallbackConfig } from '../../../dyn';
 
-export async function createPluginRollupConfig(
+export function createPluginRollupConfig(
 	config: TDynRollupOptionsCallbackConfig
-): Promise<TBaseDynRollupOptions> {
+): TBaseDynRollupOptions {
 	const { path, output } = config;
 
 	return {

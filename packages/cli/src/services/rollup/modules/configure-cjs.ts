@@ -5,6 +5,7 @@ import type { TConfigureModuleConfig, TConfigureModuleResponse } from '.';
 export function configureCJS(config: TConfigureModuleConfig): TConfigureModuleResponse {
 	const { outputOptions, outputPath } = config;
 	const preserveModules = outputOptions.preserveModules ?? true;
+
 	return {
 		output: {
 			...outputOptions,
@@ -15,6 +16,6 @@ export function configureCJS(config: TConfigureModuleConfig): TConfigureModuleRe
 				preserveModules
 			}
 		},
-		visualizeFilePath: path.resolve(process.cwd(), './.compile/stats-cjs.html')
+		visualizeFilePath: path.resolve(process.cwd(), './.dyn/stats-cjs.html')
 	};
 }

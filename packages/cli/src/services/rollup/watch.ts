@@ -52,8 +52,6 @@ export function watchWithRollup(
 			case 'ERROR':
 				command.log('⚠️ Error during build:', event.error);
 				break;
-			default:
-			// do nothing
 		}
 	});
 

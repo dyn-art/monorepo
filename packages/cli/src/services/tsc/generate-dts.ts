@@ -45,6 +45,7 @@ export async function generateDts(
 		command
 	});
 
+	// Handle Typescript paths like `{"@/rust/*": ["./src/rust_modules/*"]}`
 	if (shouldResolveTsPaths && compilerOptions.paths != null) {
 		const relativeDeclarationDirPath = getRelativeDeclarationDirPath(compilerOptions, packageJson);
 		const declarationFileEnding = '.d.ts';
@@ -220,6 +221,7 @@ function updateExportPaths(
 function getFilePathsWithExtDeep(dir: string, ext: string): string[] {
 	let result: string[] = [];
 	const fileNames = fs.readdirSync(dir);
+
 	for (const fileName of fileNames) {
 		const fullPath = path.join(dir, fileName);
 		const stat = fs.statSync(fullPath);
@@ -229,6 +231,7 @@ function getFilePathsWithExtDeep(dir: string, ext: string): string[] {
 			result.push(fullPath);
 		}
 	}
+
 	return result;
 }
 

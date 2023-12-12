@@ -6,6 +6,7 @@ async function importFreshModule<T = unknown>(
 ): Promise<T | null> {
 	const cacheBustingModulePath = `${pathToFileURL(filePath).toString()}`;
 	const module: unknown = await import(cacheBustingModulePath);
+
 	if (typeof module !== 'object' || module == null) {
 		return null;
 	} else if (exportName != null && exportName in module) {
@@ -13,6 +14,7 @@ async function importFreshModule<T = unknown>(
 	} else if ('default' in module) {
 		return module.default as T;
 	}
+
 	return null;
 }
 

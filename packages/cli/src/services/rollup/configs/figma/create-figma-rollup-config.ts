@@ -59,7 +59,6 @@ export async function createFigmaRollupConfig(
 
 		const { output } = configureCJS(moduleConfig);
 
-		// Define rollup config
 		const rollupOptionsCallbackConfig: TDynBaseRollupOptionsCallbackConfig = {
 			path: {
 				input: figmaModuleConfig.source,
@@ -82,7 +81,7 @@ export async function createFigmaRollupConfig(
 				rootHtmlPath: figmaAppConfig.rootHtmlPath
 			});
 		} else if (key === 'plugin') {
-			baseRollupConfig = await createPluginRollupConfig(rollupOptionsCallbackConfig);
+			baseRollupConfig = createPluginRollupConfig(rollupOptionsCallbackConfig);
 		} else {
 			continue; // Should never be reached
 		}
