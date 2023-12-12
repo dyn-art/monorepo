@@ -1,3 +1,2 @@
-import rollupConfigBase from './rollup.config.base';
-
-export { rollupConfigBase };
+export * from './figma';
+export * from './library';

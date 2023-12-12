@@ -10,7 +10,7 @@ import { shallowMerge } from './shallow-merge';
  * @returns A new object populated with both the target and source configurations.
  */
 export function defineConfig<
-	TTarget extends Record<string, unknown>,
+	TTarget extends Record<string, any>,
 	TSource extends Required<OptionalAttributes<TTarget>>
 >(target: TTarget, source: TSource, overwriteUndefinedProperties = true): Required<TTarget> {
 	return shallowMerge(target, source, overwriteUndefinedProperties) as Required<TTarget> & TSource;

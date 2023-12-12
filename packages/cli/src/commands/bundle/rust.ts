@@ -1,12 +1,13 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { Command, Flags } from '@oclif/core';
+import { Flags } from '@oclif/core';
 import chalk from 'chalk';
 import type { PackageJson } from 'type-fest';
 
+import { DynCommand } from '../../DynCommand';
 import { doesFileExist, execaVerbose, promisifyFiglet, readJsonFile, shortId } from '../../utils';
 
-export default class Rust extends Command {
+export default class Rust extends DynCommand {
 	static description = 'Bundle Rust part of dyn.art packages';
 
 	static examples = [];
@@ -16,7 +17,7 @@ export default class Rust extends Command {
 			char: 'p',
 			description: 'Production mode',
 			required: false,
-			default: false
+			default: true
 		}),
 		analyze: Flags.boolean({
 			char: 'a',
@@ -36,6 +37,7 @@ export default class Rust extends Command {
 
 	public async run(): Promise<void> {
 		const { flags } = await this.parse(Rust);
+		this.isVerbose = flags.verbose;
 		const startTime = Date.now();
 		const tempRustOutputName = `temp-${shortId()}`;
 		const rustModulesDirPath = path.join(process.cwd(), 'src', 'rust_modules');

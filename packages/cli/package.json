@@ -30,9 +30,14 @@
 	},
 	"homepage": "https://s.dyn.art/github",
 	"dependencies": {
+		"@dyn/utils": "workspace:^",
 		"@oclif/core": "^3.9.2",
 		"@rollup/plugin-commonjs": "^25.0.7",
+		"@rollup/plugin-html": "^1.0.3",
+		"@rollup/plugin-node-resolve": "^15.2.3",
+		"@rollup/plugin-replace": "^5.0.5",
 		"chalk": "^4.1.2",
+		"dotenv": "^16.3.1",
 		"execa": "^8.0.1",
 		"figlet": "^1.7.0",
 		"lodash": "^4.17.21",
@@ -40,10 +45,10 @@
 		"rollup": "^4.2.0",
 		"rollup-plugin-bundle-size": "^1.0.3",
 		"rollup-plugin-esbuild": "^6.1.0",
-		"rollup-plugin-node-externals": "^5.1.3"
+		"rollup-plugin-node-externals": "^5.1.3",
+		"rollup-plugin-postcss": "^4.0.2"
 	},
 	"devDependencies": {
-		"@dyn/config": "workspace:*",
 		"@types/figlet": "^1.5.7",
 		"@types/lodash": "^4.14.200",
 		"@types/node": "^20.8.10",

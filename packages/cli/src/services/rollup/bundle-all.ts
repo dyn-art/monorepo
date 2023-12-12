@@ -1,8 +1,11 @@
-import type { Command } from '@oclif/core';
-import type { RollupOptions } from 'rollup';
+import type { RollupOptions, RollupOutput } from 'rollup';
 
+import type { DynCommand } from '../../DynCommand';
 import { bundleWithRollup } from './bundle';
 
-export async function bundleAllWithRollup(command: Command, rollupOptions: RollupOptions[]) {
+export async function bundleAllWithRollup(
+	command: DynCommand,
+	rollupOptions: RollupOptions[]
+): Promise<RollupOutput[][]> {
 	return Promise.all(rollupOptions.map((option) => bundleWithRollup(command, option)));
 }

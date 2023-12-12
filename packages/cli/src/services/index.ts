@@ -1,3 +1,3 @@
-export * from './resolve-paths-from-package-json';
+export * from './dyn';
 export * from './rollup';
 export * from './tsc';

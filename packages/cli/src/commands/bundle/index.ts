@@ -1,18 +1,19 @@
 import path from 'node:path';
-import { Command, Flags } from '@oclif/core';
+import { Flags } from '@oclif/core';
 import chalk from 'chalk';
 import type { PackageJson } from 'type-fest';
 
+import { DynCommand } from '../../DynCommand';
 import {
 	bundleAllWithRollup,
 	bundleWithTsc,
-	createRollupPackageConfig,
+	createLibraryRollupConfig,
 	generateDts,
-	type TDynRollupOptions
+	getDynConfig
 } from '../../services';
-import { doesFileExist, promisifyFiglet, readJsFile, readJsonFile } from '../../utils';
+import { doesFileExist, promisifyFiglet, readJsonFile } from '../../utils';
 
-export default class Bundle extends Command {
+export default class Bundle extends DynCommand {
 	static description = 'Bundle dyn.art packages';
 
 	static examples = [];
@@ -22,7 +23,7 @@ export default class Bundle extends Command {
 			char: 'p',
 			description: 'Production mode',
 			required: false,
-			default: false
+			default: true
 		}),
 		bundleStrategy: Flags.string({
 			char: 'b',
@@ -49,6 +50,12 @@ export default class Bundle extends Command {
 			required: false,
 			default: 'all',
 			options: ['all', 'esm', 'cjs']
+		}),
+		verbose: Flags.boolean({
+			char: 'v',
+			description: 'More detailed logs',
+			required: false,
+			default: false
 		})
 	};
 
@@ -56,6 +63,7 @@ export default class Bundle extends Command {
 
 	public async run(): Promise<void> {
 		const { flags } = await this.parse(Bundle);
+		this.isVerbose = flags.verbose;
 		const startTime = Date.now();
 
 		// Read in package.json
@@ -81,8 +89,9 @@ export default class Bundle extends Command {
 			});
 		}
 
-		// Read in rollup.config.js
-		const rollupConfig = await this.getRollupConfig();
+		// Read in dyn.config.js
+		const dynConfig = await getDynConfig(this);
+		const libraryConfig = dynConfig?.library;
 
 		// Bundle package based on bundle strategy
 		switch (flags.bundleStrategy) {
@@ -90,12 +99,12 @@ export default class Bundle extends Command {
 				if (flags.format === 'all' || flags.format === 'esm') {
 					await bundleAllWithRollup(
 						this,
-						await createRollupPackageConfig(this, {
+						await createLibraryRollupConfig(this, {
 							format: 'esm',
 							isProduction: flags.prod,
 							preserveModules: true,
 							sourcemap: flags.sourcemap,
-							rollupOptions: rollupConfig ?? undefined,
+							libraryConfig,
 							tsConfigPath,
 							packageJson
 						})
@@ -104,12 +113,12 @@ export default class Bundle extends Command {
 				if (flags.format === 'all' || flags.format === 'cjs') {
 					await bundleAllWithRollup(
 						this,
-						await createRollupPackageConfig(this, {
+						await createLibraryRollupConfig(this, {
 							format: 'cjs',
 							isProduction: flags.prod,
 							preserveModules: true,
 							sourcemap: flags.sourcemap,
-							rollupOptions: rollupConfig ?? undefined,
+							libraryConfig,
 							tsConfigPath,
 							packageJson
 						})
@@ -140,19 +149,6 @@ export default class Bundle extends Command {
 	private async getPackageJson(): Promise<PackageJson | null> {
 		const packageJsonPath = path.join(process.cwd(), 'package.json');
 		return readJsonFile<PackageJson>(packageJsonPath);
-	}
-
-	private async getRollupConfig(): Promise<TDynRollupOptions | null> {
-		const rollupConfigPath = path.resolve(process.cwd(), 'rollup.config.js');
-		const rollupOptions = await readJsFile<TDynRollupOptions>(rollupConfigPath);
-		if (rollupOptions != null) {
-			this.log(
-				`🗞️  Detected ${chalk.underline('rollup.config.js')} at ${chalk.gray(
-					chalk.underline(rollupConfigPath)
-				)}`
-			);
-		}
-		return rollupOptions;
 	}
 
 	private getValidTsConfigJsonPath(isProduction: boolean): string | null {

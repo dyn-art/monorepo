@@ -2,12 +2,14 @@ import commonjs from '@rollup/plugin-commonjs';
 import esbuild from 'rollup-plugin-esbuild';
 import nodeExternals from 'rollup-plugin-node-externals';
 
-import { isExternal as isExternalFactory } from '../is-external-factory';
-import { bundleSize, typescriptPaths } from '../plugins';
-import type { TDynRollupOptionsCallback } from '../types';
+import { isExternal } from '../../../../utils';
+import type { TBaseDynRollupOptions, TDynRollupOptionsCallbackConfig } from '../../../dyn';
+import { bundleSize, typescriptPaths } from '../../plugins';
 
-const config: TDynRollupOptionsCallback = async (options) => {
-	const { packageJson, path, output, command, tsConfigPath, isProduction } = options;
+export async function createBaseRollupConfig(
+	config: TDynRollupOptionsCallbackConfig
+): Promise<TBaseDynRollupOptions> {
+	const { packageJson, path, output, command, tsConfigPath, isProduction } = config;
 
 	return {
 		input: path.input,
@@ -34,14 +36,14 @@ const config: TDynRollupOptionsCallback = async (options) => {
 				target: 'es6',
 				exclude: [/node_modules/],
 				loaders: {
-					'.json': 'json' // Require @rollup/plugin-commonjs
+					'.json': 'json' // Requires @rollup/plugin-commonjs
 				},
 				sourceMap: false // Configured in rollup 'output' object
 			}),
-			'copy', // Plugin placeholder for "rollup-plugin-copy"
 			// typescript(/* */), // Obsolete as esbuild takes care of configuring typescript
 			// babel(/* */), // Obsolete as esbuild takes care of converting ES2015+ modules into compatible JavaScript files
 			// terser(/* */), // Obsolete as esbuild takes care of minifying
+			'copy', // Plugin placeholder for "rollup-plugin-copy"
 			await bundleSize(command)
 		],
 		// Exclude peer dependencies and dependencies from bundle for these reasons:
@@ -51,11 +53,9 @@ const config: TDynRollupOptionsCallback = async (options) => {
 		// 3. For improved security: If a security vulnerability is found in a dependency,
 		//    npm can update it without needing to update this package.
 		// 4. Auto Installation: Package managers automatically install these dependencies, so no need to bundle them.
-		external: isExternalFactory(packageJson, {
+		external: isExternal(packageJson, {
 			fileTypesAsExternal: [],
 			packageJsonDepsAsExternal: true
 		})
 	};
-};
-
-export default config;
+}

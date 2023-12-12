@@ -1,4 +1,3 @@
-import type { NullValue } from 'rollup';
 import type { PackageJson } from 'type-fest';
 
 export function isExternal(
@@ -10,6 +9,7 @@ export function isExternal(
 		...(packageJson.dependencies || {}),
 		...(packageJson.peerDependencies || {})
 	});
+
 	return (source: string) => {
 		let external = false;
 		if (packageJsonDepsAsExternal) {
@@ -31,4 +31,4 @@ export type TIsExternal = (
 	source: string,
 	importer: string | undefined,
 	isResolved: boolean
-) => boolean | NullValue;
+) => boolean | null;

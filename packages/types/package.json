@@ -4,22 +4,29 @@
 	"version": "0.0.1",
 	"private": true,
 	"scripts": {
-		"build": "shx rm -rf dist && ../../scripts/cli.sh bundle",
+		"build": "shx rm -rf dist && ../../scripts/cli.sh bundle -b typesonly",
 		"lint": "eslint --ext .js,.ts src/",
 		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
 		"install:clean": "pnpm run clean && pnpm install",
 		"update:deps": "pnpm update --latest"
 	},
 	"exports": {
-		"dtif": {
+		"./dtif": {
 			"source": "./src/dtif.ts",
-			"types": "./dist/types/dtif.d.ts"
+			"types": "./dist/dtif.d.ts"
+		},
+		"./utility": {
+			"source": "./src/utility.ts",
+			"types": "./dist/utility.d.ts"
 		}
 	},
 	"typesVersions": {
 		"*": {
 			"dtif": [
-				"./dist/types/dtif.d.ts"
+				"./dist/dtif.d.ts"
+			],
+			"utility": [
+				"./dist/utility.d.ts"
 			]
 		}
 	},

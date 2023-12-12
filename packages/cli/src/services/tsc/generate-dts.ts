@@ -1,19 +1,23 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import type { Command } from '@oclif/core';
 import chalk from 'chalk';
 import type { PackageJson } from 'type-fest';
 
+import type { DynCommand } from '../../DynCommand';
 import {
 	execaVerbose,
 	findNearestTsConfigPath,
 	getTsConfigCompilerOptions,
+	resolvePathsFromPackageJson,
 	resolveTsPathsFactory,
 	type TResolveTsPaths,
 	type TTsConfigCompilerOptions
 } from '../../utils';
 
-export async function generateDts(command: Command, options: TGenerateDtsOptions = {}) {
+export async function generateDts(
+	command: DynCommand,
+	options: TGenerateDtsOptions = {}
+): Promise<void> {
 	const {
 		tsConfigPath = findNearestTsConfigPath(),
 		packageJson,
@@ -21,11 +25,13 @@ export async function generateDts(command: Command, options: TGenerateDtsOptions
 	} = options;
 	command.log(
 		'🚀 Started generating Typescript Declaration files.',
-		chalk.gray(
-			JSON.stringify({
-				args: [{ tsconfig: tsConfigPath }]
-			})
-		)
+		command.isVerbose
+			? chalk.gray(
+					JSON.stringify({
+						args: [{ tsconfig: tsConfigPath }]
+					})
+			  )
+			: ''
 	);
 
 	// Resolve Typescript compiler options
@@ -39,11 +45,12 @@ export async function generateDts(command: Command, options: TGenerateDtsOptions
 		command
 	});
 
+	// Handle Typescript paths like `{"@/rust/*": ["./src/rust_modules/*"]}`
 	if (shouldResolveTsPaths && compilerOptions.paths != null) {
 		const relativeDeclarationDirPath = getRelativeDeclarationDirPath(compilerOptions, packageJson);
 		const declarationFileEnding = '.d.ts';
 		const resolveTsPaths = resolveTsPathsFactory(command, {
-			compilerOptions: createResolveTsPathsCompilerOptions(
+			compilerOptions: adjustCompilerOptionsForResolvedPaths(
 				compilerOptions,
 				relativeDeclarationDirPath
 			),
@@ -66,38 +73,66 @@ export async function generateDts(command: Command, options: TGenerateDtsOptions
 	command.log('🏁 Completed generating Typescript Declaration files.');
 }
 
+/**
+ * Gets the relative path to the TypeScript declaration directory.
+ * Prioritizes the compilerOptions.declarationDir, falls back to packageJson paths,
+ * and defaults to './dist/types' if neither is available.
+ *
+ * @param compilerOptions - The TypeScript compiler options.
+ * @param packageJson - Optional package.json content.
+ * @returns The relative path to the declaration directory.
+ */
 function getRelativeDeclarationDirPath(
 	compilerOptions: TTsConfigCompilerOptions,
 	packageJson?: PackageJson
 ): string {
-	if (compilerOptions.declarationDir) {
+	// Use declarationDir from compilerOptions if available
+	if (typeof compilerOptions.declarationDir === 'string') {
 		return path.relative(process.cwd(), compilerOptions.declarationDir);
 	}
-	return packageJson?.types ?? './dist/types';
+
+	// Fallback to resolving paths from packageJson
+	if (packageJson) {
+		const paths = resolvePathsFromPackageJson(packageJson, {
+			format: 'types',
+			preserveModules: true,
+			resolvePath: false
+		});
+
+		if (paths.length > 0 && paths[0]?.output) {
+			return paths[0].output;
+		}
+	}
+
+	// Default path if no other options are available
+	return './dist/types';
 }
 
-function createResolveTsPathsCompilerOptions(
+/**
+ * Adjusts TypeScript compiler options to resolve paths based on a new declaration directory.
+ *
+ * @param compilerOptions - The original TypeScript compiler options.
+ * @param relativeDeclarationDirPath - The relative path to the declaration directory.
+ * @returns Adjusted TypeScript compiler options.
+ */
+function adjustCompilerOptionsForResolvedPaths(
 	compilerOptions: TTsConfigCompilerOptions,
 	relativeDeclarationDirPath: string
-) {
+): TTsConfigCompilerOptions {
 	const basePath = path.resolve(compilerOptions.pathsBasePath?.toString() ?? process.cwd());
 	const relativeRootDir = path.relative(basePath, compilerOptions.rootDir ?? './src');
 
-	// Create compiler options
-	const updatedPaths = compilerOptions.paths
-		? Object.fromEntries(
-				Object.entries(compilerOptions.paths).map(([key, value]) => [
-					key,
-					value.map((tsPath: string) =>
-						tsPath.replace(
-							new RegExp(`^\\.${path.sep}${relativeRootDir}`),
-							`.${path.sep}${relativeDeclarationDirPath}`
-						)
-					)
-				])
-		  )
-		: undefined;
+	// Update paths to reflect the new relative declaration directory
+	const updatedPaths =
+		compilerOptions.paths != null
+			? mapPathsToRelativeDeclarationDir(
+					compilerOptions.paths,
+					relativeRootDir,
+					relativeDeclarationDirPath
+			  )
+			: undefined;
 
+	// Return new compiler options with updated paths and other necessary adjustments
 	return {
 		...compilerOptions,
 		rootDir: relativeDeclarationDirPath,
@@ -105,6 +140,32 @@ function createResolveTsPathsCompilerOptions(
 		outDir: undefined,
 		declarationDir: undefined
 	};
+}
+
+/**
+ * Maps original TypeScript paths to a new relative declaration directory.
+ *
+ * @param originalPaths - The original 'paths' from TypeScript compiler options.
+ * @param relativeRootDir - The relative root directory path.
+ * @param relativeDeclarationDir - The relative declaration directory path.
+ * @returns Mapped paths object.
+ */
+function mapPathsToRelativeDeclarationDir(
+	originalPaths: Record<string, string[]>,
+	relativeRootDir: string,
+	relativeDeclarationDir: string
+): Record<string, string[]> {
+	return Object.fromEntries(
+		Object.entries(originalPaths).map(([key, value]) => [
+			key,
+			value.map((tsPath: string) =>
+				tsPath.replace(
+					new RegExp(`^\\.${path.sep}${relativeRootDir}`),
+					`.${path.sep}${relativeDeclarationDir}`
+				)
+			)
+		])
+	);
 }
 
 function updateImportPaths(
@@ -160,6 +221,7 @@ function updateExportPaths(
 function getFilePathsWithExtDeep(dir: string, ext: string): string[] {
 	let result: string[] = [];
 	const fileNames = fs.readdirSync(dir);
+
 	for (const fileName of fileNames) {
 		const fullPath = path.join(dir, fileName);
 		const stat = fs.statSync(fullPath);
@@ -169,6 +231,7 @@ function getFilePathsWithExtDeep(dir: string, ext: string): string[] {
 			result.push(fullPath);
 		}
 	}
+
 	return result;
 }
 

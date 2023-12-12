@@ -15,8 +15,8 @@
 	"exports": {
 		"rectangle-eater": {
 			"source": "./src/rectangle-eater/index.ts",
-			"main": "./dist/rectangle-eater/cjs/index.js",
-			"module": "./dist/rectangle-eater/esm/index.js",
+			"require": "./dist/rectangle-eater/cjs/index.js",
+			"import": "./dist/rectangle-eater/esm/index.js",
 			"types": "./dist/types/rectangle-eater/index.d.ts"
 		}
 	},

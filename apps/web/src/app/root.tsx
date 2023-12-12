@@ -2,7 +2,7 @@ import { cssBundleHref } from '@remix-run/css-bundle';
 import type { LinksFunction } from '@remix-run/node';
 import { Links, LiveReload, Meta, Outlet, Scripts, ScrollRestoration } from '@remix-run/react';
 import React from 'react';
-import uiStyles from '@dyn/ui/dist/index.css';
+import uiStyles from '@dyn/ui/dist/styles.css';
 
 import styles from './tailwind.css';
 

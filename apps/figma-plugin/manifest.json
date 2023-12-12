@@ -1,0 +1,8 @@
+{
+	"name": "dyn.art Figma Plugin",
+	"id": "00000000",
+	"api": "1.0.0",
+	"main": "plugin.js",
+	"ui": "app.html",
+	"editorType": ["figma"]
+}
