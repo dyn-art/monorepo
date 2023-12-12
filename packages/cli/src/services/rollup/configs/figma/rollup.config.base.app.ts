@@ -14,7 +14,7 @@ export async function createAppRollupConfig(
 	// Resolve Html to inject bundle into
 	let rootHtml = `
 	<!doctype html>
-	<html lang="en" data-theme="lofi">
+	<html lang="en">
 		<head>
 			<meta charset="utf-8">
 			<title>${packageJson.name ?? 'Figma Plugin'}</title>

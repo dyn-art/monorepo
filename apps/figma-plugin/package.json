@@ -4,27 +4,13 @@
 	"version": "0.0.1",
 	"private": true,
 	"scripts": {
-		"build": "shx rm -rf dist && ../../scripts/cli.sh bundle figma",
+		"build": "shx rm -rf dist && ../../scripts/cli.sh bundle figma -p",
 		"start:dev": "tsc -w",
 		"lint": "eslint --ext .js,.ts src/",
 		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
 		"install:clean": "pnpm run clean && pnpm install",
 		"test": "echo \"Error: no test specified\" && exit 1",
 		"update:deps": "pnpm update --latest"
-	},
-	"exports": {
-		"app": {
-			"source": "./src/app/index.tsx",
-			"previewSource": "./dev/app/index.tsx",
-			"require": "./dist/app.js",
-			"env": "./.env.app"
-		},
-		"plugin": {
-			"source": "./src/plugin/index.ts",
-			"previewSource": "./src/plugin/index.ts",
-			"require": "./dist/plugin.js",
-			"env": "./.env.plugin"
-		}
 	},
 	"repository": {
 		"type": "git",
@@ -49,10 +35,12 @@
 		"@types/node": "^20.8.10",
 		"@types/react": "^18.2.33",
 		"@types/react-dom": "^18.2.14",
+		"@vitejs/plugin-react": "^4.2.0",
 		"autoprefixer": "^10.4.16",
 		"postcss": "^8.4.32",
 		"postcss-preset-env": "^9.3.0",
-		"tailwindcss": "^3.3.5"
+		"tailwindcss": "^3.3.5",
+		"vite": "^5.0.0"
 	},
 	"files": [
 		"dist",
