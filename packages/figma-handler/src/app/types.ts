@@ -63,7 +63,7 @@ export type TAppEventTypes<
 
 export interface TPluginMessageEvent {
 	key: string;
-	args: any;
+	args: unknown;
 }
 
 // Testing

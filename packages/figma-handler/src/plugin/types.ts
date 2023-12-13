@@ -67,7 +67,7 @@ export interface TPluginEventTypes<GAppMessageEvent extends TAppMessageEvent> {
 
 export interface TAppMessageEvent {
 	key: string;
-	args: any;
+	args: unknown;
 }
 
 // Testing
