@@ -46,6 +46,9 @@ importers:
       '@dyn/ui':
         specifier: workspace:*
         version: link:../../packages/ui
+      '@dyn/utils':
+        specifier: workspace:^
+        version: link:../../packages/utils
       clsx:
         specifier: ^2.0.0
         version: 2.0.0

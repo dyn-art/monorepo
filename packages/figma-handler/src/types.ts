@@ -1,3 +1,6 @@
+import type { FigmaAppHandler } from './app';
+import type { FigmaPluginHandler } from './plugin';
+
 // =============================================================================
 // Plugin
 // =============================================================================
@@ -29,7 +32,7 @@ export interface TPluginCallbackRegistrationBase<
 	type: GEventType;
 	once?: boolean;
 	callback: (
-		instance: any,
+		instance: FigmaPluginHandler,
 		...args: GPluginCallbackArgs[0] extends {
 			key: GPluginCallbackKey;
 			args: infer TArgs;
@@ -152,7 +155,7 @@ export interface TAppCallbackRegistrationBase<
 	type: GEventType;
 	once?: boolean;
 	callback: (
-		instance: any,
+		instance: FigmaAppHandler,
 		...args: GAppCallbackArgs[0] extends {
 			key: GAppCallbackKey;
 			args: infer TArgs;

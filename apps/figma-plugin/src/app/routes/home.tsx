@@ -5,11 +5,19 @@ import { appHandler } from '../app-handler';
 import { useAppCallback } from '../hooks';
 
 const Home: React.FC = () => {
+	// TODO: REMOVE
 	useAppCallback(appHandler, {
 		type: 'plugin.message',
 		key: 'on-select-frame',
 		callback: async (instance, args) => {
-			// TODO
+			console.log('App: onSelectFrame', { args });
+		}
+	});
+	useAppCallback(appHandler, {
+		type: 'plugin.message',
+		key: 'on-select-node',
+		callback: async (instance, args) => {
+			console.log('App: onSelectNode', { args });
 		}
 	});
 

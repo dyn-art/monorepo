@@ -46,7 +46,13 @@ export class FigmaPluginHandler<
 	}
 
 	private registerCallback(callback: PluginCallback<GAppMessageEvent>): void {
-		const [typeCategory, type] = callback.type.split('.') as [string, string?];
+		let type: string = callback.type;
+		let typeCategory: string | null = null;
+		const typeParts = type.split('.');
+		if (typeParts.length === 2) {
+			typeCategory = typeParts[0] as unknown as string;
+			type = typeParts[1] as unknown as string;
+		}
 
 		// Register events based on the type and type category
 		const eventHandler = typeCategory === 'app' ? this.figma.ui : this.figma;

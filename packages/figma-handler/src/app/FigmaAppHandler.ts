@@ -43,7 +43,11 @@ export class FigmaAppHandler<
 	}
 
 	private registerCallback(callback: AppCallback<GPluginMessageEvent>): void {
-		const type = callback.type.includes('.') ? callback.type.split('.')[1] : callback.type;
+		let type: string = callback.type;
+		const typeParts = type.split('.');
+		if (typeParts.length === 2) {
+			type = typeParts[1] as unknown as string;
+		}
 
 		// Note: Using global 'addEventListener' to avoid cross-origin frame access errors.
 		// Attempting to call 'parent.x' results in a DOMException for cross-origin frame access.
@@ -57,8 +61,19 @@ export class FigmaAppHandler<
 	}
 
 	private async onEvent(callback: AppCallback<GPluginMessageEvent>, args: any[]): Promise<void> {
-		if (callback.type === 'plugin.message' && args[0]?.key === callback.key) {
-			await callback.callback(this, args[0].args);
+		if (callback.type === 'plugin.message') {
+			const data = args[0]?.data;
+			const pluginMessage = data?.pluginMessage;
+			if (
+				pluginMessage != null &&
+				pluginMessage?.key === callback.key &&
+				typeof pluginMessage?.args === 'object'
+			) {
+				await callback.callback(this, {
+					pluginId: data?.pluginId,
+					...pluginMessage.args
+				});
+			}
 		} else {
 			await callback.callback(this, ...args);
 		}

@@ -7,4 +7,9 @@ export interface TOnSelectFrameEvent extends TPluginMessageEvent {
 	};
 }
 
-export type TPluginMessageEvents = TOnSelectFrameEvent;
+export interface TOnSelectNodeEvent extends TPluginMessageEvent {
+	key: 'on-select-node';
+	args: { selected: Pick<SceneNode, 'name' | 'id'>[] };
+}
+
+export type TPluginMessageEvents = TOnSelectFrameEvent | TOnSelectNodeEvent;
