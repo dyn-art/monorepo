@@ -1,17 +1,20 @@
-export type TPluginEventMeta<GAppMessageEvent extends TAppMessageEvent = TAppMessageEvent> =
+export type TPluginEventRegistration<GAppMessageEvent extends TAppMessageEvent = TAppMessageEvent> =
 	GAppMessageEvent extends TAppMessageEvent
 		? {
-				[K in keyof TPluginEvents<TAppMessageEvent>]: TPluginEventMetaBase<GAppMessageEvent, K>;
-		  }[keyof TPluginEvents<GAppMessageEvent>]
+				[K in keyof TPluginEventTypes<TAppMessageEvent>]: TPluginEventRegistrationBase<
+					GAppMessageEvent,
+					K
+				>;
+		  }[keyof TPluginEventTypes<GAppMessageEvent>]
 		: never;
 
-export interface TPluginEventMetaBase<
+export interface TPluginEventRegistrationBase<
 	GAppMessageEvent extends TAppMessageEvent,
-	GEventType extends keyof TPluginEvents<GAppMessageEvent>,
+	GEventType extends keyof TPluginEventTypes<GAppMessageEvent>,
 	GPluginEventCallbackArgs extends
-		TPluginEvents<GAppMessageEvent>[GEventType][0] = TPluginEvents<GAppMessageEvent>[GEventType][0],
+		TPluginEventTypes<GAppMessageEvent>[GEventType][0] = TPluginEventTypes<GAppMessageEvent>[GEventType][0],
 	GPluginEventCallbackReturnValue extends
-		TPluginEvents<GAppMessageEvent>[GEventType][1] = TPluginEvents<GAppMessageEvent>[GEventType][1],
+		TPluginEventTypes<GAppMessageEvent>[GEventType][1] = TPluginEventTypes<GAppMessageEvent>[GEventType][1],
 	GPluginEventKey extends TPluginEventKey<GAppMessageEvent, GEventType> = TPluginEventKey<
 		GAppMessageEvent,
 		GEventType
@@ -33,16 +36,16 @@ export interface TPluginEventMetaBase<
 
 export type TPluginEventKey<
 	GAppMessageEvent extends TAppMessageEvent,
-	GEventType extends keyof TPluginEvents<GAppMessageEvent>,
+	GEventType extends keyof TPluginEventTypes<GAppMessageEvent>,
 	GPluginEventCallbackArgs extends
-		TPluginEvents<GAppMessageEvent>[GEventType][0] = TPluginEvents<GAppMessageEvent>[GEventType][0]
+		TPluginEventTypes<GAppMessageEvent>[GEventType][0] = TPluginEventTypes<GAppMessageEvent>[GEventType][0]
 > = GPluginEventCallbackArgs[0] extends {
 	key: infer TKey;
 }
 	? TKey
 	: string | undefined;
 
-export interface TPluginEvents<GAppMessageEvent extends TAppMessageEvent> {
+export interface TPluginEventTypes<GAppMessageEvent extends TAppMessageEvent> {
 	// Events received from Figma
 	'run': [[event: RunEvent], Promise<void>];
 	'drop': [[event: DropEvent], Promise<void>];
@@ -88,27 +91,27 @@ export interface TAppMessageEvent {
 
 // export type TAppMessageEvents = TOnAppMessageEvent1 | TOnAppMessageEvent2;
 
-// const test: TPluginEventMeta<TAppMessageEvents> = {
+// const test: TPluginEventRegistration<TAppMessageEvents> = {
 // 	type: 'run',
 // 	key: undefined,
 // 	callback: async (instance, event) => {
-// 		// TODO
+// 		// Event received by Figma
 // 	}
 // };
 
-// const test2: TPluginEventMeta<TAppMessageEvents> = {
+// const test2: TPluginEventRegistration<TAppMessageEvents> = {
 // 	type: 'app.message',
 // 	key: 'on-event-1',
 // 	callback: async (instance, event) => {
-// 		// TODO
+// 		// Event received by plugin part
 // 	}
 // };
 
-// const test3: TPluginEventMeta<TAppMessageEvents> = {
+// const test3: TPluginEventRegistration<TAppMessageEvents> = {
 // 	type: 'textreview',
 // 	key: undefined,
 // 	callback: async (instance, event) => {
-// 		// TODO
+// 		// Event received by Figma
 // 		return [];
 // 	}
 // };
