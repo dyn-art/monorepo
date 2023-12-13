@@ -1,11 +1,11 @@
 import { shortId } from '@dyn/utils';
 
-import type { TAppMessageEvent, TPluginEventRegistration } from '../types';
+import type { TAppMessageEvent, TPluginCallbackRegistration } from '../types';
 
 export class PluginCallback<
 	GAppMessageEvent extends TAppMessageEvent,
 	GPluginEventRegistration extends
-		TPluginEventRegistration<GAppMessageEvent> = TPluginEventRegistration<GAppMessageEvent>
+		TPluginCallbackRegistration<GAppMessageEvent> = TPluginCallbackRegistration<GAppMessageEvent>
 > {
 	public readonly key: string;
 	public readonly type: GPluginEventRegistration['type'];

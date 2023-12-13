@@ -1,3 +1,5 @@
 import { FigmaAppHandler } from '@dyn/figma-handler/app';
 
-export const pluginHandler = new FigmaAppHandler(parent);
+import type { TAppHandler } from '../types';
+
+export const appHandler: TAppHandler = new FigmaAppHandler(parent);

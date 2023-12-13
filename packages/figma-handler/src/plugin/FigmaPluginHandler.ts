@@ -1,4 +1,4 @@
-import type { TAppMessageEvent, TPluginEventRegistration, TPluginMessageEvent } from '../types';
+import type { TAppMessageEvent, TPluginCallbackRegistration, TPluginMessageEvent } from '../types';
 import { PluginCallback } from './PluginCallback';
 
 export class FigmaPluginHandler<
@@ -7,14 +7,19 @@ export class FigmaPluginHandler<
 > {
 	public readonly figma: typeof figma;
 
-	constructor(figmaInstance: typeof figma) {
+	constructor(
+		figmaInstance: typeof figma,
+		options: TFigmaPluginHandlerOptions<GAppMessageEvent> = {}
+	) {
+		const { events = [] } = options;
 		this.figma = figmaInstance;
+		this.register(events);
 	}
 
 	public register(
 		registrations:
-			| TPluginEventRegistration<GAppMessageEvent>
-			| TPluginEventRegistration<GAppMessageEvent>[]
+			| TPluginCallbackRegistration<GAppMessageEvent>
+			| TPluginCallbackRegistration<GAppMessageEvent>[]
 	): void {
 		const callbacks = Array.isArray(registrations)
 			? registrations.map((r) => new PluginCallback(r))
@@ -60,4 +65,8 @@ export class FigmaPluginHandler<
 			await callback.callback(this, ...args);
 		}
 	}
+}
+
+export interface TFigmaPluginHandlerOptions<GAppMessageEvent extends TAppMessageEvent> {
+	events?: TPluginCallbackRegistration<GAppMessageEvent>[];
 }

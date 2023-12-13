@@ -1,7 +1,18 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
+import { appHandler } from '../app-handler';
+import { useAppCallback } from '../hooks';
+
 const Home: React.FC = () => {
+	useAppCallback(appHandler, {
+		type: 'plugin.message',
+		key: 'on-select-frame',
+		callback: async (instance, args) => {
+			// TODO
+		}
+	});
+
 	return (
 		<div className="m-4 space-y-4">
 			<h1 className="text-2xl font-bold">dyn.art</h1>

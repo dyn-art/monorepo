@@ -1,4 +1,4 @@
-import type { TAppEventRegistration, TAppMessageEvent, TPluginMessageEvent } from '../types';
+import type { TAppCallbackRegistration, TAppMessageEvent, TPluginMessageEvent } from '../types';
 import { AppCallback } from './AppCallback';
 
 export class FigmaAppHandler<
@@ -7,14 +7,16 @@ export class FigmaAppHandler<
 > {
 	private readonly parent: Window;
 
-	constructor(parentInstance: Window) {
+	constructor(parentInstance: Window, options: TFigmaAppHandlerOptions<GPluginMessageEvent> = {}) {
+		const { events = [] } = options;
 		this.parent = parentInstance;
+		this.register(events);
 	}
 
 	public register(
 		registrations:
-			| TAppEventRegistration<GPluginMessageEvent>
-			| TAppEventRegistration<GPluginMessageEvent>[]
+			| TAppCallbackRegistration<GPluginMessageEvent>
+			| TAppCallbackRegistration<GPluginMessageEvent>[]
 	): void {
 		const callbacks = Array.isArray(registrations)
 			? registrations.map((r) => new AppCallback(r))
@@ -46,9 +48,11 @@ export class FigmaAppHandler<
 		// Note: Using global 'addEventListener' to avoid cross-origin frame access errors.
 		// Attempting to call 'parent.x' results in a DOMException for cross-origin frame access.
 		addEventListener(type as any, (...args) => {
-			this.onEvent(callback, args).catch(() => {
-				// do nothing
-			});
+			if (callback.shouldCall()) {
+				this.onEvent(callback, args).catch(() => {
+					// do nothing
+				});
+			}
 		});
 	}
 
@@ -59,4 +63,8 @@ export class FigmaAppHandler<
 			await callback.callback(this, ...args);
 		}
 	}
+}
+
+export interface TFigmaAppHandlerOptions<GPluginMessageEvent extends TPluginMessageEvent> {
+	events?: TAppCallbackRegistration<GPluginMessageEvent>[];
 }

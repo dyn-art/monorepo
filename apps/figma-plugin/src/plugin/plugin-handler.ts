@@ -1,3 +1,6 @@
 import { FigmaPluginHandler } from '@dyn/figma-handler/plugin';
 
-export const pluginHandler = new FigmaPluginHandler(figma);
+import type { TPluginHandler } from '../types';
+import { events } from './events';
+
+export const pluginHandler: TPluginHandler = new FigmaPluginHandler(figma, { events });
