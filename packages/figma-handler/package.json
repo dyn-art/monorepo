@@ -47,6 +47,9 @@
 		"url": "https://s.dyn.art/github/issues"
 	},
 	"homepage": "https://s.dyn.art/github",
+	"dependencies": {
+		"@dyn/utils": "workspace:*"
+	},
 	"devDependencies": {
 		"@dyn/config": "workspace:*",
 		"@figma/plugin-typings": "^1.82.0",

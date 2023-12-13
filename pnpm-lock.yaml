@@ -262,6 +262,10 @@ importers:
         version: 2.2.0(eslint@8.53.0)(react@18.2.0)(typescript@5.2.2)
 
   packages/figma-handler:
+    dependencies:
+      '@dyn/utils':
+        specifier: workspace:*
+        version: link:../utils
     devDependencies:
       '@dyn/config':
         specifier: workspace:*

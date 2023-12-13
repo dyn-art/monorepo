@@ -1,19 +1,62 @@
-export class FigmaAppHandler {
-	private readonly _parent: Window;
+import type { TAppEventRegistration, TAppMessageEvent, TPluginMessageEvent } from '../types';
+import { AppCallback } from './AppCallback';
+
+export class FigmaAppHandler<
+	GPluginMessageEvent extends TPluginMessageEvent = TPluginMessageEvent,
+	GAppMessageEvent extends TAppMessageEvent = TAppMessageEvent
+> {
+	private readonly parent: Window;
 
 	constructor(parentInstance: Window) {
-		this._parent = parentInstance;
-
-		// figma.ui.onmessage = (message) => {
-		// 	// TODO
-		// };
-
-		// figma.on('');
-
-		// figma.ui.postMessage('');
+		this.parent = parentInstance;
 	}
 
-	public get parent() {
-		return this._parent;
+	public register(
+		registrations:
+			| TAppEventRegistration<GPluginMessageEvent>
+			| TAppEventRegistration<GPluginMessageEvent>[]
+	): void {
+		const callbacks = Array.isArray(registrations)
+			? registrations.map((r) => new AppCallback(r))
+			: [new AppCallback(registrations)];
+
+		this.registerCallbacks(callbacks);
+	}
+
+	public post<GKey extends GAppMessageEvent['key']>(
+		key: GKey,
+		args: Extract<GAppMessageEvent, { key: GKey }>['args']
+	): void {
+		this.parent.postMessage({ pluginMessage: { key, args } }, '*');
+	}
+
+	// =========================================================================
+	// Helper
+	// =========================================================================
+
+	private registerCallbacks(callbacks: AppCallback<GPluginMessageEvent>[]): void {
+		callbacks.forEach((callback) => {
+			this.registerCallback(callback);
+		});
+	}
+
+	private registerCallback(callback: AppCallback<GPluginMessageEvent>): void {
+		const type = callback.type.includes('.') ? callback.type.split('.')[1] : callback.type;
+
+		// Note: Using global 'addEventListener' to avoid cross-origin frame access errors.
+		// Attempting to call 'parent.x' results in a DOMException for cross-origin frame access.
+		addEventListener(type as any, (...args) => {
+			this.onEvent(callback, args).catch(() => {
+				// do nothing
+			});
+		});
+	}
+
+	private async onEvent(callback: AppCallback<GPluginMessageEvent>, args: any[]): Promise<void> {
+		if (callback.type === 'plugin.message' && args[0]?.key === callback.key) {
+			await callback.callback(this, args[0].args);
+		} else {
+			await callback.callback(this, ...args);
+		}
 	}
 }
