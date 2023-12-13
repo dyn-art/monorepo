@@ -27,6 +27,7 @@
 	},
 	"homepage": "https://s.dyn.art/github",
 	"dependencies": {
+		"@dyn/figma-handler": "workspace:*",
 		"@dyn/ui": "workspace:*",
 		"clsx": "^2.0.0",
 		"react": "^18.2.0",

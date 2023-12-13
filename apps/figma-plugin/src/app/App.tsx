@@ -9,7 +9,7 @@ const App: React.FC = () => {
 	return (
 		<div>
 			<Button>Hello World</Button>
-			<div className="bg-blue-300">
+			<div className="bg-red-300">
 				<p className="font-sans font-bold">Jeff</p>
 			</div>
 		</div>

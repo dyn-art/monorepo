@@ -40,6 +40,9 @@ importers:
 
   apps/figma-plugin:
     dependencies:
+      '@dyn/figma-handler':
+        specifier: workspace:*
+        version: link:../../packages/figma-handler
       '@dyn/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -98,40 +101,6 @@ importers:
       ws:
         specifier: ^8.15.0
         version: 8.15.0
-
-  apps/my-project:
-    dependencies:
-      react:
-        specifier: ^18.2.0
-        version: 18.2.0
-      react-dom:
-        specifier: ^18.2.0
-        version: 18.2.0(react@18.2.0)
-    devDependencies:
-      '@types/react':
-        specifier: ^18.2.37
-        version: 18.2.37
-      '@types/react-dom':
-        specifier: ^18.2.15
-        version: 18.2.15
-      '@vitejs/plugin-react':
-        specifier: ^4.2.0
-        version: 4.2.0(vite@5.0.0)
-      eslint:
-        specifier: ^8.53.0
-        version: 8.53.0
-      eslint-plugin-react:
-        specifier: ^7.33.2
-        version: 7.33.2(eslint@8.53.0)
-      eslint-plugin-react-hooks:
-        specifier: ^4.6.0
-        version: 4.6.0(eslint@8.53.0)
-      eslint-plugin-react-refresh:
-        specifier: ^0.4.4
-        version: 0.4.4(eslint@8.53.0)
-      vite:
-        specifier: ^5.0.0
-        version: 5.0.0(@types/node@20.8.10)
 
   apps/web:
     dependencies:
@@ -285,6 +254,18 @@ importers:
       '@remix-run/eslint-config':
         specifier: ^2.2.0
         version: 2.2.0(eslint@8.53.0)(react@18.2.0)(typescript@5.2.2)
+
+  packages/figma-handler:
+    devDependencies:
+      '@dyn/config':
+        specifier: workspace:*
+        version: link:../config
+      '@figma/plugin-typings':
+        specifier: ^1.82.0
+        version: 1.82.0
+      '@types/node':
+        specifier: ^20.8.10
+        version: 20.8.10
 
   packages/lab:
     dependencies:
@@ -2932,26 +2913,12 @@ packages:
     dependencies:
       '@types/react': 18.2.34
 
-  /@types/react-dom@18.2.15:
-    resolution: {integrity: sha512-HWMdW+7r7MR5+PZqJF6YFNSCtjz1T0dsvo/f1BV6HkV+6erD/nA7wd9NM00KVG83zf2nJ7uATPO9ttdIPvi3gg==}
-    dependencies:
-      '@types/react': 18.2.37
-    dev: true
-
   /@types/react@18.2.34:
     resolution: {integrity: sha512-U6eW/alrRk37FU/MS2RYMjx0Va2JGIVXELTODaTIYgvWGCV4Y4TfTUzG8DdmpDNIT0Xpj/R7GfyHOJJrDttcvg==}
     dependencies:
       '@types/prop-types': 15.7.9
       '@types/scheduler': 0.16.5
       csstype: 3.1.2
-
-  /@types/react@18.2.37:
-    resolution: {integrity: sha512-RGAYMi2bhRgEXT3f4B92WTohopH6bIXw05FuGlmJEnv/omEn190+QYEIYxIAuIBdKgboYYdVved2p1AxZVQnaw==}
-    dependencies:
-      '@types/prop-types': 15.7.9
-      '@types/scheduler': 0.16.5
-      csstype: 3.1.2
-    dev: true
 
   /@types/resolve@1.20.2:
     resolution: {integrity: sha512-60BCwRFOZCQhDncwQdxxeOEEkbc5dIMccYLwbxsS4TUNeVECQ/pBJ0j09mrHOl/JJvpRPGwO9SvE4nR2Nb/a4Q==}
@@ -5189,14 +5156,6 @@ packages:
       eslint: ^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0-0
     dependencies:
       eslint: 8.53.0
-
-  /eslint-plugin-react-refresh@0.4.4(eslint@8.53.0):
-    resolution: {integrity: sha512-eD83+65e8YPVg6603Om2iCIwcQJf/y7++MWm4tACtEswFLYMwxwVWAfwN+e19f5Ad/FOyyNg9Dfi5lXhH3Y3rA==}
-    peerDependencies:
-      eslint: '>=7'
-    dependencies:
-      eslint: 8.53.0
-    dev: true
 
   /eslint-plugin-react@7.33.2(eslint@8.53.0):
     resolution: {integrity: sha512-73QQMKALArI8/7xGLNI/3LylrEYrlKZSb5C9+q3OtOewTnMQi5cT+aE9E41sLCmli3I9PGGmD1yiZydyo4FEPw==}
