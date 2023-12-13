@@ -1,19 +1,16 @@
 import React from 'react';
-import { Button } from '@dyn/ui';
+import { MemoryRouter } from 'react-router-dom';
 
-// Styles
 import '@dyn/ui/dist/styles.css';
+
+import { Routes } from './routes';
+
 import './styles/tailwind.css';
 
-const App: React.FC = () => {
+export const App: React.FC = () => {
 	return (
-		<div>
-			<Button>Hello World</Button>
-			<div className="bg-red-300">
-				<p className="font-sans font-bold">Jeff</p>
-			</div>
-		</div>
+		<MemoryRouter>
+			<Routes />
+		</MemoryRouter>
 	);
 };
-
-export default App;

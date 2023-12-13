@@ -19,11 +19,12 @@ export default class Bundle extends DynCommand {
 	static examples = [];
 
 	static flags = {
-		prod: Flags.boolean({
-			char: 'p',
-			description: 'Production mode',
+		target: Flags.string({
+			char: 't',
+			description: 'Bundle target',
 			required: false,
-			default: true
+			default: 'prod',
+			options: ['prod', 'dev']
 		}),
 		bundleStrategy: Flags.string({
 			char: 'b',
@@ -64,6 +65,7 @@ export default class Bundle extends DynCommand {
 	public async run(): Promise<void> {
 		const { flags } = await this.parse(Bundle);
 		this.isVerbose = flags.verbose;
+		this.isProduction = flags.target === 'prod';
 		const startTime = Date.now();
 
 		// Read in package.json
@@ -77,12 +79,12 @@ export default class Bundle extends DynCommand {
 		this.log(
 			`Started bundling package ${chalk.magenta(
 				chalk.underline(packageJson.name ?? 'unknown-package')
-			)} for ${flags.prod ? chalk.green('production') : chalk.blue('development')}`
+			)} for ${this.isProduction ? chalk.green('production') : chalk.blue('development')}`
 		);
 		this.log(`\n`);
 
 		// Read in tsconfig.json
-		const tsConfigPath = this.getValidTsConfigJsonPath(flags.prod);
+		const tsConfigPath = this.getValidTsConfigJsonPath(this.isProduction);
 		if (tsConfigPath == null) {
 			this.error(`No tsconfig.json file found at '${chalk.underline(process.cwd())}'!`, {
 				exit: 1
@@ -101,7 +103,7 @@ export default class Bundle extends DynCommand {
 						this,
 						await createLibraryRollupConfig(this, {
 							format: 'esm',
-							isProduction: flags.prod,
+							isProduction: this.isProduction,
 							preserveModules: true,
 							sourcemap: flags.sourcemap,
 							libraryConfig,
@@ -115,7 +117,7 @@ export default class Bundle extends DynCommand {
 						this,
 						await createLibraryRollupConfig(this, {
 							format: 'cjs',
-							isProduction: flags.prod,
+							isProduction: this.isProduction,
 							preserveModules: true,
 							sourcemap: flags.sourcemap,
 							libraryConfig,
