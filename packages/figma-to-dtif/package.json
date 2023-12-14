@@ -28,8 +28,7 @@
 	},
 	"homepage": "https://s.dyn.art/github",
 	"dependencies": {
-		"@dyn/utils": "workspace:*",
-		"ts-results": "^3.3.0"
+		"@dyn/utils": "workspace:*"
 	},
 	"devDependencies": {
 		"@dyn/config": "workspace:*",

@@ -65,7 +65,7 @@ impl Composition {
         bundle: RectangleNodeBundle,
         maybe_parent_id: Option<Entity>,
     ) -> Entity {
-        let paint_ids = bundle.fill_mixin.paints.clone();
+        let paint_ids = bundle.fill_mixin.paint_ids.clone();
         let entity_id = self.spawn_node(bundle, maybe_parent_id);
 
         // TODO

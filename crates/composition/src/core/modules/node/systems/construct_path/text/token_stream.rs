@@ -18,18 +18,18 @@ impl<'a> TokenStream<'a> {
 
         // Preload required faces to avoid mutable borrow conflicts during local font face caching
         for section in &text.sections {
-            font_cache.load_ttfp_face(&section.style.font_hash);
+            font_cache.load_ttfp_face(&section.style.font_id);
         }
 
         // Iterate through text sections, creating tokens
         for section in &text.sections {
-            let font_hash = section.style.font_hash;
+            let font_hash = section.style.font_id;
             let font_size = section.style.font_size as f32;
 
             // Cache rustybuzz font face locally
             if !font_face_cache.contains_key(&font_hash) {
-                if let Some(face) = font_cache.get_buzz_face(&section.style.font_hash) {
-                    font_face_cache.insert(section.style.font_hash, face.clone());
+                if let Some(face) = font_cache.get_buzz_face(&section.style.font_id) {
+                    font_face_cache.insert(section.style.font_id, face.clone());
                 } else {
                     continue;
                 }

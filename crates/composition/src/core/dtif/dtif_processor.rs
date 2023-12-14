@@ -90,7 +90,7 @@ impl DTIFProcessor {
         {
             // Process paints and collect their Bevy entity ids
             let new_paints: Vec<Entity> = fill_mixin
-                .paints
+                .paint_ids
                 .iter()
                 .filter_map(|paint_entity| {
                     let paint_eid = DTIFProcessor::entity_to_eid(paint_entity);

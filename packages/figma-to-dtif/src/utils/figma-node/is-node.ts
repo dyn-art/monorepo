@@ -1,3 +1,3 @@
-export function isTextNode(node: any): node is TextNode {
+export function isFigmaTextNode(node: any): node is TextNode {
 	return node?.type === 'TEXT';
 }

@@ -23,7 +23,7 @@ export const COMPOSITION_WITH_ONE_RECT = (
 			},
 			relativeTransform: createTransformMatrix(0, 0, 0),
 			fill: {
-				paints: [10]
+				paintIds: [10]
 			}
 		},
 		1: {
@@ -35,7 +35,7 @@ export const COMPOSITION_WITH_ONE_RECT = (
 			},
 			relativeTransform: createTransformMatrix((width - 100) / 2, (height - 100) / 2, 30),
 			fill: {
-				paints: [11]
+				paintIds: [11]
 			}
 		},
 		2: {
@@ -47,7 +47,7 @@ export const COMPOSITION_WITH_ONE_RECT = (
 			},
 			relativeTransform: createTransformMatrix((width - 100) / 2, (height - 100) / 2, 0),
 			fill: {
-				paints: [12]
+				paintIds: [12]
 			}
 		},
 		3: {
@@ -91,11 +91,11 @@ export const COMPOSITION_WITH_ONE_RECT = (
 			},
 			relativeTransform: createTransformMatrix((width - 100) / 4, (height - 100) / 4, 0),
 			fill: {
-				paints: [11]
+				paintIds: [11]
 			}
 		}
 	},
-	paints: {
+	paintIds: {
 		10: {
 			type: 'Solid',
 			blendMode: 'Normal',

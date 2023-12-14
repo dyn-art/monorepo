@@ -38,7 +38,7 @@ export const COMPOSITION_WITH_ONE_RECT = (
 				topRightRadius: 0
 			},
 			fill: {
-				paints: [5]
+				paintIds: [5]
 			}
 		},
 		2: {
@@ -56,7 +56,7 @@ export const COMPOSITION_WITH_ONE_RECT = (
 				topRightRadius: 80
 			},
 			fill: {
-				paints: [5]
+				paintIds: [5]
 			}
 		},
 		3: {
@@ -100,11 +100,11 @@ export const COMPOSITION_WITH_ONE_RECT = (
 			},
 			relativeTransform: createTransformMatrix((width - 100) / 4, (height - 100) / 4, 30),
 			fill: {
-				paints: [5]
+				paintIds: [5]
 			}
 		}
 	},
-	paints: {
+	paintIds: {
 		5: {
 			type: 'Solid',
 			blendMode: 'Normal',

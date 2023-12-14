@@ -76,7 +76,7 @@ impl TextBuilder {
             if let TokenKind::Space { style, .. } | TokenKind::TextFragment { style, .. } =
                 &token.kind
             {
-                if let Some(font_face) = token_stream.get_buzz_face(style.font_hash) {
+                if let Some(font_face) = token_stream.get_buzz_face(style.font_id) {
                     let mut token_with_shape = TokenWithShape::new(token, &font_face);
 
                     // Check for line break requirement
@@ -173,7 +173,7 @@ impl TextBuilder {
                 if let TokenKind::Space { metric, style, .. }
                 | TokenKind::TextFragment { metric, style, .. } = token_with_shape.token.kind
                 {
-                    if let Some(font_face) = token_stream.get_buzz_face(style.font_hash) {
+                    if let Some(font_face) = token_stream.get_buzz_face(style.font_id) {
                         self.current_scale = metric.scale;
                         self.current_ascender = metric.ascender;
                         self.process_glyphs(&token_with_shape.glyph_buffer, font_face);

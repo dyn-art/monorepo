@@ -259,12 +259,15 @@ pub enum AnchorCommand {
 pub struct FillMixin {
     /// A collection of `Paint` objects,
     /// each defining a different aspect of how the object is filled.
-    pub paints: Vec<Entity>,
+    #[serde(rename = "paintIds")]
+    pub paint_ids: Vec<Entity>,
 }
 
 impl Default for FillMixin {
     fn default() -> Self {
-        Self { paints: Vec::new() }
+        Self {
+            paint_ids: Vec::new(),
+        }
     }
 }
 

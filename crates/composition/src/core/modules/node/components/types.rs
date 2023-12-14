@@ -208,8 +208,8 @@ pub struct TextStyle {
     pub font_size: u32,
 
     /// Primary font identifier.
-    #[serde(rename = "fontHash")]
-    pub font_hash: u64,
+    #[serde(rename = "fontId")]
+    pub font_id: u64,
 
     /// Spacing between characters.
     #[serde(default)]
