@@ -94,6 +94,7 @@ export default class Figma extends DynCommand {
 		if (flags.watch) {
 			const rollupOptions = await createFigmaRollupConfig(this, {
 				isProduction: this.isProduction,
+				isWatchMode: flags.watch,
 				sourcemap: flags.sourcemap,
 				tsConfigPath,
 				packageJson,

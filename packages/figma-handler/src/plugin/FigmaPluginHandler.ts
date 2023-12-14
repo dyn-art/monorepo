@@ -20,12 +20,12 @@ export class FigmaPluginHandler<
 		registrations:
 			| TPluginCallbackRegistration<GAppMessageEvent>
 			| TPluginCallbackRegistration<GAppMessageEvent>[]
-	): void {
-		const callbacks = Array.isArray(registrations)
+	): (() => void)[] {
+		const pluginCallbacks = Array.isArray(registrations)
 			? registrations.map((r) => new PluginCallback(r))
 			: [new PluginCallback(registrations)];
 
-		this.registerCallbacks(callbacks);
+		return this.registerCallbacks(pluginCallbacks);
 	}
 
 	public post<GKey extends GPluginMessageEvent['key']>(
@@ -39,14 +39,12 @@ export class FigmaPluginHandler<
 	// Helper
 	// =========================================================================
 
-	private registerCallbacks(callbacks: PluginCallback<GAppMessageEvent>[]): void {
-		callbacks.forEach((callback) => {
-			this.registerCallback(callback);
-		});
+	private registerCallbacks(pluginCallbacks: PluginCallback<GAppMessageEvent>[]): (() => void)[] {
+		return pluginCallbacks.map((callback) => this.registerCallback(callback));
 	}
 
-	private registerCallback(callback: PluginCallback<GAppMessageEvent>): void {
-		let type: string = callback.type;
+	private registerCallback(pluginCallback: PluginCallback<GAppMessageEvent>): () => void {
+		let type: string = pluginCallback.type;
 		let typeCategory: string | null = null;
 		const typeParts = type.split('.');
 		if (typeParts.length === 2) {
@@ -54,21 +52,33 @@ export class FigmaPluginHandler<
 			type = typeParts[1] as unknown as string;
 		}
 
-		// Register events based on the type and type category
-		const eventHandler = typeCategory === 'app' ? this.figma.ui : this.figma;
-		const onKeyword = callback.once ? 'once' : 'on';
-		(eventHandler[onKeyword] as any)(type as any, (...args: any[]) => {
-			this.onEvent(callback, args).catch(() => {
-				// do nothing
+		// Determine the target based on the type category
+		const target = typeCategory === 'app' ? this.figma.ui : this.figma;
+		const eventMethod = pluginCallback.once ? 'once' : 'on';
+
+		const eventListener = (...args: any[]) => {
+			this.onEvent(pluginCallback, args).catch(() => {
+				// Error handling or do nothing
 			});
-		});
+		};
+
+		// Register the event listener
+		(target[eventMethod] as any)(type, eventListener);
+
+		// Return a function to unregister the event listener
+		return () => {
+			(target.off as any)(type, eventListener);
+		};
 	}
 
-	private async onEvent(callback: PluginCallback<GAppMessageEvent>, args: any[]): Promise<void> {
-		if (callback.type === 'app.message' && args[0]?.key === callback.key) {
-			await callback.callback(this, args[0].args);
+	private async onEvent(
+		pluginCallback: PluginCallback<GAppMessageEvent>,
+		args: any[]
+	): Promise<void> {
+		if (pluginCallback.type === 'app.message' && args[0]?.key === pluginCallback.key) {
+			await pluginCallback.callback(this, args[0].args);
 		} else {
-			await callback.callback(this, ...args);
+			await pluginCallback.callback(this, ...args);
 		}
 	}
 }

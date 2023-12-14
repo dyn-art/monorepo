@@ -10,7 +10,8 @@ import { bundleSize, typescriptPaths } from '../../plugins';
 export async function createOverrideRollupConfig(
 	config: TDynBaseRollupOptionsCallbackConfig
 ): Promise<TBaseDynRollupOptions> {
-	const { packageJson, path, output, command, tsConfigPath, isProduction, envPath } = config;
+	const { packageJson, path, output, command, tsConfigPath, isProduction, isWatchMode, envPath } =
+		config;
 	const env = await readDotenvFile(envPath);
 
 	return {
@@ -49,7 +50,8 @@ export async function createOverrideRollupConfig(
 			replace({
 				'preventAssignment': true,
 				'process.env.npm_package_version': JSON.stringify(packageJson.version),
-				'process.env.NODE_ENV': JSON.stringify(isProduction ? 'production' : 'development')
+				'process.env.NODE_ENV': JSON.stringify(isProduction ? 'production' : 'development'),
+				'process.env.WATCH_MODE': isWatchMode
 			}),
 			replace({
 				preventAssignment: true,
@@ -63,4 +65,5 @@ export async function createOverrideRollupConfig(
 
 export type TDynBaseRollupOptionsCallbackConfig = TDynRollupOptionsCallbackConfig & {
 	envPath: string;
+	isWatchMode: boolean;
 };

@@ -17,12 +17,12 @@ export class FigmaAppHandler<
 		registrations:
 			| TAppCallbackRegistration<GPluginMessageEvent>
 			| TAppCallbackRegistration<GPluginMessageEvent>[]
-	): void {
-		const callbacks = Array.isArray(registrations)
+	): (() => void)[] {
+		const appCallbacks = Array.isArray(registrations)
 			? registrations.map((r) => new AppCallback(r))
 			: [new AppCallback(registrations)];
 
-		this.registerCallbacks(callbacks);
+		return this.registerCallbacks(appCallbacks);
 	}
 
 	public post<GKey extends GAppMessageEvent['key']>(
@@ -36,46 +36,54 @@ export class FigmaAppHandler<
 	// Helper
 	// =========================================================================
 
-	private registerCallbacks(callbacks: AppCallback<GPluginMessageEvent>[]): void {
-		callbacks.forEach((callback) => {
-			this.registerCallback(callback);
-		});
+	private registerCallbacks(appCallbacks: AppCallback<GPluginMessageEvent>[]): (() => void)[] {
+		return appCallbacks.map((callback) => this.registerCallback(callback));
 	}
 
-	private registerCallback(callback: AppCallback<GPluginMessageEvent>): void {
-		let type: string = callback.type;
+	private registerCallback(appCallback: AppCallback<GPluginMessageEvent>): () => void {
+		let type: string = appCallback.type;
 		const typeParts = type.split('.');
 		if (typeParts.length === 2) {
 			type = typeParts[1] as unknown as string;
 		}
 
+		const eventListener = (...args: any[]): void => {
+			if (appCallback.shouldCall()) {
+				this.onEvent(appCallback, args).catch(() => {
+					// Handle errors or do nothing
+				});
+			} else {
+				removeEventListener(type, eventListener);
+			}
+		};
+
+		// Register the event listener
 		// Note: Using global 'addEventListener' to avoid cross-origin frame access errors.
 		// Attempting to call 'parent.x' results in a DOMException for cross-origin frame access.
-		addEventListener(type as any, (...args) => {
-			if (callback.shouldCall()) {
-				this.onEvent(callback, args).catch(() => {
-					// do nothing
-				});
-			}
-		});
+		addEventListener(type, eventListener);
+
+		// Return a function to unregister the event listener
+		return () => {
+			removeEventListener(type, eventListener);
+		};
 	}
 
-	private async onEvent(callback: AppCallback<GPluginMessageEvent>, args: any[]): Promise<void> {
-		if (callback.type === 'plugin.message') {
+	private async onEvent(appCallback: AppCallback<GPluginMessageEvent>, args: any[]): Promise<void> {
+		if (appCallback.type === 'plugin.message') {
 			const data = args[0]?.data;
 			const pluginMessage = data?.pluginMessage;
 			if (
 				pluginMessage != null &&
-				pluginMessage?.key === callback.key &&
+				pluginMessage?.key === appCallback.key &&
 				typeof pluginMessage?.args === 'object'
 			) {
-				await callback.callback(this, {
+				await appCallback.callback(this, {
 					pluginId: data?.pluginId,
 					...pluginMessage.args
 				});
 			}
 		} else {
-			await callback.callback(this, ...args);
+			await appCallback.callback(this, ...args);
 		}
 	}
 }

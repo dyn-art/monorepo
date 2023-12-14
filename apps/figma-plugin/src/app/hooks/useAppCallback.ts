@@ -8,7 +8,12 @@ export function useAppCallback<GFigmaAppHandler extends FigmaAppHandler>(
 		| TAppCallbackRegistration<ExtractPluginMessageEvent<GFigmaAppHandler>>[]
 ): void {
 	React.useEffect(() => {
-		appHandler.register(registrations);
+		const unregisterFunctions = appHandler.register(registrations);
+		return () => {
+			unregisterFunctions.forEach((unregisterFunction) => {
+				unregisterFunction();
+			});
+		};
 	}, [registrations]);
 }
 

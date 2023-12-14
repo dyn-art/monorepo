@@ -21,7 +21,8 @@ export async function createFigmaRollupConfig(
 		packageJson,
 		isProduction = false,
 		sourcemap = true,
-		figmaConfig = {}
+		figmaConfig = {},
+		isWatchMode = false
 	} = config;
 
 	// Define configurations for the Figma app and plugin
@@ -68,6 +69,7 @@ export async function createFigmaRollupConfig(
 			tsConfigPath,
 			packageJson,
 			isProduction,
+			isWatchMode,
 			command,
 			envPath: figmaModuleConfig.env
 		};
@@ -100,6 +102,7 @@ export interface TCreateFigmaConfigConfig {
 	tsConfigPath: string;
 	packageJson: PackageJson;
 	isProduction?: boolean;
+	isWatchMode?: boolean;
 	sourcemap?: boolean;
 	figmaConfig?: TDynFigmaConfig;
 }
