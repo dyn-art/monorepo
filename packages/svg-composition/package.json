@@ -21,6 +21,16 @@
 	"main": "./dist/cjs/index.js",
 	"module": "./dist/esm/index.js",
 	"types": "./dist/types/index.d.ts",
+	"typesVersions": {
+		"*": {
+			".": [
+				"./dist/types/index.d.ts"
+			],
+			"bindings": [
+				"./dist/types/rust_modules/dyn_composition_api/bindings.d.ts"
+			]
+		}
+	},
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/dyndotart/monorepo.git"
