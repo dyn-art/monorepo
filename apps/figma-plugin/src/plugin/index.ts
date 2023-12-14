@@ -1,5 +1,9 @@
-figma.showUI(__html__);
+import './plugin-handler';
 
-figma.ui.onmessage = (msg) => {
-	console.log({ msg });
-};
+// Init UI
+figma.showUI(__html__);
+if (process.env.WATCH_MODE) {
+	figma.ui.resize(50, 50);
+} else {
+	figma.ui.resize(400, 600);
+}

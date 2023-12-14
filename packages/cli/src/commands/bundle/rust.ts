@@ -13,11 +13,12 @@ export default class Rust extends DynCommand {
 	static examples = [];
 
 	static flags = {
-		prod: Flags.boolean({
-			char: 'p',
-			description: 'Production mode',
+		target: Flags.string({
+			char: 't',
+			description: 'Bundle target',
 			required: false,
-			default: true
+			default: 'prod',
+			options: ['prod', 'dev']
 		}),
 		analyze: Flags.boolean({
 			char: 'a',
@@ -38,6 +39,7 @@ export default class Rust extends DynCommand {
 	public async run(): Promise<void> {
 		const { flags } = await this.parse(Rust);
 		this.isVerbose = flags.verbose;
+		this.isProduction = flags.target === 'prod';
 		const startTime = Date.now();
 		const tempRustOutputName = `temp-${shortId()}`;
 		const rustModulesDirPath = path.join(process.cwd(), 'src', 'rust_modules');
@@ -46,7 +48,7 @@ export default class Rust extends DynCommand {
 		this.log(`\n`);
 		this.log(
 			`Started bundling Rust for ${
-				flags.prod ? chalk.green('production') : chalk.blue('development')
+				this.isProduction ? chalk.green('production') : chalk.blue('development')
 			}`
 		);
 		this.log(`\n`);
@@ -58,12 +60,12 @@ export default class Rust extends DynCommand {
 			'wasm-pack',
 			[
 				'build',
-				...(flags.prod ? ['--release'] : ['--dev']),
+				...(this.isProduction ? ['--release'] : ['--dev']),
 				'--target',
 				'web',
 				'--out-dir',
 				rustOutputDirPath,
-				...(flags.prod ? [] : ['--features', 'trace'])
+				...(this.isProduction ? [] : ['--features', 'trace'])
 			],
 			{
 				command: this,

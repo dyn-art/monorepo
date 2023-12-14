@@ -19,11 +19,12 @@ export default class Figma extends DynCommand {
 	static examples = [];
 
 	static flags = {
-		prod: Flags.boolean({
-			char: 'p',
-			description: 'Production mode',
+		target: Flags.string({
+			char: 't',
+			description: 'Bundle target',
 			required: false,
-			default: true
+			default: 'prod',
+			options: ['prod', 'dev']
 		}),
 		analyze: Flags.boolean({
 			char: 'a',
@@ -56,6 +57,7 @@ export default class Figma extends DynCommand {
 	public async run(): Promise<void> {
 		const { flags } = await this.parse(Figma);
 		this.isVerbose = flags.verbose;
+		this.isProduction = flags.target === 'prod';
 		const startTime = Date.now();
 
 		// Read in package.json
@@ -69,12 +71,12 @@ export default class Figma extends DynCommand {
 		this.log(
 			`Started bundling Figma Plugin ${chalk.magenta(
 				chalk.underline(packageJson.name ?? 'unknown-package')
-			)} for ${flags.prod ? chalk.green('production') : chalk.blue('development')}`
+			)} for ${this.isProduction ? chalk.green('production') : chalk.blue('development')}`
 		);
 		this.log(`\n`);
 
 		// Read in tsconfig.json
-		const tsConfigPath = this.getValidTsConfigJsonPath(flags.prod);
+		const tsConfigPath = this.getValidTsConfigJsonPath(this.isProduction);
 		if (tsConfigPath == null) {
 			this.error(`No tsconfig.json file found at '${chalk.underline(process.cwd())}'!`, {
 				exit: 1
@@ -85,13 +87,14 @@ export default class Figma extends DynCommand {
 		const dynConfig = await getDynConfig(this);
 		const figmaConfig =
 			typeof dynConfig?.figma === 'function'
-				? await dynConfig.figma({ isProduction: flags.prod, isWatchMode: flags.watch })
+				? await dynConfig.figma({ isProduction: this.isProduction, isWatchMode: flags.watch })
 				: dynConfig?.figma;
 
 		// Watch
 		if (flags.watch) {
 			const rollupOptions = await createFigmaRollupConfig(this, {
-				isProduction: flags.prod,
+				isProduction: this.isProduction,
+				isWatchMode: flags.watch,
 				sourcemap: flags.sourcemap,
 				tsConfigPath,
 				packageJson,
@@ -120,7 +123,7 @@ export default class Figma extends DynCommand {
 		await bundleAllWithRollup(
 			this,
 			await createFigmaRollupConfig(this, {
-				isProduction: flags.prod,
+				isProduction: this.isProduction,
 				sourcemap: flags.sourcemap,
 				tsConfigPath,
 				packageJson,

@@ -1,11 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 
-import App from '../app/App';
-import { usePreview } from './usePreview';
+import { App } from '../app/App';
+import { EEnvironment, useWatchMode } from './useWatchMode';
 
 const PreviewWebApp: React.FC = () => {
-	const { isConnected } = usePreview(false);
+	const { isConnected } = useWatchMode(EEnvironment.WEB);
 
 	return (
 		<div
