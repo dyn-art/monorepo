@@ -28,6 +28,7 @@
 	"homepage": "https://s.dyn.art/github",
 	"dependencies": {
 		"@dyn/figma-handler": "workspace:*",
+		"@dyn/figma-to-dtif": "workspace:^",
 		"@dyn/ui": "workspace:*",
 		"@dyn/utils": "workspace:*",
 		"clsx": "^2.0.0",

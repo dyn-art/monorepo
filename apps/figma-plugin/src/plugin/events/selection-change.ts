@@ -1,3 +1,4 @@
+import { Transformer } from '@dyn/figma-to-dtif';
 import { pickProperties } from '@dyn/utils';
 
 import type { TPluginCallbackRegistration, TPluginHandler } from '../../types';
@@ -7,9 +8,9 @@ export default {
 	key: 'selection-change',
 	callback: async (instance: TPluginHandler) => {
 		const selection = figma.currentPage.selection;
-		const selectedFrames = selection.filter(
+		const selectedFrames: FrameNode[] = selection.filter(
 			(node) => node.type === 'FRAME' || node.type === 'COMPONENT'
-		);
+		) as unknown as FrameNode[];
 
 		console.log('Plugin: onSelectionChange', { selection, selectedFrames }); // TODO: REMOVE
 
@@ -18,6 +19,11 @@ export default {
 			instance.post('on-select-frame', {
 				selected: selectedFrames.map((frame) => pickProperties(frame, ['name', 'id']))
 			});
+			for (const selectedFrame of selectedFrames) {
+				const transformer = new Transformer(selectedFrame);
+				await transformer.transform();
+				console.log({ transformer });
+			}
 		} else {
 			instance.post('on-select-frame', { selected: [] });
 		}
