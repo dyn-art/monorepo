@@ -47,7 +47,7 @@ importers:
         specifier: workspace:*
         version: link:../../packages/ui
       '@dyn/utils':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../../packages/utils
       clsx:
         specifier: ^2.0.0
@@ -273,6 +273,25 @@ importers:
       '@dyn/config':
         specifier: workspace:*
         version: link:../config
+      '@figma/plugin-typings':
+        specifier: ^1.82.0
+        version: 1.82.0
+      '@types/node':
+        specifier: ^20.8.10
+        version: 20.8.10
+
+  packages/figma-to-dtif:
+    dependencies:
+      '@dyn/utils':
+        specifier: workspace:*
+        version: link:../utils
+    devDependencies:
+      '@dyn/config':
+        specifier: workspace:*
+        version: link:../config
+      '@dyn/svg-composition':
+        specifier: workspace:*
+        version: link:../svg-composition
       '@figma/plugin-typings':
         specifier: ^1.82.0
         version: 1.82.0
