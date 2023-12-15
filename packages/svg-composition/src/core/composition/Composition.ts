@@ -73,7 +73,7 @@ export class Composition {
 						}
 					}
 				},
-				paintIds: {
+				paints: {
 					10: {
 						type: 'Solid',
 						blendMode: 'Normal',

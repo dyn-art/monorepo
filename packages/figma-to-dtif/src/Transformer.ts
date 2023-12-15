@@ -2,11 +2,11 @@ import type {
 	DTIFComposition,
 	FontMetadata as DTIFFontMetadata,
 	FontWithContent as DTIFFontWithContent,
-	Node as DTIFNode,
+	DTIFNode,
 	Paint as DTIFPaint
 } from '@dyn/svg-composition/bindings';
 
-import { transformNode } from './transform';
+import { transformFont, transformNode, transformPaint } from './transform';
 import {
 	ContinuousId,
 	dropMixed,
@@ -70,18 +70,27 @@ export class Transformer {
 		this._rootNodeId = rootId.toNumber();
 
 		// Transform nodes
-		// TODO
+		await this.transformNodes();
 
 		// Transform paints
-		// TODO
+		await this.transformPaints();
 
 		// Transform fonts
-		// TODO
+		await this.transformFonts();
 
 		// Construct composition
-		// TODO
+		const composition: DTIFComposition = {
+			version: '1.0',
+			name: this._toTransformRootNode.name,
+			width: this._toTransformRootNode.width,
+			height: this._toTransformRootNode.height,
+			nodes: Object.fromEntries(this.nodes),
+			paints: Object.fromEntries(this.paints),
+			fonts: Object.fromEntries(this.fonts),
+			rootNodeId: this._rootNodeId
+		};
 
-		return null as any;
+		return composition;
 	}
 
 	// =========================================================================
@@ -175,38 +184,71 @@ export class Transformer {
 	// Transform
 	// =========================================================================
 
-	private async transformNodes() {
-		const toTransformNodes = this._toTransformNodes.splice(0, this._toTransformNodes.length);
+	private async transformNodes(): Promise<void> {
+		const toTransformNodes = this._toTransformNodes
+			.splice(0, this._toTransformNodes.length)
+			.concat(this._nodesFailedToTransform.splice(0, this._nodesFailedToTransform.length));
 
 		// Transform nodes
 		for (const toTransformNode of toTransformNodes) {
-			const node = await transformNode(toTransformNode.node);
-			if (hasChildrenDTIF(node)) {
-				node.children = toTransformNode.childrenIds.map((id) => id.toNumber());
+			try {
+				const node = await transformNode(toTransformNode.node);
+				if (hasChildrenDTIF(node)) {
+					node.children = toTransformNode.childrenIds.map((id) => id.toNumber());
+				}
+				if (hasFillDTIF(node)) {
+					node.fill = { paintIds: toTransformNode.paintIds.map((id) => id.toNumber()) };
+				}
+				if (isDTIFTextNode(node)) {
+					node.text.sections.forEach((section, index) => {
+						const fontId = toTransformNode.fontIds[index];
+						if (fontId != null) {
+							section.style.fontId = fontId.toNumber();
+						} else {
+							// TODO: Error
+						}
+					});
+				}
+				this.nodes.set(toTransformNode.id.toNumber(), node);
+			} catch (error) {
+				// TODO: Error
+				this._nodesFailedToTransform.push(toTransformNode);
 			}
-			if (hasFillDTIF(node)) {
-				node.fill = { paintIds: toTransformNode.paintIds.map((id) => id.toNumber()) };
-			}
-			if (isDTIFTextNode(node)) {
-				node.text.sections.forEach((section, index) => {
-					const fontId = toTransformNode.fontIds[index];
-					if (fontId != null) {
-						section.style.fontId = fontId.toNumber();
-					} else {
-						// TODO: Error
-					}
-				});
-			}
-			this.nodes.set(toTransformNode.id.toNumber(), node);
 		}
 	}
 
-	private async transformPaints() {
-		// TODO
+	private async transformPaints(): Promise<void> {
+		const toTransformPaints = this._toTransformPaints
+			.splice(0, this._toTransformPaints.length)
+			.concat(this._paintsFailedToTransform.splice(0, this._paintsFailedToTransform.length));
+
+		// Transform paints
+		for (const toTransformPaint of toTransformPaints) {
+			try {
+				const paint = await transformPaint(toTransformPaint.paint);
+				this.paints.set(toTransformPaint.id.toNumber(), paint);
+			} catch (error) {
+				// TODO: Error
+				this._paintsFailedToTransform.push(toTransformPaint);
+			}
+		}
 	}
 
-	private async transformFonts() {
-		// TODO
+	private async transformFonts(): Promise<void> {
+		const toTransformFonts = this._toTransformFonts
+			.splice(0, this._toTransformFonts.length)
+			.concat(this._fontsFailedToTransform.splice(0, this._fontsFailedToTransform.length));
+
+		// Transform fonts
+		for (const toTransformFont of toTransformFonts) {
+			try {
+				const font = await transformFont(toTransformFont.fontMetadata);
+				this.fonts.set(toTransformFont.id.toNumber(), font);
+			} catch (error) {
+				// TODO: Error
+				this._fontsFailedToTransform.push(toTransformFont);
+			}
+		}
 	}
 }
 

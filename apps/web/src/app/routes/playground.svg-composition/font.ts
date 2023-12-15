@@ -1,7 +1,7 @@
 import { FontMetadata, FontWithContent } from '@dyn/svg-composition';
 
 export const INTER_REGULAR: TFont = {
-	hash: 123,
+	id: 123,
 	metadata: {
 		name: 'Inter Regular',
 		family: 'Inter',
@@ -12,7 +12,7 @@ export const INTER_REGULAR: TFont = {
 };
 
 export const ABEEZEE_ITALIC: TFont = {
-	hash: 124,
+	id: 124,
 	metadata: {
 		name: 'ABeeZee Italic',
 		family: 'ABeeZee',
@@ -27,17 +27,23 @@ export async function loadFont(font: TFont): Promise<FontWithContent> {
 	const arrayBuffer = await response.arrayBuffer();
 	return {
 		metadata: font.metadata,
-		content: Array.from(new Uint8Array(arrayBuffer)),
-		hash: font.hash
+		content: Array.from(new Uint8Array(arrayBuffer))
 	};
 }
 
-export async function loadFonts(fonts: TFont[]): Promise<FontWithContent[]> {
-	return Promise.all(fonts.map(async (font) => await loadFont(font)));
+export async function loadFonts(fonts: TFont[]): Promise<Record<string, FontWithContent>> {
+	const loadedFonts: Record<string, FontWithContent> = {};
+	await Promise.all(
+		fonts.map(async (font) => {
+			const loadedFont = await loadFont(font);
+			loadedFonts[font.id] = loadedFont;
+		})
+	);
+	return loadedFonts;
 }
 
 type TFont = {
 	metadata: FontMetadata;
 	url: string;
-	hash: number;
+	id: number;
 };

@@ -34,7 +34,7 @@ export const COMPOSITION_WITH_ONE_RECT = (width: number, height: number): DTIFCo
 			)
 		}
 	},
-	paintIds: {},
+	paints: {},
 	changes: [
 		{
 			type: 'EntityMoved',

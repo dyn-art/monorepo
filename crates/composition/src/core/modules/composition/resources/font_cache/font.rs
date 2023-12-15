@@ -21,11 +21,8 @@ pub struct FontMetadata {
 pub struct FontWithContent {
     /// The base font information.
     pub metadata: FontMetadata,
-    /// The actual content of the font, either as a URL or binary data.
+    /// The actual content of the font as binary data.
     pub content: Vec<u8>,
-    /// Optional hash for uniquely identifying a font.
-    /// If `None`, the font will be hashed using Rust's `DefaultHasher` when needed.
-    pub hash: Option<u64>,
 }
 
 /// Defines the style of a font, such as italic or normal.

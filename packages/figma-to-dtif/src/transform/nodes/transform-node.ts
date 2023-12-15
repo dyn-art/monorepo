@@ -1,4 +1,4 @@
-import type { Node as DTIFNode } from '@dyn/svg-composition/bindings';
+import type { DTIFNode } from '@dyn/svg-composition/bindings';
 
 export async function transformNode(node: SceneNode): Promise<DTIFNode> {
 	// TODO
