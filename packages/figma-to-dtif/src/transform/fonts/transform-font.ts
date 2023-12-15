@@ -1,9 +1,6 @@
-import type {
-	FontMetadata as DTIFFontMetadata,
-	FontWithContent as DTIFFontWithContent
-} from '@dyn/svg-composition/bindings';
+import type { TFontMetadata, TFontWithContent } from '@dyn/dtif';
 
-export async function transformFont(fontMetadata: DTIFFontMetadata): Promise<DTIFFontWithContent> {
+export async function transformFont(fontMetadata: TFontMetadata): Promise<TFontWithContent> {
 	// TODO
 	return null as any;
 }

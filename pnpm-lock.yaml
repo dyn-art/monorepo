@@ -183,9 +183,6 @@ importers:
 
   packages/cli:
     dependencies:
-      '@dyn/utils':
-        specifier: workspace:^
-        version: link:../utils
       '@oclif/core':
         specifier: ^3.9.2
         version: 3.9.2
@@ -267,6 +264,19 @@ importers:
         specifier: ^2.2.0
         version: 2.2.0(eslint@8.53.0)(react@18.2.0)(typescript@5.2.2)
 
+  packages/dtif:
+    dependencies:
+      '@dyn/utils':
+        specifier: workspace:*
+        version: link:../utils
+    devDependencies:
+      '@dyn/config':
+        specifier: workspace:*
+        version: link:../config
+      '@types/node':
+        specifier: ^20.8.10
+        version: 20.8.10
+
   packages/figma-handler:
     dependencies:
       '@dyn/utils':
@@ -292,9 +302,9 @@ importers:
       '@dyn/config':
         specifier: workspace:*
         version: link:../config
-      '@dyn/svg-composition':
+      '@dyn/dtif':
         specifier: workspace:*
-        version: link:../svg-composition
+        version: link:../dtif
       '@figma/plugin-typings':
         specifier: ^1.82.0
         version: 1.82.0

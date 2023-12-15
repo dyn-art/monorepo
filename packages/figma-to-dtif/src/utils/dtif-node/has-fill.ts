@@ -1,5 +1,5 @@
-import type { FillMixin } from '@dyn/svg-composition/bindings';
+import type { TFillMixin } from '@dyn/dtif';
 
-export function hasFillDTIF(obj: unknown): obj is { fill: FillMixin } {
+export function hasFillDTIF(obj: unknown): obj is { fill: TFillMixin } {
 	return obj != null && typeof obj === 'object' && 'fill' in obj;
 }

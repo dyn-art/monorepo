@@ -9,6 +9,7 @@ export type Unwrap<T> = T extends Promise<infer U> ? U : T;
 export interface TDynConfig {
 	figma?: TDynFigmaConfig | TDynFigmaConfigCallback;
 	library?: TDynLibraryConfig;
+	rust?: TDynRustConfig;
 }
 
 // =============================================================================
@@ -71,4 +72,12 @@ export interface TDynFigmaBaseModuleConfig {
 	source?: string;
 	output?: string;
 	env?: string;
+}
+
+// =============================================================================
+// Rust
+// =============================================================================
+
+export interface TDynRustConfig {
+	typeDeclarationTargetPaths: string | string[];
 }

@@ -1,5 +1,5 @@
-import type { TextNodeBundle } from '@dyn/svg-composition/bindings';
+import type { TTextNodeBundle } from '@dyn/dtif';
 
-export function isDTIFTextNode(node: any): node is TextNodeBundle {
+export function isDTIFTextNode(node: any): node is TTextNodeBundle {
 	return node?.text != null;
 }

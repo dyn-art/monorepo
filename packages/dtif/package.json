@@ -1,6 +1,6 @@
 {
-	"name": "@dyn/figma-to-dtif",
-	"description": "Convert Figma Frame to Design Tree Interchange Format (DTIF)",
+	"name": "@dyn/dtif",
+	"description": "Design Tree Interchange Format (DTIF) type declarations and utility functions",
 	"version": "0.0.1",
 	"private": true,
 	"scripts": {
@@ -9,7 +9,7 @@
 		"lint": "eslint --ext .js,.ts src/",
 		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
 		"install:clean": "pnpm run clean && pnpm install",
-		"test": "vitest run",
+		"test": "echo \"Error: no test specified\" && exit 1",
 		"update:deps": "pnpm update --latest"
 	},
 	"source": "./src/index.ts",
@@ -32,8 +32,6 @@
 	},
 	"devDependencies": {
 		"@dyn/config": "workspace:*",
-		"@dyn/dtif": "workspace:*",
-		"@figma/plugin-typings": "^1.82.0",
 		"@types/node": "^20.8.10"
 	},
 	"files": [

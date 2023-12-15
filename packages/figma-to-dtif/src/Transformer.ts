@@ -1,22 +1,7 @@
-import type {
-	DTIFComposition,
-	FontMetadata as DTIFFontMetadata,
-	FontWithContent as DTIFFontWithContent,
-	DTIFNode,
-	Paint as DTIFPaint
-} from '@dyn/svg-composition/bindings';
+import type { TComposition, TFontMetadata, TFontWithContent, TNode, TPaint } from '@dyn/dtif';
 
 import { transformFont, transformNode, transformPaint } from './transform';
-import {
-	ContinuousId,
-	dropMixed,
-	hasChildrenDTIF,
-	hasChildrenFigma,
-	hasFillDTIF,
-	hasFillFigma,
-	isDTIFTextNode,
-	isFigmaTextNode
-} from './utils';
+import { ContinuousId, dropMixed, hasChildrenFigma, hasFillFigma, isFigmaTextNode } from './utils';
 
 export class Transformer {
 	// Figma Nodes
@@ -25,7 +10,7 @@ export class Transformer {
 	private _nodesFailedToTransform: TToTransformNode[] = [];
 
 	// DTIF Nodes
-	public readonly nodes = new Map<number, DTIFNode>();
+	public readonly nodes = new Map<number, TNode>();
 	private _rootNodeId: number;
 
 	// Figma Paints
@@ -33,39 +18,20 @@ export class Transformer {
 	private _paintsFailedToTransform: TToTransformPaint[] = [];
 
 	// DTIF Paints
-	public readonly paints = new Map<number, DTIFPaint>();
+	public readonly paints = new Map<number, TPaint>();
 
 	// Fonts
 	private _toTransformFonts: TToTransformFont[] = [];
 	private _fontsFailedToTransform: TToTransformFont[] = [];
 
 	// DTIF Fonts
-	public readonly fonts = new Map<number, DTIFFontWithContent>();
-
-	public static readonly supportedNodeTypes = [
-		'FRAME',
-		'COMPONENT',
-		'INSTANCE',
-		'GROUP',
-		'TEXT',
-		'RECTANGLE',
-		'LINE',
-		'ELLIPSE',
-		'POLYGON',
-		'STAR',
-		'VECTOR',
-		'BOOLEAN_OPERATION'
-	];
+	public readonly fonts = new Map<number, TFontWithContent>();
 
 	constructor(node: FrameNode) {
 		this._toTransformRootNode = node;
 	}
 
-	public static isSupportedNodeType(type: string): boolean {
-		return this.supportedNodeTypes.includes(type);
-	}
-
-	public async transform(): Promise<DTIFComposition> {
+	public async transform(): Promise<TComposition> {
 		const rootId = this.traverseFigmaNodeTree(this._toTransformRootNode);
 		this._rootNodeId = rootId.toNumber();
 
@@ -79,7 +45,7 @@ export class Transformer {
 		await this.transformFonts();
 
 		// Construct composition
-		const composition: DTIFComposition = {
+		const composition: TComposition = {
 			version: '1.0',
 			name: this._toTransformRootNode.name,
 			width: this._toTransformRootNode.width,
@@ -125,7 +91,9 @@ export class Transformer {
 		// Walks through each node and processes children, paints, and fonts
 		const walk = (node: SceneNode, isRoot = false): ContinuousId => {
 			const nodeId = isRoot ? rootId : ContinuousId.nextId();
-			const childrenIds = hasChildrenFigma(node) ? node.children.map((child) => walk(child)) : [];
+			const childrenIds = hasChildrenFigma(node)
+				? node.children.map((child) => walk(child))
+				: undefined;
 			const paintIds = processPaints(node, toTransformPaintsMap, this._toTransformPaints);
 			const fontIds = processFonts(node, toTransformFontsMap, this._toTransformFonts);
 
@@ -145,9 +113,9 @@ export class Transformer {
 			node: SceneNode,
 			map: Map<string, ContinuousId>,
 			paintsArray: any[]
-		): ContinuousId[] => {
+		): ContinuousId[] | undefined => {
 			if (!hasFillFigma(node)) {
-				return [];
+				return undefined;
 			}
 			const fills = dropMixed(node, 'fills');
 			return fills.map((paint) => getOrGenerateId(map, paintsArray, { paint }));
@@ -159,9 +127,9 @@ export class Transformer {
 			node: SceneNode,
 			map: Map<string, ContinuousId>,
 			fontsArray: any[]
-		): ContinuousId[] => {
+		): ContinuousId[] | undefined => {
 			if (!isFigmaTextNode(node)) {
-				return [];
+				return undefined;
 			}
 			const { family, style } = dropMixed(node, 'fontName');
 			const fontWeight = dropMixed(node, 'fontWeight');
@@ -192,23 +160,23 @@ export class Transformer {
 		// Transform nodes
 		for (const toTransformNode of toTransformNodes) {
 			try {
-				const node = await transformNode(toTransformNode.node);
-				if (hasChildrenDTIF(node)) {
-					node.children = toTransformNode.childrenIds.map((id) => id.toNumber());
-				}
-				if (hasFillDTIF(node)) {
-					node.fill = { paintIds: toTransformNode.paintIds.map((id) => id.toNumber()) };
-				}
-				if (isDTIFTextNode(node)) {
-					node.text.sections.forEach((section, index) => {
-						const fontId = toTransformNode.fontIds[index];
-						if (fontId != null) {
-							section.style.fontId = fontId.toNumber();
-						} else {
-							// TODO: Error
-						}
-					});
-				}
+				const node = await transformNode(toTransformNode);
+				// if (hasChildrenDTIF(node)) {
+				// 	node.children = toTransformNode.childrenIds.map((id) => id.toNumber());
+				// }
+				// if (hasFillDTIF(node)) {
+				// 	node.fill = { paintIds: toTransformNode.paintIds.map((id) => id.toNumber()) };
+				// }
+				// if (isDTIFTextNode(node)) {
+				// 	node.text.sections.forEach((section, index) => {
+				// 		const fontId = toTransformNode.fontIds[index];
+				// 		if (fontId != null) {
+				// 			section.style.fontId = fontId.toNumber();
+				// 		} else {
+				// 			// TODO: Error
+				// 		}
+				// 	});
+				// }
 				this.nodes.set(toTransformNode.id.toNumber(), node);
 			} catch (error) {
 				// TODO: Error
@@ -252,20 +220,20 @@ export class Transformer {
 	}
 }
 
-interface TToTransformNode {
+export interface TToTransformNode {
 	id: ContinuousId;
 	node: SceneNode;
-	childrenIds: ContinuousId[];
-	paintIds: ContinuousId[];
-	fontIds: ContinuousId[];
+	childrenIds?: ContinuousId[];
+	paintIds?: ContinuousId[];
+	fontIds?: ContinuousId[];
 }
 
-interface TToTransformPaint {
+export interface TToTransformPaint {
 	id: ContinuousId;
 	paint: Paint;
 }
 
-interface TToTransformFont {
+export interface TToTransformFont {
 	id: ContinuousId;
-	fontMetadata: DTIFFontMetadata;
+	fontMetadata: TFontMetadata;
 }
