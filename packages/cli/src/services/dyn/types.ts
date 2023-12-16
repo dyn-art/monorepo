@@ -63,8 +63,8 @@ export type TDynFigmaConfigCallback = (config: {
 }) => Promise<TDynFigmaConfig>;
 
 export type TDynFigmaAppModuleConfig = TDynFigmaBaseModuleConfig & {
-	postcssPath?: string;
-	rootHtmlPath?: string;
+	postcssConfigPath?: string;
+	htmlTemplatePath?: string;
 };
 export type TDynFigmaPluginModuleConfig = TDynFigmaBaseModuleConfig;
 

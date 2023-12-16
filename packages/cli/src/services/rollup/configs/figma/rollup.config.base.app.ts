@@ -7,13 +7,18 @@ import { readHtmlFile } from '../../../../utils';
 import type { TBaseDynRollupOptions, TDynRollupOptionsCallbackConfig } from '../../../dyn';
 
 export async function createAppRollupConfig(
-	config: TDynRollupOptionsCallbackConfig & { postcssPath: string; rootHtmlPath?: string }
+	config: TDynRollupOptionsCallbackConfig & { postcssConfigPath: string; htmlTemplatePath?: string }
 ): Promise<TBaseDynRollupOptions> {
-	const { path: _path, output, packageJson, isProduction, postcssPath, rootHtmlPath } = config;
+	const {
+		path: _path,
+		output,
+		packageJson,
+		isProduction,
+		postcssConfigPath,
+		htmlTemplatePath
+	} = config;
 	const bundleName = path.basename(_path.output).replace('.js', '');
-
-	// Construct or fetch the root HTML template
-	const rootHtml = await getRootHtml(rootHtmlPath, packageJson);
+	const htmlTemplate = await loadHtmlTemplate(htmlTemplatePath);
 
 	return {
 		input: _path.input,
@@ -23,41 +28,55 @@ export async function createAppRollupConfig(
 			'commonjs',
 			'resolve-typescript-paths',
 			'esbuild',
-			// Inject the bundle into HTML template
-			html({
-				fileName: `${bundleName}.html`,
-				template(htmlTemplateOptions) {
-					const appBundle = htmlTemplateOptions?.bundle[`${bundleName}.js`];
-					return rootHtml.replace(
-						'/* bundleCode */',
-						appBundle && 'code' in appBundle
-							? appBundle.code
-							: '/* Failed to include app bundle! */'
-					);
-				}
-			}),
 			// Process and bundle CSS files
 			postcss({
 				config: {
-					path: postcssPath,
+					path: postcssConfigPath,
 					ctx: {}
 				},
 				minimize: isProduction,
 				sourceMap: !isProduction
 			}),
 			'replace',
+			// Inject the bundle into HTML template
+			html({
+				fileName: `${bundleName}.html`,
+				template: (htmlTemplateOptions) => {
+					const appBundle = htmlTemplateOptions?.bundle[`${bundleName}.js`];
+					return embedBundleIntoHtml(
+						appBundle != null && 'code' in appBundle
+							? appBundle.code
+							: '/* Failed to include app bundle! */',
+						htmlTemplate,
+						packageJson
+					);
+				}
+			}),
 			'rollup-plugin-bundle-size'
 		],
 		external: []
 	};
 }
 
-async function getRootHtml(
-	rootHtmlPath: string | undefined,
+// Loads custom HTML template if provided
+async function loadHtmlTemplate(htmlTemplatePath?: string): Promise<string | null> {
+	if (htmlTemplatePath) {
+		const absoluteRootHtmlPath = path.resolve(process.cwd(), htmlTemplatePath);
+		return readHtmlFile(absoluteRootHtmlPath);
+	}
+	return null;
+}
+
+function embedBundleIntoHtml(
+	bundle: string,
+	htmlTemplate: string | null,
 	packageJson: PackageJson
-): Promise<string> {
-	// Default HTML template
-	let rootHtml = `
+): string {
+	return htmlTemplate != null
+		? // TODO: `replace()` is not reliable here and damages the bundle so that it has syntax errors lol
+		  // Took me way too long to figure out and idk how to fix it yet
+		  htmlTemplate.replace('/*bundle*/', bundle)
+		: `
         <!doctype html>
         <html lang="en">
             <head>
@@ -65,20 +84,11 @@ async function getRootHtml(
                 <title>${packageJson.name ?? 'Figma Plugin'}</title>
             </head>
             <body>
-                <script>/* bundleCode */</script>
+                <script>
+				    ${bundle}
+				</script>
                 <div id="root"></div>
             </body>
         </html>
     `;
-
-	// Load custom HTML template if provided
-	if (rootHtmlPath) {
-		const absoluteRootHtmlPath = path.resolve(process.cwd(), rootHtmlPath);
-		const maybeRootHtml = await readHtmlFile(absoluteRootHtmlPath);
-		if (maybeRootHtml) {
-			rootHtml = maybeRootHtml;
-		}
-	}
-
-	return rootHtml;
 }
