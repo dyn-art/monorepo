@@ -32,7 +32,7 @@ const Home: React.FC = () => {
 	const [selectedFrames, setSelectedFrames] = React.useState<
 		TOnSelectFrameEvent['args']['selected']
 	>([]);
-	const [selectedFrameId, setSelectedFrameId] = React.useState<string | null>(null);
+	const [selectedFrameIndex, setSelectedFrameIndex] = React.useState<number | null>(null);
 	const [pluginKey, setPluginKey] = React.useState<Plugin['key']>(plugins[0].key);
 
 	useAppCallback(appHandler, {
@@ -42,10 +42,10 @@ const Home: React.FC = () => {
 			const selected = args.selected;
 			if (selected.length > 0) {
 				setSelectedFrames(selected);
-				setSelectedFrameId(selected[selected.length - 1]?.name as unknown as string);
+				setSelectedFrameIndex(selected.length - 1);
 			} else {
 				setSelectedFrames([]);
-				setSelectedFrameId(null);
+				setSelectedFrameIndex(null);
 			}
 		}
 	});
@@ -83,22 +83,26 @@ const Home: React.FC = () => {
 				</div>
 				<div className="mt-2 flex items-center justify-between">
 					<Select
-						onValueChange={(value: string) => {
-							setSelectedFrameId(value);
+						defaultValue={selectedFrameIndex?.toString()}
+						value={selectedFrameIndex?.toString()}
+						onValueChange={(value) => {
+							setSelectedFrameIndex(Number(value));
 						}}
 					>
 						<SelectTrigger id="frame">
-							<SelectValue placeholder="None selected" />
+							<SelectValue placeholder="None selected">
+								{selectedFrames[Number(selectedFrameIndex)]?.name}
+							</SelectValue>
 						</SelectTrigger>
 						<SelectContent position="popper">
-							{selectedFrames.map((style) => (
-								<SelectItem key={style.id} value={style.id} className="text-xs">
-									{style.name}
+							{selectedFrames.map((plugin, index) => (
+								<SelectItem key={plugin.id} value={index.toString()}>
+									{plugin.name}
 								</SelectItem>
 							))}
 						</SelectContent>
 					</Select>
-					<Button className="ml-2" disabled={selectedFrameId == null}>
+					<Button className="ml-2" disabled={selectedFrameIndex == null}>
 						Transform
 					</Button>
 				</div>
