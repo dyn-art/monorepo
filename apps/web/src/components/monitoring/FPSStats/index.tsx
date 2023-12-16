@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef } from 'react';
 
-import { useFPSStatsReducer } from './useFPSStatsReducer';
+import { useFPSStatsReducer } from './use-fps-stats-reducer';
 
 const FPSStats: React.FC<TProps> = ({ graphHeight = 29, graphWidth = 70 }) => {
 	const [state, dispatch] = useFPSStatsReducer(graphWidth);

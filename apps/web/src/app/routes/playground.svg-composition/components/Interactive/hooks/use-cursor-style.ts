@@ -5,7 +5,7 @@ import {
 	ResizeCursor,
 	RotateCursor
 } from '../components/Canvas/CanvasControl/components/SelectionBox/InnerSelectionBox/Cursor';
-import { useCursor } from './useCursor';
+import { useCursor } from './use-cursor';
 
 export function useCursorStyle(composition?: Composition): string {
 	const cursor = useCursor(composition);

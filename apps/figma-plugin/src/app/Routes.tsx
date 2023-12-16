@@ -3,8 +3,8 @@ import { Route, Routes as RouterRoutes } from 'react-router-dom';
 import { EAppRoutes } from '@/types';
 
 import { RouteChangeListener } from './components/navigation';
-import About from './routes/about';
 import Home from './routes/home';
+import Settings from './routes/settings';
 
 export const Routes: React.FC = () => {
 	return (
@@ -12,7 +12,7 @@ export const Routes: React.FC = () => {
 			<RouteChangeListener />
 			<RouterRoutes>
 				<Route path={EAppRoutes.HOME} element={<Home />} />
-				<Route path={EAppRoutes.ABOUT} element={<About />} />
+				<Route path={EAppRoutes.SETTINGS} element={<Settings />} />
 			</RouterRoutes>
 		</>
 	);
