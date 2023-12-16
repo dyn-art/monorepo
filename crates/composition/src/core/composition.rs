@@ -12,7 +12,6 @@ use super::{
     events::input_event::InputEvent,
     modules::node::{
         components::{bundles::RectangleNodeBundle, types::Root},
-        utils::logging::log_entity_components,
         NodePlugin,
     },
 };

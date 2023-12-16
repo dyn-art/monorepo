@@ -1,5 +1,7 @@
 import type { TFrameNodeBundle } from '@dyn/dtif';
 
+import { convertFigmaBlendModeToDTIF, convertFigmaTransformToMat3 } from '../../utils';
+
 export function transformFrameNode(
 	node: FrameNode | ComponentNode | InstanceNode,
 	childrenIds: number[],
@@ -22,7 +24,7 @@ export function transformFrameNode(
 			height: node.height,
 			width: node.width
 		},
-		relativeTransform: [] as any, // TODO:
+		relativeTransform: convertFigmaTransformToMat3(node.relativeTransform),
 		rectangleCornerMixin: {
 			bottomLeftRadius: node.bottomLeftRadius,
 			bottomRightRadius: node.bottomRightRadius,
@@ -30,7 +32,7 @@ export function transformFrameNode(
 			topRightRadius: node.topRightRadius
 		},
 		blendMixin: {
-			blendMode: node.blendMode as any, // TODO:
+			blendMode: convertFigmaBlendModeToDTIF(node.blendMode),
 			opacity: node.opacity,
 			isMask: node.isMask
 		},
