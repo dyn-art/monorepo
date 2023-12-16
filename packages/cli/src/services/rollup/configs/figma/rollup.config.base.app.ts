@@ -85,6 +85,7 @@ function embedBundleIntoHtml(
             </head>
             <body>
                 <script>
+				    var exports = {}; // https://stackoverflow.com/questions/43042889/typescript-referenceerror-exports-is-not-defined
 				    ${bundle}
 				</script>
                 <div id="root"></div>
