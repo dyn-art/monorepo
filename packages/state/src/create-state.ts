@@ -21,7 +21,6 @@ export function createState<GValue>(value: GValue): TState<GValue, ['get', 'set'
 				level: level ?? 0
 			};
 			this._listeners.push(listener);
-			// TODO: Unbind doesn't work
 			return () => {
 				this._listeners.filter((l) => l !== listener);
 			};

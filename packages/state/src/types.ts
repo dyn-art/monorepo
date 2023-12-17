@@ -73,13 +73,13 @@ export interface TCoreFeatures<GValue> {
 }
 
 export interface TWithFeatures<GValue> {
-	undo: { undo: () => void; _previousValue: GValue };
+	undo: { undo: () => void; _history: GValue[] };
 	persist: { persist: () => void };
 }
 
-export type TFeatures<GValue> = TCoreFeatures<GValue> & TWithFeatures<GValue>;
+export type TFeatures<GValue = unknown> = TCoreFeatures<GValue> & TWithFeatures<GValue>;
 
-export type TFeatureKeys<GValue> = keyof TFeatures<GValue>;
+export type TFeatureKeys<GValue = unknown> = keyof TFeatures<GValue>;
 
 export type TSelectFeatureObjects<GValue, GSelectedFeatureKeys extends TFeatureKeys<GValue>[]> = {
 	[K in GSelectedFeatureKeys[number]]: TFeatures<GValue>[K];
@@ -95,18 +95,11 @@ export type TSelectFeatures<
 > = TUnionToIntersection<GSelectedFeatureObjects[keyof GSelectedFeatureObjects]>;
 
 export type TEnforceFeatures<
-	GFeatureKeys extends any[],
-	GToEnforceFeatureKeys extends any[]
-> = GToEnforceFeatureKeys extends [infer FeatureToEnforce, ...infer RemainingFeatures]
-	? TEnforceFeatures<TEnforceFeature<GFeatureKeys, FeatureToEnforce>, RemainingFeatures>
-	: GFeatureKeys;
-
-export type TEnforceFeature<GFeatureKeys extends any[], FeatureToEnforce> = GFeatureKeys extends [
-	...infer Rest,
-	FeatureToEnforce
-]
+	GFeatureKeys extends TFeatureKeys[],
+	GToEnforceFeatureKeys extends TFeatureKeys[]
+> = GFeatureKeys extends [...infer Rest, GToEnforceFeatureKeys]
 	? GFeatureKeys
-	: [...GFeatureKeys, FeatureToEnforce];
+	: [...GFeatureKeys, ...GToEnforceFeatureKeys];
 
 // =============================================================================
 // Listener

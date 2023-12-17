@@ -1,12 +1,12 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { createState } from '@dyn/state';
+import { createState, withUndo } from '@dyn/state';
 import { Button } from '@dyn/ui';
 
 import { Footer, Navbar } from '../components';
 import { useDynState } from '../hooks';
 
-const MY_STATE = createState(0);
+const MY_STATE = withUndo(createState(0));
 
 const Settings: React.FC = () => {
 	const navigate = useNavigate();
@@ -32,6 +32,13 @@ const Settings: React.FC = () => {
 				}}
 			>
 				{myState}
+			</Button>
+			<Button
+				onClick={() => {
+					MY_STATE.undo();
+				}}
+			>
+				Undo
 			</Button>
 			<Footer leftContent={{ variant: 'version' }} rightContent={{ variant: 'socials' }} />
 		</>
