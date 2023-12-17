@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { createState } from './create-state';
 
-describe('createState function', () => {
+describe('createState function tests', () => {
 	it('should initialize with the provided value', () => {
 		// Prepare
 		const initialState = 10;
