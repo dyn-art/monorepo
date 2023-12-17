@@ -11,7 +11,8 @@ import {
 	DropdownMenuItem,
 	DropdownMenuLabel,
 	DropdownMenuSeparator,
-	DropdownMenuTrigger
+	DropdownMenuTrigger,
+	ExternalLinkIcon
 } from '@dyn/ui';
 
 import { EAppRoutes } from '../../../../types';
@@ -38,7 +39,14 @@ export const UserNav: React.FC = () => {
 				</DropdownMenuLabel>
 				<DropdownMenuSeparator />
 				<DropdownMenuGroup>
-					<DropdownMenuItem>Profile</DropdownMenuItem>
+					<DropdownMenuItem className="cursor-pointer" asChild>
+						<div className="flex flex-row justify-between">
+							<Link target="_blank" to={'https://app.dyn.art/profile/figma?source=figma'}>
+								Profile
+							</Link>
+							<ExternalLinkIcon />
+						</div>
+					</DropdownMenuItem>
 					<DropdownMenuItem className="cursor-pointer" asChild>
 						<Link to={EAppRoutes.SETTINGS}>Settings</Link>
 					</DropdownMenuItem>
