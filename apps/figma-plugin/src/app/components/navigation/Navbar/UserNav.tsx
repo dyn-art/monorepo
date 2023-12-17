@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import {
 	Avatar,
 	AvatarFallback,
@@ -18,8 +18,6 @@ import {
 import { EAppRoutes } from '../../../../types';
 
 export const UserNav: React.FC = () => {
-	const navigate = useNavigate();
-
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>

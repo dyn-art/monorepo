@@ -5,7 +5,8 @@ export function useAppCallback<GFigmaAppHandler extends FigmaAppHandler>(
 	appHandler: GFigmaAppHandler,
 	registrations:
 		| TAppCallbackRegistration<ExtractPluginMessageEvent<GFigmaAppHandler>>
-		| TAppCallbackRegistration<ExtractPluginMessageEvent<GFigmaAppHandler>>[]
+		| TAppCallbackRegistration<ExtractPluginMessageEvent<GFigmaAppHandler>>[],
+	deps: React.DependencyList = []
 ): void {
 	React.useEffect(() => {
 		const unregisterFunctions = appHandler.register(registrations);
@@ -14,7 +15,7 @@ export function useAppCallback<GFigmaAppHandler extends FigmaAppHandler>(
 				unregisterFunction();
 			});
 		};
-	}, [registrations]);
+	}, [registrations, ...deps]);
 }
 
 type ExtractPluginMessageEvent<T> = T extends FigmaAppHandler<infer U> ? U : never;

@@ -29,11 +29,13 @@
 	"dependencies": {
 		"@dyn/figma-handler": "workspace:*",
 		"@dyn/figma-to-dtif": "workspace:^",
+		"@dyn/state": "workspace:*",
 		"@dyn/ui": "workspace:*",
 		"@dyn/utils": "workspace:*",
 		"clsx": "^2.0.0",
 		"react": "^18.2.0",
 		"react-dom": "^18.2.0",
+		"react-json-tree": "^0.18.0",
 		"react-router-dom": "^6.20.1"
 	},
 	"devDependencies": {

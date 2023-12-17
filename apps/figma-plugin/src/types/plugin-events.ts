@@ -12,4 +12,18 @@ export interface TOnSelectNodeEvent extends TPluginMessageEvent {
 	args: { selected: Pick<SceneNode, 'name' | 'id'>[] };
 }
 
-export type TPluginMessageEvents = TOnSelectFrameEvent | TOnSelectNodeEvent;
+export interface TOnSelectNodePropertiesEvent extends TPluginMessageEvent {
+	key: 'on-select-node-properties';
+	args: { selected: SceneNode[] };
+}
+
+export interface TOnChangeSelectedNodePropertiesEvent extends TPluginMessageEvent {
+	key: 'on-change-selected-node-properties';
+	args: { changed: SceneNode };
+}
+
+export type TPluginMessageEvents =
+	| TOnSelectFrameEvent
+	| TOnSelectNodeEvent
+	| TOnSelectNodePropertiesEvent
+	| TOnChangeSelectedNodePropertiesEvent;
