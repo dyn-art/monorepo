@@ -11,7 +11,7 @@ export const Footer: React.FC<TProps> = (props) => {
 	return (
 		<div className="mt-auto">
 			<Separator className="my-2" />
-			<div className={`flex h-8 w-full items-center justify-between`}>
+			<div className={`flex h-6 w-full items-center justify-between px-4`}>
 				{leftContent != null && (
 					<div className="flex text-left">{renderLeftContent(leftContent)}</div>
 				)}
@@ -31,8 +31,8 @@ const renderLeftContent = (leftContent: TLeftContent) => {
 	switch (leftContent.variant) {
 		case 'version':
 			return (
-				<Link target="_blank" to={'https://dyn.art/v/0-0-1?source=figma'}>
-					<p className="text-gray-500">
+				<Link target="_blank" to={'https://dyn.art/v/changelog/figma?source=figma'}>
+					<p className="text-sm text-gray-500">
 						dyn.art <span className="text-xs">v0.0.1</span>
 					</p>
 				</Link>
@@ -50,7 +50,7 @@ const renderRightContent = (rightContent: TRightContent, navigate: NavigateFunct
 	switch (rightContent.variant) {
 		case 'socials':
 			return (
-				<div className="flex gap-2">
+				<div className="flex">
 					<Button variant="ghost" size="icon" asChild>
 						<Link target="_blank" to={'https://s.dyn.art/discord?source=figma'}>
 							<DiscordLogoIcon className="h-4 w-4" />

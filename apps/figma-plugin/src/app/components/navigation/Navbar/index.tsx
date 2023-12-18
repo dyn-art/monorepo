@@ -9,7 +9,7 @@ export const Navbar: React.FC<TProps> = (props) => {
 
 	return (
 		<>
-			<div className={`flex h-8 w-full items-center justify-between`}>
+			<div className={`flex h-8 w-full items-center justify-between px-4`}>
 				{leftContent != null && (
 					<div className="flex text-left">{renderLeftContent(leftContent)}</div>
 				)}

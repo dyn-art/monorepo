@@ -74,10 +74,10 @@ export class Transformer {
 		this._toTransformPaints = [];
 
 		// Generates a unique ID for an item, if not already generated
-		const getOrGenerateId = (
+		const getOrGenerateId = <T>(
 			map: Map<string, ContinuousId>,
-			toTransformArray: any[],
-			value: any
+			toTransformArray: T[],
+			value: T
 		): ContinuousId => {
 			const key = JSON.stringify(value);
 			let id = map.get(key);
@@ -113,13 +113,15 @@ export class Transformer {
 		const processPaints = (
 			node: SceneNode,
 			map: Map<string, ContinuousId>,
-			paintsArray: any[]
+			paintsArray: TToTransformPaint[]
 		): ContinuousId[] | undefined => {
 			if (!hasFillFigma(node)) {
 				return undefined;
 			}
 			const fills = dropMixed(node, 'fills');
-			return fills.map((paint) => getOrGenerateId(map, paintsArray, { paint }));
+			return fills.map((paint) =>
+				getOrGenerateId(map, paintsArray, { id: ContinuousId.nextId(), paint })
+			);
 		};
 
 		// Processes node fonts and returns their ID
@@ -127,7 +129,7 @@ export class Transformer {
 		const processFonts = (
 			node: SceneNode,
 			map: Map<string, ContinuousId>,
-			fontsArray: any[]
+			fontsArray: TToTransformFont[]
 		): ContinuousId[] | undefined => {
 			if (!isFigmaTextNode(node)) {
 				return undefined;
@@ -140,7 +142,7 @@ export class Transformer {
 				weight: fontWeight,
 				style: style.toLowerCase().includes('italic') ? 'Italic' : 'Normal'
 			};
-			return [getOrGenerateId(map, fontsArray, { fontMetadata })];
+			return [getOrGenerateId(map, fontsArray, { id: ContinuousId.nextId(), fontMetadata })];
 		};
 
 		// Start walking the Figma node tree from the root

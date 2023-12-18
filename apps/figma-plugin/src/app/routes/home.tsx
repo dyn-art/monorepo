@@ -52,7 +52,9 @@ const Home: React.FC = () => {
 				rightContent={{ variant: 'user' }}
 			/>
 
-			<Outlet />
+			<div className="px-4">
+				<Outlet />
+			</div>
 
 			<Footer leftContent={{ variant: 'version' }} rightContent={{ variant: 'settings' }} />
 		</>
