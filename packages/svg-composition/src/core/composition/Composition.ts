@@ -59,29 +59,35 @@ export class Composition {
 				width,
 				height,
 				rootNodeId: 0,
-				nodes: {
-					0: {
-						type: 'Frame',
-						children: [],
-						dimension: {
-							width,
-							height
-						},
-						relativeTransform: mat3(vec3(1, 0, 0), vec3(0, 1, 0), vec3(0, 0, 1)),
-						fill: {
-							paintIds: [10]
+				nodes: [
+					[
+						0,
+						{
+							type: 'Frame',
+							children: [],
+							dimension: {
+								width,
+								height
+							},
+							relativeTransform: mat3(vec3(1, 0, 0), vec3(0, 1, 0), vec3(0, 0, 1)),
+							fill: {
+								paintIds: [10]
+							}
 						}
-					}
-				},
-				paints: {
-					10: {
-						type: 'Solid',
-						blendMode: 'Normal',
-						color: [0, 191, 255],
-						isVisible: true,
-						opacity: 1
-					}
-				}
+					]
+				],
+				paints: [
+					[
+						10,
+						{
+							type: 'Solid',
+							blendMode: 'Normal',
+							color: [0, 191, 255],
+							isVisible: true,
+							opacity: 1
+						}
+					]
+				]
 			},
 			isCallbackBased = true
 		} = config;

@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use bevy_app::{Plugin, PostUpdate, PreUpdate};
 use bevy_ecs::world::World;
 
@@ -44,23 +46,29 @@ impl Plugin for CompositionPlugin {
 fn insert_dtif_into_world(world: &mut World, dtif: &DTIFComposition) {
     let root_node_eid = DTIFProcessor::entity_to_eid(&dtif.root_node_id);
     let mut dtif_processor = DTIFProcessor::new();
+    let nodes = dtif
+        .nodes
+        .iter()
+        .map(|(id, node)| (*id, node))
+        .collect::<HashMap<_, _>>();
+    let paints = dtif
+        .paints
+        .iter()
+        .map(|(id, paint)| (*id, paint))
+        .collect::<HashMap<_, _>>();
 
     // Load fonts into cache
     if let Some(fonts) = &dtif.fonts {
         for (id, font_with_content) in fonts.clone().into_iter() {
             if let Some(mut font_cache) = world.get_resource_mut::<FontCacheRes>() {
-                font_cache.insert(
-                    id.parse().unwrap(),
-                    font_with_content.metadata,
-                    font_with_content.content,
-                );
+                font_cache.insert(id, font_with_content.metadata, font_with_content.content);
             }
         }
     }
 
     // Spawn and process nodes recursively
     let root_node_entity = dtif_processor
-        .process_root(root_node_eid, world, dtif)
+        .process_root(root_node_eid, world, &nodes, &paints)
         .unwrap();
     world.entity_mut(root_node_entity).insert(Root);
 

@@ -31,12 +31,12 @@ export async function loadFont(font: TFont): Promise<FontWithContent> {
 	};
 }
 
-export async function loadFonts(fonts: TFont[]): Promise<Record<string, FontWithContent>> {
-	const loadedFonts: Record<string, FontWithContent> = {};
+export async function loadFonts(fonts: TFont[]): Promise<[number, FontWithContent][]> {
+	const loadedFonts: [number, FontWithContent][] = [];
 	await Promise.all(
 		fonts.map(async (font) => {
 			const loadedFont = await loadFont(font);
-			loadedFonts[font.id] = loadedFont;
+			loadedFonts.push([font.id, loadedFont]);
 		})
 	);
 	return loadedFonts;
