@@ -97,9 +97,9 @@ export type TSelectFeatures<
 export type TEnforceFeatures<
 	GFeatureKeys extends TFeatureKeys[],
 	GToEnforceFeatureKeys extends TFeatureKeys[]
-> = GFeatureKeys extends [...infer Rest, GToEnforceFeatureKeys]
+> = Exclude<GToEnforceFeatureKeys, GFeatureKeys> extends never
 	? GFeatureKeys
-	: [...GFeatureKeys, ...GToEnforceFeatureKeys];
+	: GFeatureKeys | Exclude<GToEnforceFeatureKeys, GFeatureKeys>;
 
 // =============================================================================
 // Listener

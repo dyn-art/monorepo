@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { createState } from './create-state';
 
-describe('createState function tests', () => {
+describe('createState function', () => {
 	it('should initialize with the provided value', () => {
 		// Prepare
 		const initialState = 10;
@@ -71,7 +71,9 @@ describe('createState function tests', () => {
 
 		// Act
 		state.set(20);
-		await new Promise((resolve) => setTimeout(resolve, 0));
+		await new Promise((resolve) => {
+			setTimeout(resolve, 0);
+		});
 
 		// Assert
 		expect(listener).toHaveBeenCalledWith(20);
@@ -100,7 +102,9 @@ describe('createState function tests', () => {
 
 		// Act
 		state.set(20);
-		await new Promise((resolve) => setTimeout(resolve, 0));
+		await new Promise((resolve) => {
+			setTimeout(resolve, 0);
+		});
 
 		// Assert
 		expect(firstListener).toHaveBeenCalled();
