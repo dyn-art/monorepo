@@ -15,7 +15,7 @@ export function createState<GValue>(
 		set(newValue) {
 			if (this._value !== newValue) {
 				this._value = newValue;
-				this.notify();
+				this._notify(true);
 			}
 		},
 		listen(callback, level) {
@@ -25,7 +25,7 @@ export function createState<GValue>(
 			};
 			this._listeners.push(listener);
 
-			// Undbind return value
+			// Undbind
 			return () => {
 				const index = this._listeners.indexOf(listener);
 				if (~index) {
@@ -38,7 +38,7 @@ export function createState<GValue>(
 			callback(this._value as TReadonlyIfObject<GValue>);
 			return unbind;
 		},
-		notify() {
+		_notify(process) {
 			// Add current state's listeners to the queue
 			this._listeners.forEach((listener) => {
 				const queueItem: TListenerQueueItem<GValue> = {
@@ -48,22 +48,25 @@ export function createState<GValue>(
 				listenerQueue.push(queueItem as TListenerQueueItem);
 			});
 
-			function process(): void {
-				// Drain the queue
-				const queueToProcess = listenerQueue.splice(0, listenerQueue.length);
-
-				// Sort the drained listeners and execute the callbacks
-				queueToProcess
-					.sort((a, b) => a.level - b.level)
-					.forEach((queueItem) => {
-						queueItem.callback(queueItem.value);
-					});
+			// Process queue
+			if (process) {
+				// Defer processing using setTimeout
+				deferred ? setTimeout(processQueue) : processQueue();
 			}
-
-			// Defer processing using setTimeout
-			deferred ? setTimeout(process) : process();
 		}
 	};
 
 	return state;
+}
+
+function processQueue(): void {
+	// Drain the queue
+	const queueToProcess = listenerQueue.splice(0, listenerQueue.length);
+
+	// Sort the drained listeners by level and execute the callbacks
+	queueToProcess
+		.sort((a, b) => a.level - b.level)
+		.forEach((queueItem) => {
+			queueItem.callback(queueItem.value);
+		});
 }

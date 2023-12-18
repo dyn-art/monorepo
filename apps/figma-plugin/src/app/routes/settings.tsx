@@ -1,12 +1,12 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { createState, withUndo } from '@dyn/state';
+import { createState, withPersistLocalStorage, withUndo } from '@dyn/state';
 import { Button } from '@dyn/ui';
 
 import { Footer, Navbar } from '../components';
 import { useDynState } from '../hooks';
 
-const MY_STATE = withUndo(createState(0));
+const MY_STATE = withPersistLocalStorage(withUndo(createState(0)), 'myState');
 
 const Settings: React.FC = () => {
 	const navigate = useNavigate();

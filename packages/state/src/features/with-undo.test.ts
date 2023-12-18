@@ -69,4 +69,21 @@ describe('withUndo function tests', () => {
 			'State must have "set" and "listen" features to use withUndo'
 		);
 	});
+
+	it('should respect the history stack size limit', () => {
+		// Prepare
+		const historyLimit = 5;
+		const state = withUndo(createState(0, false), historyLimit);
+
+		// Act
+		for (let i = 1; i <= 10; i++) {
+			state.set(i);
+		}
+		for (let i = 0; i < historyLimit; i++) {
+			state.undo();
+		}
+
+		// Assert
+		expect(state.get()).toBe(6);
+	});
 });

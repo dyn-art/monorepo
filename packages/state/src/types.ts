@@ -68,13 +68,13 @@ export interface TCoreFeatures<GValue> {
 		/**
 		 * Triggers all registered listeners to run with the current state value.
 		 */
-		notify: () => void;
+		_notify: (process: boolean) => void;
 	};
 }
 
 export interface TWithFeatures<GValue> {
 	undo: { undo: () => void; _history: GValue[] };
-	persist: { persist: () => void };
+	persist: {};
 }
 
 export type TFeatures<GValue = unknown> = TCoreFeatures<GValue> & TWithFeatures<GValue>;
