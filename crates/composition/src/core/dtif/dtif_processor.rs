@@ -15,7 +15,7 @@ use crate::core::modules::{
 use super::{DTIFComposition, DTIFNode};
 
 pub struct DTIFProcessor {
-    /// Maps DTIF entity (eid) to actual spawned Bevy entity.
+    /// Maps EntityId (eid) of DTIF to actual spawned Bevy entity.
     eid_to_entity: HashMap<String, Entity>,
 }
 
@@ -232,17 +232,7 @@ impl DTIFProcessor {
         self.eid_to_entity.get(&eid).cloned()
     }
 
-    /// Converts an `Entity` to a String representation, referred to as a DTIF entity (eid).
-    ///
-    /// # Why this conversion?
-    /// This function is necessary due to a specific limitation encountered when working
-    /// with serialization in Rust. Specifically, the `Entity` type cannot be directly
-    /// serialized due to its internal structure and the limitations of the serde library.
-    /// Reference issue: https://github.com/serde-rs/serde/issues/1183
-    ///
-    /// By converting the `Entity` to its bit representation and then to a string,
-    /// this function enables the use of `Entity` instances as keys in a hashmap,
-    /// facilitating serialization and deserialization processes.
+    /// Converts an `Entity` to an EntityId (eid) used to reference bundles in DTIF.
     #[inline]
     pub fn entity_to_eid(entity: &Entity) -> String {
         entity.to_bits().to_string()

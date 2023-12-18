@@ -183,19 +183,19 @@ height: number;
 rootNodeId: Entity; 
 /**
  * A mapping of node identifiers to their corresponding nodes within the composition.
- * Note: Planned to directly use `Entity` as a key once a specific serde issue is resolved.
+ * Note: Planned to directly use `u64` as a key once the referenced serde issue is resolved.
  * https://github.com/serde-rs/serde/issues/1183
  */
 nodes: { [key in string]: DTIFNode }; 
 /**
  * A mapping of paint identifiers to their corresponding paints within the composition.
- * Note: Planned to directly use `Entity` as a key once a specific serde issue is resolved.
+ * Note: Planned to directly use `u64` as a key once the referenced serde issue is resolved.
  * https://github.com/serde-rs/serde/issues/1183
  */
 paints: { [key in string]: Paint }; 
 /**
  * A mapping of font identifiers to their corresponding font data within the composition.
- * Note: Planned to directly use `u64` as a key once a specific serde issue is resolved.
+ * Note: Planned to directly use `u64` as a key once the referenced serde issue is resolved.
  * https://github.com/serde-rs/serde/issues/1183
  */
 fonts?: { [key in string]: FontWithContent } | null; 
