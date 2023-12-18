@@ -2,7 +2,10 @@ import type { TListener, TListenerQueueItem, TReadonlyIfObject, TState } from '.
 
 const listenerQueue: TListenerQueueItem[] = [];
 
-export function createState<GValue>(value: GValue): TState<GValue, ['get', 'set', 'listen']> {
+export function createState<GValue>(
+	value: GValue,
+	deferred = true
+): TState<GValue, ['get', 'set', 'listen']> {
 	const state: TState<GValue, ['get', 'set', 'listen']> = {
 		_listeners: [],
 		_value: value,
@@ -21,8 +24,13 @@ export function createState<GValue>(value: GValue): TState<GValue, ['get', 'set'
 				level: level ?? 0
 			};
 			this._listeners.push(listener);
+
+			// Undbind return value
 			return () => {
-				this._listeners.filter((l) => l !== listener);
+				const index = this._listeners.indexOf(listener);
+				if (~index) {
+					this._listeners.splice(index, 1);
+				}
 			};
 		},
 		subscribe(callback, level) {
@@ -40,10 +48,9 @@ export function createState<GValue>(value: GValue): TState<GValue, ['get', 'set'
 				listenerQueue.push(queueItem as TListenerQueueItem);
 			});
 
-			// Defer processing using setTimeout
-			setTimeout(() => {
+			function process(): void {
 				// Drain the queue
-				const queueToProcess = listenerQueue.slice();
+				const queueToProcess = listenerQueue.splice(0, listenerQueue.length);
 
 				// Sort the drained listeners and execute the callbacks
 				queueToProcess
@@ -51,7 +58,10 @@ export function createState<GValue>(value: GValue): TState<GValue, ['get', 'set'
 					.forEach((queueItem) => {
 						queueItem.callback(queueItem.value);
 					});
-			});
+			}
+
+			// Defer processing using setTimeout
+			deferred ? setTimeout(process) : process();
 		}
 	};
 

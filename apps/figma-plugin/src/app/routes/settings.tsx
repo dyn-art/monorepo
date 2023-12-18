@@ -28,7 +28,6 @@ const Settings: React.FC = () => {
 			<Button
 				onClick={() => {
 					MY_STATE.set(MY_STATE.get() + 1);
-					console.log({ MY_STATE });
 				}}
 			>
 				{myState}

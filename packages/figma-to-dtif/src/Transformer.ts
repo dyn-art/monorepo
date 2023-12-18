@@ -1,7 +1,8 @@
 import type { TComposition, TFontMetadata, TFontWithContent, TNode, TPaint } from '@dyn/dtif';
+import { ContinuousId } from '@dyn/utils';
 
 import { transformFont, transformNode, transformPaint } from './transform';
-import { ContinuousId, dropMixed, hasChildrenFigma, hasFillFigma, isFigmaTextNode } from './utils';
+import { dropMixed, hasChildrenFigma, hasFillFigma, isFigmaTextNode } from './utils';
 
 export class Transformer {
 	// Figma Nodes

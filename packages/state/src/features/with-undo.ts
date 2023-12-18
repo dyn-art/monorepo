@@ -8,7 +8,8 @@ export function withUndo<GValue, GSelectedFeatureKeys extends TFeatureKeys<GValu
 		const undoFeature: TSelectFeatures<GValue, ['undo']> = {
 			_history: [state._value],
 			undo(this: TState<GValue, ['undo', 'set', 'listen']>) {
-				const newValue = this._history.pop();
+				this._history.pop(); // Pop current value
+				const newValue = this._history.pop(); // Pop previous value
 				if (newValue != null) {
 					this.set(newValue);
 				}
@@ -19,9 +20,7 @@ export function withUndo<GValue, GSelectedFeatureKeys extends TFeatureKeys<GValu
 		const _state = Object.assign(state, undoFeature);
 
 		_state.listen((value) => {
-			if (_state._history[_state._history.length - 1] !== value) {
-				_state._history.push(value);
-			}
+			_state._history.push(value);
 		});
 
 		return _state as TState<GValue, ['undo', ...GSelectedFeatureKeys]>;

@@ -1,3 +1,4 @@
+export * from './ContinuousId';
 export * from './define-config';
 export * from './not-empty';
 export * from './pick-properties';

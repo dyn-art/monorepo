@@ -7,7 +7,7 @@ import { hasFeatures } from './has-features';
 describe('hasFeatures function tests', () => {
 	it('should return true if the state has all the requested features', () => {
 		// Prepare
-		const state = withUndo(createState(10));
+		const state = withUndo(createState(10, false));
 
 		// Act & Assert
 		expect(hasFeatures(state, ['set', 'undo'])).toBe(true);
@@ -15,7 +15,7 @@ describe('hasFeatures function tests', () => {
 
 	it('should return false if the state is missing any of the requested features', () => {
 		// Prepare
-		const state = createState(10);
+		const state = createState(10, false);
 
 		// Act & Assert
 		expect(hasFeatures(state, ['set', 'undo'])).toBe(false);
@@ -23,7 +23,7 @@ describe('hasFeatures function tests', () => {
 
 	it('should return true for a state with only the specified features', () => {
 		// Prepare
-		const state = createState(10);
+		const state = createState(10, false);
 
 		// Act & Assert
 		expect(hasFeatures(state, ['set'])).toBe(true);
@@ -39,7 +39,7 @@ describe('hasFeatures function tests', () => {
 
 	it('should return true if checking for an empty feature set', () => {
 		// Prepare
-		const state = createState(10);
+		const state = createState(10, false);
 
 		// Act & Assert
 		expect(hasFeatures(state, [])).toBe(true);
