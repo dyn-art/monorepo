@@ -27,9 +27,14 @@
 		"url": "https://s.dyn.art/github/issues"
 	},
 	"homepage": "https://s.dyn.art/github",
+	"peerDependencies": {
+		"react": "^18.2.0"
+	},
 	"devDependencies": {
 		"@dyn/config": "workspace:*",
-		"@types/node": "^20.8.10"
+		"@types/node": "^20.8.10",
+		"@types/react": "^18.2.33",
+		"react": "^18.2.0"
 	},
 	"files": [
 		"dist",
