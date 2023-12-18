@@ -186,19 +186,19 @@ rootNodeId: Entity;
  * Note: Planned to directly use a Map once the referenced serde issue is resolved.
  * https://github.com/serde-rs/serde/issues/1183
  */
-nodes: ([EntityId, DTIFNode])[]; 
+nodes: { [key in number]: DTIFNode }; 
 /**
  * A mapping of paint identifiers to their corresponding paints within the composition.
  * Note: Planned to directly use a Map once the referenced serde issue is resolved.
  * https://github.com/serde-rs/serde/issues/1183
  */
-paints: ([EntityId, Paint])[]; 
+paints: { [key in number]: Paint }; 
 /**
  * A mapping of font identifiers to their corresponding font data within the composition.
  * Note: Planned to directly use a Map once the referenced serde issue is resolved.
  * https://github.com/serde-rs/serde/issues/1183
  */
-fonts?: ([number, FontWithContent])[] | null; 
+fonts?: { [key in number]: FontWithContent }; 
 /**
  * Optional list of changes represented as core input events.
  * This field is optional and defaults to `None` if not provided.
@@ -270,8 +270,6 @@ endingAngle: number;
 innerRadiusRatio: number }
 
 export type Entity = number
-
-export type EntityId = number
 
 export type EntityMoved = { entity: Entity; dx: number; dy: number }
 

@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use bevy_ecs::entity::Entity;
 use serde::{Deserialize, Serialize};
 use specta::Type;
@@ -11,9 +13,6 @@ use super::modules::{
 };
 
 pub mod dtif_processor;
-
-#[derive(Serialize, Deserialize, Debug, Type, PartialEq, Eq, Hash, Clone, Copy)]
-pub struct EntityId(u64);
 
 /// Represents the composition in which all nodes exist.
 #[derive(Serialize, Deserialize, Debug, Type)]
@@ -40,18 +39,21 @@ pub struct DTIFComposition {
     /// A mapping of node identifiers to their corresponding nodes within the composition.
     /// Note: Planned to directly use a Map once the referenced serde issue is resolved.
     ///       https://github.com/serde-rs/serde/issues/1183
-    pub nodes: Vec<(EntityId, DTIFNode)>,
+    #[serde(with = "vectorize")]
+    pub nodes: HashMap<u64, DTIFNode>,
 
     /// A mapping of paint identifiers to their corresponding paints within the composition.
     /// Note: Planned to directly use a Map once the referenced serde issue is resolved.
     ///       https://github.com/serde-rs/serde/issues/1183
-    pub paints: Vec<(EntityId, Paint)>,
+    #[serde(with = "vectorize")]
+    pub paints: HashMap<u64, Paint>,
 
     /// A mapping of font identifiers to their corresponding font data within the composition.
     /// Note: Planned to directly use a Map once the referenced serde issue is resolved.
     ///       https://github.com/serde-rs/serde/issues/1183
     #[serde(default)]
-    pub fonts: Option<Vec<(u64, FontWithContent)>>,
+    #[serde(with = "vectorize")]
+    pub fonts: HashMap<u64, FontWithContent>,
 
     /// Optional list of changes represented as core input events.
     /// This field is optional and defaults to `None` if not provided.

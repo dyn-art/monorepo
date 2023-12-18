@@ -8,15 +8,15 @@ use crate::core::modules::{
     composition::events::CoreInputEvent,
     node::components::{
         bundles::{FrameNodeBundle, GroupNodeBundle, RectangleNodeBundle, TextNodeBundle},
-        mixins::{AbsoluteTransformMixin, ChildrenMixin, FillMixin, Paint, RelativeTransformMixin},
+        mixins::{AbsoluteTransformMixin, ChildrenMixin, FillMixin, RelativeTransformMixin},
     },
 };
 
-use super::{DTIFNode, EntityId};
+use super::{DTIFComposition, DTIFNode};
 
 pub struct DTIFProcessor {
     /// Maps EntityId (eid) to actual spawned Bevy entity.
-    eid_to_entity: HashMap<EntityId, Entity>,
+    eid_to_entity: HashMap<u64, Entity>,
 }
 
 impl DTIFProcessor {
@@ -33,24 +33,22 @@ impl DTIFProcessor {
     /// Processes the root DTIF node and its children.
     pub fn process_root(
         &mut self,
-        node_eid: EntityId,
+        node_eid: u64,
         world: &mut World,
-        nodes: &HashMap<EntityId, &DTIFNode>,
-        paints: &HashMap<EntityId, &Paint>,
+        dtif: &DTIFComposition,
     ) -> Option<Entity> {
-        self.process_node(node_eid, world, nodes, paints, true)
+        self.process_node(node_eid, world, dtif, true)
     }
 
     /// Processes a single DTIF node and its children.
     fn process_node(
         &mut self,
-        node_eid: EntityId,
+        node_eid: u64,
         world: &mut World,
-        nodes: &HashMap<EntityId, &DTIFNode>,
-        paints: &HashMap<EntityId, &Paint>,
+        dtif: &DTIFComposition,
         is_root: bool,
     ) -> Option<Entity> {
-        nodes.get(&node_eid).map(|dtif_node| {
+        dtif.nodes.get(&node_eid).map(|dtif_node| {
             // Spawn a new node entity from a DTIF node
             // and maintain a mapping from entity id to Bevy entity
             let node_entity = self.spawn_node(world, dtif_node);
@@ -71,8 +69,8 @@ impl DTIFProcessor {
                 }
             }
 
-            self.process_fill(node_entity, world, paints, dtif_node);
-            self.process_children(node_entity, world, nodes, paints, dtif_node);
+            self.process_fill(node_entity, world, dtif, dtif_node);
+            self.process_children(node_entity, world, dtif, dtif_node);
 
             return node_entity;
         })
@@ -83,7 +81,7 @@ impl DTIFProcessor {
         &mut self,
         node_entity: Entity,
         world: &mut World,
-        paints: &HashMap<EntityId, &Paint>,
+        dtif: &DTIFComposition,
         dtif_node: &DTIFNode,
     ) {
         if let DTIFNode::Frame(FrameNodeBundle { fill_mixin, .. })
@@ -96,7 +94,7 @@ impl DTIFProcessor {
                 .iter()
                 .filter_map(|paint_entity| {
                     let paint_eid = DTIFProcessor::entity_to_eid(paint_entity);
-                    return self.process_paint(paint_eid, world, paints);
+                    return self.process_paint(paint_eid, world, dtif);
                 })
                 .collect();
 
@@ -120,8 +118,7 @@ impl DTIFProcessor {
         &mut self,
         node_entity: Entity,
         world: &mut World,
-        nodes: &HashMap<EntityId, &DTIFNode>,
-        paints: &HashMap<EntityId, &Paint>,
+        dtif: &DTIFComposition,
         dtif_node: &DTIFNode,
     ) {
         if let DTIFNode::Frame(FrameNodeBundle { children_mixin, .. })
@@ -133,7 +130,7 @@ impl DTIFProcessor {
                 .iter()
                 .filter_map(|child_entity| {
                     let child_eid = DTIFProcessor::entity_to_eid(child_entity);
-                    return self.process_node(child_eid, world, nodes, paints, false);
+                    return self.process_node(child_eid, world, dtif, false);
                 })
                 .collect();
 
@@ -190,11 +187,11 @@ impl DTIFProcessor {
     /// Processes a single DTIF paint.
     pub fn process_paint(
         &mut self,
-        paint_eid: EntityId,
+        paint_eid: u64,
         world: &mut World,
-        paints: &HashMap<EntityId, &Paint>,
+        dtif: &DTIFComposition,
     ) -> Option<Entity> {
-        paints.get(&paint_eid).map(|paint| {
+        dtif.paints.get(&paint_eid).map(|paint| {
             // Spawn paint
             let paint_entity = world.spawn((*paint).clone()).id();
             self.eid_to_entity.insert(paint_eid, paint_entity);
@@ -237,7 +234,7 @@ impl DTIFProcessor {
 
     /// Converts an `Entity` to an `EntityId` (eid).
     #[inline]
-    pub fn entity_to_eid(entity: &Entity) -> EntityId {
-        EntityId(entity.to_bits())
+    pub fn entity_to_eid(entity: &Entity) -> u64 {
+        entity.to_bits()
     }
 }
