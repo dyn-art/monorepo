@@ -1,5 +1,5 @@
 import type { TComposition, TFontMetadata, TFontWithContent, TNode, TPaint } from '@dyn/dtif';
-import { ContinuousId } from '@dyn/utils';
+import { ContinuousId, type TContinuousId } from '@dyn/utils';
 
 import { transformFont, transformNode, transformPaint } from './transform';
 import { dropMixed, hasChildrenFigma, hasFillFigma, isFigmaTextNode } from './utils';
@@ -66,8 +66,8 @@ export class Transformer {
 
 	private traverseFigmaNodeTree(root: FrameNode): ContinuousId {
 		const rootId = ContinuousId.ZERO;
-		const toTransformPaintsMap = new Map<string, ContinuousId>();
-		const toTransformFontsMap = new Map<string, ContinuousId>();
+		const toTransformPaintsMap = new Map<string, TContinuousId>();
+		const toTransformFontsMap = new Map<string, TContinuousId>();
 
 		this._toTransformRootNode = root;
 		this._toTransformNodes = [];
@@ -75,10 +75,10 @@ export class Transformer {
 
 		// Generates a unique ID for an item, if not already generated
 		const getOrGenerateId = <T>(
-			map: Map<string, ContinuousId>,
+			map: Map<string, TContinuousId>,
 			toTransformArray: T[],
 			value: T
-		): ContinuousId => {
+		): TContinuousId => {
 			const key = JSON.stringify(value);
 			let id = map.get(key);
 			if (!id) {
@@ -90,8 +90,8 @@ export class Transformer {
 		};
 
 		// Walks through each node and processes children, paints, and fonts
-		const walk = (node: SceneNode, isRoot = false): ContinuousId => {
-			const nodeId = isRoot ? rootId : ContinuousId.nextId();
+		const walk = (node: SceneNode, isRoot = false): TContinuousId => {
+			const nodeId = isRoot ? rootId.toNumber() : ContinuousId.nextId();
 			const childrenIds = hasChildrenFigma(node)
 				? node.children.map((child) => walk(child))
 				: undefined;
@@ -112,9 +112,9 @@ export class Transformer {
 		// Processes node paints and returns their IDs
 		const processPaints = (
 			node: SceneNode,
-			map: Map<string, ContinuousId>,
+			map: Map<string, TContinuousId>,
 			paintsArray: TToTransformPaint[]
-		): ContinuousId[] | undefined => {
+		): TContinuousId[] | undefined => {
 			if (!hasFillFigma(node)) {
 				return undefined;
 			}
@@ -128,9 +128,9 @@ export class Transformer {
 		// TODO: Support multipe text sections
 		const processFonts = (
 			node: SceneNode,
-			map: Map<string, ContinuousId>,
+			map: Map<string, TContinuousId>,
 			fontsArray: TToTransformFont[]
-		): ContinuousId[] | undefined => {
+		): TContinuousId[] | undefined => {
 			if (!isFigmaTextNode(node)) {
 				return undefined;
 			}
@@ -164,23 +164,7 @@ export class Transformer {
 		for (const toTransformNode of toTransformNodes) {
 			try {
 				const node = await transformNode(toTransformNode);
-				// if (hasChildrenDTIF(node)) {
-				// 	node.children = toTransformNode.childrenIds.map((id) => id.toNumber());
-				// }
-				// if (hasFillDTIF(node)) {
-				// 	node.fill = { paintIds: toTransformNode.paintIds.map((id) => id.toNumber()) };
-				// }
-				// if (isDTIFTextNode(node)) {
-				// 	node.text.sections.forEach((section, index) => {
-				// 		const fontId = toTransformNode.fontIds[index];
-				// 		if (fontId != null) {
-				// 			section.style.fontId = fontId.toNumber();
-				// 		} else {
-				// 			// TODO: Error
-				// 		}
-				// 	});
-				// }
-				this.nodes.set(toTransformNode.id.toNumber(), node);
+				this.nodes.set(toTransformNode.id, node);
 			} catch (error) {
 				// TODO: Error
 				this._nodesFailedToTransform.push(toTransformNode);
@@ -197,7 +181,7 @@ export class Transformer {
 		for (const toTransformPaint of toTransformPaints) {
 			try {
 				const paint = await transformPaint(toTransformPaint.paint);
-				this.paints.set(toTransformPaint.id.toNumber(), paint);
+				this.paints.set(toTransformPaint.id, paint);
 			} catch (error) {
 				// TODO: Error
 				this._paintsFailedToTransform.push(toTransformPaint);
@@ -214,7 +198,7 @@ export class Transformer {
 		for (const toTransformFont of toTransformFonts) {
 			try {
 				const font = await transformFont(toTransformFont.fontMetadata);
-				this.fonts.set(toTransformFont.id.toNumber(), font);
+				this.fonts.set(toTransformFont.id, font);
 			} catch (error) {
 				// TODO: Error
 				this._fontsFailedToTransform.push(toTransformFont);
@@ -224,19 +208,19 @@ export class Transformer {
 }
 
 export interface TToTransformNode {
-	id: ContinuousId;
+	id: TContinuousId;
 	node: SceneNode;
-	childrenIds?: ContinuousId[];
-	paintIds?: ContinuousId[];
-	fontIds?: ContinuousId[];
+	childrenIds?: TContinuousId[];
+	paintIds?: TContinuousId[];
+	fontIds?: TContinuousId[];
 }
 
 export interface TToTransformPaint {
-	id: ContinuousId;
+	id: TContinuousId;
 	paint: Paint;
 }
 
 export interface TToTransformFont {
-	id: ContinuousId;
+	id: TContinuousId;
 	fontMetadata: TFontMetadata;
 }

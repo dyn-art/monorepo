@@ -1,21 +1,18 @@
-import type { TFrameNodeBundle } from '@dyn/dtif';
+import type { TGroupNodeBundle } from '@dyn/dtif';
 
 import { convertFigmaBlendModeToDTIF, convertFigmaTransformToMat3 } from '../../utils';
 
-export function transformFrameNode(
-	node: FrameNode | ComponentNode | InstanceNode,
-	config: TTransformFrameNodeConfig
-): { type: 'Frame' } & TFrameNodeBundle {
+export function transformGroupNode(
+	node: GroupNode,
+	config: TTransformGroupNodeConfig
+): { type: 'Group' } & TGroupNodeBundle {
 	const { childrenIds, paintIds } = config;
 
 	return {
-		type: 'Frame',
+		type: 'Group',
 		node: {
 			name: node.name,
-			node_type: 'Frame'
-		},
-		frame: {
-			clipContent: node.clipsContent
+			node_type: 'Group'
 		},
 		compositionMixin: {
 			isLocked: node.locked,
@@ -27,12 +24,6 @@ export function transformFrameNode(
 			width: node.width
 		},
 		relativeTransform: convertFigmaTransformToMat3(node.relativeTransform),
-		rectangleCornerMixin: {
-			bottomLeftRadius: node.bottomLeftRadius,
-			bottomRightRadius: node.bottomRightRadius,
-			topLeftRadius: node.topLeftRadius,
-			topRightRadius: node.topRightRadius
-		},
 		blendMixin: {
 			blendMode: convertFigmaBlendModeToDTIF(node.blendMode),
 			opacity: node.opacity,
@@ -42,7 +33,7 @@ export function transformFrameNode(
 	};
 }
 
-interface TTransformFrameNodeConfig {
+interface TTransformGroupNodeConfig {
 	childrenIds: number[];
 	paintIds: number[];
 }

@@ -1,6 +1,6 @@
 export class ContinuousId {
-	private static nextIdValue = 0;
-	private id: number;
+	private static nextIdValue: TContinuousId = 0;
+	private id: TContinuousId;
 
 	constructor(id: number) {
 		this.id = id;
@@ -10,11 +10,17 @@ export class ContinuousId {
 		return new ContinuousId(0);
 	}
 
-	public static nextId(): ContinuousId {
+	public static nextId(): TContinuousId {
+		return this.nextIdValue++;
+	}
+
+	public static nextCId(): ContinuousId {
 		return new ContinuousId(this.nextIdValue++);
 	}
 
-	public toNumber(): number {
+	public toNumber(): TContinuousId {
 		return this.id;
 	}
 }
+
+export type TContinuousId = number;

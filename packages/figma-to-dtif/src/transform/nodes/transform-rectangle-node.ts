@@ -1,27 +1,23 @@
-import type { TFrameNodeBundle } from '@dyn/dtif';
+import type { TRectangleNodeBundle } from '@dyn/dtif';
 
 import { convertFigmaBlendModeToDTIF, convertFigmaTransformToMat3 } from '../../utils';
 
-export function transformFrameNode(
-	node: FrameNode | ComponentNode | InstanceNode,
-	config: TTransformFrameNodeConfig
-): { type: 'Frame' } & TFrameNodeBundle {
-	const { childrenIds, paintIds } = config;
+export function transformRectangleNode(
+	node: RectangleNode,
+	config: TTransformRectangleNodeConfig
+): { type: 'Rectangle' } & TRectangleNodeBundle {
+	const { paintIds } = config;
 
 	return {
-		type: 'Frame',
+		type: 'Rectangle',
 		node: {
 			name: node.name,
 			node_type: 'Frame'
-		},
-		frame: {
-			clipContent: node.clipsContent
 		},
 		compositionMixin: {
 			isLocked: node.locked,
 			isVisible: node.visible
 		},
-		children: childrenIds,
 		dimension: {
 			height: node.height,
 			width: node.width
@@ -42,7 +38,6 @@ export function transformFrameNode(
 	};
 }
 
-interface TTransformFrameNodeConfig {
-	childrenIds: number[];
+interface TTransformRectangleNodeConfig {
 	paintIds: number[];
 }

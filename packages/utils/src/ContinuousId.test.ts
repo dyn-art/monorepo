@@ -24,8 +24,8 @@ describe('ContinuousId class tests', () => {
 
 	it('should generate continuous IDs starting from 0', () => {
 		// Act
-		const firstId = ContinuousId.nextId();
-		const secondId = ContinuousId.nextId();
+		const firstId = ContinuousId.nextCId();
+		const secondId = ContinuousId.nextCId();
 
 		// Assert
 		expect(firstId.toNumber()).toBe(0);
@@ -34,7 +34,7 @@ describe('ContinuousId class tests', () => {
 
 	it('should maintain continuous IDs across instances', () => {
 		// Prepare & Act
-		const ids = Array.from({ length: 5 }, () => ContinuousId.nextId());
+		const ids = Array.from({ length: 5 }, () => ContinuousId.nextCId());
 
 		// Assert
 		ids.forEach((id, index) => {
