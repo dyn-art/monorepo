@@ -1,6 +1,6 @@
 {
-	"name": "@dyn/state",
-	"description": "State management",
+	"name": "@dyn/state-react",
+	"description": "Extension to combine @dyn/state with React or React-Native",
 	"version": "0.0.1",
 	"private": true,
 	"scripts": {
@@ -27,9 +27,17 @@
 		"url": "https://s.dyn.art/github/issues"
 	},
 	"homepage": "https://s.dyn.art/github",
+	"dependencies": {
+		"@dyn/state": "workspace:*"
+	},
+	"peerDependencies": {
+		"react": "^18.2.0"
+	},
 	"devDependencies": {
 		"@dyn/config": "workspace:*",
-		"@types/node": "^20.8.10"
+		"@types/node": "^20.8.10",
+		"@types/react": "^18.2.33",
+		"react": "^18.2.0"
 	},
 	"files": [
 		"dist",

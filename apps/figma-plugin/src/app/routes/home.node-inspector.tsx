@@ -1,7 +1,9 @@
 import React from 'react';
+import { JSONTree } from 'react-json-tree';
 
 import { appHandler } from '../app-handler';
 import { useAppCallback } from '../hooks';
+import threezerotwofourTheme from '../styles/json-tree/threezerotwofour.theme';
 
 const NodeInspectorPlugin: React.FC = () => {
 	const [selectedNodes, setSelectedNodes] = React.useState<SceneNode[]>([]);
@@ -10,12 +12,7 @@ const NodeInspectorPlugin: React.FC = () => {
 		type: 'plugin.message',
 		key: 'on-select-node-properties',
 		callback: async (instance, args) => {
-			const selected = args.selected;
-			if (selected.length > 0) {
-				setSelectedNodes(selected);
-			} else {
-				setSelectedNodes([]);
-			}
+			setSelectedNodes(args.selected);
 		}
 	});
 
@@ -38,9 +35,11 @@ const NodeInspectorPlugin: React.FC = () => {
 	);
 
 	return (
-		<>
-			<p>Node Inspector</p>
-		</>
+		<div className="flex w-full overflow-x-hidden border bg-[#090300]">
+			<div className="relative w-full overflow-x-auto p-4">
+				<JSONTree data={selectedNodes} theme={threezerotwofourTheme} />
+			</div>
+		</div>
 	);
 };
 

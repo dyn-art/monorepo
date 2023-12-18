@@ -1,6 +1,5 @@
 import React from 'react';
-
-import type { TState } from '../types';
+import type { TState } from '@dyn/state';
 
 export function useDynState<GValue>(state: TState<GValue, ['listen']>): GValue {
 	const [, forceRender] = React.useReducer((s) => s + 1, 0);

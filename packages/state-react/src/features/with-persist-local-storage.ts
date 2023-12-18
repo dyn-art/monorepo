@@ -1,14 +1,17 @@
-import type { TEnforceFeatures, TFeatureKeys, TState } from '../types';
-import { withPersist, type StorageInterface } from './with-persist';
+import {
+	withPersist,
+	type StorageInterface,
+	type TEnforceFeatures,
+	type TFeatureKeys,
+	type TState
+} from '@dyn/state';
 
 class LocalStorageInterface<GValue> implements StorageInterface<GValue> {
 	save(key: string, value: GValue): void {
-		// @ts-expect-error
 		localStorage.setItem(key, JSON.stringify(value));
 	}
 
 	load(key: string): GValue | null {
-		// @ts-expect-error
 		const item = localStorage.getItem(key);
 		return item ? (JSON.parse(item) as GValue) : null;
 	}
