@@ -171,7 +171,6 @@ export type TTextNodeSegment = Pick<
 	| 'fontSize'
 	| 'fontName'
 	| 'fontWeight'
-	| 'fontSize'
 	| 'letterSpacing'
 	| 'lineHeight'
 	| 'characters'

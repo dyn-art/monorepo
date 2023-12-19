@@ -22,7 +22,7 @@ export const Navbar: React.FC<TProps> = (props) => {
 					<div className="flex text-right">{renderRightContent(rightContent)}</div>
 				)}
 			</div>
-			<Separator className="mb-4 mt-2" />
+			<Separator className="mt-2" />
 		</>
 	);
 };

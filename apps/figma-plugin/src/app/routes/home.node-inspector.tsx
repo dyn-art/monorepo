@@ -8,13 +8,17 @@ import threezerotwofourTheme from '../styles/json-tree/threezerotwofour.theme';
 const NodeInspectorPlugin: React.FC = () => {
 	const [selectedNodes, setSelectedNodes] = React.useState<SceneNode[]>([]);
 
-	useAppCallback(appHandler, {
-		type: 'plugin.message',
-		key: 'on-select-node-properties',
-		callback: async (instance, args) => {
-			setSelectedNodes(args.selected);
-		}
-	});
+	useAppCallback(
+		appHandler,
+		{
+			type: 'plugin.message',
+			key: 'on-select-node-properties',
+			callback: async (instance, args) => {
+				setSelectedNodes(args.selected);
+			}
+		},
+		[]
+	);
 
 	useAppCallback(
 		appHandler,

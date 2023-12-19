@@ -9,7 +9,7 @@ export const Footer: React.FC<TProps> = (props) => {
 	const navigate = useNavigate();
 
 	return (
-		<div className="mt-auto">
+		<>
 			<Separator className="my-2" />
 			<div className={`flex h-6 w-full items-center justify-between px-4`}>
 				{leftContent != null && (
@@ -19,7 +19,7 @@ export const Footer: React.FC<TProps> = (props) => {
 					<div className="flex text-right">{renderRightContent(rightContent, navigate)}</div>
 				)}
 			</div>
-		</div>
+		</>
 	);
 };
 

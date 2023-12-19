@@ -52,7 +52,7 @@ const Home: React.FC = () => {
 				rightContent={{ variant: 'user' }}
 			/>
 
-			<div className="px-4">
+			<div className="flex h-full w-full flex-col px-4">
 				<Outlet />
 			</div>
 

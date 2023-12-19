@@ -39,14 +39,21 @@ export class Transformer {
 	// DTIF Fonts
 	public readonly fonts = new Map<number, TFontWithContent>();
 
-	constructor(node: FrameNode) {
+	// Callbacks
+	private _onTransformStatusUpdate: TOnTransformStatusUpdate | null = null;
+
+	constructor(node: FrameNode, options: TTransformerOptions = {}) {
+		const { onTransformStatusUpdate = null } = options;
 		this._toTransformRootNode = node;
+		this._onTransformStatusUpdate = onTransformStatusUpdate;
 	}
 
 	public async transform(config: TTransformConfig): Promise<TComposition> {
 		const nodeConfig: TTransformNodeConfig = { includeInvisible: true, ...(config.node ?? {}) };
 		const paintConfig = config.paint;
 		const fontConfig = config.font;
+
+		this._onTransformStatusUpdate?.({ type: ETransformStatus.START });
 
 		// Walk Figma tree and discover to transform nodes, paints and fonts
 		const { rootId, toTransformNodes, toTransformPaints, toTransformFonts } =
@@ -56,16 +63,27 @@ export class Transformer {
 		this._toTransformPaints = toTransformPaints;
 		this._toTransformFonts = toTransformFonts;
 
+		this._onTransformStatusUpdate?.({
+			type: ETransformStatus.TRAVERSED_TREE,
+			toTransformNodesCount: this._toTransformNodes.length,
+			toTransformPaintsCount: this._toTransformPaints.length,
+			toTransformFontsCount: this._toTransformFonts.length
+		});
+
 		// Transform nodes
+		this._onTransformStatusUpdate?.({ type: ETransformStatus.TRANSFORMING_NODES });
 		await this.transformNodes(nodeConfig);
 
 		// Transform paints
+		this._onTransformStatusUpdate?.({ type: ETransformStatus.TRANSFORMING_PAINTS });
 		await this.transformPaints(paintConfig);
 
 		// Transform fonts
+		this._onTransformStatusUpdate?.({ type: ETransformStatus.TRANSFORMING_FONTS });
 		await this.transformFonts(fontConfig);
 
 		// Construct composition
+		this._onTransformStatusUpdate?.({ type: ETransformStatus.CONSTRUCTING_COMPOSITON });
 		const composition: TComposition = {
 			version: '1.0',
 			name: this._toTransformRootNode.name,
@@ -77,6 +95,7 @@ export class Transformer {
 			rootNodeId: this._rootNodeId
 		};
 
+		this._onTransformStatusUpdate?.({ type: ETransformStatus.END });
 		return composition;
 	}
 
@@ -141,3 +160,39 @@ export interface TTransformConfig {
 	font: TTransformFontConfig;
 	paint: TTransformPaintConfig;
 }
+
+export interface TTransformerOptions {
+	onTransformStatusUpdate?: TOnTransformStatusUpdate;
+}
+
+export type TOnTransformStatusUpdate = (status: TTransformStatusUpdate) => void;
+
+export type TTransformStatusUpdate =
+	| { type: ETransformStatus.START }
+	| {
+			type: ETransformStatus.TRAVERSED_TREE;
+			toTransformNodesCount: number;
+			toTransformPaintsCount: number;
+			toTransformFontsCount: number;
+	  }
+	| { type: ETransformStatus.TRANSFORMING_NODES }
+	| { type: ETransformStatus.TRANSFORMING_PAINTS }
+	| { type: ETransformStatus.TRANSFORMING_FONTS }
+	| { type: ETransformStatus.CONSTRUCTING_COMPOSITON }
+	| { type: ETransformStatus.END };
+
+export enum ETransformStatus {
+	START,
+	TRAVERSED_TREE,
+	TRANSFORMING_NODES,
+	TRANSFORMING_PAINTS,
+	TRANSFORMING_FONTS,
+	CONSTRUCTING_COMPOSITON,
+	END
+}
+
+export type TOnTraversedTree = (data: {
+	toTransformNodesCount: number;
+	toTransformPaintsCount: number;
+	toTransformFontsCount: number;
+}) => void;

@@ -1,4 +1,5 @@
 import type { TPluginMessageEvent } from '@dyn/figma-handler/app';
+import type { TTransformStatusUpdate } from '@dyn/figma-to-dtif';
 
 export interface TOnSelectFrameEvent extends TPluginMessageEvent {
 	key: 'on-select-frame';
@@ -22,8 +23,14 @@ export interface TOnChangeSelectedNodePropertiesEvent extends TPluginMessageEven
 	args: { changed: SceneNode };
 }
 
+export interface TOnTransformStatusUpdateEvent extends TPluginMessageEvent {
+	key: 'on-transform-status-update';
+	args: { status: TTransformStatusUpdate };
+}
+
 export type TPluginMessageEvents =
 	| TOnSelectFrameEvent
 	| TOnSelectNodeEvent
 	| TOnSelectNodePropertiesEvent
-	| TOnChangeSelectedNodePropertiesEvent;
+	| TOnChangeSelectedNodePropertiesEvent
+	| TOnTransformStatusUpdateEvent;

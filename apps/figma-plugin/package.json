@@ -31,6 +31,7 @@
 		"@dyn/figma-to-dtif": "workspace:*",
 		"@dyn/state": "workspace:*",
 		"@dyn/state-react": "workspace:*",
+		"@dyn/svg-composition": "workspace:*",
 		"@dyn/ui": "workspace:*",
 		"@dyn/utils": "workspace:*",
 		"clsx": "^2.0.0",

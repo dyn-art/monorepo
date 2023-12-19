@@ -1,11 +1,11 @@
 import { Transformer } from '@dyn/figma-to-dtif';
 
-import type { TPluginCallbackRegistration } from '../../types';
+import type { TPluginCallbackRegistration, TPluginHandler } from '../../types';
 
 export default {
 	type: 'app.message',
 	key: 'intermediate-format-export',
-	callback: async (instance, args) => {
+	callback: async (instance: TPluginHandler, args) => {
 		console.log('intermediate-format-export', args);
 
 		// Filter out unsupported nodes
@@ -17,24 +17,32 @@ export default {
 
 		// Process nodes
 		for (const node of supportedNodes) {
-			const transformer = new Transformer(node);
-			const result = await transformer.transform({
-				font: {
-					exportOptions: { inline: true },
-					resolveFontContent: async () => {
-						// TODO
-						return null as any;
-					}
-				},
-				paint: {
-					gradientExportOptions: { inline: true },
-					imageExportOptions: { inline: true }
-				}
-				// node: {
-				// 	includeInvisible: false
-				// }
-			});
-			console.log({ transformer, result });
+			await processNode(node, instance);
 		}
 	}
 } as TPluginCallbackRegistration;
+
+async function processNode(node: FrameNode, instance: TPluginHandler): Promise<void> {
+	const transformer = new Transformer(node, {
+		onTransformStatusUpdate: (status) => {
+			instance.post('on-transform-status-update', { status });
+		}
+	});
+	const result = await transformer.transform({
+		font: {
+			exportOptions: { inline: true },
+			resolveFontContent: async () => {
+				// TODO
+				return null as any;
+			}
+		},
+		paint: {
+			gradientExportOptions: { inline: true },
+			imageExportOptions: { inline: true }
+		}
+		// node: {
+		// 	includeInvisible: false
+		// }
+	});
+	console.log({ transformer, result });
+}
