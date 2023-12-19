@@ -39,7 +39,7 @@ const NodeInspectorPlugin: React.FC = () => {
 	);
 
 	return (
-		<div className="flex w-full overflow-x-hidden border bg-[#090300]">
+		<div className="flex h-full w-full border bg-[#090300]">
 			<div className="relative w-full overflow-x-auto p-4">
 				<JSONTree data={selectedNodes} theme={threezerotwofourTheme} />
 			</div>

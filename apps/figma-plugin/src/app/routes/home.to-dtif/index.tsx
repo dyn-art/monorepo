@@ -41,10 +41,10 @@ const ToDTIFPlugin: React.FC = () => {
 	// =========================================================================
 
 	return (
-		<>
+		<div className="flex h-full w-full flex-col px-4">
 			<ToTransformSelection isTransforming={isTransforming} />
 			<TransformLoadingIndicator isTransforming={isTransforming} />
-		</>
+		</div>
 	);
 };
 
