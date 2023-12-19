@@ -18,7 +18,22 @@ export default {
 		// Process nodes
 		for (const node of supportedNodes) {
 			const transformer = new Transformer(node);
-			const result = await transformer.transform({} as any);
+			const result = await transformer.transform({
+				font: {
+					exportOptions: { inline: true },
+					resolveFontContent: async () => {
+						// TODO
+						return null as any;
+					}
+				},
+				paint: {
+					gradientExportOptions: { inline: true },
+					imageExportOptions: { inline: true }
+				}
+				// node: {
+				// 	includeInvisible: false
+				// }
+			});
 			console.log({ transformer, result });
 		}
 	}

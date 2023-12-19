@@ -49,7 +49,6 @@ const ToDTIFPlugin: React.FC = () => {
 		}
 
 		const selectedFrame = selectedFrames[selectedFrameIndex];
-		console.log('onTransform', selectedFrame);
 		if (selectedFrame != null) {
 			appHandler.post('intermediate-format-export', {
 				selectedElements: [{ id: selectedFrame.id, name: selectedFrame.name }]

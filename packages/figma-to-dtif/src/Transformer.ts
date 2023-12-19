@@ -44,7 +44,7 @@ export class Transformer {
 	}
 
 	public async transform(config: TTransformConfig): Promise<TComposition> {
-		const nodeConfig: TTransformNodeConfig = { includeInvisible: true, ...config.node };
+		const nodeConfig: TTransformNodeConfig = { includeInvisible: true, ...(config.node ?? {}) };
 		const paintConfig = config.paint;
 		const fontConfig = config.font;
 

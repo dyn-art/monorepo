@@ -1,4 +1,4 @@
-export type TExportOptions = { inline: boolean } | { upload: TUploadStaticData };
+export type TExportOptions = { inline: true } | { upload: TUploadStaticData };
 
 export interface TContentType {
 	mimeType: 'image/jpeg' | 'image/png' | 'image/svg+xml' | 'image/gif' | string;
@@ -14,3 +14,12 @@ export interface TUploadStaticDataResponse {
 	key: string;
 	url?: string;
 }
+
+export type TFigmaNodeWithChildren = FrameNode | InstanceNode | ComponentNode | GroupNode;
+export type TFigmaShapeNode = RectangleNode | EllipseNode | PolygonNode | StarNode;
+export type TFigmaNodeWithPaints =
+	| FrameNode
+	| InstanceNode
+	| ComponentNode
+	| TFigmaShapeNode
+	| TextNode;

@@ -6,7 +6,7 @@ export function transformGroupNode(
 	node: GroupNode,
 	config: TTransformGroupNodeConfig
 ): { type: 'Group' } & TGroupNodeBundle {
-	const { childrenIds, paintIds } = config;
+	const { childrenIds } = config;
 
 	return {
 		type: 'Group',
@@ -28,12 +28,10 @@ export function transformGroupNode(
 			blendMode: convertFigmaBlendModeToDTIF(node.blendMode),
 			opacity: node.opacity,
 			isMask: node.isMask
-		},
-		fill: { paintIds }
+		}
 	};
 }
 
 interface TTransformGroupNodeConfig {
 	childrenIds: number[];
-	paintIds: number[];
 }

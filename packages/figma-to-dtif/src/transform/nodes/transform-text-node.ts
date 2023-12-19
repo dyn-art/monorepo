@@ -1,22 +1,19 @@
-import type { TTextNodeBundle } from '@dyn/dtif';
+import type { TTextNodeBundle, TTextSegment } from '@dyn/dtif';
 
+import type { TToTransformTextNode } from '../../FigmaNodeTreeProcessor';
 import {
 	convertFigmaBlendModeToDTIF,
 	convertFigmaHorizontalTextAlignmentToDTIF,
 	convertFigmaTransformToMat3,
-	convertFigmaVerticalTextAlignmentToDTIF,
-	dropMixed
+	convertFigmaVerticalTextAlignmentToDTIF
 } from '../../utils';
 
 export function transformTextNode(
 	node: TextNode,
+	segments: TToTransformTextNode['segments'],
 	config: TTransformTextNodeNodeConfig
 ): { type: 'Text' } & TTextNodeBundle {
-	const { fontIds, paintIds } = config;
-
-	const fontSize = dropMixed(node, 'fontSize');
-	const letterSpacing = dropMixed(node, 'letterSpacing');
-	const lineHeight = dropMixed(node, 'lineHeight');
+	const { paintIds } = config;
 
 	return {
 		type: 'Text',
@@ -25,27 +22,27 @@ export function transformTextNode(
 			node_type: 'Text'
 		},
 		text: {
-			// TODO: Support multipe segments
-			segments: [
-				{
-					value: node.characters,
-					style: {
-						fontId: fontIds[0] as unknown as number, // TODO:
-						fontSize,
-						letterSpacing:
-							letterSpacing.unit === 'PIXELS'
-								? { Pixels: letterSpacing.value }
-								: { Percent: letterSpacing.value },
-						lineHeight:
-							// eslint-disable-next-line no-nested-ternary -- Readable enough
-							lineHeight.unit === 'PIXELS'
-								? { Pixels: lineHeight.value }
-								: lineHeight.unit === 'PERCENT'
-								? { Percent: lineHeight.value }
-								: 'Auto'
-					}
-				}
-			],
+			segments: segments.map(
+				(segment) =>
+					({
+						value: segment.characters,
+						style: {
+							fontId: segment.fontId,
+							fontSize: segment.fontSize,
+							letterSpacing:
+								segment.letterSpacing.unit === 'PIXELS'
+									? { Pixels: segment.letterSpacing.value }
+									: { Percent: segment.letterSpacing.value },
+							lineHeight:
+								// eslint-disable-next-line no-nested-ternary -- Readable enough
+								segment.lineHeight.unit === 'PIXELS'
+									? { Pixels: segment.lineHeight.value }
+									: segment.lineHeight.unit === 'PERCENT'
+									? { Percent: segment.lineHeight.value }
+									: 'Auto'
+						}
+					}) as TTextSegment
+			),
 			horizontalTextAlignment: convertFigmaHorizontalTextAlignmentToDTIF(node.textAlignHorizontal),
 			verticalTextAlignment: convertFigmaVerticalTextAlignmentToDTIF(node.textAlignVertical),
 			linebreakBehaviour: 'WordBoundary'
@@ -69,6 +66,5 @@ export function transformTextNode(
 }
 
 interface TTransformTextNodeNodeConfig {
-	fontIds: number[];
 	paintIds: number[];
 }

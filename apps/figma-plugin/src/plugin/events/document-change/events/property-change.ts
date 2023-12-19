@@ -1,4 +1,4 @@
-import { isRemovedNode } from '@dyn/figma-to-dtif';
+import { isFigmaRemovedNode } from '@dyn/figma-to-dtif';
 import { pickProperties } from '@dyn/utils';
 
 import { EAppRoutes, type TPluginHandler } from '../../../../types';
@@ -12,7 +12,7 @@ export function onPropertyChange(instance: TPluginHandler, event: PropertyChange
 		const node = event.node;
 
 		// Post on change selected node properties UI event
-		if (SELECTED_NODE_IDS.get().includes(node.id) && !isRemovedNode(node)) {
+		if (SELECTED_NODE_IDS.get().includes(node.id) && !isFigmaRemovedNode(node)) {
 			instance.post('on-change-selected-node-properties', {
 				changed: pickProperties(node, getObjectPropertyKeys(node) as any) as SceneNode
 			});
