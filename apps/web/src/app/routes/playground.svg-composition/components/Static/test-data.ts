@@ -62,7 +62,7 @@ export const COMPOSITION_WITH_ONE_RECT = (
 		3: {
 			type: 'Text',
 			text: {
-				sections: [
+				segments: [
 					{
 						value: 'Hello there ',
 						style: {

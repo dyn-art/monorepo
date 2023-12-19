@@ -25,8 +25,8 @@ export function transformTextNode(
 			node_type: 'Text'
 		},
 		text: {
-			// TODO: Support multipe sections
-			sections: [
+			// TODO: Support multipe segments
+			segments: [
 				{
 					value: node.characters,
 					style: {

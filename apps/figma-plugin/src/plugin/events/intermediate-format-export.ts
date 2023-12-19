@@ -18,7 +18,7 @@ export default {
 		// Process nodes
 		for (const node of supportedNodes) {
 			const transformer = new Transformer(node);
-			const result = await transformer.transform();
+			const result = await transformer.transform({} as any);
 			console.log({ transformer, result });
 		}
 	}

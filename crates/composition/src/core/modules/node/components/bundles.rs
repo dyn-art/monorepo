@@ -214,7 +214,7 @@ pub struct TextNodeBundle {
 
     #[serde(default)]
     #[serde(rename = "fill")]
-    pub fill_mixin: FillMixin, // TODO: Needs adjustment to work with text sections
+    pub fill_mixin: FillMixin, // TODO: Needs adjustment to work with text segments
 }
 
 #[inline]

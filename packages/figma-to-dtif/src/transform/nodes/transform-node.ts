@@ -8,7 +8,10 @@ import { transformGroupNode } from './transform-group-node';
 import { transformRectangleNode } from './transform-rectangle-node';
 import { transformTextNode } from './transform-text-node';
 
-export async function transformNode(toTransformNode: TToTransformNode): Promise<TNode> {
+export async function transformNode(
+	toTransformNode: TToTransformNode,
+	config: TTransformNodeConfig
+): Promise<TNode> {
 	const node = toTransformNode.node;
 
 	// Check whether Figma node is supported by DTIF
@@ -54,4 +57,8 @@ export async function transformNode(toTransformNode: TToTransformNode): Promise<
 		default:
 			throw new UnsupportedFigmaNodeException(node);
 	}
+}
+
+export interface TTransformNodeConfig {
+	includeInvisible: boolean;
 }

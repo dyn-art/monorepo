@@ -6,7 +6,14 @@ import {
 	type TToTransformNode,
 	type TToTransformPaint
 } from './FigmaNodeTreeProcessor';
-import { transformFont, transformNode, transformPaint } from './transform';
+import {
+	transformFont,
+	transformNode,
+	transformPaint,
+	type TTransformFontConfig,
+	type TTransformNodeConfig,
+	type TTransformPaintConfig
+} from './transform';
 
 export class Transformer {
 	// Figma Nodes
@@ -36,7 +43,11 @@ export class Transformer {
 		this._toTransformRootNode = node;
 	}
 
-	public async transform(): Promise<TComposition> {
+	public async transform(config: TTransformConfig): Promise<TComposition> {
+		const nodeConfig: TTransformNodeConfig = { includeInvisible: true, ...config.node };
+		const paintConfig = config.paint;
+		const fontConfig = config.font;
+
 		// Walk Figma tree and discover to transform nodes, paints and fonts
 		const { rootId, toTransformNodes, toTransformPaints, toTransformFonts } =
 			new FigmaNodeTreeProcessor(this._toTransformRootNode).processNodeTree();
@@ -46,13 +57,13 @@ export class Transformer {
 		this._toTransformFonts = toTransformFonts;
 
 		// Transform nodes
-		await this.transformNodes();
+		await this.transformNodes(nodeConfig);
 
 		// Transform paints
-		await this.transformPaints();
+		await this.transformPaints(paintConfig);
 
 		// Transform fonts
-		await this.transformFonts();
+		await this.transformFonts(fontConfig);
 
 		// Construct composition
 		const composition: TComposition = {
@@ -73,7 +84,7 @@ export class Transformer {
 	// Transform
 	// =========================================================================
 
-	private async transformNodes(): Promise<void> {
+	private async transformNodes(config: TTransformNodeConfig): Promise<void> {
 		const toTransformNodes = this._toTransformNodes
 			.splice(0, this._toTransformNodes.length)
 			.concat(this._nodesFailedToTransform.splice(0, this._nodesFailedToTransform.length));
@@ -81,7 +92,7 @@ export class Transformer {
 		// Transform nodes
 		for (const toTransformNode of toTransformNodes) {
 			try {
-				const node = await transformNode(toTransformNode);
+				const node = await transformNode(toTransformNode, config);
 				this.nodes.set(toTransformNode.id, node);
 			} catch (error) {
 				// TODO: Error
@@ -90,7 +101,7 @@ export class Transformer {
 		}
 	}
 
-	private async transformPaints(): Promise<void> {
+	private async transformPaints(config: TTransformPaintConfig): Promise<void> {
 		const toTransformPaints = this._toTransformPaints
 			.splice(0, this._toTransformPaints.length)
 			.concat(this._paintsFailedToTransform.splice(0, this._paintsFailedToTransform.length));
@@ -98,7 +109,7 @@ export class Transformer {
 		// Transform paints
 		for (const toTransformPaint of toTransformPaints) {
 			try {
-				const paint = await transformPaint(toTransformPaint);
+				const paint = await transformPaint(toTransformPaint, config);
 				this.paints.set(toTransformPaint.id, paint);
 			} catch (error) {
 				// TODO: Error
@@ -107,7 +118,7 @@ export class Transformer {
 		}
 	}
 
-	private async transformFonts(): Promise<void> {
+	private async transformFonts(config: TTransformFontConfig): Promise<void> {
 		const toTransformFonts = this._toTransformFonts
 			.splice(0, this._toTransformFonts.length)
 			.concat(this._fontsFailedToTransform.splice(0, this._fontsFailedToTransform.length));
@@ -115,7 +126,7 @@ export class Transformer {
 		// Transform fonts
 		for (const toTransformFont of toTransformFonts) {
 			try {
-				const font = await transformFont(toTransformFont);
+				const font = await transformFont(toTransformFont, config);
 				this.fonts.set(toTransformFont.id, font);
 			} catch (error) {
 				// TODO: Error
@@ -123,4 +134,10 @@ export class Transformer {
 			}
 		}
 	}
+}
+
+export interface TTransformConfig {
+	node?: Partial<TTransformNodeConfig>;
+	font: TTransformFontConfig;
+	paint: TTransformPaintConfig;
 }

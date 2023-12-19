@@ -17,19 +17,19 @@ impl<'a> TokenStream<'a> {
         let mut font_face_cache: HashMap<u64, rustybuzz::Face<'a>> = HashMap::new();
 
         // Preload required faces to avoid mutable borrow conflicts during local font face caching
-        for section in &text.sections {
-            font_cache.load_ttfp_face(&section.style.font_id);
+        for segment in &text.segments {
+            font_cache.load_ttfp_face(&segment.style.font_id);
         }
 
-        // Iterate through text sections, creating tokens
-        for section in &text.sections {
-            let font_hash = section.style.font_id;
-            let font_size = section.style.font_size as f32;
+        // Iterate through text segments, creating tokens
+        for segment in &text.segments {
+            let font_hash = segment.style.font_id;
+            let font_size = segment.style.font_size as f32;
 
             // Cache rustybuzz font face locally
             if !font_face_cache.contains_key(&font_hash) {
-                if let Some(face) = font_cache.get_buzz_face(&section.style.font_id) {
-                    font_face_cache.insert(section.style.font_id, face.clone());
+                if let Some(face) = font_cache.get_buzz_face(&segment.style.font_id) {
+                    font_face_cache.insert(segment.style.font_id, face.clone());
                 } else {
                     continue;
                 }
@@ -39,15 +39,15 @@ impl<'a> TokenStream<'a> {
 
             // Tokenize the text, considering spaces and line breaks
             let mut start = 0;
-            for (index, match_str) in section
+            for (index, match_str) in segment
                 .value
                 .match_indices(|c: char| c.is_whitespace() || c == '\n')
             {
-                // Create a text fragment token for non-whitespace sections
+                // Create a text fragment token for non-whitespace segments
                 if start != index {
                     tokens.push(Token::new(TokenKind::TextFragment {
-                        value: String::from(&section.value[start..index]),
-                        style: section.style.clone(),
+                        value: String::from(&segment.value[start..index]),
+                        style: segment.style.clone(),
                         metric: token_metric.clone(),
                     }));
                 }
@@ -56,7 +56,7 @@ impl<'a> TokenStream<'a> {
                 tokens.push(match match_str {
                     "\n" => Token::new(TokenKind::Linebreak),
                     _ => Token::new(TokenKind::Space {
-                        style: section.style.clone(),
+                        style: segment.style.clone(),
                         metric: token_metric.clone(),
                     }),
                 });
@@ -64,11 +64,11 @@ impl<'a> TokenStream<'a> {
                 start = index + match_str.len();
             }
 
-            // Handle the last word in the section, if any
-            if start < section.value.len() {
+            // Handle the last word in the segment, if any
+            if start < segment.value.len() {
                 tokens.push(Token::new(TokenKind::TextFragment {
-                    value: String::from(&section.value[start..]),
-                    style: section.style.clone(),
+                    value: String::from(&segment.value[start..]),
+                    style: segment.style.clone(),
                     metric: token_metric,
                 }));
             }

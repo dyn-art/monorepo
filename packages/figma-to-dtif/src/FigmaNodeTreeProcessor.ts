@@ -87,6 +87,9 @@ export class FigmaNodeTreeProcessor {
 		const { family, style } = dropMixed(node, 'fontName');
 		const fontWeight = dropMixed(node, 'fontWeight');
 
+		const segments = node.getStyledTextSegments(['fontSize', 'fontName', 'fontWeight']);
+		console.log(segments);
+
 		return {
 			family,
 			name: style,
