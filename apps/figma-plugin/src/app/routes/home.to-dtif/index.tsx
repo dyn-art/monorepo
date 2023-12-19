@@ -4,7 +4,7 @@ import { ETransformStatus } from '@dyn/figma-to-dtif';
 import { appHandler } from '../../app-handler';
 import { useAppCallback } from '../../hooks';
 import { ToTransformSelection } from './ToTransformSelection';
-import { Transforming } from './Transforming';
+import { TransformLoadingIndicator } from './TransformLoadingIndicator';
 
 const ToDTIFPlugin: React.FC = () => {
 	const [isTransforming, setIsTransforming] = React.useState(false);
@@ -43,7 +43,7 @@ const ToDTIFPlugin: React.FC = () => {
 	return (
 		<>
 			<ToTransformSelection isTransforming={isTransforming} />
-			{isTransforming && <Transforming />}
+			<TransformLoadingIndicator isTransforming={isTransforming} />
 		</>
 	);
 };

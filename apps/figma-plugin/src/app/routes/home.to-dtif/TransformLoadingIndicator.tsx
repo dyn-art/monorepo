@@ -5,7 +5,8 @@ import { Icons } from '@dyn/ui';
 import { appHandler } from '../../app-handler';
 import { useAppCallback } from '../../hooks';
 
-export const Transforming: React.FC = () => {
+export const TransformLoadingIndicator: React.FC<TProps> = (props) => {
+	const { isTransforming } = props;
 	const [message, setMessage] = React.useState('Loading');
 	const [subMessage, setSubMessage] = React.useState<string>('TODO: Random facts here');
 
@@ -49,6 +50,10 @@ export const Transforming: React.FC = () => {
 		[]
 	);
 
+	if (!isTransforming) {
+		return null;
+	}
+
 	return (
 		<div className="flex h-full w-full flex-col items-center justify-center">
 			<div className="flex flex-grow flex-col items-center justify-center">
@@ -59,3 +64,7 @@ export const Transforming: React.FC = () => {
 		</div>
 	);
 };
+
+interface TProps {
+	isTransforming: boolean;
+}

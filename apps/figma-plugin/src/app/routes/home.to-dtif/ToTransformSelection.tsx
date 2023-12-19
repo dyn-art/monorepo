@@ -25,8 +25,7 @@ export const ToTransformSelection: React.FC<TProps> = (props) => {
 		TOnSelectFrameEvent['args']['selected']
 	>([]);
 	const [selectedFrameIndex, setSelectedFrameIndex] = React.useState<number | null>(null);
-	const [_isOpen, setIsOpen] = React.useState(true);
-	const isOpen = React.useMemo(() => _isOpen && !isTransforming, [_isOpen, isTransforming]);
+	const [isOpen, setIsOpen] = React.useState(true);
 
 	// =========================================================================
 	// Lifecycle
@@ -50,6 +49,12 @@ export const ToTransformSelection: React.FC<TProps> = (props) => {
 		},
 		[]
 	);
+
+	React.useEffect(() => {
+		if (isTransforming) {
+			setIsOpen(false);
+		}
+	}, [isTransforming]);
 
 	// =========================================================================
 	// Callback
