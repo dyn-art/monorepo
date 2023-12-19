@@ -20,6 +20,10 @@ const ToDTIFPlugin: React.FC = () => {
 	>([]);
 	const [selectedFrameIndex, setSelectedFrameIndex] = React.useState<number | null>(null);
 
+	// =========================================================================
+	// Lifecycle
+	// =========================================================================
+
 	useAppCallback(appHandler, {
 		type: 'plugin.message',
 		key: 'on-select-frame',
@@ -35,6 +39,27 @@ const ToDTIFPlugin: React.FC = () => {
 		}
 	});
 
+	// =========================================================================
+	// Callback
+	// =========================================================================
+
+	const onTransform = React.useCallback(() => {
+		if (selectedFrameIndex == null) {
+			return;
+		}
+
+		const selectedFrame = selectedFrames[selectedFrameIndex];
+		console.log('onTransform', selectedFrame);
+		if (selectedFrame != null) {
+			appHandler.post('intermediate-format-export', {
+				selectedElements: [{ id: selectedFrame.id, name: selectedFrame.name }]
+			});
+		}
+	}, [selectedFrames, selectedFrameIndex]);
+
+	// =========================================================================
+	// UI
+	// =========================================================================
 	return (
 		<>
 			<div className="flex h-24 w-full flex-col items-center justify-center rounded-md border text-center text-blue-400">
@@ -67,7 +92,7 @@ const ToDTIFPlugin: React.FC = () => {
 						))}
 					</SelectContent>
 				</Select>
-				<Button className="ml-2" disabled={selectedFrameIndex == null}>
+				<Button className="ml-2" disabled={selectedFrameIndex == null} onClick={onTransform}>
 					Transform
 				</Button>
 			</div>

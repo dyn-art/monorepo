@@ -1,6 +1,6 @@
 import type { TBlendMode } from '@dyn/dtif';
 
-export function convertFigmaBlendModeToDTIF(figmaBlendMode: BlendMode): TBlendMode {
+export function convertFigmaBlendModeToDTIF(figmaBlendMode?: BlendMode): TBlendMode {
 	switch (figmaBlendMode) {
 		case 'NORMAL':
 			return 'Normal';

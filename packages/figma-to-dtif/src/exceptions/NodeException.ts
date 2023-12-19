@@ -1,8 +1,8 @@
 export class NodeException extends Error {
-	public readonly node: SceneNode;
+	public readonly nodeId: SceneNode['id'];
 
-	constructor(message: string, node: SceneNode) {
+	constructor(message: string, nodeId: SceneNode['id']) {
 		super(message);
-		this.node = node;
+		this.nodeId = nodeId;
 	}
 }

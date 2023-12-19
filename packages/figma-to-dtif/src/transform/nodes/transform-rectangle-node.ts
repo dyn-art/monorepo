@@ -12,7 +12,7 @@ export function transformRectangleNode(
 		type: 'Rectangle',
 		node: {
 			name: node.name,
-			node_type: 'Frame'
+			node_type: 'Rectangle'
 		},
 		compositionMixin: {
 			isLocked: node.locked,

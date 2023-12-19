@@ -1,8 +1,12 @@
-import type { TComposition, TFontMetadata, TFontWithContent, TNode, TPaint } from '@dyn/dtif';
-import { ContinuousId, type TContinuousId } from '@dyn/utils';
+import type { TComposition, TFontWithContent, TNode, TPaint } from '@dyn/dtif';
 
+import {
+	FigmaNodeTreeProcessor,
+	type TToTransformFont,
+	type TToTransformNode,
+	type TToTransformPaint
+} from './FigmaNodeTreeProcessor';
 import { transformFont, transformNode, transformPaint } from './transform';
-import { dropMixed, hasChildrenFigma, hasFillFigma, isFigmaTextNode } from './utils';
 
 export class Transformer {
 	// Figma Nodes
@@ -33,8 +37,13 @@ export class Transformer {
 	}
 
 	public async transform(): Promise<TComposition> {
-		const rootId = this.traverseFigmaNodeTree(this._toTransformRootNode);
-		this._rootNodeId = rootId.toNumber();
+		// Walk Figma tree and discover to transform nodes, paints and fonts
+		const { rootId, toTransformNodes, toTransformPaints, toTransformFonts } =
+			new FigmaNodeTreeProcessor(this._toTransformRootNode).processNodeTree();
+		this._rootNodeId = rootId;
+		this._toTransformNodes = toTransformNodes;
+		this._toTransformPaints = toTransformPaints;
+		this._toTransformFonts = toTransformFonts;
 
 		// Transform nodes
 		await this.transformNodes();
@@ -58,97 +67,6 @@ export class Transformer {
 		};
 
 		return composition;
-	}
-
-	// =========================================================================
-	// Traverse
-	// =========================================================================
-
-	private traverseFigmaNodeTree(root: FrameNode): ContinuousId {
-		const rootId = ContinuousId.ZERO;
-		const toTransformPaintsMap = new Map<string, TContinuousId>();
-		const toTransformFontsMap = new Map<string, TContinuousId>();
-
-		this._toTransformRootNode = root;
-		this._toTransformNodes = [];
-		this._toTransformPaints = [];
-
-		// Generates a unique ID for an item, if not already generated
-		const getOrGenerateId = <T>(
-			map: Map<string, TContinuousId>,
-			toTransformArray: T[],
-			value: T
-		): TContinuousId => {
-			const key = JSON.stringify(value);
-			let id = map.get(key);
-			if (!id) {
-				id = ContinuousId.nextId();
-				toTransformArray.push(value);
-				map.set(key, id);
-			}
-			return id;
-		};
-
-		// Walks through each node and processes children, paints, and fonts
-		const walk = (node: SceneNode, isRoot = false): TContinuousId => {
-			const nodeId = isRoot ? rootId.toNumber() : ContinuousId.nextId();
-			const childrenIds = hasChildrenFigma(node)
-				? node.children.map((child) => walk(child))
-				: undefined;
-			const paintIds = processPaints(node, toTransformPaintsMap, this._toTransformPaints);
-			const fontIds = processFonts(node, toTransformFontsMap, this._toTransformFonts);
-
-			this._toTransformNodes.push({
-				id: nodeId,
-				node,
-				childrenIds,
-				paintIds,
-				fontIds
-			});
-
-			return nodeId;
-		};
-
-		// Processes node paints and returns their IDs
-		const processPaints = (
-			node: SceneNode,
-			map: Map<string, TContinuousId>,
-			paintsArray: TToTransformPaint[]
-		): TContinuousId[] | undefined => {
-			if (!hasFillFigma(node)) {
-				return undefined;
-			}
-			const fills = dropMixed(node, 'fills');
-			return fills.map((paint) =>
-				getOrGenerateId(map, paintsArray, { id: ContinuousId.nextId(), paint })
-			);
-		};
-
-		// Processes node fonts and returns their ID
-		// TODO: Support multipe text sections
-		const processFonts = (
-			node: SceneNode,
-			map: Map<string, TContinuousId>,
-			fontsArray: TToTransformFont[]
-		): TContinuousId[] | undefined => {
-			if (!isFigmaTextNode(node)) {
-				return undefined;
-			}
-			const { family, style } = dropMixed(node, 'fontName');
-			const fontWeight = dropMixed(node, 'fontWeight');
-			const fontMetadata = {
-				family,
-				name: style,
-				weight: fontWeight,
-				style: style.toLowerCase().includes('italic') ? 'Italic' : 'Normal'
-			};
-			return [getOrGenerateId(map, fontsArray, { id: ContinuousId.nextId(), fontMetadata })];
-		};
-
-		// Start walking the Figma node tree from the root
-		walk(root, true);
-
-		return rootId;
 	}
 
 	// =========================================================================
@@ -180,7 +98,7 @@ export class Transformer {
 		// Transform paints
 		for (const toTransformPaint of toTransformPaints) {
 			try {
-				const paint = await transformPaint(toTransformPaint.paint);
+				const paint = await transformPaint(toTransformPaint);
 				this.paints.set(toTransformPaint.id, paint);
 			} catch (error) {
 				// TODO: Error
@@ -197,7 +115,7 @@ export class Transformer {
 		// Transform fonts
 		for (const toTransformFont of toTransformFonts) {
 			try {
-				const font = await transformFont(toTransformFont.fontMetadata);
+				const font = await transformFont(toTransformFont);
 				this.fonts.set(toTransformFont.id, font);
 			} catch (error) {
 				// TODO: Error
@@ -205,22 +123,4 @@ export class Transformer {
 			}
 		}
 	}
-}
-
-export interface TToTransformNode {
-	id: TContinuousId;
-	node: SceneNode;
-	childrenIds?: TContinuousId[];
-	paintIds?: TContinuousId[];
-	fontIds?: TContinuousId[];
-}
-
-export interface TToTransformPaint {
-	id: TContinuousId;
-	paint: Paint;
-}
-
-export interface TToTransformFont {
-	id: TContinuousId;
-	fontMetadata: TFontMetadata;
 }

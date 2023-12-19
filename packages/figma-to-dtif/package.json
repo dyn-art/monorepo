@@ -28,13 +28,15 @@
 	},
 	"homepage": "https://s.dyn.art/github",
 	"dependencies": {
-		"@dyn/utils": "workspace:*"
+		"@dyn/utils": "workspace:*",
+		"object-hash": "^3.0.0"
 	},
 	"devDependencies": {
 		"@dyn/config": "workspace:*",
 		"@dyn/dtif": "workspace:*",
 		"@figma/plugin-typings": "^1.82.0",
-		"@types/node": "^20.8.10"
+		"@types/node": "^20.8.10",
+		"@types/object-hash": "^3.0.6"
 	},
 	"files": [
 		"dist",

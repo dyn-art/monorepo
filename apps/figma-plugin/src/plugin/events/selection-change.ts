@@ -1,4 +1,3 @@
-import { Transformer } from '@dyn/figma-to-dtif';
 import { pickProperties } from '@dyn/utils';
 
 import { EAppRoutes, type TPluginCallbackRegistration, type TPluginHandler } from '../../types';
@@ -30,11 +29,6 @@ export default {
 				instance.post('on-select-frame', {
 					selected: selectedFrames.map((frame) => pickProperties(frame, ['name', 'id']))
 				});
-				for (const selectedFrame of selectedFrames) {
-					const transformer = new Transformer(selectedFrame);
-					await transformer.transform();
-					console.log({ transformer });
-				}
 			} else {
 				instance.post('on-select-frame', { selected: [] });
 			}

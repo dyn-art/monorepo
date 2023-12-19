@@ -7,6 +7,7 @@ export class ContinuousId {
 	}
 
 	public static get ZERO(): ContinuousId {
+		this.nextIdValue = 0;
 		return new ContinuousId(0);
 	}
 

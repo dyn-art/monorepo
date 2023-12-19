@@ -1,7 +1,7 @@
 import type { TNode } from '@dyn/dtif';
 
 import { InvisibleNodeException, UnsupportedFigmaNodeException } from '../../exceptions';
-import type { TToTransformNode } from '../../Transformer';
+import type { TToTransformNode } from '../../FigmaNodeTreeProcessor';
 import { canBeTransformedToDTIF } from '../../utils';
 import { transformFrameNode } from './transform-frame-node';
 import { transformGroupNode } from './transform-group-node';
