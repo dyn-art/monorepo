@@ -41,7 +41,6 @@ export const TransformLoadingIndicator: React.FC<TProps> = (props) => {
 					case ETransformStatus.CONSTRUCTING_COMPOSITON:
 						setMessage('Constructing Composition');
 						break;
-
 					default:
 					// do nothing
 				}

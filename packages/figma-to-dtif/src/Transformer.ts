@@ -1,5 +1,6 @@
 import type { TComposition, TFontWithContent, TNode, TPaint } from '@dyn/dtif';
 
+import { FailedToResolveRootNodeException } from './exceptions';
 import {
 	FigmaNodeTreeProcessor,
 	type TToTransformFont,
@@ -14,6 +15,7 @@ import {
 	type TTransformNodeConfig,
 	type TTransformPaintConfig
 } from './transform';
+import { resetDTIFNodeTransform } from './utils';
 
 export class Transformer {
 	// Figma Nodes
@@ -81,6 +83,14 @@ export class Transformer {
 		// Transform fonts
 		this._onTransformStatusUpdate?.({ type: ETransformStatus.TRANSFORMING_FONTS });
 		await this.transformFonts(fontConfig);
+
+		// Reset root node layout
+		const rootNode = this.nodes.get(this._rootNodeId);
+		if (rootNode != null) {
+			resetDTIFNodeTransform(rootNode);
+		} else {
+			throw new FailedToResolveRootNodeException();
+		}
 
 		// Construct composition
 		this._onTransformStatusUpdate?.({ type: ETransformStatus.CONSTRUCTING_COMPOSITON });

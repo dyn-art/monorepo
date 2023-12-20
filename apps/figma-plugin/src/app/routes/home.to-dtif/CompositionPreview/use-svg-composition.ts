@@ -1,53 +1,81 @@
 import React from 'react';
 import { rustify, type TComposition } from '@dyn/figma-to-dtif';
-import { createSVGComposition, initWasm, type Composition } from '@dyn/svg-composition';
+import {
+	createSVGComposition,
+	initWasm,
+	type Composition,
+	type DTIFComposition
+} from '@dyn/svg-composition';
 
 export const useSVGComposition = (
 	props: UseSVGCompositionProps
-): { composition: Composition | null; svgContainerRef: React.RefObject<HTMLDivElement> } => {
+): {
+	composition: Composition | null;
+	svgContainerRef: React.RefObject<HTMLDivElement>;
+	isLoading: boolean;
+} => {
 	const { dtif, deps = [] } = props;
 	const svgContainerRef = React.useRef<HTMLDivElement>(null);
 	const [composition, setComposition] = React.useState<Composition | null>(null);
+	const [isLoading, setIsLoading] = React.useState(false);
+	const [rustifiedDTIF, setRustifiedDTIF] = React.useState<DTIFComposition | null>(null);
 
+	// Load WASM and rustify DTIF
 	React.useEffect(() => {
-		console.log({ dtif });
+		let isMounted = true;
+		setIsLoading(true);
 
-		(async () => {
-			if (dtif != null && svgContainerRef.current) {
-				await initWasm();
-				const rustifiedDTIF = await rustify(dtif);
-
-				console.log({ rustifiedDTIF });
-
-				try {
-					const newComposition = createSVGComposition({
-						width: dtif.width,
-						height: dtif.height,
-						renderer: {
-							domElement: svgContainerRef.current
-						},
-						dtif: rustifiedDTIF
-					});
-					console.log({ newComposition });
-
-					setComposition(newComposition);
-					newComposition.update();
-				} catch (error) {
-					console.log({ error });
-				}
+		const initializeAndRustify = async () => {
+			await initWasm();
+			if (dtif && isMounted) {
+				const rustified = await rustify(dtif);
+				setRustifiedDTIF(rustified);
 			}
-		})().catch(() => {
-			// do nothing
-		});
+		};
+
+		initializeAndRustify()
+			.catch((error) => {
+				console.error('Error in initializing or rustifying:', error);
+			})
+			.finally(() => {
+				if (isMounted) {
+					setIsLoading(false);
+				}
+			});
+
+		return () => {
+			isMounted = false;
+		};
+	}, [dtif]);
+
+	// Create SVG Composition
+	React.useEffect(() => {
+		if (rustifiedDTIF != null && svgContainerRef.current != null && composition == null) {
+			try {
+				const newComposition = createSVGComposition({
+					width: rustifiedDTIF.width,
+					height: rustifiedDTIF.height,
+					renderer: {
+						domElement: svgContainerRef.current
+					},
+					dtif: rustifiedDTIF
+				});
+
+				setComposition(newComposition);
+				newComposition.update();
+			} catch (error) {
+				console.error('Error in creating SVG composition:', error);
+			}
+		}
 
 		return () => {
 			if (composition != null) {
 				composition.unmount();
 			}
 		};
-	}, [dtif, svgContainerRef.current, ...deps]);
+	}, [rustifiedDTIF, svgContainerRef.current, ...deps]);
 
-	return { svgContainerRef, composition };
+	return { svgContainerRef, composition, isLoading };
 };
 
 interface UseSVGCompositionProps {
