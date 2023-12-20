@@ -361,7 +361,7 @@ export type FrameNodeBundle = { node?: Node; frame?: Frame; rectangleCornerMixin
  */
 export type Group = null
 
-export type GroupNodeBundle = { node?: Node; group?: Group; children: ChildrenMixin; compositionMixin?: NodeCompositionMixin; relativeTransform: RelativeTransformMixin; dimension: DimensionMixin; blendMixin?: BlendMixin; fill?: FillMixin }
+export type GroupNodeBundle = { node?: Node; group?: Group; children: ChildrenMixin; compositionMixin?: NodeCompositionMixin; relativeTransform: RelativeTransformMixin; dimension: DimensionMixin; blendMixin?: BlendMixin }
 
 export type HandleSide = "Top" | "Bottom" | "Left" | "Right"
 

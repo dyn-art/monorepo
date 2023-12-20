@@ -16,6 +16,9 @@ use super::{
     },
 };
 
+#[cfg(feature = "trace")]
+use super::modules::node::utils::logging::log_entity_components;
+
 pub struct Composition {
     app: App,
 }
