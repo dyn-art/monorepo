@@ -9,6 +9,7 @@ export type Unwrap<T> = T extends Promise<infer U> ? U : T;
 export interface TDynConfig {
 	figma?: TDynFigmaConfig | TDynFigmaConfigCallback;
 	library?: TDynLibraryConfig;
+	rust?: TDynRustConfig;
 }
 
 // =============================================================================
@@ -62,8 +63,8 @@ export type TDynFigmaConfigCallback = (config: {
 }) => Promise<TDynFigmaConfig>;
 
 export type TDynFigmaAppModuleConfig = TDynFigmaBaseModuleConfig & {
-	postcssPath?: string;
-	rootHtmlPath?: string;
+	postcssConfigPath?: string;
+	htmlTemplatePath?: string;
 };
 export type TDynFigmaPluginModuleConfig = TDynFigmaBaseModuleConfig;
 
@@ -71,4 +72,12 @@ export interface TDynFigmaBaseModuleConfig {
 	source?: string;
 	output?: string;
 	env?: string;
+}
+
+// =============================================================================
+// Rust
+// =============================================================================
+
+export interface TDynRustConfig {
+	typeDeclarationTargetPaths: string | string[];
 }

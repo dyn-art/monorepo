@@ -16,19 +16,9 @@ pub struct FontCacheRes {
 }
 
 impl FontCacheRes {
-    pub fn insert(&mut self, font_metadata: FontMetadata, content: Vec<u8>) {
-        self.insert_with_hash(None, font_metadata, content)
-    }
-
-    pub fn insert_with_hash(
-        &mut self,
-        hash: Option<u64>,
-        font_metadata: FontMetadata,
-        content: Vec<u8>,
-    ) {
-        let hash = hash.or_else(|| Some(FontCacheRes::calculate_hash(&font_metadata)));
+    pub fn insert(&mut self, id: u64, font_metadata: FontMetadata, content: Vec<u8>) {
         self.fonts.insert(
-            hash.unwrap(),
+            id,
             CachedFont {
                 data: CachedFontData::Content(content),
                 metadata: font_metadata,

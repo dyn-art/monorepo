@@ -9,8 +9,10 @@ import './styles/tailwind.css';
 
 export const App: React.FC = () => {
 	return (
-		<MemoryRouter>
-			<Routes />
-		</MemoryRouter>
+		<div className="flex h-full w-full flex-col bg-white py-2">
+			<MemoryRouter>
+				<Routes />
+			</MemoryRouter>
+		</div>
 	);
 };

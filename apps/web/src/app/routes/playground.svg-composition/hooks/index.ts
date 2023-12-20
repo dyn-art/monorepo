@@ -1,1 +1,1 @@
-export * from './useSVGComposition';
+export * from './use-svg-composition';

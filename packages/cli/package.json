@@ -30,7 +30,6 @@
 	},
 	"homepage": "https://s.dyn.art/github",
 	"dependencies": {
-		"@dyn/utils": "workspace:^",
 		"@oclif/core": "^3.9.2",
 		"@rollup/plugin-commonjs": "^25.0.7",
 		"@rollup/plugin-html": "^1.0.3",

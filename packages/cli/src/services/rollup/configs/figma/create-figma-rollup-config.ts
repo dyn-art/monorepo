@@ -31,7 +31,7 @@ export async function createFigmaRollupConfig(
 		output: './dist/app.js',
 		env: './.env.app',
 		rollupOptions: {},
-		postcssPath: './postcss.config.js',
+		postcssConfigPath: './postcss.config.js',
 		...(figmaConfig.app ?? {})
 	};
 	const figmaPluginConfig = {
@@ -79,8 +79,8 @@ export async function createFigmaRollupConfig(
 		if (key === 'app') {
 			baseRollupConfig = await createAppRollupConfig({
 				...rollupOptionsCallbackConfig,
-				postcssPath: figmaAppConfig.postcssPath,
-				rootHtmlPath: figmaAppConfig.rootHtmlPath
+				postcssConfigPath: figmaAppConfig.postcssConfigPath,
+				htmlTemplatePath: figmaAppConfig.htmlTemplatePath
 			});
 		} else if (key === 'plugin') {
 			baseRollupConfig = createPluginRollupConfig(rollupOptionsCallbackConfig);

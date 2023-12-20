@@ -5,7 +5,15 @@ import chalk from 'chalk';
 import type { PackageJson } from 'type-fest';
 
 import { DynCommand } from '../../DynCommand';
-import { doesFileExist, execaVerbose, promisifyFiglet, readJsonFile, shortId } from '../../utils';
+import { getDynConfig } from '../../services';
+import {
+	doesFileExist,
+	execaVerbose,
+	promisifyFiglet,
+	readJsonFile,
+	shortId,
+	toArray
+} from '../../utils';
 
 export default class Rust extends DynCommand {
 	static description = 'Bundle Rust part of dyn.art packages';
@@ -52,6 +60,10 @@ export default class Rust extends DynCommand {
 			}`
 		);
 		this.log(`\n`);
+
+		// Read in dyn.config.js
+		const dynConfig = await getDynConfig(this);
+		const rustConfig = dynConfig?.rust;
 
 		// Build WASM
 		const rustInputDirPath = path.join(process.cwd(), 'rust');
@@ -103,6 +115,15 @@ export default class Rust extends DynCommand {
 				chalk.underline(bindingTypesOutputPath)
 			)}`
 		);
+
+		// Copy generated type declarations to additional target paths
+		if (rustConfig?.typeDeclarationTargetPaths != null) {
+			await Promise.all(
+				toArray(rustConfig.typeDeclarationTargetPaths).map((targetPath) => {
+					return fs.copyFile(bindingTypesOutputPath, path.join(process.cwd(), targetPath));
+				})
+			);
+		}
 
 		// Read in package.json and extract name of Rust module
 		const rustOutputPackageJsonPath = path.join(rustOutputDirPath, 'package.json');

@@ -1,0 +1,7 @@
+.preview {
+	background-image: radial-gradient(
+		rgba(200, 200, 200, 0.5) 1px,
+		/* Light gray dots */ rgba(255, 255, 255, 1) 1px /* White background */
+	);
+	background-size: 10px 10px;
+}

@@ -36,9 +36,10 @@ export async function createOverrideRollupConfig(
 				tsconfig: tsConfigPath,
 				minify: isProduction,
 				target: 'es6',
-				exclude: [/node_modules/],
 				loaders: {
-					'.json': 'json' // Requires @rollup/plugin-commonjs
+					'.json': 'json', // Requires @rollup/plugin-commonjs
+					// Enable JSX in .js files too
+					'.js': 'jsx'
 				},
 				jsxFactory: 'React.createElement',
 				jsxFragment: 'React.Fragment',

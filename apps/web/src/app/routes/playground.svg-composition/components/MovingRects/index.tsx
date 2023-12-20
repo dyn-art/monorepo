@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, Card, CardDescription, CardHeader, CardTitle } from '@dyn/ui';
 
-import { useSVGComposition } from './useSVGComposition';
+import { useSVGComposition } from './use-svg-composition';
 
 export const MovingRects: React.FC<TProps> = (props) => {
 	const { size } = props;

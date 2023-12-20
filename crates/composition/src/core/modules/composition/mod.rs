@@ -47,10 +47,10 @@ fn insert_dtif_into_world(world: &mut World, dtif: &DTIFComposition) {
 
     // Load fonts into cache
     if let Some(fonts) = &dtif.fonts {
-        for font_with_content in fonts.clone() {
+        for (id, font_with_content) in fonts.clone().into_iter() {
             if let Some(mut font_cache) = world.get_resource_mut::<FontCacheRes>() {
-                font_cache.insert_with_hash(
-                    font_with_content.hash,
+                font_cache.insert(
+                    id.parse().unwrap(),
                     font_with_content.metadata,
                     font_with_content.content,
                 );

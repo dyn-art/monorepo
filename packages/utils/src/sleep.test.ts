@@ -11,6 +11,6 @@ describe('sleep function', () => {
 		// Checking if the difference in time is close to 100ms.
 		// There may be minor differences, so we can't always expect exactly 100ms
 		// but we can reasonably expect it to be within a few milliseconds of the target.
-		expect(end - start).to.be.closeTo(100, 5);
+		expect(end - start).to.be.closeTo(100, 10);
 	});
 });

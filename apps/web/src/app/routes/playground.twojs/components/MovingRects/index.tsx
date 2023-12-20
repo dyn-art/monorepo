@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { useSVGComposition } from './useSVGComposition';
+import { useSVGComposition } from './use-svg-composition';
 
 export const MovingRects: React.FC<TProps> = (props) => {
 	const { size } = props;

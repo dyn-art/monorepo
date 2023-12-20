@@ -1,0 +1,45 @@
+{
+	"name": "@dyn/figma-to-dtif",
+	"description": "Convert Figma Frame to Design Tree Interchange Format (DTIF)",
+	"version": "0.0.1",
+	"private": true,
+	"scripts": {
+		"build": "shx rm -rf dist && ../../scripts/cli.sh bundle",
+		"start:dev": "tsc -w",
+		"lint": "eslint --ext .js,.ts src/",
+		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
+		"install:clean": "pnpm run clean && pnpm install",
+		"test": "vitest run",
+		"update:deps": "pnpm update --latest"
+	},
+	"source": "./src/index.ts",
+	"main": "./dist/cjs/index.js",
+	"module": "./dist/esm/index.js",
+	"types": "./dist/types/index.d.ts",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/dyndotart/monorepo.git"
+	},
+	"keywords": [],
+	"author": "@bennoinbeta",
+	"license": "AGPL-3.0-or-later",
+	"bugs": {
+		"url": "https://s.dyn.art/github/issues"
+	},
+	"homepage": "https://s.dyn.art/github",
+	"dependencies": {
+		"@dyn/utils": "workspace:*",
+		"object-hash": "^3.0.0"
+	},
+	"devDependencies": {
+		"@dyn/config": "workspace:*",
+		"@dyn/dtif": "workspace:*",
+		"@figma/plugin-typings": "^1.82.0",
+		"@types/node": "^20.8.10",
+		"@types/object-hash": "^3.0.6"
+	},
+	"files": [
+		"dist",
+		"README.md"
+	]
+}

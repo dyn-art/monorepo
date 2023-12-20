@@ -1,48 +1,79 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@dyn/ui';
 
-import { appHandler } from '../app-handler';
-import { useAppCallback } from '../hooks';
+import { EAppRoutes } from '../../types';
+import { Footer, Navbar } from '../components';
 
 const Home: React.FC = () => {
-	// TODO: REMOVE
-	useAppCallback(appHandler, {
-		type: 'plugin.message',
-		key: 'on-select-frame',
-		callback: async (instance, args) => {
-			console.log('App: onSelectFrame', { args });
+	const navigate = useNavigate();
+	const location = useLocation();
+	const defaultPluginIndex = React.useMemo(
+		() =>
+			plugins.findIndex(
+				(plugin) => `${EAppRoutes.HOME}${plugin.route.toString()}` === location.pathname
+			),
+		[location.pathname]
+	);
+
+	// Navigate to default plugin if its the home ("/") route
+	React.useEffect(() => {
+		if (location.pathname === EAppRoutes.HOME.toString()) {
+			navigate(EAppRoutes.HOME__TO_DTIF);
 		}
-	});
-	useAppCallback(appHandler, {
-		type: 'plugin.message',
-		key: 'on-select-node',
-		callback: async (instance, args) => {
-			console.log('App: onSelectNode', { args });
-		}
-	});
+	}, [location.pathname]);
 
 	return (
-		<div className="m-4 space-y-4">
-			<h1 className="text-2xl font-bold">dyn.art</h1>
-			<ul className="menu rounded-box bg-base-100 w-56 p-2">
-				<li className="menu-title">
-					<span>Plugins</span>
-				</li>
-				<li>
-					<Link to="/dtif">Export Frame</Link>
-				</li>
-				<li>
-					<Link to="/node-inspector">Inspect Node</Link>
-				</li>
-				<li className="menu-title">
-					<span>Other</span>
-				</li>
-				<li>
-					<Link to="/about">About</Link>
-				</li>
-			</ul>
-		</div>
+		<>
+			<Navbar
+				leftContent={
+					<Select
+						value={defaultPluginIndex.toString()}
+						onValueChange={(index: string) => {
+							const route = plugins[Number(index)]?.route;
+							if (route != null) {
+								navigate(route);
+							}
+						}}
+					>
+						<SelectTrigger className={'h-7 max-w-[200px] text-xs [&_svg]:h-4 [&_svg]:w-4'}>
+							<span className="text-muted-foreground mr-1">Plugin: </span>
+							<SelectValue placeholder="Select plugin" />
+						</SelectTrigger>
+						<SelectContent>
+							{plugins.map((plugin, index) => (
+								<SelectItem key={plugin.key} value={index.toString()} className="text-xs">
+									{plugin.label}
+								</SelectItem>
+							))}
+						</SelectContent>
+					</Select>
+				}
+				rightContent={{ variant: 'user' }}
+			/>
+
+			<div className="flex h-full w-full flex-col overflow-hidden">
+				<Outlet />
+			</div>
+
+			<Footer leftContent={{ variant: 'version' }} rightContent={{ variant: 'settings' }} />
+		</>
 	);
 };
 
 export default Home;
+
+export const plugins = [
+	{
+		key: 'to-dtif',
+		label: 'To DTIF',
+		route: EAppRoutes.HOME__TO_DTIF
+	},
+	{
+		key: 'node-inspector',
+		label: 'Node Inspector',
+		route: EAppRoutes.HOME__NODE_INSPECTOR
+	}
+] as const;
+
+export type Plugin = (typeof plugins)[number];

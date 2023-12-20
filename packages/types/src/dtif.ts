@@ -63,7 +63,7 @@ export interface TComposition {
 	/**
 	 * Paints of the composition.
 	 */
-	paints: Record<string, TPaint>;
+	paintIds: Record<string, TPaint>;
 	/**
 	 * Typefaces of the composition.
 	 */

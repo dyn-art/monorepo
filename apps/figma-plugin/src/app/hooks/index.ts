@@ -1,1 +1,1 @@
-export * from './useAppCallback';
+export * from './use-app-callback';

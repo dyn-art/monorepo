@@ -6,7 +6,7 @@ import { createTransformMatrix } from '../../utils';
 export const COMPOSITION_WITH_ONE_RECT = (
 	width: number,
 	height: number,
-	fonts: FontWithContent[]
+	fonts: Record<string, FontWithContent>
 ): DTIFComposition => ({
 	version: '0.0.1',
 	name: 'Test',
@@ -38,7 +38,7 @@ export const COMPOSITION_WITH_ONE_RECT = (
 				topRightRadius: 0
 			},
 			fill: {
-				paints: [5]
+				paintIds: [5]
 			}
 		},
 		2: {
@@ -56,38 +56,38 @@ export const COMPOSITION_WITH_ONE_RECT = (
 				topRightRadius: 80
 			},
 			fill: {
-				paints: [5]
+				paintIds: [5]
 			}
 		},
 		3: {
 			type: 'Text',
 			text: {
-				sections: [
+				segments: [
 					{
 						value: 'Hello there ',
 						style: {
-							fontHash: INTER_REGULAR.hash,
+							fontId: INTER_REGULAR.id,
 							fontSize: 48
 						}
 					},
 					{
 						value: 'Jeff',
 						style: {
-							fontHash: ABEEZEE_ITALIC.hash,
+							fontId: ABEEZEE_ITALIC.id,
 							fontSize: 70
 						}
 					},
 					{
 						value: '! Long line test testtest',
 						style: {
-							fontHash: INTER_REGULAR.hash,
+							fontId: INTER_REGULAR.id,
 							fontSize: 48
 						}
 					},
 					{
 						value: 'Extra small',
 						style: {
-							fontHash: INTER_REGULAR.hash,
+							fontId: INTER_REGULAR.id,
 							fontSize: 24
 						}
 					}
@@ -100,7 +100,7 @@ export const COMPOSITION_WITH_ONE_RECT = (
 			},
 			relativeTransform: createTransformMatrix((width - 100) / 4, (height - 100) / 4, 30),
 			fill: {
-				paints: [5]
+				paintIds: [5]
 			}
 		}
 	},

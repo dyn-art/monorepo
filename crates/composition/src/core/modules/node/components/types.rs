@@ -173,7 +173,7 @@ pub struct Polygon {
 #[derive(Component, Serialize, Deserialize, Clone, Default, Debug, Type)]
 pub struct Text {
     /// Sections of the text, each with its own style.
-    pub sections: Vec<TextSection>,
+    pub segments: Vec<TextSegment>,
 
     /// Horizontal alignment of the text within its container.
     #[serde(default)]
@@ -191,16 +191,16 @@ pub struct Text {
     pub linebreak_behavior: BreakLineOn,
 }
 
-/// A section of text with a specific style.
+/// A segment of text with a specific style.
 #[derive(Serialize, Deserialize, Clone, Debug, Type)]
-pub struct TextSection {
-    /// Text content of the section.
+pub struct TextSegment {
+    /// Text content of the segment.
     pub value: String,
-    /// Style properties applied to this section.
+    /// Style properties applied to this segment.
     pub style: TextStyle,
 }
 
-/// Style properties for a text section, defining its appearance.
+/// Style properties for a text segment, defining its appearance.
 #[derive(Serialize, Deserialize, Clone, Default, Debug, Type)]
 pub struct TextStyle {
     /// Height of rasterized glyphs in pixels, influenced by window scale.
@@ -208,8 +208,8 @@ pub struct TextStyle {
     pub font_size: u32,
 
     /// Primary font identifier.
-    #[serde(rename = "fontHash")]
-    pub font_hash: u64,
+    #[serde(rename = "fontId")]
+    pub font_id: u64,
 
     /// Spacing between characters.
     #[serde(default)]
@@ -248,7 +248,7 @@ pub enum VerticalTextAlignment {
     Bottom,
 }
 
-/// Options for spacing between characters in a text section.
+/// Options for spacing between characters in a text segment.
 #[derive(Serialize, Deserialize, Clone, Default, Debug, Type)]
 pub enum LetterSpacing {
     /// Automatic spacing based on font metrics.

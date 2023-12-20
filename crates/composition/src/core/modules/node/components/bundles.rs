@@ -100,10 +100,6 @@ pub struct GroupNodeBundle {
     #[serde(default)]
     #[serde(rename = "blendMixin")]
     pub blend_mixin: BlendMixin,
-
-    #[serde(default)]
-    #[serde(rename = "fill")]
-    pub fill_mixin: FillMixin,
 }
 
 #[inline]
@@ -124,7 +120,6 @@ impl Default for GroupNodeBundle {
             relative_transform: RelativeTransformMixin::default(),
             dimension: DimensionMixin::default(),
             blend_mixin: BlendMixin::default(),
-            fill_mixin: FillMixin::default(),
         }
     }
 }
@@ -214,7 +209,7 @@ pub struct TextNodeBundle {
 
     #[serde(default)]
     #[serde(rename = "fill")]
-    pub fill_mixin: FillMixin, // TODO: Needs adjustment to work with text sections
+    pub fill_mixin: FillMixin, // TODO: Needs adjustment to work with text segments
 }
 
 #[inline]

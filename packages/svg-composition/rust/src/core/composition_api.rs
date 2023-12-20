@@ -40,8 +40,8 @@ impl JsCompositionHandle {
         let parsed_dtif: Result<DTIFComposition, _> = serde_wasm_bindgen::from_value(dtif);
         let parsed_dtif = match parsed_dtif {
             Ok(dtif) => dtif,
-            Err(_) => {
-                panic!("Invalid DTIF provided!")
+            Err(e) => {
+                panic!("Invalid DTIF provided: {}", e.to_string())
             }
         };
         let (output_event_sender, output_event_receiver) = channel::<OutputEvent>();

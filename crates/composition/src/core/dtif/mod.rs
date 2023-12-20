@@ -37,18 +37,20 @@ pub struct DTIFComposition {
     pub root_node_id: Entity,
 
     /// A mapping of node identifiers to their corresponding nodes within the composition.
-    /// Note: Planned to directly use `Entity` as a key once a specific serde issue is resolved.
+    /// Note: Planned to directly use `Entity` as a key once the referenced serde issue is resolved.
     ///       https://github.com/serde-rs/serde/issues/1183
     pub nodes: HashMap<String, DTIFNode>,
 
     /// A mapping of paint identifiers to their corresponding paints within the composition.
-    /// Note: Planned to directly use `Entity` as a key once a specific serde issue is resolved.
+    /// Note: Planned to directly use `Entity` as a key once the referenced serde issue is resolved.
     ///       https://github.com/serde-rs/serde/issues/1183
     pub paints: HashMap<String, Paint>,
 
-    /// A mapping of font hashes to their corresponding font data within the composition.
+    /// A mapping of font identifiers to their corresponding font data within the composition.
+    /// Note: Planned to directly use `u64` as a key once the referenced serde issue is resolved.
+    ///       https://github.com/serde-rs/serde/issues/1183
     #[serde(default)]
-    pub fonts: Option<Vec<FontWithContent>>,
+    pub fonts: Option<HashMap<String, FontWithContent>>,
 
     /// Optional list of changes represented as core input events.
     /// This field is optional and defaults to `None` if not provided.

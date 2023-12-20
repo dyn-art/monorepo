@@ -8,7 +8,7 @@
 		"paths": {
 			"@/rust/*": ["./src/rust_modules/*"]
 		},
-		"lib": ["esnext", "dom"]
+		"lib": ["dom"]
 	},
 	"include": ["src"]
 }

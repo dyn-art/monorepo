@@ -12,10 +12,12 @@ use super::{
     events::input_event::InputEvent,
     modules::node::{
         components::{bundles::RectangleNodeBundle, types::Root},
-        utils::logging::log_entity_components,
         NodePlugin,
     },
 };
+
+#[cfg(feature = "trace")]
+use super::modules::node::utils::logging::log_entity_components;
 
 pub struct Composition {
     app: App,
@@ -65,7 +67,7 @@ impl Composition {
         bundle: RectangleNodeBundle,
         maybe_parent_id: Option<Entity>,
     ) -> Entity {
-        let paint_ids = bundle.fill_mixin.paints.clone();
+        let paint_ids = bundle.fill_mixin.paint_ids.clone();
         let entity_id = self.spawn_node(bundle, maybe_parent_id);
 
         // TODO
