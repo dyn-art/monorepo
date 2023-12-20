@@ -12,7 +12,7 @@ export class ContinuousId {
 	}
 
 	public static nextId(): TContinuousId {
-		return this.nextIdValue++;
+		return ++this.nextIdValue;
 	}
 
 	public static nextCId(): ContinuousId {

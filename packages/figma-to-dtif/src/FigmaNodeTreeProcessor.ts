@@ -35,10 +35,10 @@ export class FigmaNodeTreeProcessor {
 		toTransformPaints: TToTransformPaint[];
 		toTransformFonts: TToTransformFont[];
 	} {
-		const rootId = ContinuousId.ZERO;
-		this.walk(this._root, true);
+		const rootId = this.walk(this._root, true);
+
 		return {
-			rootId: rootId.toNumber(),
+			rootId,
 			toTransformNodes: this._toTransformNodes,
 			toTransformPaints: this._toTransformPaints,
 			toTransformFonts: this._toTransformFonts

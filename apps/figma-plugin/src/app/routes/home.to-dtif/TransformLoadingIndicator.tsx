@@ -64,7 +64,7 @@ export const TransformLoadingIndicator: React.FC<TProps> = (props) => {
 				<Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
 				<p className="mt-2">{message}</p>
 			</div>
-			<p className="mt-auto text-sm opacity-80">{subMessage}</p>
+			<p className="mb-2 mt-auto text-sm opacity-80">{subMessage}</p>
 		</div>
 	);
 };
