@@ -1,7 +1,9 @@
 import React from 'react';
 import { JSONTree } from 'react-json-tree';
+import { ScrollArea } from '@dyn/ui';
 
 import { appHandler } from '../app-handler';
+import { ClipboardButton } from '../components/primitive/ClipboardButton';
 import { useAppCallback } from '../hooks';
 import threezerotwofourTheme from '../styles/json-tree/threezerotwofour.theme';
 
@@ -39,11 +41,15 @@ const NodeInspectorPlugin: React.FC = () => {
 	);
 
 	return (
-		<div className="flex h-full w-full border bg-[#090300]">
-			<div className="relative w-full overflow-x-auto p-4">
+		<ScrollArea className="flex h-full w-full border bg-[#090300]">
+			<div className="relative w-full p-4">
+				<ClipboardButton
+					toCopy={JSON.stringify(selectedNodes)}
+					className="absolute right-0 top-0 z-50 m-4"
+				/>
 				<JSONTree data={selectedNodes} theme={threezerotwofourTheme} />
 			</div>
-		</div>
+		</ScrollArea>
 	);
 };
 

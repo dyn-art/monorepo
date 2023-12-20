@@ -1,5 +1,6 @@
 import React from 'react';
 import type { TComposition } from '@dyn/figma-to-dtif';
+import { ScrollArea } from '@dyn/ui';
 
 import { appHandler } from '../../app-handler';
 import { useAppCallback } from '../../hooks';
@@ -35,9 +36,9 @@ export const CompositionPreview: React.FC<TProps> = (props) => {
 	}
 
 	return (
-		<>
+		<ScrollArea>
 			<p>{JSON.stringify(composition)}</p>
-		</>
+		</ScrollArea>
 	);
 };
 

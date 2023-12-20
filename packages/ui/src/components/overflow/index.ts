@@ -1,1 +1,2 @@
-export * from './dropdown-menu';
+export * from './DropdownMenu';
+export * from './Tooltip';
