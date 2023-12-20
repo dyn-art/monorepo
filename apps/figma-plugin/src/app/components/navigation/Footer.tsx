@@ -10,7 +10,7 @@ export const Footer: React.FC<TProps> = (props) => {
 
 	return (
 		<>
-			<Separator className="my-2" />
+			<Separator className="mb-2" />
 			<div className={`flex h-6 w-full items-center justify-between px-4`}>
 				{leftContent != null && (
 					<div className="flex text-left">{renderLeftContent(leftContent)}</div>

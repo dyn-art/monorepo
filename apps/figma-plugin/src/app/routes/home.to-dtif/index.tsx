@@ -3,6 +3,7 @@ import { ETransformStatus } from '@dyn/figma-to-dtif';
 
 import { appHandler } from '../../app-handler';
 import { useAppCallback } from '../../hooks';
+import { CompositionPreview } from './CompositionPreview';
 import { ToTransformSelection } from './ToTransformSelection';
 import { TransformLoadingIndicator } from './TransformLoadingIndicator';
 
@@ -44,6 +45,7 @@ const ToDTIFPlugin: React.FC = () => {
 		<div className="flex h-full w-full flex-col px-4">
 			<ToTransformSelection isTransforming={isTransforming} />
 			<TransformLoadingIndicator isTransforming={isTransforming} />
+			<CompositionPreview isTransforming={isTransforming} />
 		</div>
 	);
 };
