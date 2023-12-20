@@ -1,17 +1,27 @@
 import { beforeEach, describe, expect, it } from 'vitest';
+import { sleep } from '@dyn/utils';
 
 import { createState } from '../create-state';
-import { withPersist, type StorageInterface } from './with-persist';
+import { FAILED_TO_LOAD_IDENTIFIER, withPersist, type StorageInterface } from './with-persist';
 
 class MockStorage<GValue> implements StorageInterface<GValue> {
 	private store: Record<string, GValue> = {};
 
-	save(key: string, value: GValue): void {
+	async save(key: string, value: GValue): Promise<boolean> {
 		this.store[key] = value;
+		return true;
 	}
 
-	load(key: string): GValue | null {
-		return this.store[key] || null;
+	async load(key: string): Promise<GValue | typeof FAILED_TO_LOAD_IDENTIFIER> {
+		return this.store[key] || FAILED_TO_LOAD_IDENTIFIER;
+	}
+
+	async delete(key: string): Promise<boolean> {
+		if (key in this.store) {
+			delete this.store[key];
+			return true;
+		}
+		return false;
 	}
 
 	clear(): void {
@@ -26,37 +36,68 @@ describe('withPersist function tests', () => {
 		mockStorage = new MockStorage();
 	});
 
-	it('should initialize state with persisted value if available', () => {
+	it('should initialize state with persisted value if available', async () => {
 		// Prepare
 		const key = 'testKey';
 		const persistedValue = 42;
-		mockStorage.save(key, persistedValue);
+		await mockStorage.save(key, persistedValue);
+		const state = withPersist(createState(0), mockStorage, key);
 
 		// Act
-		const state = withPersist(createState(0, false), mockStorage, key);
+		const result = await state.persist();
 
 		// Assert
+		expect(result).toBe(true);
 		expect(state.get()).toBe(persistedValue);
 	});
 
-	it('should persist state changes', () => {
+	it('should persist state changes', async () => {
 		// Prepare
 		const key = 'testKey';
-		const state = withPersist(createState(10, false), mockStorage, key);
+		const state = withPersist(createState(10), mockStorage, key);
+		await state.persist();
 
 		// Act
 		state.set(20);
+		await sleep(10);
 
 		// Assert
-		expect(mockStorage.load(key)).toBe(20);
+		expect(await mockStorage.load(key)).toBe(20);
 	});
 
-	it('should not override state with null if no persisted value', () => {
+	it('should delete persisted state', async () => {
+		// Prepare
+		const key = 'testKey';
+		const state = withPersist(createState(10), mockStorage, key);
+		await state.persist();
+
+		// Act
+		const deleteResult = await state.deletePersisted();
+
+		// Assert
+		expect(deleteResult).toBe(true);
+		expect(await mockStorage.load(key)).toBe(FAILED_TO_LOAD_IDENTIFIER);
+	});
+
+	it('should return false if deleting non-existent key', async () => {
+		// Prepare
+		const key = 'nonExistentKey';
+		const state = withPersist(createState(10), mockStorage, key);
+
+		// Act
+		const deleteResult = await state.deletePersisted();
+
+		// Assert
+		expect(deleteResult).toBe(false);
+	});
+
+	it('should not override state with null if no persisted value', async () => {
 		// Prepare
 		const key = 'testKey';
 
 		// Act
 		const state = withPersist(createState(10, false), mockStorage, key);
+		await state.persist();
 
 		// Assert
 		expect(state.get()).toBe(10);

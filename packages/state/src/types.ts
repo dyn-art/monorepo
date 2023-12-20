@@ -74,7 +74,7 @@ export interface TCoreFeatures<GValue> {
 
 export interface TWithFeatures<GValue> {
 	undo: { undo: () => void; _history: GValue[] };
-	persist: {};
+	persist: { persist: () => Promise<boolean>; deletePersisted: () => Promise<boolean> };
 }
 
 export type TFeatures<GValue = unknown> = TCoreFeatures<GValue> & TWithFeatures<GValue>;
@@ -105,7 +105,7 @@ export type TEnforceFeatures<
 // Listener
 // =============================================================================
 
-type TListenerCallback<GValue> = (value: TReadonlyIfObject<GValue>) => void;
+type TListenerCallback<GValue> = (value: TReadonlyIfObject<GValue>) => Promise<void> | void;
 export interface TListener<GValue> {
 	callback: TListenerCallback<GValue>;
 	level: number;

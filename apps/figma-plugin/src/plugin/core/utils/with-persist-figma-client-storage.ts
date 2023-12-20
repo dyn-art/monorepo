@@ -7,29 +7,29 @@ import {
 	type TState
 } from '@dyn/state';
 
-class LocalStorageInterface<GValue> implements StorageInterface<GValue> {
+class FigmaClientStorageInterface<GValue> implements StorageInterface<GValue> {
 	async save(key: string, value: GValue): Promise<boolean> {
-		localStorage.setItem(key, JSON.stringify(value));
+		await figma.clientStorage.setAsync(key, value);
 		return true;
 	}
 
 	async load(key: string): Promise<GValue | typeof FAILED_TO_LOAD_IDENTIFIER> {
-		const item = localStorage.getItem(key);
-		return item ? (JSON.parse(item) as GValue) : FAILED_TO_LOAD_IDENTIFIER;
+		const value = await figma.clientStorage.getAsync(key);
+		return value !== undefined ? value : FAILED_TO_LOAD_IDENTIFIER;
 	}
 
 	async delete(key: string): Promise<boolean> {
-		localStorage.removeItem(key);
+		await figma.clientStorage.deleteAsync(key);
 		return true;
 	}
 }
 
-export function withPersistLocalStorage<
+export function withPersistFigmaClientStorage<
 	GValue,
 	GSelectedFeatureKeys extends TFeatureKeys<GValue>[]
 >(
 	state: TState<GValue, TEnforceFeatures<GSelectedFeatureKeys, ['set', 'listen']>>,
 	key: string
 ): TState<GValue, [...GSelectedFeatureKeys, 'persist']> {
-	return withPersist(state, new LocalStorageInterface<GValue>(), key);
+	return withPersist(state, new FigmaClientStorageInterface<GValue>(), key);
 }

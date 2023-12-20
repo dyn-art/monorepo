@@ -53,7 +53,7 @@ importers:
         specifier: workspace:*
         version: link:../../packages/state-react
       '@dyn/svg-composition':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../../packages/svg-composition
       '@dyn/ui':
         specifier: workspace:*
@@ -354,6 +354,9 @@ importers:
       '@dyn/config':
         specifier: workspace:*
         version: link:../config
+      '@dyn/utils':
+        specifier: workspace:*
+        version: link:../utils
       '@types/node':
         specifier: ^20.8.10
         version: 20.8.10
