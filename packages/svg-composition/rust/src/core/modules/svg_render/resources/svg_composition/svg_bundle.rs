@@ -31,7 +31,7 @@ pub struct BaseSVGBundle {
 
 impl BaseSVGBundle {
     pub fn new(mut element: SVGElement, entity: Entity) -> Self {
-        element.set_as_bundle_root(entity);
+        element.define_as_bundle_root(entity);
         Self {
             entity,
             element,

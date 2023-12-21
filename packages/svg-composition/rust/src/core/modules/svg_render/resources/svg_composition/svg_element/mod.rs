@@ -36,6 +36,8 @@ pub struct SVGElement {
     updates: Vec<RenderChange>,
     /// Whether the SVG element is the root of a SVG bundle.
     is_bundle_root: bool,
+    /// Whether the element was created in the current update cycle (before first update drain).
+    was_created_in_current_update_cycle: bool,
 }
 
 /// Used to efficiently locate SVG child elements within various SVG structures.
@@ -93,6 +95,7 @@ impl SVGElement {
             children: Vec::new(),
             updates: initial_updates,
             is_bundle_root: false,
+            was_created_in_current_update_cycle: true,
         };
     }
 
@@ -169,8 +172,9 @@ impl SVGElement {
             self.children.push(identifier);
         }
 
-        info!("apply_child: {:?}", self.children);
+        info!("apply_child: {:?}", self.children); // TODO: REMOVE
 
+        // TODO: this doesn't work with the reordering (yet)
         element.append_to_parent(self.id);
     }
 
@@ -224,12 +228,12 @@ impl SVGElement {
             swap_done[target] = true;
         }
 
-        // Push an update event if order has changed (commented out for now).
+        // Push an update event if order has changed
         // if target_positions.iter().any(|&pos| pos.is_none()) || swap_done.iter().any(|&done| done) {
         //     self.updates.push(RenderChange::OrderChanged);
         // }
 
-        info!("reorder_children: {:?}", self.children);
+        info!("reorder_children: {:?}", self.children); // TODO: REMOVE
     }
 
     fn append_to_parent(&mut self, parent_id: u32) {
@@ -237,15 +241,17 @@ impl SVGElement {
 
         // Attempt to set the parent id of the first 'ElementCreated' render change for the element.
         // This ensures the element is correctly attached to its parent during the initial rendering.
-        if let Some(update) = self.updates.first_mut() {
-            match update {
-                RenderChange::ElementCreated(element_created) => {
-                    if element_created.parent_id.is_none() {
-                        element_created.parent_id = Some(parent_id);
-                        updated = true;
+        if self.was_created_in_current_update_cycle {
+            if let Some(update) = self.updates.first_mut() {
+                match update {
+                    RenderChange::ElementCreated(element_created) => {
+                        if element_created.parent_id.is_none() {
+                            element_created.parent_id = Some(parent_id);
+                            updated = true;
+                        }
                     }
+                    _ => {}
                 }
-                _ => {}
             }
         }
 
@@ -259,20 +265,26 @@ impl SVGElement {
     // Other
     // =========================================================================
 
-    pub fn set_as_bundle_root(&mut self, entity: Entity) {
+    pub fn define_as_bundle_root(&mut self, entity: Entity) {
         self.is_bundle_root = true;
-        if let Some(update) = self.updates.first_mut() {
-            match update {
-                RenderChange::ElementCreated(element_created) => {
-                    element_created.is_bundle_root = true;
-                    element_created.entity = Some(entity);
+        if self.was_created_in_current_update_cycle {
+            if let Some(update) = self.updates.first_mut() {
+                match update {
+                    RenderChange::ElementCreated(element_created) => {
+                        element_created.is_bundle_root = true;
+                        element_created.entity = Some(entity);
+                    }
+                    _ => {}
                 }
-                _ => {}
             }
         }
     }
 
     pub fn drain_updates(&mut self) -> Vec<RenderChange> {
+        if self.was_created_in_current_update_cycle {
+            self.was_created_in_current_update_cycle = false;
+        }
+
         self.updates.drain(..).collect()
     }
 
