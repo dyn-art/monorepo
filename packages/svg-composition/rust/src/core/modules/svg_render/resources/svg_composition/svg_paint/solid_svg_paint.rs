@@ -36,6 +36,14 @@ impl SVGBundle for SolidSVGPaint {
     fn get_bundle_mut(&mut self) -> &mut BaseSVGBundle {
         &mut self.bundle
     }
+
+    fn drain_updates(&mut self) -> Vec<RenderUpdateEvent> {
+        self.bundle.drain_updates()
+    }
+
+    fn to_string(&self, composition: &SVGCompositionRes) -> String {
+        self.bundle.to_string(composition)
+    }
 }
 
 impl SVGPaint for SolidSVGPaint {
@@ -73,14 +81,6 @@ impl SVGPaint for SolidSVGPaint {
                 }
             }
         }
-    }
-
-    fn drain_updates(&mut self) -> Vec<RenderUpdateEvent> {
-        self.bundle.drain_updates()
-    }
-
-    fn to_string(&self, composition: &SVGCompositionRes) -> String {
-        self.bundle.to_string(composition)
     }
 }
 

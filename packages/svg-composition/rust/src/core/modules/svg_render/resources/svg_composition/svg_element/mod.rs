@@ -10,7 +10,7 @@ use self::{
     styles::SVGStyle,
 };
 
-use super::{svg_bundle::BaseSVGBundle, SVGCompositionRes};
+use super::{svg_bundle::BaseSVGBundle, SVGCompositionBundle, SVGCompositionRes};
 
 pub mod attributes;
 pub mod events;
@@ -46,17 +46,9 @@ pub struct SVGElement {
 #[derive(Debug)]
 pub enum SVGChildElementIdentifier {
     // Child element is owned by SVGBundle (query by index in "child_elements")
-    InBundleContext(usize),
+    InBundleContext(Entity, usize),
     // Child element is owned by SVGComposition and can be found there
-    InCompositionContext(InCompositionContextType),
-}
-
-#[derive(Debug)]
-pub enum InCompositionContextType {
-    // Query by entity id in "nodes"
-    Node(Entity),
-    // Query by entity id in "paints"
-    Paint(Entity),
+    InCompositionContext(Entity),
 }
 
 impl SVGElement {
@@ -231,24 +223,23 @@ impl SVGElement {
         // Append children
         for child in &self.children {
             match child {
-                SVGChildElementIdentifier::InBundleContext(child_index) => {
+                SVGChildElementIdentifier::InBundleContext(_, child_index) => {
                     if let Some(child_element) = bundle.get_children().get(*child_index) {
                         result.push_str(&child_element.to_string(bundle, composition));
                     }
                 }
-                SVGChildElementIdentifier::InCompositionContext(context_type) => match context_type
-                {
-                    InCompositionContextType::Node(entity) => {
-                        if let Some(child_element) = composition.get_node(entity) {
-                            result.push_str(&child_element.to_string(composition));
+                SVGChildElementIdentifier::InCompositionContext(entity) => {
+                    if let Some(bundle) = composition.get_bundle(entity) {
+                        match bundle {
+                            SVGCompositionBundle::Node(node) => {
+                                result.push_str(&node.to_string(composition))
+                            }
+                            SVGCompositionBundle::Paint(paint) => {
+                                result.push_str(&paint.to_string(composition))
+                            }
                         }
                     }
-                    InCompositionContextType::Paint(entity) => {
-                        if let Some(child_element) = composition.get_paint(entity) {
-                            result.push_str(&child_element.to_string(composition));
-                        }
-                    }
-                },
+                }
             }
         }
 

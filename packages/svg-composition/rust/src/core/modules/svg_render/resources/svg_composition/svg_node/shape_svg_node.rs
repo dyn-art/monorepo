@@ -43,6 +43,14 @@ impl SVGBundle for ShapeSVGNode {
     fn get_bundle_mut(&mut self) -> &mut BaseSVGBundle {
         &mut self.bundle
     }
+
+    fn drain_updates(&mut self) -> Vec<RenderUpdateEvent> {
+        self.get_bundle_mut().drain_updates()
+    }
+
+    fn to_string(&self, composition: &SVGCompositionRes) -> String {
+        self.bundle.to_string(composition)
+    }
 }
 
 impl SVGNode for ShapeSVGNode {
@@ -116,20 +124,12 @@ impl SVGNode for ShapeSVGNode {
         }
     }
 
-    fn get_child_append_id(&self) -> Option<&ElementReference> {
+    fn get_node_append_id(&self) -> Option<&ElementReference> {
         None
     }
 
     fn get_paint_append_id(&self) -> Option<&ElementReference> {
         Some(&self.fill_wrapper)
-    }
-
-    fn drain_updates(&mut self) -> Vec<RenderUpdateEvent> {
-        self.get_bundle_mut().drain_updates()
-    }
-
-    fn to_string(&self, composition: &SVGCompositionRes) -> String {
-        self.bundle.to_string(composition)
     }
 }
 

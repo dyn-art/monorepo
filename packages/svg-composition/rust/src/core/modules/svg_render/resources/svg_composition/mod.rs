@@ -6,7 +6,7 @@ use dyn_composition::core::modules::node::components::{mixins::Paint, types::Nod
 use crate::core::events::output_event::{OutputEvent, RenderUpdateEvent};
 
 use self::{
-    svg_element::{InCompositionContextType, SVGChildElementIdentifier},
+    svg_element::SVGChildElementIdentifier,
     svg_node::{frame_svg_node::FrameSVGNode, shape_svg_node::ShapeSVGNode, SVGNode},
     svg_paint::{solid_svg_paint::SolidSVGPaint, SVGPaint},
 };
@@ -16,12 +16,16 @@ pub mod svg_element;
 pub mod svg_node;
 pub mod svg_paint;
 
+#[derive(Debug)]
+pub enum SVGCompositionBundle {
+    Node(Box<dyn SVGNode>),
+    Paint(Box<dyn SVGPaint>),
+}
+
 #[derive(Resource, Debug)]
 pub struct SVGCompositionRes {
-    // All nodes of the SVGComposition
-    nodes: HashMap<Entity, Box<dyn SVGNode>>,
-    // All paints of the SVGComposition
-    paints: HashMap<Entity, Box<dyn SVGPaint>>,
+    // All bundles of the SVGComposition
+    bundles: HashMap<Entity, SVGCompositionBundle>,
     // Root entities
     root_ids: Vec<Entity>,
     // Sender to enque events for frontend
@@ -32,8 +36,7 @@ impl SVGCompositionRes {
     pub fn new(output_event_sender: Sender<OutputEvent>) -> Self {
         SVGCompositionRes {
             root_ids: Vec::new(),
-            nodes: HashMap::new(),
-            paints: HashMap::new(),
+            bundles: HashMap::new(),
             output_event_sender,
         }
     }
@@ -42,20 +45,66 @@ impl SVGCompositionRes {
     // Getter & Setter
     // =========================================================================
 
-    pub fn get_node(&self, entity: &Entity) -> Option<&Box<dyn SVGNode>> {
-        self.nodes.get(&entity)
+    pub fn get_bundle(&self, entity: &Entity) -> Option<&SVGCompositionBundle> {
+        self.bundles.get(&entity)
     }
 
-    pub fn get_node_mut(&mut self, entity: &Entity) -> Option<&mut Box<dyn SVGNode>> {
-        self.nodes.get_mut(entity)
+    pub fn get_bundle_mut(&mut self, entity: &Entity) -> Option<&mut SVGCompositionBundle> {
+        self.bundles.get_mut(&entity)
     }
 
-    pub fn get_paint(&self, entity: &Entity) -> Option<&Box<dyn SVGPaint>> {
-        self.paints.get(&entity)
-    }
+    // =========================================================================
+    // Bundle
+    // =========================================================================
 
-    pub fn get_paint_mut(&mut self, entity: &Entity) -> Option<&mut Box<dyn SVGPaint>> {
-        self.paints.get_mut(entity)
+    pub fn insert_bundle(
+        &mut self,
+        entity: Entity,
+        mut bundle: SVGCompositionBundle,
+        maybe_parent_id: &Option<Entity>,
+    ) {
+        // If the parent id exists, append this bundle element as a child to the parent element
+        if let Some(parent_id) = maybe_parent_id {
+            if let Some(mut parent_bundle) = self.get_bundle_mut(parent_id) {
+                let maybe_child_append_id = match parent_bundle {
+                    SVGCompositionBundle::Node(parent_node) => match &bundle {
+                        SVGCompositionBundle::Node(_) => parent_node.get_node_append_id(),
+                        SVGCompositionBundle::Paint(_) => parent_node.get_paint_append_id(),
+                    },
+                    _ => None,
+                };
+                let child_append_index = match maybe_child_append_id {
+                    Some(child_append_id) => child_append_id.index,
+                    None => return,
+                };
+
+                if let Some(parent_append_element) = match &mut parent_bundle {
+                    SVGCompositionBundle::Node(node) => {
+                        node.get_bundle_mut().get_child_mut(child_append_index)
+                    }
+                    SVGCompositionBundle::Paint(paint) => {
+                        paint.get_bundle_mut().get_child_mut(child_append_index)
+                    }
+                } {
+                    match &mut bundle {
+                        SVGCompositionBundle::Node(node) => parent_append_element.append_child(
+                            &mut node.get_bundle_mut().get_root_mut(),
+                            SVGChildElementIdentifier::InCompositionContext(entity),
+                        ),
+                        SVGCompositionBundle::Paint(paint) => parent_append_element.append_child(
+                            &mut paint.get_bundle_mut().get_root_mut(),
+                            SVGChildElementIdentifier::InCompositionContext(entity),
+                        ),
+                    }
+                }
+            }
+        }
+        // If there's no parent id, the node becomes a root node
+        else {
+            self.root_ids.push(entity);
+        }
+
+        self.bundles.insert(entity, bundle);
     }
 
     // =========================================================================
@@ -68,45 +117,21 @@ impl SVGCompositionRes {
         paint: &Paint,
         maybe_parent_id: &Option<Entity>,
     ) -> Option<&mut Box<dyn SVGPaint>> {
-        if !self.paints.contains_key(&entity) {
+        if !self.bundles.contains_key(&entity) {
             if let Some(new_paint) = self.create_paint(paint, entity.clone()) {
-                self.insert_paint(entity, new_paint, maybe_parent_id);
+                self.insert_bundle(
+                    entity,
+                    SVGCompositionBundle::Paint(new_paint),
+                    maybe_parent_id,
+                );
             } else {
                 return None;
             }
         }
-        return self.paints.get_mut(&entity);
-    }
-
-    pub fn insert_paint(
-        &mut self,
-        entity: Entity,
-        mut paint: Box<dyn SVGPaint>,
-        maybe_parent_id: &Option<Entity>,
-    ) {
-        // If the parent id exists, append this paint element as a child to the parent element
-        if let Some(parent_id) = maybe_parent_id {
-            if let Some(parent_node) = self.get_node_mut(parent_id) {
-                if let Some(parent_paint_append_index) = parent_node
-                    .get_paint_append_id()
-                    .and_then(|paint_append_id| Some(paint_append_id.index))
-                {
-                    if let Some(parent_paint_append_element) = parent_node
-                        .get_bundle_mut()
-                        .get_child_mut(parent_paint_append_index)
-                    {
-                        parent_paint_append_element.append_child(
-                            &mut paint.get_bundle_mut().get_root_mut(),
-                            SVGChildElementIdentifier::InCompositionContext(
-                                InCompositionContextType::Paint(entity),
-                            ),
-                        );
-                    }
-                }
-            }
-        }
-
-        self.paints.insert(entity, paint);
+        return match self.bundles.get_mut(&entity) {
+            Some(SVGCompositionBundle::Paint(paint)) => Some(paint),
+            _ => None,
+        };
     }
 
     fn create_paint(&self, paint: &Paint, entity: Entity) -> Option<Box<dyn SVGPaint>> {
@@ -125,45 +150,21 @@ impl SVGCompositionRes {
         node_type: &NodeType,
         maybe_parent_id: &Option<Entity>,
     ) -> Option<&mut Box<dyn SVGNode>> {
-        if !self.nodes.contains_key(&entity) {
+        if !self.bundles.contains_key(&entity) {
             if let Some(new_node) = self.create_node(node_type, entity.clone()) {
-                self.insert_node(entity, new_node, maybe_parent_id);
+                self.insert_bundle(
+                    entity,
+                    SVGCompositionBundle::Node(new_node),
+                    maybe_parent_id,
+                );
             } else {
                 return None;
             }
         }
-        return self.nodes.get_mut(&entity);
-    }
-
-    pub fn insert_node(
-        &mut self,
-        entity: Entity,
-        mut node: Box<dyn SVGNode>,
-        maybe_parent_id: &Option<Entity>,
-    ) {
-        // If the parent id exists, append this node element as a child to the parent element
-        if let Some(parent_id) = maybe_parent_id {
-            if let Some(parent_node) = self.get_node_mut(parent_id) {
-                let parent_child_append_index = parent_node.get_child_append_id().unwrap().index;
-                if let Some(parent_child_append_element) = parent_node
-                    .get_bundle_mut()
-                    .get_child_mut(parent_child_append_index)
-                {
-                    parent_child_append_element.append_child(
-                        &mut node.get_bundle_mut().get_root_mut(),
-                        SVGChildElementIdentifier::InCompositionContext(
-                            InCompositionContextType::Node(entity),
-                        ),
-                    );
-                }
-            }
-        }
-        // If there's no parent id, the node becomes a root node
-        else {
-            self.root_ids.push(entity);
-        }
-
-        self.nodes.insert(entity, node);
+        return match self.bundles.get_mut(&entity) {
+            Some(SVGCompositionBundle::Node(node)) => Some(node),
+            _ => None,
+        };
     }
 
     fn create_node(&self, node_type: &NodeType, entity: Entity) -> Option<Box<dyn SVGNode>> {
@@ -192,24 +193,29 @@ impl SVGCompositionRes {
 
         // Construct SVG string
         for id in self.root_ids.iter() {
-            if let Some(root) = self.get_node(id) {
-                let element = root.get_bundle().get_root();
-                let mut result = String::new();
+            if let Some(root_bundle) = self.get_bundle(id) {
+                match root_bundle {
+                    SVGCompositionBundle::Node(root) => {
+                        let element = root.get_bundle().get_root();
+                        let mut result = String::new();
 
-                // Open the SVG tag
-                result.push_str(&format!(
-                    "<svg width=\"{}\" height=\"{}\" xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\">",
-                    element.get_attribute("width")?.to_svg_string(),
-                    element.get_attribute("height")?.to_svg_string()
-                ));
+                        // Open the SVG tag
+                        result.push_str(&format!(
+                            "<svg width=\"{}\" height=\"{}\" xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\">",
+                            element.get_attribute("width")?.to_svg_string(),
+                            element.get_attribute("height")?.to_svg_string()
+                        ));
 
-                // Append the content from the root node
-                result.push_str(&root.to_string(self));
+                        // Append the content from the root node
+                        result.push_str(&root.to_string(self));
 
-                // Close the SVG tag
-                result.push_str("</svg>");
+                        // Close the SVG tag
+                        result.push_str("</svg>");
 
-                svg_strings.push(result);
+                        svg_strings.push(result);
+                    }
+                    _ => {}
+                }
             }
         }
 
