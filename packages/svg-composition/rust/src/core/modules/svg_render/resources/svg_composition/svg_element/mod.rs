@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{BTreeMap, HashMap};
 
 use bevy_ecs::entity::Entity;
 use log::info;
@@ -46,10 +46,27 @@ pub struct SVGElement {
 /// allowing for more direct and efficient retrieval.
 #[derive(Debug)]
 pub enum SVGChildElementIdentifier {
-    // Child element is owned by SVGBundle (query by index in "child_elements")
+    /// Child element is owned by SVGBundle (queried by index in "child_elements").
     InBundleContext(Entity, usize),
-    // Child element is owned by SVGComposition and can be found there
+
+    /// Child element is owned by SVGComposition and can be found there.
     InCompositionContext(Entity),
+
+    /// Placeholder for an SVG child element that has not been created yet.
+    /// It holds the Entity that it will eventually represent.
+    /// This is necessary for cases where reordering is required before the actual
+    /// SVG element (Entity) has been created.
+    Placeholder(Entity),
+}
+
+impl SVGChildElementIdentifier {
+    fn entity(&self) -> Entity {
+        match self {
+            SVGChildElementIdentifier::InBundleContext(entity, _)
+            | SVGChildElementIdentifier::InCompositionContext(entity)
+            | SVGChildElementIdentifier::Placeholder(entity) => *entity,
+        }
+    }
 }
 
 impl SVGElement {
@@ -138,13 +155,23 @@ impl SVGElement {
     // Children
     // =========================================================================
 
-    pub fn append_child(
-        &mut self,
-        element: &mut SVGElement,
-        identifier: SVGChildElementIdentifier,
-    ) {
+    pub fn apply_child(&mut self, element: &mut SVGElement, identifier: SVGChildElementIdentifier) {
+        let entity = identifier.entity();
+
+        // Check if a placeholder for this entity exists
+        if let Some(pos) = self
+            .children
+            .iter()
+            .position(|child| child.entity() == entity)
+        {
+            self.children[pos] = identifier;
+        } else {
+            self.children.push(identifier);
+        }
+
+        info!("apply_child: {:?}", self.children);
+
         element.append_to_parent(self.id);
-        self.children.push(identifier);
     }
 
     pub fn clear_children(&mut self) {
@@ -152,37 +179,57 @@ impl SVGElement {
     }
 
     pub fn reorder_children(&mut self, new_order: &Vec<Entity>) {
-        let mut index_map = HashMap::new();
+        let mut index_map = BTreeMap::new();
 
-        // TODO: Ofc children are not applied yet here as we process the parent first :)
-        info!("current_order: {:?}", self.children); // TODO: REMOVE
-        info!("new_order: {:?}", new_order); // TODO: REMOVE
-
-        // Create a map from Entity to index in the children vector
+        // Mapping each Entity to its index in the children vector
         for (index, child) in self.children.iter().enumerate() {
-            let entity = match child {
-                SVGChildElementIdentifier::InBundleContext(entity, _) => *entity,
-                SVGChildElementIdentifier::InCompositionContext(entity) => *entity,
-            };
+            let entity = child.entity();
             index_map.insert(entity, index);
         }
 
-        // Create a vector of indices representing the new order
-        let mut new_order_indices = Vec::new();
+        // Process new order to determine target positions and insertions
+        let mut target_positions = Vec::with_capacity(new_order.len());
+        let mut insertions = Vec::new();
         for entity in new_order {
-            if let Some(&index) = index_map.get(&entity) {
-                new_order_indices.push(index);
+            match index_map.get(entity) {
+                Some(&index) => target_positions.push(Some(index)),
+                None => {
+                    // Placeholder for new entities
+                    target_positions.push(None);
+                    insertions.push((
+                        target_positions.len() - 1,
+                        SVGChildElementIdentifier::Placeholder(*entity),
+                    ));
+                }
             }
         }
 
-        // Reorder the children in-place
-        for (new_position, &original_position) in new_order_indices.iter().enumerate() {
-            self.children.swap(new_position, original_position);
+        // Insert placeholders
+        for (pos, placeholder) in insertions {
+            self.children.insert(pos, placeholder);
         }
 
-        info!("applied_order: {:?}", self.children); // TODO: REMOVE
+        // Reorder children based on the target positions
+        let mut swap_done = vec![false; self.children.len()];
+        for (new_position, target) in target_positions
+            .iter()
+            .enumerate()
+            .filter_map(|(np, &t)| t.map(|t| (np, t)))
+        {
+            if swap_done[new_position] || swap_done[target] {
+                continue;
+            }
+            self.children.swap(new_position, target);
+            swap_done[new_position] = true;
+            swap_done[target] = true;
+        }
 
-        // TODO: send event to frotnend
+        // Push an update event if order has changed (commented out for now).
+        // if target_positions.iter().any(|&pos| pos.is_none()) || swap_done.iter().any(|&done| done) {
+        //     self.updates.push(RenderChange::OrderChanged);
+        // }
+
+        info!("reorder_children: {:?}", self.children);
     }
 
     fn append_to_parent(&mut self, parent_id: u32) {
@@ -268,6 +315,7 @@ impl SVGElement {
                         result.push_str(&bundle_to_string(&bundle, composition))
                     }
                 }
+                _ => {}
             }
         }
 

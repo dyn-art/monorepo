@@ -43,7 +43,7 @@ pub fn extract_children(
 
         changed_component
             .changes
-            .push(ChildrenMixin(children.iter().cloned().collect()).to_mixin_change());
+            .push(ChildrenMixin(children.iter().cloned().rev().collect()).to_mixin_change());
     });
 }
 

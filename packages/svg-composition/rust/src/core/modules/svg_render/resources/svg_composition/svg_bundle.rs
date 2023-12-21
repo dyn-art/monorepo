@@ -70,7 +70,7 @@ impl BaseSVGBundle {
     pub fn append_child_to(&mut self, index: usize, mut element: SVGElement) -> Option<usize> {
         let next_index = self.get_next_child_index();
         if let Some(target_element) = self.child_elements.get_mut(index) {
-            target_element.append_child(
+            target_element.apply_child(
                 &mut element,
                 SVGChildElementIdentifier::InBundleContext(self.entity, next_index),
             );
@@ -82,7 +82,7 @@ impl BaseSVGBundle {
 
     pub fn append_child(&mut self, mut element: SVGElement) -> usize {
         let next_index = self.get_next_child_index();
-        self.element.append_child(
+        self.element.apply_child(
             &mut element,
             SVGChildElementIdentifier::InBundleContext(self.entity, next_index),
         );

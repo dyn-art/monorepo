@@ -1,5 +1,4 @@
 use bevy_ecs::entity::Entity;
-use log::info;
 
 use crate::core::{
     events::output_event::RenderUpdateEvent,
