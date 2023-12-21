@@ -12,7 +12,7 @@ use crate::core::events::output_event::OutputEvent;
 use self::{
     resources::{changed_components::ChangedComponentsRes, svg_composition::SVGCompositionRes},
     systems::{
-        extract::{extract_mixin_generic, extract_paint},
+        extract::{extract_children, extract_mixin_generic, extract_paint},
         queue::queue_render_changes,
     },
 };
@@ -46,6 +46,7 @@ impl Plugin for SvgRenderPlugin {
                     extract_mixin_generic::<NodeCompositionMixin>,
                     extract_mixin_generic::<BlendMixin>,
                     extract_mixin_generic::<PathMixin>,
+                    extract_children,
                     extract_paint,
                 ),
             )

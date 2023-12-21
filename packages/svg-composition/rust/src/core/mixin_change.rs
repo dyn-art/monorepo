@@ -33,6 +33,14 @@ pub struct MixinChangeChildrenMixin {
     children: ChildrenMixin,
 }
 
+impl ToMixinChange for ChildrenMixin {
+    fn to_mixin_change(&self) -> MixinChange {
+        MixinChange::Children(MixinChangeChildrenMixin {
+            children: self.clone(),
+        })
+    }
+}
+
 impl ToMixinChange for DimensionMixin {
     fn to_mixin_change(&self) -> MixinChange {
         MixinChange::Dimension(self.clone())

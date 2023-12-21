@@ -1,4 +1,5 @@
 use bevy_ecs::entity::Entity;
+use log::info;
 
 use crate::core::{
     events::output_event::RenderUpdateEvent,
@@ -127,6 +128,10 @@ impl SVGNode for FrameSVGNode {
                                 SVGDisplayStyle::None
                             },
                         }]);
+                }
+                MixinChange::Children(mixin) => {
+                    // TODO:
+                    info!("MixinChange: Children - {:#?}", mixin);
                 }
                 _ => {
                     // do nothing
