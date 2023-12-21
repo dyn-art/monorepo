@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 use bevy_ecs::entity::Entity;
+use log::info;
 
 use crate::core::modules::svg_render::render_change::RenderChange;
 
@@ -10,10 +11,7 @@ use self::{
     styles::SVGStyle,
 };
 
-use super::{
-    svg_bundle::BaseSVGBundle, svg_bundle_variant::bundle_to_string, SVGBundleVariant,
-    SVGCompositionRes,
-};
+use super::{svg_bundle::BaseSVGBundle, svg_bundle_variant::bundle_to_string, SVGCompositionRes};
 
 pub mod attributes;
 pub mod events;
@@ -151,6 +149,40 @@ impl SVGElement {
 
     pub fn clear_children(&mut self) {
         self.children.clear()
+    }
+
+    pub fn reorder_children(&mut self, new_order: &Vec<Entity>) {
+        let mut index_map = HashMap::new();
+
+        // TODO: Ofc children are not applied yet here as we process the parent first :)
+        info!("current_order: {:?}", self.children); // TODO: REMOVE
+        info!("new_order: {:?}", new_order); // TODO: REMOVE
+
+        // Create a map from Entity to index in the children vector
+        for (index, child) in self.children.iter().enumerate() {
+            let entity = match child {
+                SVGChildElementIdentifier::InBundleContext(entity, _) => *entity,
+                SVGChildElementIdentifier::InCompositionContext(entity) => *entity,
+            };
+            index_map.insert(entity, index);
+        }
+
+        // Create a vector of indices representing the new order
+        let mut new_order_indices = Vec::new();
+        for entity in new_order {
+            if let Some(&index) = index_map.get(&entity) {
+                new_order_indices.push(index);
+            }
+        }
+
+        // Reorder the children in-place
+        for (new_position, &original_position) in new_order_indices.iter().enumerate() {
+            self.children.swap(new_position, original_position);
+        }
+
+        info!("applied_order: {:?}", self.children); // TODO: REMOVE
+
+        // TODO: send event to frotnend
     }
 
     fn append_to_parent(&mut self, parent_id: u32) {

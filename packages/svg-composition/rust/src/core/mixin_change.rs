@@ -30,7 +30,7 @@ pub trait ToMixinChange {
 /// `({type: 'Children'} & Entity[])` without conflict.
 #[derive(Serialize, Clone, Debug, Type)]
 pub struct MixinChangeChildrenMixin {
-    children: ChildrenMixin,
+    pub children: ChildrenMixin,
 }
 
 impl ToMixinChange for ChildrenMixin {

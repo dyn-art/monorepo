@@ -130,8 +130,10 @@ impl SVGNode for FrameSVGNode {
                         }]);
                 }
                 MixinChange::Children(mixin) => {
-                    // TODO:
-                    info!("MixinChange: Children - {:#?}", mixin);
+                    self.bundle
+                        .get_child_mut(self.children_wrapper.index)
+                        .unwrap()
+                        .reorder_children(&mixin.children.0);
                 }
                 _ => {
                     // do nothing
