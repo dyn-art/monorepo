@@ -237,8 +237,6 @@ impl SVGElement {
     }
 
     fn append_to_parent(&mut self, parent_id: u32) {
-        let mut updated = false;
-
         // Attempt to set the parent id of the first 'ElementCreated' render change for the element.
         // This ensures the element is correctly attached to its parent during the initial rendering.
         if self.was_created_in_current_update_cycle {
@@ -247,15 +245,12 @@ impl SVGElement {
                     RenderChange::ElementCreated(element_created) => {
                         if element_created.parent_id.is_none() {
                             element_created.parent_id = Some(parent_id);
-                            updated = true;
                         }
                     }
                     _ => {}
                 }
             }
-        }
-
-        if !updated {
+        } else {
             self.updates
                 .push(RenderChange::ElementAppended(ElementAppended { parent_id }))
         }
