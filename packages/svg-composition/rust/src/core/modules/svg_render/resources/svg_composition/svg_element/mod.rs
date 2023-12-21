@@ -10,7 +10,10 @@ use self::{
     styles::SVGStyle,
 };
 
-use super::{svg_bundle::BaseSVGBundle, SVGCompositionBundle, SVGCompositionRes};
+use super::{
+    svg_bundle::BaseSVGBundle, svg_bundle_variant::bundle_to_string, SVGBundleVariant,
+    SVGCompositionRes,
+};
 
 pub mod attributes;
 pub mod events;
@@ -230,14 +233,7 @@ impl SVGElement {
                 }
                 SVGChildElementIdentifier::InCompositionContext(entity) => {
                     if let Some(bundle) = composition.get_bundle(entity) {
-                        match bundle {
-                            SVGCompositionBundle::Node(node) => {
-                                result.push_str(&node.to_string(composition))
-                            }
-                            SVGCompositionBundle::Paint(paint) => {
-                                result.push_str(&paint.to_string(composition))
-                            }
-                        }
+                        result.push_str(&bundle_to_string(&bundle, composition))
                     }
                 }
             }
