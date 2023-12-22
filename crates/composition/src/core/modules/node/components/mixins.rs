@@ -69,18 +69,18 @@ impl Default for ChildrenMixin {
 pub struct DimensionMixin {
     /// The width of the node, measured in units (likely pixels).
     /// This field specifies the horizontal dimension of the node.
-    pub width: u32,
+    pub width: f32,
 
     /// The height of the node, measured in units (likely pixels).
     /// This field determines the vertical dimension of the node.
-    pub height: u32,
+    pub height: f32,
 }
 
 impl Default for DimensionMixin {
     fn default() -> Self {
         Self {
-            width: 100,
-            height: 100,
+            width: 100.0,
+            height: 100.0,
         }
     }
 }

@@ -51,24 +51,22 @@ pub fn resize_bounds(bounds: &XYWH, corner: u8, cursor_point: &Vec2, node_angle:
     if (corner & HandleSide::Left as u8) == HandleSide::Left as u8 {
         result.position.x = unrotated_cursor_point
             .x
-            .min(bounds.position.x + bounds.width as f32);
-        result.width =
-            (bounds.position.x + bounds.width as f32 - unrotated_cursor_point.x).abs() as u32;
+            .min(bounds.position.x + bounds.width);
+        result.width = (bounds.position.x + bounds.width - unrotated_cursor_point.x).abs();
     }
     if (corner & HandleSide::Right as u8) == HandleSide::Right as u8 {
         result.position.x = unrotated_cursor_point.x.min(bounds.position.x);
-        result.width = (unrotated_cursor_point.x - bounds.position.x).abs() as u32;
+        result.width = (unrotated_cursor_point.x - bounds.position.x).abs();
     }
     if (corner & HandleSide::Top as u8) == HandleSide::Top as u8 {
         result.position.y = unrotated_cursor_point
             .y
             .min(bounds.position.y + bounds.height as f32);
-        result.height =
-            (bounds.position.y + bounds.height as f32 - unrotated_cursor_point.y).abs() as u32;
+        result.height = (bounds.position.y + bounds.height - unrotated_cursor_point.y).abs();
     }
     if (corner & HandleSide::Bottom as u8) == HandleSide::Bottom as u8 {
         result.position.y = unrotated_cursor_point.y.min(bounds.position.y);
-        result.height = (unrotated_cursor_point.y - bounds.position.y).abs() as u32;
+        result.height = (unrotated_cursor_point.y - bounds.position.y).abs();
     }
 
     // Rotate the bounds back to the original angle

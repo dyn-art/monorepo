@@ -1,3 +1,5 @@
+use std::cmp::min;
+
 use bevy_ecs::{
     entity::Entity,
     query::{Changed, Or},
@@ -20,10 +22,9 @@ pub fn construct_rectangle_path(
         let mut path = PathMixin {
             vertices: Vec::new(),
         };
-        let max_radius = std::cmp::min(dimension.width, dimension.height) as f32 / 2.0;
+        let max_radius = min(dimension.width as u32, dimension.height as u32) / 2;
 
-        let min_radius =
-            |radius: u8| -> f32 { std::cmp::min(radius as i32, max_radius as i32) as f32 };
+        let min_radius = |radius: u8| -> f32 { min(radius as i32, max_radius as i32) as f32 };
 
         // Move to start point, considering the top left radius
         path.vertices.push(Anchor {

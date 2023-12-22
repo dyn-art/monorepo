@@ -18,11 +18,11 @@ pub enum SVGAttribute {
         id: ContinuousId,
     },
     Width {
-        width: u32,
+        width: f32,
         unit: SVGMeasurementUnit,
     },
     Height {
-        height: u32,
+        height: f32,
         unit: SVGMeasurementUnit,
     },
     Opacity {

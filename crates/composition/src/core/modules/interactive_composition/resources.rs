@@ -39,8 +39,8 @@ impl Default for InteractionMode {
 #[derive(Debug, Serialize, Deserialize, Type, Clone)]
 pub struct XYWH {
     pub position: Vec2,
-    pub width: u32,
-    pub height: u32,
+    pub width: f32,
+    pub height: f32,
 }
 
 #[derive(Debug, Serialize, Deserialize, Type, Clone)]

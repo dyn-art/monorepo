@@ -55,7 +55,6 @@ pub fn extract_children(
                     None
                 }
             })
-            .rev()
             .clone()
             .collect();
 
