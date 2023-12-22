@@ -30,7 +30,15 @@ pub trait ToMixinChange {
 /// `({type: 'Children'} & Entity[])` without conflict.
 #[derive(Serialize, Clone, Debug, Type)]
 pub struct MixinChangeChildrenMixin {
-    children: ChildrenMixin,
+    pub children: ChildrenMixin,
+}
+
+impl ToMixinChange for ChildrenMixin {
+    fn to_mixin_change(&self) -> MixinChange {
+        MixinChange::Children(MixinChangeChildrenMixin {
+            children: self.clone(),
+        })
+    }
 }
 
 impl ToMixinChange for DimensionMixin {

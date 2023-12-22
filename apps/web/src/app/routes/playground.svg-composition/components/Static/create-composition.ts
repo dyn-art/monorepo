@@ -1,7 +1,7 @@
 import { Composition, createSVGComposition, initWasm } from '@dyn/svg-composition';
 
 import { ABEEZEE_ITALIC, INTER_REGULAR, loadFonts } from '../../font';
-import { COMPOSITION_WITH_ONE_RECT } from './test-data';
+import { TEST_DATA } from './test-data';
 
 export async function createComposition(config: {
 	width: number;
@@ -19,7 +19,7 @@ export async function createComposition(config: {
 		renderer: {
 			domElement: element
 		},
-		dtif: COMPOSITION_WITH_ONE_RECT(width, height, fonts)
+		dtif: TEST_DATA(width, height, fonts)
 	});
 
 	return composition;

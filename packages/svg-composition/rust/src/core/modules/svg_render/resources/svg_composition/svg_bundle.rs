@@ -10,11 +10,14 @@ use super::{
 pub trait SVGBundle {
     fn get_bundle(&self) -> &BaseSVGBundle;
     fn get_bundle_mut(&mut self) -> &mut BaseSVGBundle;
+    fn drain_updates(&mut self) -> Vec<RenderUpdateEvent>;
+    fn to_string(&self, composition: &SVGCompositionRes) -> String;
 }
 
 /// Wrapped SVGElement with static children (known from compile time) for quick access.
 #[derive(Debug)]
 pub struct BaseSVGBundle {
+    entity: Entity,
     // The primary SVG element associated with this bundle
     element: SVGElement,
     // Children that are directly related to this bundles's context
@@ -28,8 +31,9 @@ pub struct BaseSVGBundle {
 
 impl BaseSVGBundle {
     pub fn new(mut element: SVGElement, entity: Entity) -> Self {
-        element.set_as_bundle_root(entity);
+        element.define_as_bundle_root(entity);
         Self {
+            entity,
             element,
             child_elements: Vec::new(),
         }
@@ -68,7 +72,7 @@ impl BaseSVGBundle {
         if let Some(target_element) = self.child_elements.get_mut(index) {
             target_element.append_child(
                 &mut element,
-                SVGChildElementIdentifier::InBundleContext(next_index),
+                SVGChildElementIdentifier::InBundleContext(self.entity, next_index),
             );
             self.child_elements.push(element);
             return Some(next_index);
@@ -80,7 +84,7 @@ impl BaseSVGBundle {
         let next_index = self.get_next_child_index();
         self.element.append_child(
             &mut element,
-            SVGChildElementIdentifier::InBundleContext(next_index),
+            SVGChildElementIdentifier::InBundleContext(self.entity, next_index),
         );
         self.child_elements.push(element);
         return next_index;
@@ -110,7 +114,7 @@ impl BaseSVGBundle {
             if !updates.is_empty() {
                 drained_updates.push(RenderUpdateEvent {
                     id: child.get_id(),
-                    updates: updates,
+                    updates,
                 })
             }
         }

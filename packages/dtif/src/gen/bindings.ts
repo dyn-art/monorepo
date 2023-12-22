@@ -133,6 +133,8 @@ export type BreakLineOn =
  */
 export type ChildrenMixin = Entity[]
 
+export type ContinuousId = number
+
 export type CoreInputEvent = ({ type: "EntityMoved" } & EntityMoved) | ({ type: "EntitySetPosition" } & EntitySetPosition)
 
 export type CursorChangeEvent = { cursor: CursorForFrontend }
@@ -225,12 +227,12 @@ height: number }
 /**
  * Emitted when a SVGElement (child) is append to another SVGElement (parent).
  */
-export type ElementAppended = { parentId: number }
+export type ElementAppended = { parentId: ContinuousId }
 
 /**
  * Emitted when a new SVGElement is created.
  */
-export type ElementCreated = { tagName: string; attributes: SVGAttribute[]; styles: SVGStyle[]; parentId: number | null; isBundleRoot: boolean; entity: Entity | null }
+export type ElementCreated = { tagName: string; attributes: SVGAttribute[]; styles: SVGStyle[]; parentId: ContinuousId | null; isBundleRoot: boolean; entity: Entity | null }
 
 /**
  * Emitted when a SVGElement is deleted.
@@ -569,7 +571,7 @@ export type RelativeTransformMixin = Mat3
  */
 export type RenderChange = ({ type: "ElementCreated" } & ElementCreated) | ({ type: "ElementDeleted" }) | ({ type: "ElementAppended" } & ElementAppended) | ({ type: "AttributeUpdated" } & AttributeUpdated) | ({ type: "AttributeRemoved" } & AttributeRemoved) | ({ type: "StyleUpdated" } & StyleUpdated) | ({ type: "StyleRemoved" } & StyleRemoved)
 
-export type RenderUpdateEvent = { id: number; updates: RenderChange[] }
+export type RenderUpdateEvent = { id: ContinuousId; updates: RenderChange[] }
 
 /**
  * Marks the root node within the composition or scene.
@@ -583,7 +585,7 @@ export type RenderUpdateEvent = { id: number; updates: RenderChange[] }
  */
 export type Root = null
 
-export type SVGAttribute = { type: "Id"; id: number } | { type: "Width"; width: number; unit: SVGMeasurementUnit } | { type: "Height"; height: number; unit: SVGMeasurementUnit } | { type: "Opacity"; opacity: number } | { type: "Transform"; transform: SVGTransformAttribute } | { type: "D"; d: SVGPathCommand[] } | { type: "ClipPath"; clipPath: number } | { type: "Fill"; fill: string } | { type: "Name"; name: string }
+export type SVGAttribute = { type: "Id"; id: ContinuousId } | { type: "Width"; width: number; unit: SVGMeasurementUnit } | { type: "Height"; height: number; unit: SVGMeasurementUnit } | { type: "Opacity"; opacity: number } | { type: "Transform"; transform: SVGTransformAttribute } | { type: "D"; d: SVGPathCommand[] } | { type: "ClipPath"; clipPath: ContinuousId } | { type: "Fill"; fill: string } | { type: "Name"; name: string }
 
 export type SVGBlendMode = { type: "Normal" } | { type: "Multiply" } | { type: "Screen" } | { type: "Overlay" } | { type: "Darken" } | { type: "Lighten" } | { type: "ColorDodge" } | { type: "ColorBurn" } | { type: "HardLight" } | { type: "SoftLight" } | { type: "Difference" } | { type: "Exclusion" } | { type: "Hue" } | { type: "Saturation" } | { type: "Color" } | { type: "Luminosity" }
 

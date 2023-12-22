@@ -14,7 +14,7 @@ pub struct ChangedComponentsRes {
     pub changed_paints: HashMap<Entity, ChangedPaint>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ChangedNode {
     pub node_type: NodeType,
     pub parent_id: Option<Entity>,
