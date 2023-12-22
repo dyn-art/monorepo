@@ -1,7 +1,6 @@
 use std::{collections::HashMap, mem::take};
 
 use bevy_ecs::{entity::Entity, system::ResMut};
-use log::info;
 
 use crate::core::{
     events::output_event::RenderUpdateEvent,
@@ -66,13 +65,26 @@ fn process_paint(
 
 /// A structure representing a node in the dependency tree.
 #[derive(Debug)]
-struct Leaf {
+struct ChangedNodeBranch {
     entity: Entity,
     changed: ChangedNode,
-    children: Option<Vec<Leaf>>,
+    children: Option<Vec<ChangedNodeBranch>>,
 }
 
-fn build_dependency_trees(changed_nodes: &HashMap<Entity, ChangedNode>) -> Vec<Leaf> {
+fn process_nodes(
+    changed_nodes: &HashMap<Entity, ChangedNode>,
+    svg_composition: &mut SVGCompositionRes,
+    updates: &mut Vec<RenderUpdateEvent>,
+) {
+    let dependency_tree = build_dependency_trees(changed_nodes);
+
+    // Traverse and process each node in the dependency tree
+    for root in dependency_tree {
+        process_tree_node(&root, svg_composition, updates);
+    }
+}
+
+fn build_dependency_trees(changed_nodes: &HashMap<Entity, ChangedNode>) -> Vec<ChangedNodeBranch> {
     let mut roots = Vec::new();
 
     // Identify roots
@@ -89,7 +101,7 @@ fn build_dependency_trees(changed_nodes: &HashMap<Entity, ChangedNode>) -> Vec<L
     return roots;
 }
 
-fn build_leaf(entity: Entity, changed_nodes: &HashMap<Entity, ChangedNode>) -> Leaf {
+fn build_leaf(entity: Entity, changed_nodes: &HashMap<Entity, ChangedNode>) -> ChangedNodeBranch {
     let changed_node = changed_nodes.get(&entity).unwrap();
     let mut children = Vec::new();
 
@@ -109,7 +121,7 @@ fn build_leaf(entity: Entity, changed_nodes: &HashMap<Entity, ChangedNode>) -> L
         }
     }
 
-    Leaf {
+    ChangedNodeBranch {
         entity,
         changed: changed_node.clone(), // TODO: avoid clone
         children: if children.is_empty() {
@@ -130,22 +142,9 @@ fn find_children_mixin(changes: &[MixinChange]) -> Option<&MixinChangeChildrenMi
     })
 }
 
-fn process_nodes(
-    changed_nodes: &HashMap<Entity, ChangedNode>,
-    svg_composition: &mut SVGCompositionRes,
-    updates: &mut Vec<RenderUpdateEvent>,
-) {
-    let dependency_tree = build_dependency_trees(changed_nodes);
-
-    // Traverse and process each node in the dependency tree
-    for root in dependency_tree {
-        process_tree_node(&root, svg_composition, updates);
-    }
-}
-
 /// Recursively processes a node in the dependency tree.
 fn process_tree_node(
-    leaf: &Leaf,
+    leaf: &ChangedNodeBranch,
     svg_composition: &mut SVGCompositionRes,
     updates: &mut Vec<RenderUpdateEvent>,
 ) {
