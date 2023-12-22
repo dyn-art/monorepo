@@ -67,7 +67,7 @@ fn process_paint(
 struct ChangedNodeBranch<'a> {
     entity: Entity,
     changed: &'a ChangedNode,
-    children: Option<Vec<ChangedNodeBranch<'a>>>,
+    children: Vec<ChangedNodeBranch<'a>>,
 }
 
 /// Processes nodes by building and traversing dependency trees
@@ -139,11 +139,7 @@ fn build_branch<'a>(
     return ChangedNodeBranch {
         entity,
         changed: changed_node,
-        children: if children.is_empty() {
-            None
-        } else {
-            Some(children)
-        },
+        children,
     };
 }
 
@@ -165,10 +161,8 @@ fn process_tree_node(
     process_node(leaf.entity, leaf.changed, svg_composition, updates);
 
     // Recursively process children, if any
-    if let Some(children) = &leaf.children {
-        for child in children {
-            process_tree_node(child, svg_composition, updates);
-        }
+    for child in &leaf.children {
+        process_tree_node(child, svg_composition, updates);
     }
 }
 
