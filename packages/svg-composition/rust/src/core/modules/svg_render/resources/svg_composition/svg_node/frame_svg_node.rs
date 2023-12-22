@@ -341,7 +341,7 @@ impl FrameSVGNode {
     }
 
     #[cfg(feature = "trace")]
-    fn create_element_name(id: u32, category: String, is_definition: bool) -> String {
+    fn create_element_name(id: ContinuousId, category: String, is_definition: bool) -> String {
         let def_part = if is_definition { "def" } else { "" };
         format!("frame_{}_{}{}", category, id, def_part)
     }

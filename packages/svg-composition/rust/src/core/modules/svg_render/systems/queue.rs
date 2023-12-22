@@ -77,6 +77,8 @@ fn process_nodes(
     svg_composition: &mut SVGCompositionRes,
     updates: &mut Vec<RenderUpdateEvent>,
 ) {
+    // TODO: Compared to previous direct access approach (`process_with_parents`) quite slow
+    //  but no idea how to improve it yet
     let dependency_tree = build_dependency_trees(changed_nodes);
 
     // Traverse and process each root node and its descendants
