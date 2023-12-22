@@ -65,12 +65,13 @@ fn process_paint(
 
 /// A structure representing a node in the dependency tree.
 #[derive(Debug)]
-struct ChangedNodeBranch {
+struct ChangedNodeBranch<'a> {
     entity: Entity,
-    changed: ChangedNode,
-    children: Option<Vec<ChangedNodeBranch>>,
+    changed: &'a ChangedNode,
+    children: Option<Vec<ChangedNodeBranch<'a>>>,
 }
 
+// Processes nodes by building and traversing dependency trees
 fn process_nodes(
     changed_nodes: &HashMap<Entity, ChangedNode>,
     svg_composition: &mut SVGCompositionRes,
@@ -78,52 +79,64 @@ fn process_nodes(
 ) {
     let dependency_tree = build_dependency_trees(changed_nodes);
 
-    // Traverse and process each node in the dependency tree
+    // Traverse and process each root node and its descendants
     for root in dependency_tree {
         process_tree_node(&root, svg_composition, updates);
     }
 }
 
-fn build_dependency_trees(changed_nodes: &HashMap<Entity, ChangedNode>) -> Vec<ChangedNodeBranch> {
+// Builds dependency trees from the changed nodes
+fn build_dependency_trees<'a>(
+    changed_nodes: &'a HashMap<Entity, ChangedNode>,
+) -> Vec<ChangedNodeBranch<'a>> {
     let mut roots = Vec::new();
 
-    // Identify roots
-    for &entity in changed_nodes.keys() {
-        if let Some(changed_node) = changed_nodes.get(&entity) {
-            if changed_node.parent_id.is_none()
-                || !changed_nodes.contains_key(&changed_node.parent_id.unwrap())
-            {
-                roots.push(build_leaf(entity, changed_nodes));
-            }
+    // Identify root nodes (those without parents or whose parents are not in changed_nodes)
+    for (&entity, changed_node) in changed_nodes {
+        if changed_node.parent_id.is_none()
+            || !changed_nodes.contains_key(&changed_node.parent_id.unwrap())
+        {
+            roots.push(build_leaf(entity, changed_nodes));
         }
     }
 
     return roots;
 }
 
-fn build_leaf(entity: Entity, changed_nodes: &HashMap<Entity, ChangedNode>) -> ChangedNodeBranch {
-    let changed_node = changed_nodes.get(&entity).unwrap();
-    let mut children = Vec::new();
+// Recursively builds a leaf node in the dependency tree
+fn build_leaf<'a>(
+    entity: Entity,
+    changed_nodes: &'a HashMap<Entity, ChangedNode>,
+) -> ChangedNodeBranch<'a> {
+    let changed_node = changed_nodes.get(&entity).expect("Node must exist");
 
     // Build children leaves if they are in changed_nodes
-    if let Some(children_mixin) = find_children_mixin(&changed_node.changes) {
-        for &child_entity in &children_mixin.children.0 {
-            if changed_nodes.contains_key(&child_entity) {
-                children.push(build_leaf(child_entity, changed_nodes));
-            }
-        }
-    } else {
-        // Find and process direct children of the current node
-        for (&child_entity, child_node) in changed_nodes {
-            if child_node.parent_id == Some(entity) {
-                children.push(build_leaf(child_entity, changed_nodes));
-            }
-        }
-    }
+    let children: Vec<ChangedNodeBranch> =
+        if let Some(children_mixin) = find_children_mixin(&changed_node.changes) {
+            children_mixin
+                .children
+                .0
+                .iter()
+                .filter_map(|&child_entity| {
+                    changed_nodes
+                        .get(&child_entity)
+                        .map(|_| build_leaf(child_entity, changed_nodes))
+                })
+                .collect()
+        } else {
+            // Find and process direct children of the current node
+            changed_nodes
+                .iter()
+                .filter_map(|(&child_entity, child_node)| {
+                    (child_node.parent_id == Some(entity))
+                        .then(|| build_leaf(child_entity, changed_nodes))
+                })
+                .collect()
+        };
 
     ChangedNodeBranch {
         entity,
-        changed: changed_node.clone(), // TODO: avoid clone
+        changed: changed_node,
         children: if children.is_empty() {
             None
         } else {
@@ -132,13 +145,11 @@ fn build_leaf(entity: Entity, changed_nodes: &HashMap<Entity, ChangedNode>) -> C
     }
 }
 
+// Finds children mixin change from a list of changes
 fn find_children_mixin(changes: &[MixinChange]) -> Option<&MixinChangeChildrenMixin> {
-    changes.iter().find_map(|change| {
-        if let MixinChange::Children(children_mixin) = change {
-            Some(children_mixin)
-        } else {
-            None
-        }
+    changes.iter().find_map(|change| match change {
+        MixinChange::Children(children_mixin) => Some(children_mixin),
+        _ => None,
     })
 }
 
@@ -149,9 +160,9 @@ fn process_tree_node(
     updates: &mut Vec<RenderUpdateEvent>,
 ) {
     // Process the current node entity
-    process_node(leaf.entity, &leaf.changed, svg_composition, updates);
+    process_node(leaf.entity, leaf.changed, svg_composition, updates);
 
-    // Process child nodes, if any
+    // Recursively process children, if any
     if let Some(children) = &leaf.children {
         for child in children {
             process_tree_node(child, svg_composition, updates);
@@ -175,7 +186,7 @@ fn process_node(
 
     // Apply collected changes to the SVG node and drain updates
     if let Some(node) = maybe_node {
-        node.apply_node_change(&changed_node);
+        node.apply_node_change(changed_node);
         updates.extend(node.drain_updates());
     }
 }
