@@ -1,7 +1,4 @@
-use std::{
-    collections::{HashMap, HashSet},
-    mem::take,
-};
+use std::{collections::HashMap, mem::take};
 
 use bevy_ecs::{entity::Entity, system::ResMut};
 use log::info;
@@ -104,11 +101,10 @@ fn build_leaf(entity: Entity, changed_nodes: &HashMap<Entity, ChangedNode>) -> L
             }
         }
     } else {
-        if let Some(parent_id) = changed_node.parent_id {
-            for (&child_entity, child_node) in changed_nodes {
-                if child_node.parent_id == Some(parent_id) {
-                    children.push(build_leaf(child_entity, changed_nodes));
-                }
+        // Find and process direct children of the current node
+        for (&child_entity, child_node) in changed_nodes {
+            if child_node.parent_id == Some(entity) {
+                children.push(build_leaf(child_entity, changed_nodes));
             }
         }
     }
