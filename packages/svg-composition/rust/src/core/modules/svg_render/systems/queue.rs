@@ -4,9 +4,11 @@ use std::{
 };
 
 use bevy_ecs::{entity::Entity, system::ResMut};
+use log::info;
 
 use crate::core::{
     events::output_event::RenderUpdateEvent,
+    mixin_change::{MixinChange, MixinChangeChildrenMixin},
     modules::svg_render::resources::{
         changed_components::{ChangedComponentsRes, ChangedNode, ChangedPaint},
         svg_composition::SVGCompositionRes,
@@ -65,49 +67,100 @@ fn process_paint(
 // Node
 // =============================================================================
 
+/// A structure representing a node in the dependency tree.
+#[derive(Debug)]
+struct Leaf {
+    entity: Entity,
+    changed: ChangedNode,
+    children: Option<Vec<Leaf>>,
+}
+
+fn build_dependency_trees(changed_nodes: &HashMap<Entity, ChangedNode>) -> Vec<Leaf> {
+    let mut roots = Vec::new();
+
+    // Identify roots
+    for &entity in changed_nodes.keys() {
+        if let Some(changed_node) = changed_nodes.get(&entity) {
+            if changed_node.parent_id.is_none()
+                || !changed_nodes.contains_key(&changed_node.parent_id.unwrap())
+            {
+                roots.push(build_leaf(entity, changed_nodes));
+            }
+        }
+    }
+
+    return roots;
+}
+
+fn build_leaf(entity: Entity, changed_nodes: &HashMap<Entity, ChangedNode>) -> Leaf {
+    let changed_node = changed_nodes.get(&entity).unwrap();
+    let mut children = Vec::new();
+
+    // Build children leaves if they are in changed_nodes
+    if let Some(children_mixin) = find_children_mixin(&changed_node.changes) {
+        for &child_entity in &children_mixin.children.0 {
+            if changed_nodes.contains_key(&child_entity) {
+                children.push(build_leaf(child_entity, changed_nodes));
+            }
+        }
+    } else {
+        if let Some(parent_id) = changed_node.parent_id {
+            for (&child_entity, child_node) in changed_nodes {
+                if child_node.parent_id == Some(parent_id) {
+                    children.push(build_leaf(child_entity, changed_nodes));
+                }
+            }
+        }
+    }
+
+    Leaf {
+        entity,
+        changed: changed_node.clone(), // TODO: avoid clone
+        children: if children.is_empty() {
+            None
+        } else {
+            Some(children)
+        },
+    }
+}
+
+fn find_children_mixin(changes: &[MixinChange]) -> Option<&MixinChangeChildrenMixin> {
+    changes.iter().find_map(|change| {
+        if let MixinChange::Children(children_mixin) = change {
+            Some(children_mixin)
+        } else {
+            None
+        }
+    })
+}
+
 fn process_nodes(
     changed_nodes: &HashMap<Entity, ChangedNode>,
     svg_composition: &mut SVGCompositionRes,
     updates: &mut Vec<RenderUpdateEvent>,
 ) {
-    let mut processed: HashSet<Entity> = HashSet::new();
-    for &entity in changed_nodes.keys() {
-        process_with_parents(
-            entity,
-            &changed_nodes,
-            &mut processed,
-            svg_composition,
-            updates,
-        );
+    let dependency_tree = build_dependency_trees(changed_nodes);
+
+    // Traverse and process each node in the dependency tree
+    for root in dependency_tree {
+        process_tree_node(&root, svg_composition, updates);
     }
 }
 
-/// Recursively process a node entity and its parents.
-fn process_with_parents(
-    entity: Entity,
-    changed_nodes: &HashMap<Entity, ChangedNode>,
-    processed: &mut HashSet<Entity>,
+/// Recursively processes a node in the dependency tree.
+fn process_tree_node(
+    leaf: &Leaf,
     svg_composition: &mut SVGCompositionRes,
     updates: &mut Vec<RenderUpdateEvent>,
 ) {
-    if !processed.insert(entity) {
-        return;
-    }
+    // Process the current node entity
+    process_node(leaf.entity, &leaf.changed, svg_composition, updates);
 
-    if let Some(change) = changed_nodes.get(&entity) {
-        // Process parent first
-        if let Some(parent_id) = change.parent_id {
-            process_with_parents(
-                parent_id,
-                changed_nodes,
-                processed,
-                svg_composition,
-                updates,
-            );
+    // Process child nodes, if any
+    if let Some(children) = &leaf.children {
+        for child in children {
+            process_tree_node(child, svg_composition, updates);
         }
-
-        // Process the current node entity
-        process_node(entity, change, svg_composition, updates);
     }
 }
 

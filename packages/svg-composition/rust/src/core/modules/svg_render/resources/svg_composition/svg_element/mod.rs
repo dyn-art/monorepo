@@ -1,7 +1,6 @@
-use std::collections::{BTreeMap, HashMap};
+use std::collections::HashMap;
 
 use bevy_ecs::entity::Entity;
-use log::info;
 
 use crate::core::modules::svg_render::render_change::RenderChange;
 
@@ -53,20 +52,13 @@ pub enum SVGChildElementIdentifier {
 
     /// Child element is owned by SVGComposition and can be found there.
     InCompositionContext(Entity),
-
-    /// Placeholder for an SVG child element that has not been created yet.
-    /// It holds the Entity that it will eventually represent.
-    /// This is necessary for cases where reordering is required before the actual
-    /// SVG element (Entity) has been created.
-    Placeholder(Entity),
 }
 
 impl SVGChildElementIdentifier {
     fn entity(&self) -> Entity {
         match self {
             SVGChildElementIdentifier::InBundleContext(entity, _)
-            | SVGChildElementIdentifier::InCompositionContext(entity)
-            | SVGChildElementIdentifier::Placeholder(entity) => *entity,
+            | SVGChildElementIdentifier::InCompositionContext(entity) => *entity,
         }
     }
 }
@@ -158,82 +150,72 @@ impl SVGElement {
     // Children
     // =========================================================================
 
-    pub fn apply_child(&mut self, element: &mut SVGElement, identifier: SVGChildElementIdentifier) {
-        let entity = identifier.entity();
-
-        // Check if a placeholder for this entity exists
-        if let Some(pos) = self
-            .children
-            .iter()
-            .position(|child| child.entity() == entity)
-        {
-            self.children[pos] = identifier;
-        } else {
-            self.children.push(identifier);
-        }
-
-        info!("apply_child: {:?}", self.children); // TODO: REMOVE
-
-        // TODO: this doesn't work with the reordering (yet)
+    pub fn append_child(
+        &mut self,
+        element: &mut SVGElement,
+        identifier: SVGChildElementIdentifier,
+    ) {
         element.append_to_parent(self.id);
+        self.children.push(identifier);
     }
 
     pub fn clear_children(&mut self) {
         self.children.clear()
     }
 
+    // TODO
     pub fn reorder_children(&mut self, new_order: &Vec<Entity>) {
-        let mut index_map = BTreeMap::new();
+        // let mut index_map = BTreeMap::new();
 
-        // Mapping each Entity to its index in the children vector
-        for (index, child) in self.children.iter().enumerate() {
-            let entity = child.entity();
-            index_map.insert(entity, index);
-        }
-
-        // Process new order to determine target positions and insertions
-        let mut target_positions = Vec::with_capacity(new_order.len());
-        let mut insertions = Vec::new();
-        for entity in new_order {
-            match index_map.get(entity) {
-                Some(&index) => target_positions.push(Some(index)),
-                None => {
-                    // Placeholder for new entities
-                    target_positions.push(None);
-                    insertions.push((
-                        target_positions.len() - 1,
-                        SVGChildElementIdentifier::Placeholder(*entity),
-                    ));
-                }
-            }
-        }
-
-        // Insert placeholders
-        for (pos, placeholder) in insertions {
-            self.children.insert(pos, placeholder);
-        }
-
-        // Reorder children based on the target positions
-        let mut swap_done = vec![false; self.children.len()];
-        for (new_position, target) in target_positions
-            .iter()
-            .enumerate()
-            .filter_map(|(np, &t)| t.map(|t| (np, t)))
-        {
-            if swap_done[new_position] || swap_done[target] {
-                continue;
-            }
-            self.children.swap(new_position, target);
-            swap_done[new_position] = true;
-            swap_done[target] = true;
-        }
-
-        // Push an update event if order has changed
-        // if target_positions.iter().any(|&pos| pos.is_none()) || swap_done.iter().any(|&done| done) {
-        //     self.updates.push(RenderChange::OrderChanged);
+        // // Mapping each Entity to its index in the children vector
+        // for (index, child) in self.children.iter().enumerate() {
+        //     let entity = child.entity();
+        //     index_map.insert(entity, index);
         // }
 
-        info!("reorder_children: {:?}", self.children); // TODO: REMOVE
+        // // Process new order to determine target positions and insertions
+        // let mut target_positions = Vec::with_capacity(new_order.len());
+        // let mut insertions = Vec::new();
+        // for entity in new_order {
+        //     match index_map.get(entity) {
+        //         Some(&index) => target_positions.push(Some(index)),
+        //         None => {
+        //             // Placeholder for new entities
+        //             target_positions.push(None);
+        //             insertions.push((
+        //                 target_positions.len() - 1,
+        //                 SVGChildElementIdentifier::Placeholder(*entity),
+        //             ));
+        //         }
+        //     }
+        // }
+
+        // // Insert placeholders
+        // for (pos, placeholder) in insertions {
+        //     self.children.insert(pos, placeholder);
+        // }
+
+        // // Reorder children based on the target positions
+        // let mut swap_done = vec![false; self.children.len()];
+        // for (new_position, target) in target_positions
+        //     .iter()
+        //     .enumerate()
+        //     .filter_map(|(np, &t)| t.map(|t| (np, t)))
+        // {
+        //     if swap_done[new_position] || swap_done[target] {
+        //         continue;
+        //     }
+        //     self.children.swap(new_position, target);
+        //     swap_done[new_position] = true;
+        //     swap_done[target] = true;
+        // }
+
+        // // Push an update event if order has changed
+        // // if target_positions.iter().any(|&pos| pos.is_none()) || swap_done.iter().any(|&done| done) {
+        // //     self.updates.push(RenderChange::OrderChanged);
+        // // }
+
+        // info!("reorder_children: {:?}", self.children); // TODO: REMOVE
     }
 
     fn append_to_parent(&mut self, parent_id: u32) {
@@ -322,7 +304,6 @@ impl SVGElement {
                         result.push_str(&bundle_to_string(&bundle, composition))
                     }
                 }
-                _ => {}
             }
         }
 

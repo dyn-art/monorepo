@@ -24,6 +24,7 @@ pub fn extract_children(
     mut changed: ResMut<ChangedComponentsRes>,
     query: Extract<Query<(Entity, &Node, &Children), (With<Node>, Changed<Children>)>>,
     parent_query: Extract<Query<&Parent>>,
+    node_query: Extract<Query<Entity, With<Node>>>,
 ) {
     query.for_each(|(entity, node, children)| {
         let changed_component = changed.changed_nodes.entry(entity).or_insert_with(|| {
@@ -41,9 +42,26 @@ pub fn extract_children(
             };
         });
 
+        // TODO: Improve
+        // Note: Also paints are included here as they are managed with Bevy child parent relation too
+
+        // Filter children to include only those that are Nodes
+        let node_children: Vec<_> = children
+            .iter()
+            .filter_map(|child_entity| {
+                if node_query.get(*child_entity).is_ok() {
+                    Some(child_entity.clone())
+                } else {
+                    None
+                }
+            })
+            .rev()
+            .clone()
+            .collect();
+
         changed_component
             .changes
-            .push(ChildrenMixin(children.iter().cloned().rev().collect()).to_mixin_change());
+            .push(ChildrenMixin(node_children).to_mixin_change());
     });
 }
 

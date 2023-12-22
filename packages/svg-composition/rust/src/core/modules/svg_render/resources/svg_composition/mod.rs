@@ -224,7 +224,7 @@ impl SVGCompositionRes {
                 .get_bundle_mut()
                 .get_child_mut(child_append_index)
             {
-                parent_append_element.apply_child(
+                parent_append_element.append_child(
                     get_bundle_mut(&mut bundle_variant).get_root_mut(),
                     SVGChildElementIdentifier::InCompositionContext(entity),
                 );
