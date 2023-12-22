@@ -1,4 +1,5 @@
 use bevy_ecs::entity::Entity;
+use dyn_composition::core::utils::continuous_id::ContinuousId;
 use serde::Serialize;
 use serde_with::serde_as;
 use specta::Type;
@@ -14,7 +15,7 @@ pub struct ElementCreated {
     pub attributes: Vec<SVGAttribute>,
     pub styles: Vec<SVGStyle>,
     #[serde(rename = "parentId")]
-    pub parent_id: Option<u32>,
+    pub parent_id: Option<ContinuousId>,
     #[serde(rename = "isBundleRoot")]
     pub is_bundle_root: bool,
     pub entity: Option<Entity>,
@@ -28,7 +29,7 @@ pub struct ElementDeleted {}
 #[derive(Debug, Serialize, Clone, Type)]
 pub struct ElementAppended {
     #[serde(rename = "parentId")]
-    pub parent_id: u32,
+    pub parent_id: ContinuousId,
 }
 
 /// Emitted when an attribute of an SVGElement is updated.

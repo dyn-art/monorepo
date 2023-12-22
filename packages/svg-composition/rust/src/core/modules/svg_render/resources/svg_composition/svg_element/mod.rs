@@ -1,6 +1,7 @@
-use std::collections::HashMap;
+use std::collections::{BTreeMap, HashMap};
 
 use bevy_ecs::entity::Entity;
+use dyn_composition::core::utils::continuous_id::ContinuousId;
 
 use crate::core::modules::svg_render::render_change::RenderChange;
 
@@ -22,7 +23,7 @@ pub mod styles;
 #[derive(Debug)]
 pub struct SVGElement {
     /// Unique identifier of the SVGElement
-    id: u32,
+    id: ContinuousId,
     /// The type of SVG element (e.g., circle, rect)
     tag_name: SVGTag,
     /// The attributes of the SVG element
@@ -64,8 +65,8 @@ impl SVGChildElementIdentifier {
 }
 
 impl SVGElement {
-    pub fn new(tag_name: SVGTag) -> Self {
-        let id: u32 = rand::random();
+    pub fn new(tag_name: SVGTag, id_generator: &mut ContinuousId) -> Self {
+        let id = id_generator.next_id();
         let id_attribute = SVGAttribute::Id { id };
         let inital_attributes: HashMap<&'static str, SVGAttribute> =
             HashMap::from([(id_attribute.key(), id_attribute)]);
@@ -138,7 +139,7 @@ impl SVGElement {
         self.styles.values().cloned().collect()
     }
 
-    pub fn get_id(&self) -> u32 {
+    pub fn get_id(&self) -> ContinuousId {
         self.id
     }
 
@@ -163,62 +164,59 @@ impl SVGElement {
         self.children.clear()
     }
 
-    // TODO
     pub fn reorder_children(&mut self, new_order: &Vec<Entity>) {
-        // let mut index_map = BTreeMap::new();
+        // TODO
+        // In the creation update cycle the correct order should be established
+        // when constructing the dependency tree based on the changed nodes
+        if self.was_created_in_current_update_cycle {
+            return;
+        }
 
-        // // Mapping each Entity to its index in the children vector
-        // for (index, child) in self.children.iter().enumerate() {
-        //     let entity = child.entity();
-        //     index_map.insert(entity, index);
-        // }
+        let mut index_map = BTreeMap::new();
 
-        // // Process new order to determine target positions and insertions
-        // let mut target_positions = Vec::with_capacity(new_order.len());
-        // let mut insertions = Vec::new();
-        // for entity in new_order {
-        //     match index_map.get(entity) {
-        //         Some(&index) => target_positions.push(Some(index)),
-        //         None => {
-        //             // Placeholder for new entities
-        //             target_positions.push(None);
-        //             insertions.push((
-        //                 target_positions.len() - 1,
-        //                 SVGChildElementIdentifier::Placeholder(*entity),
-        //             ));
-        //         }
-        //     }
-        // }
+        // Mapping each Entity to its index in the children vector
+        for (index, child) in self.children.iter().enumerate() {
+            let entity = child.entity();
+            index_map.insert(entity, index);
+        }
 
-        // // Insert placeholders
-        // for (pos, placeholder) in insertions {
-        //     self.children.insert(pos, placeholder);
-        // }
+        // Process new order to determine target positions and insertions
+        let mut target_positions = Vec::with_capacity(new_order.len());
+        let insertions = Vec::new();
+        for entity in new_order {
+            if let Some(&index) = index_map.get(entity) {
+                target_positions.push(Some(index))
+            }
+        }
 
-        // // Reorder children based on the target positions
-        // let mut swap_done = vec![false; self.children.len()];
-        // for (new_position, target) in target_positions
-        //     .iter()
-        //     .enumerate()
-        //     .filter_map(|(np, &t)| t.map(|t| (np, t)))
-        // {
-        //     if swap_done[new_position] || swap_done[target] {
-        //         continue;
-        //     }
-        //     self.children.swap(new_position, target);
-        //     swap_done[new_position] = true;
-        //     swap_done[target] = true;
-        // }
+        // Insert placeholders
+        for (pos, placeholder) in insertions {
+            self.children.insert(pos, placeholder);
+        }
 
-        // // Push an update event if order has changed
-        // // if target_positions.iter().any(|&pos| pos.is_none()) || swap_done.iter().any(|&done| done) {
-        // //     self.updates.push(RenderChange::OrderChanged);
-        // // }
+        // Reorder children based on the target positions
+        let mut swap_done = vec![false; self.children.len()];
+        for (new_position, target) in target_positions
+            .iter()
+            .enumerate()
+            .filter_map(|(np, &t)| t.map(|t| (np, t)))
+        {
+            if swap_done[new_position] || swap_done[target] {
+                continue;
+            }
+            self.children.swap(new_position, target);
+            swap_done[new_position] = true;
+            swap_done[target] = true;
+        }
 
-        // info!("reorder_children: {:?}", self.children); // TODO: REMOVE
+        // Push an update event if order has changed
+        if target_positions.iter().any(|&pos| pos.is_none()) || swap_done.iter().any(|&done| done) {
+            // TODO: fetch actual element ids
+            //  self.updates.push(RenderChange::OrderChanged);
+        }
     }
 
-    fn append_to_parent(&mut self, parent_id: u32) {
+    fn append_to_parent(&mut self, parent_id: ContinuousId) {
         // Attempt to set the parent id of the first 'ElementCreated' render change for the element.
         // This ensures the element is correctly attached to its parent during the initial rendering.
         if self.was_created_in_current_update_cycle {

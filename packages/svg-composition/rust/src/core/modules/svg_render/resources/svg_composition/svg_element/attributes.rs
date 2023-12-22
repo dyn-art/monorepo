@@ -1,3 +1,4 @@
+use dyn_composition::core::utils::continuous_id::ContinuousId;
 use serde::Serialize;
 use specta::Type;
 
@@ -14,7 +15,7 @@ pub enum SVGMeasurementUnit {
 #[serde(tag = "type")]
 pub enum SVGAttribute {
     Id {
-        id: u32,
+        id: ContinuousId,
     },
     Width {
         width: u32,
@@ -35,7 +36,7 @@ pub enum SVGAttribute {
     },
     ClipPath {
         #[serde(rename = "clipPath")]
-        clip_path: u32,
+        clip_path: ContinuousId,
     },
     Fill {
         fill: String,

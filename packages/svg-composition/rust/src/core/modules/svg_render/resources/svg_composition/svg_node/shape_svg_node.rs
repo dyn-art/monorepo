@@ -1,4 +1,5 @@
 use bevy_ecs::entity::Entity;
+use dyn_composition::core::utils::continuous_id::ContinuousId;
 
 use crate::core::{
     events::output_event::RenderUpdateEvent,
@@ -134,9 +135,9 @@ impl SVGNode for ShapeSVGNode {
 }
 
 impl ShapeSVGNode {
-    pub fn new(entity: Entity) -> Self {
+    pub fn new(entity: Entity, id_generator: &mut ContinuousId) -> Self {
         // Create root element
-        let mut element = SVGElement::new(SVGTag::Group);
+        let mut element = SVGElement::new(SVGTag::Group, id_generator);
         let element_id = element.get_id();
         #[cfg(feature = "trace")]
         element.set_attribute(SVGAttribute::Name {
@@ -145,7 +146,7 @@ impl ShapeSVGNode {
         let mut bundle = BaseSVGBundle::new(element, entity);
 
         // Create click area element
-        let mut click_area = SVGElement::new(SVGTag::Rect);
+        let mut click_area = SVGElement::new(SVGTag::Rect, id_generator);
         let click_area_id = click_area.get_id();
         #[cfg(feature = "trace")]
         click_area.set_attributes(vec![
@@ -167,7 +168,7 @@ impl ShapeSVGNode {
         let click_area_index = bundle.append_child(click_area);
 
         // Create fill elements
-        let mut fill_clip_path_defs = SVGElement::new(SVGTag::Defs);
+        let mut fill_clip_path_defs = SVGElement::new(SVGTag::Defs, id_generator);
         let fill_clip_path_defs_id = fill_clip_path_defs.get_id();
         #[cfg(feature = "trace")]
         fill_clip_path_defs.set_attribute(SVGAttribute::Name {
@@ -179,7 +180,7 @@ impl ShapeSVGNode {
         });
         let fill_clip_path_defs_index = bundle.append_child(fill_clip_path_defs);
 
-        let mut fill_clip_path_element = SVGElement::new(SVGTag::ClipPath);
+        let mut fill_clip_path_element = SVGElement::new(SVGTag::ClipPath, id_generator);
         let fill_clip_path_id = fill_clip_path_element.get_id();
         #[cfg(feature = "trace")]
         fill_clip_path_element.set_attribute(SVGAttribute::Name {
@@ -193,7 +194,7 @@ impl ShapeSVGNode {
             .append_child_to(fill_clip_path_defs_index, fill_clip_path_element)
             .unwrap();
 
-        let mut fill_clipped_shape_element = SVGElement::new(SVGTag::Path);
+        let mut fill_clipped_shape_element = SVGElement::new(SVGTag::Path, id_generator);
         let fill_clipped_shape_id = fill_clipped_shape_element.get_id();
         #[cfg(feature = "trace")]
         fill_clipped_shape_element.set_attribute(SVGAttribute::Name {
@@ -207,7 +208,7 @@ impl ShapeSVGNode {
             .append_child_to(fill_clip_path_index, fill_clipped_shape_element)
             .unwrap();
 
-        let mut fill_wrapper_element = SVGElement::new(SVGTag::Group);
+        let mut fill_wrapper_element = SVGElement::new(SVGTag::Group, id_generator);
         let fill_wrapper_id = fill_wrapper_element.get_id();
         #[cfg(feature = "trace")]
         fill_wrapper_element.set_attribute(SVGAttribute::Name {

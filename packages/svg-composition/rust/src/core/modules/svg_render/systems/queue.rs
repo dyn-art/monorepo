@@ -63,7 +63,6 @@ fn process_paint(
 // Node
 // =============================================================================
 
-/// A structure representing a node in the dependency tree.
 #[derive(Debug)]
 struct ChangedNodeBranch<'a> {
     entity: Entity,
@@ -71,7 +70,8 @@ struct ChangedNodeBranch<'a> {
     children: Option<Vec<ChangedNodeBranch<'a>>>,
 }
 
-// Processes nodes by building and traversing dependency trees
+/// Processes nodes by building and traversing dependency trees
+/// to ensure that parents are processed before its children.
 fn process_nodes(
     changed_nodes: &HashMap<Entity, ChangedNode>,
     svg_composition: &mut SVGCompositionRes,
@@ -85,7 +85,7 @@ fn process_nodes(
     }
 }
 
-// Builds dependency trees from the changed nodes
+/// Builds dependency trees from the changed nodes.
 fn build_dependency_trees<'a>(
     changed_nodes: &'a HashMap<Entity, ChangedNode>,
 ) -> Vec<ChangedNodeBranch<'a>> {
@@ -96,22 +96,24 @@ fn build_dependency_trees<'a>(
         if changed_node.parent_id.is_none()
             || !changed_nodes.contains_key(&changed_node.parent_id.unwrap())
         {
-            roots.push(build_leaf(entity, changed_nodes));
+            roots.push(build_branch(entity, changed_nodes));
         }
     }
 
     return roots;
 }
 
-// Recursively builds a leaf node in the dependency tree
-fn build_leaf<'a>(
+/// Recursively builds a branch in the dependency tree.
+fn build_branch<'a>(
     entity: Entity,
     changed_nodes: &'a HashMap<Entity, ChangedNode>,
 ) -> ChangedNodeBranch<'a> {
     let changed_node = changed_nodes.get(&entity).expect("Node must exist");
 
-    // Build children leaves if they are in changed_nodes
+    // Build children branches
     let children: Vec<ChangedNodeBranch> =
+         // Build branches for children of the current node,
+         // while ensuring the correct order of the children based on the children mixin
         if let Some(children_mixin) = find_children_mixin(&changed_node.changes) {
             children_mixin
                 .children
@@ -120,21 +122,21 @@ fn build_leaf<'a>(
                 .filter_map(|&child_entity| {
                     changed_nodes
                         .get(&child_entity)
-                        .map(|_| build_leaf(child_entity, changed_nodes))
+                        .map(|_| build_branch(child_entity, changed_nodes))
                 })
                 .collect()
         } else {
-            // Find and process direct children of the current node
+            // Build branches for children of the current node (order not relevant)
             changed_nodes
                 .iter()
                 .filter_map(|(&child_entity, child_node)| {
                     (child_node.parent_id == Some(entity))
-                        .then(|| build_leaf(child_entity, changed_nodes))
+                        .then(|| build_branch(child_entity, changed_nodes))
                 })
                 .collect()
         };
 
-    ChangedNodeBranch {
+    return ChangedNodeBranch {
         entity,
         changed: changed_node,
         children: if children.is_empty() {
@@ -142,10 +144,10 @@ fn build_leaf<'a>(
         } else {
             Some(children)
         },
-    }
+    };
 }
 
-// Finds children mixin change from a list of changes
+/// Finds children mixin change from a list of changes.
 fn find_children_mixin(changes: &[MixinChange]) -> Option<&MixinChangeChildrenMixin> {
     changes.iter().find_map(|change| match change {
         MixinChange::Children(children_mixin) => Some(children_mixin),
@@ -170,7 +172,8 @@ fn process_tree_node(
     }
 }
 
-/// Processes a node entity by updating its corresponding SVG element/s based on the provided changes.
+/// Processes a node entity by updating its corresponding SVG element/s
+/// based on the provided changes.
 fn process_node(
     entity: Entity,
     changed_node: &ChangedNode,

@@ -1,6 +1,9 @@
 use std::fmt::Display;
 
-#[derive(Clone, Copy, PartialEq, Eq, Hash, Debug)]
+use serde::Serialize;
+use specta::Type;
+
+#[derive(Clone, Copy, PartialEq, Eq, Hash, Debug, Serialize, Type)]
 pub struct ContinuousId(usize);
 
 impl ContinuousId {
@@ -10,6 +13,12 @@ impl ContinuousId {
         let old = self.0;
         self.0 += 1;
         Self(old)
+    }
+}
+
+impl Into<usize> for ContinuousId {
+    fn into(self) -> usize {
+        self.0
     }
 }
 

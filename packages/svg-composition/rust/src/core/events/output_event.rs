@@ -1,4 +1,5 @@
 use bevy_ecs::entity::Entity;
+use dyn_composition::core::utils::continuous_id::ContinuousId;
 use serde::Serialize;
 use specta::Type;
 
@@ -16,7 +17,7 @@ pub enum OutputEvent {
 
 #[derive(Debug, Serialize, Clone, Type)]
 pub struct RenderUpdateEvent {
-    pub id: u32,
+    pub id: ContinuousId,
     pub updates: Vec<RenderChange>,
 }
 

@@ -1,7 +1,10 @@
 use std::{collections::HashMap, sync::mpsc::Sender};
 
 use bevy_ecs::{entity::Entity, system::Resource};
-use dyn_composition::core::modules::node::components::{mixins::Paint, types::NodeType};
+use dyn_composition::core::{
+    modules::node::components::{mixins::Paint, types::NodeType},
+    utils::continuous_id::ContinuousId,
+};
 
 use crate::core::events::output_event::{OutputEvent, RenderUpdateEvent};
 
@@ -26,6 +29,7 @@ pub struct SVGCompositionRes {
     root_ids: Vec<Entity>,
     // Sender to enque events for frontend
     output_event_sender: Sender<OutputEvent>,
+    id_generator: ContinuousId,
 }
 
 impl SVGCompositionRes {
@@ -34,6 +38,7 @@ impl SVGCompositionRes {
             root_ids: Vec::new(),
             bundles: HashMap::new(),
             output_event_sender,
+            id_generator: ContinuousId::ZERO,
         }
     }
 
@@ -103,9 +108,9 @@ impl SVGCompositionRes {
         };
     }
 
-    fn create_paint(&self, paint: &Paint, entity: Entity) -> Option<Box<dyn SVGPaint>> {
+    fn create_paint(&mut self, paint: &Paint, entity: Entity) -> Option<Box<dyn SVGPaint>> {
         match paint {
-            Paint::Solid(..) => Some(Box::new(SolidSVGPaint::new(entity))),
+            Paint::Solid(..) => Some(Box::new(SolidSVGPaint::new(entity, &mut self.id_generator))),
         }
     }
 
@@ -135,11 +140,13 @@ impl SVGCompositionRes {
         };
     }
 
-    fn create_node(&self, node_type: &NodeType, entity: Entity) -> Option<Box<dyn SVGNode>> {
+    fn create_node(&mut self, node_type: &NodeType, entity: Entity) -> Option<Box<dyn SVGNode>> {
         match node_type {
-            NodeType::Rectangle => Some(Box::new(ShapeSVGNode::new(entity))),
-            NodeType::Frame => Some(Box::new(FrameSVGNode::new(entity))),
-            NodeType::Text => Some(Box::new(ShapeSVGNode::new(entity))),
+            NodeType::Rectangle => {
+                Some(Box::new(ShapeSVGNode::new(entity, &mut self.id_generator)))
+            }
+            NodeType::Frame => Some(Box::new(FrameSVGNode::new(entity, &mut self.id_generator))),
+            NodeType::Text => Some(Box::new(ShapeSVGNode::new(entity, &mut self.id_generator))),
             _ => None,
         }
     }

@@ -1,5 +1,7 @@
 use bevy_ecs::entity::Entity;
-use dyn_composition::core::modules::node::components::mixins::Paint;
+use dyn_composition::core::{
+    modules::node::components::mixins::Paint, utils::continuous_id::ContinuousId,
+};
 
 use crate::core::{
     events::output_event::RenderUpdateEvent,
@@ -85,9 +87,9 @@ impl SVGPaint for SolidSVGPaint {
 }
 
 impl SolidSVGPaint {
-    pub fn new(entity: Entity) -> Self {
+    pub fn new(entity: Entity, id_generator: &mut ContinuousId) -> Self {
         // Create root element
-        let mut element = SVGElement::new(SVGTag::Group);
+        let mut element = SVGElement::new(SVGTag::Group, id_generator);
         #[cfg(feature = "trace")]
         element.set_attribute(SVGAttribute::Name {
             name: SolidSVGPaint::create_element_name(element.get_id(), String::from("root"), false),
@@ -95,7 +97,7 @@ impl SolidSVGPaint {
         let mut bundle = BaseSVGBundle::new(element, entity);
 
         // Create paint elements
-        let mut paint_shape_element = SVGElement::new(SVGTag::Rect);
+        let mut paint_shape_element = SVGElement::new(SVGTag::Rect, id_generator);
         let paint_shape_element_id = paint_shape_element.get_id();
         #[cfg(feature = "trace")]
         paint_shape_element.set_attribute(SVGAttribute::Name {
