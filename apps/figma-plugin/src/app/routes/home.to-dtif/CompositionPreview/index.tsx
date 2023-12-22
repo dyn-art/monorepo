@@ -7,6 +7,7 @@ import { useAppCallback } from '../../../hooks';
 
 import './styles.css';
 
+import { copyToClipboard } from '../../../core/utils';
 import { useSVGComposition } from './use-svg-composition';
 
 const WIDTH = 364;
@@ -35,6 +36,7 @@ export const CompositionPreview: React.FC<TProps> = (props) => {
 			callback: async (instance, args) => {
 				if (args.type === 'success') {
 					setDTIF(args.content);
+					await copyToClipboard(JSON.stringify(args.content));
 				}
 			}
 		},

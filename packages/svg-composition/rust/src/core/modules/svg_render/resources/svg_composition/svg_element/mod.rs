@@ -1,7 +1,6 @@
 use std::collections::HashMap;
 
 use bevy_ecs::entity::Entity;
-use log::info;
 
 use crate::core::modules::svg_render::render_change::RenderChange;
 
@@ -36,6 +35,8 @@ pub struct SVGElement {
     updates: Vec<RenderChange>,
     /// Whether the SVG element is the root of a SVG bundle.
     is_bundle_root: bool,
+    /// Whether the element was created in the current update cycle (before first update drain).
+    was_created_in_current_update_cycle: bool,
 }
 
 /// Used to efficiently locate SVG child elements within various SVG structures.
@@ -46,10 +47,20 @@ pub struct SVGElement {
 /// allowing for more direct and efficient retrieval.
 #[derive(Debug)]
 pub enum SVGChildElementIdentifier {
-    // Child element is owned by SVGBundle (query by index in "child_elements")
+    /// Child element is owned by SVGBundle (queried by index in "child_elements").
     InBundleContext(Entity, usize),
-    // Child element is owned by SVGComposition and can be found there
+
+    /// Child element is owned by SVGComposition and can be found there.
     InCompositionContext(Entity),
+}
+
+impl SVGChildElementIdentifier {
+    fn entity(&self) -> Entity {
+        match self {
+            SVGChildElementIdentifier::InBundleContext(entity, _)
+            | SVGChildElementIdentifier::InCompositionContext(entity) => *entity,
+        }
+    }
 }
 
 impl SVGElement {
@@ -76,6 +87,7 @@ impl SVGElement {
             children: Vec::new(),
             updates: initial_updates,
             is_bundle_root: false,
+            was_created_in_current_update_cycle: true,
         };
     }
 
@@ -151,58 +163,76 @@ impl SVGElement {
         self.children.clear()
     }
 
+    // TODO
     pub fn reorder_children(&mut self, new_order: &Vec<Entity>) {
-        let mut index_map = HashMap::new();
+        // let mut index_map = BTreeMap::new();
 
-        // TODO: Ofc children are not applied yet here as we process the parent first :)
-        info!("current_order: {:?}", self.children); // TODO: REMOVE
-        info!("new_order: {:?}", new_order); // TODO: REMOVE
+        // // Mapping each Entity to its index in the children vector
+        // for (index, child) in self.children.iter().enumerate() {
+        //     let entity = child.entity();
+        //     index_map.insert(entity, index);
+        // }
 
-        // Create a map from Entity to index in the children vector
-        for (index, child) in self.children.iter().enumerate() {
-            let entity = match child {
-                SVGChildElementIdentifier::InBundleContext(entity, _) => *entity,
-                SVGChildElementIdentifier::InCompositionContext(entity) => *entity,
-            };
-            index_map.insert(entity, index);
-        }
+        // // Process new order to determine target positions and insertions
+        // let mut target_positions = Vec::with_capacity(new_order.len());
+        // let mut insertions = Vec::new();
+        // for entity in new_order {
+        //     match index_map.get(entity) {
+        //         Some(&index) => target_positions.push(Some(index)),
+        //         None => {
+        //             // Placeholder for new entities
+        //             target_positions.push(None);
+        //             insertions.push((
+        //                 target_positions.len() - 1,
+        //                 SVGChildElementIdentifier::Placeholder(*entity),
+        //             ));
+        //         }
+        //     }
+        // }
 
-        // Create a vector of indices representing the new order
-        let mut new_order_indices = Vec::new();
-        for entity in new_order {
-            if let Some(&index) = index_map.get(&entity) {
-                new_order_indices.push(index);
-            }
-        }
+        // // Insert placeholders
+        // for (pos, placeholder) in insertions {
+        //     self.children.insert(pos, placeholder);
+        // }
 
-        // Reorder the children in-place
-        for (new_position, &original_position) in new_order_indices.iter().enumerate() {
-            self.children.swap(new_position, original_position);
-        }
+        // // Reorder children based on the target positions
+        // let mut swap_done = vec![false; self.children.len()];
+        // for (new_position, target) in target_positions
+        //     .iter()
+        //     .enumerate()
+        //     .filter_map(|(np, &t)| t.map(|t| (np, t)))
+        // {
+        //     if swap_done[new_position] || swap_done[target] {
+        //         continue;
+        //     }
+        //     self.children.swap(new_position, target);
+        //     swap_done[new_position] = true;
+        //     swap_done[target] = true;
+        // }
 
-        info!("applied_order: {:?}", self.children); // TODO: REMOVE
+        // // Push an update event if order has changed
+        // // if target_positions.iter().any(|&pos| pos.is_none()) || swap_done.iter().any(|&done| done) {
+        // //     self.updates.push(RenderChange::OrderChanged);
+        // // }
 
-        // TODO: send event to frotnend
+        // info!("reorder_children: {:?}", self.children); // TODO: REMOVE
     }
 
     fn append_to_parent(&mut self, parent_id: u32) {
-        let mut updated = false;
-
         // Attempt to set the parent id of the first 'ElementCreated' render change for the element.
         // This ensures the element is correctly attached to its parent during the initial rendering.
-        if let Some(update) = self.updates.first_mut() {
-            match update {
-                RenderChange::ElementCreated(element_created) => {
-                    if element_created.parent_id.is_none() {
-                        element_created.parent_id = Some(parent_id);
-                        updated = true;
+        if self.was_created_in_current_update_cycle {
+            if let Some(update) = self.updates.first_mut() {
+                match update {
+                    RenderChange::ElementCreated(element_created) => {
+                        if element_created.parent_id.is_none() {
+                            element_created.parent_id = Some(parent_id);
+                        }
                     }
+                    _ => {}
                 }
-                _ => {}
             }
-        }
-
-        if !updated {
+        } else {
             self.updates
                 .push(RenderChange::ElementAppended(ElementAppended { parent_id }))
         }
@@ -212,20 +242,26 @@ impl SVGElement {
     // Other
     // =========================================================================
 
-    pub fn set_as_bundle_root(&mut self, entity: Entity) {
+    pub fn define_as_bundle_root(&mut self, entity: Entity) {
         self.is_bundle_root = true;
-        if let Some(update) = self.updates.first_mut() {
-            match update {
-                RenderChange::ElementCreated(element_created) => {
-                    element_created.is_bundle_root = true;
-                    element_created.entity = Some(entity);
+        if self.was_created_in_current_update_cycle {
+            if let Some(update) = self.updates.first_mut() {
+                match update {
+                    RenderChange::ElementCreated(element_created) => {
+                        element_created.is_bundle_root = true;
+                        element_created.entity = Some(entity);
+                    }
+                    _ => {}
                 }
-                _ => {}
             }
         }
     }
 
     pub fn drain_updates(&mut self) -> Vec<RenderChange> {
+        if self.was_created_in_current_update_cycle {
+            self.was_created_in_current_update_cycle = false;
+        }
+
         self.updates.drain(..).collect()
     }
 

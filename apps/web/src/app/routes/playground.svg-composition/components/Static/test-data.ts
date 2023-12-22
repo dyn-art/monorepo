@@ -3,7 +3,26 @@ import { DTIFComposition, FontWithContent } from '@dyn/svg-composition';
 import { ABEEZEE_ITALIC, INTER_REGULAR } from '../../font';
 import { createTransformMatrix } from '../../utils';
 
-export const COMPOSITION_WITH_ONE_RECT = (
+export const TEST_DATA = (
+	width: number,
+	height: number,
+	fonts: Record<string, FontWithContent>
+): DTIFComposition => {
+	return COMPOSITION_FROM_JSON(width, height, fonts);
+};
+
+const COMPOSITION_FROM_JSON = (
+	width: number,
+	height: number,
+	fonts: Record<string, FontWithContent>
+): DTIFComposition => {
+	const dtif = `{"version":"1.0","name":"Frame 3","width":500,"height":500,"nodes":{"0":{"type":"Frame","node":{"name":"Frame 3","node_type":"Frame"},"frame":{"clipContent":false},"compositionMixin":{"isLocked":false,"isVisible":true},"children":[9,7,5,3,1],"dimension":{"height":500,"width":500},"relativeTransform":[1,0,0,0,1,0,0,0,1],"rectangleCornerMixin":{"bottomLeftRadius":0,"bottomRightRadius":0,"topLeftRadius":0,"topRightRadius":0},"blendMixin":{"blendMode":"Normal","opacity":1,"isMask":false},"fill":{"paintIds":[]}},"1":{"type":"Rectangle","node":{"name":"0","node_type":"Rectangle"},"compositionMixin":{"isLocked":false,"isVisible":true},"dimension":{"height":500,"width":500},"relativeTransform":[1,0,0,0,1,0,0,0,1],"rectangleCornerMixin":{"bottomLeftRadius":0,"bottomRightRadius":0,"topLeftRadius":0,"topRightRadius":0},"blendMixin":{"blendMode":"Normal","opacity":1,"isMask":false},"fill":{"paintIds":[2]}},"3":{"type":"Rectangle","node":{"name":"2","node_type":"Rectangle"},"compositionMixin":{"isLocked":false,"isVisible":true},"dimension":{"height":100,"width":100},"relativeTransform":[1,0,0,0,1,0,200,200,1],"rectangleCornerMixin":{"bottomLeftRadius":0,"bottomRightRadius":0,"topLeftRadius":0,"topRightRadius":0},"blendMixin":{"blendMode":"Normal","opacity":1,"isMask":false},"fill":{"paintIds":[4]}},"5":{"type":"Rectangle","node":{"name":"3","node_type":"Rectangle"},"compositionMixin":{"isLocked":false,"isVisible":true},"dimension":{"height":100,"width":100},"relativeTransform":[1,0,0,0,1,0,184,180,1],"rectangleCornerMixin":{"bottomLeftRadius":0,"bottomRightRadius":0,"topLeftRadius":0,"topRightRadius":0},"blendMixin":{"blendMode":"Normal","opacity":1,"isMask":false},"fill":{"paintIds":[6]}},"7":{"type":"Rectangle","node":{"name":"4","node_type":"Rectangle"},"compositionMixin":{"isLocked":false,"isVisible":true},"dimension":{"height":100,"width":100},"relativeTransform":[1,0,0,0,1,0,157,150,1],"rectangleCornerMixin":{"bottomLeftRadius":0,"bottomRightRadius":0,"topLeftRadius":0,"topRightRadius":0},"blendMixin":{"blendMode":"Normal","opacity":1,"isMask":false},"fill":{"paintIds":[8]}},"9":{"type":"Rectangle","node":{"name":"5","node_type":"Rectangle"},"compositionMixin":{"isLocked":false,"isVisible":true},"dimension":{"height":100,"width":100},"relativeTransform":[1,0,0,0,1,0,120,115,1],"rectangleCornerMixin":{"bottomLeftRadius":0,"bottomRightRadius":0,"topLeftRadius":0,"topRightRadius":0},"blendMixin":{"blendMode":"Normal","opacity":1,"isMask":false},"fill":{"paintIds":[10]}}},"paints":{"2":{"type":"Solid","blendMode":"Normal","color":[169,169,169],"opacity":1,"isVisible":true},"4":{"type":"Solid","blendMode":"Normal","color":[0,0,139],"opacity":1,"isVisible":true},"6":{"type":"Solid","blendMode":"Normal","color":[139,83,0],"opacity":1,"isVisible":true},"8":{"type":"Solid","blendMode":"Normal","color":[136,0,139],"opacity":1,"isVisible":true},"10":{"type":"Solid","blendMode":"Normal","color":[0,139,97],"opacity":1,"isVisible":true}},"fonts":{},"rootNodeId":0}`;
+	const result = JSON.parse(dtif);
+
+	return result;
+};
+
+const COMPOSITION_WITH_ONE_RECT = (
 	width: number,
 	height: number,
 	fonts: Record<string, FontWithContent>
