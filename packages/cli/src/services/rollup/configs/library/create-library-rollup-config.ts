@@ -3,7 +3,7 @@ import { defineConfig as rollupDefineConfig, type RollupOptions } from 'rollup';
 import type { PackageJson } from 'type-fest';
 
 import type { DynCommand } from '../../../../DynCommand';
-import { resolvePaths, toArray, type TPath } from '../../../../utils';
+import { resolvePaths, toArray, type TInputOutputPath } from '../../../../utils';
 import type { TDynLibraryConfig, TDynRollupOptionsCallbackConfig } from '../../../dyn';
 import { mergeRollupConfigs } from '../../merge-rollup-configs';
 import { configureCJS, configureESM, type TConfigureModuleConfig } from '../../modules';
@@ -46,7 +46,7 @@ export async function createLibraryRollupConfig(
 		const { output } = format === 'esm' ? configureESM(moduleConfig) : configureCJS(moduleConfig);
 
 		const rollupOptionsCallbackConfig: TDynRollupOptionsCallbackConfig = {
-			path: {
+			paths: {
 				input: inputPath,
 				output: outputPath
 			},
@@ -84,7 +84,7 @@ export interface TCreateLibraryConfigConfig {
 	tsConfigPath: string;
 	packageJson: PackageJson;
 	format?: 'cjs' | 'esm';
-	paths?: TPath | TPath[];
+	paths?: TInputOutputPath | TInputOutputPath[];
 	isProduction?: boolean;
 	preserveModules?: boolean;
 	sourcemap?: boolean;

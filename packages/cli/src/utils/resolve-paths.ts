@@ -4,13 +4,13 @@ import { resolvePathsFromPackageJson } from './resolve-paths-from-package-json';
 import { toArray } from './to-array';
 
 export function resolvePaths(config: {
-	paths: TPath | TPath[] | null;
+	paths: TInputOutputPath | TInputOutputPath[] | null;
 	packageJson: PackageJson;
 	format: 'cjs' | 'esm' | 'types';
 	preserveModules: boolean;
-}): TPath[] {
+}): TInputOutputPath[] {
 	const { paths, packageJson, format, preserveModules } = config;
-	const finalPaths: TPath[] = [];
+	const finalPaths: TInputOutputPath[] = [];
 
 	if (paths != null) {
 		finalPaths.push(...toArray(paths));
@@ -21,7 +21,7 @@ export function resolvePaths(config: {
 	return finalPaths;
 }
 
-export interface TPath {
+export interface TInputOutputPath {
 	output: string;
 	input: string;
 	key?: string;

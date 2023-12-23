@@ -3,10 +3,10 @@ import type { TBaseDynRollupOptions, TDynRollupOptionsCallbackConfig } from '../
 export function createPluginRollupConfig(
 	config: TDynRollupOptionsCallbackConfig
 ): TBaseDynRollupOptions {
-	const { path, output } = config;
+	const { paths, output } = config;
 
 	return {
-		input: path.input,
+		input: paths.input,
 		output,
 		plugins: [
 			'node-resolve',
@@ -14,6 +14,7 @@ export function createPluginRollupConfig(
 			'resolve-typescript-paths',
 			'esbuild',
 			'replace',
+			'rollup-plugin-license',
 			'rollup-plugin-bundle-size'
 		],
 		external: ['react', 'react-dom']

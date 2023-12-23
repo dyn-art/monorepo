@@ -61,7 +61,7 @@ export async function createFigmaRollupConfig(
 		const { output } = configureCJS(moduleConfig);
 
 		const rollupOptionsCallbackConfig: TDynBaseRollupOptionsCallbackConfig = {
-			path: {
+			paths: {
 				input: figmaModuleConfig.source,
 				output: figmaModuleConfig.output
 			},

@@ -9,10 +9,10 @@ import { bundleSize, typescriptPaths } from '../../plugins';
 export async function createBaseRollupConfig(
 	config: TDynRollupOptionsCallbackConfig
 ): Promise<TBaseDynRollupOptions> {
-	const { packageJson, path, output, command, tsConfigPath, isProduction } = config;
+	const { packageJson, paths, output, command, tsConfigPath, isProduction } = config;
 
 	return {
-		input: path.input,
+		input: paths.input,
 		output,
 		plugins: [
 			// Automatically declares NodeJS built-in modules like (node:path, node:fs) as external.
@@ -43,6 +43,7 @@ export async function createBaseRollupConfig(
 			// typescript(/* */), // Obsolete as esbuild takes care of configuring typescript
 			// babel(/* */), // Obsolete as esbuild takes care of converting ES2015+ modules into compatible JavaScript files
 			// terser(/* */), // Obsolete as esbuild takes care of minifying
+			// license(/* */), Note: Not checking for third party licenses here as packages not included in bundle can't be detected (// https://github.com/mjeanroy/rollup-plugin-license/issues/440)
 			'copy', // Plugin placeholder for "rollup-plugin-copy"
 			await bundleSize(command)
 		],

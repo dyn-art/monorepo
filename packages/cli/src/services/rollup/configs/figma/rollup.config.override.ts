@@ -1,21 +1,24 @@
+import path from 'node:path';
 import commonjs from '@rollup/plugin-commonjs';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import replace from '@rollup/plugin-replace';
 import esbuild from 'rollup-plugin-esbuild';
+import license from 'rollup-plugin-license';
 
-import { readDotenvFile } from '../../../../utils';
+import { getPathDetails, readDotenvFile } from '../../../../utils';
 import type { TBaseDynRollupOptions, TDynRollupOptionsCallbackConfig } from '../../../dyn';
 import { bundleSize, typescriptPaths } from '../../plugins';
 
 export async function createOverrideRollupConfig(
 	config: TDynBaseRollupOptionsCallbackConfig
 ): Promise<TBaseDynRollupOptions> {
-	const { packageJson, path, output, command, tsConfigPath, isProduction, isWatchMode, envPath } =
+	const { packageJson, paths, output, command, tsConfigPath, isProduction, isWatchMode, envPath } =
 		config;
 	const env = await readDotenvFile(envPath);
+	const pathDetails = getPathDetails(paths.output);
 
 	return {
-		input: path.input,
+		input: paths.input,
 		output,
 		plugins: [
 			// Resolve and bundle dependencies from node_modules
@@ -48,6 +51,26 @@ export async function createOverrideRollupConfig(
 			// typescript(/* */), // Obsolete as esbuild takes care of configuring typescript
 			// babel(/* */), // Obsolete as esbuild takes care of converting ES2015+ modules into compatible JavaScript files
 			// terser(/* */), // Obsolete as esbuild takes care of minifying
+			license({
+				thirdParty: {
+					output: {
+						file: path.join(
+							pathDetails.directory,
+							`${pathDetails.fileName}-third-party-licenses.txt`
+						),
+						encoding: 'utf-8',
+						template(dependencies) {
+							return dependencies
+								.map(
+									(dependency) =>
+										`${dependency.license} -- ${dependency.name}:${dependency.version}`
+								)
+								.join('\n');
+						}
+					},
+					allow: '(Apache-2.0 OR BSD-2-Clause OR BSD-3-Clause OR MIT OR 0BSD)'
+				}
+			}),
 			replace({
 				'preventAssignment': true,
 				'process.env.npm_package_version': JSON.stringify(packageJson.version),

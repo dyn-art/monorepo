@@ -1,7 +1,7 @@
 import path from 'node:path';
 import type { PackageJson } from 'type-fest';
 
-import type { TPath } from './resolve-paths';
+import type { TInputOutputPath } from './resolve-paths';
 
 /**
  * Resolves the output path based on the provided export conditions.
@@ -70,12 +70,12 @@ function resolveInputPathFromPackageJson(
 export function resolvePathsFromPackageJson(
 	packageJson: PackageJson,
 	config: TResolvePathsFromPackageJsonConfig
-): TPath[] {
+): TInputOutputPath[] {
 	const { resolvePath = true } = config;
 	const exportsArray = Array.isArray(packageJson.exports)
 		? packageJson.exports
 		: [packageJson.exports];
-	const paths: TPath[] = [];
+	const paths: TInputOutputPath[] = [];
 
 	exportsArray.forEach((exportCondition) => {
 		// If the export condition is an object (nested conditions or subpaths)
@@ -124,7 +124,7 @@ export function resolvePathsFromPackageJson(
 function createPathObject(
 	exportConditions: PackageJson.ExportConditions,
 	config: TResolvePathFromPackageJsonConfig & { key?: string }
-): TPath {
+): TInputOutputPath {
 	const { key, ...pathConfig } = config;
 	return {
 		input: resolveInputPathFromPackageJson(exportConditions, pathConfig),

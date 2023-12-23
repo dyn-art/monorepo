@@ -9,19 +9,12 @@ import type { TBaseDynRollupOptions, TDynRollupOptionsCallbackConfig } from '../
 export async function createAppRollupConfig(
 	config: TDynRollupOptionsCallbackConfig & { postcssConfigPath: string; htmlTemplatePath?: string }
 ): Promise<TBaseDynRollupOptions> {
-	const {
-		path: _path,
-		output,
-		packageJson,
-		isProduction,
-		postcssConfigPath,
-		htmlTemplatePath
-	} = config;
-	const bundleName = path.basename(_path.output).replace('.js', '');
+	const { paths, output, packageJson, isProduction, postcssConfigPath, htmlTemplatePath } = config;
+	const bundleName = path.basename(paths.output).replace('.js', '');
 	const htmlTemplate = await loadHtmlTemplate(htmlTemplatePath);
 
 	return {
-		input: _path.input,
+		input: paths.input,
 		output,
 		plugins: [
 			'node-resolve',
@@ -52,6 +45,7 @@ export async function createAppRollupConfig(
 					);
 				}
 			}),
+			'rollup-plugin-license',
 			'rollup-plugin-bundle-size'
 		],
 		external: []

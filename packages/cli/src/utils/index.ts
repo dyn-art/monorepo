@@ -1,6 +1,7 @@
 export * from './does-file-exist';
 export * from './execa-verbose';
 export * from './find-nearest-ts-config-path';
+export * from './get-path-details';
 export * from './get-ts-config-compiler-options';
 export * from './is-external';
 export * from './promisify-figlet';

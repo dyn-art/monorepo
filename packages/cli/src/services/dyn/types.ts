@@ -2,7 +2,7 @@ import type { InputPluginOption, MaybePromise, OutputOptions, RollupOptions } fr
 import type { PackageJson } from 'type-fest';
 
 import type { DynCommand } from '../../DynCommand';
-import type { TPath } from '../../utils';
+import type { TInputOutputPath } from '../../utils';
 
 export type Unwrap<T> = T extends Promise<infer U> ? U : T;
 
@@ -32,7 +32,7 @@ export type TDynRollupOptionsCallback = (
 ) => Promise<TBaseDynRollupOptions | TBaseDynRollupOptions[]>;
 
 export interface TDynRollupOptionsCallbackConfig {
-	path: TPath;
+	paths: TInputOutputPath;
 	output: OutputOptions;
 	tsConfigPath: string;
 	packageJson: PackageJson;
