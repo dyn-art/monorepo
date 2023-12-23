@@ -40,6 +40,7 @@ pub fn handle_entity_set_position(
     }
 }
 
+// TODO: Performance improvement
 pub fn calculate_absolute_transform(
     mut commands: Commands,
     query_children: Query<

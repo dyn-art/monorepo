@@ -41,7 +41,7 @@ impl Default for Node {
     }
 }
 
-#[derive(Default, Serialize, Deserialize, Clone, Debug, Type)]
+#[derive(Default, Serialize, Deserialize, Clone, Debug, Type, Eq, PartialEq)]
 pub enum NodeType {
     #[default]
     None,

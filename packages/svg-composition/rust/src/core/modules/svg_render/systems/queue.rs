@@ -1,6 +1,7 @@
 use std::{collections::HashMap, mem::take};
 
 use bevy_ecs::{entity::Entity, system::ResMut};
+use dyn_composition::core::modules::node::components::types::NodeType;
 
 use crate::core::{
     events::output_event::RenderUpdateEvent,
@@ -77,8 +78,7 @@ fn process_nodes(
     svg_composition: &mut SVGCompositionRes,
     updates: &mut Vec<RenderUpdateEvent>,
 ) {
-    // TODO: Compared to previous direct access approach (`process_with_parents`) quite slow
-    //  but no idea how to improve it yet
+    // TODO: Performance improvement
     let dependency_tree = build_dependency_trees(changed_nodes);
 
     // Traverse and process each root node and its descendants
@@ -91,51 +91,65 @@ fn process_nodes(
 fn build_dependency_trees<'a>(
     changed_nodes: &'a HashMap<Entity, ChangedNode>,
 ) -> Vec<ChangedNodeBranch<'a>> {
-    let mut roots = Vec::new();
+    let mut children_map = HashMap::new();
 
-    // Identify root nodes (those without parents or whose parents are not in changed_nodes)
+    // Preparing a map of children for each parent (for quick lookup)
     for (&entity, changed_node) in changed_nodes {
-        if changed_node.parent_id.is_none()
-            || !changed_nodes.contains_key(&changed_node.parent_id.unwrap())
-        {
-            roots.push(build_branch(entity, changed_nodes));
+        if let Some(parent_id) = changed_node.parent_id {
+            children_map
+                .entry(parent_id)
+                .or_insert_with(Vec::new)
+                .push(entity);
         }
     }
 
-    return roots;
+    // Identify root nodes (those without parents or whose parents are not in changed_nodes)
+    return changed_nodes
+        .iter()
+        .filter_map(|(&entity, changed_node)| {
+            (changed_node.parent_id.is_none()
+                || !changed_nodes.contains_key(&changed_node.parent_id.unwrap()))
+            .then(|| build_branch(entity, changed_nodes, &children_map))
+        })
+        .collect();
 }
 
 /// Recursively builds a branch in the dependency tree.
 fn build_branch<'a>(
     entity: Entity,
     changed_nodes: &'a HashMap<Entity, ChangedNode>,
+    children_map: &HashMap<Entity, Vec<Entity>>,
 ) -> ChangedNodeBranch<'a> {
-    let changed_node = changed_nodes.get(&entity).expect("Node must exist");
+    let changed_node = changed_nodes
+        .get(&entity)
+        .unwrap_or_else(|| panic!("Node must exist for entity {}", entity.to_bits()));
 
     // Build children branches
-    let children: Vec<ChangedNodeBranch> =
-         // Build branches for children of the current node,
-         // while ensuring the correct order of the children based on the children mixin
-        if let Some(children_mixin) = find_children_mixin(&changed_node.changes) {
-            children_mixin
-                .children
-                .0
-                .iter()
-                .filter_map(|&child_entity| {
-                    changed_nodes
-                        .get(&child_entity)
-                        .map(|_| build_branch(child_entity, changed_nodes))
-                })
-                .collect()
+    let children =
+        if changed_node.node_type == NodeType::Frame || changed_node.node_type == NodeType::Group {
+            // If children_mixin is present, sort children accordingly
+            if let Some(children_mixin) = find_children_mixin(&changed_node.changes) {
+                children_mixin
+                    .children
+                    .0
+                    .iter()
+                    .filter_map(|&child_entity| {
+                        changed_nodes
+                            .get(&child_entity)
+                            .map(|_| build_branch(child_entity, changed_nodes, children_map))
+                    })
+                    .collect()
+            } else {
+                // Otherwise, use the children from the children_map (order not relevant)
+                children_map
+                    .get(&entity)
+                    .unwrap_or(&Vec::new())
+                    .iter()
+                    .map(|&child_entity| build_branch(child_entity, changed_nodes, children_map))
+                    .collect()
+            }
         } else {
-            // Build branches for children of the current node (order not relevant)
-            changed_nodes
-                .iter()
-                .filter_map(|(&child_entity, child_node)| {
-                    (child_node.parent_id == Some(entity))
-                        .then(|| build_branch(child_entity, changed_nodes))
-                })
-                .collect()
+            Vec::new()
         };
 
     return ChangedNodeBranch {
