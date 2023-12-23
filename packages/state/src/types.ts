@@ -4,17 +4,6 @@
 
 export type TState<GValue, GSelectedFeatureKeys extends TFeatureKeys<GValue>[]> = {
 	_value: GValue;
-	/**
-	 * Retrieves the current state value.
-	 *
-	 * Example usage:
-	 * ```js
-	 * const currentState = MY_STATE.get();
-	 * ```
-	 *
-	 * @returns The current state value of type `GValue`.
-	 */
-	get: () => GValue;
 } & TSelectFeatures<GValue, GSelectedFeatureKeys>;
 
 // =============================================================================
@@ -22,6 +11,19 @@ export type TState<GValue, GSelectedFeatureKeys extends TFeatureKeys<GValue>[]> 
 // =============================================================================
 
 export interface TCoreFeatures<GValue> {
+	get: {
+		/**
+		 * Retrieves the current state value.
+		 *
+		 * Example usage:
+		 * ```js
+		 * const currentState = MY_STATE.get();
+		 * ```
+		 *
+		 * @returns The current state value of type `GValue`.
+		 */
+		get: () => GValue;
+	};
 	set: {
 		/**
 		 * Updates the state value.

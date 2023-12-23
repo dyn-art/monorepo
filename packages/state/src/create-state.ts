@@ -5,8 +5,8 @@ const listenerQueue: TListenerQueueItem[] = [];
 export function createState<GValue>(
 	value: GValue,
 	deferred = true
-): TState<GValue, ['set', 'listen']> {
-	const state: TState<GValue, ['set', 'listen']> = {
+): TState<GValue, ['get', 'set', 'listen']> {
+	const state: TState<GValue, ['get', 'set', 'listen']> = {
 		_listeners: [],
 		_value: value,
 		get() {
