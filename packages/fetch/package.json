@@ -1,6 +1,6 @@
 {
-	"name": "@dyn/state",
-	"description": "State management",
+	"name": "@dyn/fetch",
+	"description": "Simple fetch wrapper",
 	"version": "0.0.1",
 	"private": true,
 	"scripts": {
@@ -30,11 +30,13 @@
 	"devDependencies": {
 		"@dyn/config": "workspace:*",
 		"@dyn/types": "workspace:*",
-		"@dyn/utils": "workspace:*",
 		"@types/node": "^20.8.10"
 	},
 	"files": [
 		"dist",
 		"README.md"
-	]
+	],
+	"dependencies": {
+		"ts-results-es": "4.1.0-alpha.1"
+	}
 }

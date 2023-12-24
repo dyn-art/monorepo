@@ -1,3 +1,5 @@
+import type { TPrimitive, TUnionToIntersection } from '@dyn/types/utility';
+
 // =============================================================================
 // State
 // =============================================================================
@@ -10,7 +12,7 @@ export type TState<GValue, GSelectedFeatureKeys extends TFeatureKeys<GValue>[]> 
 // Features
 // =============================================================================
 
-export interface TCoreFeatures<GValue> {
+export interface TFeatures<GValue = unknown> {
 	get: {
 		/**
 		 * Retrieves the current state value.
@@ -70,14 +72,9 @@ export interface TCoreFeatures<GValue> {
 		 */
 		_notify: (process: boolean) => void;
 	};
-}
-
-export interface TWithFeatures<GValue> {
 	undo: { undo: () => void; _history: GValue[] };
 	persist: { persist: () => Promise<boolean>; deletePersisted: () => Promise<boolean> };
 }
-
-export type TFeatures<GValue = unknown> = TCoreFeatures<GValue> & TWithFeatures<GValue>;
 
 export type TFeatureKeys<GValue = unknown> = keyof TFeatures<GValue>;
 
@@ -116,13 +113,6 @@ export type TListenerQueueItem<GValue = unknown> = { value: GValue } & TListener
 // =============================================================================
 // Helper
 // =============================================================================
-
-// https://fettblog.eu/typescript-union-to-intersection/
-type TUnionToIntersection<T> = (T extends any ? (x: T) => any : never) extends (x: infer R) => any
-	? R
-	: never;
-
-type TPrimitive = boolean | number | string;
 
 export type TReadonlyIfObject<Value> = Value extends undefined
 	? Value

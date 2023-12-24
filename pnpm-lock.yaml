@@ -292,6 +292,22 @@ importers:
         specifier: ^20.8.10
         version: 20.8.10
 
+  packages/fetch:
+    dependencies:
+      ts-results-es:
+        specifier: 4.1.0-alpha.1
+        version: 4.1.0-alpha.1
+    devDependencies:
+      '@dyn/config':
+        specifier: workspace:*
+        version: link:../config
+      '@dyn/types':
+        specifier: workspace:*
+        version: link:../types
+      '@types/node':
+        specifier: ^20.8.10
+        version: 20.8.10
+
   packages/figma-handler:
     dependencies:
       '@dyn/utils':
@@ -357,6 +373,9 @@ importers:
       '@dyn/config':
         specifier: workspace:*
         version: link:../config
+      '@dyn/types':
+        specifier: workspace:*
+        version: link:../types
       '@dyn/utils':
         specifier: workspace:*
         version: link:../utils
@@ -10962,6 +10981,10 @@ packages:
 
   /ts-interface-checker@0.1.13:
     resolution: {integrity: sha512-Y/arvbn+rrz3JCKl9C4kVNfTfSm2/mEp5FSz5EsZSANGPSlQrpRI5M4PKF+mJnE52jOO90PnPSc3Ur3bTQw0gA==}
+
+  /ts-results-es@4.1.0-alpha.1:
+    resolution: {integrity: sha512-AwbHOBEU2zWnM8D1N1TeMKWiECO9nwDMnTwkJBVZ7E9FWRfsDCrFxo+4JE9g+HvHSBcNzqR1rmZC05zPnN5LMQ==}
+    dev: false
 
   /tsconfck@2.1.2(typescript@5.2.2):
     resolution: {integrity: sha512-ghqN1b0puy3MhhviwO2kGF8SeMDNhEbnKxjK7h6+fvY9JAxqvXi8y5NAHSQv687OVboS2uZIByzGd45/YxrRHg==}
