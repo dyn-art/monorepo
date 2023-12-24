@@ -40,16 +40,14 @@ export type TResponseBodyWithParseAs<
 	: never;
 
 export interface TFetchResponseSuccess<GSuccessResponseBody, GParseAs extends TParseAs> {
-	isError: false;
 	data: TResponseBodyWithParseAs<GSuccessResponseBody, GParseAs>;
 	raw: Response;
 }
 
-export interface TFetchResponseError<GErrorResponseBody> {
-	isError: true;
-	error: NetworkException | RequestException<GErrorResponseBody> | ServiceException;
-	raw: Response | null;
-}
+export type TFetchResponseError<GErrorResponseBody> =
+	| NetworkException
+	| RequestException<GErrorResponseBody>
+	| ServiceException;
 
 export type TFetchResponse<
 	GSuccessResponseBody,

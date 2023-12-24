@@ -4,6 +4,7 @@ import type { TApiFeature } from './api';
 import type { TOpenApiFeature } from './openapi';
 
 export interface TFeatures {
+	base: { _: null }; // TODO: Placeholder Feature: Figure out how to make the TS infer work with [] (empty array -> no feature)
 	api: TApiFeature;
 	openapi: TOpenApiFeature;
 }
