@@ -1,7 +1,7 @@
-import type { TEnforceFeatures, TFeatureKeys, TFetchClient, TSelectFeatures } from '../types';
+import type { TFeatureKeys, TFetchClient, TSelectFeatures } from '../types';
 
 export function withApi<GSelectedFeatureKeys extends TFeatureKeys[]>(
-	fetchClient: TFetchClient<TEnforceFeatures<GSelectedFeatureKeys, []>>
+	fetchClient: TFetchClient<GSelectedFeatureKeys>
 ): TFetchClient<['api', ...GSelectedFeatureKeys]> {
 	const apiFeature: TSelectFeatures<['api']> = {
 		get() {
@@ -21,5 +21,5 @@ export function withApi<GSelectedFeatureKeys extends TFeatureKeys[]>(
 	// Merge existing features from the state with the new api feature
 	const _fetchClient = Object.assign(fetchClient, apiFeature);
 
-	return _fetchClient as any; //  TFetchClient<[...GSelectedFeatureKeys, 'api']>;
+	return _fetchClient as TFetchClient<['api', ...GSelectedFeatureKeys]>;
 }

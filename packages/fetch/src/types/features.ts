@@ -1,21 +1,11 @@
 import type { TUnionToIntersection } from '@dyn/types/utility';
 
-import type { TApiDelete, TApiGet, TApiPost, TApiPut } from './api';
-import type { TOpenApiDelete, TOpenApiGet, TOpenApiPost, TOpenApiPut } from './openapi';
+import type { TApiFeature } from './api';
+import type { TOpenApiFeature } from './openapi';
 
 export interface TFeatures {
-	api: {
-		get: TApiGet;
-		put: TApiPut;
-		post: TApiPost;
-		del: TApiDelete;
-	};
-	openapi: {
-		get: TOpenApiGet;
-		put: TOpenApiPut;
-		post: TOpenApiPost;
-		del: TOpenApiDelete;
-	};
+	api: TApiFeature;
+	openapi: TOpenApiFeature;
 }
 
 export type TFeatureKeys = keyof TFeatures;

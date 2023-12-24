@@ -1,7 +1,7 @@
-import type { TEnforceFeatures, TFeatureKeys, TFetchClient, TSelectFeatures } from '../types';
+import type { TFeatureKeys, TFetchClient, TSelectFeatures } from '../types';
 
 export function withOpenApi<GSelectedFeatureKeys extends TFeatureKeys[]>(
-	fetchClient: TFetchClient<TEnforceFeatures<GSelectedFeatureKeys, []>>
+	fetchClient: TFetchClient<GSelectedFeatureKeys>
 ): TFetchClient<['openapi', ...GSelectedFeatureKeys]> {
 	const openApiFeature: TSelectFeatures<['openapi']> = {
 		get() {
@@ -21,5 +21,5 @@ export function withOpenApi<GSelectedFeatureKeys extends TFeatureKeys[]>(
 	// Merge existing features from the state with the new openapi feature
 	const _fetchClient = Object.assign(fetchClient, openApiFeature);
 
-	return _fetchClient as TFetchClient<[...GSelectedFeatureKeys, 'api']>;
+	return _fetchClient as TFetchClient<['openapi', ...GSelectedFeatureKeys]>;
 }

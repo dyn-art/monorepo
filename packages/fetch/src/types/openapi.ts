@@ -14,3 +14,10 @@ export type TOpenApiPut = <GRequestBody, GSuccessResponseBody = any, GErrorRespo
 export type TOpenApiDelete = <GSuccessResponseBody = any, GErrorResponseBody = any>(
 	path: string
 ) => Promise<TFetchResponse<GSuccessResponseBody, GErrorResponseBody, 'json'>>;
+
+export interface TOpenApiFeature {
+	get: TOpenApiGet;
+	put: TOpenApiPut;
+	post: TOpenApiPost;
+	del: TOpenApiDelete;
+}

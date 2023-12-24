@@ -14,11 +14,11 @@ export type TFetchClient<GSelectedFeatureKeys extends TFeatureKeys[]> = {
 	) => Promise<TFetchResponse<GSuccessResponseBody, GErrorResponseBody, 'json'>>;
 } & TSelectFeatures<GSelectedFeatureKeys>;
 
-interface TFetchClientConfig {
+export interface TFetchClientConfig {
 	prefixUrl: string;
 }
 
-interface TBaseFetchOptions {
+export interface TBaseFetchOptions {
 	parseAs?: TParseAs;
 	headers?: Record<string, string>;
 	prefixUrl?: string;

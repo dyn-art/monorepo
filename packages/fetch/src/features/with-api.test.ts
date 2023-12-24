@@ -5,6 +5,7 @@ import { withApi } from './with-api';
 
 describe('withApi function tests', () => {
 	it('should have correct types', async () => {
-		const fetchClient = withApi(createFetchClient());
+		const baseFetchClient = createFetchClient();
+		const fetchClient = withApi(baseFetchClient as any);
 	});
 });

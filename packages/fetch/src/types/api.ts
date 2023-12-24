@@ -69,3 +69,10 @@ export type TApiPut = <GRequestBody, GSuccessResponseBody = any, GErrorResponseB
 export type TApiDelete = <GSuccessResponseBody = any, GErrorResponseBody = any>(
 	path: string
 ) => Promise<TFetchResponse<GSuccessResponseBody, GErrorResponseBody, 'json'>>;
+
+export interface TApiFeature {
+	get: TApiGet;
+	put: TApiPut;
+	post: TApiPost;
+	del: TApiDelete;
+}
