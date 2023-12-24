@@ -6,6 +6,6 @@ import { withOpenApi } from './with-openapi';
 describe('withOpenApi function tests', () => {
 	it('should have correct types', async () => {
 		const baseFetchClient = createFetchClient();
-		const fetchClient = withOpenApi(baseFetchClient as any);
+		const fetchClient = withOpenApi(baseFetchClient);
 	});
 });

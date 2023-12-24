@@ -55,20 +55,38 @@ export type TMediaType = `${string}/${string}`;
 export type THeadersInit = NonNullable<RequestInit['headers']>;
 export type TRequestMethod = NonNullable<RequestInit['method']>;
 
-export type TApiGet = <GSucessResponseBody = any, GErrorResponseBody = any>(
+export type TApiGet = <
+	GSucessResponseBody = any,
+	GErrorResponseBody = any,
+	GParseAs extends TParseAs = 'json'
+>(
 	path: string
-) => Promise<TFetchResponse<GSucessResponseBody, GErrorResponseBody, 'json'>>;
-export type TApiPost = <GRequestBody, GSuccessResponseBody = any, GErrorResponseBody = any>(
+) => Promise<TFetchResponse<GSucessResponseBody, GErrorResponseBody, GParseAs>>;
+export type TApiPost = <
+	GSuccessResponseBody = any,
+	GErrorResponseBody = any,
+	GRequestBody = any,
+	GParseAs extends TParseAs = 'json'
+>(
 	path: string,
 	body: GRequestBody
-) => Promise<TFetchResponse<GSuccessResponseBody, GErrorResponseBody, 'json'>>;
-export type TApiPut = <GRequestBody, GSuccessResponseBody = any, GErrorResponseBody = any>(
+) => Promise<TFetchResponse<GSuccessResponseBody, GErrorResponseBody, GParseAs>>;
+export type TApiPut = <
+	GSuccessResponseBody = any,
+	GErrorResponseBody = any,
+	GRequestBody = any,
+	GParseAs extends TParseAs = 'json'
+>(
 	path: string,
 	body: GRequestBody
-) => Promise<TFetchResponse<GSuccessResponseBody, GErrorResponseBody, 'json'>>;
-export type TApiDelete = <GSuccessResponseBody = any, GErrorResponseBody = any>(
+) => Promise<TFetchResponse<GSuccessResponseBody, GErrorResponseBody, GParseAs>>;
+export type TApiDelete = <
+	GSuccessResponseBody = any,
+	GErrorResponseBody = any,
+	GParseAs extends TParseAs = 'json'
+>(
 	path: string
-) => Promise<TFetchResponse<GSuccessResponseBody, GErrorResponseBody, 'json'>>;
+) => Promise<TFetchResponse<GSuccessResponseBody, GErrorResponseBody, GParseAs>>;
 
 export interface TApiFeature {
 	get: TApiGet;
