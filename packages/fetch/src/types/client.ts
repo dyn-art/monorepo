@@ -5,7 +5,7 @@ import type { NetworkException, RequestException, ServiceException } from '../ex
 import type { TParseAs, TRequestMethod } from './api';
 import type { TFeatureKeys, TSelectFeatures } from './features';
 
-export type TFetchClient<GSelectedFeatureKeys extends TFeatureKeys[] = []> = {
+export type TFetchClient<GSelectedFeatureKeys extends TFeatureKeys[]> = {
 	_config: TFetchClientConfig;
 	_baseFetch: <GSuccessResponseBody = any, GErrorResponseBody = any>(
 		path: string,

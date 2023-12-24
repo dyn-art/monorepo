@@ -1,6 +1,7 @@
 import type { TUnionToIntersection } from '@dyn/types/utility';
 
 import type { TApiDelete, TApiGet, TApiPost, TApiPut } from './api';
+import type { TOpenApiDelete, TOpenApiGet, TOpenApiPost, TOpenApiPut } from './openapi';
 
 export interface TFeatures {
 	api: {
@@ -10,7 +11,10 @@ export interface TFeatures {
 		del: TApiDelete;
 	};
 	openapi: {
-		// TODO
+		get: TOpenApiGet;
+		put: TOpenApiPut;
+		post: TOpenApiPost;
+		del: TOpenApiDelete;
 	};
 }
 
