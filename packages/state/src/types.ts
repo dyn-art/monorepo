@@ -68,6 +68,9 @@ export type TState<GValue, GSelectedFeatureKeys extends TFeatureKeys<GValue>[]> 
 export interface TFeatures<GValue = unknown> {
 	base: { _: null }; // TODO: Placeholder Feature: Figure out how to make the TS infer work with [] (empty array -> no feature)
 	undo: { undo: () => void; _history: GValue[] };
+	multiundo: {
+		multiundo: (count: number) => void;
+	};
 	persist: { persist: () => Promise<boolean>; deletePersisted: () => Promise<boolean> };
 }
 
