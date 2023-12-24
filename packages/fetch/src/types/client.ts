@@ -5,14 +5,14 @@ import type { NetworkException, RequestException, ServiceException } from '../ex
 import type { TParseAs, TRequestMethod } from './api';
 import type { TFeatureKeys, TSelectFeatures } from './features';
 
-export type TFetchClient<GSelectedFeatureKeys extends TFeatureKeys[]> = {
+export type TFetchClient<GPaths extends {}, GSelectedFeatureKeys extends TFeatureKeys[]> = {
 	_config: TFetchClientConfig;
 	_baseFetch: <GSuccessResponseBody = any, GErrorResponseBody = any>(
 		path: string,
 		method: TRequestMethod,
 		options: TBaseFetchOptions
 	) => Promise<TFetchResponse<GSuccessResponseBody, GErrorResponseBody, 'json'>>;
-} & TSelectFeatures<GSelectedFeatureKeys>;
+} & TSelectFeatures<GPaths, GSelectedFeatureKeys>;
 
 export interface TFetchClientConfig {
 	prefixUrl: string;

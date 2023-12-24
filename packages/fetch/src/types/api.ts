@@ -62,6 +62,7 @@ export type TApiGet = <
 >(
 	path: string
 ) => Promise<TFetchResponse<GSucessResponseBody, GErrorResponseBody, GParseAs>>;
+
 export type TApiPost = <
 	GSuccessResponseBody = any,
 	GErrorResponseBody = any,
@@ -71,6 +72,7 @@ export type TApiPost = <
 	path: string,
 	body: GRequestBody
 ) => Promise<TFetchResponse<GSuccessResponseBody, GErrorResponseBody, GParseAs>>;
+
 export type TApiPut = <
 	GSuccessResponseBody = any,
 	GErrorResponseBody = any,
@@ -80,6 +82,7 @@ export type TApiPut = <
 	path: string,
 	body: GRequestBody
 ) => Promise<TFetchResponse<GSuccessResponseBody, GErrorResponseBody, GParseAs>>;
+
 export type TApiDelete = <
 	GSuccessResponseBody = any,
 	GErrorResponseBody = any,
