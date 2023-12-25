@@ -1,153 +1,146 @@
-import type { ReadableStream } from 'node:stream/web';
-
 import type { TErrorStatus, THttpMethod, TMediaType, TOkStatus, TParseAs } from './api';
 
 // ============================================================================
-// Utils
+// Utility Types
 // ============================================================================
 
+// Identifies required keys in a generic type
 type TRequiredKeys<T> = {
-	[K in keyof T]: T extends Record<K, T[K]> ? never : K;
-} extends { [_ in keyof T]: infer U }
-	? U
-	: never;
+	[GKey in keyof T]: T extends Record<GKey, T[GKey]> ? never : GKey;
+}[keyof T];
 
+// Determines if a generic type is empty
 type TIsEmpty<T> = keyof T extends never ? true : false;
 
+// Makes a generic type optional if it has no required keys
 export type TOptionalIfNoRequired<T> = TIsEmpty<TRequiredKeys<T>> extends true ? T | undefined : T;
 
-// Find first match of multiple keys
-export type TFilterKeys<Obj, Matchers> = {
-	[K in keyof Obj]: K extends Matchers ? Obj[K] : never;
-}[keyof Obj];
+// Filters keys from a type based on a set of matchers
+export type TFilterKeys<GObject, GMatchers> = {
+	[GKey in keyof GObject]: GKey extends GMatchers ? GObject[GKey] : never;
+}[keyof GObject];
 
-// Base path item object structure
-export type TPathItemObject = {
-	[GHttpMethod in THttpMethod]: {
+// ============================================================================
+// API Path Item Object
+// ============================================================================
+
+// Represents the base structure of API path items for a given HTTP method
+export type TPathItemObject<GHttpMethod extends THttpMethod> = {
+	[Method in GHttpMethod]: {
 		parameters: any;
 		requestBody: any;
 		response: any;
 	};
 } & { parameters?: any };
 
-// Get a union of paths which have http method
-export type TPathsWith<
-	GPaths extends Record<string, TPathItemObject>,
-	GPathnameMethod extends THttpMethod
-> = {
-	[GPathname in keyof GPaths]: GPaths[GPathname] extends {
-		[K in GPathnameMethod]: any;
-	}
-		? GPathname
-		: never;
+// Retrieves paths that include a specific HTTP method
+export type TPathsWith<GPaths, GHttpMethod extends THttpMethod> = {
+	[GPath in keyof GPaths]: GPaths[GPath] extends { [GMethod in GHttpMethod]: any } ? GPath : never;
 }[keyof GPaths];
 
 // ============================================================================
-// Request parameters
+// Request Parameters
 // ============================================================================
 
-export type TRequestPathParamsObject<T> = T extends {
-	parameters: { path?: any };
-}
-	? T['parameters']['path']
+// Extracts path parameters from a generic path type
+export type TRequestPathParams<GPath> = GPath extends { parameters: { path?: any } }
+	? GPath['parameters']['path']
 	: never;
 
-export type TRequestPathParams<T> = TRequestPathParamsObject<T>;
+// Filters out 'never' from path parameters for a given path type
+export type TRequestPathParamsFiltered<GPath> = TRequestPathParams<GPath> extends never
+	? NonNullable<TRequestPathParams<GPath>> | undefined
+	: TRequestPathParams<GPath>;
 
-export type TRequestPathParamsFilteredNever<T> = TRequestPathParamsObject<T> extends never
-	? NonNullable<TRequestPathParamsObject<T>> | undefined
-	: TRequestPathParamsObject<T>;
-
-export type TRequestQueryParamsObject<T> = T extends {
-	parameters: { query?: any };
-}
-	? T['parameters']['query']
+// Extracts query parameters from a generic path type
+export type TRequestQueryParams<GPath> = GPath extends { parameters: { query?: any } }
+	? GPath['parameters']['query']
 	: never;
 
-export type TRequestQueryParams<T> = TRequestQueryParamsObject<T>;
-
-export type TRequestQueryParamsFilteredNever<T> = TRequestQueryParamsObject<T> extends never
-	? NonNullable<TRequestQueryParamsObject<T>> | undefined
-	: TRequestQueryParamsObject<T>;
-
-// ============================================================================
-// Request body
-// ============================================================================
-
-export type TRequestBodyObject<T> = T extends { requestBody?: any } ? T['requestBody'] : never;
-
-export type TRequestBodyContent<T> = undefined extends TRequestBodyObject<T>
-	? TFilterKeys<NonNullable<TRequestBodyObject<T>>, 'content'> | undefined
-	: TFilterKeys<TRequestBodyObject<T>, 'content'>;
-
-export type TRequestBodyMedia<T> = undefined extends TRequestBodyContent<T>
-	? TFilterKeys<NonNullable<TRequestBodyContent<T>>, TMediaType> | undefined
-	: TFilterKeys<TRequestBodyContent<T>, TMediaType>;
-
-export type TRequestBody<T> = TRequestBodyMedia<T>;
-
-export type TRequestBodyFilteredNever<T> = TRequestBodyMedia<T> extends never
-	? NonNullable<TRequestBodyMedia<T>> | undefined
-	: TRequestBodyMedia<T>;
+// Filters out 'never' from query parameters for a given path type
+export type TRequestQueryParamsFiltered<GPath> = TRequestQueryParams<GPath> extends never
+	? NonNullable<TRequestQueryParams<GPath>> | undefined
+	: TRequestQueryParams<GPath>;
 
 // ============================================================================
-// Response body
+// Request Body
 // ============================================================================
 
-export type TSuccessResponseContent<T> = TFilterKeys<TFilterKeys<T, TOkStatus>, 'content'>;
+// Extracts request body from a generic path type
+export type TRequestBodyObject<GPath> = GPath extends { requestBody?: any }
+	? GPath['requestBody']
+	: never;
 
-export type TErrorResponseContent<T> = TFilterKeys<TFilterKeys<T, TErrorStatus>, 'content'>;
+// Extracts the 'content' from the request body object
+export type TRequestBodyContent<GPath> = undefined extends TRequestBodyObject<GPath>
+	? TFilterKeys<NonNullable<TRequestBodyObject<GPath>>, 'content'> | undefined
+	: TFilterKeys<TRequestBodyObject<GPath>, 'content'>;
 
-export type TSuccessResponseBody<T> = T extends { responses?: any }
-	? NonNullable<TFilterKeys<TSuccessResponseContent<T['responses']>, TMediaType>>
+// Extracts media content based on TMediaType from the request body content
+export type TRequestBodyMedia<GPath> = undefined extends TRequestBodyContent<GPath>
+	? TFilterKeys<NonNullable<TRequestBodyContent<GPath>>, TMediaType> | undefined
+	: TFilterKeys<TRequestBodyContent<GPath>, TMediaType>;
+
+export type TRequestBody<GPath> = TRequestBodyMedia<GPath>;
+
+// Final type for the request body after filtering 'never' and handling optional/undefined cases
+export type TRequestBodyFiltered<GPath> = TRequestBodyMedia<GPath> extends never
+	? NonNullable<TRequestBodyMedia<GPath>> | undefined
+	: TRequestBodyMedia<GPath>;
+
+// ============================================================================
+// Response Body
+// ============================================================================
+
+// Extracts successful response content for a given response type
+export type TSuccessResponseContent<GResponse> = TFilterKeys<
+	TFilterKeys<GResponse, TOkStatus>,
+	'content'
+>;
+
+// Extracts error response content for a given response type
+export type TErrorResponseContent<GResponse> = TFilterKeys<
+	TFilterKeys<GResponse, TErrorStatus>,
+	'content'
+>;
+
+// Extracts successful response body for a given response type
+export type TSuccessResponseBody<GResponse> = GResponse extends { responses?: any }
+	? NonNullable<TFilterKeys<TSuccessResponseContent<GResponse['responses']>, TMediaType>>
 	: unknown;
 
-export type TErrorResponseBody<T> = T extends { responses?: any }
-	? NonNullable<TFilterKeys<TErrorResponseContent<T['responses']>, TMediaType>>
+// Extracts error response body for a given response type
+export type TErrorResponseBody<GResponse> = GResponse extends { responses?: any }
+	? NonNullable<TFilterKeys<TErrorResponseContent<GResponse['responses']>, TMediaType>>
 	: unknown;
 
-export type TResponseBody<T> = TSuccessResponseBody<T>; // No ErrorResponse as errors are handled via Exceptions
-
-export type TResponseBodyWithParseAs<
-	GResponseBody,
-	GParseAs extends TParseAs = 'json'
-> = GParseAs extends 'json'
-	? GResponseBody
-	: GParseAs extends 'text'
-	? string
-	: GParseAs extends 'blob'
-	? Blob
-	: GParseAs extends 'arrayBuffer'
-	? ArrayBuffer
-	: GParseAs extends 'stream'
-	? ReadableStream
-	: never;
-
 // ============================================================================
-// Fetch options
+// Fetch Options
 // ============================================================================
 
-export type TFetchOptionsQueryParamsPart<T> = undefined extends TRequestQueryParams<T> // Note: 'undefined extends xyz' behaves different than 'xyz extends undefined'
-	? {
-			queryParams?: TRequestQueryParams<T>;
-	  }
-	: TRequestQueryParams<T> extends never
+// Fetch options for query parameters
+export type TFetchOptionsQueryParams<GPath> = undefined extends TRequestQueryParams<GPath>
+	? { queryParams?: TRequestQueryParams<GPath> }
+	: TRequestQueryParams<GPath> extends never
 	? { queryParams?: Record<string, any> }
-	: { queryParams: TRequestQueryParams<T> };
+	: { queryParams: TRequestQueryParams<GPath> };
 
-export type TFetchOptionsPathParamsPart<T> = undefined extends TRequestPathParams<T>
-	? { pathParams?: TRequestPathParams<T> }
-	: TRequestPathParams<T> extends never
+// Fetch options for path parameters
+export type TFetchOptionsPathParams<GPath> = undefined extends TRequestPathParams<GPath>
+	? { pathParams?: TRequestPathParams<GPath> }
+	: TRequestPathParams<GPath> extends never
 	? { pathParams?: Record<string, any> }
-	: { pathParams: TRequestPathParams<T> };
+	: { pathParams: TRequestPathParams<GPath> };
 
-export type TFetchOptionsBodyPart<T> = undefined extends TRequestBody<T>
-	? { body?: TRequestBody<T> }
-	: TRequestBody<T> extends never
-	? { body?: any }
-	: { body: TRequestBody<T> };
+// Fetch options for request body
+export type TFetchOptionsBody<GPath> = undefined extends TRequestBody<GPath>
+	? { body?: TRequestBody<GPath> }
+	: TRequestBody<GPath> extends never
+	? { body?: Record<string, any> }
+	: { body: TRequestBody<GPath> };
 
-export interface TFetchOptionsBase<T, GParseAs extends TParseAs> {
+// Base interface for fetch options
+export interface TFetchOptionsBase<GPath, GParseAs extends TParseAs> {
 	parseAs?: GParseAs | TParseAs; // '| TParseAs' to fix VsCode autocomplete
 	headers?: Record<string, string>;
 	rootFetchProps?: Omit<RequestInit, 'body' | 'headers' | 'method'>;
@@ -155,14 +148,20 @@ export interface TFetchOptionsBase<T, GParseAs extends TParseAs> {
 	baseUrl?: string;
 }
 
-export type TFetchOptions<T, GParseAs extends TParseAs> = TFetchOptionsBase<T, GParseAs> &
-	TFetchOptionsQueryParamsPart<T> &
-	TFetchOptionsPathParamsPart<T>;
-export type TFetchOptionsWithBody<T, GParseAs extends TParseAs> = TFetchOptions<T, GParseAs> &
-	TFetchOptionsBodyPart<T>;
+// Combines base fetch options with query and path parameters
+export type TFetchOptions<GPath, GParseAs extends TParseAs> = TFetchOptionsBase<GPath, GParseAs> &
+	TFetchOptionsQueryParams<GPath> &
+	TFetchOptionsPathParams<GPath>;
+
+// Combines fetch options with request body
+export type TFetchOptionsWithBody<GPath, GParseAs extends TParseAs> = TFetchOptions<
+	GPath,
+	GParseAs
+> &
+	TFetchOptionsBody<GPath>;
 
 // ============================================================================
-// Requests
+// API Request
 // ============================================================================
 
 export type TOpenApiGet<GPaths extends {}> = <
@@ -177,8 +176,8 @@ export type TOpenApiPost<GPaths extends {}> = <
 	GPostPaths extends TPathsWith<GPaths, 'post'> = TPathsWith<GPaths, 'post'>,
 	GParseAs extends TParseAs = 'json'
 >(
-	path: string,
-	body: TRequestBodyFilteredNever<
+	path: GPostPaths | (string & Record<never, never>), // https://github.com/microsoft/TypeScript/issues/29729
+	body: TRequestBodyFiltered<
 		'post' extends keyof GPaths[GPostPaths] ? GPaths[GPostPaths]['post'] : unknown
 	>,
 	options?: TFetchOptions<TFilterKeys<GPaths[GPostPaths], 'post'>, GParseAs>
@@ -189,7 +188,7 @@ export type TOpenApiPut<GPaths extends {}> = <
 	GParseAs extends TParseAs = 'json'
 >(
 	path: GPutPaths | (string & Record<never, never>), // https://github.com/microsoft/TypeScript/issues/29729
-	body: TRequestBodyFilteredNever<
+	body: TRequestBodyFiltered<
 		'put' extends keyof GPaths[GPutPaths] ? GPaths[GPutPaths]['put'] : unknown
 	>,
 	options?: TFetchOptions<TFilterKeys<GPaths[GPutPaths], 'put'>, GParseAs>
@@ -202,6 +201,10 @@ export type TOpenApiDelete<GPaths extends {}> = <
 	path: GDeletePaths | (string & Record<never, never>), // https://github.com/microsoft/TypeScript/issues/29729
 	options?: TFetchOptions<TFilterKeys<GPaths[GDeletePaths], 'delete'>, GParseAs>
 ) => Promise<void>;
+
+// ============================================================================
+// OpenAPI Feature
+// ============================================================================
 
 export interface TOpenApiFeature<GPaths extends {}> {
 	get: TOpenApiGet<GPaths>;

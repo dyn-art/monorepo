@@ -10,8 +10,14 @@ describe('withOpenApi function tests', () => {
 		const fetchClient = withOpenApi<paths>(baseFetchClient);
 		fetchClient.get('/v1/media/pre-signed-download-url/{key}', {
 			pathParams: {
-				key: 'jeff'
+				key: 'j'
 			}
 		});
+
+		fetchClient.get('/v1/ping', {
+			pathParams: { test: '' }
+		});
+
+		// fetchClient.post('/v1/ping', )
 	});
 });
