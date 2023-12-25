@@ -8,7 +8,7 @@ describe('withOpenApi function tests', () => {
 	it('should have correct types', async () => {
 		const baseFetchClient = createFetchClient();
 		const fetchClient = withOpenApi<paths>(baseFetchClient);
-		fetchClient.get('/v1/media/pre-signed-download-url/{key}', {
+		const response = await fetchClient.get('/v1/media/pre-signed-download-url/{key}', {
 			pathParams: {
 				key: ''
 			}

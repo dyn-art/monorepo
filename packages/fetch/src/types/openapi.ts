@@ -1,4 +1,5 @@
 import type { TErrorStatus, THttpMethod, TMediaType, TOkStatus, TParseAs } from './api';
+import type { TFetchResponse } from './client';
 
 // =============================================================================
 // Utility Types
@@ -111,14 +112,24 @@ export type TErrorResponseContent<GResponse> = TFilterKeys<
 >;
 
 // Extracts successful response body for a given response type
-export type TSuccessResponseBody<GResponse> = GResponse extends { responses?: any }
-	? NonNullable<TFilterKeys<TSuccessResponseContent<GResponse['responses']>, TMediaType>>
+export type TSuccessResponseBody<GPathOperation> = GPathOperation extends { responses?: any }
+	? NonNullable<TFilterKeys<TSuccessResponseContent<GPathOperation['responses']>, TMediaType>>
 	: unknown;
 
 // Extracts error response body for a given response type
-export type TErrorResponseBody<GResponse> = GResponse extends { responses?: any }
-	? NonNullable<TFilterKeys<TErrorResponseContent<GResponse['responses']>, TMediaType>>
+export type TErrorResponseBody<GPathOperation> = GPathOperation extends { responses?: any }
+	? NonNullable<TFilterKeys<TErrorResponseContent<GPathOperation['responses']>, TMediaType>>
 	: unknown;
+
+// =============================================================================
+// Fetch Response
+// =============================================================================
+
+export type TOpenApiFetchResponse<GPathOperation, GParseAs extends TParseAs> = TFetchResponse<
+	TSuccessResponseBody<GPathOperation>,
+	TErrorResponseBody<GPathOperation>,
+	GParseAs
+>;
 
 // =============================================================================
 // Fetch Options
@@ -163,39 +174,52 @@ export type TFetchOptions<GPathOperation, GParseAs extends TParseAs> = TFetchOpt
 
 export type TOpenApiGet<GPaths extends {}> = <
 	GGetPaths extends TPathsWith<GPaths, 'get'> = TPathsWith<GPaths, 'get'>,
+	GPathOperation extends TFilterKeys<GPaths[GGetPaths], 'get'> = TFilterKeys<
+		GPaths[GGetPaths],
+		'get'
+	>,
 	GParseAs extends TParseAs = 'json'
 >(
 	path: GGetPaths | (string & Record<never, never>), // https://github.com/microsoft/TypeScript/issues/29729
-	options?: TFetchOptions<TFilterKeys<GPaths[GGetPaths], 'get'>, GParseAs>
-) => Promise<void>;
+	options?: TFetchOptions<GPathOperation, GParseAs>
+) => Promise<TOpenApiFetchResponse<GPathOperation, GParseAs>>;
 
 export type TOpenApiPost<GPaths extends {}> = <
 	GPostPaths extends TPathsWith<GPaths, 'post'> = TPathsWith<GPaths, 'post'>,
+	GPathOperation extends TFilterKeys<GPaths[GPostPaths], 'post'> = TFilterKeys<
+		GPaths[GPostPaths],
+		'post'
+	>,
 	GParseAs extends TParseAs = 'json'
 >(
 	path: GPostPaths | (string & Record<never, never>), // https://github.com/microsoft/TypeScript/issues/29729
 	body: TRequestBody<
 		'post' extends keyof GPaths[GPostPaths] ? GPaths[GPostPaths]['post'] : unknown
 	>,
-	options?: TFetchOptions<TFilterKeys<GPaths[GPostPaths], 'post'>, GParseAs>
-) => Promise<void>;
+	options?: TFetchOptions<GPathOperation, GParseAs>
+) => Promise<TOpenApiFetchResponse<GPathOperation, GParseAs>>;
 
 export type TOpenApiPut<GPaths extends {}> = <
 	GPutPaths extends TPathsWith<GPaths, 'put'> = TPathsWith<GPaths, 'put'>,
+	GPathOperation = TFilterKeys<GPaths[GPutPaths], 'put'>,
 	GParseAs extends TParseAs = 'json'
 >(
 	path: GPutPaths | (string & Record<never, never>), // https://github.com/microsoft/TypeScript/issues/29729
 	body: TRequestBody<'put' extends keyof GPaths[GPutPaths] ? GPaths[GPutPaths]['put'] : unknown>,
-	options?: TFetchOptions<TFilterKeys<GPaths[GPutPaths], 'put'>, GParseAs>
-) => Promise<void>;
+	options?: TFetchOptions<GPathOperation, GParseAs>
+) => Promise<TOpenApiFetchResponse<GPathOperation, GParseAs>>;
 
 export type TOpenApiDelete<GPaths extends {}> = <
 	GDeletePaths extends TPathsWith<GPaths, 'delete'> = TPathsWith<GPaths, 'delete'>,
+	GPathOperation extends TFilterKeys<GPaths[GDeletePaths], 'delete'> = TFilterKeys<
+		GPaths[GDeletePaths],
+		'delete'
+	>,
 	GParseAs extends TParseAs = 'json'
 >(
 	path: GDeletePaths | (string & Record<never, never>), // https://github.com/microsoft/TypeScript/issues/29729
-	options?: TFetchOptions<TFilterKeys<GPaths[GDeletePaths], 'delete'>, GParseAs>
-) => Promise<void>;
+	options?: TFetchOptions<GPathOperation, GParseAs>
+) => Promise<TOpenApiFetchResponse<GPathOperation, GParseAs>>;
 
 // =============================================================================
 // OpenAPI Feature
