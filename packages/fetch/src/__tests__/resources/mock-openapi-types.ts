@@ -238,7 +238,7 @@ export interface operations {
 			};
 			query: {
 				/** @description The unique positive non-zero numeric ID for an Etsy Shop. */
-				shop_id: number;
+				test123: number;
 			};
 		};
 		/** @description Request body */
