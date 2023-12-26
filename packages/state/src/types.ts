@@ -112,12 +112,12 @@ export type TListenerQueueItem<GValue = unknown> = { value: GValue } & TListener
 // Helper
 // =============================================================================
 
-export type TReadonlyIfObject<Value> = Value extends undefined
-	? Value
-	: Value extends (...args: any) => any
-	? Value
-	: Value extends TPrimitive
-	? Value
-	: Value extends object
-	? Readonly<Value>
-	: Value;
+export type TReadonlyIfObject<GValue> = GValue extends undefined
+	? GValue
+	: GValue extends (...args: any) => any
+	? GValue
+	: GValue extends TPrimitive
+	? GValue
+	: GValue extends object
+	? Readonly<GValue>
+	: GValue;

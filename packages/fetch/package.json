@@ -30,13 +30,16 @@
 	"devDependencies": {
 		"@dyn/config": "workspace:*",
 		"@dyn/types": "workspace:*",
-		"@types/node": "^20.8.10"
+		"@types/node": "^20.8.10",
+		"@types/url-parse": "^1.4.11"
 	},
 	"files": [
 		"dist",
 		"README.md"
 	],
 	"dependencies": {
-		"ts-results-es": "4.1.0-alpha.1"
+		"@dyn/utils": "workspace:^",
+		"ts-results-es": "4.1.0-alpha.1",
+		"url-parse": "^1.5.10"
 	}
 }

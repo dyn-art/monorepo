@@ -14,7 +14,7 @@ describe('withOpenApi function tests', () => {
 			}
 		});
 
-		fetchClient.post(
+		const response2 = await fetchClient.post(
 			'/v1/ping',
 			{ jeff: 1, hello: 'world' },
 			{
@@ -26,6 +26,8 @@ describe('withOpenApi function tests', () => {
 				}
 			}
 		);
+
+		const jeff = response2.unwrap();
 
 		fetchClient.get('/v1/ping', {
 			pathParams: { test: '' }

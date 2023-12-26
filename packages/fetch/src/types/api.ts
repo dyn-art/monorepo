@@ -56,17 +56,17 @@ export type THeadersInit = NonNullable<RequestInit['headers']>;
 export type TRequestMethod = NonNullable<RequestInit['method']>;
 
 export type TApiGet = <
-	GSucessResponseBody = any,
-	GErrorResponseBody = any,
+	GSucessResponseBody = unknown,
+	GErrorResponseBody = unknown,
 	GParseAs extends TParseAs = 'json'
 >(
 	path: string
 ) => Promise<TFetchResponse<GSucessResponseBody, GErrorResponseBody, GParseAs>>;
 
 export type TApiPost = <
-	GSuccessResponseBody = any,
-	GErrorResponseBody = any,
-	GRequestBody = any,
+	GSuccessResponseBody = unknown,
+	GErrorResponseBody = unknown,
+	GRequestBody = unknown,
 	GParseAs extends TParseAs = 'json'
 >(
 	path: string,
@@ -74,9 +74,9 @@ export type TApiPost = <
 ) => Promise<TFetchResponse<GSuccessResponseBody, GErrorResponseBody, GParseAs>>;
 
 export type TApiPut = <
-	GSuccessResponseBody = any,
-	GErrorResponseBody = any,
-	GRequestBody = any,
+	GSuccessResponseBody = unknown,
+	GErrorResponseBody = unknown,
+	GRequestBody = unknown,
 	GParseAs extends TParseAs = 'json'
 >(
 	path: string,
@@ -84,8 +84,8 @@ export type TApiPut = <
 ) => Promise<TFetchResponse<GSuccessResponseBody, GErrorResponseBody, GParseAs>>;
 
 export type TApiDelete = <
-	GSuccessResponseBody = any,
-	GErrorResponseBody = any,
+	GSuccessResponseBody = unknown,
+	GErrorResponseBody = unknown,
 	GParseAs extends TParseAs = 'json'
 >(
 	path: string

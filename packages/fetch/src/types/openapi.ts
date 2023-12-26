@@ -140,7 +140,7 @@ export type TFetchOptionsQueryParams<GPathOperation> =
 	undefined extends TRequestQueryParams<GPathOperation> // If the queryParams can be undefined/optional
 		? { queryParams?: TRequestQueryParams<GPathOperation> }
 		: TRequestQueryParams<GPathOperation> extends never
-		? { queryParams?: Record<string, any> }
+		? { queryParams?: Record<string, unknown> }
 		: { queryParams: TRequestQueryParams<GPathOperation> };
 
 // Fetch options for path parameters
@@ -148,7 +148,7 @@ export type TFetchOptionsPathParams<GPathOperation> =
 	undefined extends TRequestPathParams<GPathOperation> // If the pathParams can be undefined/optional
 		? { pathParams?: TRequestPathParams<GPathOperation> }
 		: TRequestPathParams<GPathOperation> extends never
-		? { pathParams?: Record<string, any> }
+		? { pathParams?: Record<string, unknown> }
 		: { pathParams: TRequestPathParams<GPathOperation> };
 
 // Base interface for fetch options
@@ -156,7 +156,7 @@ export interface TFetchOptionsBase<GPathOperation, GParseAs extends TParseAs> {
 	parseAs?: GParseAs | TParseAs; // '| TParseAs' to fix VsCode autocomplete
 	headers?: Record<string, string>;
 	fetchProps?: Omit<RequestInit, 'body' | 'headers' | 'method'>;
-	middlewareProps?: Record<string, any>;
+	middlewareProps?: Record<string, unknown>;
 	pathPrefix?: string;
 }
 

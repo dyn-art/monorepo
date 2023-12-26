@@ -1,4 +1,3 @@
-import type { ReadableStream } from 'node:stream/web';
 import type { Result } from 'ts-results-es';
 
 import type { NetworkException, RequestException, ServiceException } from '../exceptions';
@@ -14,15 +13,59 @@ export type TFetchClient<GPaths extends {}, GSelectedFeatureKeys extends TFeatur
 	) => Promise<TFetchResponse<GSuccessResponseBody, GErrorResponseBody, 'json'>>;
 } & TSelectFeatures<GPaths, GSelectedFeatureKeys>;
 
+// =============================================================================
+// Fetch Client Options & Config
+// =============================================================================
+
 export interface TFetchClientConfig {
 	prefixUrl: string;
+	querySerializer: TQuerySerializer;
+	bodySerializer: TBodySerializer;
+	headers: Headers;
+	fetchProps: Omit<RequestInit, 'body' | 'method' | 'headers'>;
 }
+
+export type TFetchClientOptions = Partial<Omit<TFetchClientConfig, 'headers'>> & {
+	headers?: RequestInit['headers'];
+};
+
+// ============================================================================
+// Serializer Methods
+// ============================================================================
+
+export type TQuerySerializer<
+	GQueryParams extends Record<string, unknown> = Record<string, unknown>
+> = (query: GQueryParams) => string;
+
+export type TBodySerializer<
+	GBody = unknown,
+	GResult extends RequestInit['body'] = RequestInit['body']
+> = (body: GBody, contentType?: string) => GResult;
+
+// =============================================================================
+// Fetch Options
+// =============================================================================
 
 export interface TBaseFetchOptions {
 	parseAs?: TParseAs;
-	headers?: Record<string, string>;
+	headers?: RequestInit['headers'];
 	prefixUrl?: string;
+	fetchProps?: Omit<RequestInit, 'body' | 'method'>;
+	body?: RequestInit['body']; // TODO: If POST or PUT
+	queryParams?: TURLParams['query'];
+	pathParams?: TURLParams['path'];
+	querySerializer?: TQuerySerializer;
+	bodySerializer?: TBodySerializer;
 }
+
+export interface TURLParams {
+	query?: Record<string, unknown>;
+	path?: Record<string, unknown>;
+}
+
+// =============================================================================
+// Fetch Response
+// =============================================================================
 
 export type TResponseBodyWithParseAs<
 	GResponseBody,
@@ -30,18 +73,18 @@ export type TResponseBodyWithParseAs<
 > = GParseAs extends 'json'
 	? GResponseBody
 	: GParseAs extends 'text'
-	? string
+	? Awaited<ReturnType<Response['text']>>
 	: GParseAs extends 'blob'
-	? Blob
+	? Awaited<ReturnType<Response['blob']>>
 	: GParseAs extends 'arrayBuffer'
-	? ArrayBuffer
+	? Awaited<ReturnType<Response['arrayBuffer']>>
 	: GParseAs extends 'stream'
-	? ReadableStream
+	? Response['body']
 	: never;
 
 export interface TFetchResponseSuccess<GSuccessResponseBody, GParseAs extends TParseAs> {
 	data: TResponseBodyWithParseAs<GSuccessResponseBody, GParseAs>;
-	raw: Response;
+	response: Response;
 }
 
 export type TFetchResponseError<GErrorResponseBody> =
