@@ -1,4 +1,4 @@
-import type { TFetchResponse } from './client';
+import type { TFetchOptions, TFetchResponse } from './client';
 
 export type TParseAs = 'json' | 'text' | 'blob' | 'arrayBuffer' | 'stream';
 export type THttpMethod =
@@ -60,27 +60,30 @@ export type TApiGet = <
 	GErrorResponseBody = unknown,
 	GParseAs extends TParseAs = 'json'
 >(
-	path: string
+	path: string,
+	options: TFetchOptions<GParseAs>
 ) => Promise<TFetchResponse<GSucessResponseBody, GErrorResponseBody, GParseAs>>;
 
 export type TApiPost = <
 	GSuccessResponseBody = unknown,
 	GErrorResponseBody = unknown,
-	GRequestBody = unknown,
+	GRequestBody extends RequestInit['body'] = any,
 	GParseAs extends TParseAs = 'json'
 >(
 	path: string,
-	body: GRequestBody
+	body: GRequestBody,
+	options: TFetchOptions<GParseAs>
 ) => Promise<TFetchResponse<GSuccessResponseBody, GErrorResponseBody, GParseAs>>;
 
 export type TApiPut = <
 	GSuccessResponseBody = unknown,
 	GErrorResponseBody = unknown,
-	GRequestBody = unknown,
+	GRequestBody extends RequestInit['body'] = any,
 	GParseAs extends TParseAs = 'json'
 >(
 	path: string,
-	body: GRequestBody
+	body: GRequestBody,
+	options: TFetchOptions<GParseAs>
 ) => Promise<TFetchResponse<GSuccessResponseBody, GErrorResponseBody, GParseAs>>;
 
 export type TApiDelete = <
@@ -88,7 +91,8 @@ export type TApiDelete = <
 	GErrorResponseBody = unknown,
 	GParseAs extends TParseAs = 'json'
 >(
-	path: string
+	path: string,
+	options: TFetchOptions<GParseAs>
 ) => Promise<TFetchResponse<GSuccessResponseBody, GErrorResponseBody, GParseAs>>;
 
 export interface TApiFeature {

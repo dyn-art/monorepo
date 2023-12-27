@@ -4,17 +4,17 @@ export function withApi<GPaths extends {}, GSelectedFeatureKeys extends TFeature
 	fetchClient: TFetchClient<GPaths, TEnforceFeatures<GSelectedFeatureKeys, ['base']>>
 ): TFetchClient<GPaths, ['api', ...GSelectedFeatureKeys]> {
 	const apiFeature: TSelectFeatures<GPaths, ['api']> = {
-		get() {
-			return null as any;
+		get(this: TFetchClient<GPaths, ['base']>, path, options) {
+			return this._baseFetch(path, 'GET', options);
 		},
-		post() {
-			return null as any;
+		post(this: TFetchClient<GPaths, ['base']>, path, body, options) {
+			return this._baseFetch(path, 'POST', { body, ...options });
 		},
-		put() {
-			return null as any;
+		put(this: TFetchClient<GPaths, ['base']>, path, body, options) {
+			return this._baseFetch(path, 'PUT', { body, ...options });
 		},
-		del() {
-			return null as any;
+		del(this: TFetchClient<GPaths, ['base']>, path, options) {
+			return this._baseFetch(path, 'DELETE', options);
 		}
 	};
 
