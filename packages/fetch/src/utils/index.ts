@@ -4,4 +4,6 @@ export * from './map-catch-to-network-exception';
 export * from './map-response-to-request-exception';
 export * from './merge-headers';
 export * from './parse-and-validate-url';
+export * from './serialize-body';
+export * from './serialize-body-to-json';
 export * from './serialize-query-params';

@@ -8,6 +8,7 @@ import {
 	mapResponseToRequestException,
 	mergeHeaders,
 	parseAndValidateURL,
+	serializeBody,
 	serializeQueryParams
 } from './utils';
 
@@ -18,7 +19,7 @@ export function createFetchClient<GPaths extends {} = {}>(
 		prefixUrl: options.prefixUrl ?? '',
 		fetchProps: options.fetchProps ?? {},
 		headers: options.headers != null ? new Headers(options.headers) : new Headers(),
-		bodySerializer: options.bodySerializer ?? (null as any), // TODO:
+		bodySerializer: options.bodySerializer ?? serializeBody,
 		querySerializer: options.querySerializer ?? serializeQueryParams
 	};
 

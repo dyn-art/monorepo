@@ -164,7 +164,7 @@ export type TOpenApiFetchOptions<GPathOperation, GParseAs extends TParseAs> = {
 			: TRequestQueryParams<GPathOperation>
 	>;
 	bodySerializer?: TBodySerializer<
-		TRequestBody<GPathOperation> extends never ? any : TRequestBody<GPathOperation>
+		TRequestBody<GPathOperation> extends never ? unknown : TRequestBody<GPathOperation>
 	>;
 } & TBaseFetchOptions<GParseAs> &
 	TOpenApiQueryParamsFetchOptions<GPathOperation> &
