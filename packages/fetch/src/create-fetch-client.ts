@@ -14,7 +14,7 @@ import {
 
 export function createFetchClient<GPaths extends {} = {}>(
 	options: TFetchClientOptions = {}
-): TFetchClient<GPaths, ['base']> {
+): TFetchClient<['base'], GPaths> {
 	const config: TFetchClientConfig = {
 		prefixUrl: options.prefixUrl ?? '',
 		fetchProps: options.fetchProps ?? {},
@@ -31,7 +31,7 @@ export function createFetchClient<GPaths extends {} = {}>(
 	return {
 		_: null,
 		_config: config,
-		async _baseFetch(this: TFetchClient<GPaths, ['base']>, path, method, baseFetchOptions = {}) {
+		async _baseFetch(this: TFetchClient<['base']>, path, method, baseFetchOptions = {}) {
 			const {
 				parseAs = 'json',
 				headers = {},
@@ -69,6 +69,12 @@ export function createFetchClient<GPaths extends {} = {}>(
 						? bodySerializer(body, mergedHeaders.get('Content-Type') ?? undefined)
 						: undefined
 			};
+
+			// Remove `Content-Type` if serialized body is FormData.
+			// Browser will correctly set Content-Type & boundary expression.
+			if (requestInit.body instanceof FormData) {
+				mergedHeaders.delete('Content-Type');
+			}
 
 			// Build final URL
 			const finalURL = buildURI(origin, {

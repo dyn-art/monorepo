@@ -20,8 +20,8 @@ export type TSelectFeatureObjects<
 };
 
 export type TSelectFeatures<
-	GPaths extends {},
 	GSelectedFeatureKeys extends TFeatureKeys<GPaths>[],
+	GPaths extends {} = {},
 	GSelectedFeatureObjects extends TSelectFeatureObjects<
 		GPaths,
 		GSelectedFeatureKeys
