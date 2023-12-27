@@ -1,16 +1,19 @@
 import { Err, Ok } from 'ts-results-es';
+import { toArray } from '@dyn/utils';
 
-import type { TFetchClient, TFetchClientConfig, TFetchClientOptions, TURLParams } from './types';
+import type { TFetchClient, TFetchClientConfig, TFetchClientOptions, TURLParams } from '../types';
 import {
-	buildURI,
+	buildUrl,
 	fetchWithRetries,
-	mapCatchToNetworkException,
+	mapErrorToNetworkException,
+	mapErrorToServiceException,
 	mapResponseToRequestException,
 	mergeHeaders,
-	parseAndValidateURL,
+	parseAndValidateUrl,
+	processRequestMiddlewares,
 	serializeBody,
 	serializeQueryParams
-} from './utils';
+} from '../utils';
 
 export function createFetchClient<GPaths extends {} = {}>(
 	options: TFetchClientOptions = {}
@@ -20,7 +23,8 @@ export function createFetchClient<GPaths extends {} = {}>(
 		fetchProps: options.fetchProps ?? {},
 		headers: options.headers != null ? new Headers(options.headers) : new Headers(),
 		bodySerializer: options.bodySerializer ?? serializeBody,
-		querySerializer: options.querySerializer ?? serializeQueryParams
+		querySerializer: options.querySerializer ?? serializeQueryParams,
+		middleware: toArray(options.middleware ?? [])
 	};
 
 	// Apply default content type header
@@ -41,12 +45,13 @@ export function createFetchClient<GPaths extends {} = {}>(
 				queryParams,
 				body = undefined,
 				pathPrefix = this._config.prefixUrl,
-				fetchProps = {}
+				fetchProps = {},
+				middlewareProps
 			} = baseFetchOptions;
 
 			// Parse and validate URL to ensure that even if path is a full URL and baseUrl is an empty string,
 			// the finalPath and origin can still be correctly extracted
-			const { path: parsedPath, origin } = parseAndValidateURL(
+			const { path: parsedPath, origin } = parseAndValidateUrl(
 				`${pathPrefix}${path}`,
 				queryParams == null
 			);
@@ -58,7 +63,7 @@ export function createFetchClient<GPaths extends {} = {}>(
 
 			// Build request init object
 			const mergedHeaders = mergeHeaders(headers, this._config.headers);
-			const requestInit: RequestInit = {
+			let requestInit: RequestInit = {
 				redirect: 'follow',
 				...this._config.fetchProps,
 				...fetchProps,
@@ -76,8 +81,26 @@ export function createFetchClient<GPaths extends {} = {}>(
 				mergedHeaders.delete('Content-Type');
 			}
 
+			// Call middlewares
+			try {
+				const middlewaresResponse = await processRequestMiddlewares(
+					this._config.middleware,
+					{
+						requestInit,
+						queryParams: urlParams.query,
+						pathParams: urlParams.path
+					},
+					middlewareProps
+				);
+				requestInit = middlewaresResponse.requestInit;
+				urlParams.path = middlewaresResponse.pathParams;
+				urlParams.query = middlewaresResponse.queryParams;
+			} catch (error) {
+				return Err(mapErrorToServiceException(error, '#ERR_MIDDLEWARE'));
+			}
+
 			// Build final URL
-			const finalURL = buildURI(origin, {
+			const finalURL = buildUrl(origin, {
 				path: parsedPath,
 				params: urlParams,
 				querySerializer
@@ -90,7 +113,7 @@ export function createFetchClient<GPaths extends {} = {}>(
 					requestInit
 				});
 			} catch (error) {
-				return Err(mapCatchToNetworkException(error, '#ERR_NETWORK'));
+				return Err(mapErrorToNetworkException(error));
 			}
 
 			// Handle ok response (parse as "parseAs" and falling back to .text() when necessary)
@@ -109,7 +132,7 @@ export function createFetchClient<GPaths extends {} = {}>(
 			}
 
 			// Handle errors (always parse as .json() or .text())
-			return Err(await mapResponseToRequestException(response, '#ERR_UNKNOWN'));
+			return Err(await mapResponseToRequestException(response));
 		}
 	};
 }

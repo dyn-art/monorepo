@@ -1,6 +1,7 @@
 import type { TFetchOptions, TFetchResponse } from './client';
 
 export type TParseAs = 'json' | 'text' | 'blob' | 'arrayBuffer' | 'stream';
+
 export type THttpMethod =
 	| 'get'
 	| 'put'
@@ -10,7 +11,9 @@ export type THttpMethod =
 	| 'head'
 	| 'patch'
 	| 'trace';
+
 export type TOkStatus = 200 | 201 | 202 | 203 | 204 | 206 | 207;
+
 export type TErrorStatus =
 	| 500
 	| 400
@@ -61,7 +64,7 @@ export type TApiGet = <
 	GParseAs extends TParseAs = 'json'
 >(
 	path: string,
-	options: TFetchOptions<GParseAs>
+	options?: TFetchOptions<GParseAs>
 ) => Promise<TFetchResponse<GSucessResponseBody, GErrorResponseBody, GParseAs>>;
 
 export type TApiPost = <
@@ -72,7 +75,7 @@ export type TApiPost = <
 >(
 	path: string,
 	body: GRequestBody,
-	options: TFetchOptions<GParseAs>
+	options?: TFetchOptions<GParseAs>
 ) => Promise<TFetchResponse<GSuccessResponseBody, GErrorResponseBody, GParseAs>>;
 
 export type TApiPut = <
@@ -83,7 +86,7 @@ export type TApiPut = <
 >(
 	path: string,
 	body: GRequestBody,
-	options: TFetchOptions<GParseAs>
+	options?: TFetchOptions<GParseAs>
 ) => Promise<TFetchResponse<GSuccessResponseBody, GErrorResponseBody, GParseAs>>;
 
 export type TApiDelete = <
@@ -92,7 +95,7 @@ export type TApiDelete = <
 	GParseAs extends TParseAs = 'json'
 >(
 	path: string,
-	options: TFetchOptions<GParseAs>
+	options?: TFetchOptions<GParseAs>
 ) => Promise<TFetchResponse<GSuccessResponseBody, GErrorResponseBody, GParseAs>>;
 
 export interface TApiFeature {

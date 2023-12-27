@@ -1,4 +1,4 @@
-import type { TFeatureKeys, TFetchClient } from './types';
+import type { TFeatureKeys, TFetchClient } from '../types';
 
 export function hasFeatures<
 	GFeatureKeys extends TFeatureKeys[],

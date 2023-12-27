@@ -1,18 +1,18 @@
-import type { TQuerySerializer, TURLParams } from '../types';
-import { serializeQueryParams } from './serialize-query-params';
+import type { TQuerySerializer, TURLParams } from '../../types';
+import { serializeQueryParams } from '../serialize';
 
-export function buildURI(baseURL: string, options: TBuildURIOptions): string {
+export function buildUrl(baseURL: string, options: TBuildURIOptions): string {
 	const {
 		path = '',
 		params: { query: queryParams = {}, path: pathParams = {} } = {},
 		querySerializer = serializeQueryParams
 	} = options;
 	const sanitizedBaseURL = sanitizeBaseURL(baseURL);
-	const pathWithParams = injectPathParams(path, pathParams);
+	const pathWithParams = injectPathParams(path, pathParams ?? undefined);
 	const finalURL = appendQueryParams(
 		`${sanitizedBaseURL}${pathWithParams}`,
 		querySerializer,
-		queryParams
+		queryParams ?? undefined
 	);
 	return finalURL;
 }

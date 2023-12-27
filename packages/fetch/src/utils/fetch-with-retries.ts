@@ -36,7 +36,6 @@ export async function fetchWithRetries(
 		}
 
 		// If backoff strategy retries are exhausted, throw the network error
-
 		throw error;
 	}
 }

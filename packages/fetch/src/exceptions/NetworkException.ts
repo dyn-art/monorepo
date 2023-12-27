@@ -1,17 +1,14 @@
-import { ServiceException } from './ServiceException';
+import { ServiceException, type TErrorCode } from './ServiceException';
 
 export class NetworkException extends ServiceException {
-	public readonly throwable?: Error;
-
-	constructor(code: string, options: TNetworkExceptionOptions = {}) {
+	constructor(code: TErrorCode, options: TNetworkExceptionOptions = {}) {
 		const { throwable, description } = options;
 		super(code, {
-			description,
-			message: `Call to endpoint failed with network error ${code}${
+			message: `Call to endpoint failed with network exception${
 				description != null ? `: ${description}` : '!'
-			}`
+			}`,
+			throwable
 		});
-		this.throwable = throwable;
 	}
 }
 

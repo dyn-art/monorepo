@@ -7,58 +7,30 @@ export function withOpenApi<
 	fetchClient: TFetchClient<TEnforceFeatures<GSelectedFeatureKeys, ['base']>, GPaths>
 ): TFetchClient<['openapi', ...GSelectedFeatureKeys], GPaths> {
 	const openApiFeature: TSelectFeatures<['openapi'], GPaths> = {
-		get(this: TFetchClient<['base'], GPaths>, path, options) {
+		get(this: TFetchClient<['base'], GPaths>, path, options = {} as any) {
 			return this._baseFetch(path as string, 'GET', {
-				parseAs: options?.parseAs,
-				headers: options?.headers,
-				fetchProps: options?.fetchProps,
-				// TODO: middlewareProps
-				pathPrefix: options?.pathPrefix,
-				querySerializer: options?.querySerializer as any,
-				bodySerializer: options?.bodySerializer,
-				pathParams: options?.pathParams,
-				queryParams: options?.queryParams
+				...options,
+				querySerializer: options.querySerializer as any
 			});
 		},
-		post(this: TFetchClient<['base'], GPaths>, path, body, options) {
+		post(this: TFetchClient<['base'], GPaths>, path, body, options = {} as any) {
 			return this._baseFetch(path as string, 'POST', {
+				...options,
 				body,
-				parseAs: options?.parseAs,
-				headers: options?.headers,
-				fetchProps: options?.fetchProps,
-				// TODO: middlewareProps
-				pathPrefix: options?.pathPrefix,
-				querySerializer: options?.querySerializer as any,
-				bodySerializer: options?.bodySerializer,
-				pathParams: options?.pathParams,
-				queryParams: options?.queryParams
+				querySerializer: options.querySerializer as any
 			});
 		},
-		put(this: TFetchClient<['base'], GPaths>, path, body, options) {
+		put(this: TFetchClient<['base'], GPaths>, path, body, options = {} as any) {
 			return this._baseFetch(path as string, 'PUT', {
+				...options,
 				body,
-				parseAs: options?.parseAs,
-				headers: options?.headers,
-				fetchProps: options?.fetchProps,
-				// TODO: middlewareProps
-				pathPrefix: options?.pathPrefix,
-				querySerializer: options?.querySerializer as any,
-				bodySerializer: options?.bodySerializer,
-				pathParams: options?.pathParams,
-				queryParams: options?.queryParams
+				querySerializer: options.querySerializer as any
 			});
 		},
-		del(this: TFetchClient<['base'], GPaths>, path, options) {
+		del(this: TFetchClient<['base'], GPaths>, path, options = {} as any) {
 			return this._baseFetch(path as string, 'DELETE', {
-				parseAs: options?.parseAs,
-				headers: options?.headers,
-				fetchProps: options?.fetchProps,
-				// TODO: middlewareProps
-				pathPrefix: options?.pathPrefix,
-				querySerializer: options?.querySerializer as any,
-				bodySerializer: options?.bodySerializer,
-				pathParams: options?.pathParams,
-				queryParams: options?.queryParams
+				...options,
+				querySerializer: options.querySerializer as any
 			});
 		}
 	};

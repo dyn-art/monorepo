@@ -1,15 +1,14 @@
-import { ServiceException } from './ServiceException';
+import { ServiceException, type TErrorCode } from './ServiceException';
 
 export class RequestException<GData = any> extends ServiceException {
 	public readonly status: number;
 	public readonly response?: Response;
 	public readonly data?: GData;
 
-	constructor(code: string, status: number, options: TRequestExceptionOptions<GData> = {}) {
+	constructor(code: TErrorCode, status: number, options: TRequestExceptionOptions<GData> = {}) {
 		const { description, response, data } = options;
 		super(code, {
-			description,
-			message: `Call to endpoint failed with status ${status} and error code ${code}${
+			message: `Call to endpoint failed with status ${status}${
 				description != null ? `: ${description}` : '!'
 			}`
 		});

@@ -1,16 +1,17 @@
 export class ServiceException extends Error {
 	public readonly code: string;
-	public readonly description?: string;
+	public readonly throwable?: Error;
 
-	constructor(code: string, options: TServiceExceptionOptions = {}) {
-		const { description, message } = options;
-		super(message ?? `${code}${description != null ? `: ${description}` : '!'}`);
+	constructor(code: TErrorCode, options: TServiceExceptionOptions = {}) {
+		const { message } = options;
+		super(`[${code}] ${message}`);
 		this.code = code;
-		this.description = description;
 	}
 }
 
 interface TServiceExceptionOptions {
-	description?: string;
 	message?: string;
+	throwable?: Error;
 }
+
+export type TErrorCode = `#ERR_${string}`;

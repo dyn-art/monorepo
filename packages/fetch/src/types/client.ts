@@ -21,16 +21,21 @@ export type TFetchClient<GSelectedFeatureKeys extends TFeatureKeys[], GPaths ext
 // Fetch Client Options & Config
 // =============================================================================
 
-export interface TFetchClientConfig {
+export interface TBaseFetchClientConfig {
 	prefixUrl: string;
 	querySerializer: TQuerySerializer;
 	bodySerializer: TBodySerializer;
-	headers: Headers;
 	fetchProps: Omit<RequestInit, 'body' | 'method' | 'headers'>;
 }
 
-export type TFetchClientOptions = Partial<Omit<TFetchClientConfig, 'headers'>> & {
+export type TFetchClientConfig = {
+	headers: Headers;
+	middleware: TRequestMiddleware[];
+} & TBaseFetchClientConfig;
+
+export type TFetchClientOptions = Partial<TFetchClientConfig> & {
 	headers?: RequestInit['headers'];
+	middleware?: TRequestMiddleware | TRequestMiddleware[];
 };
 
 // ============================================================================
@@ -46,13 +51,38 @@ export type TBodySerializer<
 	GResult extends RequestInit['body'] = RequestInit['body']
 > = (body: GBody, contentType?: string) => GResult;
 
+// ============================================================================
+// Middleware
+// ============================================================================
+
+export type TRequestMiddleware = (
+	data: {
+		props: unknown;
+	} & TRequestMiddlewareData
+) => Promise<Partial<TRequestMiddlewareData>>;
+
+export interface TRequestMiddlewareData {
+	requestInit: RequestInit;
+	queryParams: TURLParams['query'];
+	pathParams: TURLParams['path'];
+}
+
+export interface TURLParams {
+	query?: Record<string, unknown> | null;
+	path?: Record<string, unknown> | null;
+}
+
 // =============================================================================
 // Fetch Options
 // =============================================================================
 
-export type TFetchOptionsWithBody<GParseAs extends TParseAs> = {
-	body?: RequestInit['body']; // TODO: Only if POST or PUT
-} & TFetchOptions<GParseAs>;
+export interface TBaseFetchOptions<GParseAs extends TParseAs> {
+	parseAs?: GParseAs | TParseAs; // '| TParseAs' to fix VsCode autocomplete
+	headers?: RequestInit['headers'];
+	pathPrefix?: string;
+	fetchProps?: Omit<RequestInit, 'body' | 'method'>;
+	middlewareProps?: unknown;
+}
 
 export type TFetchOptions<GParseAs extends TParseAs> = {
 	queryParams?: TURLParams['query'];
@@ -61,18 +91,9 @@ export type TFetchOptions<GParseAs extends TParseAs> = {
 	bodySerializer?: TBodySerializer;
 } & TBaseFetchOptions<GParseAs>;
 
-export interface TBaseFetchOptions<GParseAs extends TParseAs> {
-	parseAs?: GParseAs | TParseAs; // '| TParseAs' to fix VsCode autocomplete
-	headers?: RequestInit['headers'];
-	pathPrefix?: string;
-	fetchProps?: Omit<RequestInit, 'body' | 'method'>;
-	middlewareProps?: Record<string, unknown>;
-}
-
-export interface TURLParams {
-	query?: Record<string, unknown>;
-	path?: Record<string, unknown>;
-}
+export type TFetchOptionsWithBody<GParseAs extends TParseAs> = {
+	body?: RequestInit['body']; // TODO: Only if POST or PUT
+} & TFetchOptions<GParseAs>;
 
 // =============================================================================
 // Fetch Response

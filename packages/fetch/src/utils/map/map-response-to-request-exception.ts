@@ -1,30 +1,30 @@
 import { isObject } from '@dyn/utils';
 
-import { RequestException } from '../exceptions';
+import { RequestException, type TErrorCode } from '../../exceptions';
 
 export async function mapResponseToRequestException(
 	response: Response,
-	defaultErrorCode = '#ERR_UNKNOWN'
+	defaultErrorCode: TErrorCode = '#ERR_UNKOWN'
 ): Promise<RequestException> {
 	try {
 		const contentType = response.headers.get('Content-Type');
 
-		let error;
-		let errorCode;
-		let errorDescription;
+		let errorData: any;
+		let errorCode: TErrorCode;
+		let errorDescription: string | undefined;
 		if (contentType && contentType.includes('application/json')) {
-			error = await response.json();
-			errorCode = getErrorCode(error) ?? defaultErrorCode;
-			errorDescription = getErrorDescription(error) ?? undefined;
+			errorData = await response.json();
+			errorCode = getErrorCode(errorData) ?? defaultErrorCode;
+			errorDescription = getErrorDescription(errorData) ?? undefined;
 		} else {
-			error = await response.text();
+			errorData = await response.text();
 			errorCode = defaultErrorCode;
-			errorDescription = error;
+			errorDescription = errorData;
 		}
 
 		return new RequestException(errorCode, response.status, {
 			description: errorDescription,
-			data: error as any,
+			data: errorData,
 			response
 		});
 	} catch (error) {
@@ -45,7 +45,7 @@ function getErrorDescription(data: unknown): string | null {
 }
 
 // Helper function to extract error code from various possible fields
-function getErrorCode(data: unknown): string | null {
+function getErrorCode(data: unknown): TErrorCode | null {
 	if (isObject(data)) {
 		return data.error_code || data.status || data.code || getErrorCode(data.error) || null;
 	}

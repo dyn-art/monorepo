@@ -1,8 +1,8 @@
 import URL from 'url-parse';
 
-import { ServiceException } from '../exceptions';
+import { mapErrorToServiceException } from '../map';
 
-export function parseAndValidateURL(
+export function parseAndValidateUrl(
 	urlString: string,
 	withSuffix = false
 ): {
@@ -16,8 +16,10 @@ export function parseAndValidateURL(
 			origin: url.origin
 		};
 	} catch (error) {
-		throw new ServiceException('#RESOLVE_URL', {
-			description: `Failed to resolve url: ${urlString}`
-		});
+		throw mapErrorToServiceException(
+			error,
+			'#ERR_RESOLVE_URL',
+			`Failed to resolve url: ${urlString}`
+		);
 	}
 }
