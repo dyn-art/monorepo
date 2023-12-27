@@ -183,7 +183,7 @@ export type TFetchOptions<GPathOperation, GParseAs extends TParseAs> = TFetchOpt
 export type TOpenApiGet<GPaths extends {}> = <
 	GGetPaths extends TPathsWith<GPaths, 'get'>,
 	GPathOperation extends TFilterKeys<GPaths[GGetPaths], 'get'>,
-	GParseAs extends TParseAs
+	GParseAs extends TParseAs = 'json'
 >(
 	path: GGetPaths | (string & Record<never, never>), // https://github.com/microsoft/TypeScript/issues/29729
 	options?: TFetchOptions<GPathOperation, GParseAs>
@@ -192,7 +192,7 @@ export type TOpenApiGet<GPaths extends {}> = <
 export type TOpenApiPost<GPaths extends {}> = <
 	GPostPaths extends TPathsWith<GPaths, 'post'>,
 	GPathOperation extends TFilterKeys<GPaths[GPostPaths], 'post'>,
-	GParseAs extends TParseAs
+	GParseAs extends TParseAs = 'json'
 >(
 	path: GPostPaths | (string & Record<never, never>), // https://github.com/microsoft/TypeScript/issues/29729
 	body: TRequestBody<
@@ -204,7 +204,7 @@ export type TOpenApiPost<GPaths extends {}> = <
 export type TOpenApiPut<GPaths extends {}> = <
 	GPutPaths extends TPathsWith<GPaths, 'put'>,
 	GPathOperation extends TFilterKeys<GPaths[GPutPaths], 'put'>,
-	GParseAs extends TParseAs
+	GParseAs extends TParseAs = 'json'
 >(
 	path: GPutPaths | (string & Record<never, never>), // https://github.com/microsoft/TypeScript/issues/29729
 	body: TRequestBody<'put' extends keyof GPaths[GPutPaths] ? GPaths[GPutPaths]['put'] : unknown>,
@@ -214,7 +214,7 @@ export type TOpenApiPut<GPaths extends {}> = <
 export type TOpenApiDelete<GPaths extends {}> = <
 	GDeletePaths extends TPathsWith<GPaths, 'delete'>,
 	GPathOperation extends TFilterKeys<GPaths[GDeletePaths], 'delete'>,
-	GParseAs extends TParseAs
+	GParseAs extends TParseAs = 'json'
 >(
 	path: GDeletePaths | (string & Record<never, never>), // https://github.com/microsoft/TypeScript/issues/29729
 	options?: TFetchOptions<GPathOperation, GParseAs>

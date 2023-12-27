@@ -6,11 +6,15 @@ import type { TFeatureKeys, TSelectFeatures } from './features';
 
 export type TFetchClient<GPaths extends {}, GSelectedFeatureKeys extends TFeatureKeys[]> = {
 	_config: TFetchClientConfig;
-	_baseFetch: <GSuccessResponseBody = any, GErrorResponseBody = any>(
+	_baseFetch: <
+		GSuccessResponseBody = any,
+		GErrorResponseBody = any,
+		GParseAs extends TParseAs = 'json'
+	>(
 		path: string,
 		method: TRequestMethod,
 		options: TBaseFetchOptions
-	) => Promise<TFetchResponse<GSuccessResponseBody, GErrorResponseBody, 'json'>>;
+	) => Promise<TFetchResponse<GSuccessResponseBody, GErrorResponseBody, GParseAs>>;
 } & TSelectFeatures<GPaths, GSelectedFeatureKeys>;
 
 // =============================================================================

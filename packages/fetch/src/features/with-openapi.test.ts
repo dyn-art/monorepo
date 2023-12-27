@@ -11,8 +11,10 @@ describe('withOpenApi function tests', () => {
 		const response = await fetchClient.get('/v1/media/pre-signed-download-url/{key}', {
 			pathParams: {
 				key: ''
-			}
+			},
+			parseAs: 'text'
 		});
+		const responseData = response.unwrap();
 
 		const response2 = await fetchClient.post(
 			'/v1/ping',
@@ -23,6 +25,12 @@ describe('withOpenApi function tests', () => {
 				},
 				pathParams: {
 					shop_id: 1
+				},
+				querySerializer: (query) => {
+					return query.test123.toString();
+				},
+				bodySerializer: (body) => {
+					return JSON.stringify(body);
 				}
 			}
 		);
@@ -32,7 +40,5 @@ describe('withOpenApi function tests', () => {
 		fetchClient.get('/v1/ping', {
 			pathParams: { test: '' }
 		});
-
-		// fetchClient.post('/v1/ping', )
 	});
 });

@@ -18,7 +18,7 @@ export function withOpenApi<
 				bodySerializer: options?.bodySerializer,
 				pathParams: options?.pathParams,
 				queryParams: options?.queryParams
-			}) as any;
+			});
 		},
 		post(this: TFetchClient<GPaths, ['base']>, path, body, options) {
 			return this._baseFetch(path as string, 'POST', {
@@ -32,7 +32,7 @@ export function withOpenApi<
 				bodySerializer: options?.bodySerializer,
 				pathParams: options?.pathParams,
 				queryParams: options?.queryParams
-			}) as any;
+			});
 		},
 		put(this: TFetchClient<GPaths, ['base']>, path, body, options) {
 			return this._baseFetch(path as string, 'PUT', {
@@ -46,7 +46,7 @@ export function withOpenApi<
 				bodySerializer: options?.bodySerializer,
 				pathParams: options?.pathParams,
 				queryParams: options?.queryParams
-			}) as any;
+			});
 		},
 		del(this: TFetchClient<GPaths, ['base']>, path, options) {
 			return this._baseFetch(path as string, 'DELETE', {
@@ -59,7 +59,7 @@ export function withOpenApi<
 				bodySerializer: options?.bodySerializer,
 				pathParams: options?.pathParams,
 				queryParams: options?.queryParams
-			}) as any;
+			});
 		}
 	};
 
