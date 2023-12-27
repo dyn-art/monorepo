@@ -1,4 +1,4 @@
-# `@dyn/fetch`
+# `@dyn/fetch-client`
 
 - Dyn Fetch has core and then I can extend it with like `withOpenAPI` or `withAPI`
   which then sets the get set and stuff methods.. however they are not typesafe or
@@ -20,7 +20,7 @@
 - 
 
 ```
-import dynFetch from '@dyn/fetch';
+import dynFetch from '@dyn/fetch-client';
 
 const response = await dynFetch.post('https://example.com');
 
