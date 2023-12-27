@@ -39,14 +39,14 @@ export function createFetchClient<GPaths extends {} = {}>(
 				pathParams,
 				queryParams,
 				body = undefined,
-				prefixUrl = this._config.prefixUrl,
+				pathPrefix = this._config.prefixUrl,
 				fetchProps = {}
 			} = baseFetchOptions;
 
 			// Parse and validate URL to ensure that even if path is a full URL and baseUrl is an empty string,
 			// the finalPath and origin can still be correctly extracted
 			const { path: parsedPath, origin } = parseAndValidateURL(
-				`${prefixUrl}${path}`,
+				`${pathPrefix}${path}`,
 				queryParams == null
 			);
 

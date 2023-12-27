@@ -38,7 +38,7 @@ export type TQuerySerializer<
 > = (query: GQueryParams) => string;
 
 export type TBodySerializer<
-	GBody = unknown,
+	GBody = any,
 	GResult extends RequestInit['body'] = RequestInit['body']
 > = (body: GBody, contentType?: string) => GResult;
 
@@ -49,9 +49,9 @@ export type TBodySerializer<
 export interface TBaseFetchOptions {
 	parseAs?: TParseAs;
 	headers?: RequestInit['headers'];
-	prefixUrl?: string;
+	pathPrefix?: string;
 	fetchProps?: Omit<RequestInit, 'body' | 'method'>;
-	body?: RequestInit['body']; // TODO: If POST or PUT
+	body?: RequestInit['body']; // TODO: Only if POST or PUT
 	queryParams?: TURLParams['query'];
 	pathParams?: TURLParams['path'];
 	querySerializer?: TQuerySerializer;
@@ -69,7 +69,7 @@ export interface TURLParams {
 
 export type TResponseBodyWithParseAs<
 	GResponseBody,
-	GParseAs extends TParseAs = 'json'
+	GParseAs extends TParseAs
 > = GParseAs extends 'json'
 	? GResponseBody
 	: GParseAs extends 'text'

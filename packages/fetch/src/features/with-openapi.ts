@@ -7,17 +7,59 @@ export function withOpenApi<
 	fetchClient: TFetchClient<GPaths, TEnforceFeatures<GSelectedFeatureKeys, ['base']>>
 ): TFetchClient<GPaths, ['openapi', ...GSelectedFeatureKeys]> {
 	const openApiFeature: TSelectFeatures<GPaths, ['openapi']> = {
-		get() {
-			return null as any;
+		get(this: TFetchClient<GPaths, ['base']>, path, options) {
+			return this._baseFetch(path as string, 'GET', {
+				parseAs: options?.parseAs,
+				headers: options?.headers,
+				fetchProps: options?.fetchProps,
+				// TODO: middlewareProps
+				pathPrefix: options?.pathPrefix,
+				querySerializer: options?.querySerializer as any,
+				bodySerializer: options?.bodySerializer,
+				pathParams: options?.pathParams,
+				queryParams: options?.queryParams
+			}) as any;
 		},
-		post() {
-			return null as any;
+		post(this: TFetchClient<GPaths, ['base']>, path, body, options) {
+			return this._baseFetch(path as string, 'POST', {
+				body,
+				parseAs: options?.parseAs,
+				headers: options?.headers,
+				fetchProps: options?.fetchProps,
+				// TODO: middlewareProps
+				pathPrefix: options?.pathPrefix,
+				querySerializer: options?.querySerializer as any,
+				bodySerializer: options?.bodySerializer,
+				pathParams: options?.pathParams,
+				queryParams: options?.queryParams
+			}) as any;
 		},
-		put() {
-			return null as any;
+		put(this: TFetchClient<GPaths, ['base']>, path, body, options) {
+			return this._baseFetch(path as string, 'PUT', {
+				body,
+				parseAs: options?.parseAs,
+				headers: options?.headers,
+				fetchProps: options?.fetchProps,
+				// TODO: middlewareProps
+				pathPrefix: options?.pathPrefix,
+				querySerializer: options?.querySerializer as any,
+				bodySerializer: options?.bodySerializer,
+				pathParams: options?.pathParams,
+				queryParams: options?.queryParams
+			}) as any;
 		},
-		del() {
-			return null as any;
+		del(this: TFetchClient<GPaths, ['base']>, path, options) {
+			return this._baseFetch(path as string, 'DELETE', {
+				parseAs: options?.parseAs,
+				headers: options?.headers,
+				fetchProps: options?.fetchProps,
+				// TODO: middlewareProps
+				pathPrefix: options?.pathPrefix,
+				querySerializer: options?.querySerializer as any,
+				bodySerializer: options?.bodySerializer,
+				pathParams: options?.pathParams,
+				queryParams: options?.queryParams
+			}) as any;
 		}
 	};
 
