@@ -1,6 +1,6 @@
 import React from 'react';
 import { ETransformStatus } from '@dyn/figma-to-dtif';
-import { Icons } from '@dyn/ui';
+import { SpinnerIcon } from '@dyn/ui';
 
 import { appHandler } from '../../app-handler';
 import { useAppCallback } from '../../hooks';
@@ -60,7 +60,7 @@ export const TransformLoadingIndicator: React.FC<TProps> = (props) => {
 	return (
 		<div className="flex h-full w-full flex-col items-center justify-center">
 			<div className="flex flex-grow flex-col items-center justify-center">
-				<Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
+				<SpinnerIcon className="mr-2 h-4 w-4 animate-spin" />
 				<p className="mt-2">{message}</p>
 			</div>
 			<p className="mb-2 mt-auto text-sm opacity-80">{subMessage}</p>

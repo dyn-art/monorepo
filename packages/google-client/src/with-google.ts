@@ -13,7 +13,7 @@ export function withGoogle<GSelectedFeatureKeys extends TFeatureKeys[]>(
 ): TFetchClient<['google', ...GSelectedFeatureKeys], paths> {
 	if (hasFeatures(fetchClient, ['openapi'])) {
 		const googleFeature: TSelectFeatures<['google']> = {
-			async getWebFonts(this: TFetchClient<['base', 'openapi'], paths>, options = {} as any) {
+			async getWebFonts(this: TFetchClient<['base', 'openapi'], paths>, options = {}) {
 				return this.get('/webfonts', {
 					queryParams: {
 						key: 'not-set', // Set by middleware,

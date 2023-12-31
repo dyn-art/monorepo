@@ -1,13 +1,12 @@
 import { createOpenApiFetchClient, type TFetchClient } from '@dyn/fetch-client';
 
-import { googleConfig } from './environment';
 import type { paths } from './gen/v1';
 import { withGoogle } from './with-google';
 
 export function createGoogleClient(
-	options: TGoogleClientOptions = {}
+	config: TGoogleClientConfig
 ): TFetchClient<['base', 'openapi', 'google'], paths> {
-	const { prefixUrl = googleConfig.baseUrl, apiKey = googleConfig.auth.apiKey } = options;
+	const { prefixUrl = 'https://www.googleapis.com/webfonts/v1', apiKey } = config;
 	return withGoogle(
 		createOpenApiFetchClient<paths>({
 			prefixUrl,
@@ -23,7 +22,7 @@ export function createGoogleClient(
 	);
 }
 
-export interface TGoogleClientOptions {
+export interface TGoogleClientConfig {
 	prefixUrl?: string;
-	apiKey?: string;
+	apiKey: string;
 }
