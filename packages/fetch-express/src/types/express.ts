@@ -2,8 +2,6 @@ import type express from 'express';
 import type * as core from 'express-serve-static-core';
 
 import type {
-	TFilterKeys,
-	TPathsWith,
 	TRequestBody,
 	TRequestPathParams,
 	TRequestQueryParams,
@@ -53,37 +51,7 @@ export type TOpenApiExpressResponse<GPathOperation> = express.Response<
 // Route
 // =============================================================================
 
-export type TExpressGetRoute<GPaths extends {}> = <
-	GGetPaths extends TPathsWith<GPaths, 'get'>,
-	GPathOperation extends TFilterKeys<GPaths[GGetPaths], 'get'>
->(
-	req: TOpenApiExpressRequest<GPathOperation>,
-	res: TOpenApiExpressResponse<GPathOperation>,
-	next: express.NextFunction
-) => Promise<void>;
-
-export type TExpressPostRoute<GPaths extends {}> = <
-	GPostPaths extends TPathsWith<GPaths, 'post'>,
-	GPathOperation extends TFilterKeys<GPaths[GPostPaths], 'post'>
->(
-	req: TOpenApiExpressRequest<GPathOperation>,
-	res: TOpenApiExpressResponse<GPathOperation>,
-	next: express.NextFunction
-) => Promise<void>;
-
-export type TExpressPutRoute<GPaths extends {}> = <
-	GPutPaths extends TPathsWith<GPaths, 'put'>,
-	GPathOperation extends TFilterKeys<GPaths[GPutPaths], 'put'>
->(
-	req: TOpenApiExpressRequest<GPathOperation>,
-	res: TOpenApiExpressResponse<GPathOperation>,
-	next: express.NextFunction
-) => Promise<void>;
-
-export type TExpressDeleteRoute<GPaths extends {}> = <
-	GDeletePaths extends TPathsWith<GPaths, 'delete'>,
-	GPathOperation extends TFilterKeys<GPaths[GDeletePaths], 'delete'>
->(
+export type TExpressRoute<GPathOperation> = (
 	req: TOpenApiExpressRequest<GPathOperation>,
 	res: TOpenApiExpressResponse<GPathOperation>,
 	next: express.NextFunction
