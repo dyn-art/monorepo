@@ -29,24 +29,12 @@ export type TRequestPathParams<GPathOperation> = GPathOperation extends {
 	? GPathOperation['parameters']['path']
 	: never;
 
-// Filters out 'never' from path parameters for a given path type
-export type TRequestPathParamsFiltered<GPathOperation> =
-	TRequestPathParams<GPathOperation> extends never
-		? NonNullable<TRequestPathParams<GPathOperation>> | undefined
-		: TRequestPathParams<GPathOperation>;
-
 // Extracts query parameters from a generic path type
 export type TRequestQueryParams<GPathOperation> = GPathOperation extends {
 	parameters: { query?: any };
 }
 	? GPathOperation['parameters']['query']
 	: never;
-
-// Filters out 'never' from query parameters for a given path type
-export type TRequestQueryParamsFiltered<GPathOperation> =
-	TRequestQueryParams<GPathOperation> extends never
-		? NonNullable<TRequestQueryParams<GPathOperation>> | undefined
-		: TRequestQueryParams<GPathOperation>;
 
 // =============================================================================
 // Request Body

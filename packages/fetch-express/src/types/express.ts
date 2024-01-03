@@ -14,17 +14,13 @@ import type {
 
 // Request options for query parameters
 export type TOpenApiQueryParamsRequestOptions<GPathOperation> =
-	undefined extends TRequestQueryParams<GPathOperation> // If the queryParams can be undefined/optional
-		? TRequestQueryParams<GPathOperation>
-		: TRequestQueryParams<GPathOperation> extends never
+	TRequestQueryParams<GPathOperation> extends never
 		? core.Query
 		: TRequestQueryParams<GPathOperation>;
 
 // Request options for path parameters
 export type TOpenApiPathParamsRequestOptions<GPathOperation> =
-	undefined extends TRequestPathParams<GPathOperation> // If the pathParams can be undefined/optional
-		? TRequestPathParams<GPathOperation>
-		: TRequestPathParams<GPathOperation> extends never
+	TRequestPathParams<GPathOperation> extends never
 		? core.ParamsDictionary
 		: TRequestPathParams<GPathOperation>;
 

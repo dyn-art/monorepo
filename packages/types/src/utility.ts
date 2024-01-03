@@ -10,3 +10,5 @@ export type TUnionToIntersection<T> = (T extends any ? (x: T) => any : never) ex
 	: never;
 
 export type TPrimitive = boolean | number | string;
+
+export type TErrorMessage<GMessage extends string> = GMessage;
