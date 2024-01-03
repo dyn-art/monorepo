@@ -317,6 +317,24 @@ importers:
         specifier: ^1.4.11
         version: 1.4.11
 
+  packages/fetch-express:
+    devDependencies:
+      '@dyn/config':
+        specifier: workspace:*
+        version: link:../config
+      '@types/express':
+        specifier: ^4.17.21
+        version: 4.17.21
+      '@types/express-serve-static-core':
+        specifier: ^4.17.41
+        version: 4.17.41
+      '@types/node':
+        specifier: ^20.8.10
+        version: 20.8.10
+      express:
+        specifier: ^4.18.2
+        version: 4.18.2
+
   packages/figma-handler:
     dependencies:
       '@dyn/utils':

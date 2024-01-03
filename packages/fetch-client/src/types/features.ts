@@ -1,7 +1,7 @@
 import type { TUnionToIntersection } from '@dyn/types/utility';
 
-import type { TApiFeature } from './api';
-import type { TOpenApiFeature } from './openapi';
+import type { TApiFeature } from './api-client';
+import type { TOpenApiFeature } from './openapi-client';
 
 // TODO: Figure out how to apply GPaths to openapi without having to define it at TFeatures and the other helpers
 export type TFeatures<GPaths extends {} = {}> = {

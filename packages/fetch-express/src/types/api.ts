@@ -52,6 +52,3 @@ export type TErrorStatus =
 
 // Http media type structure (e.g. 'application/json')
 export type TMediaType = `${string}/${string}`;
-
-export type THeadersInit = NonNullable<RequestInit['headers']>;
-export type TRequestMethod = NonNullable<RequestInit['method']>;
