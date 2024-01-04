@@ -1,12 +1,16 @@
 import type express from 'express';
 
-import type {
-	TBaseExpressHandler,
-	TBaseValidationSchema,
-	TExpressHandler,
-	TFilterKeys,
-	TOpenApiValidationSchema,
-	TPathsWith
+import { ValidationError, type TValidationErrorDetails } from './exceptions';
+import {
+	isTParserCustomValidatorEsque,
+	isTParserYupEsque,
+	isTParserZodEsque,
+	type TBaseValidationSchema,
+	type TBaseValidationSchemaEntry,
+	type TExpressRequestHandler,
+	type TFilterKeys,
+	type TOpenApiValidationSchema,
+	type TPathsWith
 } from './types';
 
 export class OpenApiRouter<GPaths extends {} = {}> {
@@ -22,14 +26,13 @@ export class OpenApiRouter<GPaths extends {} = {}> {
 	>(
 		path: GGetPaths | (string & Record<never, never>),
 		validation: TOpenApiValidationSchema<GPathOperation>,
-		handler: TExpressHandler<GPathOperation>
+		handler: TExpressRequestHandler<GPathOperation>
 	): void {
 		this.router.get(
 			this.formatPath(path as string),
-			// eslint-disable-next-line @typescript-eslint/no-misused-promises -- Passed callback
 			this.validationHandler(validation as TBaseValidationSchema),
-			// eslint-disable-next-line @typescript-eslint/no-misused-promises -- Passed callback
-			this.handlerWrapper(handler as TBaseExpressHandler)
+			// eslint-disable-next-line @typescript-eslint/no-misused-promises -- Express handler can be async
+			this.handlerWrapper(handler)
 		);
 	}
 
@@ -39,14 +42,13 @@ export class OpenApiRouter<GPaths extends {} = {}> {
 	>(
 		path: GPostPaths | (string & Record<never, never>),
 		validation: TOpenApiValidationSchema<GPathOperation>,
-		handler: TExpressHandler<GPathOperation>
+		handler: TExpressRequestHandler<GPathOperation>
 	): void {
 		this.router.post(
 			this.formatPath(path as string),
-			// eslint-disable-next-line @typescript-eslint/no-misused-promises -- Passed callback
 			this.validationHandler(validation as TBaseValidationSchema),
-			// eslint-disable-next-line @typescript-eslint/no-misused-promises -- Passed callback
-			this.handlerWrapper(handler as TBaseExpressHandler)
+			// eslint-disable-next-line @typescript-eslint/no-misused-promises -- Express handler can be async
+			this.handlerWrapper(handler)
 		);
 	}
 
@@ -56,14 +58,13 @@ export class OpenApiRouter<GPaths extends {} = {}> {
 	>(
 		path: GPutPaths | (string & Record<never, never>),
 		validation: TOpenApiValidationSchema<GPathOperation>,
-		handler: TExpressHandler<GPathOperation>
+		handler: TExpressRequestHandler<GPathOperation>
 	): void {
 		this.router.put(
 			this.formatPath(path as string),
-			// eslint-disable-next-line @typescript-eslint/no-misused-promises -- Passed callback
 			this.validationHandler(validation as TBaseValidationSchema),
-			// eslint-disable-next-line @typescript-eslint/no-misused-promises -- Passed callback
-			this.handlerWrapper(handler as TBaseExpressHandler)
+			// eslint-disable-next-line @typescript-eslint/no-misused-promises -- Express handler can be async
+			this.handlerWrapper(handler)
 		);
 	}
 
@@ -73,14 +74,13 @@ export class OpenApiRouter<GPaths extends {} = {}> {
 	>(
 		path: GDeletePaths | (string & Record<never, never>),
 		validation: TOpenApiValidationSchema<GPathOperation>,
-		handler: TExpressHandler<GPathOperation>
+		handler: TExpressRequestHandler<GPathOperation>
 	): void {
 		this.router.delete(
 			this.formatPath(path as string),
-			// eslint-disable-next-line @typescript-eslint/no-misused-promises -- Passed callback
 			this.validationHandler(validation as TBaseValidationSchema),
-			// eslint-disable-next-line @typescript-eslint/no-misused-promises -- Passed callback
-			this.handlerWrapper(handler as TBaseExpressHandler)
+			// eslint-disable-next-line @typescript-eslint/no-misused-promises -- Express handler can be async
+			this.handlerWrapper(handler)
 		);
 	}
 
@@ -89,15 +89,69 @@ export class OpenApiRouter<GPaths extends {} = {}> {
 		return path.replace(/\{(?<name>\w+)\}/g, ':$<name>');
 	}
 
-	public validationHandler(validationSchema: TBaseValidationSchema): TBaseExpressHandler {
-		return async (req: express.Request, res: express.Response, next: express.NextFunction) => {
-			// TODO
+	public validationHandler(validationSchema: TBaseValidationSchema): express.RequestHandler {
+		// eslint-disable-next-line @typescript-eslint/no-misused-promises -- Callback
+		return async (req, res, next) => {
+			try {
+				// Validate each part of the request if a corresponding schema is provided
+				const validationErrors = (
+					await Promise.all(
+						(['query', 'path', 'body'] as const).map(async (key) => {
+							const schema = validationSchema[`${key}Schema`];
+							if (schema != null) {
+								return this.validateRequestPart(req[key], schema);
+							}
+							return [];
+						})
+					)
+				).flat();
+
+				// Check whether validation errors occured
+				if (validationErrors.length > 0) {
+					throw new ValidationError(validationErrors);
+				}
+
+				next();
+			} catch (error) {
+				next(error);
+			}
 		};
 	}
 
-	public handlerWrapper(handler: TBaseExpressHandler): TBaseExpressHandler {
+	private async validateRequestPart(
+		part: Record<string, unknown>,
+		schema: TBaseValidationSchemaEntry
+	): Promise<TValidationErrorDetails[]> {
+		const errors: TValidationErrorDetails[] = [];
+
+		for (const [key, validator] of Object.entries(schema)) {
+			try {
+				if (isTParserZodEsque(validator)) {
+					validator.parse(part[key]);
+				} else if (isTParserYupEsque(validator)) {
+					validator.validateSync(part[key]);
+				} else if (isTParserCustomValidatorEsque(validator)) {
+					await validator(part[key]);
+				}
+			} catch (error) {
+				if (error instanceof Error) {
+					errors.push({ property: key, message: error.message, error });
+				}
+			}
+		}
+
+		return errors;
+	}
+
+	public handlerWrapper(handler: express.RequestHandler): express.RequestHandler {
+		// eslint-disable-next-line @typescript-eslint/no-misused-promises -- Callback
 		return async (req: express.Request, res: express.Response, next: express.NextFunction) => {
-			// TODO
+			try {
+				// eslint-disable-next-line @typescript-eslint/await-thenable, @typescript-eslint/no-confusing-void-expression -- Express handler can be async
+				await handler(req, res, next);
+			} catch (error) {
+				next(error);
+			}
 		};
 	}
 }
