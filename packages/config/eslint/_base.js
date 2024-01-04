@@ -51,6 +51,9 @@ module.exports = {
 		'unicorn/filename-case': OFF, // Annoying with React components and Typescript classes
 		'import/no-named-as-default-member': OFF, // For ReactJs imports like React.useState()
 		'import/no-extraneous-dependencies': OFF, // Conflict with Typescript paths
-		'camelcase': WARNING
+		'camelcase': WARNING,
+
+		// Turbo
+		'turbo/no-undeclared-env-vars': WARNING
 	}
 };

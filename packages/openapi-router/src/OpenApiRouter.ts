@@ -1,6 +1,7 @@
 import type express from 'express';
 
 import { ValidationError, type TValidationErrorDetails } from './exceptions';
+import { parseRequestQuery } from './helper';
 import {
 	isTParserCustomValidatorEsque,
 	isTParserYupEsque,
@@ -147,6 +148,12 @@ export class OpenApiRouter<GPaths extends {} = {}> {
 		// eslint-disable-next-line @typescript-eslint/no-misused-promises -- Callback
 		return async (req: express.Request, res: express.Response, next: express.NextFunction) => {
 			try {
+				// Parse query strings in the Express request object.
+				// It expands the default query parser to handle advanced types like numbers and booleans.
+				// https://expressjs.com/en/5x/api.html#req.query
+				// https://github.com/ljharb/qs/issues/91
+				req.query = parseRequestQuery(req.query) as any;
+
 				// eslint-disable-next-line @typescript-eslint/await-thenable, @typescript-eslint/no-confusing-void-expression -- Express handler can be async
 				await handler(req, res, next);
 			} catch (error) {
