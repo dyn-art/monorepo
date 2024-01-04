@@ -80,7 +80,9 @@ export type TOpenApiPost<GPaths extends {}> = <
 	path: GPostPaths | (string & Record<never, never>), // https://github.com/microsoft/TypeScript/issues/29729
 	body: TRequestBody<
 		'post' extends keyof GPaths[GPostPaths] ? GPaths[GPostPaths]['post'] : unknown
-	>,
+	> extends never
+		? null
+		: TRequestBody<'post' extends keyof GPaths[GPostPaths] ? GPaths[GPostPaths]['post'] : unknown>,
 	options?: TOpenApiFetchOptions<GPathOperation, GParseAs>
 ) => Promise<TOpenApiFetchResponse<GPathOperation, GParseAs>>;
 
@@ -90,7 +92,11 @@ export type TOpenApiPut<GPaths extends {}> = <
 	GParseAs extends TParseAs = 'json'
 >(
 	path: GPutPaths | (string & Record<never, never>), // https://github.com/microsoft/TypeScript/issues/29729
-	body: TRequestBody<'put' extends keyof GPaths[GPutPaths] ? GPaths[GPutPaths]['put'] : unknown>,
+	body: TRequestBody<
+		'put' extends keyof GPaths[GPutPaths] ? GPaths[GPutPaths]['put'] : unknown
+	> extends never
+		? null
+		: TRequestBody<'put' extends keyof GPaths[GPutPaths] ? GPaths[GPutPaths]['put'] : unknown>,
 	options?: TOpenApiFetchOptions<GPathOperation, GParseAs>
 ) => Promise<TOpenApiFetchResponse<GPathOperation, GParseAs>>;
 

@@ -176,6 +176,9 @@ export interface operations {
 				scope?: string;
 				overwrite?: boolean;
 			};
+			path: {
+				key: string;
+			};
 		};
 		responses: {
 			/** @description Success */
@@ -251,7 +254,13 @@ export interface operations {
 				 */
 				'application/json': {
 					hello: string;
-					jeff?: number;
+					jeff?: {
+						num1: string;
+						num2: number;
+						moreNested: {
+							hello: string;
+						};
+					};
 				};
 			};
 		};

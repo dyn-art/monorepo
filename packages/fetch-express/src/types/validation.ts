@@ -1,23 +1,35 @@
-import type { TRequestPathParams, TRequestQueryParams } from './openapi';
-
-// TODO:
+import type { TRequestBody, TRequestPathParams, TRequestQueryParams } from './openapi';
+import type { TParserSchema } from './parser';
 
 // =============================================================================
-// Validation Options
+// Validation Schema
 // =============================================================================
 
-// Fetch options for query parameters
-export type TOpenApiQueryParamsValidationOptions<GPathOperation> =
+// Validation schema for query parameters
+export type TOpenApiQueryParamsValidationSchema<GPathOperation> =
 	undefined extends TRequestQueryParams<GPathOperation> // If the queryParams can be undefined/optional
-		? { queryParams?: TRequestQueryParams<GPathOperation> }
+		? { querySchema: Required<TParserSchema<TRequestQueryParams<GPathOperation> | undefined>> }
 		: TRequestQueryParams<GPathOperation> extends never
-		? { queryParams?: Record<string, unknown> }
-		: { queryParams: TRequestQueryParams<GPathOperation> };
+		? { querySchema?: Record<string, TParserSchema<any>> }
+		: { querySchema: TParserSchema<TRequestQueryParams<GPathOperation>> };
 
-// Fetch options for path parameters
-export type TOpenApiPathParamsValidationOptions<GPathOperation> =
+// Validation schema for path parameters
+export type TOpenApiPathParamsValidationSchema<GPathOperation> =
 	undefined extends TRequestPathParams<GPathOperation> // If the pathParams can be undefined/optional
-		? { pathParams?: TRequestPathParams<GPathOperation> }
+		? { pathSchema: TParserSchema<TRequestPathParams<GPathOperation> | undefined> }
 		: TRequestPathParams<GPathOperation> extends never
-		? { pathParams?: Record<string, unknown> }
-		: { pathParams: TRequestPathParams<GPathOperation> };
+		? { pathSchema?: Record<string, TParserSchema<any>> }
+		: { pathSchema: TParserSchema<TRequestPathParams<GPathOperation>> };
+
+// Validation schema for body
+export type TOpenApiBodyValidationSchema<GPathOperation> =
+	undefined extends TRequestBody<GPathOperation> // If the body can be undefined/optional
+		? { bodySchema: TParserSchema<TRequestBody<GPathOperation> | undefined> }
+		: TRequestBody<GPathOperation> extends never
+		? { bodySchema?: Record<string, TParserSchema<any>> }
+		: { bodySchema: TParserSchema<TRequestBody<GPathOperation>> };
+
+export type TOpenApiValidationSchema<GPathOperation> =
+	TOpenApiPathParamsValidationSchema<GPathOperation> &
+		TOpenApiQueryParamsValidationSchema<GPathOperation> &
+		TOpenApiBodyValidationSchema<GPathOperation>;

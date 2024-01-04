@@ -57,10 +57,7 @@ export type TRequestBodyMedia<GPathOperation> =
 		? TFilterKeys<NonNullable<TRequestBodyContent<GPathOperation>>, TMediaType> | undefined
 		: TFilterKeys<TRequestBodyContent<GPathOperation>, TMediaType>;
 
-// Final type for the request body after filtering 'never' and handling optional/undefined cases
-export type TRequestBody<GPathOperation> = TRequestBodyMedia<GPathOperation> extends never
-	? NonNullable<TRequestBodyMedia<GPathOperation>> | undefined
-	: TRequestBodyMedia<GPathOperation>;
+export type TRequestBody<GPathOperation> = TRequestBodyMedia<GPathOperation>;
 
 // =============================================================================
 // Response Body

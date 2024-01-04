@@ -1,4 +1,4 @@
-import type { TExpressRoute, TFilterKeys, TPathsWith } from './types';
+import type { TExpressRoute, TFilterKeys, TOpenApiValidationSchema, TPathsWith } from './types';
 
 export class FetchExpress<GPaths extends {} = {}> {
 	public get<
@@ -6,7 +6,7 @@ export class FetchExpress<GPaths extends {} = {}> {
 		GPathOperation extends TFilterKeys<GPaths[GGetPaths], 'get'>
 	>(
 		path: GGetPaths | (string & Record<never, never>),
-		validation: any,
+		validation: TOpenApiValidationSchema<GPathOperation>,
 		handler: TExpressRoute<GPathOperation>
 	): void {
 		//TODO:
@@ -17,7 +17,7 @@ export class FetchExpress<GPaths extends {} = {}> {
 		GPathOperation extends TFilterKeys<GPaths[GPostPaths], 'post'>
 	>(
 		path: GPostPaths | (string & Record<never, never>),
-		validation: any,
+		validation: TOpenApiValidationSchema<GPathOperation>,
 		handler: TExpressRoute<GPathOperation>
 	): void {
 		//TODO:
@@ -28,7 +28,7 @@ export class FetchExpress<GPaths extends {} = {}> {
 		GPathOperation extends TFilterKeys<GPaths[GPutPaths], 'put'>
 	>(
 		path: GPutPaths | (string & Record<never, never>),
-		validation: any,
+		validation: TOpenApiValidationSchema<GPathOperation>,
 		handler: TExpressRoute<GPathOperation>
 	): void {
 		//TODO:
@@ -39,7 +39,7 @@ export class FetchExpress<GPaths extends {} = {}> {
 		GPathOperation extends TFilterKeys<GPaths[GDeletePaths], 'delete'>
 	>(
 		path: GDeletePaths | (string & Record<never, never>),
-		validation: any,
+		validation: TOpenApiValidationSchema<GPathOperation>,
 		handler: TExpressRoute<GPathOperation>
 	): void {
 		//TODO:
