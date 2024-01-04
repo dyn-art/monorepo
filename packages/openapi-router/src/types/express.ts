@@ -44,11 +44,17 @@ export type TOpenApiExpressResponse<GPathOperation> = express.Response<
 >;
 
 // =============================================================================
-// Route
+// Handler
 // =============================================================================
 
-export type TExpressRoute<GPathOperation> = (
+export type TExpressHandler<GPathOperation> = (
 	req: TOpenApiExpressRequest<GPathOperation>,
 	res: TOpenApiExpressResponse<GPathOperation>,
 	next: express.NextFunction
-) => Promise<void>;
+) => Promise<void> | void;
+
+export type TBaseExpressHandler = (
+	req: express.Request,
+	res: express.Response,
+	next: express.NextFunction
+) => Promise<void> | void;

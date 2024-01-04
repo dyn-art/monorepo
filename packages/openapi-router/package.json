@@ -1,6 +1,6 @@
 {
-	"name": "@dyn/fetch-express",
-	"description": "Fetch Express",
+	"name": "@dyn/openapi-routter",
+	"description": "Express OpenApi Router",
 	"version": "0.0.1",
 	"private": true,
 	"scripts": {

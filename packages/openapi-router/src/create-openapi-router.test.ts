@@ -1,12 +1,13 @@
+import { Router } from 'express';
 import { describe, it } from 'vitest';
 import { z } from 'zod';
 
 import type { paths } from './__tests__/resources/mock-openapi-types';
-import { createFetchExpress } from './create-fetch-express';
+import { createOpenApiRouter } from './create-openapi-router';
 
-describe('createFetchExpress function tests', () => {
+describe('createOpenApiRouter function tests', () => {
 	it('should have correct types', async () => {
-		const baseFetchClient = createFetchExpress<paths>();
+		const baseFetchClient = createOpenApiRouter<paths>(Router());
 
 		baseFetchClient.get(
 			'/v1/media/pre-signed-upload-url',
