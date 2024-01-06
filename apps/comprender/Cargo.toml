@@ -1,0 +1,18 @@
+[package]
+name = "dyn_comprender"
+version = "0.0.1"
+edition = "2021"
+description = "Composition Render API"
+homepage = "https://s.dyn.art/github"
+repository = "https://github.com/dyndotart/monorepo"
+license = "AGPL-3.0-or-later"
+
+[dependencies]
+dyn_composition = { path = "../../crates/composition" }
+dyn_svg_render = { path = "../../crates/svg_render" }
+dyn_bevy_render_skeleton = { path = "../../crates/bevy_render_skeleton" }
+axum = "0.7.3"
+bevy_ecs = "0.12"
+bevy_app = "0.12"
+serde = { version = "1.0.195", features = ["derive"] }
+tokio = { version = "1.35.1", features = ["full"] }

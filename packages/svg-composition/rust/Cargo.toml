@@ -2,7 +2,7 @@
 name = "dyn_composition_api"
 version = "0.0.1"
 edition = "2021"
-description = "Description of the package"
+description = "SVG Composition"
 homepage = "https://s.dyn.art/github"
 repository = "https://github.com/dyndotart/monorepo"
 license = "AGPL-3.0-or-later"
@@ -31,8 +31,6 @@ dyn_svg_render = { path = "../../../crates/svg_render" }
 dyn_bevy_render_skeleton = { path = "../../../crates/bevy_render_skeleton" }
 bevy_ecs = "0.12"
 bevy_app = "0.12"
-bevy_utils = "0.12"
-bevy_hierarchy = "0.12"
 specta = { git = "https://github.com/oscartbeaumont/specta.git", branch = "main", features = [
     "typescript",
     "serde",
@@ -40,7 +38,6 @@ specta = { git = "https://github.com/oscartbeaumont/specta.git", branch = "main"
     "bevy_ecs",
 ] }
 serde = { version = "1.0.189", features = ["derive"] }
-serde_with = "3.4.0"
 glam = { version = "0.24.2", features = ["serde"] }
 
 # Logging

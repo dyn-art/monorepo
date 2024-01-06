@@ -20,7 +20,6 @@ bevy_hierarchy = "0.12"
 serde = { version = "1.0.189", features = ["derive"] }
 serde_with = "3.4.0"
 glam = { version = "0.24.2", features = ["serde"] }
-log = "0.4.20"
 specta = { git = "https://github.com/oscartbeaumont/specta.git", branch = "main", features = [
     "typescript",
     "serde",
