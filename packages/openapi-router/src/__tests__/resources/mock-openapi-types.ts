@@ -4,6 +4,13 @@
  */
 
 export interface paths {
+	'/v1/hello': {
+		/**
+		 * API Hello
+		 * @description Say Hello.
+		 */
+		get: operations['getHelloAPI'];
+	};
 	'/v1/auth/etsy/ping': {
 		/**
 		 * Etsy Ping
@@ -105,6 +112,25 @@ export interface components {
 export type external = Record<string, never>;
 
 export interface operations {
+	/**
+	 * API Hello
+	 * @description Say Hello.
+	 */
+	getHelloAPI: {
+		parameters: {
+			query: {
+				name: string;
+			};
+		};
+		responses: {
+			/** @description Success */
+			200: {
+				content: {
+					'application/json': string;
+				};
+			};
+		};
+	};
 	/**
 	 * Etsy Ping
 	 * @description Ping Etsy API.

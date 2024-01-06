@@ -5,6 +5,7 @@
   or well I can make them typesafe indeed if I've like feature 'api' and 'openapi'
 
 ### Features
+
 - `core`
   - `coreFetch()`
 - `api`
@@ -17,7 +18,7 @@
   - `post()`
   - `put()`
   - `del()`
-- 
+-
 
 ```
 import dynFetch from '@dyn/fetch-client';

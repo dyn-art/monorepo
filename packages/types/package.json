@@ -11,9 +11,9 @@
 		"update:deps": "pnpm update --latest"
 	},
 	"exports": {
-		"./dtif": {
-			"source": "./src/dtif.ts",
-			"types": "./dist/dtif.d.ts"
+		"./core": {
+			"source": "./src/core/index.ts",
+			"types": "./dist/core/index.d.ts"
 		},
 		"./utility": {
 			"source": "./src/utility.ts",
@@ -22,8 +22,8 @@
 	},
 	"typesVersions": {
 		"*": {
-			"dtif": [
-				"./dist/dtif.d.ts"
+			"core": [
+				"./dist/core/index.d.ts"
 			],
 			"utility": [
 				"./dist/utility.d.ts"

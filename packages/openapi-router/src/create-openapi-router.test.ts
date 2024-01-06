@@ -10,6 +10,18 @@ describe('createOpenApiRouter function tests', () => {
 		const baseFetchClient = createOpenApiRouter<paths>(Router());
 
 		baseFetchClient.get(
+			'/v1/hello',
+			{
+				querySchema: {
+					name: z.string()
+				}
+			},
+			async (req, res) => {
+				const { name } = req.query;
+			}
+		);
+
+		baseFetchClient.get(
 			'/v1/media/pre-signed-upload-url',
 			{
 				querySchema: {
@@ -51,6 +63,7 @@ describe('createOpenApiRouter function tests', () => {
 			},
 			async (req, res, next) => {
 				const params = req.params;
+				const query = req.query;
 				// TODO
 			}
 		);

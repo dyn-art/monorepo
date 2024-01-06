@@ -1,0 +1,99 @@
+openapi: 3.1.0
+info:
+  title: "@dyn/core"
+  description: "API documentation for @dyn/core"
+  version: 1.0.0
+  contact:
+    email: dev@physical.art
+
+servers:
+  - url: http://localhost:9000
+    description: Development server
+
+tags:
+  - name: auth
+    description: Authentication endpoint
+  - name: media
+    description: Media endpoint
+
+paths:
+  /v1/ping:
+    get:
+      summary: API Ping
+      description: Ping the API to check if it's working.
+      operationId: getPingAPI
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: boolean
+              example: true
+  /v1/hello:
+    get:
+      summary: API Hello
+      description: Say Hello.
+      operationId: getHelloAPI
+      parameters:
+      - name: name
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: string
+              example: 'Hello Jeff'
+
+
+components:
+  responses:
+    BadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ServerError'
+    ServerError:
+      description: Server Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ServerError'
+    NotFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ServerError'
+
+  schemas:
+    ServerError:
+      type: object
+      description: Error Response
+      properties:
+        error_code:
+          type: string
+          description: Error code
+        error_description:
+          type: string
+          description: Error description
+          nullable: true
+        error_uri:
+          type: string
+          description: Error URI
+          nullable: true
+        additional_errors:
+          type: array
+          items:
+            type: object
+      example:
+        error_code: "400"
+        error_description: "Bad Request"
+        error_uri: null
+        additional_errors: []

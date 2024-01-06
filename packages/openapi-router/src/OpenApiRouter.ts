@@ -32,8 +32,7 @@ export class OpenApiRouter<GPaths extends {} = {}> {
 		this.router.get(
 			this.formatPath(path as string),
 			this.validationHandler(validation as TBaseValidationSchema),
-			// eslint-disable-next-line @typescript-eslint/no-misused-promises -- Express handler can be async
-			this.handlerWrapper(handler)
+			this.handlerWrapper(handler as express.RequestHandler)
 		);
 	}
 
@@ -48,8 +47,7 @@ export class OpenApiRouter<GPaths extends {} = {}> {
 		this.router.post(
 			this.formatPath(path as string),
 			this.validationHandler(validation as TBaseValidationSchema),
-			// eslint-disable-next-line @typescript-eslint/no-misused-promises -- Express handler can be async
-			this.handlerWrapper(handler)
+			this.handlerWrapper(handler as express.RequestHandler)
 		);
 	}
 
@@ -64,8 +62,7 @@ export class OpenApiRouter<GPaths extends {} = {}> {
 		this.router.put(
 			this.formatPath(path as string),
 			this.validationHandler(validation as TBaseValidationSchema),
-			// eslint-disable-next-line @typescript-eslint/no-misused-promises -- Express handler can be async
-			this.handlerWrapper(handler)
+			this.handlerWrapper(handler as express.RequestHandler)
 		);
 	}
 
@@ -80,8 +77,7 @@ export class OpenApiRouter<GPaths extends {} = {}> {
 		this.router.delete(
 			this.formatPath(path as string),
 			this.validationHandler(validation as TBaseValidationSchema),
-			// eslint-disable-next-line @typescript-eslint/no-misused-promises -- Express handler can be async
-			this.handlerWrapper(handler)
+			this.handlerWrapper(handler as express.RequestHandler)
 		);
 	}
 
