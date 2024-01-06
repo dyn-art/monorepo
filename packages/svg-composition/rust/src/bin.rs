@@ -1,9 +1,11 @@
 #![cfg(feature = "cli")]
 
 use clap::Parser;
-use specta::export;
-use specta::ts::{BigIntExportBehavior, ExportConfig};
-use std::process;
+use specta::{
+    export,
+    ts::{BigIntExportBehavior, ExportConfig},
+};
+use std::{borrow::Cow, process};
 
 // Import all types and modules from `dyn_composition` to make them accessible to specta here
 use dyn_composition_api::*;
@@ -32,7 +34,7 @@ struct GenerateTsTypes {
 fn generate_ts_types(export_path: &str) {
     println!("Generating TypeScript types at {}", export_path);
     let export_config = ExportConfig::default().bigint(BigIntExportBehavior::Number);
-    match export::ts_with_cfg(export_path, &export_config) {
+    match export::ts_with_cfg(export_path, Cow::Borrowed(""), &export_config) {
         Ok(_) => println!("Successfully generated TypeScript types at {}", export_path),
         Err(e) => {
             eprintln!("Failed to generate TypeScript types: {:?}", e);

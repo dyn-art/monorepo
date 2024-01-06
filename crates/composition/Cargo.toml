@@ -16,16 +16,16 @@ trace = []
 dyn_bevy_render_skeleton = { path = "../bevy_render_skeleton" }
 bevy_ecs = "0.12"
 bevy_app = "0.12"
-bevy_utils = "0.12"
 bevy_hierarchy = "0.12"
 serde = { version = "1.0.189", features = ["derive"] }
 glam = { version = "0.24.2", features = ["serde"] }
 log = "0.4.20"
-specta = { git = "https://github.com/oscartbeaumont/specta.git", branch = "main", features = [
+specta = { git = "https://github.com/oscartbeaumont/specta.git", rev = "10e7cd3f2eb0611ed749e6c281ba0e825fd51481", features = [
     "typescript",
     "serde",
     "glam",
     "bevy_ecs",
+    "functions",
 ] }
 rustybuzz = "0.11.0"
 owned_ttf_parser = "0.20.0"

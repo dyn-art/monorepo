@@ -1,26 +1,11 @@
-use axum::{routing::get, Json, Router, Server};
-use serde::Serialize;
-use std::os::unix::net::SocketAddr;
+use axum::{routing::get, Router};
 
 #[tokio::main]
 async fn main() {
-    let app = Router::new().route("/", get(handler));
+    // Build our application with a single route
+    let app = Router::new().route("/", get(|| async { "Hello, World!" }));
 
-    let address = SocketAddr::from(([127, 0, 0, 1], 3030));
-    println!("Server started, listening on {address}");
-    Server::bind(&address)
-        .serve(app.into_make_service())
-        .await
-        .expect("Failed to start server");
-}
-
-#[derive(Serialize)]
-struct Message {
-    message: String,
-}
-
-async fn handler() -> Json<Message> {
-    Json(Message {
-        message: String::from("Hello World"),
-    })
+    // Run our app with hyper, listening globally on port 3000
+    let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
+    axum::serve(listener, app).await.unwrap();
 }

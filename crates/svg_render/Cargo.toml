@@ -15,14 +15,14 @@ dyn_bevy_render_skeleton = { path = "../bevy_render_skeleton" }
 dyn_composition = { path = "../composition" }
 bevy_ecs = "0.12"
 bevy_app = "0.12"
-bevy_utils = "0.12"
 bevy_hierarchy = "0.12"
 serde = { version = "1.0.189", features = ["derive"] }
 serde_with = "3.4.0"
 glam = { version = "0.24.2", features = ["serde"] }
-specta = { git = "https://github.com/oscartbeaumont/specta.git", branch = "main", features = [
+specta = { git = "https://github.com/oscartbeaumont/specta.git", rev = "10e7cd3f2eb0611ed749e6c281ba0e825fd51481", features = [
     "typescript",
     "serde",
     "glam",
     "bevy_ecs",
+    "functions",
 ] }
