@@ -1,4 +1,4 @@
-use crate::core::events::output_event::RenderUpdateEvent;
+use crate::events::output_event::RenderUpdateEvent;
 
 use super::{svg_bundle::BaseSVGBundle, svg_node::SVGNode, svg_paint::SVGPaint, SVGCompositionRes};
 

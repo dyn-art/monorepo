@@ -1,6 +1,6 @@
 {
 	"name": "@dyn/fetch-client",
-	"description": "Simple fetch wrapper",
+	"description": "Straightforward fetch wrapper",
 	"version": "0.0.1",
 	"private": true,
 	"scripts": {

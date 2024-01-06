@@ -1,6 +1,6 @@
 use bevy_ecs::entity::Entity;
 
-use crate::core::events::output_event::RenderUpdateEvent;
+use crate::events::output_event::RenderUpdateEvent;
 
 use super::{
     svg_element::{SVGChildElementIdentifier, SVGElement},

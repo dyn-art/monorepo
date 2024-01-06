@@ -11,11 +11,9 @@ use dyn_composition::core::modules::node::components::{
     types::Node,
 };
 
-use crate::core::{
+use crate::{
     mixin_change::ToMixinChange,
-    modules::svg_render::resources::changed_components::{
-        ChangedComponentsRes, ChangedNode, ChangedPaint,
-    },
+    resources::changed_components::{ChangedComponentsRes, ChangedNode, ChangedPaint},
 };
 
 // Special handling for ChildrenMixin as the ChildrenMixin is no Component itself in the ECS

@@ -6,7 +6,7 @@ use dyn_composition::core::modules::node::components::{
     types::NodeType,
 };
 
-use crate::core::mixin_change::MixinChange;
+use crate::mixin_change::MixinChange;
 
 #[derive(Resource, Debug, Default)]
 pub struct ChangedComponentsRes {

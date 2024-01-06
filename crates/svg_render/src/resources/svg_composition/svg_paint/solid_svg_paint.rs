@@ -3,9 +3,9 @@ use dyn_composition::core::{
     modules::node::components::mixins::Paint, utils::continuous_id::ContinuousId,
 };
 
-use crate::core::{
+use crate::{
     events::output_event::RenderUpdateEvent,
-    modules::svg_render::resources::{
+    resources::{
         changed_components::ChangedPaint,
         svg_composition::{
             svg_bundle::{BaseSVGBundle, SVGBundle},

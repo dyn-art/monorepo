@@ -1,6 +1,6 @@
 use dyn_composition::core::utils::continuous_id::ContinuousId;
 
-use crate::core::modules::svg_render::resources::changed_components::ChangedNode;
+use crate::resources::changed_components::ChangedNode;
 
 use super::svg_bundle::SVGBundle;
 use std::fmt::Debug;

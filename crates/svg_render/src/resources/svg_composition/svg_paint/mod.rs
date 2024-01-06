@@ -1,8 +1,8 @@
-use crate::core::modules::svg_render::resources::{
-    changed_components::ChangedPaint, svg_composition::svg_bundle::SVGBundle,
-};
-
 use std::fmt::Debug;
+
+use crate::resources::changed_components::ChangedPaint;
+
+use super::svg_bundle::SVGBundle;
 
 pub mod solid_svg_paint;
 mod utils;

@@ -1,42 +1,49 @@
 use bevy_ecs::entity::Entity;
 use dyn_composition::core::utils::continuous_id::ContinuousId;
 
-use crate::core::{
+use crate::{
     events::output_event::RenderUpdateEvent,
     mixin_change::MixinChange,
-    modules::svg_render::resources::{
+    resources::{
         changed_components::ChangedNode,
         svg_composition::{
             svg_bundle::{BaseSVGBundle, SVGBundle},
             svg_element::{
                 attributes::{SVGAttribute, SVGMeasurementUnit},
-                helper::{construct_svg_path, mat3_to_svg_transform},
+                helper::mat3_to_svg_transform,
                 mapper::map_blend_mode,
                 styles::{SVGDisplayStyle, SVGStyle},
                 SVGElement, SVGTag,
             },
+            svg_node::ElementReference,
             SVGCompositionRes,
         },
     },
 };
 
-use super::{ElementReference, SVGNode};
+use super::SVGNode;
 
 #[derive(Debug)]
-pub struct ShapeSVGNode {
+pub struct FrameSVGNode {
     bundle: BaseSVGBundle,
+
+    // Content elements
+    content_wrapper: ElementReference,
+    content_clip_path: ElementReference,
+    content_clip_path_defs: ElementReference,
+    content_clipped_shape: ElementReference,
+
+    // Children elements
+    children_wrapper: ElementReference,
 
     // Fill elements
     fill_clip_path: ElementReference,
     fill_clip_path_defs: ElementReference,
     fill_clipped_shape: ElementReference,
     fill_wrapper: ElementReference,
-
-    // Click area elements
-    click_area: ElementReference,
 }
 
-impl SVGBundle for ShapeSVGNode {
+impl SVGBundle for FrameSVGNode {
     fn get_bundle(&self) -> &BaseSVGBundle {
         &self.bundle
     }
@@ -54,7 +61,7 @@ impl SVGBundle for ShapeSVGNode {
     }
 }
 
-impl SVGNode for ShapeSVGNode {
+impl SVGNode for FrameSVGNode {
     fn apply_node_change(&mut self, changed_node: &ChangedNode) {
         for change in &changed_node.changes {
             match change {
@@ -69,9 +76,21 @@ impl SVGNode for ShapeSVGNode {
                             unit: SVGMeasurementUnit::Pixel,
                         },
                     ]);
-
                     self.bundle
-                        .get_child_mut(self.click_area.index)
+                        .get_child_mut(self.fill_clipped_shape.index)
+                        .unwrap()
+                        .set_attributes(vec![
+                            SVGAttribute::Width {
+                                width: mixin.width,
+                                unit: SVGMeasurementUnit::Pixel,
+                            },
+                            SVGAttribute::Height {
+                                height: mixin.height,
+                                unit: SVGMeasurementUnit::Pixel,
+                            },
+                        ]);
+                    self.bundle
+                        .get_child_mut(self.content_clipped_shape.index)
                         .unwrap()
                         .set_attributes(vec![
                             SVGAttribute::Width {
@@ -91,13 +110,6 @@ impl SVGNode for ShapeSVGNode {
                         }),
                     ]);
                 }
-                MixinChange::Path(mixin) => self
-                    .bundle
-                    .get_child_mut(self.fill_clipped_shape.index)
-                    .unwrap()
-                    .set_attributes(vec![SVGAttribute::D {
-                        d: construct_svg_path(&mixin.vertices),
-                    }]),
                 MixinChange::Blend(mixin) => {
                     let root_element = self.bundle.get_root_mut();
                     root_element.set_attributes(vec![SVGAttribute::Opacity {
@@ -118,6 +130,12 @@ impl SVGNode for ShapeSVGNode {
                             },
                         }]);
                 }
+                MixinChange::Children(mixin) => {
+                    self.bundle
+                        .get_child_mut(self.children_wrapper.index)
+                        .unwrap()
+                        .reorder_children(&mixin.children.0);
+                }
                 _ => {
                     // do nothing
                 }
@@ -126,7 +144,7 @@ impl SVGNode for ShapeSVGNode {
     }
 
     fn get_node_append_id(&self) -> Option<&ElementReference> {
-        None
+        Some(&self.children_wrapper)
     }
 
     fn get_paint_append_id(&self) -> Option<&ElementReference> {
@@ -134,57 +152,97 @@ impl SVGNode for ShapeSVGNode {
     }
 }
 
-impl ShapeSVGNode {
+impl FrameSVGNode {
     pub fn new(entity: Entity, id_generator: &mut ContinuousId) -> Self {
+        // TODO: implment clip path without having to remove or add elements
+        // as the size should be known at compile time so that we can use Vector
+        // over Hashmap for storing SVGElements
+
         // Create root element
         let mut element = SVGElement::new(SVGTag::Group, id_generator);
         let element_id = element.get_id();
         #[cfg(feature = "trace")]
         element.set_attribute(SVGAttribute::Name {
-            name: ShapeSVGNode::create_element_name(element.get_id(), String::from("root"), false),
+            name: FrameSVGNode::create_element_name(element.get_id(), String::from("root"), false),
         });
         let mut bundle = BaseSVGBundle::new(element, entity);
 
-        // Create click area element
-        let mut click_area = SVGElement::new(SVGTag::Rect, id_generator);
-        let click_area_id = click_area.get_id();
+        // Create content elements
+        let mut content_clip_path_defs_element = SVGElement::new(SVGTag::Defs, id_generator);
+        let content_clip_path_defs_id = content_clip_path_defs_element.get_id();
         #[cfg(feature = "trace")]
-        click_area.set_attributes(vec![
-            SVGAttribute::Name {
-                name: ShapeSVGNode::create_element_name(
-                    click_area_id,
-                    String::from("click-area"),
-                    false,
-                ),
-            },
-            SVGAttribute::Fill {
-                fill: String::from("rgba(255, 204, 203, 0.5)"),
-            },
-        ]);
-        #[cfg(not(feature = "trace"))]
-        click_area.set_attribute(SVGAttribute::Fill {
-            fill: String::from("transparent"),
+        content_clip_path_defs_element.set_attribute(SVGAttribute::Name {
+            name: FrameSVGNode::create_element_name(
+                content_clip_path_defs_id,
+                String::from("content-defs"),
+                false,
+            ),
         });
-        let click_area_index = bundle.append_child(click_area);
+        let content_clip_path_defs_index = bundle.append_child(content_clip_path_defs_element);
+
+        let mut content_clip_path_element = SVGElement::new(SVGTag::ClipPath, id_generator);
+        let content_clip_path_id = content_clip_path_element.get_id();
+        #[cfg(feature = "trace")]
+        content_clip_path_element.set_attribute(SVGAttribute::Name {
+            name: FrameSVGNode::create_element_name(
+                content_clip_path_id,
+                String::from("content-clip"),
+                true,
+            ),
+        });
+        let content_clip_path_index = bundle
+            .append_child_to(content_clip_path_defs_index, content_clip_path_element)
+            .unwrap();
+
+        let mut content_clipped_shape_element = SVGElement::new(SVGTag::Rect, id_generator);
+        let content_clipped_shape_id = content_clipped_shape_element.get_id();
+        #[cfg(feature = "trace")]
+        content_clipped_shape_element.set_attribute(SVGAttribute::Name {
+            name: FrameSVGNode::create_element_name(
+                content_clipped_shape_id,
+                String::from("content-clipped-shape"),
+                false,
+            ),
+        });
+        let content_clipped_shape_index = bundle
+            .append_child_to(content_clip_path_index, content_clipped_shape_element)
+            .unwrap();
+
+        let mut content_wrapper = SVGElement::new(SVGTag::Group, id_generator);
+        let content_wrapper_id = content_wrapper.get_id();
+        #[cfg(feature = "trace")]
+        content_wrapper.set_attribute(SVGAttribute::Name {
+            name: FrameSVGNode::create_element_name(
+                content_wrapper_id,
+                String::from("content"),
+                false,
+            ),
+        });
+        content_wrapper.set_attribute(SVGAttribute::ClipPath {
+            clip_path: content_clip_path_id,
+        });
+        let content_wrapper_index = bundle.append_child(content_wrapper);
 
         // Create fill elements
         let mut fill_clip_path_defs = SVGElement::new(SVGTag::Defs, id_generator);
         let fill_clip_path_defs_id = fill_clip_path_defs.get_id();
         #[cfg(feature = "trace")]
         fill_clip_path_defs.set_attribute(SVGAttribute::Name {
-            name: ShapeSVGNode::create_element_name(
+            name: FrameSVGNode::create_element_name(
                 fill_clip_path_defs_id,
                 String::from("fill-defs"),
                 false,
             ),
         });
-        let fill_clip_path_defs_index = bundle.append_child(fill_clip_path_defs);
+        let fill_clip_path_defs_index = bundle
+            .append_child_to(content_wrapper_index, fill_clip_path_defs)
+            .unwrap();
 
         let mut fill_clip_path_element = SVGElement::new(SVGTag::ClipPath, id_generator);
         let fill_clip_path_id = fill_clip_path_element.get_id();
         #[cfg(feature = "trace")]
         fill_clip_path_element.set_attribute(SVGAttribute::Name {
-            name: ShapeSVGNode::create_element_name(
+            name: FrameSVGNode::create_element_name(
                 fill_clip_path_id,
                 String::from("fill-clip"),
                 true,
@@ -194,11 +252,11 @@ impl ShapeSVGNode {
             .append_child_to(fill_clip_path_defs_index, fill_clip_path_element)
             .unwrap();
 
-        let mut fill_clipped_shape_element = SVGElement::new(SVGTag::Path, id_generator);
+        let mut fill_clipped_shape_element = SVGElement::new(SVGTag::Rect, id_generator);
         let fill_clipped_shape_id = fill_clipped_shape_element.get_id();
         #[cfg(feature = "trace")]
         fill_clipped_shape_element.set_attribute(SVGAttribute::Name {
-            name: ShapeSVGNode::create_element_name(
+            name: FrameSVGNode::create_element_name(
                 fill_clipped_shape_id,
                 String::from("fill-clipped-shape"),
                 false,
@@ -212,20 +270,55 @@ impl ShapeSVGNode {
         let fill_wrapper_id = fill_wrapper_element.get_id();
         #[cfg(feature = "trace")]
         fill_wrapper_element.set_attribute(SVGAttribute::Name {
-            name: ShapeSVGNode::create_element_name(fill_wrapper_id, String::from("fill"), false),
+            name: FrameSVGNode::create_element_name(fill_wrapper_id, String::from("fill"), false),
         });
         fill_wrapper_element.set_attribute(SVGAttribute::ClipPath {
             clip_path: fill_clip_path_id,
         });
-        let fill_wrapper_index = bundle.append_child(fill_wrapper_element);
+        let fill_wrapper_index = bundle
+            .append_child_to(content_wrapper_index, fill_wrapper_element)
+            .unwrap();
+
+        // Create children wrapper element
+        let mut children_wrapper = SVGElement::new(SVGTag::Group, id_generator);
+        let children_wrapper_id = children_wrapper.get_id();
+        #[cfg(feature = "trace")]
+        children_wrapper.set_attribute(SVGAttribute::Name {
+            name: FrameSVGNode::create_element_name(
+                children_wrapper_id,
+                String::from("children"),
+                false,
+            ),
+        });
+        let children_wrapper_index = bundle
+            .append_child_to(content_wrapper_index, children_wrapper)
+            .unwrap();
 
         Self {
             bundle,
 
-            // Click area element references
-            click_area: ElementReference {
-                id: click_area_id,
-                index: click_area_index,
+            // Content element references
+            content_clip_path_defs: ElementReference {
+                id: content_clip_path_defs_id,
+                index: content_clip_path_defs_index,
+            },
+            content_clip_path: ElementReference {
+                id: content_clip_path_id,
+                index: content_clip_path_index,
+            },
+            content_clipped_shape: ElementReference {
+                id: content_clipped_shape_id,
+                index: content_clipped_shape_index,
+            },
+            content_wrapper: ElementReference {
+                id: content_wrapper_id,
+                index: content_wrapper_index,
+            },
+
+            // Children element references
+            children_wrapper: ElementReference {
+                id: children_wrapper_id,
+                index: children_wrapper_index,
             },
 
             // Fill element references
@@ -251,6 +344,6 @@ impl ShapeSVGNode {
     #[cfg(feature = "trace")]
     fn create_element_name(id: ContinuousId, category: String, is_definition: bool) -> String {
         let def_part = if is_definition { "def" } else { "" };
-        format!("shape_{}_{}{}", category, id, def_part)
+        format!("frame_{}_{}{}", category, id, def_part)
     }
 }

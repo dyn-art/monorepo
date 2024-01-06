@@ -3,7 +3,7 @@ use std::collections::{BTreeMap, HashMap};
 use bevy_ecs::entity::Entity;
 use dyn_composition::core::utils::continuous_id::ContinuousId;
 
-use crate::core::modules::svg_render::render_change::RenderChange;
+use crate::render_change::RenderChange;
 
 use self::{
     attributes::SVGAttribute,

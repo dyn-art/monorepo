@@ -1,8 +1,7 @@
 use std::collections::HashMap;
 
 use bevy_ecs::{entity::Entity, system::Resource};
-
-use crate::core::mixin_change::MixinChange;
+use dyn_svg_render::mixin_change::MixinChange;
 
 #[derive(Resource, Debug, Default)]
 pub struct ChangedComponentsRes {

@@ -3,10 +3,10 @@ use std::{collections::HashMap, mem::take};
 use bevy_ecs::{entity::Entity, system::ResMut};
 use dyn_composition::core::modules::node::components::types::NodeType;
 
-use crate::core::{
+use crate::{
     events::output_event::RenderUpdateEvent,
     mixin_change::{MixinChange, MixinChangeChildrenMixin},
-    modules::svg_render::resources::{
+    resources::{
         changed_components::{ChangedComponentsRes, ChangedNode, ChangedPaint},
         svg_composition::SVGCompositionRes,
     },

@@ -6,7 +6,7 @@ use dyn_composition::core::{
     utils::continuous_id::ContinuousId,
 };
 
-use crate::core::events::output_event::{OutputEvent, RenderUpdateEvent};
+use crate::events::output_event::RenderUpdateEvent;
 
 use self::{
     svg_bundle_variant::{get_bundle_mut, SVGBundleVariant},
@@ -28,12 +28,12 @@ pub struct SVGCompositionRes {
     // Root entities
     root_ids: Vec<Entity>,
     // Sender to enque events for frontend
-    output_event_sender: Sender<OutputEvent>,
+    output_event_sender: Sender<RenderUpdateEvent>,
     id_generator: ContinuousId,
 }
 
 impl SVGCompositionRes {
-    pub fn new(output_event_sender: Sender<OutputEvent>) -> Self {
+    pub fn new(output_event_sender: Sender<RenderUpdateEvent>) -> Self {
         SVGCompositionRes {
             root_ids: Vec::new(),
             bundles: HashMap::new(),
@@ -157,9 +157,7 @@ impl SVGCompositionRes {
 
     pub fn forward_render_updates(&mut self, updates: Vec<RenderUpdateEvent>) {
         for update in updates {
-            let _ = self
-                .output_event_sender
-                .send(OutputEvent::RenderUpdate(update));
+            let _ = self.output_event_sender.send(update);
         }
     }
 

@@ -48,6 +48,7 @@
 	"rust-analyzer.linkedProjects": [
 		"packages/svg-composition/rust/Cargo.toml",
 		"crates/bevy_render_skeleton/Cargo.toml",
-		"crates/composition/Cargo.toml"
+		"crates/composition/Cargo.toml",
+		"crates/svg_render/Cargo.toml"
 	]
 }

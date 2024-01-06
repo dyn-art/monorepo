@@ -6,8 +6,7 @@ use dyn_bevy_render_skeleton::{ExtractSchedule, Render, RenderApp, RenderSet};
 use dyn_composition::core::modules::node::components::mixins::{
     BlendMixin, DimensionMixin, NodeCompositionMixin, PathMixin, RelativeTransformMixin,
 };
-
-use crate::core::events::output_event::OutputEvent;
+use events::output_event::RenderUpdateEvent;
 
 use self::{
     resources::{changed_components::ChangedComponentsRes, svg_composition::SVGCompositionRes},
@@ -17,12 +16,14 @@ use self::{
     },
 };
 
+pub mod events;
+pub mod mixin_change;
 pub mod render_change;
 pub mod resources;
 mod systems;
 
 pub struct SvgRenderPlugin {
-    pub output_event_sender: Sender<OutputEvent>,
+    pub render_event_sender: Sender<RenderUpdateEvent>,
 }
 
 impl Plugin for SvgRenderPlugin {
@@ -34,7 +35,7 @@ impl Plugin for SvgRenderPlugin {
 
         // Register resources
         render_app.init_resource::<ChangedComponentsRes>();
-        render_app.insert_resource(SVGCompositionRes::new(self.output_event_sender.clone()));
+        render_app.insert_resource(SVGCompositionRes::new(self.render_event_sender.clone()));
 
         // Register systems
         render_app

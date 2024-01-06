@@ -9,14 +9,15 @@ use dyn_composition::core::modules::node::components::bundles::RectangleNodeBund
 use dyn_composition::core::modules::node::components::mixins::{
     DimensionMixin, Paint, RelativeTransformMixin,
 };
+use dyn_svg_render::events::output_event::RenderUpdateEvent;
+use dyn_svg_render::mixin_change::{MixinChange, MixinChangeRelativeTransformMixin};
+use dyn_svg_render::resources::svg_composition::SVGCompositionRes;
+use dyn_svg_render::SvgRenderPlugin;
 use wasm_bindgen::prelude::wasm_bindgen;
 use wasm_bindgen::JsValue;
 
 use crate::bindgen::utils::convert_optional_jsvalue;
 use crate::core::events::input_event::AnyInputEvent;
-use crate::core::mixin_change::MixinChangeRelativeTransformMixin;
-use crate::core::modules::svg_render::resources::svg_composition::SVGCompositionRes;
-use crate::core::modules::svg_render::SvgRenderPlugin;
 use crate::core::modules::track::resources::tracked_entities::{
     TrackableMixinType, TrackedEntitiesRes,
 };
@@ -24,13 +25,13 @@ use crate::core::modules::track::TrackPlugin;
 
 use super::events::output_event::OutputEvent;
 use super::events::output_event_queue::OutputEventQueueRes;
-use super::mixin_change::MixinChange;
 
 #[wasm_bindgen]
 pub struct JsCompositionHandle {
     composition: Composition,
     event_callback: js_sys::Function,
-    event_receiver: Receiver<OutputEvent>,
+    output_event_receiver: Receiver<OutputEvent>,
+    render_event_receiver: Receiver<RenderUpdateEvent>,
 }
 
 #[wasm_bindgen]
@@ -45,6 +46,7 @@ impl JsCompositionHandle {
             }
         };
         let (output_event_sender, output_event_receiver) = channel::<OutputEvent>();
+        let (render_event_sender, render_event_receiver) = channel::<RenderUpdateEvent>();
 
         // Initalize composition
         let mut composition = Composition::new(Some(parsed_dtif));
@@ -53,19 +55,20 @@ impl JsCompositionHandle {
         // Register plugins
         app.add_plugins((
             SvgRenderPlugin {
-                output_event_sender: output_event_sender.clone(),
+                render_event_sender,
             },
             TrackPlugin,
         ));
 
         // Register resources
         app.world
-            .insert_resource(OutputEventQueueRes::new(output_event_sender.clone()));
+            .insert_resource(OutputEventQueueRes::new(output_event_sender));
 
         return Self {
             composition,
             event_callback,
-            event_receiver: output_event_receiver,
+            output_event_receiver,
+            render_event_receiver,
         };
     }
 
@@ -96,8 +99,11 @@ impl JsCompositionHandle {
 
         // Collect output events that were emitted during the last update cycle
         let mut output_events = Vec::new();
-        while let Ok(event) = self.event_receiver.try_recv() {
+        while let Ok(event) = self.output_event_receiver.try_recv() {
             output_events.push(event);
+        }
+        while let Ok(event) = self.render_event_receiver.try_recv() {
+            output_events.push(OutputEvent::RenderUpdate(event));
         }
 
         // Invoke the JavaScript callback if with collected output events
