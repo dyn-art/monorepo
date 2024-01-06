@@ -16,3 +16,5 @@ axum = "0.7.3"
 # bevy_app = "0.12"
 serde = { version = "1.0.195", features = ["derive"] }
 tokio = { version = "1.35.1", features = ["full"] }
+# rspc = { version = "1.0.0-rc.5", features = ["axum"] }
+# specta = "2.0.0-rc.1"
