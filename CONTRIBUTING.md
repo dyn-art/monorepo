@@ -77,6 +77,7 @@ For specific packages, additional fields should be included as shown below. Note
 ```
 
 ### `Cargo.toml` structure
+
 ```toml
 [package]
 name = "dyn_example"

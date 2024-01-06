@@ -1,6 +1,6 @@
 import React from 'react';
 import type { TComposition } from '@dyn/figma-to-dtif';
-import { Icons, ScrollArea } from '@dyn/ui';
+import { ScrollArea, SpinnerIcon } from '@dyn/ui';
 
 import { appHandler } from '../../../app-handler';
 import { useAppCallback } from '../../../hooks';
@@ -69,7 +69,7 @@ export const CompositionPreview: React.FC<TProps> = (props) => {
 			>
 				{isLoading && (
 					<div className="flex flex-grow flex-col items-center justify-center">
-						<Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
+						<SpinnerIcon className="mr-2 h-4 w-4 animate-spin" />
 						<p className="mt-2">Loading Preview</p>
 					</div>
 				)}

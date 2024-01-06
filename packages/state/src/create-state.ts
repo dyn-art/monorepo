@@ -2,11 +2,9 @@ import type { TListener, TListenerQueueItem, TReadonlyIfObject, TState } from '.
 
 const listenerQueue: TListenerQueueItem[] = [];
 
-export function createState<GValue>(
-	value: GValue,
-	deferred = true
-): TState<GValue, ['get', 'set', 'listen']> {
-	const state: TState<GValue, ['get', 'set', 'listen']> = {
+export function createState<GValue>(value: GValue, deferred = true): TState<GValue, ['base']> {
+	const state: TState<GValue, ['base']> = {
+		_: null,
 		_listeners: [],
 		_value: value,
 		get() {

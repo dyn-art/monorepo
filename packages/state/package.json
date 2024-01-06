@@ -29,6 +29,7 @@
 	"homepage": "https://s.dyn.art/github",
 	"devDependencies": {
 		"@dyn/config": "workspace:*",
+		"@dyn/types": "workspace:*",
 		"@dyn/utils": "workspace:*",
 		"@types/node": "^20.8.10"
 	},

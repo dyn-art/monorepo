@@ -31,6 +31,7 @@ module.exports = {
 		'@typescript-eslint/no-dynamic-delete': WARNING,
 		'@typescript-eslint/ban-types': WARNING,
 		'@typescript-eslint/no-explicit-any': WARNING,
+		'@typescript-eslint/no-floating-promises': WARNING,
 
 		// Its everywhere although Typescript can infer it
 		'@typescript-eslint/no-unsafe-assignment': OFF,
@@ -50,6 +51,9 @@ module.exports = {
 		'unicorn/filename-case': OFF, // Annoying with React components and Typescript classes
 		'import/no-named-as-default-member': OFF, // For ReactJs imports like React.useState()
 		'import/no-extraneous-dependencies': OFF, // Conflict with Typescript paths
-		'camelcase': WARNING
+		'camelcase': WARNING,
+
+		// Turbo
+		'turbo/no-undeclared-env-vars': WARNING
 	}
 };

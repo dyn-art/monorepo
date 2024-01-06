@@ -4,10 +4,10 @@ import { createState } from '../create-state';
 import { withUndo } from './with-undo';
 
 describe('withUndo function tests', () => {
-	// it('should have correct types', () => {
-	// 	const state: TState<string, ['get', 'set', 'listen']> = createState('Jeff');
-	// 	const stateWithUndo = withUndo(state);
-	// });
+	it('should have correct types', () => {
+		const state = createState('Jeff');
+		const stateWithUndo = withUndo(state);
+	});
 
 	it('should allow undoing the last set operation', () => {
 		// Prepare
@@ -58,16 +58,6 @@ describe('withUndo function tests', () => {
 
 		// Assert
 		expect(state.get()).toBe(10);
-	});
-
-	it('should throw an error if the state does not have required features', () => {
-		// Prepare
-		const incompleteState = {};
-
-		// Act & Assert
-		expect(() => withUndo(incompleteState as any)).toThrow(
-			'State must have "set" and "listen" features to use withUndo'
-		);
 	});
 
 	it('should respect the history stack size limit', () => {

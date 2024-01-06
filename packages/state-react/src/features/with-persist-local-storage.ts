@@ -28,7 +28,7 @@ export function withPersistLocalStorage<
 	GValue,
 	GSelectedFeatureKeys extends TFeatureKeys<GValue>[]
 >(
-	state: TState<GValue, TEnforceFeatures<GSelectedFeatureKeys, ['set', 'listen']>>,
+	state: TState<GValue, TEnforceFeatures<GSelectedFeatureKeys, ['base']>>,
 	key: string
 ): TState<GValue, [...GSelectedFeatureKeys, 'persist']> {
 	return withPersist(state, new LocalStorageInterface<GValue>(), key);

@@ -1,0 +1,51 @@
+{
+	"name": "@dyn/core",
+	"description": "Core backend",
+	"version": "0.0.1",
+	"private": true,
+	"scripts": {
+		"build": "shx rm -rf dist && tsc",
+		"start:dev": "nodemon --config ./nodemon.json",
+		"gen:openapi": "npx openapi-typescript ./resources/openapi-v1.yaml -o ../../packages/types/src/core/gen/v1.ts",
+		"lint": "eslint --ext .js,.ts src/",
+		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
+		"install:clean": "pnpm run clean && pnpm install",
+		"test": "vitest run",
+		"update:deps": "pnpm update --latest"
+	},
+	"source": "./src/index.ts",
+	"main": "./dist/cjs/index.js",
+	"module": "./dist/esm/index.js",
+	"types": "./dist/types/index.d.ts",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/dyndotart/monorepo.git"
+	},
+	"keywords": [],
+	"author": "@bennoinbeta",
+	"license": "AGPL-3.0-or-later",
+	"bugs": {
+		"url": "https://s.dyn.art/github/issues"
+	},
+	"homepage": "https://s.dyn.art/github",
+	"dependencies": {
+		"@dyn/logger": "workspace:*",
+		"@dyn/openapi-router": "workspace:*",
+		"express": "^4.18.2",
+		"zod": "^3.22.4"
+	},
+	"devDependencies": {
+		"@dyn/config": "workspace:*",
+		"@dyn/types": "workspace:*",
+		"@types/express": "^4.17.21",
+		"@types/express-serve-static-core": "^4.17.41",
+		"@types/node": "^20.8.10",
+		"nodemon": "^3.0.2",
+		"openapi-typescript": "^6.7.3",
+		"ts-node": "^10.9.2"
+	},
+	"files": [
+		"dist",
+		"README.md"
+	]
+}

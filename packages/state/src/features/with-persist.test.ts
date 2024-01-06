@@ -102,15 +102,4 @@ describe('withPersist function tests', () => {
 		// Assert
 		expect(state.get()).toBe(10);
 	});
-
-	it('should throw an error if the state does not have required features', () => {
-		// Prepare
-		const incompleteState = {};
-		const key = 'testKey';
-
-		// Act & Assert
-		expect(() => withPersist(incompleteState as any, mockStorage, key)).toThrow(
-			'State must have "set" and "listen" features to use withPersist'
-		);
-	});
 });
