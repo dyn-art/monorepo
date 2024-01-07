@@ -3,21 +3,18 @@
 # Dependencies
 node_modules
 rust_modules
-.pnp
-.pnp.js
 
 # Testing
 coverage
 
-# Next.js
+# Build artifacts and directories
 .next/
 out/
 build
-
-# Misc
-.DS_Store
-*.pem
-.temp
+dist
+dist.*
+target
+pkg
 
 # Debug logs
 npm-debug.log*
@@ -31,19 +28,12 @@ yarn-error.log*
 .env.test.local
 .env.production.local
 
-# Turbo-specific files
+# Development tools specific files
 .turbo
-
-# Vercel-specific files
 .vercel
+.git
 
-# Node.js build artifacts
-dist
-dist.*
-
-# Rust build artifacts
-target
-pkg
-
-# Miscellaneous
+# Misc
 *.todo
+.DS_Store
+*.pem
