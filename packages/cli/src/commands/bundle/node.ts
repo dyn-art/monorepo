@@ -4,17 +4,11 @@ import chalk from 'chalk';
 import type { PackageJson } from 'type-fest';
 
 import { DynCommand } from '../../DynCommand';
-import {
-	bundleAllWithRollup,
-	bundleWithTsc,
-	createLibraryRollupConfig,
-	generateDts,
-	getDynConfig
-} from '../../services';
+import { bundleAllWithRollup, createNodeRollupConfig, getDynConfig } from '../../services';
 import { doesFileExist, promisifyFiglet, readJsonFile } from '../../utils';
 
-export default class Bundle extends DynCommand {
-	static description = 'Bundle dyn.art packages';
+export default class Node extends DynCommand {
+	static description = 'Bundle Figma Plugin of dyn.art';
 
 	static examples = [];
 
@@ -25,13 +19,6 @@ export default class Bundle extends DynCommand {
 			required: false,
 			default: 'prod',
 			options: ['prod', 'dev']
-		}),
-		bundleStrategy: Flags.string({
-			char: 'b',
-			description: `Bundle strategy like 'rollup', 'tsc' or 'typesonly'`,
-			required: false,
-			default: 'rollup',
-			options: ['rollup', 'tsc', 'typesonly']
 		}),
 		analyze: Flags.boolean({
 			char: 'a',
@@ -45,13 +32,6 @@ export default class Bundle extends DynCommand {
 			required: false,
 			default: false
 		}),
-		format: Flags.string({
-			char: 'f',
-			description: `Bundle format like 'esm', 'cjs' or 'all' when using the bundle strategy 'rollup'`,
-			required: false,
-			default: 'all',
-			options: ['all', 'esm', 'cjs']
-		}),
 		verbose: Flags.boolean({
 			char: 'v',
 			description: 'More detailed logs',
@@ -63,7 +43,7 @@ export default class Bundle extends DynCommand {
 	static args = {};
 
 	public async run(): Promise<void> {
-		const { flags } = await this.parse(Bundle);
+		const { flags } = await this.parse(Node);
 		this.isVerbose = flags.verbose;
 		this.isProduction = flags.target === 'prod';
 		const startTime = Date.now();
@@ -74,10 +54,10 @@ export default class Bundle extends DynCommand {
 			this.error(`No package.json file found at '${chalk.underline(process.cwd())}'!`, { exit: 1 });
 		}
 
-		this.log(chalk.yellowBright(await promisifyFiglet('dyn bundler')));
+		this.log(chalk.yellowBright(await promisifyFiglet('dyn nodler')));
 		this.log(`\n`);
 		this.log(
-			`Started bundling package ${chalk.magenta(
+			`Started bundling Node App ${chalk.magenta(
 				chalk.underline(packageJson.name ?? 'unknown-package')
 			)} for ${this.isProduction ? chalk.green('production') : chalk.blue('development')}`
 		);
@@ -93,54 +73,25 @@ export default class Bundle extends DynCommand {
 
 		// Read in dyn.config.js
 		const dynConfig = await getDynConfig(this);
-		const libraryConfig = dynConfig?.library;
+		const nodeConfig = dynConfig?.node;
 
-		// Bundle package based on bundle strategy
-		switch (flags.bundleStrategy) {
-			case 'rollup':
-				if (flags.format === 'all' || flags.format === 'esm') {
-					await bundleAllWithRollup(
-						this,
-						await createLibraryRollupConfig(this, {
-							format: 'esm',
-							isProduction: this.isProduction,
-							preserveModules: true,
-							sourcemap: flags.sourcemap,
-							libraryConfig,
-							tsConfigPath,
-							packageJson
-						})
-					);
-				}
-				if (flags.format === 'all' || flags.format === 'cjs') {
-					await bundleAllWithRollup(
-						this,
-						await createLibraryRollupConfig(this, {
-							format: 'cjs',
-							isProduction: this.isProduction,
-							preserveModules: true,
-							sourcemap: flags.sourcemap,
-							libraryConfig,
-							tsConfigPath,
-							packageJson
-						})
-					);
-				}
-				await generateDts(this, { tsConfigPath });
-				break;
-			case 'tsc':
-				await bundleWithTsc(this);
-				break;
-			case 'typesonly':
-				await generateDts(this, { tsConfigPath });
-				break;
-			default:
-				this.error(`Unknown build strategy '${flags.buildStrategy}'!`, { exit: 1 });
-		}
+		// Bundle
+		await bundleAllWithRollup(
+			this,
+			await createNodeRollupConfig(this, {
+				format: 'cjs',
+				isProduction: this.isProduction,
+				preserveModules: false,
+				sourcemap: flags.sourcemap,
+				nodeConfig,
+				tsConfigPath,
+				packageJson
+			})
+		);
 
 		this.log(`\n`);
 		this.log(
-			`${chalk.green('→')} Package was bundled in ${chalk.green(
+			`${chalk.green('→')} Node App was bundled in ${chalk.green(
 				chalk.underline(`${((Date.now() - startTime) / 1000).toFixed(2)}s`)
 			)}.`
 		);

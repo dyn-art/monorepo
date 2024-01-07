@@ -12,7 +12,8 @@ export function configureESM(config: TConfigureModuleConfig): TConfigureModuleRe
 			...{
 				[preserveModules ? 'dir' : 'file']: outputPath,
 				format: 'esm',
-				preserveModules
+				preserveModules,
+				inlineDynamicImports: !preserveModules
 			}
 		},
 		visualizeFilePath: path.resolve(process.cwd(), './.dyn/stats-esm.html')

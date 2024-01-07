@@ -38,9 +38,9 @@ RUN --mount=type=cache,id=pnpm,target=~/.pnpm-store pnpm install --frozen-lockfi
 # Copy source code of isolated subworkspace
 COPY --from=pruner /app/out/full/ .
 
+RUN turbo build --filter=@dyn/cli
 RUN turbo build --filter=${PROJECT}
 RUN --mount=type=cache,id=pnpm,target=~/.pnpm-store pnpm prune --prod --no-optional
-RUN rm -rf ./**/*/src
 
 # Final image
 FROM alpine AS runner
@@ -51,12 +51,15 @@ RUN adduser --system --uid 1001 nodejs
 USER nodejs
 
 WORKDIR /app
-COPY --from=builder --chown=nodejs:nodejs /app .
-WORKDIR /app/apps/${PROJECT}
+
+# Copy only necessary files (e.g., dist folder, package.json, and node_modules)
+COPY --from=builder --chown=nodejs:nodejs /app/apps/${PROJECT}/dist ./dist
+COPY --from=builder --chown=nodejs:nodejs /app/apps/${PROJECT}/package.json .
+# COPY --from=builder --chown=nodejs:nodejs /app/apps/${PROJECT}/node_modules ./node_modules # TODO think about whether to include node_modules in bundle or so?
 
 ARG PORT=8080
 ENV PORT=${PORT}
 ENV NODE_ENV=production
 EXPOSE ${PORT}
 
-CMD node dist/main
+CMD ["node", "dist/index.js"]

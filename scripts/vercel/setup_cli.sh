@@ -11,4 +11,4 @@ source $RUST_ENV_FILE
 # Set the default Rust toolchain to stable
 rustup default stable
 
-echo "🔄 - ⬛️ Vercel environment setup complete."
+echo "🔄 - ⬛️ Vercel cli setup complete."

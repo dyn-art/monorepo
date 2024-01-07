@@ -26,15 +26,20 @@ export async function bundleWithRollup(
 			: ''
 	);
 
-	// https://rollupjs.org/javascript-api/#rollup-rollup
-	const build = await rollup(rollupOptions);
+	try {
+		// https://rollupjs.org/javascript-api/#rollup-rollup
+		const build = await rollup(rollupOptions);
 
-	const outputs: OutputOptions[] = formatOutput(rollupOptions.output);
-	const response = await Promise.all(outputs.map((output) => build.write(output)));
+		const outputs: OutputOptions[] = formatOutput(rollupOptions.output);
+		const response = await Promise.all(outputs.map((output) => build.write(output)));
 
-	command.log('🏁 Completed bundling.');
+		command.log('🏁 Completed bundling.');
 
-	return response;
+		return response;
+	} catch (error) {
+		console.log(error);
+		command.error(error as Error, { message: '⛔️ Failed bundling!' });
+	}
 }
 
 function formatOutput(output: RollupOptions['output']): OutputOptions[] {

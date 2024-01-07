@@ -4,7 +4,7 @@
 	"version": "0.0.1",
 	"private": true,
 	"scripts": {
-		"build": "shx rm -rf dist && tsc",
+		"build": "shx rm -rf dist && ../../scripts/cli.sh bundle node",
 		"start:dev": "nodemon --config ./nodemon.json",
 		"gen:openapi": "npx openapi-typescript ./resources/openapi-v1.yaml -o ../../packages/types/src/core/gen/v1.ts",
 		"lint": "eslint --ext .js,.ts src/",
@@ -14,9 +14,7 @@
 		"update:deps": "pnpm update --latest"
 	},
 	"source": "./src/index.ts",
-	"main": "./dist/cjs/index.js",
-	"module": "./dist/esm/index.js",
-	"types": "./dist/types/index.d.ts",
+	"main": "./dist/index.js",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/dyndotart/monorepo.git"
