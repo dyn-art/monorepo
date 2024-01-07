@@ -22,7 +22,10 @@ else
 fi
 
 # Find the absolute path to the monorepo's root directory
-MONOREPO_ROOT=$(git rev-parse --show-toplevel)
+chmod +x "$DIR/find_monorepo_root.sh"
+source "$DIR/find_monorepo_root.sh"
+MONOREPO_ROOT=$(find_monorepo_root)
+echo "👉 Monorepo root found at: $MONOREPO_ROOT"
 
 # Get the absolute path to the CLI's bin directory
 CLI_BIN_PATH="$MONOREPO_ROOT/packages/cli/bin"
