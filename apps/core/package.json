@@ -7,6 +7,7 @@
 		"build": "shx rm -rf dist && tsc",
 		"start:dev": "nodemon --config ./nodemon.json",
 		"gen:openapi": "npx openapi-typescript ./resources/openapi-v1.yaml -o ../../packages/types/src/core/gen/v1.ts",
+		"d:build": "docker build . -t dyn-core:latest -f ../../devops/docker/base/node/Dockerfile --build-arg PROJECT=core",
 		"lint": "eslint --ext .js,.ts src/",
 		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
 		"install:clean": "pnpm run clean && pnpm install",

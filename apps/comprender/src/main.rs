@@ -32,7 +32,10 @@ async fn main() {
 
     // Build our application with a single route
     let app = Router::new()
-        .route("/", get(|| async { "Hello, World!" }))
+        .route(
+            "/",
+            get(|| async { "dyn_comprender is up and running! Connect to RSPC via '/rspc'." }),
+        )
         .nest("/rspc", router.endpoint(|| ()).axum());
 
     // Run our app with hyper, listening globally on port 4000
