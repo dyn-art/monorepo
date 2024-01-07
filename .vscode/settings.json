@@ -26,7 +26,7 @@
 		"*.jsx": "${capture}.js",
 		"*.tsx": "${capture}.ts",
 		".npmrc": ".nvmrc, .yarnrc.yml",
-		".gitignore": ".eslintignore, .prettierignore",
+		".gitignore": ".eslintignore, .prettierignore, .dockerignore",
 		"README.md": "CONTRIBUTING.md, CODE_OF_CONDUCT.md",
 		"Cargo.toml": "Cargo.lock",
 		".eslintrc.js": ".eslintcache",

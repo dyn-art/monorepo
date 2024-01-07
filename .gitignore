@@ -1,8 +1,8 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # Dependencies
-rust_modules
 node_modules
+rust_modules
 .pnp
 .pnp.js
 
@@ -19,31 +19,31 @@ build
 *.pem
 .temp
 
-# Debug
+# Debug logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Local env files
+# Local environment files
 .env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
 
-# Turbo
+# Turbo-specific files
 .turbo
 
-# Vercel
+# Vercel-specific files
 .vercel
 
-# Node
+# Node.js build artifacts
 dist
 dist.*
 
-# Wasm
+# Rust build artifacts
 target
 pkg
 
-# Other
+# Miscellaneous
 *.todo

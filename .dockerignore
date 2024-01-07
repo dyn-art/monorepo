@@ -1,0 +1,40 @@
+# Dependencies
+node_modules
+rust_modules
+
+# Testing artifacts
+coverage
+
+# Build artifacts and directories
+.next/
+out/
+build
+dist
+dist.*
+target
+pkg
+
+# Miscellaneous system files
+.DS_Store
+*.pem
+.temp
+
+# Debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Local environment files (if they contain sensitive information)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Development tools specific files
+.turbo
+.vercel
+.git
+
+# Other
+*.todo
