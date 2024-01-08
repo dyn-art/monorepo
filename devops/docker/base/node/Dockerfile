@@ -70,7 +70,7 @@ COPY --from=builder --chown=${APP_USER}:${APP_USER} /app ./
 WORKDIR /app/apps/${PROJECT}
 
 ARG PORT=8080
-ENV PORT=${PORT}
+ENV APP_PORT=${PORT}
 ENV NODE_ENV=production
 EXPOSE ${PORT}
 

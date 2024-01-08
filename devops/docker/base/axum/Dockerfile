@@ -2,7 +2,7 @@
 # https://github.com/linux-china/axum-demo/blob/master/Dockerfile
 
 # Use Rust image with specific version
-ARG RUST_VERSION=1.72
+ARG RUST_VERSION=1.74
 FROM rust:${RUST_VERSION} as base
 
 # Build the project with necessary files
@@ -19,7 +19,8 @@ WORKDIR /app/apps/${PROJECT}
 RUN cargo build --release
 
 # Create a lean production image
-FROM debian:buster-slim AS runner
+# https://github.com/rust-lang/docker-rust/issues/105#issuecomment-1149081766
+FROM debian:bookworm AS runner
 ARG PROJECT
 ENV APP_USER=appuser
 ENV APP_BINARY=dyn_${PROJECT}
@@ -31,11 +32,11 @@ USER appuser
 
 # Copy built application and set working directory
 WORKDIR /app
-COPY --from=builder --chown=${APP_USER}:${APP_USER} /app/apps/${PROJECT}/target/release/${APP_BINARY} ./
+COPY --from=builder --chown=${APP_USER}:${APP_USER} /app/apps/${PROJECT}/target/release/${APP_BINARY} ./app_binary
 
 ARG PORT=8080
-ENV PORT=${PORT}
+ENV APP_PORT=${PORT}
 EXPOSE ${PORT}
 
 # Command to run the application
-CMD ["./${APP_BINARY}"]
+CMD ["./app_binary"]

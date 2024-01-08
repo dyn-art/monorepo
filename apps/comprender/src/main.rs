@@ -5,7 +5,10 @@ use std::{
 };
 
 use axum::{routing::get, Router};
+use config::Config;
 use rspc::{BuiltRouter, ExportConfig, Rspc};
+
+mod config;
 
 const R: Rspc<()> = Rspc::new();
 
@@ -19,6 +22,7 @@ fn router() -> Arc<BuiltRouter> {
 
 #[tokio::main]
 async fn main() {
+    let config = Config::new().expect("Failed to load configuration");
     let router = router();
 
     // Only export types in development builds
@@ -30,7 +34,7 @@ async fn main() {
         ))
         .unwrap();
 
-    // Build our application with a single route
+    // Build application with a single route
     let app = Router::new()
         .route(
             "/",
@@ -38,8 +42,9 @@ async fn main() {
         )
         .nest("/rspc", router.endpoint(|| ()).axum());
 
-    // Run our app with hyper, listening globally on port 4000
-    let addr = SocketAddr::from((Ipv4Addr::UNSPECIFIED, 4000));
+    // Run app with hyper, listening globally on specified port
+    let addr = SocketAddr::from((Ipv4Addr::UNSPECIFIED, config.port));
+    println!("Server starting on port: {}", config.port);
     axum::Server::bind(&addr)
         .serve(app.into_make_service())
         .await
