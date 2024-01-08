@@ -73,7 +73,9 @@ export function resolveTsPathsFactory(
 			return null;
 		}
 
-		// Handle potential .d.ts files and try to resolve corresponding source file
+		// Handle potential imported .d.ts files and try to resolve corresponding source file.
+		// Required for 'rust_modules' where the generated code (from WASM-Pack) is no TS file
+		// but instead a JS file and a declaration file.
 		let targetFileName: string = resolvedFileName;
 		if (resolveDTsSource) {
 			if (resolvedFileName.endsWith('.d.ts')) {

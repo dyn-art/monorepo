@@ -26,9 +26,8 @@ export default class Node extends DynCommand {
 			required: false,
 			default: false
 		}),
-		sourcemap: Flags.boolean({
-			char: 's',
-			description: 'Generate sourcemaps',
+		bundleDeps: Flags.boolean({
+			description: 'Include dependencies in bundle',
 			required: false,
 			default: false
 		}),
@@ -79,10 +78,8 @@ export default class Node extends DynCommand {
 		await bundleAllWithRollup(
 			this,
 			await createNodeRollupConfig(this, {
-				format: 'cjs',
 				isProduction: this.isProduction,
-				preserveModules: false,
-				sourcemap: flags.sourcemap,
+				bundleDeps: flags.bundleDeps,
 				nodeConfig,
 				tsConfigPath,
 				packageJson

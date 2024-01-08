@@ -6,7 +6,7 @@ import type { DynCommand } from '../../../../DynCommand';
 import { resolvePaths, toArray, type TInputOutputPath } from '../../../../utils';
 import type { TDynNodeConfig, TDynRollupOptionsCallbackConfig } from '../../../dyn';
 import { mergeRollupConfigs } from '../../merge-rollup-configs';
-import { configureCJS, configureESM, type TConfigureModuleConfig } from '../../modules';
+import { configureCJS, type TConfigureModuleConfig } from '../../modules';
 import { createBaseRollupConfig } from './rollup.config.base';
 
 export async function createNodeRollupConfig(
@@ -16,14 +16,17 @@ export async function createNodeRollupConfig(
 	const {
 		tsConfigPath,
 		packageJson,
-		format = 'esm',
-		nodeConfig: libraryConfig = {},
+		nodeConfig = {},
 		isProduction = false,
-		preserveModules = true,
-		sourcemap = true
+		bundleDeps = false
 	} = config;
-	const paths = resolvePaths({ paths: config.paths ?? null, packageJson, format, preserveModules });
-	const rollupConfig = libraryConfig.rollupConfig ?? { isBase: false, options: {} };
+	const paths = resolvePaths({
+		paths: config.paths ?? null,
+		packageJson,
+		format: 'cjs',
+		preserveModules: false
+	});
+	const rollupConfig = nodeConfig.rollupConfig ?? { isBase: false, options: {} };
 
 	command.log(
 		`🛣️  Resolved paths from ${chalk.underline('package.json')}'s export conditions${
@@ -38,12 +41,12 @@ export async function createNodeRollupConfig(
 			outputPath,
 			outputOptions: {
 				name: packageJson.name,
-				preserveModules,
-				sourcemap
+				preserveModules: false,
+				sourcemap: false
 			}
 		};
 
-		const { output } = format === 'esm' ? configureESM(moduleConfig) : configureCJS(moduleConfig);
+		const { output } = configureCJS(moduleConfig);
 
 		const rollupOptionsCallbackConfig: TDynRollupOptionsCallbackConfig = {
 			paths: {
@@ -58,7 +61,10 @@ export async function createNodeRollupConfig(
 		};
 
 		// Parse base config and override options
-		const baseRollupConfig = await createBaseRollupConfig(rollupOptionsCallbackConfig);
+		const baseRollupConfig = await createBaseRollupConfig({
+			...rollupOptionsCallbackConfig,
+			bundleDeps
+		});
 		const rollupOptions = toArray(
 			typeof rollupConfig.options === 'object'
 				? rollupConfig.options
@@ -83,10 +89,8 @@ export async function createNodeRollupConfig(
 export interface TCreateNodeConfigConfig {
 	tsConfigPath: string;
 	packageJson: PackageJson;
-	format?: 'cjs' | 'esm';
 	paths?: TInputOutputPath | TInputOutputPath[];
 	isProduction?: boolean;
-	preserveModules?: boolean;
-	sourcemap?: boolean;
+	bundleDeps?: boolean;
 	nodeConfig?: TDynNodeConfig;
 }

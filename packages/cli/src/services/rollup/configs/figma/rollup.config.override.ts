@@ -41,8 +41,7 @@ export async function createOverrideRollupConfig(
 				target: 'es6',
 				loaders: {
 					'.json': 'json', // Requires @rollup/plugin-commonjs
-					// Enable JSX in .js files too
-					'.js': 'jsx'
+					'.js': 'jsx' // Enable JSX in .js files too
 				},
 				jsxFactory: 'React.createElement',
 				jsxFragment: 'React.Fragment',
