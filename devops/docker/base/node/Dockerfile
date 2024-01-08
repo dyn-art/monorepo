@@ -21,6 +21,7 @@ FROM base AS pruner
 ARG PROJECT
 WORKDIR /app
 
+# Copy required files from monorepo and prune with turbo
 COPY . .
 RUN turbo prune --scope=@dyn/${PROJECT} --docker
 
@@ -29,7 +30,7 @@ FROM base AS builder
 ARG PROJECT
 WORKDIR /app
 
-# Copy pruned lockfile, workspace, and scripts
+# Copy required files from isolated pruned subworkspace
 COPY --from=pruner /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
 COPY --from=pruner /app/out/pnpm-workspace.yaml ./pnpm-workspace.yaml
 COPY --from=pruner /app/out/json/ ./
@@ -38,7 +39,7 @@ COPY --from=pruner /app/scripts ./scripts
 # Install dependencies with cache mount for efficiency
 RUN --mount=type=cache,id=pnpm,target=~/.pnpm-store pnpm install --frozen-lockfile
 
-# Copy source code of isolated subworkspace and build
+# Copy source code from isolated pruned subworkspace and build
 COPY --from=pruner /app/out/full/ ./
 RUN turbo build --filter=@dyn/cli
 RUN turbo build --filter=@dyn/${PROJECT}
@@ -56,15 +57,16 @@ RUN for dir in apps/*/ packages/*/; do \
 # Create a lean production image on the alpine base
 FROM alpine AS runner
 ARG PROJECT
+ENV APP_USER=appuser
 
 # Add non-root user for security
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nodejs
-USER nodejs
+RUN addgroup --system --gid 1001 ${APP_USER}
+RUN adduser --system --uid 1001 ${APP_USER}
+USER ${APP_USER}
 
 # Copy built application and set working directory
 WORKDIR /app
-COPY --from=builder --chown=nodejs:nodejs /app ./
+COPY --from=builder --chown=${APP_USER}:${APP_USER} /app ./
 WORKDIR /app/apps/${PROJECT}
 
 ARG PORT=8080
@@ -72,4 +74,5 @@ ENV PORT=${PORT}
 ENV NODE_ENV=production
 EXPOSE ${PORT}
 
+# Command to run the application
 CMD ["node", "dist/index.js"]
