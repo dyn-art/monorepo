@@ -34,7 +34,7 @@ struct GenerateTsTypes {
 fn generate_ts_types(export_path: &str) {
     println!("Generating TypeScript types at {}", export_path);
     let export_config = ExportConfig::default().bigint(BigIntExportBehavior::Number);
-    match export::ts_with_cfg(export_path, Cow::Borrowed(""), &export_config) {
+    match export::ts_with_cfg(export_path, &export_config) {
         Ok(_) => println!("Successfully generated TypeScript types at {}", export_path),
         Err(e) => {
             eprintln!("Failed to generate TypeScript types: {:?}", e);

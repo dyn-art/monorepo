@@ -28,16 +28,16 @@ pub struct SVGCompositionRes {
     // Root entities
     root_ids: Vec<Entity>,
     // Sender to enque events for frontend
-    output_event_sender: Sender<RenderUpdateEvent>,
+    render_event_sender: Option<Sender<RenderUpdateEvent>>,
     id_generator: ContinuousId,
 }
 
 impl SVGCompositionRes {
-    pub fn new(output_event_sender: Sender<RenderUpdateEvent>) -> Self {
+    pub fn new(render_event_sender: Option<Sender<RenderUpdateEvent>>) -> Self {
         SVGCompositionRes {
             root_ids: Vec::new(),
             bundles: HashMap::new(),
-            output_event_sender,
+            render_event_sender,
             id_generator: ContinuousId::ZERO,
         }
     }
@@ -156,8 +156,10 @@ impl SVGCompositionRes {
     // =========================================================================
 
     pub fn forward_render_updates(&mut self, updates: Vec<RenderUpdateEvent>) {
-        for update in updates {
-            let _ = self.output_event_sender.send(update);
+        if let Some(render_event_sender) = &self.render_event_sender {
+            for update in updates {
+                let _ = render_event_sender.send(update);
+            }
         }
     }
 

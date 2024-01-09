@@ -1165,7 +1165,8 @@ dependencies = [
 [[package]]
 name = "specta"
 version = "2.0.0-rc.7"
-source = "git+https://github.com/oscartbeaumont/specta.git?rev=10e7cd3f2eb0611ed749e6c281ba0e825fd51481#10e7cd3f2eb0611ed749e6c281ba0e825fd51481"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "18938fc0c7c0e8b7c8f4702e8cb53c218d4442f5b7420dd8b3d9640ca9a46712"
 dependencies = [
  "bevy_ecs",
  "ctor",
@@ -1180,7 +1181,8 @@ dependencies = [
 [[package]]
 name = "specta-macros"
 version = "2.0.0-rc.7"
-source = "git+https://github.com/oscartbeaumont/specta.git?rev=10e7cd3f2eb0611ed749e6c281ba0e825fd51481#10e7cd3f2eb0611ed749e6c281ba0e825fd51481"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "05080358d47cc706229b854d51c6477208de2b022ec0e16f1572c8cdc5263c8e"
 dependencies = [
  "Inflector",
  "proc-macro2",

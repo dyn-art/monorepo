@@ -23,7 +23,7 @@ pub mod resources;
 mod systems;
 
 pub struct SvgRenderPlugin {
-    pub render_event_sender: Sender<RenderUpdateEvent>,
+    pub render_event_sender: Option<Sender<RenderUpdateEvent>>,
 }
 
 impl Plugin for SvgRenderPlugin {

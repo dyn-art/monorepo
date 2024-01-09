@@ -55,7 +55,7 @@ impl JsCompositionHandle {
         // Register plugins
         app.add_plugins((
             SvgRenderPlugin {
-                render_event_sender,
+                render_event_sender: Some(render_event_sender),
             },
             TrackPlugin,
         ));
