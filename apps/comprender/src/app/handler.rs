@@ -3,6 +3,8 @@ use dyn_bevy_render_skeleton::RenderApp;
 use dyn_composition::core::{composition::Composition, dtif::DTIFComposition};
 use dyn_svg_render::{resources::svg_composition::SVGCompositionRes, SvgRenderPlugin};
 
+use super::model::app_error::{AppError, ErrorCode};
+
 pub async fn health_checker_handler() -> impl IntoResponse {
     const MESSAGE: &str = "Server is up and running!";
 
@@ -16,7 +18,7 @@ pub async fn health_checker_handler() -> impl IntoResponse {
 
 pub async fn render_composition(
     Json(body): Json<DTIFComposition>,
-) -> Result<(StatusCode, String), (StatusCode, Json<serde_json::Value>)> {
+) -> Result<(StatusCode, String), (StatusCode, Json<AppError>)> {
     // Initalize composition
     let mut composition = Composition::new(Some(body));
     let app = composition.get_app_mut();
@@ -42,9 +44,11 @@ pub async fn render_composition(
 
     // let body = Body::from_stream(stream);
 
-    let error_response = serde_json::json!({
-        "status": "fail",
-        "message": "Whatever"
-    });
-    return Err((StatusCode::INTERNAL_SERVER_ERROR, Json(error_response)));
+    return Err((
+        StatusCode::INTERNAL_SERVER_ERROR,
+        Json(AppError::new(
+            StatusCode::INTERNAL_SERVER_ERROR.as_u16(),
+            ErrorCode::new("UNKOWN"),
+        )),
+    ));
 }
