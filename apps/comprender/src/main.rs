@@ -1,52 +1,57 @@
-use std::{
-    net::{Ipv4Addr, SocketAddr},
-    path::PathBuf,
-    sync::Arc,
+use std::net::{Ipv4Addr, SocketAddr};
+
+use axum::{
+    body::Body,
+    http::StatusCode,
+    response::IntoResponse,
+    routing::{get, post},
+    Router,
 };
-
-use axum::{routing::get, Router};
 use config::Config;
-use rspc::{BuiltRouter, ExportConfig, Rspc};
+use dyn_bevy_render_skeleton::RenderApp;
+use dyn_composition::core::{composition::Composition, dtif::DTIFComposition};
+use dyn_svg_render::{resources::svg_composition::SVGCompositionRes, SvgRenderPlugin};
 
+use crate::app::app;
+
+mod app;
 mod config;
-
-const R: Rspc<()> = Rspc::new();
-
-fn router() -> Arc<BuiltRouter> {
-    R.router()
-        .procedure("version", R.query(|ctx, _: ()| env!("CARGO_PKG_VERSION")))
-        .build()
-        .unwrap()
-        .arced()
-}
 
 #[tokio::main]
 async fn main() {
     let config = Config::new().expect("Failed to load configuration");
-    let router = router();
-
-    // Only export types in development builds
-    #[cfg(debug_assertions)]
-    router
-        .export_ts(ExportConfig::new(
-            PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-                .join("../../packages/types/src/comprender/gen/bindings.ts"),
-        ))
-        .unwrap();
-
-    // Build application with a single route
-    let app = Router::new()
-        .route(
-            "/",
-            get(|| async { "dyn_comprender is up and running! Connect to RSPC via '/rspc'." }),
-        )
-        .nest("/rspc", router.endpoint(|| ()).axum());
 
     // Run app with hyper, listening globally on specified port
     let addr = SocketAddr::from((Ipv4Addr::UNSPECIFIED, config.port));
-    println!("Server starting on port: {}", config.port);
-    axum::Server::bind(&addr)
-        .serve(app.into_make_service())
-        .await
-        .unwrap();
+    let listener = tokio::net::TcpListener::bind(addr).await.unwrap();
+    println!(
+        "🚀 Server (v{}) started successfully and is listening on port: {}",
+        env!("CARGO_PKG_VERSION"),
+        listener.local_addr().unwrap()
+    );
+    axum::serve(listener, app()).await.unwrap();
 }
+
+// async fn handler() -> Result<String, String> {
+//     // Initalize composition
+//     let mut composition = Composition::new(Some(v));
+//     let app = composition.get_app_mut();
+//     // Register plugins
+//     app.add_plugins(SvgRenderPlugin {
+//         render_event_sender: None,
+//     });
+//     // Update app once
+//     app.update();
+//     // Get SVG string
+//     let maybe_render_app = app.get_sub_app(RenderApp).ok();
+//     if let Some(render_app) = maybe_render_app {
+//         let maybe_svg_composition_res = render_app.world.get_resource::<SVGCompositionRes>();
+//         if let Some(svg_composition_res) = maybe_svg_composition_res {
+//             // return Some(svg_composition_res.to_string());
+//         }
+//     }
+
+//     // let body = Body::from_stream(stream);
+
+//     Ok(String::from("Hello World"))
+// }
