@@ -1,4 +1,4 @@
-import type { TComposition, TFontWithContent, TNode, TPaint } from '@dyn/dtif';
+import type { TComposition, TFont, TNode, TPaint } from '@dyn/dtif';
 
 import { FailedToResolveRootNodeException } from './exceptions';
 import {
@@ -39,7 +39,7 @@ export class Transformer {
 	private _fontsFailedToTransform: TToTransformFont[] = [];
 
 	// DTIF Fonts
-	public readonly fonts = new Map<number, TFontWithContent>();
+	public readonly fonts = new Map<number, TFont>();
 
 	// Callbacks
 	private _onTransformStatusUpdate: TOnTransformStatusUpdate | null = null;

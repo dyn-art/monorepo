@@ -19,14 +19,16 @@ path = "src/bin.rs"
 
 [features]
 default = []
-console_log = ["console_error_panic_hook", "once_cell"]
-trace = ["console_log", "dyn_composition/trace"]
-cli = ["clap", "specta/export"]
+console_log = ["dep:console_error_panic_hook", "dep:once_cell"]
+tracing = ["console_log", "dyn_composition/tracing"]
+cli = ["dep:clap", "specta/export"]
 
 [dependencies]
 
 # Core dependencies
-dyn_composition = { path = "../../../crates/composition" }
+dyn_composition = { path = "../../../crates/composition", features = [
+    "interactive",
+] }
 dyn_svg_render = { path = "../../../crates/svg_render" }
 dyn_bevy_render_skeleton = { path = "../../../crates/bevy_render_skeleton" }
 bevy_ecs = "0.12"

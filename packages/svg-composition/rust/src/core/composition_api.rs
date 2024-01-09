@@ -236,13 +236,21 @@ impl JsCompositionHandle {
 
     #[wasm_bindgen(js_name = logEntityComponents)]
     pub fn log_entity_components(&self, entity: JsValue) {
-        #[cfg(feature = "trace")]
-        let entity: Entity = match serde_wasm_bindgen::from_value(entity) {
-            Ok(entity) => entity,
-            Err(_) => return,
-        };
-        #[cfg(feature = "trace")]
-        self.composition.log_entity_components(entity);
+        #[cfg(feature = "tracing")]
+        {
+            let entity: Entity = match serde_wasm_bindgen::from_value(entity) {
+                Ok(entity) => entity,
+                Err(_) => return,
+            };
+
+            dyn_composition::core::modules::node::utils::logging::log_entity_components(
+                &self.composition.get_app().world,
+                entity,
+            );
+        }
+
+        #[cfg(not(feature = "tracing"))]
+        log::warn!("Log entity components not supported in this build");
     }
 
     // =========================================================================

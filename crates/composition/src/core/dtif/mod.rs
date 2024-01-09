@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 use specta::Type;
 
 use super::modules::{
-    composition::{events::CoreInputEvent, resources::font_cache::font::FontWithContent},
+    composition::{events::CoreInputEvent, resources::font_cache::font::Font},
     node::components::{
         bundles::{FrameNodeBundle, GroupNodeBundle, RectangleNodeBundle, TextNodeBundle},
         mixins::Paint,
@@ -50,7 +50,7 @@ pub struct DTIFComposition {
     /// Note: Planned to directly use `u64` as a key once the referenced serde issue is resolved.
     ///       https://github.com/serde-rs/serde/issues/1183
     #[serde(default)]
-    pub fonts: Option<HashMap<String, FontWithContent>>,
+    pub fonts: Option<HashMap<String, Font>>,
 
     /// Optional list of changes represented as core input events.
     /// This field is optional and defaults to `None` if not provided.

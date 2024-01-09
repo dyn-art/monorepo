@@ -5,7 +5,10 @@ use crate::core::dtif::{dtif_processor::DTIFProcessor, DTIFComposition};
 
 use self::{
     events::{EntityMoved, EntitySetPosition},
-    resources::{composition::CompositionRes, font_cache::FontCacheRes},
+    resources::{
+        composition::CompositionRes,
+        font_cache::{font::FontContent, FontCacheRes},
+    },
     systems::layout::{
         calculate_absolute_transform, handle_entity_moved, handle_entity_set_position,
     },
@@ -41,19 +44,42 @@ impl Plugin for CompositionPlugin {
     }
 }
 
+#[cfg(feature = "resolve-url")]
+fn fetch_font_binary(url: &str) -> Result<Vec<u8>, reqwest::Error> {
+    reqwest::blocking::get(url)?.bytes().map(|b| b.to_vec())
+}
+
+#[cfg(not(feature = "resolve-url"))]
+fn fetch_font_binary(_url: &str) -> Result<Vec<u8>, String> {
+    Err("URL resolution not supported in this build!".to_string())
+}
+
 fn insert_dtif_into_world(world: &mut World, dtif: &DTIFComposition) {
     let root_node_eid = DTIFProcessor::entity_to_eid(&dtif.root_node_id);
     let mut dtif_processor = DTIFProcessor::new();
 
     // Load fonts into cache
     if let Some(fonts) = &dtif.fonts {
-        for (id, font_with_content) in fonts.clone().into_iter() {
+        for (id, font) in fonts.clone().into_iter() {
             if let Some(mut font_cache) = world.get_resource_mut::<FontCacheRes>() {
-                font_cache.insert(
-                    id.parse().unwrap(),
-                    font_with_content.metadata,
-                    font_with_content.content,
-                );
+                match font.content {
+                    FontContent::Binary { content } => {
+                        font_cache.insert(id.parse().unwrap(), font.metadata, content);
+                    }
+                    FontContent::Url { url } => {
+                        #[cfg(feature = "resolve-url")]
+                        {
+                            match fetch_font_binary(&url) {
+                                Ok(content) => {
+                                    font_cache.insert(id.parse().unwrap(), font.metadata, content)
+                                }
+                                Err(e) => log::error!("Error fetching font: {}", e),
+                            }
+                        }
+                        #[cfg(not(feature = "resolve-url"))]
+                        log::warn!("URL font loading not supported in this build");
+                    }
+                }
             }
         }
     }
