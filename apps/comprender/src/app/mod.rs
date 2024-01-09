@@ -1,6 +1,9 @@
-use axum::{routing::get, Router};
+use axum::{
+    routing::{get, post},
+    Router,
+};
 
-use self::handler::health_checker_handler;
+use self::handler::{health_checker_handler, render_composition};
 
 mod handler;
 
@@ -16,11 +19,5 @@ pub fn app() -> Router {
             }),
         )
         .route("/health", get(health_checker_handler))
-    // .route(
-    //     "images",
-    //     post(|req, next| async move {
-    //         // TODO
-    //         return "";
-    //     }),
-    // ) // TODO:
+        .route("/render", post(render_composition))
 }
