@@ -22,7 +22,7 @@ export const ABEEZEE_ITALIC: TFont = {
 	url: 'http://fonts.gstatic.com/s/abeezee/v22/esDT31xSG-6AGleN2tCklZUCGpG-GQ.ttf'
 };
 
-export async function loadFont(font: TFont): Promise<Font> {
+export async function loadFontWithContent(font: TFont): Promise<Font> {
 	const response = await fetch(font.url);
 	const arrayBuffer = await response.arrayBuffer();
 	return {
@@ -34,11 +34,21 @@ export async function loadFont(font: TFont): Promise<Font> {
 	};
 }
 
-export async function loadFonts(fonts: TFont[]): Promise<Record<string, Font>> {
+export function loadFontWithUrl(font: TFont): Font {
+	return {
+		metadata: font.metadata,
+		content: {
+			type: 'Url',
+			url: font.url
+		}
+	};
+}
+
+export async function loadFonts(fonts: TFont[], inline = true): Promise<Record<string, Font>> {
 	const loadedFonts: Record<string, Font> = {};
 	await Promise.all(
 		fonts.map(async (font) => {
-			const loadedFont = await loadFont(font);
+			const loadedFont = inline ? await loadFontWithContent(font) : loadFontWithUrl(font);
 			loadedFonts[font.id] = loadedFont;
 		})
 	);
