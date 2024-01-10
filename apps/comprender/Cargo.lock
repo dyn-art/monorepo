@@ -723,7 +723,7 @@ dependencies = [
  "glam",
  "log",
  "owned_ttf_parser",
- "rustybuzz 0.11.0",
+ "rustybuzz",
  "serde",
  "specta",
 ]
@@ -742,8 +742,9 @@ dependencies = [
  "serde",
  "serde_json",
  "specta",
- "thiserror",
+ "tiny-skia",
  "tokio",
+ "usvg",
 ]
 
 [[package]]
@@ -1666,22 +1667,6 @@ checksum = "7ffc183a10b4478d04cbbbfc96d0873219d962dd5accaff2ffbd4ceb7df837f4"
 
 [[package]]
 name = "rustybuzz"
-version = "0.11.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2ee8fe2a8461a0854a37101fe7a1b13998d0cfa987e43248e81d2a5f4570f6fa"
-dependencies = [
- "bitflags 1.3.2",
- "bytemuck",
- "smallvec",
- "ttf-parser",
- "unicode-bidi-mirroring",
- "unicode-ccc",
- "unicode-properties",
- "unicode-script",
-]
-
-[[package]]
-name = "rustybuzz"
 version = "0.12.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f0ae5692c5beaad6a9e22830deeed7874eae8a4e3ba4076fb48e12c56856222c"
@@ -2333,7 +2318,7 @@ dependencies = [
  "fontdb",
  "kurbo",
  "log",
- "rustybuzz 0.12.1",
+ "rustybuzz",
  "unicode-bidi",
  "unicode-script",
  "unicode-vo",

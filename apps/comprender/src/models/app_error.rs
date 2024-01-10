@@ -1,5 +1,10 @@
 use std::collections::HashMap;
 
+use axum::{
+    http::StatusCode,
+    response::{IntoResponse, Response},
+    Json,
+};
 use serde::Serialize;
 
 #[derive(Debug, Serialize)]
@@ -26,9 +31,9 @@ pub struct AppError {
 }
 
 impl AppError {
-    pub fn new(status: u16, code: ErrorCode) -> Self {
+    pub fn new(status: StatusCode, code: ErrorCode) -> Self {
         AppError {
-            status,
+            status: status.as_u16(),
             code,
             description: None,
             uri: None,
@@ -36,9 +41,9 @@ impl AppError {
         }
     }
 
-    pub fn new_with_options(status: u16, code: ErrorCode, options: AppErrorOptions) -> Self {
+    pub fn new_with_options(status: StatusCode, code: ErrorCode, options: AppErrorOptions) -> Self {
         AppError {
-            status,
+            status: status.as_u16(),
             code,
             description: options.description,
             uri: options.uri,
@@ -60,5 +65,15 @@ pub struct ErrorCode(String);
 impl ErrorCode {
     pub fn new(code: &str) -> Self {
         ErrorCode(format!("#ERR_{}", code))
+    }
+}
+
+impl IntoResponse for AppError {
+    fn into_response(self) -> Response {
+        let status = StatusCode::from_u16(self.status).unwrap_or(StatusCode::INTERNAL_SERVER_ERROR);
+
+        let body = Json(self);
+
+        (status, body).into_response()
     }
 }

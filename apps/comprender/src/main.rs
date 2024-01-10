@@ -1,11 +1,11 @@
 use std::net::{Ipv4Addr, SocketAddr};
 
-use config::Config;
-
-use crate::app::app;
+use crate::environment::config::Config;
 
 mod app;
-mod config;
+mod environment;
+mod models;
+mod routes;
 
 #[tokio::main]
 async fn main() {
@@ -19,5 +19,5 @@ async fn main() {
         env!("CARGO_PKG_VERSION"),
         listener.local_addr().unwrap()
     );
-    axum::serve(listener, app()).await.unwrap();
+    axum::serve(listener, app::app()).await.unwrap();
 }

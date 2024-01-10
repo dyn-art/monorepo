@@ -21,10 +21,10 @@ tracing = []
 
 [dependencies]
 dyn_bevy_render_skeleton = { path = "../bevy_render_skeleton" }
-bevy_ecs = "0.12"
-bevy_app = "0.12"
-bevy_hierarchy = "0.12"
-serde = { version = "1.0.189", features = ["derive"] }
+bevy_ecs = "0.12.1"
+bevy_app = "0.12.1"
+bevy_hierarchy = "0.12.1"
+serde = { version = "1.0.195", features = ["derive"] }
 glam = { version = "0.24.2", features = ["serde"] }
 log = "0.4.20"
 specta = { version = "2.0.0-rc.7", features = [
@@ -34,6 +34,6 @@ specta = { version = "2.0.0-rc.7", features = [
     "bevy_ecs",
     "functions",
 ] }
-rustybuzz = "0.11.0"
+rustybuzz = "0.12.1"
 owned_ttf_parser = "0.20.0"
 reqwest = { version = "0.11.23", features = ["blocking"], optional = true }

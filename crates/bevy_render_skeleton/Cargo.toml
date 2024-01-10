@@ -11,7 +11,7 @@ license = "AGPL-3.0-or-later"
 default = []
 
 [dependencies]
-bevy_ecs = "0.12"
-bevy_app = "0.12"
-bevy_utils = "0.12"
-bevy_time = "0.12"
+bevy_ecs = "0.12.1"
+bevy_app = "0.12.1"
+bevy_utils = "0.12.1"
+bevy_time = "0.12.1"
