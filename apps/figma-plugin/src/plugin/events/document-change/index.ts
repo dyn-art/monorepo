@@ -1,11 +1,10 @@
-import type { TPluginCallbackRegistration } from '@dyn/figma-handler/app';
-
+import { registerPluginEventCallback } from '../../plugin-handler';
 import { onPropertyChange } from './events';
 
-export default {
+registerPluginEventCallback({
 	type: 'documentchange',
 	key: 'document-change-event',
-	callback: (instance, args) => {
+	callback: async (instance, args) => {
 		for (const documentChange of args.documentChanges) {
 			switch (documentChange.type) {
 				case 'PROPERTY_CHANGE':
@@ -16,4 +15,4 @@ export default {
 			}
 		}
 	}
-} as TPluginCallbackRegistration;
+});

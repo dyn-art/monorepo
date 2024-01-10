@@ -1,9 +1,10 @@
 import { NodeException, Transformer, type TComposition } from '@dyn/figma-to-dtif';
 import { extractErrorData } from '@dyn/utils';
 
-import type { TPluginCallbackRegistration, TPluginHandler } from '../../types';
+import { type TPluginHandler } from '../../types';
+import { registerPluginEventCallback } from '../plugin-handler';
 
-export default {
+registerPluginEventCallback({
 	type: 'app.message',
 	key: 'intermediate-format-export',
 	callback: async (instance: TPluginHandler, args) => {
@@ -21,7 +22,7 @@ export default {
 			await processNode(node, instance);
 		}
 	}
-} as TPluginCallbackRegistration;
+});
 
 async function processNode(node: FrameNode, instance: TPluginHandler): Promise<void> {
 	const transformer = new Transformer(node, {
