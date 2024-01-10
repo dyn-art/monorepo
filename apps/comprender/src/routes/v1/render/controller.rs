@@ -1,6 +1,10 @@
-use std::collections::HashMap;
-
-use axum::{extract::Query, http::StatusCode, response::IntoResponse, Json};
+use axum::{
+    body::{Body, Bytes},
+    extract::Query,
+    http::{header, StatusCode},
+    response::{IntoResponse, Response},
+    Json,
+};
 use dyn_bevy_render_skeleton::RenderApp;
 use dyn_composition::core::{composition::Composition, dtif::DTIFComposition};
 use dyn_svg_render::{resources::svg_composition::SVGCompositionRes, SvgRenderPlugin};
@@ -18,7 +22,7 @@ pub struct QueryParams {
 pub async fn render_composition(
     Query(params): Query<QueryParams>,
     Json(body): Json<DTIFComposition>,
-) -> Result<(StatusCode, Vec<u8>), impl IntoResponse> {
+) -> Result<Response, impl IntoResponse> {
     let svg_result = generate_svg(body);
 
     match svg_result {
@@ -37,11 +41,19 @@ pub async fn render_composition(
                     let png_data = pixmap.encode_png().unwrap();
 
                     // Return PNG response
-                    Ok((StatusCode::OK, png_data))
+                    Ok(Response::builder()
+                        .status(StatusCode::OK)
+                        .header(header::CONTENT_TYPE, "image/png")
+                        .body(Body::from(png_data))
+                        .unwrap())
                 }
                 "svg" => {
                     // Return SVG response
-                    Ok((StatusCode::OK, svg_string.into_bytes()))
+                    Ok(Response::builder()
+                        .status(StatusCode::OK)
+                        .header(header::CONTENT_TYPE, "image/svg+xml")
+                        .body(Body::from(svg_string.into_bytes()))
+                        .unwrap())
                 }
                 _ => Err(
                     AppError::new(StatusCode::BAD_REQUEST, ErrorCode::new("INVALID_FORMAT"))
