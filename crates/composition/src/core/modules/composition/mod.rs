@@ -44,16 +44,6 @@ impl Plugin for CompositionPlugin {
     }
 }
 
-#[cfg(feature = "resolve-url")]
-fn fetch_font_binary(url: &str) -> Result<Vec<u8>, reqwest::Error> {
-    reqwest::blocking::get(url)?.bytes().map(|b| b.to_vec())
-}
-
-#[cfg(not(feature = "resolve-url"))]
-fn fetch_font_binary(_url: &str) -> Result<Vec<u8>, String> {
-    Err("URL resolution not supported in this build!".to_string())
-}
-
 fn insert_dtif_into_world(world: &mut World, dtif: &DTIFComposition) {
     let root_node_eid = DTIFProcessor::entity_to_eid(&dtif.root_node_id);
     let mut dtif_processor = DTIFProcessor::new();
@@ -67,17 +57,14 @@ fn insert_dtif_into_world(world: &mut World, dtif: &DTIFComposition) {
                         font_cache.insert(id.parse().unwrap(), font.metadata, content);
                     }
                     FontContent::Url { url } => {
+                        // TODO: Add URL resolve functionality once Bevy supports async plugin creation,
+                        // or somehow allow blocking in a Tokio environment work ("Cannot drop a runtime in a context where blocking is not allowed...")
+                        // https://github.com/bevyengine/bevy/discussions/3239
                         #[cfg(feature = "resolve-url")]
-                        {
-                            match fetch_font_binary(&url) {
-                                Ok(content) => {
-                                    font_cache.insert(id.parse().unwrap(), font.metadata, content)
-                                }
-                                Err(e) => log::error!("Error fetching font: {}", e),
-                            }
-                        }
+                        log::error!("URL resolve feature not implemented yet!");
+
                         #[cfg(not(feature = "resolve-url"))]
-                        log::warn!("URL font loading not supported in this build");
+                        log::warn!("URL font loading not supported in this build. Use 'resolve-url' feature to activate this functionality.");
                     }
                 }
             }

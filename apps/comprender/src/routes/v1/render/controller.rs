@@ -1,12 +1,17 @@
+use std::collections::HashMap;
+
 use axum::{
-    body::{Body, Bytes},
+    body::Body,
     extract::Query,
     http::{header, StatusCode},
     response::{IntoResponse, Response},
     Json,
 };
 use dyn_bevy_render_skeleton::RenderApp;
-use dyn_composition::core::{composition::Composition, dtif::DTIFComposition};
+use dyn_composition::core::{
+    composition::Composition, dtif::DTIFComposition,
+    modules::composition::resources::font_cache::font::FontContent,
+};
 use dyn_svg_render::{resources::svg_composition::SVGCompositionRes, SvgRenderPlugin};
 use resvg::usvg::Options;
 use serde::Deserialize;
@@ -21,11 +26,12 @@ pub struct QueryParams {
 
 pub async fn render_composition(
     Query(params): Query<QueryParams>,
-    Json(body): Json<DTIFComposition>,
+    Json(mut body): Json<DTIFComposition>,
 ) -> Result<Response, impl IntoResponse> {
+    let _ = prepare_composition(&mut body).await;
     let svg_result = generate_svg(body);
 
-    match svg_result {
+    return match svg_result {
         Ok(svg_string) => {
             // Determine response format from query parameter
             match params.format.as_str() {
@@ -62,7 +68,29 @@ pub async fn render_composition(
             }
         }
         Err(e) => Err(e.into_response()),
+    };
+}
+
+async fn prepare_composition(composition: &mut DTIFComposition) -> Result<(), reqwest::Error> {
+    // Resolve font urls
+    if let Some(fonts) = &mut composition.fonts {
+        let mut url_contents: HashMap<String, Vec<u8>> = HashMap::new();
+
+        for (id, font) in fonts.iter() {
+            if let FontContent::Url { url } = &font.content {
+                let content = reqwest::get(url).await?.bytes().await?.to_vec();
+                url_contents.insert(id.clone(), content);
+            }
+        }
+
+        for (id, content) in url_contents {
+            if let Some(font) = fonts.get_mut(&id) {
+                font.content = FontContent::Binary { content };
+            }
+        }
     }
+
+    return Ok(());
 }
 
 fn generate_svg(body: DTIFComposition) -> Result<String, AppError> {
@@ -79,7 +107,8 @@ fn generate_svg(body: DTIFComposition) -> Result<String, AppError> {
     app.update();
 
     // Attempt to retrieve the SVG string
-    app.get_sub_app(RenderApp)
+    return app
+        .get_sub_app(RenderApp)
         .map_err(|_| {
             AppError::new(
                 StatusCode::INTERNAL_SERVER_ERROR,
@@ -104,5 +133,5 @@ fn generate_svg(body: DTIFComposition) -> Result<String, AppError> {
                     ErrorCode::new("SVG_CONVERSION_FAILED"),
                 )
             })
-        })
+        });
 }
