@@ -61,6 +61,18 @@ pub async fn render_composition(
                         .body(Body::from(svg_string.into_bytes()))
                         .unwrap())
                 }
+                "pdf" => {
+                    // Convert SVG to PDF
+                    let pdf_data =
+                        svg2pdf::convert_str(&svg_string, svg2pdf::Options::default()).unwrap();
+
+                    // Return PDF response
+                    Ok(Response::builder()
+                        .status(StatusCode::OK)
+                        .header(header::CONTENT_TYPE, "application/pdf")
+                        .body(Body::from(pdf_data))
+                        .unwrap())
+                }
                 _ => Err(
                     AppError::new(StatusCode::BAD_REQUEST, ErrorCode::new("INVALID_FORMAT"))
                         .into_response(),
