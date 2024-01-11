@@ -18,22 +18,22 @@ router.get('/v1/satori', async (req, res) => {
 	const format = req.query.format;
 
 	// Loaad fonts
-	// const fontResponse = await fetch(
-	// 	'https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfMZhrib2Bg-4.ttf'
-	// );
-	// const fontBuffer = await fontResponse.arrayBuffer();
+	const fontResponse = await fetch(
+		'https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfMZhrib2Bg-4.ttf'
+	);
+	const fontBuffer = await fontResponse.arrayBuffer();
 
 	// Generate SVG using Satori
 	const svg = await satori(req.body, {
 		width: 600,
 		height: 400,
 		fonts: [
-			// {
-			// 	name: 'Inter',
-			// 	data: fontBuffer,
-			// 	weight: 400,
-			// 	style: 'normal'
-			// }
+			{
+				name: 'Inter',
+				data: fontBuffer,
+				weight: 400,
+				style: 'normal'
+			}
 		]
 	});
 

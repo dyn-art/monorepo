@@ -9,9 +9,7 @@ use self::{
         composition::CompositionRes,
         font_cache::{font::FontContent, FontCacheRes},
     },
-    systems::layout::{
-        calculate_absolute_transform, handle_entity_moved, handle_entity_set_position,
-    },
+    systems::layout::{handle_entity_moved, handle_entity_set_position},
 };
 
 use super::node::components::types::Root;
@@ -35,7 +33,8 @@ impl Plugin for CompositionPlugin {
 
         // Register systems
         app.add_systems(PreUpdate, (handle_entity_moved, handle_entity_set_position));
-        app.add_systems(PostUpdate, calculate_absolute_transform);
+        #[cfg(feature = "interactive")]
+        app.add_systems(PostUpdate, systems::layout::calculate_absolute_transform);
 
         // Load DTIF
         if let Some(dtif) = &self.dtif {
