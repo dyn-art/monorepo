@@ -11,6 +11,10 @@
 		"update:deps": "pnpm update --latest"
 	},
 	"exports": {
+		"./comprender": {
+			"source": "./src/comprender/index.ts",
+			"types": "./dist/comprender/index.d.ts"
+		},
 		"./core": {
 			"source": "./src/core/index.ts",
 			"types": "./dist/core/index.d.ts"
@@ -22,6 +26,9 @@
 	},
 	"typesVersions": {
 		"*": {
+			"comprender": [
+				"./dist/comprender/index.d.ts"
+			],
 			"core": [
 				"./dist/core/index.d.ts"
 			],

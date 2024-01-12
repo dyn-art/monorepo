@@ -10,6 +10,7 @@ export interface TDynConfig {
 	figma?: TDynFigmaConfig | TDynFigmaConfigCallback;
 	library?: TDynLibraryConfig;
 	rust?: TDynRustConfig;
+	node?: TDynNodeConfig;
 }
 
 // =============================================================================
@@ -38,6 +39,14 @@ export interface TDynRollupOptionsCallbackConfig {
 	packageJson: PackageJson;
 	isProduction: boolean;
 	command: DynCommand;
+}
+
+// =============================================================================
+// Node
+// =============================================================================
+
+export interface TDynNodeConfig {
+	rollupConfig?: { isBase: boolean; options: TDynRollupOptions };
 }
 
 // =============================================================================

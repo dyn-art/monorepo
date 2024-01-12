@@ -1,5 +1,7 @@
 import type * as bindings from './gen/bindings';
 
+// TODO: REMOVE and configure Serde to use proper T[xyz] naming as I prefer
+
 export type TAbsoluteTransformMixin = bindings.AbsoluteTransformMixin;
 export type TAnchor = bindings.Anchor;
 export type TAnchorCommand = bindings.AnchorCommand;
@@ -23,9 +25,7 @@ export type TCursorExitedComposition = bindings.CursorExitedComposition;
 export type TCursorForFrontend = bindings.CursorForFrontend;
 export type TCursorMovedOnComposition = bindings.CursorMovedOnComposition;
 export type TCursorUpOnComposition = bindings.CursorUpOnComposition;
-export type TComposition = Omit<bindings.DTIFComposition, 'fonts'> & {
-	fonts: Record<string, TFontWithContent>;
-};
+export type TComposition = bindings.DTIFComposition;
 export type TNode = bindings.DTIFNode;
 export type TDimensionMixin = bindings.DimensionMixin;
 export type TElementAppended = bindings.ElementAppended;
@@ -39,16 +39,8 @@ export type TEntitySetPosition = bindings.EntitySetPosition;
 export type TFillMixin = bindings.FillMixin;
 export type TFontMetadata = bindings.FontMetadata;
 export type TFontStyle = bindings.FontStyle;
-export type TFontWithContent = Omit<bindings.FontWithContent, 'content'> & {
-	/**
-	 * The actual content of the font as binary data
-	 * or a URL string pointing to the file location.
-	 *
-	 * Note: FontWithContent doesn't support URL as its not that easy making a request from WASM
-	 * https://stackoverflow.com/questions/66397775/how-do-i-make-an-http-request-within-a-wasm-bindgen-function-in-rust
-	 */
-	content: number[] | string;
-};
+export type TFont = bindings.Font;
+export type TFontContent = bindings.FontContent;
 export type TFrame = bindings.Frame;
 export type TFrameNodeBundle = bindings.FrameNodeBundle;
 export type TGroup = bindings.Group;

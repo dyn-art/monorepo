@@ -1,4 +1,4 @@
-import { FontMetadata, FontWithContent } from '@dyn/svg-composition';
+import { Font, FontMetadata } from '@dyn/svg-composition';
 
 export const INTER_REGULAR: TFont = {
 	id: 123,
@@ -22,20 +22,33 @@ export const ABEEZEE_ITALIC: TFont = {
 	url: 'http://fonts.gstatic.com/s/abeezee/v22/esDT31xSG-6AGleN2tCklZUCGpG-GQ.ttf'
 };
 
-export async function loadFont(font: TFont): Promise<FontWithContent> {
+export async function loadFontWithContent(font: TFont): Promise<Font> {
 	const response = await fetch(font.url);
 	const arrayBuffer = await response.arrayBuffer();
 	return {
 		metadata: font.metadata,
-		content: Array.from(new Uint8Array(arrayBuffer))
+		content: {
+			type: 'Binary',
+			content: Array.from(new Uint8Array(arrayBuffer))
+		}
 	};
 }
 
-export async function loadFonts(fonts: TFont[]): Promise<Record<string, FontWithContent>> {
-	const loadedFonts: Record<string, FontWithContent> = {};
+export function loadFontWithUrl(font: TFont): Font {
+	return {
+		metadata: font.metadata,
+		content: {
+			type: 'Url',
+			url: font.url
+		}
+	};
+}
+
+export async function loadFonts(fonts: TFont[], inline = true): Promise<Record<string, Font>> {
+	const loadedFonts: Record<string, Font> = {};
 	await Promise.all(
 		fonts.map(async (font) => {
-			const loadedFont = await loadFont(font);
+			const loadedFont = inline ? await loadFontWithContent(font) : loadFontWithUrl(font);
 			loadedFonts[font.id] = loadedFont;
 		})
 	);

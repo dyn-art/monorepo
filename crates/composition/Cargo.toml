@@ -2,7 +2,7 @@
 name = "dyn_composition"
 version = "0.0.1"
 edition = "2021"
-description = "Description of the package"
+description = "Composition"
 homepage = "https://s.dyn.art/github"
 repository = "https://github.com/dyndotart/monorepo"
 license = "AGPL-3.0-or-later"
@@ -10,22 +10,30 @@ authors = ["@bennoinbeta"]
 
 [features]
 default = []
-trace = []
+# Enables functionality for resolving URLs. This feature includes `reqwest`
+# as a dependency, allowing the application to fetch resources from the web.
+resolve-url = ["dep:reqwest"]
+# Adds interactive elements to the Composition. This feature is used to
+# enhance user interactivity in environments where interactive components
+# should be supported.
+interactive = []
+tracing = []
 
 [dependencies]
-bevy_ecs = "0.12"
-bevy_app = "0.12"
-bevy_utils = "0.12"
-bevy_hierarchy = "0.12"
-serde = { version = "1.0.189", features = ["derive"] }
+dyn_bevy_render_skeleton = { path = "../bevy_render_skeleton" }
+bevy_ecs = "0.12.1"
+bevy_app = "0.12.1"
+bevy_hierarchy = "0.12.1"
+serde = { version = "1.0.195", features = ["derive"] }
 glam = { version = "0.24.2", features = ["serde"] }
 log = "0.4.20"
-dyn_bevy_render_skeleton = { path = "../bevy_render_skeleton" }
-specta = { git = "https://github.com/oscartbeaumont/specta.git", branch = "main", features = [
+specta = { version = "2.0.0-rc.7", features = [
     "typescript",
     "serde",
     "glam",
     "bevy_ecs",
+    "functions",
 ] }
-rustybuzz = "0.11.0"
+rustybuzz = "0.12.1"
 owned_ttf_parser = "0.20.0"
+reqwest = { version = "0.11.23", features = ["blocking"], optional = true }

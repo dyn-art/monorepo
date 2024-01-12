@@ -15,14 +15,25 @@ pub struct FontMetadata {
     pub weight: u16,
 }
 
-/// Extends the `Font` structure with additional content for rendering.
-/// Includes a preview URL and the font content itself.
+/// Extends the `FontMetadata` structure with additional content for rendering.
 #[derive(Serialize, Deserialize, Eq, PartialEq, Hash, Clone, Debug, Type)]
-pub struct FontWithContent {
+pub struct Font {
     /// The base font information.
     pub metadata: FontMetadata,
-    /// The actual content of the font as binary data.
-    pub content: Vec<u8>,
+    /// The actual content of the font.
+    pub content: FontContent,
+}
+
+/// Defines the content of a font.
+#[derive(Serialize, Deserialize, Eq, PartialEq, Hash, Clone, Debug, Type)]
+#[serde(tag = "type")]
+pub enum FontContent {
+    /// Font content stored as binary data.
+    Binary { content: Vec<u8> },
+    /// Font content referenced by a URL.
+    ///
+    /// This variant is only supported when the `resolve-url` feature is enabled.
+    Url { url: String },
 }
 
 /// Defines the style of a font, such as italic or normal.

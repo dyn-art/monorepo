@@ -2,7 +2,7 @@
 name = "dyn_bevy_render_skeleton"
 version = "0.0.1"
 edition = "2021"
-description = "Provides stripped down rendering functionality for Bevy Engine"
+description = "Stripped down rendering skeleton for Bevy Engine. Based on `bevy_render`."
 homepage = "https://s.dyn.art/github"
 repository = "https://github.com/dyndotart/monorepo"
 license = "AGPL-3.0-or-later"
@@ -11,7 +11,7 @@ license = "AGPL-3.0-or-later"
 default = []
 
 [dependencies]
-bevy_ecs = "0.12"
-bevy_app = "0.12"
-bevy_utils = "0.12"
-bevy_time = "0.12"
+bevy_ecs = "0.12.1"
+bevy_app = "0.12.1"
+bevy_utils = "0.12.1"
+bevy_time = "0.12.1"

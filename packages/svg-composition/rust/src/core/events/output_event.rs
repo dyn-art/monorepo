@@ -1,9 +1,7 @@
 use bevy_ecs::entity::Entity;
-use dyn_composition::core::utils::continuous_id::ContinuousId;
+use dyn_svg_render::{events::output_event::RenderUpdateEvent, mixin_change::MixinChange};
 use serde::Serialize;
 use specta::Type;
-
-use crate::core::{mixin_change::MixinChange, modules::svg_render::render_change::RenderChange};
 
 #[derive(Debug, Serialize, Clone, Type)]
 #[serde(tag = "type")]
@@ -13,12 +11,6 @@ pub enum OutputEvent {
     SelectionChange(SelectionChangeEvent),
     InteractionModeChange(InteractionModeChangeEvent),
     CursorChange(CursorChangeEvent),
-}
-
-#[derive(Debug, Serialize, Clone, Type)]
-pub struct RenderUpdateEvent {
-    pub id: ContinuousId,
-    pub updates: Vec<RenderChange>,
 }
 
 #[derive(Debug, Serialize, Clone, Type)]

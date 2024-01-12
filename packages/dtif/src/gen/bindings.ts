@@ -200,7 +200,7 @@ paints: { [key in string]: Paint };
  * Note: Planned to directly use `u64` as a key once the referenced serde issue is resolved.
  * https://github.com/serde-rs/serde/issues/1183
  */
-fonts?: { [key in string]: FontWithContent } | null; 
+fonts?: { [key in string]: Font } | null; 
 /**
  * Optional list of changes represented as core input events.
  * This field is optional and defaults to `None` if not provided.
@@ -288,6 +288,34 @@ export type FillMixin = {
 paintIds: Entity[] }
 
 /**
+ * Extends the `FontMetadata` structure with additional content for rendering.
+ */
+export type Font = { 
+/**
+ * The base font information.
+ */
+metadata: FontMetadata; 
+/**
+ * The actual content of the font.
+ */
+content: FontContent }
+
+/**
+ * Defines the content of a font.
+ */
+export type FontContent = 
+/**
+ * Font content stored as binary data.
+ */
+{ type: "Binary"; content: number[] } | 
+/**
+ * Font content referenced by a URL.
+ * 
+ * This variant is only supported when the `resolve-url` feature is enabled.
+ */
+{ type: "Url"; url: string }
+
+/**
  * Represents a font with specific characteristics.
  * Used for text rendering and styling.
  */
@@ -321,20 +349,6 @@ export type FontStyle =
  * A style where the letters slant to the right.
  */
 "Italic"
-
-/**
- * Extends the `Font` structure with additional content for rendering.
- * Includes a preview URL and the font content itself.
- */
-export type FontWithContent = { 
-/**
- * The base font information.
- */
-metadata: FontMetadata; 
-/**
- * The actual content of the font as binary data.
- */
-content: number[] }
 
 /**
  * Acts as a container used to define a layout hierarchy.

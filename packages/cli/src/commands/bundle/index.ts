@@ -47,7 +47,7 @@ export default class Bundle extends DynCommand {
 		}),
 		format: Flags.string({
 			char: 'f',
-			description: `Bundle format like 'esm', 'cjs' or 'all'`,
+			description: `Bundle format like 'esm', 'cjs' or 'all' when using the bundle strategy 'rollup'`,
 			required: false,
 			default: 'all',
 			options: ['all', 'esm', 'cjs']

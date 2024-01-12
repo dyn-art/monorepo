@@ -1,5 +1,6 @@
 // Based on:
 // https://github.com/simonhaenisch/rollup-plugin-typescript-paths
+// https://github.com/justkey007/tsc-alias
 
 import type { Plugin } from 'rollup';
 

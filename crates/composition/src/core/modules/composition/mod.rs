@@ -5,10 +5,11 @@ use crate::core::dtif::{dtif_processor::DTIFProcessor, DTIFComposition};
 
 use self::{
     events::{EntityMoved, EntitySetPosition},
-    resources::{composition::CompositionRes, font_cache::FontCacheRes},
-    systems::layout::{
-        calculate_absolute_transform, handle_entity_moved, handle_entity_set_position,
+    resources::{
+        composition::CompositionRes,
+        font_cache::{font::FontContent, FontCacheRes},
     },
+    systems::layout::{handle_entity_moved, handle_entity_set_position},
 };
 
 use super::node::components::types::Root;
@@ -32,7 +33,8 @@ impl Plugin for CompositionPlugin {
 
         // Register systems
         app.add_systems(PreUpdate, (handle_entity_moved, handle_entity_set_position));
-        app.add_systems(PostUpdate, calculate_absolute_transform);
+        #[cfg(feature = "interactive")]
+        app.add_systems(PostUpdate, systems::layout::calculate_absolute_transform);
 
         // Load DTIF
         if let Some(dtif) = &self.dtif {
@@ -47,13 +49,23 @@ fn insert_dtif_into_world(world: &mut World, dtif: &DTIFComposition) {
 
     // Load fonts into cache
     if let Some(fonts) = &dtif.fonts {
-        for (id, font_with_content) in fonts.clone().into_iter() {
+        for (id, font) in fonts.clone().into_iter() {
             if let Some(mut font_cache) = world.get_resource_mut::<FontCacheRes>() {
-                font_cache.insert(
-                    id.parse().unwrap(),
-                    font_with_content.metadata,
-                    font_with_content.content,
-                );
+                match font.content {
+                    FontContent::Binary { content } => {
+                        font_cache.insert(id.parse().unwrap(), font.metadata, content);
+                    }
+                    FontContent::Url { url } => {
+                        // TODO: Add URL resolve functionality once Bevy supports async plugin creation,
+                        // or somehow allow blocking in a Tokio environment work ("Cannot drop a runtime in a context where blocking is not allowed...")
+                        // https://github.com/bevyengine/bevy/discussions/3239
+                        #[cfg(feature = "resolve-url")]
+                        log::error!("URL resolve feature not implemented yet!");
+
+                        #[cfg(not(feature = "resolve-url"))]
+                        log::warn!("URL font loading not supported in this build. Use 'resolve-url' feature to activate this functionality.");
+                    }
+                }
             }
         }
     }

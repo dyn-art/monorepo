@@ -1,5 +1,3 @@
-// #![cfg(feature = "trace")]
-
 use bevy_ecs::{entity::Entity, world::World};
 use log::info;
 

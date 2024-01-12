@@ -1,4 +1,4 @@
-import type { bindings, TComposition, TFontWithContent } from './dtif';
+import type { bindings, TComposition } from './dtif';
 
 export async function rustify(dtif: TComposition): Promise<bindings.DTIFComposition> {
 	const finalDTIF: bindings.DTIFComposition = {
@@ -9,22 +9,30 @@ export async function rustify(dtif: TComposition): Promise<bindings.DTIFComposit
 		rootNodeId: dtif.rootNodeId,
 		nodes: dtif.nodes,
 		paints: dtif.paints,
-		fonts: await transformFonts(dtif.fonts),
+		fonts: dtif.fonts != null ? await resolveFonts(dtif.fonts) : null,
 		changes: dtif.changes
 	};
 
 	return finalDTIF;
 }
 
-async function transformFonts(
-	fonts: Record<string, TFontWithContent>
-): Promise<Record<string, bindings.FontWithContent>> {
-	const transformedFonts: Record<string, bindings.FontWithContent> = {};
+async function resolveFonts(
+	fonts: Record<string, bindings.Font>
+): Promise<Record<string, bindings.Font>> {
+	const transformedFonts: Record<string, bindings.Font> = {};
 
 	// Check if content is a string (URL), then load the font, else use the existing number array
 	for (const [key, font] of Object.entries(fonts)) {
-		const content = typeof font.content === 'string' ? await loadFont(font.content) : font.content;
-		transformedFonts[key] = { ...font, content };
+		if (font.content.type === 'Url') {
+			const content = await loadFont(font.content.url);
+			transformedFonts[key] = {
+				...font,
+				content: {
+					type: 'Binary',
+					content
+				}
+			};
+		}
 	}
 
 	return transformedFonts;

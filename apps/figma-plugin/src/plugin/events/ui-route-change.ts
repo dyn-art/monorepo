@@ -1,10 +1,10 @@
-import type { TPluginCallbackRegistration } from '../../types';
 import { ACTIVE_APP_ROUTE } from '../core/ui';
+import { registerPluginEventCallback } from '../plugin-handler';
 
-export default {
+registerPluginEventCallback({
 	type: 'app.message',
 	key: 'on-ui-route-change',
-	callback: (instance, args) => {
+	callback: async (instance, args) => {
 		ACTIVE_APP_ROUTE.set(args.activeRoute);
 	}
-} as TPluginCallbackRegistration;
+});

@@ -13,7 +13,8 @@ export function configureCJS(config: TConfigureModuleConfig): TConfigureModuleRe
 				[preserveModules ? 'dir' : 'file']: outputPath,
 				format: 'cjs',
 				exports: 'named',
-				preserveModules
+				preserveModules,
+				inlineDynamicImports: !preserveModules
 			}
 		},
 		visualizeFilePath: path.resolve(process.cwd(), './.dyn/stats-cjs.html')

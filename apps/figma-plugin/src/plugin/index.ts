@@ -1,3 +1,4 @@
+import './events';
 import './plugin-handler';
 
 // Init UI

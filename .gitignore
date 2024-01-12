@@ -1,49 +1,39 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # Dependencies
-rust_modules
 node_modules
-.pnp
-.pnp.js
+rust_modules
 
 # Testing
 coverage
 
-# Next.js
+# Build artifacts and directories
 .next/
 out/
 build
+dist
+dist.*
+target
+pkg
 
-# Misc
-.DS_Store
-*.pem
-.temp
-
-# Debug
+# Debug logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Local env files
+# Local environment files
 .env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
 
-# Turbo
+# Development tools specific files
 .turbo
-
-# Vercel
 .vercel
+.git
 
-# Node
-dist
-dist.*
-
-# Wasm
-target
-pkg
-
-# Other
+# Misc
 *.todo
+.DS_Store
+*.pem

@@ -1,10 +1,11 @@
 import { pickProperties } from '@dyn/utils';
 
-import { EAppRoutes, type TPluginCallbackRegistration, type TPluginHandler } from '../../types';
+import { EAppRoutes, type TPluginHandler } from '../../types';
 import { ACTIVE_APP_ROUTE, SELECTED_NODE_IDS } from '../core/ui';
 import { getObjectPropertyKeys } from '../core/utils';
+import { registerPluginEventCallback } from '../plugin-handler';
 
-export default {
+registerPluginEventCallback({
 	type: 'selectionchange',
 	key: 'selection-change',
 	callback: async (instance: TPluginHandler) => {
@@ -45,4 +46,4 @@ export default {
 			});
 		}
 	}
-} as TPluginCallbackRegistration;
+});

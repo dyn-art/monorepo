@@ -1,4 +1,4 @@
-import { DTIFComposition, FontWithContent } from '@dyn/svg-composition';
+import { DTIFComposition, Font } from '@dyn/svg-composition';
 
 import { ABEEZEE_ITALIC, INTER_REGULAR } from '../../font';
 import { createTransformMatrix } from '../../utils';
@@ -6,7 +6,7 @@ import { createTransformMatrix } from '../../utils';
 export const COMPOSITION_WITH_ONE_RECT = (
 	width: number,
 	height: number,
-	fonts: Record<string, FontWithContent>
+	fonts: Record<string, Font>
 ): DTIFComposition => ({
 	version: '0.0.1',
 	name: 'Test',

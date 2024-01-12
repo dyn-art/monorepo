@@ -3,9 +3,7 @@ use bevy_ecs::{bundle::Bundle, entity::Entity, query::With};
 use bevy_hierarchy::BuildWorldChildren;
 use dyn_bevy_render_skeleton::RenderPlugin;
 
-use crate::core::modules::{
-    composition::CompositionPlugin, interactive_composition::InteractiveCompositionPlugin,
-};
+use crate::core::modules::composition::CompositionPlugin;
 
 use super::{
     dtif::DTIFComposition,
@@ -16,9 +14,6 @@ use super::{
     },
 };
 
-#[cfg(feature = "trace")]
-use super::modules::node::utils::logging::log_entity_components;
-
 pub struct Composition {
     app: App,
 }
@@ -28,12 +23,9 @@ impl Composition {
         let mut app = App::new();
 
         // Register plugins
-        app.add_plugins((
-            RenderPlugin,
-            NodePlugin,
-            CompositionPlugin { dtif },
-            InteractiveCompositionPlugin, // TODO: only include if "interaction" feature active?
-        ));
+        app.add_plugins((RenderPlugin, NodePlugin, CompositionPlugin { dtif }));
+        #[cfg(feature = "interactive")]
+        app.add_plugins(super::modules::interactive_composition::InteractiveCompositionPlugin);
 
         return Self { app };
     }
@@ -126,10 +118,5 @@ impl Composition {
 
     pub fn clear(&mut self) {
         self.app.world.clear_all();
-    }
-
-    #[cfg(feature = "trace")]
-    pub fn log_entity_components(&self, entity: Entity) {
-        log_entity_components(&self.app.world, entity);
     }
 }

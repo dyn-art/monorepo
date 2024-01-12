@@ -33,6 +33,7 @@
 		"@oclif/core": "^3.9.2",
 		"@rollup/plugin-commonjs": "^25.0.7",
 		"@rollup/plugin-html": "^1.0.3",
+		"@rollup/plugin-json": "^6.1.0",
 		"@rollup/plugin-node-resolve": "^15.2.3",
 		"@rollup/plugin-replace": "^5.0.5",
 		"chalk": "^4.1.2",
@@ -57,7 +58,6 @@
 	"files": [
 		"dist",
 		"bin",
-		"oclif.manifest.json",
 		"README.md"
 	],
 	"oclif": {

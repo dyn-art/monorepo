@@ -1,9 +1,11 @@
 #![cfg(feature = "cli")]
 
 use clap::Parser;
-use specta::export;
-use specta::ts::{BigIntExportBehavior, ExportConfig};
-use std::process;
+use specta::{
+    export,
+    ts::{BigIntExportBehavior, ExportConfig},
+};
+use std::{borrow::Cow, process};
 
 // Import all types and modules from `dyn_composition` to make them accessible to specta here
 use dyn_composition_api::*;
