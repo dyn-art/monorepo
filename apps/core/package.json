@@ -29,7 +29,6 @@
 	"dependencies": {
 		"@dyn/logger": "workspace:*",
 		"@dyn/openapi-router": "workspace:*",
-		"@rspc/client": "^0.1.3",
 		"express": "^4.18.2",
 		"zod": "^3.22.4"
 	},
