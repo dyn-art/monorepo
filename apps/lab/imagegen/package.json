@@ -1,0 +1,19 @@
+{
+	"name": "imagegen",
+	"module": "src/index.ts",
+	"type": "module",
+	"scripts": {
+		"start:dev": "bun --watch src/index.ts"
+	},
+	"devDependencies": {
+		"@types/bun": "latest"
+	},
+	"peerDependencies": {
+		"typescript": "^5.0.0"
+	},
+	"dependencies": {
+		"@resvg/resvg-js": "^2.6.0",
+		"hono": "^3.12.2",
+		"satori": "^0.10.11"
+	}
+}

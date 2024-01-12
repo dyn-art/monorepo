@@ -29,10 +29,8 @@
 	"dependencies": {
 		"@dyn/logger": "workspace:*",
 		"@dyn/openapi-router": "workspace:*",
-		"@resvg/resvg-js": "^2.6.0",
 		"@rspc/client": "^0.1.3",
 		"express": "^4.18.2",
-		"satori": "^0.10.11",
 		"zod": "^3.22.4"
 	},
 	"devDependencies": {

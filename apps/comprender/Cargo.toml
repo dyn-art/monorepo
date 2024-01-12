@@ -27,3 +27,10 @@ usvg = "0.37.0"
 tiny-skia = "0.11.3"
 reqwest = "0.11.23"
 svg2pdf = "0.9.1"
+
+[profile.release]
+opt-level = "s"
+lto = true
+
+[profile.dev.package."*"]
+opt-level = 3

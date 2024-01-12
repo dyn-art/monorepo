@@ -1,0 +1,28 @@
+benchmark:
+  phases:
+    - duration: 10
+      arrival_rate: 10
+    - duration: 20
+      arrival_rate: 20
+scenarios:
+  - name: SVG Endpoint Test
+    flow:
+      - post:
+          url: http://localhost:9003/v1/render?format=svg
+          headers:
+            Content-Type: application/json
+          body: "{{ payload.json }}"
+  - name: PNG Endpoint Test
+    flow:
+      - post:
+          url: http://localhost:9003/v1/render?format=png
+          headers:
+            Content-Type: application/json
+          body: "{{ payload.json }}"
+  - name: PDF Endpoint Test
+    flow:
+      - post:
+          url: http://localhost:9003/v1/render?format=pdf
+          headers:
+            Content-Type: application/json
+          body: "{{ payload.json }}"
