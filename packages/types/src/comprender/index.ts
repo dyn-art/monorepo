@@ -1,1 +1,1 @@
-export * from './gen/bindings';
+export * from './gen/v1';
