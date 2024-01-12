@@ -1,28 +1,40 @@
-benchmark:
-  phases:
-    - duration: 10
-      arrival_rate: 10
-    - duration: 20
-      arrival_rate: 20
-scenarios:
-  - name: SVG Endpoint Test
-    flow:
-      - post:
-          url: http://localhost:9003/v1/render?format=svg
-          headers:
-            Content-Type: application/json
-          body: "{{ payload.json }}"
-  - name: PNG Endpoint Test
-    flow:
-      - post:
-          url: http://localhost:9003/v1/render?format=png
-          headers:
-            Content-Type: application/json
-          body: "{{ payload.json }}"
-  - name: PDF Endpoint Test
-    flow:
-      - post:
-          url: http://localhost:9003/v1/render?format=pdf
-          headers:
-            Content-Type: application/json
-          body: "{{ payload.json }}"
+concurrency: 1
+base: 'http://localhost:9003'
+iterations: 5
+rampup: 2
+
+plan:
+  - name: Test Render Endpoint SVG
+    request:
+      method: POST
+      url: /v1/render?format=svg
+      headers:
+        Content-Type: 'application/json'
+      body: '{{ item.txn }}'
+    with_items_from_csv:
+      file_name: ./payload.csv
+      quote_char: "\'"
+
+  - name: Test Render Endpoint PNG
+    request:
+      method: POST
+      url: /v1/render?format=png
+      headers:
+        Content-Type: 'application/json'
+      body: '{{ item.txn }}'
+    with_items_from_csv:
+      file_name: ./payload.csv
+      quote_char: "\'"
+
+  - name: Test Render Endpoint PDF
+    request:
+      method: POST
+      url: /v1/render?format=pdf
+      headers:
+        Content-Type: 'application/json'
+      body: '{{ item.txn }}'
+    with_items_from_csv:
+      file_name: ./payload.csv
+      quote_char: "\'"
+
+
