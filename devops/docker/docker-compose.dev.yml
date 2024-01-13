@@ -3,8 +3,8 @@ version: '3.8'
 services:
   comprender:
     build:
-      context: .
-      dockerfile: ./axum/Dockerfile
+      context: ../.. # Root of monorepo
+      dockerfile: ./devops/docker/base/rust/Dockerfile
       args:
         PROJECT: comprender
         APP_PORT: 3000
@@ -13,8 +13,8 @@ services:
 
   core:
     build:
-      context: .
-      dockerfile: ./node/Dockerfile
+      context: ../.. # Root of monorepo
+      dockerfile: ./devops/docker/base/node/Dockerfile
       args:
         PROJECT: core
         APP_PORT: 3000
@@ -25,7 +25,7 @@ services:
 
   # https://medium.com/@chrischuck35/how-to-create-a-mysql-instance-with-docker-compose-1598f3cc1bee
   db:
-    image: mysql:5.7
+    image: mysql:8.2.0
     environment:
       MYSQL_DATABASE: 'db'
       MYSQL_USER: 'user'

@@ -2,7 +2,7 @@
 # https://github.com/linux-china/axum-demo/blob/master/Dockerfile
 
 # Use Rust image with specific version
-ARG RUST_VERSION=1.74
+ARG RUST_VERSION=bookworm
 FROM rust:${RUST_VERSION} as base
 
 # Build the project with necessary files
@@ -21,7 +21,7 @@ RUN cargo build --bin ${APP_BINARY} --release
 
 # Create a lean production image
 # https://github.com/rust-lang/docker-rust/issues/105#issuecomment-1149081766
-FROM debian:bookworm AS runner
+FROM debian:bookworm-slim AS runner
 ARG PROJECT
 ENV APP_USER=appuser
 ENV APP_BINARY=dyn_${PROJECT}
