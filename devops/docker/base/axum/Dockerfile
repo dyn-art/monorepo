@@ -16,7 +16,7 @@ COPY ./crates ./crates
 
 # Build the project
 WORKDIR /app/apps/${PROJECT}
-RUN cargo build --release
+RUN cargo build --bin server --release
 
 # Create a lean production image
 # https://github.com/rust-lang/docker-rust/issues/105#issuecomment-1149081766
