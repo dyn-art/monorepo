@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  comprender:
+    build:
+      context: .
+      dockerfile: ./axum/Dockerfile
+      args:
+        PROJECT: comprender
+        APP_PORT: 3000
+    ports:
+      - '3001:3000'
+
+  core:
+    build:
+      context: .
+      dockerfile: ./node/Dockerfile
+      args:
+        PROJECT: core
+        APP_PORT: 3000
+    ports:
+      - '3002:3000'
+    depends_on:
+      - db
+
+  # https://medium.com/@chrischuck35/how-to-create-a-mysql-instance-with-docker-compose-1598f3cc1bee
+  db:
+    image: mysql:5.7
+    environment:
+      MYSQL_DATABASE: 'db'
+      MYSQL_USER: 'user'
+      MYSQL_PASSWORD: 'password'
+      MYSQL_ROOT_PASSWORD: 'password'
+    ports:
+      - '3306:3306'
+    expose:
+      - 3306
+    volumes:
+      - my-db:/var/lib/mysql
+
+volumes:
+  my-db:

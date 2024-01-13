@@ -16,7 +16,7 @@ cli = ["dep:clap"]
 path = "src/lib.rs"
 
 [[bin]]
-name = "server"
+name = "dyn_comprender"    # Needs to be called like the package so that the Dockerfile can work with `dyn_[name]` pattern
 path = "src/bin/server.rs"
 
 [[bin]]

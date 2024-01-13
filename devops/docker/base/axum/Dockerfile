@@ -8,6 +8,7 @@ FROM rust:${RUST_VERSION} as base
 # Build the project with necessary files
 FROM base AS builder
 ARG PROJECT
+ENV APP_BINARY=dyn_${PROJECT}
 WORKDIR /app
 
 # Copy required files from monorepo
@@ -16,7 +17,7 @@ COPY ./crates ./crates
 
 # Build the project
 WORKDIR /app/apps/${PROJECT}
-RUN cargo build --bin server --release
+RUN cargo build --bin ${APP_BINARY} --release
 
 # Create a lean production image
 # https://github.com/rust-lang/docker-rust/issues/105#issuecomment-1149081766
@@ -32,9 +33,9 @@ USER appuser
 
 # Copy built application and set working directory
 WORKDIR /app
-COPY --from=builder --chown=${APP_USER}:${APP_USER} /app/apps/${PROJECT}/target/release/${APP_BINARY} ./app_binary
+COPY --from=builder --chown=${APP_USER}:${APP_USER} ./app/apps/${PROJECT}/target/release/${APP_BINARY} ./app_binary
 
-ARG PORT=8080
+ARG PORT=3000
 ENV APP_PORT=${PORT}
 EXPOSE ${PORT}
 
