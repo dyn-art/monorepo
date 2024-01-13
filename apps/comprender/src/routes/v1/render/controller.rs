@@ -4,7 +4,7 @@ use axum::{
     body::Body,
     extract::Query,
     http::{header, StatusCode},
-    response::{IntoResponse, Response},
+    response::Response,
     Json,
 };
 use dyn_bevy_render_skeleton::RenderApp;
@@ -17,70 +17,81 @@ use resvg::usvg::Options;
 use serde::Deserialize;
 use usvg::TreeParsing;
 
-use crate::models::app_error::{AppError, ErrorCode};
+use crate::{
+    core::utils::{extract_json_body, extract_query_params},
+    models::app_error::{AppError, ErrorCode},
+};
 
-#[derive(Deserialize)]
+#[derive(Deserialize, utoipa::IntoParams)]
 pub struct QueryParams {
     format: String,
 }
 
+#[utoipa::path(
+    post,
+    path = "/v1/render",
+    responses(
+        (status = 200, description = "Generation success", body = DTIFComposition),
+        (status = BAD_REQUEST, description = "Bad Request")
+    ),
+    params(
+        QueryParams,
+    )
+)]
 pub async fn render_composition(
-    Query(params): Query<QueryParams>,
-    Json(mut body): Json<DTIFComposition>,
-) -> Result<Response, impl IntoResponse> {
+    maybe_query: Option<Query<QueryParams>>,
+    maybe_body: Option<Json<DTIFComposition>>,
+) -> Result<Response, AppError> {
+    let params = extract_query_params(maybe_query)?;
+    let mut body = extract_json_body(maybe_body)?;
+
     let _ = prepare_composition(&mut body).await;
-    let svg_result = generate_svg(body);
+    let svg_string = generate_svg(body)?;
 
-    return match svg_result {
-        Ok(svg_string) => {
-            // Determine response format from query parameter
-            match params.format.as_str() {
-                "png" => {
-                    // Convert SVG to PNG
-                    let opts = Options::default();
-                    let rtree = usvg::Tree::from_str(&svg_string, &opts).unwrap();
-                    let pixmap_size = rtree.size.to_int_size();
-                    let mut pixmap =
-                        tiny_skia::Pixmap::new(pixmap_size.width(), pixmap_size.height()).unwrap();
-                    resvg::Tree::from_usvg(&rtree)
-                        .render(tiny_skia::Transform::default(), &mut pixmap.as_mut());
-                    let png_data = pixmap.encode_png().unwrap();
+    // Determine response format from query parameter
+    match params.format.as_str() {
+        "png" => {
+            // Convert SVG to PNG
+            let opts = Options::default();
+            let rtree = usvg::Tree::from_str(&svg_string, &opts).unwrap();
+            let pixmap_size = rtree.size.to_int_size();
+            let mut pixmap =
+                tiny_skia::Pixmap::new(pixmap_size.width(), pixmap_size.height()).unwrap();
+            resvg::Tree::from_usvg(&rtree)
+                .render(tiny_skia::Transform::default(), &mut pixmap.as_mut());
+            let png_data = pixmap.encode_png().unwrap();
 
-                    // Return PNG response
-                    Ok(Response::builder()
-                        .status(StatusCode::OK)
-                        .header(header::CONTENT_TYPE, "image/png")
-                        .body(Body::from(png_data))
-                        .unwrap())
-                }
-                "svg" => {
-                    // Return SVG response
-                    Ok(Response::builder()
-                        .status(StatusCode::OK)
-                        .header(header::CONTENT_TYPE, "image/svg+xml")
-                        .body(Body::from(svg_string.into_bytes()))
-                        .unwrap())
-                }
-                "pdf" => {
-                    // Convert SVG to PDF
-                    let pdf_data =
-                        svg2pdf::convert_str(&svg_string, svg2pdf::Options::default()).unwrap();
-
-                    // Return PDF response
-                    Ok(Response::builder()
-                        .status(StatusCode::OK)
-                        .header(header::CONTENT_TYPE, "application/pdf")
-                        .body(Body::from(pdf_data))
-                        .unwrap())
-                }
-                _ => Err(
-                    AppError::new(StatusCode::BAD_REQUEST, ErrorCode::new("INVALID_FORMAT"))
-                        .into_response(),
-                ),
-            }
+            // Return PNG response
+            Ok(Response::builder()
+                .status(StatusCode::OK)
+                .header(header::CONTENT_TYPE, "image/png")
+                .body(Body::from(png_data))
+                .unwrap())
         }
-        Err(e) => Err(e.into_response()),
-    };
+        "svg" => {
+            // Return SVG response
+            Ok(Response::builder()
+                .status(StatusCode::OK)
+                .header(header::CONTENT_TYPE, "image/svg+xml")
+                .body(Body::from(svg_string.into_bytes()))
+                .unwrap())
+        }
+        "pdf" => {
+            // Convert SVG to PDF
+            let pdf_data = svg2pdf::convert_str(&svg_string, svg2pdf::Options::default()).unwrap();
+
+            // Return PDF response
+            Ok(Response::builder()
+                .status(StatusCode::OK)
+                .header(header::CONTENT_TYPE, "application/pdf")
+                .body(Body::from(pdf_data))
+                .unwrap())
+        }
+        _ => Err(AppError::new(
+            StatusCode::BAD_REQUEST,
+            ErrorCode::new("INVALID_FORMAT"),
+        )),
+    }
 }
 
 async fn prepare_composition(composition: &mut DTIFComposition) -> Result<(), reqwest::Error> {

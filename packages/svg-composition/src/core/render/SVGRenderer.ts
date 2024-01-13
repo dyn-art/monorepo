@@ -3,7 +3,7 @@ import type {
 	SVGAttribute,
 	SVGStyle,
 	Vec2
-} from '@/rust/dyn_composition_api/bindings';
+} from '@/rust/dyn_svg_composition_api/bindings';
 
 import type { Composition } from '../composition';
 import { Renderer } from './Renderer';

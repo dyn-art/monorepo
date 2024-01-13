@@ -7,15 +7,31 @@ homepage = "https://s.dyn.art/github"
 repository = "https://github.com/dyndotart/monorepo"
 license = "AGPL-3.0-or-later"
 
+[features]
+default = []
+tracing = ["dyn_composition/tracing"]
+cli = ["dep:clap"]
+
+[lib]
+path = "src/lib.rs"
+
+[[bin]]
+name = "server"
+path = "src/bin/server.rs"
+
+[[bin]]
+name = "cli"
+path = "src/bin/cli.rs"
+
 [dependencies]
+
+# Core dependencies
 dyn_composition = { path = "../../crates/composition", features = [
     'resolve-url',
 ] }
 dyn_svg_render = { path = "../../crates/svg_render" }
 dyn_bevy_render_skeleton = { path = "../../crates/bevy_render_skeleton" }
 axum = "0.7.3"
-# bevy_ecs = "0.12"
-# bevy_app = "0.12"
 serde = { version = "1.0.195", features = ["derive"] }
 serde_json = "1.0.111"
 tokio = { version = "1.35.1", features = ["full"] }
@@ -27,6 +43,10 @@ usvg = "0.37.0"
 tiny-skia = "0.11.3"
 reqwest = "0.11.23"
 svg2pdf = "0.9.1"
+
+# CLI dependencies
+clap = { version = "4.4.16", features = ["derive"], optional = true }
+utoipa = { version = "4.2.0", features = ["axum_extras"] }
 
 [profile.release]
 opt-level = "s"

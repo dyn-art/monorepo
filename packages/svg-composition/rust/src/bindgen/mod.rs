@@ -37,9 +37,10 @@ fn setup_console_logger() {
     info!("Console log wasm bindgen bridge set up");
 }
 
-// When the `console_error_panic_hook` feature is enabled, we can call the
-// `set_panic_hook` function at least once during initialization, and then
-// we will get better error messages if our code ever panics.
+// The `console_error_panic_hook` crate provides better debugging of panics by
+// logging them with `console.error`. This is great for development, but requires
+// all the `std::fmt` and `std::panicking` infrastructure, so isn't great for
+// code size when deploying.
 //
 // For more details see
 // https://github.com/rustwasm/console_error_panic_hook#readme

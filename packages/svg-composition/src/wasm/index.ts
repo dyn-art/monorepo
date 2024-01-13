@@ -1,5 +1,5 @@
-import init, { type InitInput } from '@/rust/dyn_composition_api';
-import wasm from '@/rust/dyn_composition_api/bg.wasm';
+import init, { type InitInput } from '@/rust/dyn_svg_composition_api';
+import wasm from '@/rust/dyn_svg_composition_api/bg.wasm';
 
 export * from './types';
 

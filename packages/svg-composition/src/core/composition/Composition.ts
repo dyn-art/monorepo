@@ -1,5 +1,5 @@
 import { shortId } from '@dyn/utils';
-import { JsCompositionHandle } from '@/rust/dyn_composition_api';
+import { JsCompositionHandle } from '@/rust/dyn_svg_composition_api';
 import type {
 	AnyInputEvent,
 	CoreInputEvent,
@@ -18,7 +18,7 @@ import type {
 	SelectionChangeEvent,
 	TrackableMixinType,
 	TrackUpdateEvent
-} from '@/rust/dyn_composition_api/bindings';
+} from '@/rust/dyn_svg_composition_api/bindings';
 
 import type { TRustEnumKeyArray } from '../../wasm';
 import type { Renderer } from '../render';

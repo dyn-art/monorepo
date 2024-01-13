@@ -1,11 +1,6 @@
 use std::net::{Ipv4Addr, SocketAddr};
 
-use crate::environment::config::Config;
-
-mod app;
-mod environment;
-mod models;
-mod routes;
+use dyn_comprender::{app, environment::config::Config};
 
 #[tokio::main]
 async fn main() {

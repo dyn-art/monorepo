@@ -6,8 +6,9 @@ use axum::{
     Json,
 };
 use serde::Serialize;
+use utoipa::ToSchema;
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct AppError {
     /// HTTP status code associated with the error, indicating the nature of the failure.
@@ -75,5 +76,19 @@ impl IntoResponse for AppError {
         let body = Json(self);
 
         (status, body).into_response()
+    }
+}
+
+impl From<std::io::Error> for AppError {
+    fn from(err: std::io::Error) -> Self {
+        AppError::new_with_options(
+            StatusCode::INTERNAL_SERVER_ERROR,
+            ErrorCode::new("INTERNAL_SERVER_ERROR"),
+            AppErrorOptions {
+                description: Some(err.to_string()),
+                uri: None,
+                additional_errors: None,
+            },
+        )
     }
 }

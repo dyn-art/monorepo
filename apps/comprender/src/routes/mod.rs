@@ -2,8 +2,8 @@ use axum::{routing::get, Router};
 
 use self::controller::health_checker_handler;
 
-mod controller;
-mod v1;
+pub mod controller;
+pub mod v1;
 
 pub fn routes() -> Router {
     Router::new()

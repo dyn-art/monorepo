@@ -97,11 +97,13 @@ export default class Rust extends DynCommand {
 			'cargo',
 			[
 				'run',
+				'--bin',
+				'cli',
 				'--features',
 				'cli',
 				'--',
 				'generate-ts-types',
-				'--export-path',
+				'--output-path',
 				bindingTypesOutputPath
 			],
 			{

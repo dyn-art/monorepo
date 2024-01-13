@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import type { DTIFComposition } from '@/rust/dyn_composition_api/bindings';
+import type { DTIFComposition } from '@/rust/dyn_svg_composition_api/bindings';
 
 import { createSVGComposition, mat3, vec3 } from '../core';
 import { initWasm } from '../wasm';
