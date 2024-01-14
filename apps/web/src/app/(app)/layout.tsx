@@ -6,4 +6,6 @@ const Layout: React.FC<TProps> = (props) => {
 
 export default Layout;
 
-type TProps = { children: React.ReactNode };
+interface TProps {
+	children: React.ReactNode;
+}

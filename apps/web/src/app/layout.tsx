@@ -45,4 +45,6 @@ const RootLayout: React.FC<TProps> = (props) => {
 
 export default RootLayout;
 
-type TProps = { children: React.ReactNode };
+interface TProps {
+	children: React.ReactNode;
+}
