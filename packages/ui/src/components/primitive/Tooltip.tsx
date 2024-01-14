@@ -1,6 +1,8 @@
 // Imported from shadcn UI
 // https://ui.shadcn.com/docs/components/tooltip
 
+'use client';
+
 import * as TooltipPrimitive from '@radix-ui/react-tooltip';
 import * as React from 'react';
 import { cn } from '@/utils';

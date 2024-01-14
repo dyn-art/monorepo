@@ -1,9 +1,11 @@
 // Imported from shadcn UI
 // https://ui.shadcn.com/docs/components/dropdown-menu
 
+'use client';
+
 import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
 import { CheckIcon, ChevronRightIcon, DotFilledIcon } from '@radix-ui/react-icons';
-import React from 'react';
+import * as React from 'react';
 import { cn } from '@/utils';
 
 const DropdownMenu = DropdownMenuPrimitive.Root;

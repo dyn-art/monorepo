@@ -44,6 +44,7 @@ export async function createBaseRollupConfig(
 			// babel(/* */), // Obsolete as esbuild takes care of converting ES2015+ modules into compatible JavaScript files
 			// terser(/* */), // Obsolete as esbuild takes care of minifying
 			// license(/* */), Note: Not checking for third party licenses here as packages not included in bundle can't be detected (// https://github.com/mjeanroy/rollup-plugin-license/issues/440)
+			'preserve-directives',
 			'copy', // Plugin placeholder for "rollup-plugin-copy"
 			await bundleSize(command)
 		],
