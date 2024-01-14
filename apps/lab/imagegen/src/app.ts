@@ -6,15 +6,14 @@ import { fetchFont } from './utils';
 
 export const app = new Hono();
 
-const inter = await fetchFont(
-	'https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfMZhrib2Bg-4.ttf'
-);
-
 app.post('/v1/satori', async (ctx) => {
 	const format = ctx.req.query('format');
 	const body = await ctx.req.json();
 
 	// Loaad fonts
+	const inter = await fetchFont(
+		'https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfMZhrib2Bg-4.ttf'
+	);
 
 	// Generate SVG using Satori
 	const svg = await satori(body, {

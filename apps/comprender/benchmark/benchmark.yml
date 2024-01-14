@@ -1,6 +1,6 @@
 concurrency: 1
 base: 'http://localhost:9003'
-iterations: 5
+iterations: 10
 rampup: 2
 
 plan:
@@ -8,6 +8,16 @@ plan:
     request:
       method: POST
       url: /v1/render?format=svg
+      headers:
+        Content-Type: 'application/json'
+      body: '{{ item.txn }}'
+    with_items_from_csv:
+      file_name: ./payload.csv
+      quote_char: "\'"
+  - name: Test Render Endpoint USVG
+    request:
+      method: POST
+      url: /v1/render?format=usvg
       headers:
         Content-Type: 'application/json'
       body: '{{ item.txn }}'
