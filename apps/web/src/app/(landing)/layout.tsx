@@ -1,7 +1,9 @@
+import { Container } from '@dyn/ui';
+
 const Layout: React.FC<TProps> = (props) => {
 	const { children } = props;
 
-	return <>{children}</>;
+	return <Container tag="main">{children}</Container>;
 };
 
 export default Layout;
