@@ -1,9 +1,11 @@
 // Imported from shadcn UI
 // https://ui.shadcn.com/docs/components/select
 
+'use client';
+
 import { CaretSortIcon, CheckIcon, ChevronDownIcon, ChevronUpIcon } from '@radix-ui/react-icons';
 import * as SelectPrimitive from '@radix-ui/react-select';
-import React from 'react';
+import * as React from 'react';
 import { cn } from '@/utils';
 
 const Select = SelectPrimitive.Root;

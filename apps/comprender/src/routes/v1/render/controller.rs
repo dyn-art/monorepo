@@ -15,7 +15,7 @@ use dyn_composition::core::{
 use dyn_svg_render::{resources::svg_composition::SVGCompositionRes, SvgRenderPlugin};
 use resvg::usvg::Options;
 use serde::Deserialize;
-use usvg::TreeParsing;
+use usvg::{TreeParsing, TreeWriting, XmlOptions};
 
 use crate::{
     core::utils::{extract_json_body, extract_query_params},
@@ -66,6 +66,18 @@ pub async fn render_composition(
                 .status(StatusCode::OK)
                 .header(header::CONTENT_TYPE, "image/png")
                 .body(Body::from(png_data))
+                .unwrap())
+        }
+        "usvg" => {
+            let opts = Options::default();
+            let rtree = usvg::Tree::from_str(&svg_string, &opts).unwrap();
+
+            Ok(Response::builder()
+                .status(StatusCode::OK)
+                .header(header::CONTENT_TYPE, "image/svg+xml")
+                .body(Body::from(
+                    rtree.to_string(&XmlOptions::default()).into_bytes(),
+                ))
                 .unwrap())
         }
         "svg" => {

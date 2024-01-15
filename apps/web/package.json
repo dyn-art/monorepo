@@ -1,0 +1,41 @@
+{
+	"name": "@dyn/web",
+	"description": "Web client for dyn.art",
+	"version": "0.0.1",
+	"private": true,
+	"scripts": {
+		"start:dev": "next dev",
+		"build": "next build",
+		"start": "next start",
+		"lint": "next lint"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/monatheoctocat/my_package.git"
+	},
+	"keywords": [],
+	"author": "@bennoinbeta",
+	"license": "AGPL-3.0-or-later",
+	"bugs": {
+		"url": "https://s.dyn.art/github/issues"
+	},
+	"homepage": "https://s.dyn.art/github",
+	"dependencies": {
+		"@dyn/svg-composition": "workspace:^",
+		"@dyn/ui": "workspace:*",
+		"clsx": "^2.0.0",
+		"next": "14.0.4",
+		"react": "^18.2.0",
+		"react-dom": "^18.2.0"
+	},
+	"devDependencies": {
+		"@dyn/config": "workspace:*",
+		"@types/node": "^20.8.10",
+		"@types/react": "^18.2.33",
+		"@types/react-dom": "^18.2.14",
+		"autoprefixer": "^10.4.16",
+		"postcss": "^8.4.32",
+		"sass": "^1.69.7",
+		"tailwindcss": "^3.3.5"
+	}
+}

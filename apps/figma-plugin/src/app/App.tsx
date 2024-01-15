@@ -3,7 +3,7 @@ import { MemoryRouter } from 'react-router-dom';
 
 import '@dyn/ui/dist/styles.css';
 
-import { Routes } from './routes';
+import { Routes } from './Routes';
 
 import './styles/tailwind.css';
 

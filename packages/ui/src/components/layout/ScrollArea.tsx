@@ -1,6 +1,8 @@
 // Imported from shadcn UI
 // https://ui.shadcn.com/docs/components/scroll-area
 
+'use client';
+
 import * as ScrollAreaPrimitive from '@radix-ui/react-scroll-area';
 import * as React from 'react';
 import { cn } from '@/utils';
