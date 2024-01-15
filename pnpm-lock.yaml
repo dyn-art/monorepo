@@ -168,6 +168,9 @@ importers:
 
   apps/web:
     dependencies:
+      '@dyn/svg-composition':
+        specifier: workspace:^
+        version: link:../../packages/svg-composition
       '@dyn/ui':
         specifier: workspace:*
         version: link:../../packages/ui
