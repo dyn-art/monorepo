@@ -6,11 +6,13 @@ const containerVariants = cva('mx-auto w-full overflow-y-auto overflow-x-hidden'
 	variants: {
 		size: {
 			default: 'px-2.5 md:px-20',
-			compact: 'px-2.5 md:px-6'
+			compact: 'px-2.5 md:px-6',
+			full: 'px-0'
 		},
 		maxWidth: {
 			default: 'max-w-screen-xl',
 			compact: '',
+			full: '',
 			article: 'max-w-[65ch]'
 		}
 	},
@@ -39,5 +41,5 @@ Container.displayName = 'Container';
 
 export interface TContainerProps extends React.HTMLAttributes<HTMLDivElement> {
 	tag?: 'div' | 'main' | 'article';
-	size?: 'default' | 'compact';
+	size?: 'default' | 'compact' | 'full';
 }

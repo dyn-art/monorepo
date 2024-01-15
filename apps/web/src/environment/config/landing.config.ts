@@ -1,6 +1,6 @@
 export const landingConfig = {
 	meta: {
-		title: 'todo',
-		description: 'todo'
+		title: 'dyn.art - Leave the repetitive design to us',
+		description: 'Leave the repetitive design to us'
 	}
 };
