@@ -6,6 +6,8 @@ import type { TComposition } from '@dyn/dtif';
 import { createSVGComposition, type Composition } from '@dyn/svg-composition';
 import { Skeleton } from '@dyn/ui';
 
+import { CanvasInner } from './CanvasInner';
+
 export const Canvas = dynamic(
 	async () => {
 		const { initWasm } = await import('@dyn/svg-composition');
@@ -14,12 +16,14 @@ export const Canvas = dynamic(
 
 		// eslint-disable-next-line react/display-name, func-names -- j
 		return function (props: TCanvasProps) {
-			const { width, height, dtif } = props;
+			const { width, height, dtif, onLoadedComposition, ...other } = props;
 			const svgContainerRef = React.useRef<HTMLDivElement>(null);
+			// const compositionRef = React.useRef<Composition | null>(null);
 			const [composition, setComposition] = React.useState<Composition | null>(null);
 
+			let isMounted = true; // https://github.com/facebook/react/issues/24502
 			React.useEffect(() => {
-				if (svgContainerRef.current != null && composition == null) {
+				if (svgContainerRef.current != null && composition == null && isMounted) {
 					const newComposition = createSVGComposition({
 						width,
 						height,
@@ -30,16 +34,24 @@ export const Canvas = dynamic(
 					});
 					setComposition(newComposition);
 					newComposition.update();
+					onLoadedComposition(newComposition);
 				}
 
 				return () => {
+					isMounted = false;
 					if (composition != null) {
 						composition.unmount();
 					}
 				};
 			}, [composition, width, height, dtif]);
 
-			return <div ref={svgContainerRef} />;
+			return (
+				<CanvasInner
+					composition={composition ?? undefined}
+					svgContainerRef={svgContainerRef}
+					{...other}
+				/>
+			);
 		};
 	},
 	{
@@ -48,8 +60,9 @@ export const Canvas = dynamic(
 	}
 );
 
-export interface TCanvasProps {
+export type TCanvasProps = {
 	width: number;
 	height: number;
 	dtif?: TComposition;
-}
+	onLoadedComposition: (composition: Composition) => void;
+} & React.HTMLAttributes<HTMLDivElement>;
