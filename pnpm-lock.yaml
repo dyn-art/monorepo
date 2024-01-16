@@ -168,6 +168,9 @@ importers:
 
   apps/web:
     dependencies:
+      '@dyn/dtif':
+        specifier: workspace:^
+        version: link:../../packages/dtif
       '@dyn/svg-composition':
         specifier: workspace:^
         version: link:../../packages/svg-composition
