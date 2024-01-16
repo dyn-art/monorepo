@@ -389,8 +389,8 @@ export class Composition {
 					isLocked: false
 				},
 				dimension: {
-					width: Math.round(width),
-					height: Math.round(height)
+					width,
+					height
 				},
 				relativeTransform: mat3(vec3(1, 0, 0), vec3(0, 1, 0), vec3(x, y, 1)),
 				blendMixin: {
@@ -437,6 +437,8 @@ export class Composition {
 	public unmount(): void {
 		this.clear();
 		this._compositionHandle.free();
+		this._renderer = [];
+		this._eventQueue = [];
 	}
 
 	public toString(): string | null {

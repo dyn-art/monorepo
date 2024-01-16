@@ -10,15 +10,14 @@ import { CanvasInner } from './CanvasInner';
 
 export const Canvas = dynamic(
 	async () => {
+		// Load and initialize WASM before the component is returned
 		const { initWasm } = await import('@dyn/svg-composition');
-
 		await initWasm();
 
-		// eslint-disable-next-line react/display-name, func-names -- j
-		return function (props: TCanvasProps) {
+		// eslint-disable-next-line react/function-component-definition, react/display-name -- Inline return
+		return (props: TCanvasProps) => {
 			const { width, height, dtif, onLoadedComposition, ...other } = props;
 			const svgContainerRef = React.useRef<HTMLDivElement>(null);
-			// const compositionRef = React.useRef<Composition | null>(null);
 			const [composition, setComposition] = React.useState<Composition | null>(null);
 
 			let isMounted = true; // https://github.com/facebook/react/issues/24502

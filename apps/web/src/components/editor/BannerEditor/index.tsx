@@ -18,7 +18,22 @@ export const BannerEditor: React.FC<TBannerEditorProps> = (props) => {
 			<div className="flex w-full flex-row items-center justify-between ">
 				<div>TODO</div>
 				<div>
-					<Button size="icon" variant="outline">
+					<Button
+						onClick={() => {
+							if (composition != null) {
+								composition.createRectangle({
+									x: 10,
+									y: 10,
+									width: 100,
+									height: 100,
+									color: [0, 0, 0]
+								});
+								composition.update();
+							}
+						}}
+						size="icon"
+						variant="outline"
+					>
 						<SquareIcon className="h-4 w-4" />
 					</Button>
 					<Button size="icon" variant="outline">
@@ -35,20 +50,7 @@ export const BannerEditor: React.FC<TBannerEditorProps> = (props) => {
 					>
 						Preview
 					</Button>
-					<Button
-						onClick={() => {
-							console.log('create rect');
-							composition?.createRectangle({
-								x: 10,
-								y: 10,
-								width: 100,
-								height: 100,
-								color: [0, 0, 0]
-							});
-						}}
-					>
-						Export
-					</Button>
+					<Button>Export</Button>
 				</div>
 			</div>
 		</div>
