@@ -25,5 +25,5 @@ pub struct ChangedNode {
 pub struct ChangedPaint {
     pub paint: Paint,
     pub parent_id: Option<Entity>,
-    pub parent_dimension: Option<DimensionMixin>,
+    pub parent_dimension_mixin: Option<DimensionMixin>,
 }

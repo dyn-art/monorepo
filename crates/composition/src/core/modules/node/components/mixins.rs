@@ -9,35 +9,36 @@ use specta::Type;
 
 /// Provides corner radius properties for rectangle like nodes.
 #[derive(Component, Serialize, Deserialize, Clone, Debug, Type)]
+#[serde(rename_all = "camelCase")]
 pub struct RectangleCornerMixin {
     /// The radius in pixels for rounding the top left corner of the node.
     /// This value determines how curved the top left corner will be.
-    #[serde(rename = "topLeftRadius")]
+    #[serde(default = "default_corner_radius")]
     pub top_left_radius: u8,
 
     /// The radius in pixels for rounding the top right corner of the node.
     /// This value influences the curvature of the top right corner.
-    #[serde(rename = "topRightRadius")]
+    #[serde(default = "default_corner_radius")]
     pub top_right_radius: u8,
 
     /// The radius in pixels for rounding the bottom right corner of the node.
     /// Adjusts the curve of the bottom right corner.
-    #[serde(rename = "bottomRightRadius")]
+    #[serde(default = "default_corner_radius")]
     pub bottom_right_radius: u8,
 
     /// The radius in pixels for rounding the bottom left corner of the node.
     /// Modifies the roundness of the bottom left corner.
-    #[serde(rename = "bottomLeftRadius")]
+    #[serde(default = "default_corner_radius")]
     pub bottom_left_radius: u8,
 }
 
 impl Default for RectangleCornerMixin {
     fn default() -> Self {
         Self {
-            top_left_radius: 0,
-            top_right_radius: 0,
-            bottom_right_radius: 0,
-            bottom_left_radius: 0,
+            top_left_radius: default_corner_radius(),
+            top_right_radius: default_corner_radius(),
+            bottom_right_radius: default_corner_radius(),
+            bottom_left_radius: default_corner_radius(),
         }
     }
 }
@@ -129,23 +130,24 @@ impl Default for AbsoluteTransformMixin {
 
 /// Contains properties related to the composition settings of a node.
 #[derive(Component, Serialize, Deserialize, Clone, Debug, Type)]
+#[serde(rename_all = "camelCase")]
 pub struct NodeCompositionMixin {
     /// Determines the visibility of the node.
-    #[serde(rename = "isVisible")]
+    #[serde(default = "default_is_visible")]
     pub is_visible: bool,
 
     /// Indicates whether the node is locked or not.
     /// A locked node restricts certain user interactions,
     /// such as selecting or dragging on the canvas.
-    #[serde(rename = "isLocked")]
+    #[serde(default = "default_is_locked")]
     pub is_locked: bool,
 }
 
 impl Default for NodeCompositionMixin {
     fn default() -> Self {
         Self {
-            is_visible: true,
-            is_locked: false,
+            is_visible: default_is_visible(),
+            is_locked: default_is_locked(),
         }
     }
 }
@@ -156,27 +158,29 @@ impl Default for NodeCompositionMixin {
 
 /// Defines blending properties for a node.
 #[derive(Component, Serialize, Deserialize, Clone, Debug, Type)]
+#[serde(rename_all = "camelCase")]
 pub struct BlendMixin {
     /// Specifies the blend mode for the node.
     /// Blend mode determines how the node's color blends with colors beneath it.
-    #[serde(rename = "blendMode")]
+    #[serde(default)]
     pub blend_mode: BlendMode,
 
     /// The opacity of the node,
     /// ranging from 0.0 (completely transparent) to 1.0 (completely opaque).
+    #[serde(default = "default_opacity")]
     pub opacity: f32,
 
     /// Indicates whether the node is used as a mask.
-    #[serde(rename = "isMask")]
+    #[serde(default = "default_is_mask")]
     pub is_mask: bool,
 }
 
 impl Default for BlendMixin {
     fn default() -> Self {
         Self {
-            blend_mode: BlendMode::Normal,
-            opacity: 1.0,
-            is_mask: false,
+            blend_mode: BlendMode::default(),
+            opacity: default_opacity(),
+            is_mask: default_is_mask(),
         }
     }
 }
@@ -214,36 +218,34 @@ pub struct Anchor {
 }
 
 #[derive(Serialize, Deserialize, Clone, PartialEq, Debug, Type)]
+#[serde(tag = "type")]
 pub enum AnchorCommand {
     /// Moves the path to a new location without drawing anything.
     MoveTo,
     /// Draws a straight line from the current position to the anchor point.
     LineTo,
     /// Draws a curve to the anchor point using two control points.
+    #[serde(rename_all = "camelCase")]
     CurveTo {
         /// The first control point for the curve.
-        #[serde(rename = "controlPoint1")]
         control_point_1: Vec2,
 
         /// The second control point for the curve.
-        #[serde(rename = "controlPoint2")]
         control_point_2: Vec2,
     },
     /// Draws an arc to the anchor point.
+    #[serde(rename_all = "camelCase")]
     ArcTo {
         /// The radius of the arc in 2D space.
         radius: Vec2,
 
         /// The rotation of the arc's x-axis, in degrees.
-        #[serde(rename = "xAxisRotation")]
         x_axis_rotation: f32,
 
         /// A flag to determine if the arc should be the larger of the two possible arcs.
-        #[serde(rename = "largeArcFlag")]
         large_arc_flag: bool,
 
         /// A flag to determine the direction of the arc sweep.
-        #[serde(rename = "sweepFlag")]
         sweep_flag: bool,
     },
     /// Closes the path by drawing a line to the start point.
@@ -256,10 +258,11 @@ pub enum AnchorCommand {
 
 /// Manages the fill properties of a graphical object.
 #[derive(Component, Serialize, Deserialize, Clone, Debug, Type)]
+#[serde(rename_all = "camelCase")]
 pub struct FillMixin {
     /// A collection of `Paint` objects,
     /// each defining a different aspect of how the object is filled.
-    #[serde(rename = "paintIds")]
+    #[serde(default)]
     pub paint_ids: Vec<Entity>,
 }
 
@@ -279,24 +282,38 @@ pub enum Paint {
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, Type)]
-pub struct SolidPaint {
-    /// The color of the paint, represented as an RGB array
-    /// where each component ranges from 0 to 255.
-    pub color: (u8, u8, u8),
-
+#[serde(rename_all = "camelCase")]
+pub struct BasePaint {
     /// The opacity of the paint,
     /// ranging from 0.0 (completely transparent) to 1.0 (completely opaque).
+    #[serde(default = "default_opacity")]
     pub opacity: f32,
 
     /// The blend mode used when applying the paint,
     /// which determines how the paint's color blends with colors underneath it.
-    #[serde(rename = "blendMode")]
+    #[serde(default)]
     pub blend_mode: BlendMode,
 
     /// Determines whether the paint is visible.
-    #[serde(rename = "isVisible")]
+    #[serde(default = "default_is_visible")]
     pub is_visible: bool,
 }
+
+#[derive(Serialize, Deserialize, Clone, Debug, Type)]
+pub struct SolidPaint {
+    #[serde(flatten)]
+    pub base_paint: BasePaint,
+
+    /// The color of the paint, represented as an RGB array
+    /// where each component ranges from 0 to 255.
+    pub color: (u8, u8, u8),
+}
+
+// #[derive(Serialize, Deserialize, Clone, Debug, Type)]
+// pub struct SolidPaint {
+//     pub
+
+// }
 
 // =============================================================================
 // Effects
@@ -321,4 +338,33 @@ pub enum BlendMode {
     Saturation,
     Color,
     Luminosity,
+}
+
+// =============================================================================
+// Defaults
+// =============================================================================
+
+#[inline]
+fn default_opacity() -> f32 {
+    1.0
+}
+
+#[inline]
+fn default_is_visible() -> bool {
+    true
+}
+
+#[inline]
+fn default_is_locked() -> bool {
+    false
+}
+
+#[inline]
+fn default_is_mask() -> bool {
+    false
+}
+
+#[inline]
+fn default_corner_radius() -> u8 {
+    0
 }

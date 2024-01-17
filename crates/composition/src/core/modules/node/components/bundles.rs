@@ -15,6 +15,7 @@ use super::{
 // =============================================================================
 
 #[derive(Bundle, Debug, Serialize, Deserialize, Clone, Type)]
+#[serde(rename_all = "camelCase")]
 pub struct FrameNodeBundle {
     #[serde(default = "default_frame_node_bundle")]
     pub node: Node,
@@ -23,28 +24,23 @@ pub struct FrameNodeBundle {
     pub frame: Frame,
 
     #[serde(default)]
-    #[serde(rename = "rectangleCornerMixin")]
     pub rectangle_corner_mixin: RectangleCornerMixin,
 
     #[serde(rename = "children")]
     pub children_mixin: ChildrenMixin,
 
     #[serde(default)]
-    #[serde(rename = "compositionMixin")]
     pub composition_mixin: NodeCompositionMixin,
 
-    #[serde(rename = "relativeTransform")]
     pub relative_transform: RelativeTransformMixin,
 
     #[serde(rename = "dimension")]
-    pub dimension: DimensionMixin,
+    pub dimension_mixin: DimensionMixin,
 
     #[serde(default)]
-    #[serde(rename = "blendMixin")]
     pub blend_mixin: BlendMixin,
 
-    #[serde(default)]
-    #[serde(rename = "fill")]
+    #[serde(rename = "fill", default)]
     pub fill_mixin: FillMixin,
 }
 
@@ -65,7 +61,7 @@ impl Default for FrameNodeBundle {
             children_mixin: ChildrenMixin::default(),
             composition_mixin: NodeCompositionMixin::default(),
             relative_transform: RelativeTransformMixin::default(),
-            dimension: DimensionMixin::default(),
+            dimension_mixin: DimensionMixin::default(),
             blend_mixin: BlendMixin::default(),
             fill_mixin: FillMixin::default(),
         }
@@ -77,6 +73,7 @@ impl Default for FrameNodeBundle {
 // =============================================================================
 
 #[derive(Bundle, Debug, Serialize, Deserialize, Clone, Type)]
+#[serde(rename_all = "camelCase")]
 pub struct GroupNodeBundle {
     #[serde(default = "default_group_node_bundle")]
     pub node: Node,
@@ -88,17 +85,14 @@ pub struct GroupNodeBundle {
     pub children_mixin: ChildrenMixin,
 
     #[serde(default)]
-    #[serde(rename = "compositionMixin")]
     pub composition_mixin: NodeCompositionMixin,
 
-    #[serde(rename = "relativeTransform")]
     pub relative_transform: RelativeTransformMixin,
 
     #[serde(rename = "dimension")]
-    pub dimension: DimensionMixin,
+    pub dimension_mixin: DimensionMixin,
 
     #[serde(default)]
-    #[serde(rename = "blendMixin")]
     pub blend_mixin: BlendMixin,
 }
 
@@ -118,7 +112,7 @@ impl Default for GroupNodeBundle {
             children_mixin: ChildrenMixin::default(),
             composition_mixin: NodeCompositionMixin::default(),
             relative_transform: RelativeTransformMixin::default(),
-            dimension: DimensionMixin::default(),
+            dimension_mixin: DimensionMixin::default(),
             blend_mixin: BlendMixin::default(),
         }
     }
@@ -129,6 +123,7 @@ impl Default for GroupNodeBundle {
 // =============================================================================
 
 #[derive(Bundle, Debug, Serialize, Deserialize, Clone, Type)]
+#[serde(rename_all = "camelCase")]
 pub struct RectangleNodeBundle {
     #[serde(default = "default_rectangle_node_bundle")]
     pub node: Node,
@@ -137,25 +132,20 @@ pub struct RectangleNodeBundle {
     pub recangle: Rectangle,
 
     #[serde(default)]
-    #[serde(rename = "rectangleCornerMixin")]
     pub rectangle_corner_mixin: RectangleCornerMixin,
 
     #[serde(default)]
-    #[serde(rename = "compositionMixin")]
     pub composition_mixin: NodeCompositionMixin,
 
-    #[serde(rename = "relativeTransform")]
     pub relative_transform: RelativeTransformMixin,
 
     #[serde(rename = "dimension")]
-    pub dimension: DimensionMixin,
+    pub dimension_mixin: DimensionMixin,
 
     #[serde(default)]
-    #[serde(rename = "blendMixin")]
     pub blend_mixin: BlendMixin,
 
-    #[serde(default)]
-    #[serde(rename = "fill")]
+    #[serde(rename = "fill", default)]
     pub fill_mixin: FillMixin,
 }
 
@@ -175,7 +165,7 @@ impl Default for RectangleNodeBundle {
             rectangle_corner_mixin: RectangleCornerMixin::default(),
             composition_mixin: NodeCompositionMixin::default(),
             relative_transform: RelativeTransformMixin::default(),
-            dimension: DimensionMixin::default(),
+            dimension_mixin: DimensionMixin::default(),
             blend_mixin: BlendMixin::default(),
             fill_mixin: FillMixin::default(),
         }
@@ -187,6 +177,7 @@ impl Default for RectangleNodeBundle {
 // =============================================================================
 
 #[derive(Bundle, Debug, Serialize, Deserialize, Clone, Type)]
+#[serde(rename_all = "camelCase")]
 pub struct TextNodeBundle {
     #[serde(default = "default_text_node_bundle")]
     pub node: Node,
@@ -194,21 +185,17 @@ pub struct TextNodeBundle {
     pub text: Text,
 
     #[serde(default)]
-    #[serde(rename = "compositionMixin")]
     pub composition_mixin: NodeCompositionMixin,
 
-    #[serde(rename = "relativeTransform")]
     pub relative_transform: RelativeTransformMixin,
 
     #[serde(rename = "dimension")]
-    pub dimension: DimensionMixin,
+    pub dimension_mixin: DimensionMixin,
 
     #[serde(default)]
-    #[serde(rename = "blendMixin")]
     pub blend_mixin: BlendMixin,
 
-    #[serde(default)]
-    #[serde(rename = "fill")]
+    #[serde(rename = "fill", default)]
     pub fill_mixin: FillMixin, // TODO: Needs adjustment to work with text segments
 }
 
@@ -223,11 +210,11 @@ fn default_text_node_bundle() -> Node {
 impl Default for TextNodeBundle {
     fn default() -> Self {
         Self {
-            node: default_rectangle_node_bundle(),
+            node: default_text_node_bundle(),
             text: Text::default(),
             composition_mixin: NodeCompositionMixin::default(),
             relative_transform: RelativeTransformMixin::default(),
-            dimension: DimensionMixin::default(),
+            dimension_mixin: DimensionMixin::default(),
             blend_mixin: BlendMixin::default(),
             fill_mixin: FillMixin::default(),
         }

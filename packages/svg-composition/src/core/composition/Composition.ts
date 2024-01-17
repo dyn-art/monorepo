@@ -69,17 +69,14 @@ export class Composition {
 						},
 						relativeTransform: mat3(vec3(1, 0, 0), vec3(0, 1, 0), vec3(0, 0, 1)),
 						fill: {
-							paintIds: [10]
+							paintIds: [1]
 						}
 					}
 				},
 				paints: {
-					10: {
+					1: {
 						type: 'Solid',
-						blendMode: 'Normal',
-						color: [0, 191, 255],
-						isVisible: true,
-						opacity: 1
+						color: [0, 191, 255]
 					}
 				}
 			},
@@ -377,32 +374,17 @@ export class Composition {
 		const { x, y, width, height, color = [0, 0, 0] } = config;
 		const paintId = this.registerPaint({
 			type: 'Solid',
-			blendMode: 'Normal',
-			color,
-			isVisible: true,
-			opacity: 1
+			color
 		});
 		return this._compositionHandle.spawnRectangleNode(
 			{
-				compositionMixin: {
-					isVisible: true,
-					isLocked: false
-				},
 				dimension: {
 					width,
 					height
 				},
 				relativeTransform: mat3(vec3(1, 0, 0), vec3(0, 1, 0), vec3(x, y, 1)),
-				blendMixin: {
-					blendMode: 'Normal',
-					opacity: 1,
-					isMask: false
-				},
 				rectangleCornerMixin: {
-					bottomLeftRadius: 20,
-					bottomRightRadius: 0,
-					topLeftRadius: 0,
-					topRightRadius: 0
+					bottomLeftRadius: 20
 				},
 				fill: {
 					paintIds: [paintId]

@@ -28,47 +28,23 @@ export type AnchorCommand =
 /**
  * Moves the path to a new location without drawing anything.
  */
-"MoveTo" | 
+{ type: "MoveTo" } | 
 /**
  * Draws a straight line from the current position to the anchor point.
  */
-"LineTo" | 
+{ type: "LineTo" } | 
 /**
  * Draws a curve to the anchor point using two control points.
  */
-{ CurveTo: { 
-/**
- * The first control point for the curve.
- */
-controlPoint1: Vec2; 
-/**
- * The second control point for the curve.
- */
-controlPoint2: Vec2 } } | 
+{ type: "CurveTo"; controlPoint1: Vec2; controlPoint2: Vec2 } | 
 /**
  * Draws an arc to the anchor point.
  */
-{ ArcTo: { 
-/**
- * The radius of the arc in 2D space.
- */
-radius: Vec2; 
-/**
- * The rotation of the arc's x-axis, in degrees.
- */
-xAxisRotation: number; 
-/**
- * A flag to determine if the arc should be the larger of the two possible arcs.
- */
-largeArcFlag: boolean; 
-/**
- * A flag to determine the direction of the arc sweep.
- */
-sweepFlag: boolean } } | 
+{ type: "ArcTo"; radius: Vec2; xAxisRotation: number; largeArcFlag: boolean; sweepFlag: boolean } | 
 /**
  * Closes the path by drawing a line to the start point.
  */
-"ClosePath"
+{ type: "ClosePath" }
 
 export type AnyCoreInputEvent = { events: CoreInputEvent[] }
 
@@ -86,6 +62,22 @@ export type AttributeRemoved = { key: string }
  */
 export type AttributeUpdated = { newValue: SVGAttribute }
 
+export type BasePaint = { 
+/**
+ * The opacity of the paint,
+ * ranging from 0.0 (completely transparent) to 1.0 (completely opaque).
+ */
+opacity?: number; 
+/**
+ * The blend mode used when applying the paint,
+ * which determines how the paint's color blends with colors underneath it.
+ */
+blendMode?: BlendMode; 
+/**
+ * Determines whether the paint is visible.
+ */
+isVisible?: boolean }
+
 /**
  * Defines blending properties for a node.
  */
@@ -94,16 +86,16 @@ export type BlendMixin = {
  * Specifies the blend mode for the node.
  * Blend mode determines how the node's color blends with colors beneath it.
  */
-blendMode: BlendMode; 
+blendMode?: BlendMode; 
 /**
  * The opacity of the node,
  * ranging from 0.0 (completely transparent) to 1.0 (completely opaque).
  */
-opacity: number; 
+opacity?: number; 
 /**
  * Indicates whether the node is used as a mask.
  */
-isMask: boolean }
+isMask?: boolean }
 
 export type BlendMode = "Normal" | "Multiply" | "Screen" | "Overlay" | "Darken" | "Lighten" | "ColorDodge" | "ColorBurn" | "HardLight" | "SoftLight" | "Difference" | "Exclusion" | "Hue" | "Saturation" | "Color" | "Luminosity"
 
@@ -285,7 +277,7 @@ export type FillMixin = {
  * A collection of `Paint` objects,
  * each defining a different aspect of how the object is filled.
  */
-paintIds: Entity[] }
+paintIds?: Entity[] }
 
 /**
  * Extends the `FontMetadata` structure with additional content for rendering.
@@ -468,6 +460,7 @@ export type Node = {
  * Represents the specific type of the node, such as `Rectangle`, `Ellipse`, `Star`, etc.
  * This field is redundant but neccessary to distinguish different nodes in the rendering process,
  * without a big overhead like a separate system for each node type/variant.
+ * Note that the NodeType should be equivalent to the 'DTIFNode' enum!
  */
 node_type: NodeType; 
 /**
@@ -476,7 +469,7 @@ node_type: NodeType;
  * such as 'Cool Node'.
  * If not provided, it defaults to `None`.
  */
-name: string | null }
+name?: string | null }
 
 /**
  * Contains properties related to the composition settings of a node.
@@ -485,13 +478,13 @@ export type NodeCompositionMixin = {
 /**
  * Determines the visibility of the node.
  */
-isVisible: boolean; 
+isVisible?: boolean; 
 /**
  * Indicates whether the node is locked or not.
  * A locked node restricts certain user interactions,
  * such as selecting or dragging on the canvas.
  */
-isLocked: boolean }
+isLocked?: boolean }
 
 export type NodeType = "None" | "Group" | "Rectangle" | "Frame" | "Text"
 
@@ -539,22 +532,22 @@ export type RectangleCornerMixin = {
  * The radius in pixels for rounding the top left corner of the node.
  * This value determines how curved the top left corner will be.
  */
-topLeftRadius: number; 
+topLeftRadius?: number; 
 /**
  * The radius in pixels for rounding the top right corner of the node.
  * This value influences the curvature of the top right corner.
  */
-topRightRadius: number; 
+topRightRadius?: number; 
 /**
  * The radius in pixels for rounding the bottom right corner of the node.
  * Adjusts the curve of the bottom right corner.
  */
-bottomRightRadius: number; 
+bottomRightRadius?: number; 
 /**
  * The radius in pixels for rounding the bottom left corner of the node.
  * Modifies the roundness of the bottom left corner.
  */
-bottomLeftRadius: number }
+bottomLeftRadius?: number }
 
 export type RectangleNodeBundle = { node?: Node; recangle?: Rectangle; rectangleCornerMixin?: RectangleCornerMixin; compositionMixin?: NodeCompositionMixin; relativeTransform: RelativeTransformMixin; dimension: DimensionMixin; blendMixin?: BlendMixin; fill?: FillMixin }
 
@@ -617,26 +610,26 @@ export type Selected = null
 
 export type SelectionChangeEvent = { selected: Entity[] }
 
-export type SolidPaint = { 
-/**
- * The color of the paint, represented as an RGB array
- * where each component ranges from 0 to 255.
- */
-color: [number, number, number]; 
+export type SolidPaint = ({ 
 /**
  * The opacity of the paint,
  * ranging from 0.0 (completely transparent) to 1.0 (completely opaque).
  */
-opacity: number; 
+opacity?: number; 
 /**
  * The blend mode used when applying the paint,
  * which determines how the paint's color blends with colors underneath it.
  */
-blendMode: BlendMode; 
+blendMode?: BlendMode; 
 /**
  * Determines whether the paint is visible.
  */
-isVisible: boolean }
+isVisible?: boolean }) & { 
+/**
+ * The color of the paint, represented as an RGB array
+ * where each component ranges from 0 to 255.
+ */
+color: [number, number, number] }
 
 /**
  * Represents a basic shape node for a star with a set number of points.

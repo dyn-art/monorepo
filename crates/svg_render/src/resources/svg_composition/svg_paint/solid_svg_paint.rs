@@ -54,10 +54,10 @@ impl SVGPaint for SolidSVGPaint {
             Paint::Solid(paint) => {
                 let root_element = self.bundle.get_root_mut();
                 root_element.set_attributes(vec![SVGAttribute::Opacity {
-                    opacity: paint.opacity,
+                    opacity: paint.base_paint.opacity,
                 }]);
                 root_element.set_styles(vec![SVGStyle::Display {
-                    display: if paint.is_visible {
+                    display: if paint.base_paint.is_visible {
                         SVGDisplayStyle::Block
                     } else {
                         SVGDisplayStyle::None
@@ -69,7 +69,7 @@ impl SVGPaint for SolidSVGPaint {
                 paint_shape_element.set_attributes(vec![SVGAttribute::Fill {
                     fill: rgb_to_hex(paint.color),
                 }]);
-                if let Some(dimension) = &changed_paint.parent_dimension {
+                if let Some(dimension) = &changed_paint.parent_dimension_mixin {
                     paint_shape_element.set_attributes(vec![
                         SVGAttribute::Width {
                             width: dimension.width,

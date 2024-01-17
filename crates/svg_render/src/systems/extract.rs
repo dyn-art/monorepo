@@ -99,7 +99,7 @@ pub fn extract_paint(
     changed_paint_query.for_each(|(entity, paint)| {
         changed.changed_paints.entry(entity).or_insert_with(|| {
             let mut parent_id: Option<Entity> = None;
-            let mut parent_dimension: Option<DimensionMixin> = None;
+            let mut parent_dimension_mixin: Option<DimensionMixin> = None;
 
             // Try to get the parent entity id and its dimension mixin
             if let Ok(parent) = parent_query.get(entity) {
@@ -109,14 +109,14 @@ pub fn extract_paint(
                 if let Ok(dimension_mixin) =
                     changed_dimension_query.get_component::<DimensionMixin>(parent_entity)
                 {
-                    parent_dimension = Some(dimension_mixin.clone());
+                    parent_dimension_mixin = Some(dimension_mixin.clone());
                 }
             }
 
             return ChangedPaint {
                 paint: paint.clone(),
                 parent_id,
-                parent_dimension,
+                parent_dimension_mixin,
             };
         });
     });
@@ -133,7 +133,7 @@ pub fn extract_paint(
                         .or_insert_with(|| ChangedPaint {
                             paint: paint.clone(),
                             parent_id: Some(parent_entity),
-                            parent_dimension: Some(dimension_mixin.clone()),
+                            parent_dimension_mixin: Some(dimension_mixin.clone()),
                         });
                 }
             }

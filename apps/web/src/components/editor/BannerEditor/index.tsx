@@ -3,12 +3,14 @@
 import React from 'react';
 import type { Composition } from '@dyn/svg-composition';
 import { Button, CircleIcon, SquareIcon } from '@dyn/ui';
+import { useWindowSize } from '@/hooks';
 
 import { Canvas, type TCanvasProps } from './components';
 
 export const BannerEditor: React.FC<TBannerEditorProps> = (props) => {
 	const { width, height, dtif } = props;
 	const [composition, setComposition] = React.useState<Composition | null>(null);
+	const size = useWindowSize(); // TODO: Figure out how to define canvas size based on window size
 
 	return (
 		<div className="flex flex-col items-center justify-center">
@@ -20,6 +22,7 @@ export const BannerEditor: React.FC<TBannerEditorProps> = (props) => {
 				<div>
 					<Button
 						onClick={() => {
+							console.log({ composition });
 							if (composition != null) {
 								composition.createRectangle({
 									x: 10,
@@ -59,4 +62,4 @@ export const BannerEditor: React.FC<TBannerEditorProps> = (props) => {
 
 export type TBannerEditorProps = {
 	// TODO:
-} & TCanvasProps;
+} & Omit<TCanvasProps, 'onLoadedComposition'>;

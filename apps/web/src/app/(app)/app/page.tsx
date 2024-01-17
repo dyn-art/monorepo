@@ -24,30 +24,27 @@ const DTIF: TComposition = {
 		},
 		1: {
 			type: 'Rectangle',
-			compositionMixin: { isVisible: true, isLocked: false },
 			dimension: {
 				width: 100,
 				height: 100
 			},
 			relativeTransform: createTransformMatrix((WIDTH - 100) / 2, (HEIGHT - 100) / 2, 30),
 			rectangleCornerMixin: {
-				bottomLeftRadius: 20,
-				bottomRightRadius: 0,
-				topLeftRadius: 0,
-				topRightRadius: 0
+				bottomLeftRadius: 20
 			},
 			fill: {
-				paintIds: [5]
+				paintIds: [6]
 			}
 		}
 	},
 	paints: {
 		5: {
 			type: 'Solid',
-			blendMode: 'Normal',
-			color: [189, 183, 107],
-			isVisible: true,
-			opacity: 1
+			color: [189, 183, 107]
+		},
+		6: {
+			type: 'Solid',
+			color: [0, 0, 0]
 		}
 	},
 	fonts: {},
