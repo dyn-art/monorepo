@@ -23,7 +23,7 @@ pub struct Node {
     /// Represents the specific type of the node, such as `Rectangle`, `Ellipse`, `Star`, etc.
     /// This field is redundant but neccessary to distinguish different nodes in the rendering process,
     /// without a big overhead like a separate system for each node type/variant.
-    /// Note that the NodeType should be equivalent to the 'DTIFNode' enum!
+    /// Note that the NodeType should be equivalent to the 'NodeBundle' enum!
     // #[serde(rename = "type")]
     pub node_type: NodeType,
 

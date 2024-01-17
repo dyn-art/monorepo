@@ -36,6 +36,7 @@
 	},
 	"homepage": "https://s.dyn.art/github",
 	"dependencies": {
+		"@dyn/dtif": "workspace:*",
 		"@dyn/utils": "workspace:*"
 	},
 	"devDependencies": {

@@ -7,7 +7,7 @@ use self::{
         CursorDownOnRotateHandle, CursorEnteredComposition, CursorExitedComposition,
         CursorMovedOnComposition, CursorUpOnComposition,
     },
-    resources::InteractiveCompositionRes,
+    resources::{InteractionMode, InteractiveCompositionRes, ViewBox},
     systems::cursor::{
         composition::{
             cursor_down::handle_cursor_down_on_composition,
@@ -37,7 +37,10 @@ enum InteractionSet {
     Last,
 }
 
-pub struct InteractiveCompositionPlugin;
+pub struct InteractiveCompositionPlugin {
+    pub width: f32,
+    pub height: f32,
+}
 
 impl Plugin for InteractiveCompositionPlugin {
     fn build(&self, app: &mut bevy_app::App) {
@@ -52,7 +55,15 @@ impl Plugin for InteractiveCompositionPlugin {
         app.add_event::<CursorDownOnRotateHandle>();
 
         // Register resources
-        app.world.init_resource::<InteractiveCompositionRes>();
+        app.world.insert_resource(InteractiveCompositionRes {
+            interaction_mode: InteractionMode::default(),
+            view_box: ViewBox {
+                width: self.width,
+                height: self.height,
+                min_y: 0.0,
+                min_x: 0.0,
+            },
+        });
 
         // Configure system sets
         app.configure_sets(

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Composition, InteractionModeForFrontend } from '@dyn/svg-composition';
+import type { Composition, InteractionModeForFrontend } from '@dyn/svg-composition';
 
 export function useInteractionMode(composition?: Composition): InteractionModeForFrontend {
 	const [interactionMode, setInteractionMode] = React.useState<InteractionModeForFrontend>({
@@ -8,8 +8,8 @@ export function useInteractionMode(composition?: Composition): InteractionModeFo
 
 	React.useEffect(() => {
 		if (composition) {
-			const unwatch = composition.onInteractionModeChange((interactionMode) => {
-				setInteractionMode(interactionMode);
+			const unwatch = composition.onInteractionModeChange((_interactionMode) => {
+				setInteractionMode(_interactionMode);
 			});
 			return () => {
 				unwatch();

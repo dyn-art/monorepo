@@ -12,7 +12,7 @@ use crate::core::modules::{
     },
 };
 
-use super::{DTIFComposition, DTIFNode};
+use super::{DTIFComposition, NodeBundle};
 
 pub struct DTIFProcessor {
     /// Maps EntityId (eid) of DTIF to actual spawned Bevy entity.
@@ -82,11 +82,11 @@ impl DTIFProcessor {
         node_entity: Entity,
         world: &mut World,
         dtif: &DTIFComposition,
-        dtif_node: &DTIFNode,
+        dtif_node: &NodeBundle,
     ) {
-        if let DTIFNode::Frame(FrameNodeBundle { fill_mixin, .. })
-        | DTIFNode::Rectangle(RectangleNodeBundle { fill_mixin, .. })
-        | DTIFNode::Text(TextNodeBundle { fill_mixin, .. }) = dtif_node
+        if let NodeBundle::Frame(FrameNodeBundle { fill_mixin, .. })
+        | NodeBundle::Rectangle(RectangleNodeBundle { fill_mixin, .. })
+        | NodeBundle::Text(TextNodeBundle { fill_mixin, .. }) = dtif_node
         {
             // Process paints and collect their Bevy entity ids
             let new_paints: Vec<Entity> = fill_mixin
@@ -119,10 +119,10 @@ impl DTIFProcessor {
         node_entity: Entity,
         world: &mut World,
         dtif: &DTIFComposition,
-        dtif_node: &DTIFNode,
+        dtif_node: &NodeBundle,
     ) {
-        if let DTIFNode::Frame(FrameNodeBundle { children_mixin, .. })
-        | DTIFNode::Group(GroupNodeBundle { children_mixin, .. }) = dtif_node
+        if let NodeBundle::Frame(FrameNodeBundle { children_mixin, .. })
+        | NodeBundle::Group(GroupNodeBundle { children_mixin, .. }) = dtif_node
         {
             // Process child nodes and collect their Bevy entity ids
             let new_children: Vec<Entity> = children_mixin
@@ -171,12 +171,12 @@ impl DTIFProcessor {
     }
 
     /// Spawns a DTIF node into the ECS world.
-    fn spawn_node(&self, world: &mut World, node: &DTIFNode) -> Entity {
+    fn spawn_node(&self, world: &mut World, node: &NodeBundle) -> Entity {
         match node {
-            DTIFNode::Frame(bundle) => world.spawn(bundle.clone()).id(),
-            DTIFNode::Rectangle(bundle) => world.spawn(bundle.clone()).id(),
-            DTIFNode::Group(bundle) => world.spawn(bundle.clone()).id(),
-            DTIFNode::Text(bundle) => world.spawn(bundle.clone()).id(),
+            NodeBundle::Frame(bundle) => world.spawn(bundle.clone()).id(),
+            NodeBundle::Rectangle(bundle) => world.spawn(bundle.clone()).id(),
+            NodeBundle::Group(bundle) => world.spawn(bundle.clone()).id(),
+            NodeBundle::Text(bundle) => world.spawn(bundle.clone()).id(),
         }
     }
 
@@ -216,6 +216,18 @@ impl DTIFProcessor {
             CoreInputEvent::EntitySetPosition(mut event) => {
                 if let Some(entity) = self.find_entity(&event.entity) {
                     event.entity = entity;
+                    world.send_event(event);
+                }
+            }
+            CoreInputEvent::NodeCreated(mut event) => {
+                if let Some(parent_entity) = event
+                    .parent_entity
+                    .as_ref()
+                    .and_then(|entity| self.find_entity(entity))
+                {
+                    event.parent_entity = Some(parent_entity);
+                    world.send_event(event);
+                } else {
                     world.send_event(event);
                 }
             }

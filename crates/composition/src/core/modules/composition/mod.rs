@@ -1,4 +1,4 @@
-use bevy_app::{Plugin, PostUpdate, PreUpdate};
+use bevy_app::{Plugin, PreUpdate};
 use bevy_ecs::world::World;
 
 use crate::core::dtif::{dtif_processor::DTIFProcessor, DTIFComposition};
@@ -9,7 +9,10 @@ use self::{
         composition::CompositionRes,
         font_cache::{font::FontContent, FontCacheRes},
     },
-    systems::layout::{handle_entity_moved, handle_entity_set_position},
+    systems::{
+        creation::handle_node_created,
+        layout::{handle_entity_moved, handle_entity_set_position},
+    },
 };
 
 use super::node::components::types::Root;
@@ -19,7 +22,7 @@ pub mod resources;
 mod systems;
 
 pub struct CompositionPlugin {
-    pub dtif: Option<DTIFComposition>,
+    pub dtif: DTIFComposition,
 }
 
 impl Plugin for CompositionPlugin {
@@ -32,14 +35,22 @@ impl Plugin for CompositionPlugin {
         app.world.init_resource::<FontCacheRes>();
 
         // Register systems
-        app.add_systems(PreUpdate, (handle_entity_moved, handle_entity_set_position));
+        app.add_systems(
+            PreUpdate,
+            (
+                handle_entity_moved,
+                handle_entity_set_position,
+                // handle_node_created, // TODO: damaged
+            ),
+        );
         #[cfg(feature = "interactive")]
-        app.add_systems(PostUpdate, systems::layout::calculate_absolute_transform);
+        app.add_systems(
+            bevy_app::PostUpdate,
+            systems::layout::interactive::calculate_absolute_transform,
+        );
 
         // Load DTIF
-        if let Some(dtif) = &self.dtif {
-            insert_dtif_into_world(&mut app.world, dtif);
-        }
+        insert_dtif_into_world(&mut app.world, &self.dtif);
     }
 }
 

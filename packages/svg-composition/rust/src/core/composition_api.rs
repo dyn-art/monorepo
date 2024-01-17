@@ -49,7 +49,7 @@ impl JsCompositionHandle {
         let (render_event_sender, render_event_receiver) = channel::<RenderUpdateEvent>();
 
         // Initalize composition
-        let mut composition = Composition::new(Some(parsed_dtif));
+        let mut composition = Composition::new(parsed_dtif);
         let app = composition.get_app_mut();
 
         // Register plugins
@@ -200,6 +200,8 @@ impl JsCompositionHandle {
     // =========================================================================
     // Spawn
     // =========================================================================
+
+    // TODO: Create spawn events instead of these methods so that it can be dynamically changed
 
     #[wasm_bindgen(js_name = spawnPaint)]
     pub fn spawn_paint(&mut self, paint: JsValue) -> JsValue {

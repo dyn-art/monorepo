@@ -1,3 +1,4 @@
+import { mat3, vec3 } from '@dyn/dtif';
 import { shortId } from '@dyn/utils';
 import { JsCompositionHandle } from '@/rust/dyn_svg_composition_api';
 import type {
@@ -22,7 +23,7 @@ import type {
 
 import type { TRustEnumKeyArray } from '../../wasm';
 import type { Renderer } from '../render';
-import { groupByType, mat3, vec3 } from '../utils';
+import { groupByType } from '../utils';
 
 export class Composition {
 	public readonly id: string;
@@ -145,6 +146,7 @@ export class Composition {
 
 	public registerRenderer(renderer: Renderer): void {
 		renderer.setSize(this._width, this._height);
+		renderer.setViewBox(this._width, this._height);
 		this._renderer.push(renderer);
 	}
 
@@ -350,18 +352,14 @@ export class Composition {
 	}
 
 	// =========================================================================
-	// Paint
-	// =========================================================================
-
-	public registerPaint(paint: Paint): Entity {
-		return this._compositionHandle.spawnPaint(paint);
-	}
-
-	// =========================================================================
 	// Entity Creation
 	// =========================================================================
 
-	public createRectangle(
+	public spawnPaint(paint: Paint): Entity {
+		return this._compositionHandle.spawnPaint(paint);
+	}
+
+	public spawnRectangle(
 		config: {
 			x: number;
 			y: number;
@@ -372,7 +370,7 @@ export class Composition {
 		parentId?: Entity
 	): Entity {
 		const { x, y, width, height, color = [0, 0, 0] } = config;
-		const paintId = this.registerPaint({
+		const paintId = this.spawnPaint({
 			type: 'Solid',
 			color
 		});

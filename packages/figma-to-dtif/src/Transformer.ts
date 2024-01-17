@@ -15,7 +15,7 @@ import {
 	type TTransformNodeConfig,
 	type TTransformPaintConfig
 } from './transform';
-import { resetDTIFNodeTransform } from './utils';
+import { resetNodeBundleTransform } from './utils';
 
 export class Transformer {
 	// Figma Nodes
@@ -87,7 +87,7 @@ export class Transformer {
 		// Reset root node layout
 		const rootNode = this.nodes.get(this._rootNodeId);
 		if (rootNode != null) {
-			resetDTIFNodeTransform(rootNode);
+			resetNodeBundleTransform(rootNode);
 		} else {
 			throw new FailedToResolveRootNodeException();
 		}

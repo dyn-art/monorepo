@@ -1,5 +1,5 @@
 import React from 'react';
-import { Composition, CursorForFrontend } from '@dyn/svg-composition';
+import type { Composition, CursorForFrontend } from '@dyn/svg-composition';
 
 export function useCursor(composition?: Composition): CursorForFrontend {
 	const [cursor, setCursor] = React.useState<CursorForFrontend>({
@@ -8,8 +8,8 @@ export function useCursor(composition?: Composition): CursorForFrontend {
 
 	React.useEffect(() => {
 		if (composition) {
-			const unwatch = composition.onCursorChange((cursor) => {
-				setCursor(cursor);
+			const unwatch = composition.onCursorChange((_cursor) => {
+				setCursor(_cursor);
 			});
 			return () => {
 				unwatch();

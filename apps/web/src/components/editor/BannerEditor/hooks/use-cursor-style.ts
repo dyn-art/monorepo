@@ -1,5 +1,5 @@
 import React from 'react';
-import { Composition } from '@dyn/svg-composition';
+import type { Composition } from '@dyn/svg-composition';
 
 import {
 	ResizeCursor,

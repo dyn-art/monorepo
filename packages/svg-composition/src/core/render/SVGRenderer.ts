@@ -20,6 +20,10 @@ export class SVGRenderer extends Renderer {
 
 	private _isCursorOutOfComposion = true;
 
+	private _viewBox: { width: number; height: number };
+	private _width: number;
+	private _height: number;
+
 	constructor(composition: Composition, options: TSVGRendererOptions = {}) {
 		super(composition);
 		const { domElement = document.body } = options;
@@ -77,8 +81,15 @@ export class SVGRenderer extends Renderer {
 	}
 
 	public setSize(width: number, height: number): void {
+		this._width = width;
+		this._height = height;
 		this._svgElement.setAttribute('width', `${width}px`);
 		this._svgElement.setAttribute('height', `${height}px`);
+	}
+
+	public setViewBox(width: number, height: number): void {
+		this._viewBox = { width, height };
+		this._svgElement.setAttribute('viewBox', `0 0 ${width} ${height}`);
 	}
 
 	public render(events: RenderUpdateEvent[]): void {

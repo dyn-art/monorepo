@@ -1,6 +1,6 @@
 import React from 'react';
+import { radiansToDegrees } from '@dyn/dtif';
 import {
-	radiansToDegrees,
 	type Composition,
 	type Entity,
 	type SVGRenderer,

@@ -20,7 +20,10 @@ export abstract class Renderer {
 	// =========================================================================
 	// Abstract
 	// =========================================================================
+
 	public abstract setSize(width: number, height: number): void;
+
+	public abstract setViewBox(width: number, height: number): void;
 
 	public abstract render(events: RenderUpdateEvent[]): void;
 

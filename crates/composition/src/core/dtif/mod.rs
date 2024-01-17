@@ -6,10 +6,7 @@ use specta::Type;
 
 use super::modules::{
     composition::{events::CoreInputEvent, resources::font_cache::font::Font},
-    node::components::{
-        bundles::{FrameNodeBundle, GroupNodeBundle, RectangleNodeBundle, TextNodeBundle},
-        mixins::Paint,
-    },
+    node::components::{bundles::NodeBundle, mixins::Paint},
 };
 
 pub mod dtif_processor;
@@ -39,7 +36,7 @@ pub struct DTIFComposition {
     /// A mapping of node identifiers to their corresponding nodes within the composition.
     /// Note: Planned to directly use `Entity` as a key once the referenced serde issue is resolved.
     ///       https://github.com/serde-rs/serde/issues/1183
-    pub nodes: HashMap<String, DTIFNode>,
+    pub nodes: HashMap<String, NodeBundle>,
 
     /// A mapping of paint identifiers to their corresponding paints within the composition.
     /// Note: Planned to directly use `Entity` as a key once the referenced serde issue is resolved.
@@ -60,13 +57,4 @@ pub struct DTIFComposition {
 
 fn default_dtif_version() -> String {
     String::from("1.0")
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug, Type)]
-#[serde(tag = "type")]
-pub enum DTIFNode {
-    Frame(FrameNodeBundle),
-    Group(GroupNodeBundle),
-    Rectangle(RectangleNodeBundle),
-    Text(TextNodeBundle),
 }

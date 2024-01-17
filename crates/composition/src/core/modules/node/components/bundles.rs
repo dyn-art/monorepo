@@ -10,6 +10,15 @@ use super::{
     types::{Frame, Group, Node, NodeType, Rectangle, Text},
 };
 
+#[derive(Serialize, Deserialize, Clone, Debug, Type)]
+#[serde(tag = "type")]
+pub enum NodeBundle {
+    Frame(FrameNodeBundle),
+    Group(GroupNodeBundle),
+    Rectangle(RectangleNodeBundle),
+    Text(TextNodeBundle),
+}
+
 // =============================================================================
 // Frame
 // =============================================================================

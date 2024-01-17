@@ -1,4 +1,4 @@
-import { Vec2 } from '@dyn/svg-composition';
+import type { Vec2 } from '@dyn/svg-composition';
 
 import { ResizeCursor, RotateCursor } from './Cursor';
 
@@ -142,7 +142,7 @@ export function getHandleMetaData(width: number, height: number): THandleMetaDat
 	];
 }
 
-export type THandleMetaData = {
+export interface THandleMetaData {
 	corner: number;
 	position: Vec2;
 	resizeHandle: {
@@ -159,7 +159,7 @@ export type THandleMetaData = {
 				cursor: RotateCursor;
 		  }
 		| false;
-};
+}
 
 export enum EHandleSide {
 	Top = 1,

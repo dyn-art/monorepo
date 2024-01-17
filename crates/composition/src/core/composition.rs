@@ -8,9 +8,12 @@ use crate::core::modules::composition::CompositionPlugin;
 use super::{
     dtif::DTIFComposition,
     events::input_event::InputEvent,
-    modules::node::{
-        components::{bundles::RectangleNodeBundle, types::Root},
-        NodePlugin,
+    modules::{
+        composition::resources::composition::CompositionRes,
+        node::{
+            components::{bundles::RectangleNodeBundle, types::Root},
+            NodePlugin,
+        },
     },
 };
 
@@ -19,13 +22,17 @@ pub struct Composition {
 }
 
 impl Composition {
-    pub fn new(dtif: Option<DTIFComposition>) -> Self {
+    pub fn new(dtif: DTIFComposition) -> Self {
         let mut app = App::new();
+        let width = dtif.width;
+        let height = dtif.height;
 
         // Register plugins
         app.add_plugins((RenderPlugin, NodePlugin, CompositionPlugin { dtif }));
         #[cfg(feature = "interactive")]
-        app.add_plugins(super::modules::interactive_composition::InteractiveCompositionPlugin);
+        app.add_plugins(
+            super::modules::interactive_composition::InteractiveCompositionPlugin { width, height },
+        );
 
         return Self { app };
     }
@@ -53,6 +60,10 @@ impl Composition {
     // =========================================================================
     // Spawn
     // =========================================================================
+
+    // TODO: Try to solve with 'NodeCreated' event as its basically the same logic,
+    //  but ofc it can't directly return the created Entity
+    //  -> Solve with callback id where the Entity is sent back under the callback id or so
 
     pub fn spawn_rectangle_node(
         &mut self,
@@ -115,6 +126,14 @@ impl Composition {
     // =========================================================================
     // Other
     // =========================================================================
+
+    pub fn set_size(&mut self, width: f32, height: f32) {
+        let maybe_composition_res = self.app.world.get_resource_mut::<CompositionRes>();
+        if let Some(mut composition_res) = maybe_composition_res {
+            composition_res.width = width;
+            composition_res.height = height;
+        }
+    }
 
     pub fn clear(&mut self) {
         self.app.world.clear_all();

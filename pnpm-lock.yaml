@@ -487,6 +487,9 @@ importers:
 
   packages/svg-composition:
     dependencies:
+      '@dyn/dtif':
+        specifier: workspace:^
+        version: link:../dtif
       '@dyn/utils':
         specifier: workspace:*
         version: link:../utils

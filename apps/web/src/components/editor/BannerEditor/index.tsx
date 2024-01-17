@@ -12,6 +12,24 @@ export const BannerEditor: React.FC<TBannerEditorProps> = (props) => {
 	const [composition, setComposition] = React.useState<Composition | null>(null);
 	const size = useWindowSize(); // TODO: Figure out how to define canvas size based on window size
 
+	const zoomIn = () => {
+		if (composition) {
+			// Adjust these values for zooming in
+			const newWidth = width * 0.8;
+			const newHeight = height * 0.8;
+			composition.renderer[0].setViewBox(newWidth, newHeight);
+		}
+	};
+
+	const zoomOut = () => {
+		if (composition) {
+			// Adjust these values for zooming out
+			const newWidth = width * 1.2;
+			const newHeight = height * 1.2;
+			composition.renderer[0].setViewBox(newWidth, newHeight);
+		}
+	};
+
 	return (
 		<div className="flex flex-col items-center justify-center">
 			<div style={{ width: width + 4, height: height + 4 }}>
@@ -24,7 +42,7 @@ export const BannerEditor: React.FC<TBannerEditorProps> = (props) => {
 						onClick={() => {
 							console.log({ composition });
 							if (composition != null) {
-								composition.createRectangle({
+								composition.spawnRectangle({
 									x: 10,
 									y: 10,
 									width: 100,
@@ -46,14 +64,19 @@ export const BannerEditor: React.FC<TBannerEditorProps> = (props) => {
 				<div className="flex flex-row gap-2">
 					<Button
 						onClick={() => {
-							console.log({ composition });
-							composition?.update();
+							zoomOut();
 						}}
 						variant="outline"
 					>
 						Preview
 					</Button>
-					<Button>Export</Button>
+					<Button
+						onClick={() => {
+							zoomIn();
+						}}
+					>
+						Export
+					</Button>
 				</div>
 			</div>
 		</div>

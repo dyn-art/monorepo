@@ -127,7 +127,7 @@ export type ChildrenMixin = Entity[]
 
 export type ContinuousId = number
 
-export type CoreInputEvent = ({ type: "EntityMoved" } & EntityMoved) | ({ type: "EntitySetPosition" } & EntitySetPosition)
+export type CoreInputEvent = ({ type: "EntityMoved" } & EntityMoved) | ({ type: "EntitySetPosition" } & EntitySetPosition) | ({ type: "NodeCreated" } & NodeCreated)
 
 export type CursorChangeEvent = { cursor: CursorForFrontend }
 
@@ -180,7 +180,7 @@ rootNodeId: Entity;
  * Note: Planned to directly use `Entity` as a key once the referenced serde issue is resolved.
  * https://github.com/serde-rs/serde/issues/1183
  */
-nodes: { [key in string]: DTIFNode }; 
+nodes: { [key in string]: NodeBundle }; 
 /**
  * A mapping of paint identifiers to their corresponding paints within the composition.
  * Note: Planned to directly use `Entity` as a key once the referenced serde issue is resolved.
@@ -198,8 +198,6 @@ fonts?: { [key in string]: Font } | null;
  * This field is optional and defaults to `None` if not provided.
  */
 changes?: CoreInputEvent[] | null }
-
-export type DTIFNode = ({ type: "Frame" } & FrameNodeBundle) | ({ type: "Group" } & GroupNodeBundle) | ({ type: "Rectangle" } & RectangleNodeBundle) | ({ type: "Text" } & TextNodeBundle)
 
 /**
  * Represents the dimensional properties of a node, specifically its width and height.
@@ -460,7 +458,7 @@ export type Node = {
  * Represents the specific type of the node, such as `Rectangle`, `Ellipse`, `Star`, etc.
  * This field is redundant but neccessary to distinguish different nodes in the rendering process,
  * without a big overhead like a separate system for each node type/variant.
- * Note that the NodeType should be equivalent to the 'DTIFNode' enum!
+ * Note that the NodeType should be equivalent to the 'NodeBundle' enum!
  */
 node_type: NodeType; 
 /**
@@ -470,6 +468,8 @@ node_type: NodeType;
  * If not provided, it defaults to `None`.
  */
 name?: string | null }
+
+export type NodeBundle = ({ type: "Frame" } & FrameNodeBundle) | ({ type: "Group" } & GroupNodeBundle) | ({ type: "Rectangle" } & RectangleNodeBundle) | ({ type: "Text" } & TextNodeBundle)
 
 /**
  * Contains properties related to the composition settings of a node.
@@ -485,6 +485,8 @@ isVisible?: boolean;
  * such as selecting or dragging on the canvas.
  */
 isLocked?: boolean }
+
+export type NodeCreated = { parentEntity: Entity | null; node: NodeBundle }
 
 export type NodeType = "None" | "Group" | "Rectangle" | "Frame" | "Text"
 

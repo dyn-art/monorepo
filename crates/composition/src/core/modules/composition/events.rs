@@ -2,13 +2,16 @@ use bevy_ecs::{entity::Entity, event::Event, world::World};
 use serde::{Deserialize, Serialize};
 use specta::Type;
 
-use crate::core::events::input_event::InputEvent;
+use crate::core::{
+    events::input_event::InputEvent, modules::node::components::bundles::NodeBundle,
+};
 
 #[derive(Debug, Serialize, Deserialize, Type, Clone)]
 #[serde(tag = "type")]
 pub enum CoreInputEvent {
     EntityMoved(EntityMoved),
     EntitySetPosition(EntitySetPosition),
+    NodeCreated(NodeCreated),
 }
 
 impl InputEvent for CoreInputEvent {
@@ -20,8 +23,22 @@ impl InputEvent for CoreInputEvent {
             CoreInputEvent::EntitySetPosition(event) => {
                 world.send_event(event);
             }
+            CoreInputEvent::NodeCreated(event) => {
+                world.send_event(event);
+            }
         }
     }
+}
+
+// =============================================================================
+// Created Events
+// =============================================================================
+
+#[derive(Event, Debug, Serialize, Deserialize, Type, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct NodeCreated {
+    pub parent_entity: Option<Entity>,
+    pub node: NodeBundle,
 }
 
 // =============================================================================

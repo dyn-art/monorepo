@@ -3,14 +3,25 @@ use glam::Vec2;
 use serde::{Deserialize, Serialize};
 use specta::Type;
 
-#[derive(Resource, Debug, Default)]
+#[derive(Resource, Debug)]
 pub struct InteractiveCompositionRes {
     pub interaction_mode: InteractionMode,
+    pub view_box: ViewBox,
 }
 
+// https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/viewBox
 #[derive(Debug)]
+pub struct ViewBox {
+    pub width: f32,
+    pub height: f32,
+    pub min_x: f32,
+    pub min_y: f32,
+}
+
+#[derive(Debug, Default)]
 pub enum InteractionMode {
     /// Default canvas mode. Nothing is happening.
+    #[default]
     None,
     /// When the user's pointer is pressed.
     Pressing { origin: Vec2 },
@@ -28,12 +39,6 @@ pub enum InteractionMode {
         initial_rotation_in_radians: f32,
         rotation_in_degrees: f32, // For cursor
     },
-}
-
-impl Default for InteractionMode {
-    fn default() -> Self {
-        Self::None
-    }
 }
 
 #[derive(Debug, Serialize, Deserialize, Type, Clone)]
