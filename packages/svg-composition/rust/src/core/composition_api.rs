@@ -5,7 +5,7 @@ use bevy_ecs::entity::Entity;
 use dyn_bevy_render_skeleton::RenderApp;
 use dyn_composition::core::composition::Composition;
 use dyn_composition::core::dtif::DTIFComposition;
-use dyn_composition::core::modules::node::components::bundles::RectangleNodeBundle;
+use dyn_composition::core::modules::node::components::bundles::{NodeBundle, RectangleNodeBundle};
 use dyn_composition::core::modules::node::components::mixins::{
     DimensionMixin, Paint, RelativeTransformMixin,
 };
@@ -211,7 +211,7 @@ impl JsCompositionHandle {
         };
 
         // Spawn a new paint in the composition
-        let entity = self.composition.spawn_node(paint, None);
+        let entity = self.composition.spawn_bundle(paint, None);
 
         return serde_wasm_bindgen::to_value(&entity).unwrap_or(JsValue::NULL);
     }
@@ -227,7 +227,7 @@ impl JsCompositionHandle {
         // Spawn a new rectangle node in the composition
         let entity = self
             .composition
-            .spawn_rectangle_node(mixin, maybe_parent_id);
+            .spawn_node_bundle(NodeBundle::Rectangle(mixin), maybe_parent_id);
 
         return serde_wasm_bindgen::to_value(&entity).unwrap_or(JsValue::NULL);
     }

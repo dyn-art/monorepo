@@ -5,10 +5,11 @@ use bevy_hierarchy::BuildWorldChildren;
 use glam::Mat3;
 
 use crate::core::modules::{
-    composition::events::CoreInputEvent,
+    composition::events::{CoreInputEvent, NodeCreated},
     node::components::{
         bundles::{FrameNodeBundle, GroupNodeBundle, RectangleNodeBundle, TextNodeBundle},
         mixins::{AbsoluteTransformMixin, ChildrenMixin, FillMixin, RelativeTransformMixin},
+        types::Node,
     },
 };
 
@@ -222,10 +223,21 @@ impl DTIFProcessor {
             CoreInputEvent::NodeCreated(mut event) => {
                 if let Some(parent_entity) = event
                     .parent_entity
-                    .as_ref()
-                    .and_then(|entity| self.find_entity(entity))
+                    .and_then(|entity| self.find_entity(&entity))
                 {
                     event.parent_entity = Some(parent_entity);
+                    match &mut event.node {
+                        NodeBundle::Rectangle(RectangleNodeBundle { fill_mixin, .. })
+                        | NodeBundle::Frame(FrameNodeBundle { fill_mixin, .. })
+                        | NodeBundle::Text(TextNodeBundle { fill_mixin, .. }) => {
+                            fill_mixin.paint_ids = fill_mixin
+                                .paint_ids
+                                .iter()
+                                .filter_map(|paint_id| self.find_entity(paint_id))
+                                .collect()
+                        }
+                        _ => {}
+                    };
                     world.send_event(event);
                 } else {
                     world.send_event(event);

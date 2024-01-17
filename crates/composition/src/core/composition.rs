@@ -11,7 +11,10 @@ use super::{
     modules::{
         composition::resources::composition::CompositionRes,
         node::{
-            components::{bundles::RectangleNodeBundle, types::Root},
+            components::{
+                bundles::{FrameNodeBundle, NodeBundle, RectangleNodeBundle, TextNodeBundle},
+                types::Root,
+            },
             NodePlugin,
         },
     },
@@ -65,33 +68,42 @@ impl Composition {
     //  but ofc it can't directly return the created Entity
     //  -> Solve with callback id where the Entity is sent back under the callback id or so
 
-    pub fn spawn_rectangle_node(
+    pub fn spawn_node_bundle(
         &mut self,
-        bundle: RectangleNodeBundle,
+        bundle: NodeBundle,
         maybe_parent_id: Option<Entity>,
     ) -> Entity {
-        let paint_ids = bundle.fill_mixin.paint_ids.clone();
-        let entity_id = self.spawn_node(bundle, maybe_parent_id);
+        let maybe_fill_mixin = match &bundle {
+            NodeBundle::Rectangle(RectangleNodeBundle { fill_mixin, .. })
+            | NodeBundle::Frame(FrameNodeBundle { fill_mixin, .. })
+            | NodeBundle::Text(TextNodeBundle { fill_mixin, .. }) => Some(fill_mixin.clone()),
+            _ => None,
+        };
+        let entity_id = match bundle {
+            NodeBundle::Frame(bundle) => self.spawn_bundle(bundle, maybe_parent_id),
+            NodeBundle::Rectangle(bundle) => self.spawn_bundle(bundle, maybe_parent_id),
+            NodeBundle::Group(bundle) => self.spawn_bundle(bundle, maybe_parent_id),
+            NodeBundle::Text(bundle) => self.spawn_bundle(bundle, maybe_parent_id),
+        };
 
-        // TODO
-        if let Some(mut entity) = self.app.world.get_entity_mut(entity_id) {
-            entity.push_children(&paint_ids);
+        if let Some(fill_mixin) = maybe_fill_mixin {
+            if let Some(mut entity) = self.app.world.get_entity_mut(entity_id) {
+                entity.push_children(&fill_mixin.paint_ids);
+            }
         }
-
-        // TOOD: Set absolute position
 
         return entity_id;
     }
 
-    pub fn spawn_node<B: Bundle + std::fmt::Debug>(
+    pub fn spawn_bundle<B: Bundle + std::fmt::Debug>(
         &mut self,
         bundle: B,
         maybe_parent_id: Option<Entity>,
     ) -> Entity {
-        let entity_id = self.app.world.spawn::<B>(bundle).id();
+        let entity = self.app.world.spawn::<B>(bundle).id();
 
         // If no parent id provided the root node will become the parent
-        let maybe_parent_id = maybe_parent_id.or_else(|| {
+        let maybe_parent_entity = maybe_parent_id.or_else(|| {
             self.app
                 .world
                 .query_filtered::<Entity, With<Root>>()
@@ -100,13 +112,13 @@ impl Composition {
         });
 
         // Establish potential parent child relation
-        if let Some(parent_id) = maybe_parent_id {
-            if let Some(mut entity) = self.app.world.get_entity_mut(parent_id) {
-                entity.push_children(&[entity_id]);
+        if let Some(parent_entity) = maybe_parent_entity {
+            if let Some(mut parent) = self.app.world.get_entity_mut(parent_entity) {
+                parent.push_children(&[entity]);
             }
         }
 
-        return entity_id;
+        return entity;
     }
 
     // =========================================================================
