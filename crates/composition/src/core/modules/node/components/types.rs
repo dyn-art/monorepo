@@ -23,23 +23,15 @@ pub struct Node {
     /// Represents the specific type of the node, such as `Rectangle`, `Ellipse`, `Star`, etc.
     /// This field is redundant but neccessary to distinguish different nodes in the rendering process,
     /// without a big overhead like a separate system for each node type/variant.
-    /// Note that the NodeType should be equivalent to the 'NodeBundle' enum!
-    // #[serde(rename = "type")]
+    /// Note that the NodeType should be equivalent to the 'NodeBundle' enum
+    /// and when creating a new `NodeBundle` always use the default of that specific bundle!
     pub node_type: NodeType,
-
-    /// The name of the node.
-    /// This is an optional field and can be used to label the node with a descriptive name,
-    /// such as 'Cool Node'.
-    /// If not provided, it defaults to `None`.
-    #[serde(default)]
-    pub name: Option<String>,
 }
 
 impl Default for Node {
     fn default() -> Self {
         Self {
             node_type: NodeType::None,
-            name: None,
         }
     }
 }
@@ -61,21 +53,22 @@ pub enum NodeType {
 /// Acts as a container used to define a layout hierarchy.
 /// It functions similarly to an HTML `<div>` element.
 /// This is distinct from a `GroupNode`, which is more akin to a folder for layers in its use and functionality.
-#[derive(Component, Serialize, Deserialize, Clone, Debug, Type)]
+#[derive(Component, Serialize, Deserialize, Clone, Default, Debug, Type)]
+#[serde(rename_all = "camelCase")]
 pub struct Frame {
+    #[serde(default)]
+    _frame: Option<()>,
+
     /// Indicates whether the frame clips its content to its bounding box.
     /// When set to `true`, content that extends beyond the frame's boundaries will be clipped.
     /// When `false`, content can extend beyond the frame's boundaries without being clipped.
-    #[serde(rename = "clipContent")]
+    #[serde(default = "default_clip_content")]
     clip_content: bool,
 }
 
-impl Default for Frame {
-    fn default() -> Self {
-        Self {
-            clip_content: false,
-        }
-    }
+#[inline]
+fn default_clip_content() -> bool {
+    true
 }
 
 // =============================================================================
@@ -91,7 +84,10 @@ impl Default for Frame {
 /// As a result, while it is possible to move or resize a `Group`, be aware that its
 /// position and size are subject to change in response to modifications of its content.
 #[derive(Component, Serialize, Deserialize, Clone, Default, Debug, Type)]
-pub struct Group;
+pub struct Group {
+    #[serde(default)]
+    _group: Option<()>,
+}
 
 // =============================================================================
 // Rectangle
@@ -101,7 +97,10 @@ pub struct Group;
 /// It is a fundamental building block used to create and manipulate rectangular shapes
 /// within the composition.
 #[derive(Component, Serialize, Deserialize, Clone, Default, Debug, Type)]
-pub struct Rectangle;
+pub struct Rectangle {
+    #[serde(default)]
+    _rectangle: Option<()>,
+}
 
 // =============================================================================
 // Ellipse
@@ -110,11 +109,15 @@ pub struct Rectangle;
 /// Represents a basic shape node for an ellipse.
 /// Note that a circle is a special case of an ellipse where the width equals the height.
 #[derive(Component, Serialize, Deserialize, Clone, Default, Debug, Type)]
+#[serde(rename_all = "camelCase")]
 pub struct Ellipse {
+    #[serde(default)]
+    _ellipse: Option<()>,
+
     /// Contains the arc data for the ellipse,
     /// which includes the starting angle, ending angle, and the inner radius ratio.
     /// These properties are used to create arcs and donuts shapes.
-    #[serde(rename = "arcData")]
+    #[serde(default)]
     pub arc_data: EllipseArcData,
 }
 
@@ -122,18 +125,16 @@ pub struct Ellipse {
 /// This includes properties for defining the sweep of the ellipse and its inner radius,
 /// which are used in UI elements to create various elliptical shapes.
 #[derive(Default, Serialize, Deserialize, Clone, Debug, Type)]
+#[serde(rename_all = "camelCase")]
 pub struct EllipseArcData {
     /// The starting angle of the ellipse's arc.
-    #[serde(rename = "startingAngle")]
     pub starting_angle: f32,
 
     /// The ending angle of the ellipse's arc.
-    #[serde(rename = "endingAngle")]
     pub ending_angle: f32,
 
     /// The ratio of the inner radius to the outer radius of the ellipse.
     /// A value of 0 indicates a full ellipse, while higher values create a 'donut' shape.
-    #[serde(rename = "innerRadiusRatio")]
     pub inner_radius_ratio: f32,
 }
 
@@ -143,16 +144,24 @@ pub struct EllipseArcData {
 
 /// Represents a basic shape node for a star with a set number of points.
 #[derive(Component, Serialize, Deserialize, Clone, Default, Debug, Type)]
+#[serde(rename_all = "camelCase")]
 pub struct Star {
+    #[serde(default)]
+    _star: Option<()>,
+
     /// The number of "spikes", or outer points of the star.
     /// This value must be an integer greater than or equal to 3.
-    #[serde(rename = "pointCount")]
+    #[serde(default = "default_star_point_count")]
     pub point_count: u8,
 
     /// The ratio of the inner radius to the outer radius of the star.
     /// This value is used to define the sharpness of the star's points.
-    #[serde(rename = "innerRadiusRatio")]
     pub inner_radius_ratio: f32,
+}
+
+#[inline]
+fn default_star_point_count() -> u8 {
+    5
 }
 
 // =============================================================================
@@ -161,11 +170,20 @@ pub struct Star {
 
 /// Represents a basic shape node for a regular convex polygon with three or more sides.
 #[derive(Component, Serialize, Deserialize, Clone, Default, Debug, Type)]
+#[serde(rename_all = "camelCase")]
 pub struct Polygon {
+    #[serde(default)]
+    _polygon: Option<()>,
+
     /// The number of sides of the polygon.
     /// This value must be an integer greater than or equal to 3.
-    #[serde(rename = "pointCount")]
+    #[serde(default = "default_polygon_point_count")]
     pub point_count: u8,
+}
+
+#[inline]
+fn default_polygon_point_count() -> u8 {
+    3
 }
 
 // =============================================================================
@@ -174,23 +192,24 @@ pub struct Polygon {
 
 /// Represents a text node with customizable style and layout properties.
 #[derive(Component, Serialize, Deserialize, Clone, Default, Debug, Type)]
+#[serde(rename_all = "camelCase")]
 pub struct Text {
+    #[serde(default)]
+    _text: Option<()>,
+
     /// Sections of the text, each with its own style.
     pub segments: Vec<TextSegment>,
 
     /// Horizontal alignment of the text within its container.
     #[serde(default)]
-    #[serde(rename = "horizontalTextAlignment")]
     pub horizontal_text_alignment: HorizontalTextAlignment,
 
     /// Vertical alignment of the text within its container.
     #[serde(default)]
-    #[serde(rename = "verticalTextAlignment")]
     pub vertical_text_alignment: VerticalTextAlignment,
 
     /// Behavior of text line breaking at the bounds of its container.
     #[serde(default)]
-    #[serde(rename = "linebreakBehaviour")]
     pub linebreak_behavior: BreakLineOn,
 }
 
@@ -205,23 +224,20 @@ pub struct TextSegment {
 
 /// Style properties for a text segment, defining its appearance.
 #[derive(Serialize, Deserialize, Clone, Default, Debug, Type)]
+#[serde(rename_all = "camelCase")]
 pub struct TextStyle {
     /// Height of rasterized glyphs in pixels, influenced by window scale.
-    #[serde(rename = "fontSize")]
     pub font_size: u32,
 
     /// Primary font identifier.
-    #[serde(rename = "fontId")]
     pub font_id: u64,
 
     /// Spacing between characters.
     #[serde(default)]
-    #[serde(rename = "letterSpacing")]
     pub letter_spacing: LetterSpacing,
 
     /// Vertical spacing between lines of text.
     #[serde(default)]
-    #[serde(rename = "lineHeight")]
     pub line_height: LineHeight,
 }
 

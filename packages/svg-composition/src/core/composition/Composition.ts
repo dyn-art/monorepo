@@ -12,9 +12,9 @@ import type {
 	InteractionModeChangeEvent,
 	InteractionModeForFrontend,
 	MixinChange,
+	NodeBundle,
 	OutputEvent,
 	Paint,
-	RectangleNodeBundle,
 	RenderUpdateEvent,
 	SelectionChangeEvent,
 	TrackableMixinType,
@@ -374,22 +374,21 @@ export class Composition {
 			type: 'Solid',
 			color
 		});
-		return this._compositionHandle.spawnRectangleNode(
-			{
-				dimension: {
-					width,
-					height
-				},
-				relativeTransform: mat3(vec3(1, 0, 0), vec3(0, 1, 0), vec3(x, y, 1)),
-				rectangleCornerMixin: {
-					bottomLeftRadius: 20
-				},
-				fill: {
-					paintIds: [paintId]
-				}
-			} as RectangleNodeBundle,
-			parentId
-		);
+		const bundle: NodeBundle = {
+			type: 'Rectangle',
+			dimension: {
+				width,
+				height
+			},
+			relativeTransform: mat3(vec3(1, 0, 0), vec3(0, 1, 0), vec3(x, y, 1)),
+			rectangleCornerMixin: {
+				bottomLeftRadius: 20
+			},
+			fill: {
+				paintIds: [paintId]
+			}
+		};
+		return this._compositionHandle.spawnNodeBundle(bundle, parentId);
 	}
 
 	// =========================================================================

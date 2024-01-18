@@ -130,7 +130,7 @@ async fn prepare_composition(composition: &mut DTIFComposition) -> Result<(), re
 
 fn generate_svg(body: DTIFComposition) -> Result<String, AppError> {
     // Initialize composition
-    let mut composition = Composition::new(Some(body));
+    let mut composition = Composition::new(body);
     let app = composition.get_app_mut();
 
     // Register plugins

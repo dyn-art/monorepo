@@ -4,6 +4,26 @@ use serde::{Deserialize, Serialize};
 use specta::Type;
 
 // =============================================================================
+// Node Meta Mixin
+// =============================================================================
+
+#[derive(Component, Serialize, Deserialize, Clone, Debug, Type)]
+pub struct NodeMetaMixin {
+    /// The name of the node.
+    /// This is an optional field and can be used to label the node with a descriptive name,
+    /// such as 'Cool Node'.
+    /// If not provided, it defaults to `None`.
+    #[serde(default)]
+    pub name: Option<String>,
+}
+
+impl Default for NodeMetaMixin {
+    fn default() -> Self {
+        Self { name: None }
+    }
+}
+
+// =============================================================================
 // Rectangle Corner Mixin
 // =============================================================================
 

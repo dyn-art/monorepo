@@ -233,13 +233,13 @@ export type ElementDeleted = Record<string, never>
  * Represents a basic shape node for an ellipse.
  * Note that a circle is a special case of an ellipse where the width equals the height.
  */
-export type Ellipse = { 
+export type Ellipse = { ellipse?: null | null; 
 /**
  * Contains the arc data for the ellipse,
  * which includes the starting angle, ending angle, and the inner radius ratio.
  * These properties are used to create arcs and donuts shapes.
  */
-arcData: EllipseArcData }
+arcData?: EllipseArcData }
 
 /**
  * Represents the arc data for an ellipse.
@@ -345,15 +345,28 @@ export type FontStyle =
  * It functions similarly to an HTML `<div>` element.
  * This is distinct from a `GroupNode`, which is more akin to a folder for layers in its use and functionality.
  */
-export type Frame = { 
+export type Frame = { frame?: null | null; 
 /**
  * Indicates whether the frame clips its content to its bounding box.
  * When set to `true`, content that extends beyond the frame's boundaries will be clipped.
  * When `false`, content can extend beyond the frame's boundaries without being clipped.
  */
-clipContent: boolean }
+clipContent?: boolean }
 
-export type FrameNodeBundle = { node?: Node; frame?: Frame; rectangleCornerMixin?: RectangleCornerMixin; children: ChildrenMixin; compositionMixin?: NodeCompositionMixin; relativeTransform: RelativeTransformMixin; dimension: DimensionMixin; blendMixin?: BlendMixin; fill?: FillMixin }
+export type FrameNodeBundle = ({ 
+/**
+ * The name of the node.
+ * This is an optional field and can be used to label the node with a descriptive name,
+ * such as 'Cool Node'.
+ * If not provided, it defaults to `None`.
+ */
+name?: string | null }) & ({ frame?: null | null; 
+/**
+ * Indicates whether the frame clips its content to its bounding box.
+ * When set to `true`, content that extends beyond the frame's boundaries will be clipped.
+ * When `false`, content can extend beyond the frame's boundaries without being clipped.
+ */
+clipContent?: boolean }) & { node?: Node; rectangleCornerMixin?: RectangleCornerMixin; children: ChildrenMixin; compositionMixin?: NodeCompositionMixin; relativeTransform: RelativeTransformMixin; dimension: DimensionMixin; blendMixin?: BlendMixin; fill?: FillMixin }
 
 /**
  * Serves as a container used to semantically group related nodes,
@@ -365,9 +378,16 @@ export type FrameNodeBundle = { node?: Node; frame?: Frame; rectangleCornerMixin
  * As a result, while it is possible to move or resize a `Group`, be aware that its
  * position and size are subject to change in response to modifications of its content.
  */
-export type Group = null
+export type Group = { _group?: null | null }
 
-export type GroupNodeBundle = { node?: Node; group?: Group; children: ChildrenMixin; compositionMixin?: NodeCompositionMixin; relativeTransform: RelativeTransformMixin; dimension: DimensionMixin; blendMixin?: BlendMixin }
+export type GroupNodeBundle = ({ _group?: null | null }) & ({ 
+/**
+ * The name of the node.
+ * This is an optional field and can be used to label the node with a descriptive name,
+ * such as 'Cool Node'.
+ * If not provided, it defaults to `None`.
+ */
+name?: string | null }) & { node?: Node; children: ChildrenMixin; compositionMixin?: NodeCompositionMixin; relativeTransform: RelativeTransformMixin; dimension: DimensionMixin; blendMixin?: BlendMixin }
 
 export type HandleSide = "Top" | "Bottom" | "Left" | "Right"
 
@@ -458,16 +478,10 @@ export type Node = {
  * Represents the specific type of the node, such as `Rectangle`, `Ellipse`, `Star`, etc.
  * This field is redundant but neccessary to distinguish different nodes in the rendering process,
  * without a big overhead like a separate system for each node type/variant.
- * Note that the NodeType should be equivalent to the 'NodeBundle' enum!
+ * Note that the NodeType should be equivalent to the 'NodeBundle' enum
+ * and when creating a new `NodeBundle` always use the default of that specific bundle!
  */
-node_type: NodeType; 
-/**
- * The name of the node.
- * This is an optional field and can be used to label the node with a descriptive name,
- * such as 'Cool Node'.
- * If not provided, it defaults to `None`.
- */
-name?: string | null }
+node_type: NodeType }
 
 export type NodeBundle = ({ type: "Frame" } & FrameNodeBundle) | ({ type: "Group" } & GroupNodeBundle) | ({ type: "Rectangle" } & RectangleNodeBundle) | ({ type: "Text" } & TextNodeBundle)
 
@@ -487,6 +501,15 @@ isVisible?: boolean;
 isLocked?: boolean }
 
 export type NodeCreated = { parentEntity: Entity | null; node: NodeBundle }
+
+export type NodeMetaMixin = { 
+/**
+ * The name of the node.
+ * This is an optional field and can be used to label the node with a descriptive name,
+ * such as 'Cool Node'.
+ * If not provided, it defaults to `None`.
+ */
+name?: string | null }
 
 export type NodeType = "None" | "Group" | "Rectangle" | "Frame" | "Text"
 
@@ -512,19 +535,19 @@ vertices: Anchor[] }
 /**
  * Represents a basic shape node for a regular convex polygon with three or more sides.
  */
-export type Polygon = { 
+export type Polygon = { polygon?: null | null; 
 /**
  * The number of sides of the polygon.
  * This value must be an integer greater than or equal to 3.
  */
-pointCount: number }
+pointCount?: number }
 
 /**
  * Represents a basic shape node for a rectangle.
  * It is a fundamental building block used to create and manipulate rectangular shapes
  * within the composition.
  */
-export type Rectangle = null
+export type Rectangle = { _rectangle?: null | null }
 
 /**
  * Provides corner radius properties for rectangle like nodes.
@@ -551,7 +574,14 @@ bottomRightRadius?: number;
  */
 bottomLeftRadius?: number }
 
-export type RectangleNodeBundle = { node?: Node; recangle?: Rectangle; rectangleCornerMixin?: RectangleCornerMixin; compositionMixin?: NodeCompositionMixin; relativeTransform: RelativeTransformMixin; dimension: DimensionMixin; blendMixin?: BlendMixin; fill?: FillMixin }
+export type RectangleNodeBundle = ({ _rectangle?: null | null }) & ({ 
+/**
+ * The name of the node.
+ * This is an optional field and can be used to label the node with a descriptive name,
+ * such as 'Cool Node'.
+ * If not provided, it defaults to `None`.
+ */
+name?: string | null }) & { node?: Node; rectangleCornerMixin?: RectangleCornerMixin; compositionMixin?: NodeCompositionMixin; relativeTransform: RelativeTransformMixin; dimension: DimensionMixin; blendMixin?: BlendMixin; fill?: FillMixin }
 
 /**
  * Represents the relative position and orientation of a node within its parent's coordinate system.
@@ -636,12 +666,12 @@ color: [number, number, number] }
 /**
  * Represents a basic shape node for a star with a set number of points.
  */
-export type Star = { 
+export type Star = { star?: null | null; 
 /**
  * The number of "spikes", or outer points of the star.
  * This value must be an integer greater than or equal to 3.
  */
-pointCount: number; 
+pointCount?: number; 
 /**
  * The ratio of the inner radius to the outer radius of the star.
  * This value is used to define the sharpness of the star's points.
@@ -661,7 +691,7 @@ export type StyleUpdated = { newValue: SVGStyle }
 /**
  * Represents a text node with customizable style and layout properties.
  */
-export type Text = { 
+export type Text = { text?: null | null; 
 /**
  * Sections of the text, each with its own style.
  */
@@ -677,9 +707,32 @@ verticalTextAlignment?: VerticalTextAlignment;
 /**
  * Behavior of text line breaking at the bounds of its container.
  */
-linebreakBehaviour?: BreakLineOn }
+linebreakBehavior?: BreakLineOn }
 
-export type TextNodeBundle = { node?: Node; text: Text; compositionMixin?: NodeCompositionMixin; relativeTransform: RelativeTransformMixin; dimension: DimensionMixin; blendMixin?: BlendMixin; fill?: FillMixin }
+export type TextNodeBundle = ({ text?: null | null; 
+/**
+ * Sections of the text, each with its own style.
+ */
+segments: TextSegment[]; 
+/**
+ * Horizontal alignment of the text within its container.
+ */
+horizontalTextAlignment?: HorizontalTextAlignment; 
+/**
+ * Vertical alignment of the text within its container.
+ */
+verticalTextAlignment?: VerticalTextAlignment; 
+/**
+ * Behavior of text line breaking at the bounds of its container.
+ */
+linebreakBehavior?: BreakLineOn }) & ({ 
+/**
+ * The name of the node.
+ * This is an optional field and can be used to label the node with a descriptive name,
+ * such as 'Cool Node'.
+ * If not provided, it defaults to `None`.
+ */
+name?: string | null }) & { node?: Node; compositionMixin?: NodeCompositionMixin; relativeTransform: RelativeTransformMixin; dimension: DimensionMixin; blendMixin?: BlendMixin; fill?: FillMixin }
 
 /**
  * A segment of text with a specific style.

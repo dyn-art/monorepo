@@ -4,7 +4,7 @@ use specta::Type;
 
 use super::{
     mixins::{
-        BlendMixin, ChildrenMixin, DimensionMixin, FillMixin, NodeCompositionMixin,
+        BlendMixin, ChildrenMixin, DimensionMixin, FillMixin, NodeCompositionMixin, NodeMetaMixin,
         RectangleCornerMixin, RelativeTransformMixin,
     },
     types::{Frame, Group, Node, NodeType, Rectangle, Text},
@@ -29,7 +29,10 @@ pub struct FrameNodeBundle {
     #[serde(default = "default_frame_node_bundle")]
     pub node: Node,
 
-    #[serde(default)]
+    #[serde(flatten)]
+    pub meta: NodeMetaMixin,
+
+    #[serde(flatten)]
     pub frame: Frame,
 
     #[serde(default)]
@@ -57,7 +60,6 @@ pub struct FrameNodeBundle {
 fn default_frame_node_bundle() -> Node {
     Node {
         node_type: NodeType::Frame,
-        name: None,
     }
 }
 
@@ -66,6 +68,7 @@ impl Default for FrameNodeBundle {
         Self {
             node: default_frame_node_bundle(),
             frame: Frame::default(),
+            meta: NodeMetaMixin::default(),
             rectangle_corner_mixin: RectangleCornerMixin::default(),
             children_mixin: ChildrenMixin::default(),
             composition_mixin: NodeCompositionMixin::default(),
@@ -87,8 +90,11 @@ pub struct GroupNodeBundle {
     #[serde(default = "default_group_node_bundle")]
     pub node: Node,
 
-    #[serde(default)]
+    #[serde(flatten)]
     pub group: Group,
+
+    #[serde(flatten)]
+    pub meta: NodeMetaMixin,
 
     #[serde(rename = "children")]
     pub children_mixin: ChildrenMixin,
@@ -109,7 +115,6 @@ pub struct GroupNodeBundle {
 fn default_group_node_bundle() -> Node {
     Node {
         node_type: NodeType::Group,
-        name: None,
     }
 }
 
@@ -118,6 +123,7 @@ impl Default for GroupNodeBundle {
         Self {
             node: default_group_node_bundle(),
             group: Group::default(),
+            meta: NodeMetaMixin::default(),
             children_mixin: ChildrenMixin::default(),
             composition_mixin: NodeCompositionMixin::default(),
             relative_transform: RelativeTransformMixin::default(),
@@ -137,8 +143,11 @@ pub struct RectangleNodeBundle {
     #[serde(default = "default_rectangle_node_bundle")]
     pub node: Node,
 
-    #[serde(default)]
+    #[serde(flatten)]
     pub recangle: Rectangle,
+
+    #[serde(flatten)]
+    pub meta: NodeMetaMixin,
 
     #[serde(default)]
     pub rectangle_corner_mixin: RectangleCornerMixin,
@@ -162,7 +171,6 @@ pub struct RectangleNodeBundle {
 fn default_rectangle_node_bundle() -> Node {
     Node {
         node_type: NodeType::Rectangle,
-        name: None,
     }
 }
 
@@ -171,6 +179,7 @@ impl Default for RectangleNodeBundle {
         Self {
             node: default_rectangle_node_bundle(),
             recangle: Rectangle::default(),
+            meta: NodeMetaMixin::default(),
             rectangle_corner_mixin: RectangleCornerMixin::default(),
             composition_mixin: NodeCompositionMixin::default(),
             relative_transform: RelativeTransformMixin::default(),
@@ -191,7 +200,11 @@ pub struct TextNodeBundle {
     #[serde(default = "default_text_node_bundle")]
     pub node: Node,
 
+    #[serde(flatten)]
     pub text: Text,
+
+    #[serde(flatten)]
+    pub meta: NodeMetaMixin,
 
     #[serde(default)]
     pub composition_mixin: NodeCompositionMixin,
@@ -212,7 +225,6 @@ pub struct TextNodeBundle {
 fn default_text_node_bundle() -> Node {
     Node {
         node_type: NodeType::Text,
-        name: None,
     }
 }
 
@@ -221,6 +233,7 @@ impl Default for TextNodeBundle {
         Self {
             node: default_text_node_bundle(),
             text: Text::default(),
+            meta: NodeMetaMixin::default(),
             composition_mixin: NodeCompositionMixin::default(),
             relative_transform: RelativeTransformMixin::default(),
             dimension_mixin: DimensionMixin::default(),

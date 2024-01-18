@@ -5,7 +5,7 @@ use bevy_ecs::entity::Entity;
 use dyn_bevy_render_skeleton::RenderApp;
 use dyn_composition::core::composition::Composition;
 use dyn_composition::core::dtif::DTIFComposition;
-use dyn_composition::core::modules::node::components::bundles::{NodeBundle, RectangleNodeBundle};
+use dyn_composition::core::modules::node::components::bundles::NodeBundle;
 use dyn_composition::core::modules::node::components::mixins::{
     DimensionMixin, Paint, RelativeTransformMixin,
 };
@@ -201,8 +201,6 @@ impl JsCompositionHandle {
     // Spawn
     // =========================================================================
 
-    // TODO: Create spawn events instead of these methods so that it can be dynamically changed
-
     #[wasm_bindgen(js_name = spawnPaint)]
     pub fn spawn_paint(&mut self, paint: JsValue) -> JsValue {
         let paint: Paint = match serde_wasm_bindgen::from_value(paint) {
@@ -216,18 +214,18 @@ impl JsCompositionHandle {
         return serde_wasm_bindgen::to_value(&entity).unwrap_or(JsValue::NULL);
     }
 
-    #[wasm_bindgen(js_name = spawnRectangleNode)]
-    pub fn spawn_rectangle_node(&mut self, mixin: JsValue, maybe_parent_id: JsValue) -> JsValue {
-        let mixin: RectangleNodeBundle = match serde_wasm_bindgen::from_value(mixin) {
-            Ok(mixin) => mixin,
+    #[wasm_bindgen(js_name = spawnNodeBundle)]
+    pub fn spawn_node_bundle(&mut self, node_bundle: JsValue, maybe_parent_id: JsValue) -> JsValue {
+        let node_bundle: NodeBundle = match serde_wasm_bindgen::from_value(node_bundle) {
+            Ok(node_bundle) => node_bundle,
             Err(_) => return JsValue::NULL,
         };
         let maybe_parent_id = convert_optional_jsvalue::<Entity>(maybe_parent_id);
 
-        // Spawn a new rectangle node in the composition
+        // Spawn a new node bundle (Rectangle, Frame, ..) in the composition
         let entity = self
             .composition
-            .spawn_node_bundle(NodeBundle::Rectangle(mixin), maybe_parent_id);
+            .spawn_node_bundle(node_bundle, maybe_parent_id);
 
         return serde_wasm_bindgen::to_value(&entity).unwrap_or(JsValue::NULL);
     }
