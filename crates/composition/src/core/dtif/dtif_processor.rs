@@ -212,6 +212,9 @@ impl DTIFProcessor {
             CoreInputEvent::CompositionResized(event) => {
                 world.send_event(event);
             }
+            CoreInputEvent::CompositionViewBoxChanged(event) => {
+                world.send_event(event);
+            }
 
             // Node Events
             CoreInputEvent::NodeCreated(mut event) => {

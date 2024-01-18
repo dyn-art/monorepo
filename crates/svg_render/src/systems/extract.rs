@@ -1,20 +1,48 @@
 use bevy_ecs::{
+    change_detection::DetectChanges,
     component::Component,
     entity::Entity,
     query::{Changed, With},
-    system::{Query, ResMut},
+    system::{Query, Res, ResMut},
 };
 use bevy_hierarchy::{Children, Parent};
 use dyn_bevy_render_skeleton::extract_param::Extract;
-use dyn_composition::core::modules::node::components::{
-    mixins::{ChildrenMixin, DimensionMixin, Paint},
-    types::Node,
+use dyn_composition::core::modules::{
+    composition::resources::composition::CompositionRes,
+    node::components::{
+        mixins::{ChildrenMixin, DimensionMixin, Paint},
+        types::Node,
+    },
 };
 
 use crate::{
+    composition_change::CompositionChange,
     mixin_change::ToMixinChange,
-    resources::changed_components::{ChangedComponentsRes, ChangedNode, ChangedPaint},
+    resources::{
+        changed_components::{ChangedComponentsRes, ChangedNode, ChangedPaint},
+        svg_composition::{
+            events::{SizeChanged, ViewBoxChanged},
+            SVGCompositionRes,
+        },
+    },
 };
+
+pub fn extract_composition(
+    mut svg_composition: ResMut<SVGCompositionRes>,
+    composition: Extract<Res<CompositionRes>>,
+) {
+    if composition.is_changed() {
+        svg_composition.forward_composition_changes(vec![
+            CompositionChange::SizeChanged(SizeChanged {
+                width: composition.width,
+                height: composition.height,
+            }),
+            CompositionChange::ViewBoxChanged(ViewBoxChanged {
+                view_box: composition.view_box,
+            }),
+        ])
+    }
+}
 
 // Special handling for ChildrenMixin as the ChildrenMixin is no Component itself in the ECS
 // as the child parent relation is managed by Bevy's children implementation

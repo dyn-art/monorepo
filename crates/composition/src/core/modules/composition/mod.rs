@@ -4,13 +4,15 @@ use bevy_ecs::world::World;
 use crate::core::dtif::{dtif_processor::DTIFProcessor, DTIFComposition};
 
 use self::{
-    events::{EntityMoved, EntitySetPosition},
+    events::{
+        CompositionResized, CompositionViewBoxChanged, EntityMoved, EntitySetPosition, NodeCreated,
+    },
     resources::{
-        composition::CompositionRes,
+        composition::{CompositionRes, ViewBox},
         font_cache::{font::FontContent, FontCacheRes},
     },
     systems::{
-        composition::handle_composition_resized,
+        composition::{handle_composition_resized, handle_composition_view_box_changed},
         entity::{handle_entity_moved, handle_entity_set_position},
         node::handle_node_created,
     },
@@ -29,8 +31,11 @@ pub struct CompositionPlugin {
 impl Plugin for CompositionPlugin {
     fn build(&self, app: &mut bevy_app::App) {
         // Register events
+        app.add_event::<CompositionResized>();
+        app.add_event::<CompositionViewBoxChanged>();
         app.add_event::<EntityMoved>();
         app.add_event::<EntitySetPosition>();
+        app.add_event::<NodeCreated>();
 
         // Register resources
         app.world.init_resource::<FontCacheRes>();
@@ -39,7 +44,8 @@ impl Plugin for CompositionPlugin {
         app.add_systems(
             PreUpdate,
             (
-                // handle_composition_resized, // TODO: damaged
+                handle_composition_resized,
+                handle_composition_view_box_changed,
                 handle_entity_moved,
                 handle_entity_set_position,
                 // handle_node_created, // TODO: damaged
@@ -103,5 +109,11 @@ fn insert_dtif_into_world(world: &mut World, dtif: &DTIFComposition) {
         width: dtif.width,
         height: dtif.height,
         root_node: root_node_entity,
+        view_box: ViewBox {
+            width: dtif.width,
+            height: dtif.height,
+            min_y: 0.0,
+            min_x: 0.0,
+        },
     });
 }

@@ -1,6 +1,6 @@
 import type {
-	CompositionUpdateEvent,
-	ElementUpdateEvent,
+	CompositionChangeEvent,
+	ElementChangeEvent,
 	RenderUpdateEvent,
 	SVGAttribute,
 	SVGStyle,
@@ -82,13 +82,6 @@ export class SVGRenderer extends Renderer {
 		});
 	}
 
-	public setSize(width: number, height: number): void {
-		this._width = width;
-		this._height = height;
-		this._svgElement.setAttribute('width', `${width}px`);
-		this._svgElement.setAttribute('height', `${height}px`);
-	}
-
 	public setViewBox(width: number, height: number): void {
 		this._viewBox = { width, height };
 		this._svgElement.setAttribute('viewBox', `0 0 ${width} ${height}`);
@@ -97,36 +90,53 @@ export class SVGRenderer extends Renderer {
 	public render(events: RenderUpdateEvent[]): void {
 		for (const renderUpdate of events) {
 			switch (renderUpdate.event.type) {
-				case 'CompositionUpdate':
+				case 'CompositionChange':
 					this.renderComposition(renderUpdate.event);
 					break;
-				case 'ElementUpdate':
+				case 'ElementChange':
 					this.renderElement(renderUpdate.event);
 					break;
 			}
 		}
 	}
 
-	private renderComposition(renderUpdate: CompositionUpdateEvent): void {
-		// TODO
+	private renderComposition(renderChange: CompositionChangeEvent): void {
+		for (const change of renderChange.changes) {
+			switch (change.type) {
+				case 'SizeChanged':
+					this._width = change.width;
+					this._height = change.height;
+					this._svgElement.setAttribute('width', `${change.width}px`);
+					this._svgElement.setAttribute('height', `${change.height}px`);
+					break;
+				case 'ViewBoxChanged': {
+					const viewBox = change.viewBox;
+					this._svgElement.setAttribute(
+						'viewBox',
+						`${viewBox.minX} ${viewBox.minY} ${viewBox.width} ${viewBox.height}`
+					);
+					break;
+				}
+			}
+		}
 	}
 
-	private renderElement(renderUpdate: ElementUpdateEvent): void {
+	private renderElement(renderChange: ElementChangeEvent): void {
 		let element: SVGElement | null = null;
 		const getElement = (): SVGElement | null => {
 			if (element == null) {
-				element = this._svgElementMap.get(renderUpdate.id) ?? null;
+				element = this._svgElementMap.get(renderChange.id) ?? null;
 			}
 			return element;
 		};
 
-		for (const update of renderUpdate.updates) {
-			switch (update.type) {
+		for (const change of renderChange.changes) {
+			switch (change.type) {
 				case 'ElementCreated': {
-					const newElement: SVGElement = document.createElementNS(NS, update.tagName);
+					const newElement: SVGElement = document.createElementNS(NS, change.tagName);
 
 					// Apply attributes
-					for (const attribute of update.attributes) {
+					for (const attribute of change.attributes) {
 						const parsedAttribute = this.parseSVGAttribute(attribute);
 						if (parsedAttribute != null) {
 							const [key, value] = parsedAttribute;
@@ -135,7 +145,7 @@ export class SVGRenderer extends Renderer {
 					}
 
 					// Apply styles
-					for (const style of update.styles) {
+					for (const style of change.styles) {
 						const parsedStyle = this.parseSVGStyle(style);
 						if (parsedStyle != null) {
 							const [key, value] = parsedStyle;
@@ -144,8 +154,8 @@ export class SVGRenderer extends Renderer {
 					}
 
 					// Register callbacks
-					const entity = update.entity;
-					if (update.isBundleRoot && entity != null) {
+					const entity = change.entity;
+					if (change.isBundleRoot && entity != null) {
 						newElement.addEventListener('pointerdown', (e) => {
 							e.preventDefault();
 							this.composition.emitInteractionEvents([
@@ -158,11 +168,11 @@ export class SVGRenderer extends Renderer {
 						});
 					}
 
-					this._svgElementMap.set(renderUpdate.id, newElement);
+					this._svgElementMap.set(renderChange.id, newElement);
 
 					// Append element to parent
-					if (update.parentId != null) {
-						const parentElement = this._svgElementMap.get(update.parentId);
+					if (change.parentId != null) {
+						const parentElement = this._svgElementMap.get(change.parentId);
 						if (parentElement != null) {
 							parentElement.appendChild(newElement);
 						}
@@ -177,13 +187,13 @@ export class SVGRenderer extends Renderer {
 					const elementToDelete = getElement();
 					if (elementToDelete?.parentNode != null) {
 						elementToDelete.parentNode.removeChild(elementToDelete);
-						this._svgElementMap.delete(renderUpdate.id);
+						this._svgElementMap.delete(renderChange.id);
 					}
 					break;
 				}
 				case 'ElementAppended': {
 					const toAppendElement = getElement();
-					const parentElement = this._svgElementMap.get(renderUpdate.id);
+					const parentElement = this._svgElementMap.get(renderChange.id);
 					if (parentElement != null && toAppendElement != null) {
 						parentElement.appendChild(toAppendElement);
 					}
@@ -192,7 +202,7 @@ export class SVGRenderer extends Renderer {
 				case 'AttributeUpdated': {
 					const elementToUpdate = getElement();
 					if (elementToUpdate != null) {
-						const parsedAttribute = this.parseSVGAttribute(update.newValue);
+						const parsedAttribute = this.parseSVGAttribute(change.newValue);
 						if (parsedAttribute != null) {
 							const [key, value] = parsedAttribute;
 							elementToUpdate.setAttribute(key, value);
@@ -203,14 +213,14 @@ export class SVGRenderer extends Renderer {
 				case 'AttributeRemoved': {
 					const elementToUpdate = getElement();
 					if (elementToUpdate != null) {
-						elementToUpdate.removeAttribute(update.key);
+						elementToUpdate.removeAttribute(change.key);
 					}
 					break;
 				}
 				case 'StyleUpdated': {
 					const elementToUpdate = getElement();
 					if (elementToUpdate != null) {
-						const parsedStyle = this.parseSVGStyle(update.newValue);
+						const parsedStyle = this.parseSVGStyle(change.newValue);
 						if (parsedStyle != null) {
 							const [key, value] = parsedStyle;
 							elementToUpdate.style.setProperty(key, value);
@@ -221,7 +231,7 @@ export class SVGRenderer extends Renderer {
 				case 'StyleRemoved': {
 					const elementToUpdate = getElement();
 					if (elementToUpdate != null) {
-						elementToUpdate.style.removeProperty(update.key);
+						elementToUpdate.style.removeProperty(change.key);
 					}
 					break;
 				}

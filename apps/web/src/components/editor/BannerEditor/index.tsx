@@ -6,6 +6,7 @@ import { Button, CircleIcon, SquareIcon } from '@dyn/ui';
 import { useWindowSize } from '@/hooks';
 
 import { Canvas, type TCanvasProps } from './components';
+import { CompositionControl } from './components/CompositionControl';
 
 export const BannerEditor: React.FC<TBannerEditorProps> = (props) => {
 	const { width, height, dtif } = props;
@@ -13,20 +14,20 @@ export const BannerEditor: React.FC<TBannerEditorProps> = (props) => {
 	const size = useWindowSize(); // TODO: Figure out how to define canvas size based on window size
 
 	const zoomIn = () => {
-		if (composition) {
+		if (composition != null) {
 			// Adjust these values for zooming in
-			const newWidth = width * 0.8;
-			const newHeight = height * 0.8;
-			// composition.renderer[0].setViewBox(newWidth, newHeight);
+			const newWidth = composition.width * 0.8;
+			const newHeight = composition.height * 0.8;
+			composition.resize(newWidth, newHeight);
 		}
 	};
 
 	const zoomOut = () => {
-		if (composition) {
+		if (composition != null) {
 			// Adjust these values for zooming out
-			const newWidth = width * 1.2;
-			const newHeight = height * 1.2;
-			// composition.renderer[0].setViewBox(newWidth, newHeight);
+			const newWidth = composition.width * 1.2;
+			const newHeight = composition.height * 1.2;
+			composition.resize(newWidth, newHeight);
 		}
 	};
 
@@ -79,6 +80,7 @@ export const BannerEditor: React.FC<TBannerEditorProps> = (props) => {
 					</Button>
 				</div>
 			</div>
+			{composition != null && <CompositionControl composition={composition} />}
 		</div>
 	);
 };

@@ -4,7 +4,7 @@ use dyn_composition::core::{
 };
 
 use crate::{
-    events::output_event::ElementUpdateEvent,
+    events::output_event::ElementChangeEvent,
     resources::{
         changed_components::ChangedPaint,
         svg_composition::{
@@ -39,8 +39,8 @@ impl SVGBundle for SolidSVGPaint {
         &mut self.bundle
     }
 
-    fn drain_updates(&mut self) -> Vec<ElementUpdateEvent> {
-        self.bundle.drain_updates()
+    fn drain_changes(&mut self) -> Vec<ElementChangeEvent> {
+        self.bundle.drain_changes()
     }
 
     fn to_string(&self, composition: &SVGCompositionRes) -> String {

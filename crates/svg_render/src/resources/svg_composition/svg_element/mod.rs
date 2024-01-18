@@ -33,7 +33,7 @@ pub struct SVGElement {
     /// Identifiers for child elements, supporting both in-context and out-of-context children.
     children: Vec<SVGChildElementIdentifier>,
     /// Render change updates
-    updates: Vec<ElementChange>,
+    changes: Vec<ElementChange>,
     /// Whether the SVG element is the root of a SVG bundle.
     is_bundle_root: bool,
     /// Whether the element was created in the current update cycle (before first update drain).
@@ -71,7 +71,7 @@ impl SVGElement {
         let inital_attributes: HashMap<&'static str, SVGAttribute> =
             HashMap::from([(id_attribute.key(), id_attribute)]);
         let intial_styles: HashMap<&'static str, SVGStyle> = HashMap::new();
-        let initial_updates = vec![ElementChange::ElementCreated(ElementCreated {
+        let initial_changes = vec![ElementChange::ElementCreated(ElementCreated {
             parent_id: None,
             tag_name: tag_name.as_str(),
             attributes: inital_attributes.values().cloned().collect(),
@@ -86,7 +86,7 @@ impl SVGElement {
             attributes: inital_attributes,
             styles: intial_styles,
             children: Vec::new(),
-            updates: initial_updates,
+            changes: initial_changes,
             is_bundle_root: false,
             was_created_in_current_update_cycle: true,
         };
@@ -97,7 +97,7 @@ impl SVGElement {
     // =========================================================================
 
     pub fn set_attribute(&mut self, attribute: SVGAttribute) {
-        self.updates
+        self.changes
             .push(ElementChange::AttributeUpdated(AttributeUpdated {
                 new_value: attribute.clone(),
             }));
@@ -119,7 +119,7 @@ impl SVGElement {
     }
 
     pub fn set_style(&mut self, style: SVGStyle) {
-        self.updates.push(ElementChange::StyleUpdated(StyleUpdated {
+        self.changes.push(ElementChange::StyleUpdated(StyleUpdated {
             new_value: style.clone(),
         }));
         self.styles.insert(style.key(), style);
@@ -212,7 +212,7 @@ impl SVGElement {
         // Push an update event if order has changed
         if target_positions.iter().any(|&pos| pos.is_none()) || swap_done.iter().any(|&done| done) {
             // TODO: fetch actual element ids
-            //  self.updates.push(ElementChange::OrderChanged);
+            //  self.changes.push(ElementChange::OrderChanged);
         }
     }
 
@@ -220,7 +220,7 @@ impl SVGElement {
         // Attempt to set the parent id of the first 'ElementCreated' render change for the element.
         // This ensures the element is correctly attached to its parent during the initial rendering.
         if self.was_created_in_current_update_cycle {
-            if let Some(update) = self.updates.first_mut() {
+            if let Some(update) = self.changes.first_mut() {
                 match update {
                     ElementChange::ElementCreated(element_created) => {
                         if element_created.parent_id.is_none() {
@@ -231,7 +231,7 @@ impl SVGElement {
                 }
             }
         } else {
-            self.updates
+            self.changes
                 .push(ElementChange::ElementAppended(ElementAppended {
                     parent_id,
                 }))
@@ -245,7 +245,7 @@ impl SVGElement {
     pub fn define_as_bundle_root(&mut self, entity: Entity) {
         self.is_bundle_root = true;
         if self.was_created_in_current_update_cycle {
-            if let Some(update) = self.updates.first_mut() {
+            if let Some(update) = self.changes.first_mut() {
                 match update {
                     ElementChange::ElementCreated(element_created) => {
                         element_created.is_bundle_root = true;
@@ -257,12 +257,12 @@ impl SVGElement {
         }
     }
 
-    pub fn drain_updates(&mut self) -> Vec<ElementChange> {
+    pub fn drain_changes(&mut self) -> Vec<ElementChange> {
         if self.was_created_in_current_update_cycle {
             self.was_created_in_current_update_cycle = false;
         }
 
-        self.updates.drain(..).collect()
+        self.changes.drain(..).collect()
     }
 
     pub fn to_string(&self, bundle: &BaseSVGBundle, composition: &SVGCompositionRes) -> String {

@@ -2,7 +2,7 @@ use bevy_ecs::entity::Entity;
 use dyn_composition::core::utils::continuous_id::ContinuousId;
 
 use crate::{
-    events::output_event::ElementUpdateEvent,
+    events::output_event::ElementChangeEvent,
     mixin_change::MixinChange,
     resources::{
         changed_components::ChangedNode,
@@ -46,8 +46,8 @@ impl SVGBundle for ShapeSVGNode {
         &mut self.bundle
     }
 
-    fn drain_updates(&mut self) -> Vec<ElementUpdateEvent> {
-        self.get_bundle_mut().drain_updates()
+    fn drain_changes(&mut self) -> Vec<ElementChangeEvent> {
+        self.get_bundle_mut().drain_changes()
     }
 
     fn to_string(&self, composition: &SVGCompositionRes) -> String {

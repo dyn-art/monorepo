@@ -6,6 +6,8 @@ use crate::core::{
     events::input_event::InputEvent, modules::node::components::bundles::NodeBundle,
 };
 
+use super::resources::composition::ViewBox;
+
 #[derive(Debug, Serialize, Deserialize, Type, Clone)]
 #[serde(tag = "type")]
 pub enum CoreInputEvent {
@@ -13,6 +15,7 @@ pub enum CoreInputEvent {
     EntitySetPosition(EntitySetPosition),
     NodeCreated(NodeCreated),
     CompositionResized(CompositionResized),
+    CompositionViewBoxChanged(CompositionViewBoxChanged),
 }
 
 impl InputEvent for CoreInputEvent {
@@ -20,6 +23,9 @@ impl InputEvent for CoreInputEvent {
         match self {
             // Composition Events
             CoreInputEvent::CompositionResized(event) => {
+                world.send_event(event);
+            }
+            CoreInputEvent::CompositionViewBoxChanged(event) => {
                 world.send_event(event);
             }
 
@@ -47,6 +53,12 @@ impl InputEvent for CoreInputEvent {
 pub struct CompositionResized {
     pub width: f32,
     pub height: f32,
+}
+
+#[derive(Event, Debug, Serialize, Deserialize, Type, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct CompositionViewBoxChanged {
+    pub view_box: ViewBox,
 }
 
 // =============================================================================

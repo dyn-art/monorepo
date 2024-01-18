@@ -11,12 +11,10 @@ export function transformFrameNode(
 	return {
 		type: 'Frame',
 		node: {
-			name: node.name,
 			node_type: 'Frame'
 		},
-		frame: {
-			clipContent: node.clipsContent
-		},
+		name: node.name,
+		clipContent: node.clipsContent,
 		compositionMixin: {
 			isLocked: node.locked,
 			isVisible: node.visible

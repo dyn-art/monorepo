@@ -11,9 +11,9 @@ export function transformGroupNode(
 	return {
 		type: 'Group',
 		node: {
-			name: node.name,
 			node_type: 'Group'
 		},
+		name: node.name,
 		compositionMixin: {
 			isLocked: node.locked,
 			isVisible: node.visible

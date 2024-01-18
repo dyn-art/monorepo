@@ -27,15 +27,11 @@ pub struct Composition {
 impl Composition {
     pub fn new(dtif: DTIFComposition) -> Self {
         let mut app = App::new();
-        let width = dtif.width;
-        let height = dtif.height;
 
         // Register plugins
         app.add_plugins((RenderPlugin, NodePlugin, CompositionPlugin { dtif }));
         #[cfg(feature = "interactive")]
-        app.add_plugins(
-            super::modules::interactive_composition::InteractiveCompositionPlugin { width, height },
-        );
+        app.add_plugins(super::modules::interactive_composition::InteractiveCompositionPlugin);
 
         return Self { app };
     }

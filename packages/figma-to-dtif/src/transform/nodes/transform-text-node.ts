@@ -18,35 +18,33 @@ export function transformTextNode(
 	return {
 		type: 'Text',
 		node: {
-			name: node.name,
 			node_type: 'Text'
 		},
-		text: {
-			segments: segments.map(
-				(segment) =>
-					({
-						value: segment.characters,
-						style: {
-							fontId: segment.fontId,
-							fontSize: segment.fontSize,
-							letterSpacing:
-								segment.letterSpacing.unit === 'PIXELS'
-									? { Pixels: segment.letterSpacing.value }
-									: { Percent: segment.letterSpacing.value },
-							lineHeight:
-								// eslint-disable-next-line no-nested-ternary -- Readable enough
-								segment.lineHeight.unit === 'PIXELS'
-									? { Pixels: segment.lineHeight.value }
-									: segment.lineHeight.unit === 'PERCENT'
-									? { Percent: segment.lineHeight.value }
-									: 'Auto'
-						}
-					}) as TTextSegment
-			),
-			horizontalTextAlignment: convertFigmaHorizontalTextAlignmentToDTIF(node.textAlignHorizontal),
-			verticalTextAlignment: convertFigmaVerticalTextAlignmentToDTIF(node.textAlignVertical),
-			linebreakBehaviour: 'WordBoundary'
-		},
+		name: node.name,
+		segments: segments.map(
+			(segment) =>
+				({
+					value: segment.characters,
+					style: {
+						fontId: segment.fontId,
+						fontSize: segment.fontSize,
+						letterSpacing:
+							segment.letterSpacing.unit === 'PIXELS'
+								? { Pixels: segment.letterSpacing.value }
+								: { Percent: segment.letterSpacing.value },
+						lineHeight:
+							// eslint-disable-next-line no-nested-ternary -- Readable enough
+							segment.lineHeight.unit === 'PIXELS'
+								? { Pixels: segment.lineHeight.value }
+								: segment.lineHeight.unit === 'PERCENT'
+								? { Percent: segment.lineHeight.value }
+								: 'Auto'
+					}
+				}) as TTextSegment
+		),
+		horizontalTextAlignment: convertFigmaHorizontalTextAlignmentToDTIF(node.textAlignHorizontal),
+		verticalTextAlignment: convertFigmaVerticalTextAlignmentToDTIF(node.textAlignVertical),
+		linebreakBehavior: 'WordBoundary',
 		compositionMixin: {
 			isLocked: node.locked,
 			isVisible: node.visible

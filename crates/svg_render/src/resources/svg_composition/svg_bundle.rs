@@ -1,6 +1,6 @@
 use bevy_ecs::entity::Entity;
 
-use crate::events::output_event::ElementUpdateEvent;
+use crate::events::output_event::ElementChangeEvent;
 
 use super::{
     svg_element::{SVGChildElementIdentifier, SVGElement},
@@ -10,7 +10,7 @@ use super::{
 pub trait SVGBundle {
     fn get_bundle(&self) -> &BaseSVGBundle;
     fn get_bundle_mut(&mut self) -> &mut BaseSVGBundle;
-    fn drain_updates(&mut self) -> Vec<ElementUpdateEvent>;
+    fn drain_changes(&mut self) -> Vec<ElementChangeEvent>;
     fn to_string(&self, composition: &SVGCompositionRes) -> String;
 }
 
@@ -99,22 +99,22 @@ impl BaseSVGBundle {
     // Other
     // =========================================================================
 
-    pub fn drain_updates(&mut self) -> Vec<ElementUpdateEvent> {
+    pub fn drain_changes(&mut self) -> Vec<ElementChangeEvent> {
         let mut drained_updates = Vec::new();
 
         // Drain updates from root element
-        drained_updates.push(ElementUpdateEvent {
+        drained_updates.push(ElementChangeEvent {
             id: self.element.get_id(),
-            updates: self.element.drain_updates(),
+            changes: self.element.drain_changes(),
         });
 
         // Drain updates from child elements
         for child in &mut self.child_elements {
-            let updates = child.drain_updates();
-            if !updates.is_empty() {
-                drained_updates.push(ElementUpdateEvent {
+            let changes = child.drain_changes();
+            if !changes.is_empty() {
+                drained_updates.push(ElementChangeEvent {
                     id: child.get_id(),
-                    updates,
+                    changes,
                 })
             }
         }

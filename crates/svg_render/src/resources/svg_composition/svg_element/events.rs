@@ -42,7 +42,7 @@ pub struct AttributeUpdated {
 /// Emitted when an attribute of a SVGElement is removed.
 #[derive(Debug, Serialize, Clone, Type)]
 pub struct AttributeRemoved {
-    key: &'static str,
+    pub key: &'static str,
 }
 
 /// Emitted when a style property of a SVGElement is updated.

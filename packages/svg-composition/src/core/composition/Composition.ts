@@ -18,7 +18,8 @@ import type {
 	RenderUpdateEvent,
 	SelectionChangeEvent,
 	TrackableMixinType,
-	TrackUpdateEvent
+	TrackUpdateEvent,
+	ViewBox
 } from '@/rust/dyn_svg_composition_api/bindings';
 
 import type { TRustEnumKeyArray } from '../../wasm';
@@ -33,6 +34,7 @@ export class Composition {
 
 	private _width: number;
 	private _height: number;
+	private _viewBox: ViewBox;
 	private readonly _isCallbackBased: boolean;
 
 	private _eventQueue: AnyInputEvent[] = [];
@@ -89,6 +91,12 @@ export class Composition {
 		});
 		this._width = width;
 		this._height = height;
+		this._viewBox = {
+			minX: 0,
+			minY: 0,
+			width,
+			height
+		};
 		this._isCallbackBased = isCallbackBased;
 	}
 
@@ -102,6 +110,10 @@ export class Composition {
 
 	public get height(): number {
 		return this._height;
+	}
+
+	public get viewBox(): Readonly<ViewBox> {
+		return this._viewBox;
 	}
 
 	public get renderer(): Renderer[] {
@@ -145,8 +157,6 @@ export class Composition {
 	// =========================================================================
 
 	public registerRenderer(renderer: Renderer): void {
-		renderer.setSize(this._width, this._height); // TODO: REMOVE
-		renderer.setViewBox(this._width, this._height);
 		this._renderer.push(renderer);
 	}
 
@@ -397,6 +407,15 @@ export class Composition {
 
 	public resize(width: number, height: number): void {
 		this.emitCoreEvents([{ type: 'CompositionResized', width, height }]);
+		this.update();
+		this._width = width;
+		this._height = height;
+	}
+
+	public updateViewBox(viewBox: ViewBox): void {
+		this.emitCoreEvents([{ type: 'CompositionViewBoxChanged', viewBox }]);
+		this.update();
+		this._viewBox = viewBox;
 	}
 
 	// =========================================================================

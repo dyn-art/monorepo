@@ -131,13 +131,15 @@ export type ChildrenMixin = Entity[]
  */
 export type CompositionChange = ({ type: "SizeChanged" } & SizeChanged) | ({ type: "ViewBoxChanged" } & ViewBoxChanged)
 
+export type CompositionChangeEvent = { changes: CompositionChange[] }
+
 export type CompositionResized = { width: number; height: number }
 
-export type CompositionUpdateEvent = { updates: CompositionChange[] }
+export type CompositionViewBoxChanged = { viewBox: ViewBox }
 
 export type ContinuousId = number
 
-export type CoreInputEvent = ({ type: "EntityMoved" } & EntityMoved) | ({ type: "EntitySetPosition" } & EntitySetPosition) | ({ type: "NodeCreated" } & NodeCreated) | ({ type: "CompositionResized" } & CompositionResized)
+export type CoreInputEvent = ({ type: "EntityMoved" } & EntityMoved) | ({ type: "EntitySetPosition" } & EntitySetPosition) | ({ type: "NodeCreated" } & NodeCreated) | ({ type: "CompositionResized" } & CompositionResized) | ({ type: "CompositionViewBoxChanged" } & CompositionViewBoxChanged)
 
 export type CursorChangeEvent = { cursor: CursorForFrontend }
 
@@ -246,6 +248,8 @@ export type ElementAppended = { parentId: ContinuousId }
  */
 export type ElementChange = ({ type: "ElementCreated" } & ElementCreated) | ({ type: "ElementDeleted" }) | ({ type: "ElementAppended" } & ElementAppended) | ({ type: "AttributeUpdated" } & AttributeUpdated) | ({ type: "AttributeRemoved" } & AttributeRemoved) | ({ type: "StyleUpdated" } & StyleUpdated) | ({ type: "StyleRemoved" } & StyleRemoved)
 
+export type ElementChangeEvent = { id: ContinuousId; changes: ElementChange[] }
+
 /**
  * Emitted when a new SVGElement is created.
  */
@@ -255,8 +259,6 @@ export type ElementCreated = { tagName: string; attributes: SVGAttribute[]; styl
  * Emitted when a SVGElement is deleted.
  */
 export type ElementDeleted = Record<string, never>
-
-export type ElementUpdateEvent = { id: ContinuousId; updates: ElementChange[] }
 
 /**
  * Represents a basic shape node for an ellipse.
@@ -646,7 +648,7 @@ export type SVGMeasurementUnit = { type: "Pixel" } | { type: "Percent" }
 
 export type SVGPathCommand = { type: "MoveTo"; x: number; y: number } | { type: "LineTo"; x: number; y: number } | { type: "CurveTo"; cx1: number; cy1: number; cx2: number; cy2: number; x: number; y: number } | { type: "ArcTo"; rx: number; ry: number; xAxisRotation: number; largeArcFlag: boolean; sweepFlag: boolean; x: number; y: number } | { type: "ClosePath" }
 
-export type SVGRenderOutputEvent = ({ type: "CompositionUpdate" } & CompositionUpdateEvent) | ({ type: "ElementUpdate" } & ElementUpdateEvent)
+export type SVGRenderOutputEvent = ({ type: "CompositionChange" } & CompositionChangeEvent) | ({ type: "ElementChange" } & ElementChangeEvent)
 
 export type SVGStyle = { type: "Display"; display: SVGDisplayStyle } | { type: "BlendMode"; blendMode: SVGBlendMode }
 
@@ -810,10 +812,12 @@ export type VerticalTextAlignment =
  */
 "Bottom"
 
+export type ViewBox = { width: number; height: number; minX: number; minY: number }
+
 /**
  * Emitted when the view box of the Composition is changed.
  */
-export type ViewBoxChanged = { width: number; height: number; minX: number; minY: number }
+export type ViewBoxChanged = { viewBox: ViewBox }
 
 export type XYWH = { position: Vec2; width: number; height: number }
 

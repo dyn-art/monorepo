@@ -7,17 +7,17 @@ use crate::{composition_change::CompositionChange, element_change::ElementChange
 #[derive(Debug, Serialize, Clone, Type)]
 #[serde(tag = "type")]
 pub enum SVGRenderOutputEvent {
-    CompositionUpdate(CompositionUpdateEvent),
-    ElementUpdate(ElementUpdateEvent),
+    CompositionChange(CompositionChangeEvent),
+    ElementChange(ElementChangeEvent),
 }
 
 #[derive(Debug, Serialize, Clone, Type)]
-pub struct CompositionUpdateEvent {
-    pub updates: Vec<CompositionChange>,
+pub struct CompositionChangeEvent {
+    pub changes: Vec<CompositionChange>,
 }
 
 #[derive(Debug, Serialize, Clone, Type)]
-pub struct ElementUpdateEvent {
+pub struct ElementChangeEvent {
     pub id: ContinuousId,
-    pub updates: Vec<ElementChange>,
+    pub changes: Vec<ElementChange>,
 }

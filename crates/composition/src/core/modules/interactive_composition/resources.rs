@@ -6,16 +6,6 @@ use specta::Type;
 #[derive(Resource, Debug)]
 pub struct InteractiveCompositionRes {
     pub interaction_mode: InteractionMode,
-    pub view_box: ViewBox,
-}
-
-// https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/viewBox
-#[derive(Debug)]
-pub struct ViewBox {
-    pub width: f32,
-    pub height: f32,
-    pub min_x: f32,
-    pub min_y: f32,
 }
 
 #[derive(Debug, Default)]

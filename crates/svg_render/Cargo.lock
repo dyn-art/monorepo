@@ -512,6 +512,7 @@ dependencies = [
  "dyn_bevy_render_skeleton",
  "dyn_composition",
  "glam",
+ "log",
  "serde",
  "serde_with",
  "specta",

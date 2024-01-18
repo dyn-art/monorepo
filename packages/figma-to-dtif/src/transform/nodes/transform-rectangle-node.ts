@@ -11,9 +11,9 @@ export function transformRectangleNode(
 	return {
 		type: 'Rectangle',
 		node: {
-			name: node.name,
 			node_type: 'Rectangle'
 		},
+		name: node.name,
 		compositionMixin: {
 			isLocked: node.locked,
 			isVisible: node.visible
