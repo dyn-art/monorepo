@@ -1,10 +1,11 @@
 use bevy_ecs::{
     event::EventReader,
     query::With,
-    system::{ParamSet, Query, ResMut},
+    system::{ParamSet, Query, Res, ResMut},
 };
 
 use crate::core::modules::{
+    composition::resources::composition::CompositionRes,
     interactive_composition::{
         events::CursorMovedOnComposition,
         resources::{InteractionMode, InteractiveCompositionRes},
@@ -24,6 +25,7 @@ mod translating;
 pub fn handle_cursor_moved_on_composition(
     mut event_reader: EventReader<CursorMovedOnComposition>,
     mut interactive_composition: ResMut<InteractiveCompositionRes>,
+    composition: Res<CompositionRes>,
     // https://bevy-cheatbook.github.io/programming/paramset.html
     mut selected_nodes_query: ParamSet<(
         // Translating
@@ -44,7 +46,7 @@ pub fn handle_cursor_moved_on_composition(
     for event in event_reader.read() {
         match &mut interactive_composition.interaction_mode {
             InteractionMode::Translating { current, .. } => {
-                handle_translating(&mut selected_nodes_query.p0(), event, current);
+                handle_translating(&composition, &mut selected_nodes_query.p0(), event, current);
             }
             InteractionMode::Resizing {
                 corner,
