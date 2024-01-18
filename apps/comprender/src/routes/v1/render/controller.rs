@@ -135,7 +135,7 @@ fn generate_svg(body: DTIFComposition) -> Result<String, AppError> {
 
     // Register plugins
     app.add_plugins(SvgRenderPlugin {
-        render_event_sender: None,
+        output_event_sender: None,
     });
 
     // Update app once

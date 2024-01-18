@@ -6,24 +6,25 @@ use dyn_bevy_render_skeleton::{ExtractSchedule, Render, RenderApp, RenderSet};
 use dyn_composition::core::modules::node::components::mixins::{
     BlendMixin, DimensionMixin, NodeCompositionMixin, PathMixin, RelativeTransformMixin,
 };
-use events::output_event::RenderUpdateEvent;
+use events::output_event::SVGRenderOutputEvent;
 
 use self::{
     resources::{changed_components::ChangedComponentsRes, svg_composition::SVGCompositionRes},
     systems::{
         extract::{extract_children, extract_mixin_generic, extract_paint},
-        queue::queue_render_changes,
+        queue::queue_element_changes,
     },
 };
 
+pub mod composition_change;
+pub mod element_change;
 pub mod events;
 pub mod mixin_change;
-pub mod render_change;
 pub mod resources;
 mod systems;
 
 pub struct SvgRenderPlugin {
-    pub render_event_sender: Option<Sender<RenderUpdateEvent>>,
+    pub output_event_sender: Option<Sender<SVGRenderOutputEvent>>,
 }
 
 impl Plugin for SvgRenderPlugin {
@@ -35,7 +36,7 @@ impl Plugin for SvgRenderPlugin {
 
         // Register resources
         render_app.init_resource::<ChangedComponentsRes>();
-        render_app.insert_resource(SVGCompositionRes::new(self.render_event_sender.clone()));
+        render_app.insert_resource(SVGCompositionRes::new(self.output_event_sender.clone()));
 
         // Register systems
         render_app
@@ -51,6 +52,6 @@ impl Plugin for SvgRenderPlugin {
                     extract_paint,
                 ),
             )
-            .add_systems(Render, (queue_render_changes.in_set(RenderSet::Queue),));
+            .add_systems(Render, (queue_element_changes.in_set(RenderSet::Queue),));
     }
 }

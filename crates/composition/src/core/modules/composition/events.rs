@@ -12,18 +12,27 @@ pub enum CoreInputEvent {
     EntityMoved(EntityMoved),
     EntitySetPosition(EntitySetPosition),
     NodeCreated(NodeCreated),
+    CompositionResized(CompositionResized),
 }
 
 impl InputEvent for CoreInputEvent {
     fn send_to_ecs(self, world: &mut World) {
         match self {
+            // Composition Events
+            CoreInputEvent::CompositionResized(event) => {
+                world.send_event(event);
+            }
+
+            // Node Events
+            CoreInputEvent::NodeCreated(event) => {
+                world.send_event(event);
+            }
+
+            // Entity Events
             CoreInputEvent::EntityMoved(event) => {
                 world.send_event(event);
             }
             CoreInputEvent::EntitySetPosition(event) => {
-                world.send_event(event);
-            }
-            CoreInputEvent::NodeCreated(event) => {
                 world.send_event(event);
             }
         }
@@ -31,7 +40,17 @@ impl InputEvent for CoreInputEvent {
 }
 
 // =============================================================================
-// Created Events
+// Composition Events
+// =============================================================================
+
+#[derive(Event, Debug, Serialize, Deserialize, Type, Clone)]
+pub struct CompositionResized {
+    pub width: f32,
+    pub height: f32,
+}
+
+// =============================================================================
+// Node Events
 // =============================================================================
 
 #[derive(Event, Debug, Serialize, Deserialize, Type, Clone)]

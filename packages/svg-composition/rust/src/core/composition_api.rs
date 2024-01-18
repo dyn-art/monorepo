@@ -9,7 +9,7 @@ use dyn_composition::core::modules::node::components::bundles::NodeBundle;
 use dyn_composition::core::modules::node::components::mixins::{
     DimensionMixin, Paint, RelativeTransformMixin,
 };
-use dyn_svg_render::events::output_event::RenderUpdateEvent;
+use dyn_svg_render::events::output_event::SVGRenderOutputEvent;
 use dyn_svg_render::mixin_change::{MixinChange, MixinChangeRelativeTransformMixin};
 use dyn_svg_render::resources::svg_composition::SVGCompositionRes;
 use dyn_svg_render::SvgRenderPlugin;
@@ -18,6 +18,7 @@ use wasm_bindgen::JsValue;
 
 use crate::bindgen::utils::convert_optional_jsvalue;
 use crate::core::events::input_event::AnyInputEvent;
+use crate::core::events::output_event::RenderUpdateEvent;
 use crate::core::modules::track::resources::tracked_entities::{
     TrackableMixinType, TrackedEntitiesRes,
 };
@@ -31,7 +32,7 @@ pub struct JsCompositionHandle {
     composition: Composition,
     event_callback: js_sys::Function,
     output_event_receiver: Receiver<OutputEvent>,
-    render_event_receiver: Receiver<RenderUpdateEvent>,
+    svg_output_event_receiver: Receiver<SVGRenderOutputEvent>,
 }
 
 #[wasm_bindgen]
@@ -46,7 +47,8 @@ impl JsCompositionHandle {
             }
         };
         let (output_event_sender, output_event_receiver) = channel::<OutputEvent>();
-        let (render_event_sender, render_event_receiver) = channel::<RenderUpdateEvent>();
+        let (svg_output_event_sender, svg_output_event_receiver) =
+            channel::<SVGRenderOutputEvent>();
 
         // Initalize composition
         let mut composition = Composition::new(parsed_dtif);
@@ -55,7 +57,7 @@ impl JsCompositionHandle {
         // Register plugins
         app.add_plugins((
             SvgRenderPlugin {
-                render_event_sender: Some(render_event_sender),
+                output_event_sender: Some(svg_output_event_sender),
             },
             TrackPlugin,
         ));
@@ -68,7 +70,7 @@ impl JsCompositionHandle {
             composition,
             event_callback,
             output_event_receiver,
-            render_event_receiver,
+            svg_output_event_receiver,
         };
     }
 
@@ -102,8 +104,8 @@ impl JsCompositionHandle {
         while let Ok(event) = self.output_event_receiver.try_recv() {
             output_events.push(event);
         }
-        while let Ok(event) = self.render_event_receiver.try_recv() {
-            output_events.push(OutputEvent::RenderUpdate(event));
+        while let Ok(event) = self.svg_output_event_receiver.try_recv() {
+            output_events.push(OutputEvent::RenderUpdate(RenderUpdateEvent { event }));
         }
 
         // Invoke the JavaScript callback if with collected output events

@@ -8,9 +8,7 @@ import {
 	type XYWH
 } from '@dyn/svg-composition';
 
-import { useInteractionMode } from '../../../../../hooks/use-interaction-mode';
-import { useMatrixTransform } from '../../../../../hooks/use-matrix-transform';
-import { useWatchEntity } from '../../../../../hooks/use-watch-entity';
+import { useInteractionMode, useMatrixTransform, useWatchEntity } from '../../../../../hooks';
 import { getHandleMetaData as getHandlePositions, type EHandleSide } from './controller';
 import { Handle } from './Handle';
 

@@ -208,18 +208,12 @@ impl DTIFProcessor {
     /// Processes and sends the event into the ECS world.
     pub fn send_event_into_world(&self, event: CoreInputEvent, world: &mut World) {
         match event {
-            CoreInputEvent::EntityMoved(mut event) => {
-                if let Some(entity) = self.find_entity(&event.entity) {
-                    event.entity = entity;
-                    world.send_event(event);
-                }
+            // Composition Events
+            CoreInputEvent::CompositionResized(event) => {
+                world.send_event(event);
             }
-            CoreInputEvent::EntitySetPosition(mut event) => {
-                if let Some(entity) = self.find_entity(&event.entity) {
-                    event.entity = entity;
-                    world.send_event(event);
-                }
-            }
+
+            // Node Events
             CoreInputEvent::NodeCreated(mut event) => {
                 if let Some(parent_entity) = event
                     .parent_entity
@@ -240,6 +234,20 @@ impl DTIFProcessor {
                     };
                     world.send_event(event);
                 } else {
+                    world.send_event(event);
+                }
+            }
+
+            // Entity Events
+            CoreInputEvent::EntityMoved(mut event) => {
+                if let Some(entity) = self.find_entity(&event.entity) {
+                    event.entity = entity;
+                    world.send_event(event);
+                }
+            }
+            CoreInputEvent::EntitySetPosition(mut event) => {
+                if let Some(entity) = self.find_entity(&event.entity) {
+                    event.entity = entity;
                     world.send_event(event);
                 }
             }

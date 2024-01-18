@@ -68,6 +68,7 @@ impl Composition {
     //  but ofc it can't directly return the created Entity
     //  -> Solve with callback id where the Entity is sent back under the callback id or so
 
+    #[cfg(feature = "interactive")]
     pub fn spawn_node_bundle(
         &mut self,
         bundle: NodeBundle,
@@ -95,6 +96,7 @@ impl Composition {
         return entity_id;
     }
 
+    #[cfg(feature = "interactive")]
     pub fn spawn_bundle<B: Bundle + std::fmt::Debug>(
         &mut self,
         bundle: B,
@@ -138,14 +140,6 @@ impl Composition {
     // =========================================================================
     // Other
     // =========================================================================
-
-    pub fn set_size(&mut self, width: f32, height: f32) {
-        let maybe_composition_res = self.app.world.get_resource_mut::<CompositionRes>();
-        if let Some(mut composition_res) = maybe_composition_res {
-            composition_res.width = width;
-            composition_res.height = height;
-        }
-    }
 
     pub fn clear(&mut self) {
         self.app.world.clear_all();

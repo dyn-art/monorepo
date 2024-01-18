@@ -17,7 +17,7 @@ export const BannerEditor: React.FC<TBannerEditorProps> = (props) => {
 			// Adjust these values for zooming in
 			const newWidth = width * 0.8;
 			const newHeight = height * 0.8;
-			composition.renderer[0].setViewBox(newWidth, newHeight);
+			// composition.renderer[0].setViewBox(newWidth, newHeight);
 		}
 	};
 
@@ -26,7 +26,7 @@ export const BannerEditor: React.FC<TBannerEditorProps> = (props) => {
 			// Adjust these values for zooming out
 			const newWidth = width * 1.2;
 			const newHeight = height * 1.2;
-			composition.renderer[0].setViewBox(newWidth, newHeight);
+			// composition.renderer[0].setViewBox(newWidth, newHeight);
 		}
 	};
 

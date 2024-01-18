@@ -3,7 +3,7 @@ use std::collections::{BTreeMap, HashMap};
 use bevy_ecs::entity::Entity;
 use dyn_composition::core::utils::continuous_id::ContinuousId;
 
-use crate::render_change::RenderChange;
+use crate::element_change::ElementChange;
 
 use self::{
     attributes::SVGAttribute,
@@ -33,7 +33,7 @@ pub struct SVGElement {
     /// Identifiers for child elements, supporting both in-context and out-of-context children.
     children: Vec<SVGChildElementIdentifier>,
     /// Render change updates
-    updates: Vec<RenderChange>,
+    updates: Vec<ElementChange>,
     /// Whether the SVG element is the root of a SVG bundle.
     is_bundle_root: bool,
     /// Whether the element was created in the current update cycle (before first update drain).
@@ -71,7 +71,7 @@ impl SVGElement {
         let inital_attributes: HashMap<&'static str, SVGAttribute> =
             HashMap::from([(id_attribute.key(), id_attribute)]);
         let intial_styles: HashMap<&'static str, SVGStyle> = HashMap::new();
-        let initial_updates = vec![RenderChange::ElementCreated(ElementCreated {
+        let initial_updates = vec![ElementChange::ElementCreated(ElementCreated {
             parent_id: None,
             tag_name: tag_name.as_str(),
             attributes: inital_attributes.values().cloned().collect(),
@@ -98,7 +98,7 @@ impl SVGElement {
 
     pub fn set_attribute(&mut self, attribute: SVGAttribute) {
         self.updates
-            .push(RenderChange::AttributeUpdated(AttributeUpdated {
+            .push(ElementChange::AttributeUpdated(AttributeUpdated {
                 new_value: attribute.clone(),
             }));
         self.attributes.insert(attribute.key(), attribute);
@@ -119,7 +119,7 @@ impl SVGElement {
     }
 
     pub fn set_style(&mut self, style: SVGStyle) {
-        self.updates.push(RenderChange::StyleUpdated(StyleUpdated {
+        self.updates.push(ElementChange::StyleUpdated(StyleUpdated {
             new_value: style.clone(),
         }));
         self.styles.insert(style.key(), style);
@@ -212,7 +212,7 @@ impl SVGElement {
         // Push an update event if order has changed
         if target_positions.iter().any(|&pos| pos.is_none()) || swap_done.iter().any(|&done| done) {
             // TODO: fetch actual element ids
-            //  self.updates.push(RenderChange::OrderChanged);
+            //  self.updates.push(ElementChange::OrderChanged);
         }
     }
 
@@ -222,7 +222,7 @@ impl SVGElement {
         if self.was_created_in_current_update_cycle {
             if let Some(update) = self.updates.first_mut() {
                 match update {
-                    RenderChange::ElementCreated(element_created) => {
+                    ElementChange::ElementCreated(element_created) => {
                         if element_created.parent_id.is_none() {
                             element_created.parent_id = Some(parent_id);
                         }
@@ -232,7 +232,9 @@ impl SVGElement {
             }
         } else {
             self.updates
-                .push(RenderChange::ElementAppended(ElementAppended { parent_id }))
+                .push(ElementChange::ElementAppended(ElementAppended {
+                    parent_id,
+                }))
         }
     }
 
@@ -245,7 +247,7 @@ impl SVGElement {
         if self.was_created_in_current_update_cycle {
             if let Some(update) = self.updates.first_mut() {
                 match update {
-                    RenderChange::ElementCreated(element_created) => {
+                    ElementChange::ElementCreated(element_created) => {
                         element_created.is_bundle_root = true;
                         element_created.entity = Some(entity);
                     }
@@ -255,7 +257,7 @@ impl SVGElement {
         }
     }
 
-    pub fn drain_updates(&mut self) -> Vec<RenderChange> {
+    pub fn drain_updates(&mut self) -> Vec<ElementChange> {
         if self.was_created_in_current_update_cycle {
             self.was_created_in_current_update_cycle = false;
         }

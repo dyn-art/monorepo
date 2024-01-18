@@ -10,8 +10,9 @@ use self::{
         font_cache::{font::FontContent, FontCacheRes},
     },
     systems::{
-        creation::handle_node_created,
-        layout::{handle_entity_moved, handle_entity_set_position},
+        composition::handle_composition_resized,
+        entity::{handle_entity_moved, handle_entity_set_position},
+        node::handle_node_created,
     },
 };
 
@@ -38,6 +39,7 @@ impl Plugin for CompositionPlugin {
         app.add_systems(
             PreUpdate,
             (
+                // handle_composition_resized, // TODO: damaged
                 handle_entity_moved,
                 handle_entity_set_position,
                 // handle_node_created, // TODO: damaged
@@ -46,7 +48,7 @@ impl Plugin for CompositionPlugin {
         #[cfg(feature = "interactive")]
         app.add_systems(
             bevy_app::PostUpdate,
-            systems::layout::interactive::calculate_absolute_transform,
+            systems::entity::interactive::calculate_absolute_transform,
         );
 
         // Load DTIF

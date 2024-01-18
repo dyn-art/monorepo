@@ -145,7 +145,7 @@ export class Composition {
 	// =========================================================================
 
 	public registerRenderer(renderer: Renderer): void {
-		renderer.setSize(this._width, this._height);
+		renderer.setSize(this._width, this._height); // TODO: REMOVE
 		renderer.setViewBox(this._width, this._height);
 		this._renderer.push(renderer);
 	}
@@ -389,6 +389,14 @@ export class Composition {
 			}
 		};
 		return this._compositionHandle.spawnNodeBundle(bundle, parentId);
+	}
+
+	// =========================================================================
+	// Composition Interaction
+	// =========================================================================
+
+	public resize(width: number, height: number): void {
+		this.emitCoreEvents([{ type: 'CompositionResized', width, height }]);
 	}
 
 	// =========================================================================

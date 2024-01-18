@@ -1,4 +1,4 @@
-use crate::events::output_event::RenderUpdateEvent;
+use crate::events::output_event::ElementUpdateEvent;
 
 use super::{svg_bundle::BaseSVGBundle, svg_node::SVGNode, svg_paint::SVGPaint, SVGCompositionRes};
 
@@ -23,7 +23,7 @@ pub fn get_bundle_mut(bundle_variant: &mut SVGBundleVariant) -> &mut BaseSVGBund
     }
 }
 
-pub fn drain_bundle_updates(bundle_variant: &mut SVGBundleVariant) -> Vec<RenderUpdateEvent> {
+pub fn drain_bundle_updates(bundle_variant: &mut SVGBundleVariant) -> Vec<ElementUpdateEvent> {
     match bundle_variant {
         SVGBundleVariant::Node(node) => node.drain_updates(),
         SVGBundleVariant::Paint(paint) => paint.drain_updates(),

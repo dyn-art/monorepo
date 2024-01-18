@@ -125,9 +125,19 @@ export type BreakLineOn =
  */
 export type ChildrenMixin = Entity[]
 
+/**
+ * Represents the different types of events that can be emitted by the SVGComposition
+ * to synchronize its state with the frontend.
+ */
+export type CompositionChange = ({ type: "SizeChanged" } & SizeChanged) | ({ type: "ViewBoxChanged" } & ViewBoxChanged)
+
+export type CompositionResized = { width: number; height: number }
+
+export type CompositionUpdateEvent = { updates: CompositionChange[] }
+
 export type ContinuousId = number
 
-export type CoreInputEvent = ({ type: "EntityMoved" } & EntityMoved) | ({ type: "EntitySetPosition" } & EntitySetPosition) | ({ type: "NodeCreated" } & NodeCreated)
+export type CoreInputEvent = ({ type: "EntityMoved" } & EntityMoved) | ({ type: "EntitySetPosition" } & EntitySetPosition) | ({ type: "NodeCreated" } & NodeCreated) | ({ type: "CompositionResized" } & CompositionResized)
 
 export type CursorChangeEvent = { cursor: CursorForFrontend }
 
@@ -220,6 +230,23 @@ height: number }
 export type ElementAppended = { parentId: ContinuousId }
 
 /**
+ * Represents the different types of events that can be emitted by a SVGElement
+ * to synchronize its state with the frontend.
+ * 
+ * Note on Child Element Management:
+ * - Child elements are managed implicitly through their own lifecycle events rather than
+ * explicit child addition or removal events.
+ * - When a child element is created (`ElementCreated`), it includes an optional `parent_id`
+ * indicating its parent. This way, the frontend knows to append this new child element
+ * to the specified parent element.
+ * - When a child element is deleted (`ElementDeleted`), it is responsible for removing itself
+ * from the DOM. The parent element implicitly recognizes this removal.
+ * - This approach avoids the need for separate `ChildAdded` or `ChildRemoved` events, simplifying
+ * the event model and reducing the number of events needed to manage the DOM structure.
+ */
+export type ElementChange = ({ type: "ElementCreated" } & ElementCreated) | ({ type: "ElementDeleted" }) | ({ type: "ElementAppended" } & ElementAppended) | ({ type: "AttributeUpdated" } & AttributeUpdated) | ({ type: "AttributeRemoved" } & AttributeRemoved) | ({ type: "StyleUpdated" } & StyleUpdated) | ({ type: "StyleRemoved" } & StyleRemoved)
+
+/**
  * Emitted when a new SVGElement is created.
  */
 export type ElementCreated = { tagName: string; attributes: SVGAttribute[]; styles: SVGStyle[]; parentId: ContinuousId | null; isBundleRoot: boolean; entity: Entity | null }
@@ -228,6 +255,8 @@ export type ElementCreated = { tagName: string; attributes: SVGAttribute[]; styl
  * Emitted when a SVGElement is deleted.
  */
 export type ElementDeleted = Record<string, never>
+
+export type ElementUpdateEvent = { id: ContinuousId; updates: ElementChange[] }
 
 /**
  * Represents a basic shape node for an ellipse.
@@ -593,24 +622,7 @@ name?: string | null }) & { node?: Node; rectangleCornerMixin?: RectangleCornerM
  */
 export type RelativeTransformMixin = Mat3
 
-/**
- * Represents the different types of events that can be emitted by a SVGElement
- * to synchronize its state with the frontend.
- * 
- * Note on Child Element Management:
- * - Child elements are managed implicitly through their own lifecycle events rather than
- * explicit child addition or removal events.
- * - When a child element is created (`ElementCreated`), it includes an optional `parent_id`
- * indicating its parent. This way, the frontend knows to append this new child element
- * to the specified parent element.
- * - When a child element is deleted (`ElementDeleted`), it is responsible for removing itself
- * from the DOM. The parent element implicitly recognizes this removal.
- * - This approach avoids the need for separate `ChildAdded` or `ChildRemoved` events, simplifying
- * the event model and reducing the number of events needed to manage the DOM structure.
- */
-export type RenderChange = ({ type: "ElementCreated" } & ElementCreated) | ({ type: "ElementDeleted" }) | ({ type: "ElementAppended" } & ElementAppended) | ({ type: "AttributeUpdated" } & AttributeUpdated) | ({ type: "AttributeRemoved" } & AttributeRemoved) | ({ type: "StyleUpdated" } & StyleUpdated) | ({ type: "StyleRemoved" } & StyleRemoved)
-
-export type RenderUpdateEvent = { id: ContinuousId; updates: RenderChange[] }
+export type RenderUpdateEvent = { event: SVGRenderOutputEvent }
 
 /**
  * Marks the root node within the composition or scene.
@@ -634,6 +646,8 @@ export type SVGMeasurementUnit = { type: "Pixel" } | { type: "Percent" }
 
 export type SVGPathCommand = { type: "MoveTo"; x: number; y: number } | { type: "LineTo"; x: number; y: number } | { type: "CurveTo"; cx1: number; cy1: number; cx2: number; cy2: number; x: number; y: number } | { type: "ArcTo"; rx: number; ry: number; xAxisRotation: number; largeArcFlag: boolean; sweepFlag: boolean; x: number; y: number } | { type: "ClosePath" }
 
+export type SVGRenderOutputEvent = ({ type: "CompositionUpdate" } & CompositionUpdateEvent) | ({ type: "ElementUpdate" } & ElementUpdateEvent)
+
 export type SVGStyle = { type: "Display"; display: SVGDisplayStyle } | { type: "BlendMode"; blendMode: SVGBlendMode }
 
 export type SVGTransformAttribute = { type: "Matrix"; a: number; b: number; c: number; d: number; tx: number; ty: number }
@@ -641,6 +655,11 @@ export type SVGTransformAttribute = { type: "Matrix"; a: number; b: number; c: n
 export type Selected = null
 
 export type SelectionChangeEvent = { selected: Entity[] }
+
+/**
+ * Emitted when the size of the Composition is changed.
+ */
+export type SizeChanged = { width: number; height: number }
 
 export type SolidPaint = ({ 
 /**
@@ -790,6 +809,11 @@ export type VerticalTextAlignment =
  * Aligns text to the bottom of its container.
  */
 "Bottom"
+
+/**
+ * Emitted when the view box of the Composition is changed.
+ */
+export type ViewBoxChanged = { width: number; height: number; minX: number; minY: number }
 
 export type XYWH = { position: Vec2; width: number; height: number }
 

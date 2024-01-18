@@ -2,7 +2,7 @@ use bevy_ecs::entity::Entity;
 use dyn_composition::core::utils::continuous_id::ContinuousId;
 
 use crate::{
-    events::output_event::RenderUpdateEvent,
+    events::output_event::ElementUpdateEvent,
     mixin_change::MixinChange,
     resources::{
         changed_components::ChangedNode,
@@ -52,7 +52,7 @@ impl SVGBundle for FrameSVGNode {
         &mut self.bundle
     }
 
-    fn drain_updates(&mut self) -> Vec<RenderUpdateEvent> {
+    fn drain_updates(&mut self) -> Vec<ElementUpdateEvent> {
         self.get_bundle_mut().drain_updates()
     }
 
@@ -161,7 +161,7 @@ impl FrameSVGNode {
         // Create root element
         let mut element = SVGElement::new(SVGTag::Group, id_generator);
         let element_id = element.get_id();
-        #[cfg(feature = "trace")]
+        #[cfg(feature = "tracing")]
         element.set_attribute(SVGAttribute::Name {
             name: FrameSVGNode::create_element_name(element.get_id(), String::from("root"), false),
         });
@@ -170,7 +170,7 @@ impl FrameSVGNode {
         // Create content elements
         let mut content_clip_path_defs_element = SVGElement::new(SVGTag::Defs, id_generator);
         let content_clip_path_defs_id = content_clip_path_defs_element.get_id();
-        #[cfg(feature = "trace")]
+        #[cfg(feature = "tracing")]
         content_clip_path_defs_element.set_attribute(SVGAttribute::Name {
             name: FrameSVGNode::create_element_name(
                 content_clip_path_defs_id,
@@ -182,7 +182,7 @@ impl FrameSVGNode {
 
         let mut content_clip_path_element = SVGElement::new(SVGTag::ClipPath, id_generator);
         let content_clip_path_id = content_clip_path_element.get_id();
-        #[cfg(feature = "trace")]
+        #[cfg(feature = "tracing")]
         content_clip_path_element.set_attribute(SVGAttribute::Name {
             name: FrameSVGNode::create_element_name(
                 content_clip_path_id,
@@ -196,7 +196,7 @@ impl FrameSVGNode {
 
         let mut content_clipped_shape_element = SVGElement::new(SVGTag::Rect, id_generator);
         let content_clipped_shape_id = content_clipped_shape_element.get_id();
-        #[cfg(feature = "trace")]
+        #[cfg(feature = "tracing")]
         content_clipped_shape_element.set_attribute(SVGAttribute::Name {
             name: FrameSVGNode::create_element_name(
                 content_clipped_shape_id,
@@ -210,7 +210,7 @@ impl FrameSVGNode {
 
         let mut content_wrapper = SVGElement::new(SVGTag::Group, id_generator);
         let content_wrapper_id = content_wrapper.get_id();
-        #[cfg(feature = "trace")]
+        #[cfg(feature = "tracing")]
         content_wrapper.set_attribute(SVGAttribute::Name {
             name: FrameSVGNode::create_element_name(
                 content_wrapper_id,
@@ -226,7 +226,7 @@ impl FrameSVGNode {
         // Create fill elements
         let mut fill_clip_path_defs = SVGElement::new(SVGTag::Defs, id_generator);
         let fill_clip_path_defs_id = fill_clip_path_defs.get_id();
-        #[cfg(feature = "trace")]
+        #[cfg(feature = "tracing")]
         fill_clip_path_defs.set_attribute(SVGAttribute::Name {
             name: FrameSVGNode::create_element_name(
                 fill_clip_path_defs_id,
@@ -240,7 +240,7 @@ impl FrameSVGNode {
 
         let mut fill_clip_path_element = SVGElement::new(SVGTag::ClipPath, id_generator);
         let fill_clip_path_id = fill_clip_path_element.get_id();
-        #[cfg(feature = "trace")]
+        #[cfg(feature = "tracing")]
         fill_clip_path_element.set_attribute(SVGAttribute::Name {
             name: FrameSVGNode::create_element_name(
                 fill_clip_path_id,
@@ -254,7 +254,7 @@ impl FrameSVGNode {
 
         let mut fill_clipped_shape_element = SVGElement::new(SVGTag::Rect, id_generator);
         let fill_clipped_shape_id = fill_clipped_shape_element.get_id();
-        #[cfg(feature = "trace")]
+        #[cfg(feature = "tracing")]
         fill_clipped_shape_element.set_attribute(SVGAttribute::Name {
             name: FrameSVGNode::create_element_name(
                 fill_clipped_shape_id,
@@ -268,7 +268,7 @@ impl FrameSVGNode {
 
         let mut fill_wrapper_element = SVGElement::new(SVGTag::Group, id_generator);
         let fill_wrapper_id = fill_wrapper_element.get_id();
-        #[cfg(feature = "trace")]
+        #[cfg(feature = "tracing")]
         fill_wrapper_element.set_attribute(SVGAttribute::Name {
             name: FrameSVGNode::create_element_name(fill_wrapper_id, String::from("fill"), false),
         });
@@ -282,7 +282,7 @@ impl FrameSVGNode {
         // Create children wrapper element
         let mut children_wrapper = SVGElement::new(SVGTag::Group, id_generator);
         let children_wrapper_id = children_wrapper.get_id();
-        #[cfg(feature = "trace")]
+        #[cfg(feature = "tracing")]
         children_wrapper.set_attribute(SVGAttribute::Name {
             name: FrameSVGNode::create_element_name(
                 children_wrapper_id,
@@ -341,7 +341,7 @@ impl FrameSVGNode {
         }
     }
 
-    #[cfg(feature = "trace")]
+    #[cfg(feature = "tracing")]
     fn create_element_name(id: ContinuousId, category: String, is_definition: bool) -> String {
         let def_part = if is_definition { "def" } else { "" };
         format!("frame_{}_{}{}", category, id, def_part)

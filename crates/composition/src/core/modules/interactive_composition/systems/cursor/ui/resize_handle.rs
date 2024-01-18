@@ -11,7 +11,7 @@ pub fn handle_cursor_down_on_resize_handle(
     mut interactive_composition: ResMut<InteractiveCompositionRes>,
 ) {
     for event in event_reader.read() {
-        #[cfg(feature = "trace")]
+        #[cfg(feature = "tracing")]
         info!("handle_cursor_down_on_resize_handle: {:#?}", event);
 
         interactive_composition.interaction_mode = InteractionMode::Resizing {

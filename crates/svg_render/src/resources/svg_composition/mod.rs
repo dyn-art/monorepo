@@ -6,7 +6,7 @@ use dyn_composition::core::{
     utils::continuous_id::ContinuousId,
 };
 
-use crate::events::output_event::RenderUpdateEvent;
+use crate::events::output_event::{ElementUpdateEvent, SVGRenderOutputEvent};
 
 use self::{
     svg_bundle_variant::{get_bundle_mut, SVGBundleVariant},
@@ -15,6 +15,7 @@ use self::{
     svg_paint::{solid_svg_paint::SolidSVGPaint, SVGPaint},
 };
 
+pub mod events;
 pub mod svg_bundle;
 pub mod svg_bundle_variant;
 pub mod svg_element;
@@ -28,16 +29,17 @@ pub struct SVGCompositionRes {
     // Root entities
     root_ids: Vec<Entity>,
     // Sender to enque events for frontend
-    render_event_sender: Option<Sender<RenderUpdateEvent>>,
+    output_event_sender: Option<Sender<SVGRenderOutputEvent>>,
+    // SVG Element ID generator
     id_generator: ContinuousId,
 }
 
 impl SVGCompositionRes {
-    pub fn new(render_event_sender: Option<Sender<RenderUpdateEvent>>) -> Self {
+    pub fn new(output_event_sender: Option<Sender<SVGRenderOutputEvent>>) -> Self {
         SVGCompositionRes {
             root_ids: Vec::new(),
             bundles: HashMap::new(),
-            render_event_sender,
+            output_event_sender,
             id_generator: ContinuousId::ZERO,
         }
     }
@@ -155,10 +157,10 @@ impl SVGCompositionRes {
     // Other
     // =========================================================================
 
-    pub fn forward_render_updates(&mut self, updates: Vec<RenderUpdateEvent>) {
-        if let Some(render_event_sender) = &self.render_event_sender {
+    pub fn forward_element_updates(&mut self, updates: Vec<ElementUpdateEvent>) {
+        if let Some(output_event_sender) = &self.output_event_sender {
             for update in updates {
-                let _ = render_event_sender.send(update);
+                let _ = output_event_sender.send(SVGRenderOutputEvent::ElementUpdate(update));
             }
         }
     }

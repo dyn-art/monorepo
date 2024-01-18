@@ -73,7 +73,7 @@ pub fn handle_cursor_down_on_entity_event(
         if is_new {
             commands.entity(entity).insert(Selected);
 
-            #[cfg(feature = "trace")]
+            #[cfg(feature = "tracing")]
             info!("Selected Entity {:#?} at {:#?}", entity, pos);
         }
 
@@ -87,7 +87,7 @@ pub fn handle_cursor_down_on_entity_event(
     selected_nodes_query.for_each(|entity| {
         if selected_entity.map_or(true, |(selected, _, _)| selected != entity) {
             commands.entity(entity).remove::<Selected>();
-            #[cfg(feature = "trace")]
+            #[cfg(feature = "tracing")]
             info!("Unselected Entity: {:#?}", entity);
         }
     });

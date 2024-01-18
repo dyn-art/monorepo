@@ -4,7 +4,7 @@ use bevy_ecs::{entity::Entity, system::ResMut};
 use dyn_composition::core::modules::node::components::types::NodeType;
 
 use crate::{
-    events::output_event::RenderUpdateEvent,
+    events::output_event::ElementUpdateEvent,
     mixin_change::{MixinChange, MixinChangeChildrenMixin},
     resources::{
         changed_components::{ChangedComponentsRes, ChangedNode, ChangedPaint},
@@ -12,20 +12,20 @@ use crate::{
     },
 };
 
-pub fn queue_render_changes(
+pub fn queue_element_changes(
     mut changed: ResMut<ChangedComponentsRes>,
     mut svg_composition: ResMut<SVGCompositionRes>,
 ) {
     let changed_nodes = take(&mut changed.changed_nodes);
     let changed_paints = take(&mut changed.changed_paints);
-    let mut updates: Vec<RenderUpdateEvent> = Vec::new();
+    let mut updates: Vec<ElementUpdateEvent> = Vec::new();
 
     // Process nodes & paints and collect render updates emitted during this process
     process_nodes(&changed_nodes, &mut svg_composition, &mut updates);
     process_paints(&changed_paints, &mut svg_composition, &mut updates);
 
     // Forward render updates into output event channel
-    svg_composition.forward_render_updates(updates);
+    svg_composition.forward_element_updates(updates);
 }
 
 // =============================================================================
@@ -35,7 +35,7 @@ pub fn queue_render_changes(
 fn process_paints(
     changed_paints: &HashMap<Entity, ChangedPaint>,
     svg_composition: &mut SVGCompositionRes,
-    updates: &mut Vec<RenderUpdateEvent>,
+    updates: &mut Vec<ElementUpdateEvent>,
 ) {
     for (entity, paint) in changed_paints {
         process_paint(*entity, &paint, svg_composition, updates);
@@ -47,7 +47,7 @@ fn process_paint(
     entity: Entity,
     changed_paint: &ChangedPaint,
     svg_composition: &mut SVGCompositionRes,
-    updates: &mut Vec<RenderUpdateEvent>,
+    updates: &mut Vec<ElementUpdateEvent>,
 ) {
     // Attempt to get or create the paint associated with the entity
     let maybe_paint =
@@ -76,7 +76,7 @@ struct ChangedNodeBranch<'a> {
 fn process_nodes(
     changed_nodes: &HashMap<Entity, ChangedNode>,
     svg_composition: &mut SVGCompositionRes,
-    updates: &mut Vec<RenderUpdateEvent>,
+    updates: &mut Vec<ElementUpdateEvent>,
 ) {
     // TODO: Performance improvement
     let dependency_tree = build_dependency_trees(changed_nodes);
@@ -171,7 +171,7 @@ fn find_children_mixin(changes: &[MixinChange]) -> Option<&MixinChangeChildrenMi
 fn process_tree_node(
     leaf: &ChangedNodeBranch,
     svg_composition: &mut SVGCompositionRes,
-    updates: &mut Vec<RenderUpdateEvent>,
+    updates: &mut Vec<ElementUpdateEvent>,
 ) {
     // Process the current node entity
     process_node(leaf.entity, leaf.changed, svg_composition, updates);
@@ -188,7 +188,7 @@ fn process_node(
     entity: Entity,
     changed_node: &ChangedNode,
     svg_composition: &mut SVGCompositionRes,
-    updates: &mut Vec<RenderUpdateEvent>,
+    updates: &mut Vec<ElementUpdateEvent>,
 ) {
     // Attempt to get or create the node associated with the entity
     let maybe_node = svg_composition.get_or_create_node(

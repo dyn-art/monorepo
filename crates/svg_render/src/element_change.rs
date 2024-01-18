@@ -21,7 +21,7 @@ use super::resources::svg_composition::svg_element::events::{
 ///   the event model and reducing the number of events needed to manage the DOM structure.
 #[derive(Debug, Serialize, Clone, Type)]
 #[serde(tag = "type")]
-pub enum RenderChange {
+pub enum ElementChange {
     ElementCreated(ElementCreated),
     ElementDeleted(ElementDeleted),
     ElementAppended(ElementAppended),

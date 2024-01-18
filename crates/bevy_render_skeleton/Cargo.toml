@@ -9,6 +9,7 @@ license = "AGPL-3.0-or-later"
 
 [features]
 default = []
+tracing = []
 
 [dependencies]
 bevy_ecs = "0.12.1"

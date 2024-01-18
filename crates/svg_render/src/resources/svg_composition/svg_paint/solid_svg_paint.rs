@@ -4,7 +4,7 @@ use dyn_composition::core::{
 };
 
 use crate::{
-    events::output_event::RenderUpdateEvent,
+    events::output_event::ElementUpdateEvent,
     resources::{
         changed_components::ChangedPaint,
         svg_composition::{
@@ -39,7 +39,7 @@ impl SVGBundle for SolidSVGPaint {
         &mut self.bundle
     }
 
-    fn drain_updates(&mut self) -> Vec<RenderUpdateEvent> {
+    fn drain_updates(&mut self) -> Vec<ElementUpdateEvent> {
         self.bundle.drain_updates()
     }
 
@@ -90,7 +90,7 @@ impl SolidSVGPaint {
     pub fn new(entity: Entity, id_generator: &mut ContinuousId) -> Self {
         // Create root element
         let mut element = SVGElement::new(SVGTag::Group, id_generator);
-        #[cfg(feature = "trace")]
+        #[cfg(feature = "tracing")]
         element.set_attribute(SVGAttribute::Name {
             name: SolidSVGPaint::create_element_name(element.get_id(), String::from("root"), false),
         });
@@ -99,7 +99,7 @@ impl SolidSVGPaint {
         // Create paint elements
         let mut paint_shape_element = SVGElement::new(SVGTag::Rect, id_generator);
         let paint_shape_element_id = paint_shape_element.get_id();
-        #[cfg(feature = "trace")]
+        #[cfg(feature = "tracing")]
         paint_shape_element.set_attribute(SVGAttribute::Name {
             name: SolidSVGPaint::create_element_name(
                 paint_shape_element_id,
@@ -118,7 +118,7 @@ impl SolidSVGPaint {
         }
     }
 
-    #[cfg(feature = "trace")]
+    #[cfg(feature = "tracing")]
     fn create_element_name(id: ContinuousId, category: String, is_definition: bool) -> String {
         let def_part = if is_definition { "def" } else { "" };
         format!("solid-paint_{}_{}{}", category, id, def_part)

@@ -1,4 +1,6 @@
 import type {
+	CompositionUpdateEvent,
+	ElementUpdateEvent,
 	RenderUpdateEvent,
 	SVGAttribute,
 	SVGStyle,
@@ -94,119 +96,134 @@ export class SVGRenderer extends Renderer {
 
 	public render(events: RenderUpdateEvent[]): void {
 		for (const renderUpdate of events) {
-			let element: SVGElement | null = null;
-			const getElement = (): SVGElement | null => {
-				if (element == null) {
-					element = this._svgElementMap.get(renderUpdate.id) ?? null;
+			switch (renderUpdate.event.type) {
+				case 'CompositionUpdate':
+					this.renderComposition(renderUpdate.event);
+					break;
+				case 'ElementUpdate':
+					this.renderElement(renderUpdate.event);
+					break;
+			}
+		}
+	}
+
+	private renderComposition(renderUpdate: CompositionUpdateEvent): void {
+		// TODO
+	}
+
+	private renderElement(renderUpdate: ElementUpdateEvent): void {
+		let element: SVGElement | null = null;
+		const getElement = (): SVGElement | null => {
+			if (element == null) {
+				element = this._svgElementMap.get(renderUpdate.id) ?? null;
+			}
+			return element;
+		};
+
+		for (const update of renderUpdate.updates) {
+			switch (update.type) {
+				case 'ElementCreated': {
+					const newElement: SVGElement = document.createElementNS(NS, update.tagName);
+
+					// Apply attributes
+					for (const attribute of update.attributes) {
+						const parsedAttribute = this.parseSVGAttribute(attribute);
+						if (parsedAttribute != null) {
+							const [key, value] = parsedAttribute;
+							newElement.setAttribute(key, value);
+						}
+					}
+
+					// Apply styles
+					for (const style of update.styles) {
+						const parsedStyle = this.parseSVGStyle(style);
+						if (parsedStyle != null) {
+							const [key, value] = parsedStyle;
+							newElement.style.setProperty(key, `${value}`);
+						}
+					}
+
+					// Register callbacks
+					const entity = update.entity;
+					if (update.isBundleRoot && entity != null) {
+						newElement.addEventListener('pointerdown', (e) => {
+							e.preventDefault();
+							this.composition.emitInteractionEvents([
+								{
+									type: 'CursorDownOnEntity',
+									entity,
+									position: this.pointerEventToCompositionPoint(e)
+								}
+							]);
+						});
+					}
+
+					this._svgElementMap.set(renderUpdate.id, newElement);
+
+					// Append element to parent
+					if (update.parentId != null) {
+						const parentElement = this._svgElementMap.get(update.parentId);
+						if (parentElement != null) {
+							parentElement.appendChild(newElement);
+						}
+					} else {
+						this._svgElement.appendChild(newElement);
+					}
+
+					element = newElement;
+					break;
 				}
-				return element;
-			};
-
-			for (const update of renderUpdate.updates) {
-				switch (update.type) {
-					case 'ElementCreated': {
-						const newElement: SVGElement = document.createElementNS(NS, update.tagName);
-
-						// Apply attributes
-						for (const attribute of update.attributes) {
-							const parsedAttribute = this.parseSVGAttribute(attribute);
-							if (parsedAttribute != null) {
-								const [key, value] = parsedAttribute;
-								newElement.setAttribute(key, value);
-							}
-						}
-
-						// Apply styles
-						for (const style of update.styles) {
-							const parsedStyle = this.parseSVGStyle(style);
-							if (parsedStyle != null) {
-								const [key, value] = parsedStyle;
-								newElement.style.setProperty(key, `${value}`);
-							}
-						}
-
-						// Register callbacks
-						const entity = update.entity;
-						if (update.isBundleRoot && entity != null) {
-							newElement.addEventListener('pointerdown', (e) => {
-								e.preventDefault();
-								this.composition.emitInteractionEvents([
-									{
-										type: 'CursorDownOnEntity',
-										entity,
-										position: this.pointerEventToCompositionPoint(e)
-									}
-								]);
-							});
-						}
-
-						this._svgElementMap.set(renderUpdate.id, newElement);
-
-						// Append element to parent
-						if (update.parentId != null) {
-							const parentElement = this._svgElementMap.get(update.parentId);
-							if (parentElement != null) {
-								parentElement.appendChild(newElement);
-							}
-						} else {
-							this._svgElement.appendChild(newElement);
-						}
-
-						element = newElement;
-						break;
+				case 'ElementDeleted': {
+					const elementToDelete = getElement();
+					if (elementToDelete?.parentNode != null) {
+						elementToDelete.parentNode.removeChild(elementToDelete);
+						this._svgElementMap.delete(renderUpdate.id);
 					}
-					case 'ElementDeleted': {
-						const elementToDelete = getElement();
-						if (elementToDelete?.parentNode != null) {
-							elementToDelete.parentNode.removeChild(elementToDelete);
-							this._svgElementMap.delete(renderUpdate.id);
-						}
-						break;
+					break;
+				}
+				case 'ElementAppended': {
+					const toAppendElement = getElement();
+					const parentElement = this._svgElementMap.get(renderUpdate.id);
+					if (parentElement != null && toAppendElement != null) {
+						parentElement.appendChild(toAppendElement);
 					}
-					case 'ElementAppended': {
-						const toAppendElement = getElement();
-						const parentElement = this._svgElementMap.get(renderUpdate.id);
-						if (parentElement != null && toAppendElement != null) {
-							parentElement.appendChild(toAppendElement);
+					break;
+				}
+				case 'AttributeUpdated': {
+					const elementToUpdate = getElement();
+					if (elementToUpdate != null) {
+						const parsedAttribute = this.parseSVGAttribute(update.newValue);
+						if (parsedAttribute != null) {
+							const [key, value] = parsedAttribute;
+							elementToUpdate.setAttribute(key, value);
 						}
-						break;
 					}
-					case 'AttributeUpdated': {
-						const elementToUpdate = getElement();
-						if (elementToUpdate != null) {
-							const parsedAttribute = this.parseSVGAttribute(update.newValue);
-							if (parsedAttribute != null) {
-								const [key, value] = parsedAttribute;
-								elementToUpdate.setAttribute(key, value);
-							}
+					break;
+				}
+				case 'AttributeRemoved': {
+					const elementToUpdate = getElement();
+					if (elementToUpdate != null) {
+						elementToUpdate.removeAttribute(update.key);
+					}
+					break;
+				}
+				case 'StyleUpdated': {
+					const elementToUpdate = getElement();
+					if (elementToUpdate != null) {
+						const parsedStyle = this.parseSVGStyle(update.newValue);
+						if (parsedStyle != null) {
+							const [key, value] = parsedStyle;
+							elementToUpdate.style.setProperty(key, value);
 						}
-						break;
 					}
-					case 'AttributeRemoved': {
-						const elementToUpdate = getElement();
-						if (elementToUpdate != null) {
-							elementToUpdate.removeAttribute(update.key);
-						}
-						break;
+					break;
+				}
+				case 'StyleRemoved': {
+					const elementToUpdate = getElement();
+					if (elementToUpdate != null) {
+						elementToUpdate.style.removeProperty(update.key);
 					}
-					case 'StyleUpdated': {
-						const elementToUpdate = getElement();
-						if (elementToUpdate != null) {
-							const parsedStyle = this.parseSVGStyle(update.newValue);
-							if (parsedStyle != null) {
-								const [key, value] = parsedStyle;
-								elementToUpdate.style.setProperty(key, value);
-							}
-						}
-						break;
-					}
-					case 'StyleRemoved': {
-						const elementToUpdate = getElement();
-						if (elementToUpdate != null) {
-							elementToUpdate.style.removeProperty(update.key);
-						}
-						break;
-					}
+					break;
 				}
 			}
 		}
