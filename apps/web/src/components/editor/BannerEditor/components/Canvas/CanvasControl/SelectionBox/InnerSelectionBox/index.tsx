@@ -26,14 +26,22 @@ export const InnerSelectionBox: React.FC<TProps> = React.memo((props) => {
 		Dimension: { width = undefined, height = undefined } = {},
 		RelativeTransform: { relativeTransform = undefined } = {}
 	} = useWatchEntity(composition, entity, ['Dimension', 'RelativeTransform']);
+	const viewWidthFactor = React.useMemo(
+		() => composition.width / composition.viewBox.width,
+		[composition.width, composition.viewBox.width]
+	);
+	const viewHeightFactor = React.useMemo(
+		() => composition.height / composition.viewBox.height,
+		[composition.height, composition.viewBox.height]
+	);
 	const { tx: x, ty: y, rotationInRadians } = useMatrixTransform(relativeTransform);
 	const interactionMode = useInteractionMode(composition);
 	const handlePositions = React.useMemo(() => {
 		if (width == null || height == null) {
 			return null;
 		}
-		return getHandlePositions(width, height);
-	}, [width, height]);
+		return getHandlePositions(width * viewWidthFactor, height * viewHeightFactor);
+	}, [width, height, viewWidthFactor, viewHeightFactor]);
 
 	if (
 		width == null ||
@@ -48,19 +56,31 @@ export const InnerSelectionBox: React.FC<TProps> = React.memo((props) => {
 	const rotationInDegrees = radiansToDegrees(rotationInRadians);
 
 	return (
-		<g style={{ transform: `translate(${x}px, ${y}px) rotate(${-rotationInDegrees}deg)` }}>
+		<g
+			style={{
+				transform: `translate(${x * viewWidthFactor}px, ${
+					y * viewHeightFactor
+				}px) rotate(${-rotationInDegrees}deg)`
+			}}
+		>
 			{/* Border */}
 			<rect
 				className="pointer-events-none fill-transparent stroke-blue-400 stroke-1"
-				height={height}
-				width={width}
+				height={height * viewHeightFactor}
+				width={width * viewWidthFactor}
 				x={0}
 				y={0}
 			/>
 
 			{/* Dimension Indicator */}
 			{showHandles ? (
-				<foreignObject className="overflow-visible" height="40" width={width} x={0} y={height}>
+				<foreignObject
+					className="overflow-visible"
+					height="40"
+					width={width * viewWidthFactor}
+					x={0}
+					y={height * viewHeightFactor}
+				>
 					<div className="flex h-full items-center justify-center">
 						<div
 							className="whitespace-nowrap rounded-sm bg-blue-500 px-2 py-1 text-center text-xs text-white"

@@ -3,6 +3,7 @@ import { shortId } from '@dyn/utils';
 import { JsCompositionHandle } from '@/rust/dyn_svg_composition_api';
 import type {
 	AnyInputEvent,
+	CompositionChange,
 	CompositionChangeEvent,
 	CoreInputEvent,
 	CursorChangeEvent,
@@ -41,6 +42,7 @@ export class Composition {
 	private _eventQueue: AnyInputEvent[] = [];
 
 	// https://www.zhenghao.io/posts/object-vs-map
+	private _watchCompositionCallbacks = new Map<string, TWatchCompositionCallback>();
 	private readonly _watchEntityCallbacks = new Map<Entity, Map<string, TWatchEntityCallback>>();
 	private readonly _onSelectionChangeCallbacks = new Map<string, TOnSelectionChangeCallback>();
 	private readonly _onInteractionModeChangeCallbacks = new Map<
@@ -163,23 +165,47 @@ export class Composition {
 	}
 
 	private handleElementUpdates(events: ElementChangeEvent[]): void {
-		this._renderer.forEach((renderer) => {
-			renderer.applyElementChanges(events);
-		});
+		if (events.length > 0) {
+			this._renderer.forEach((renderer) => {
+				renderer.applyElementChanges(events);
+			});
+		}
 	}
 
 	private handleCompositionUpdates(events: CompositionChangeEvent[]): void {
-		this._renderer.forEach((renderer) => {
-			renderer.applyCompositionChanges(events);
-		});
+		if (events.length > 0) {
+			// Apply composition changes to each renderer
+			this._renderer.forEach((renderer) => {
+				renderer.applyCompositionChanges(events);
+			});
+
+			// Call the watch composition callbacks with the aggregated changes
+			const aggregatedChanges = events.reduce<CompositionChange[]>((accumulator, event) => {
+				const changes = event.changes as unknown as CompositionChange[];
+				return accumulator.concat(changes);
+			}, []);
+			this._watchCompositionCallbacks.forEach((callback) => {
+				callback(aggregatedChanges);
+			});
+		}
 	}
 
 	// =========================================================================
 	// Watch Composition
 	// =========================================================================
 
-	public watchComposition(toTrack: TRustEnumKeyArray<CompositionChangeEvent>): void {
-		// TODO
+	public watchComposition(callback: TWatchCompositionCallback): () => void {
+		const callbackId = shortId();
+		this._watchCompositionCallbacks.set(callbackId, callback);
+		return () => {
+			this.unwatchComposition(callbackId);
+		};
+	}
+
+	private unwatchComposition(callbackId: string): void {
+		if (this._watchCompositionCallbacks.has(callbackId)) {
+			this._watchCompositionCallbacks.delete(callbackId);
+		}
 	}
 
 	// =========================================================================
@@ -188,14 +214,14 @@ export class Composition {
 
 	public watchEntity(
 		entity: Entity,
-		toTrackMixins: TRustEnumKeyArray<TrackableMixinType>[],
+		toTrackMixinKeys: TRustEnumKeyArray<TrackableMixinType>[],
 		callback: TWatchEntityCallback,
 		initalValue = true
 	): (() => void) | false {
 		// Enable tracking of entity in composition
 		const intialChanges = this.trackEntity(
 			entity,
-			toTrackMixins.map((v) => ({ type: v })),
+			toTrackMixinKeys.map((key) => ({ type: key })),
 			initalValue
 		);
 
@@ -475,6 +501,7 @@ export interface TCompositionConfig {
 	isCallbackBased?: boolean;
 }
 
+type TWatchCompositionCallback = (changes: CompositionChange[]) => void;
 type TWatchEntityCallback = (entity: Entity, changes: MixinChange[]) => void;
 type TOnSelectionChangeCallback = (selected: Entity[]) => void;
 type TOnInteractionModeChangeCallback = (interactionMode: InteractionModeForFrontend) => void;

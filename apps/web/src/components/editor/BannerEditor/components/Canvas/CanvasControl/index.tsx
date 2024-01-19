@@ -1,10 +1,12 @@
 import React from 'react';
 import type { Composition } from '@dyn/svg-composition';
 
+import { useWatchComposition } from '../../../hooks';
 import { SelectionBox } from './SelectionBox';
 
 export const CanvasControl: React.FC<TProps> = (props) => {
 	const { composition } = props;
+	useWatchComposition(composition);
 
 	return (
 		<svg
@@ -13,7 +15,7 @@ export const CanvasControl: React.FC<TProps> = (props) => {
 			id="canvas-control"
 			overflow="visible"
 			style={{ cursor: 'crosshair' }}
-			viewBox={`${composition.viewBox.minX} ${composition.viewBox.minY} ${composition.viewBox.width} ${composition.viewBox.height}`}
+			viewBox={`0 0 ${composition.width} ${composition.height}`}
 			width={`${composition.width}px`}
 		>
 			<SelectionBox

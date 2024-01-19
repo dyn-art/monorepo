@@ -1,4 +1,3 @@
-import React from 'react';
 import type {
 	Composition,
 	Entity,
@@ -6,6 +5,7 @@ import type {
 	TrackableMixinType,
 	TRustEnumKeyArray
 } from '@dyn/svg-composition';
+import React from 'react';
 
 export function useWatchEntity<T extends TTrackableMixinKey[]>(
 	composition: Composition,
@@ -51,3 +51,27 @@ type TCombinedMixin<T extends TTrackableMixinKey[]> = {
 	[K in T[number]]?: Extract<MixinChange, { type: K }>;
 };
 type TTrackableMixinKey = TRustEnumKeyArray<TrackableMixinType>;
+type TMiddleware<T> = (change: MixinChange) => T;
+
+// TODO: figure out how to solve this as tuple
+
+// interface Example {
+// 	a: number;
+// 	b: string;
+// 	c: boolean;
+// }
+
+// const exampleObj: Example = { a: 1, b: 'string', c: true };
+
+// // Optimized MappedTuple type
+// type MappedTuple<T, K extends readonly (keyof T)[]> = {
+// 	[Index in keyof K]: K[Index] extends keyof T ? T[K[Index]] : never;
+// };
+
+// // Improved getValuesFromKeys function
+// function getValuesFromKeys<T, K extends readonly (keyof T)[]>(obj: T, keys: K): MappedTuple<T, K> {
+// 	return keys.map((key) => obj[key]) as MappedTuple<T, K>;
+// }
+
+// // Example usage
+// const values = getValuesFromKeys(exampleObj, ['b', 'a'] as const); // values is inferred as [string, number]
