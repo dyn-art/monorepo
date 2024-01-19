@@ -2,15 +2,13 @@ use std::{collections::HashMap, sync::mpsc::Sender};
 
 use bevy_ecs::{entity::Entity, system::Resource};
 use dyn_composition::core::{
-    composition::Composition,
     modules::node::components::{mixins::Paint, types::NodeType},
     utils::continuous_id::ContinuousId,
 };
 
 use crate::{
-    composition_change::CompositionChange,
     element_change::ElementChange,
-    events::output_event::{CompositionChangeEvent, ElementChangeEvent, SVGRenderOutputEvent},
+    events::output_event::{ElementChangeEvent, SVGRenderOutputEvent},
 };
 
 use self::{
@@ -20,7 +18,6 @@ use self::{
     svg_paint::{solid_svg_paint::SolidSVGPaint, SVGPaint},
 };
 
-pub mod events;
 pub mod svg_bundle;
 pub mod svg_bundle_variant;
 pub mod svg_element;
@@ -169,14 +166,6 @@ impl SVGCompositionRes {
                     id,
                     changes,
                 }));
-        }
-    }
-
-    pub fn forward_composition_changes(&mut self, changes: Vec<CompositionChange>) {
-        if let Some(output_event_sender) = &self.output_event_sender {
-            let _ = output_event_sender.send(SVGRenderOutputEvent::CompositionChange(
-                CompositionChangeEvent { changes },
-            ));
         }
     }
 

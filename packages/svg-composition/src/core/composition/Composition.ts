@@ -175,7 +175,15 @@ export class Composition {
 	}
 
 	// =========================================================================
-	// Tracking
+	// Watch Composition
+	// =========================================================================
+
+	public watchComposition(toTrack: TRustEnumKeyArray<CompositionChangeEvent>): void {
+		// TODO
+	}
+
+	// =========================================================================
+	// Watch Entity
 	// =========================================================================
 
 	public watchEntity(

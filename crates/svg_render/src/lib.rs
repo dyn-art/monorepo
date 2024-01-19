@@ -7,7 +7,6 @@ use dyn_composition::core::modules::node::components::mixins::{
     BlendMixin, DimensionMixin, NodeCompositionMixin, PathMixin, RelativeTransformMixin,
 };
 use events::output_event::SVGRenderOutputEvent;
-use systems::extract::extract_composition;
 
 use self::{
     resources::{changed_components::ChangedComponentsRes, svg_composition::SVGCompositionRes},
@@ -17,7 +16,6 @@ use self::{
     },
 };
 
-pub mod composition_change;
 pub mod element_change;
 pub mod events;
 pub mod mixin_change;
@@ -51,7 +49,6 @@ impl Plugin for SvgRenderPlugin {
                     extract_mixin_generic::<PathMixin>,
                     extract_children,
                     extract_paint,
-                    extract_composition,
                 ),
             )
             .add_systems(Render, (queue_element_changes.in_set(RenderSet::Queue),));

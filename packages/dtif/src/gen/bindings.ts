@@ -646,7 +646,7 @@ export type SVGMeasurementUnit = { type: "Pixel" } | { type: "Percent" }
 
 export type SVGPathCommand = { type: "MoveTo"; x: number; y: number } | { type: "LineTo"; x: number; y: number } | { type: "CurveTo"; cx1: number; cy1: number; cx2: number; cy2: number; x: number; y: number } | { type: "ArcTo"; rx: number; ry: number; xAxisRotation: number; largeArcFlag: boolean; sweepFlag: boolean; x: number; y: number } | { type: "ClosePath" }
 
-export type SVGRenderOutputEvent = ({ type: "CompositionChange" } & CompositionChangeEvent) | ({ type: "ElementChange" } & ElementChangeEvent)
+export type SVGRenderOutputEvent = ({ type: "ElementChange" } & ElementChangeEvent)
 
 export type SVGStyle = { type: "Display"; display: SVGDisplayStyle } | { type: "BlendMode"; blendMode: SVGBlendMode }
 

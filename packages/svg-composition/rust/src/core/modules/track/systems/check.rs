@@ -7,17 +7,54 @@ use bevy_ecs::{
     system::{Local, Query, Res, ResMut},
 };
 use dyn_composition::core::modules::{
+    composition::resources::composition::{CompositionRes, ViewBox},
     interactive_composition::resources::{HandleSide, InteractionMode, InteractiveCompositionRes},
     node::components::states::Selected,
 };
 
 use crate::core::events::{
     output_event::{
-        CursorChangeEvent, CursorForFrontend, InteractionModeChangeEvent,
-        InteractionModeForFrontend, OutputEvent, SelectionChangeEvent,
+        CompositionChange, CompositionChangeEvent, CursorChangeEvent, CursorForFrontend,
+        InteractionModeChangeEvent, InteractionModeForFrontend, OutputEvent, SelectionChangeEvent,
+        SizeChanged, ViewBoxChanged,
     },
     output_event_queue::OutputEventQueueRes,
 };
+
+pub fn check_composition_changes(
+    mut output_event_queue: ResMut<OutputEventQueueRes>,
+    composition: Res<CompositionRes>,
+    mut last_width: Local<f32>,
+    mut last_height: Local<f32>,
+    mut last_view_box: Local<ViewBox>,
+) {
+    let mut changes = Vec::new();
+
+    // Check if either width or height has changed
+    if *last_width != composition.width || *last_height != composition.height {
+        *last_width = composition.width;
+        *last_height = composition.height;
+        changes.push(CompositionChange::SizeChanged(SizeChanged {
+            width: composition.width,
+            height: composition.height,
+        }));
+    }
+
+    // Check if view box has changed
+    if *last_view_box != composition.view_box {
+        *last_view_box = composition.view_box;
+        changes.push(CompositionChange::ViewBoxChanged(ViewBoxChanged {
+            view_box: composition.view_box,
+        }));
+    }
+
+    // Forward the changes if any
+    if !changes.is_empty() {
+        output_event_queue.push_event(OutputEvent::CompositionUpdate(CompositionChangeEvent {
+            changes,
+        }));
+    }
+}
 
 pub fn check_selection_changes(
     mut output_event_queue: ResMut<OutputEventQueueRes>,

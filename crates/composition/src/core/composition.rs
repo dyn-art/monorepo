@@ -8,15 +8,12 @@ use crate::core::modules::composition::CompositionPlugin;
 use super::{
     dtif::DTIFComposition,
     events::input_event::InputEvent,
-    modules::{
-        composition::resources::composition::CompositionRes,
-        node::{
-            components::{
-                bundles::{FrameNodeBundle, NodeBundle, RectangleNodeBundle, TextNodeBundle},
-                types::Root,
-            },
-            NodePlugin,
+    modules::node::{
+        components::{
+            bundles::{FrameNodeBundle, NodeBundle, RectangleNodeBundle, TextNodeBundle},
+            types::Root,
         },
+        NodePlugin,
     },
 };
 
