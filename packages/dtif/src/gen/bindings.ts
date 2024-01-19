@@ -544,7 +544,7 @@ name?: string | null }
 
 export type NodeType = "None" | "Group" | "Rectangle" | "Frame" | "Text"
 
-export type OutputEvent = ({ type: "RenderUpdate" } & RenderUpdateEvent) | ({ type: "TrackUpdate" } & TrackUpdateEvent) | ({ type: "SelectionChange" } & SelectionChangeEvent) | ({ type: "InteractionModeChange" } & InteractionModeChangeEvent) | ({ type: "CursorChange" } & CursorChangeEvent)
+export type OutputEvent = ({ type: "ElementUpdate" } & ElementChangeEvent) | ({ type: "CompositionUpdate" } & CompositionChangeEvent) | ({ type: "TrackUpdate" } & TrackUpdateEvent) | ({ type: "SelectionChange" } & SelectionChangeEvent) | ({ type: "InteractionModeChange" } & InteractionModeChangeEvent) | ({ type: "CursorChange" } & CursorChangeEvent)
 
 export type Paint = 
 /**
@@ -623,8 +623,6 @@ name?: string | null }) & { node?: Node; rectangleCornerMixin?: RectangleCornerM
  * For scaling, refer to the `DimensionMixin`.
  */
 export type RelativeTransformMixin = Mat3
-
-export type RenderUpdateEvent = { event: SVGRenderOutputEvent }
 
 /**
  * Marks the root node within the composition or scene.

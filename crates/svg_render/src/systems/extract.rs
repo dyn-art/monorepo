@@ -1,14 +1,13 @@
 use bevy_ecs::{
-    change_detection::DetectChanges,
     component::Component,
     entity::Entity,
     query::{Changed, With},
-    system::{Query, Res, ResMut},
+    system::{Local, Query, Res, ResMut},
 };
 use bevy_hierarchy::{Children, Parent};
 use dyn_bevy_render_skeleton::extract_param::Extract;
 use dyn_composition::core::modules::{
-    composition::resources::composition::CompositionRes,
+    composition::resources::composition::{CompositionRes, ViewBox},
     node::components::{
         mixins::{ChildrenMixin, DimensionMixin, Paint},
         types::Node,
@@ -30,17 +29,33 @@ use crate::{
 pub fn extract_composition(
     mut svg_composition: ResMut<SVGCompositionRes>,
     composition: Extract<Res<CompositionRes>>,
+    mut last_width: Local<f32>,
+    mut last_height: Local<f32>,
+    mut last_view_box: Local<ViewBox>,
 ) {
-    if composition.is_changed() {
-        svg_composition.forward_composition_changes(vec![
-            CompositionChange::SizeChanged(SizeChanged {
-                width: composition.width,
-                height: composition.height,
-            }),
-            CompositionChange::ViewBoxChanged(ViewBoxChanged {
-                view_box: composition.view_box,
-            }),
-        ])
+    let mut changes = Vec::new();
+
+    // Check if either width or height has changed
+    if *last_width != composition.width || *last_height != composition.height {
+        *last_width = composition.width;
+        *last_height = composition.height;
+        changes.push(CompositionChange::SizeChanged(SizeChanged {
+            width: composition.width,
+            height: composition.height,
+        }));
+    }
+
+    // Check if view box has changed
+    if *last_view_box != composition.view_box {
+        *last_view_box = composition.view_box;
+        changes.push(CompositionChange::ViewBoxChanged(ViewBoxChanged {
+            view_box: composition.view_box,
+        }));
+    }
+
+    // Forward the changes if any
+    if !changes.is_empty() {
+        svg_composition.forward_composition_changes(changes);
     }
 }
 

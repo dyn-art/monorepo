@@ -13,7 +13,7 @@ pub struct CompositionRes {
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/viewBox
-#[derive(Debug, Serialize, Deserialize, Type, Copy, Clone)]
+#[derive(Debug, Serialize, Deserialize, Type, Copy, Clone, Default, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub struct ViewBox {
     pub width: f32,

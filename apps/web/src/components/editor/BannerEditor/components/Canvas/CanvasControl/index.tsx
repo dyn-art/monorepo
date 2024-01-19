@@ -8,10 +8,13 @@ export const CanvasControl: React.FC<TProps> = (props) => {
 
 	return (
 		<svg
-			className="pointer-events-none absolute h-full w-full"
+			className="pointer-events-none absolute"
+			height={`${composition.height}px`}
 			id="canvas-control"
 			overflow="visible"
 			style={{ cursor: 'crosshair' }}
+			viewBox={`${composition.viewBox.minX} ${composition.viewBox.minY} ${composition.viewBox.width} ${composition.viewBox.height}`}
+			width={`${composition.width}px`}
 		>
 			<SelectionBox
 				composition={composition}

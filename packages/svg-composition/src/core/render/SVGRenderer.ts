@@ -1,7 +1,6 @@
 import type {
 	CompositionChangeEvent,
 	ElementChangeEvent,
-	RenderUpdateEvent,
 	SVGAttribute,
 	SVGStyle,
 	Vec2
@@ -87,16 +86,15 @@ export class SVGRenderer extends Renderer {
 		this._svgElement.setAttribute('viewBox', `0 0 ${width} ${height}`);
 	}
 
-	public render(events: RenderUpdateEvent[]): void {
-		for (const renderUpdate of events) {
-			switch (renderUpdate.event.type) {
-				case 'CompositionChange':
-					this.renderComposition(renderUpdate.event);
-					break;
-				case 'ElementChange':
-					this.renderElement(renderUpdate.event);
-					break;
-			}
+	public applyCompositionChanges(events: CompositionChangeEvent[]): void {
+		for (const event of events) {
+			this.renderComposition(event);
+		}
+	}
+
+	public applyElementChanges(events: ElementChangeEvent[]): void {
+		for (const event of events) {
+			this.renderElement(event);
 		}
 	}
 

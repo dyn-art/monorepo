@@ -1,4 +1,7 @@
-import type { RenderUpdateEvent } from '@/rust/dyn_svg_composition_api/bindings';
+import type {
+	CompositionChangeEvent,
+	ElementChangeEvent
+} from '@/rust/dyn_svg_composition_api/bindings';
 
 import type { Composition } from '../composition';
 
@@ -21,7 +24,9 @@ export abstract class Renderer {
 	// Abstract
 	// =========================================================================
 
-	public abstract render(events: RenderUpdateEvent[]): void;
+	public abstract applyElementChanges(events: ElementChangeEvent[]): void;
+
+	public abstract applyCompositionChanges(events: CompositionChangeEvent[]): void;
 
 	public abstract clear(): void;
 }

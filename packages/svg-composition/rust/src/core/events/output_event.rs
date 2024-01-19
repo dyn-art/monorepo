@@ -1,21 +1,20 @@
 use bevy_ecs::entity::Entity;
-use dyn_svg_render::{events::output_event::SVGRenderOutputEvent, mixin_change::MixinChange};
+use dyn_svg_render::{
+    events::output_event::{CompositionChangeEvent, ElementChangeEvent, SVGRenderOutputEvent},
+    mixin_change::MixinChange,
+};
 use serde::Serialize;
 use specta::Type;
 
 #[derive(Debug, Serialize, Clone, Type)]
 #[serde(tag = "type")]
 pub enum OutputEvent {
-    RenderUpdate(RenderUpdateEvent),
+    ElementUpdate(ElementChangeEvent),
+    CompositionUpdate(CompositionChangeEvent),
     TrackUpdate(TrackUpdateEvent),
     SelectionChange(SelectionChangeEvent),
     InteractionModeChange(InteractionModeChangeEvent),
     CursorChange(CursorChangeEvent),
-}
-
-#[derive(Debug, Serialize, Clone, Type)]
-pub struct RenderUpdateEvent {
-    pub event: SVGRenderOutputEvent,
 }
 
 #[derive(Debug, Serialize, Clone, Type)]

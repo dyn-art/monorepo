@@ -18,7 +18,6 @@ use wasm_bindgen::JsValue;
 
 use crate::bindgen::utils::convert_optional_jsvalue;
 use crate::core::events::input_event::AnyInputEvent;
-use crate::core::events::output_event::RenderUpdateEvent;
 use crate::core::modules::track::resources::tracked_entities::{
     TrackableMixinType, TrackedEntitiesRes,
 };
@@ -105,7 +104,14 @@ impl JsCompositionHandle {
             output_events.push(event);
         }
         while let Ok(event) = self.svg_output_event_receiver.try_recv() {
-            output_events.push(OutputEvent::RenderUpdate(RenderUpdateEvent { event }));
+            match event {
+                SVGRenderOutputEvent::CompositionChange(event) => {
+                    output_events.push(OutputEvent::CompositionUpdate(event))
+                }
+                SVGRenderOutputEvent::ElementChange(event) => {
+                    output_events.push(OutputEvent::ElementUpdate(event))
+                }
+            }
         }
 
         // Invoke the JavaScript callback if with collected output events

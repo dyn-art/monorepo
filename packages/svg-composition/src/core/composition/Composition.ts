@@ -3,10 +3,12 @@ import { shortId } from '@dyn/utils';
 import { JsCompositionHandle } from '@/rust/dyn_svg_composition_api';
 import type {
 	AnyInputEvent,
+	CompositionChangeEvent,
 	CoreInputEvent,
 	CursorChangeEvent,
 	CursorForFrontend,
 	DTIFComposition,
+	ElementChangeEvent,
 	Entity,
 	InteractionInputEvent,
 	InteractionModeChangeEvent,
@@ -15,7 +17,6 @@ import type {
 	NodeBundle,
 	OutputEvent,
 	Paint,
-	RenderUpdateEvent,
 	SelectionChangeEvent,
 	TrackableMixinType,
 	TrackUpdateEvent,
@@ -130,8 +131,11 @@ export class Composition {
 			const groupedEvent = groupedEvents[eventType];
 			if (groupedEvent != null) {
 				switch (eventType) {
-					case 'RenderUpdate':
-						this.handleRenderUpdates(groupedEvent as RenderUpdateEvent[]);
+					case 'CompositionUpdate':
+						this.handleCompositionUpdates(groupedEvent as CompositionChangeEvent[]);
+						break;
+					case 'ElementUpdate':
+						this.handleElementUpdates(groupedEvent as ElementChangeEvent[]);
 						break;
 					case 'TrackUpdate':
 						this.handleTrackUpdates(groupedEvent as TrackUpdateEvent[]);
@@ -145,8 +149,6 @@ export class Composition {
 					case 'CursorChange':
 						this.handleCursorChanges(groupedEvent as CursorChangeEvent[]);
 						break;
-					default:
-						console.warn(`Unknown event: ${eventType as string}`);
 				}
 			}
 		}
@@ -160,9 +162,15 @@ export class Composition {
 		this._renderer.push(renderer);
 	}
 
-	private handleRenderUpdates(events: RenderUpdateEvent[]): void {
+	private handleElementUpdates(events: ElementChangeEvent[]): void {
 		this._renderer.forEach((renderer) => {
-			renderer.render(events);
+			renderer.applyElementChanges(events);
+		});
+	}
+
+	private handleCompositionUpdates(events: CompositionChangeEvent[]): void {
+		this._renderer.forEach((renderer) => {
+			renderer.applyCompositionChanges(events);
 		});
 	}
 
