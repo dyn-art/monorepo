@@ -1,3 +1,4 @@
+import React from 'react';
 import type {
 	Composition,
 	Entity,
@@ -5,7 +6,6 @@ import type {
 	TrackableMixinType,
 	TRustEnumKeyArray
 } from '@dyn/svg-composition';
-import React from 'react';
 
 export function useWatchEntity<T extends TTrackableMixinKey[]>(
 	composition: Composition,

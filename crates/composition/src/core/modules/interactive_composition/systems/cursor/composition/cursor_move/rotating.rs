@@ -1,8 +1,14 @@
-use bevy_ecs::{query::With, system::Query};
+use bevy_ecs::{
+    query::With,
+    system::{Query, Res},
+};
 use glam::Vec2;
 
 use crate::core::modules::{
-    interactive_composition::{events::CursorMovedOnComposition, resources::HandleSide},
+    composition::resources::composition::CompositionRes,
+    interactive_composition::{
+        events::CursorMovedOnComposition, resources::HandleSide, utils::apply_view_box_offset,
+    },
     node::{
         components::{
             mixins::{AbsoluteTransformMixin, DimensionMixin, RelativeTransformMixin},
@@ -13,6 +19,7 @@ use crate::core::modules::{
 };
 
 pub fn handle_rotating(
+    composition: &Res<CompositionRes>,
     selected_nodes_query: &mut Query<
         (
             &mut RelativeTransformMixin,
@@ -29,6 +36,7 @@ pub fn handle_rotating(
     let CursorMovedOnComposition {
         position: cursor_position,
     } = event;
+    let cursor_position = apply_view_box_offset(composition, cursor_position);
 
     selected_nodes_query.for_each_mut(
         |(mut relative_transform_mixin, absolute_transform_mixin, dimension_mixin)| {
@@ -91,7 +99,7 @@ pub fn handle_rotating(
 
             // Calculate rotation based on the corner
             let rotation_angle =
-                calculate_rotation(initial_rotation, cursor_position, &absolute_pivot_point);
+                calculate_rotation(initial_rotation, &cursor_position, &absolute_pivot_point);
             let final_rotation_angle =
                 rotation_angle + rotation_offset_in_radians - initial_rotation;
             relative_transform_mixin.0 = set_rotation(

@@ -1,10 +1,15 @@
-use bevy_ecs::{query::With, system::Query};
+use bevy_ecs::{
+    query::With,
+    system::{Query, Res},
+};
 use glam::Vec2;
 
 use crate::core::modules::{
+    composition::resources::composition::CompositionRes,
     interactive_composition::{
         events::CursorMovedOnComposition,
         resources::{HandleSide, XYWH},
+        utils::apply_view_box_offset,
     },
     node::{
         components::{
@@ -16,6 +21,7 @@ use crate::core::modules::{
 };
 
 pub fn handle_resizing(
+    composition: &Res<CompositionRes>,
     selected_nodes_query: &mut Query<
         (&mut RelativeTransformMixin, &mut DimensionMixin),
         With<Selected>,
@@ -27,10 +33,11 @@ pub fn handle_resizing(
     let CursorMovedOnComposition {
         position: cursor_position,
     } = event;
+    let cursor_position = apply_view_box_offset(composition, cursor_position);
 
     selected_nodes_query.for_each_mut(|(mut relative_transform_mixin, mut dimension_mixin)| {
         let (node_angle, _, _) = extract_transform_data(&relative_transform_mixin.0);
-        let new_bounds = resize_bounds(&initial_bounds, corner, cursor_position, node_angle);
+        let new_bounds = resize_bounds(&initial_bounds, corner, &cursor_position, node_angle);
 
         relative_transform_mixin.0.col_mut(2).x = new_bounds.position.x;
         relative_transform_mixin.0.col_mut(2).y = new_bounds.position.y;

@@ -1,12 +1,13 @@
 import React from 'react';
 import type { Composition } from '@dyn/svg-composition';
 
-import { useWatchComposition } from '../../../hooks';
+import { useMouseViewBox, useWatchComposition } from '../../../hooks';
 import { SelectionBox } from './SelectionBox';
 
 export const CanvasControl: React.FC<TProps> = (props) => {
-	const { composition } = props;
-	useWatchComposition(composition);
+	const { composition, svgContainerRef } = props;
+	useWatchComposition(composition); // TODO: Don't have Composition mixins instead have one containing the entire Composition
+	useMouseViewBox(composition, svgContainerRef);
 
 	return (
 		<svg
@@ -52,4 +53,5 @@ export const CanvasControl: React.FC<TProps> = (props) => {
 
 interface TProps {
 	composition: Composition;
+	svgContainerRef: React.RefObject<HTMLDivElement>;
 }

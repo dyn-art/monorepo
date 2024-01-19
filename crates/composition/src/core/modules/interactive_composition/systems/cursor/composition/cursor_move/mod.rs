@@ -54,6 +54,7 @@ pub fn handle_cursor_moved_on_composition(
                 ..
             } => {
                 handle_resizing(
+                    &composition,
                     &mut selected_nodes_query.p1(),
                     event,
                     *corner,
@@ -65,6 +66,7 @@ pub fn handle_cursor_moved_on_composition(
                 initial_rotation_in_radians,
                 rotation_in_degrees,
             } => handle_rotating(
+                &composition,
                 &mut selected_nodes_query.p2(),
                 event,
                 *corner,

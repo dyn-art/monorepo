@@ -27,6 +27,7 @@ use self::{
 pub mod events;
 pub mod resources;
 mod systems;
+mod utils;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, SystemSet)]
 enum InteractionSet {

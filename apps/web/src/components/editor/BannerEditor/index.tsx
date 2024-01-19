@@ -3,7 +3,6 @@
 import React from 'react';
 import type { Composition } from '@dyn/svg-composition';
 import { Button, CircleIcon, SquareIcon } from '@dyn/ui';
-import { useWindowSize } from '@/hooks';
 
 import { Canvas, type TCanvasProps } from './components';
 import { CompositionControl } from './components/CompositionControl';
@@ -11,25 +10,6 @@ import { CompositionControl } from './components/CompositionControl';
 export const BannerEditor: React.FC<TBannerEditorProps> = (props) => {
 	const { width, height, dtif } = props;
 	const [composition, setComposition] = React.useState<Composition | null>(null);
-	const size = useWindowSize(); // TODO: Figure out how to define canvas size based on window size
-
-	const zoomIn = () => {
-		if (composition != null) {
-			// Adjust these values for zooming in
-			const newWidth = composition.width * 0.8;
-			const newHeight = composition.height * 0.8;
-			composition.resize(newWidth, newHeight);
-		}
-	};
-
-	const zoomOut = () => {
-		if (composition != null) {
-			// Adjust these values for zooming out
-			const newWidth = composition.width * 1.2;
-			const newHeight = composition.height * 1.2;
-			composition.resize(newWidth, newHeight);
-		}
-	};
 
 	return (
 		<div className="flex flex-col items-center justify-center">
@@ -63,21 +43,8 @@ export const BannerEditor: React.FC<TBannerEditorProps> = (props) => {
 					</Button>
 				</div>
 				<div className="flex flex-row gap-2">
-					<Button
-						onClick={() => {
-							zoomOut();
-						}}
-						variant="outline"
-					>
-						Preview
-					</Button>
-					<Button
-						onClick={() => {
-							zoomIn();
-						}}
-					>
-						Export
-					</Button>
+					<Button variant="outline">Preview</Button>
+					<Button>Export</Button>
 				</div>
 			</div>
 			{composition != null && <CompositionControl composition={composition} />}

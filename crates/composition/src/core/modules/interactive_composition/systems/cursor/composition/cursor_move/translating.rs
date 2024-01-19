@@ -6,7 +6,7 @@ use glam::{Mat3, Vec2};
 
 use crate::core::modules::{
     composition::resources::composition::CompositionRes,
-    interactive_composition::events::CursorMovedOnComposition,
+    interactive_composition::{events::CursorMovedOnComposition, utils::apply_view_box_offset},
     node::components::{mixins::RelativeTransformMixin, states::Selected},
 };
 
@@ -20,17 +20,10 @@ pub fn handle_translating(
         position: cursor_position,
     } = event;
 
-    let offset = *cursor_position - *current;
-
-    // Calculate scale factors based on the view_box
-    let scale_x = composition.view_box.width / composition.width;
-    let scale_y = composition.view_box.height / composition.height;
-
-    // Scale the offset
-    let scaled_offset = Vec2::new(offset.x * scale_x, offset.y * scale_y);
+    let offset = apply_view_box_offset(composition, &(*cursor_position - *current));
 
     selected_nodes_query.for_each_mut(|mut relative_transform_mixin| {
-        let translation = Mat3::from_translation(scaled_offset);
+        let translation = Mat3::from_translation(offset);
         relative_transform_mixin.0 = translation * relative_transform_mixin.0;
     });
 

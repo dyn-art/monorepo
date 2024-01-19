@@ -44,6 +44,12 @@ export const Canvas = dynamic(
 				};
 			}, [composition, width, height, dtif]);
 
+			// TODO: Rn that is not possible as we rely on the svgContainerRef
+			//  -> We can work around that by decoupeling SVGComposition from SVGRenderer
+			// if (composition == null) {
+			// 	return <Skeleton className="h-full w-full" />;
+			// }
+
 			return (
 				<CanvasInner
 					composition={composition ?? undefined}
