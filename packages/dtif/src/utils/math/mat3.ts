@@ -1,10 +1,9 @@
-import type { Mat3 } from '../../gen/bindings';
-import type { Vec3 } from './vec3';
+import type { COMP } from '../../comp';
 
 // | a d tx |
 // | b e ty |
 // | c f j |
 // [ a, b, c, d, e, f, tx, ty, i ]
-export function mat3(xAxis: Vec3, yAxis: Vec3, zAxis: Vec3): Mat3 {
+export function mat3(xAxis: COMP.Vec3, yAxis: COMP.Vec3, zAxis: COMP.Vec3): COMP.Mat3 {
 	return [...xAxis, ...yAxis, ...zAxis];
 }

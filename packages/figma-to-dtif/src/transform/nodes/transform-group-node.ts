@@ -1,11 +1,11 @@
-import type { TGroupNodeBundle } from '@dyn/dtif';
+import type { COMP } from '@dyn/dtif';
 
 import { convertFigmaBlendModeToDTIF, convertFigmaTransformToMat3 } from '../../utils';
 
 export function transformGroupNode(
 	node: GroupNode,
 	config: TTransformGroupNodeConfig
-): { type: 'Group' } & TGroupNodeBundle {
+): { type: 'Group' } & COMP.GroupNodeBundle {
 	const { childrenIds } = config;
 
 	return {

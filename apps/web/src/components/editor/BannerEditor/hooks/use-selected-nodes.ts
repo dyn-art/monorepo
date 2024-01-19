@@ -1,8 +1,8 @@
 import React from 'react';
-import type { Composition, Entity } from '@dyn/svg-composition';
+import type { COMP, Composition } from '@dyn/svg-composition';
 
-export function useSelectedNodes(composition: Composition): Entity[] {
-	const [selectedEntities, setSelectedEntities] = React.useState<Entity[]>([]);
+export function useSelectedNodes(composition: Composition): COMP.Entity[] {
+	const [selectedEntities, setSelectedEntities] = React.useState<COMP.Entity[]>([]);
 
 	React.useEffect(() => {
 		const unwatch = composition.onSelectionChange((selected) => {

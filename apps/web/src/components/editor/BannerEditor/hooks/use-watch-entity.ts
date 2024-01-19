@@ -1,15 +1,9 @@
 import React from 'react';
-import type {
-	Composition,
-	Entity,
-	MixinChange,
-	TrackableMixinType,
-	TRustEnumKeyArray
-} from '@dyn/svg-composition';
+import type { COMP, Composition, TRustEnumKeyArray } from '@dyn/svg-composition';
 
 export function useWatchEntity<T extends TTrackableMixinKey[]>(
 	composition: Composition,
-	entity: Entity,
+	entity: COMP.Entity,
 	toTrackMixinKeys: T
 ): TCombinedMixin<T> {
 	const initialState: TCombinedMixin<T> = {};
@@ -41,17 +35,17 @@ export function useWatchEntity<T extends TTrackableMixinKey[]>(
 
 function changesReducer<T extends TTrackableMixinKey[]>(
 	state: TCombinedMixin<T>,
-	action: MixinChange
+	action: COMP.MixinChange
 ): TCombinedMixin<T> {
 	const { type, ...change } = action;
 	return { ...state, [type]: change };
 }
 
 type TCombinedMixin<T extends TTrackableMixinKey[]> = {
-	[K in T[number]]?: Extract<MixinChange, { type: K }>;
+	[K in T[number]]?: Extract<COMP.MixinChange, { type: K }>;
 };
-type TTrackableMixinKey = TRustEnumKeyArray<TrackableMixinType>;
-type TMiddleware<T> = (change: MixinChange) => T;
+type TTrackableMixinKey = TRustEnumKeyArray<COMP.TrackableMixinType>;
+type TMiddleware<T> = (change: COMP.MixinChange) => T;
 
 // TODO: figure out how to solve this as tuple
 

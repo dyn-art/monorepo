@@ -2,8 +2,7 @@
 
 import dynamic from 'next/dynamic';
 import React from 'react';
-import type { TComposition } from '@dyn/dtif';
-import { createSVGComposition, type Composition } from '@dyn/svg-composition';
+import { createSVGComposition, type COMP, type Composition } from '@dyn/svg-composition';
 import { Skeleton } from '@dyn/ui';
 
 import { CanvasInner } from './CanvasInner';
@@ -26,7 +25,7 @@ export const Canvas = dynamic(
 					const newComposition = createSVGComposition({
 						width,
 						height,
-						renderer: {
+						render: {
 							domElement: svgContainerRef.current
 						},
 						dtif
@@ -68,6 +67,6 @@ export const Canvas = dynamic(
 export type TCanvasProps = {
 	width: number;
 	height: number;
-	dtif?: TComposition;
+	dtif?: COMP.DTIFComposition;
 	onLoadedComposition: (composition: Composition) => void;
 } & React.HTMLAttributes<HTMLDivElement>;

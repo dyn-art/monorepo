@@ -125,13 +125,9 @@ export type BreakLineOn =
  */
 export type ChildrenMixin = Entity[]
 
-/**
- * Represents the different types of events that can be emitted by the SVGComposition
- * to synchronize its state with the frontend.
- */
-export type CompositionChange = ({ type: "SizeChanged" } & SizeChanged) | ({ type: "ViewBoxChanged" } & ViewBoxChanged)
+export type CompositionChange = { rootNode: Entity; viewBox: ViewBox; width: number; height: number }
 
-export type CompositionChangeEvent = { changes: CompositionChange[] }
+export type CompositionChangeEvent = { change: CompositionChange }
 
 export type CompositionResized = { width: number; height: number }
 
@@ -544,7 +540,7 @@ name?: string | null }
 
 export type NodeType = "None" | "Group" | "Rectangle" | "Frame" | "Text"
 
-export type OutputEvent = ({ type: "ElementUpdate" } & ElementChangeEvent) | ({ type: "CompositionUpdate" } & CompositionChangeEvent) | ({ type: "TrackUpdate" } & TrackUpdateEvent) | ({ type: "SelectionChange" } & SelectionChangeEvent) | ({ type: "InteractionModeChange" } & InteractionModeChangeEvent) | ({ type: "CursorChange" } & CursorChangeEvent)
+export type OutputEvent = ({ type: "ElementChange" } & ElementChangeEvent) | ({ type: "CompositionChange" } & CompositionChangeEvent) | ({ type: "TrackUpdate" } & TrackUpdateEvent) | ({ type: "SelectionChange" } & SelectionChangeEvent) | ({ type: "InteractionModeChange" } & InteractionModeChangeEvent) | ({ type: "CursorChange" } & CursorChangeEvent)
 
 export type Paint = 
 /**
@@ -655,11 +651,6 @@ export type SVGTransformAttribute = { type: "Matrix"; a: number; b: number; c: n
 export type Selected = null
 
 export type SelectionChangeEvent = { selected: Entity[] }
-
-/**
- * Emitted when the size of the Composition is changed.
- */
-export type SizeChanged = { width: number; height: number }
 
 export type SolidPaint = ({ 
 /**
@@ -811,11 +802,6 @@ export type VerticalTextAlignment =
 "Bottom"
 
 export type ViewBox = { width: number; height: number; minX: number; minY: number }
-
-/**
- * Emitted when the view box of the Composition is changed.
- */
-export type ViewBoxChanged = { viewBox: ViewBox }
 
 export type XYWH = { position: Vec2; width: number; height: number }
 

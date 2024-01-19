@@ -7,8 +7,8 @@ use specta::Type;
 #[derive(Debug, Serialize, Clone, Type)]
 #[serde(tag = "type")]
 pub enum OutputEvent {
-    ElementUpdate(ElementChangeEvent),
-    CompositionUpdate(CompositionChangeEvent),
+    ElementChange(ElementChangeEvent),
+    CompositionChange(CompositionChangeEvent),
     TrackUpdate(TrackUpdateEvent),
     SelectionChange(SelectionChangeEvent),
     InteractionModeChange(InteractionModeChangeEvent),
@@ -17,30 +17,16 @@ pub enum OutputEvent {
 
 #[derive(Debug, Serialize, Clone, Type)]
 pub struct CompositionChangeEvent {
-    pub changes: Vec<CompositionChange>,
+    pub change: CompositionChange,
 }
 
-/// Represents the different types of events that can be emitted by the SVGComposition
-/// to synchronize its state with the frontend.
-#[derive(Debug, Serialize, Clone, Type)]
-#[serde(tag = "type")]
-pub enum CompositionChange {
-    SizeChanged(SizeChanged),
-    ViewBoxChanged(ViewBoxChanged),
-}
-
-/// Emitted when the size of the Composition is changed.
-#[derive(Debug, Serialize, Clone, Type)]
-pub struct SizeChanged {
+#[derive(Serialize, Type, Clone, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct CompositionChange {
+    pub root_node: Entity,
+    pub view_box: ViewBox,
     pub width: f32,
     pub height: f32,
-}
-
-/// Emitted when the view box of the Composition is changed.
-#[derive(Debug, Serialize, Clone, Type)]
-#[serde(rename_all = "camelCase")]
-pub struct ViewBoxChanged {
-    pub view_box: ViewBox,
 }
 
 #[derive(Debug, Serialize, Clone, Type)]

@@ -1,5 +1,5 @@
 import React from 'react';
-import type { Composition, Vec2, XYWH } from '@dyn/svg-composition';
+import type { COMP, Composition } from '@dyn/svg-composition';
 
 import { useInteractionMode, useSelectedNodes } from '../../../../hooks';
 import { InnerSelectionBox } from './InnerSelectionBox';
@@ -40,10 +40,10 @@ interface TProps {
 	composition: Composition;
 	onResizeHandlePointerDown: (
 		corner: EHandleSide,
-		initialBounds: XYWH,
+		initialBounds: COMP.XYWH,
 		rotationInRadians: number
 	) => void;
-	onResizeHandlePointerUp: (position: Vec2) => void;
+	onResizeHandlePointerUp: (position: COMP.Vec2) => void;
 	onRotateHandlePointerDown: (corner: EHandleSide, rotationInRadians: number) => void;
-	onRotateHandlePointerUp: (position: Vec2) => void;
+	onRotateHandlePointerUp: (position: COMP.Vec2) => void;
 }

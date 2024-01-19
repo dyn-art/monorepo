@@ -1,9 +1,9 @@
-import { createTransformMatrix, type TComposition } from '@dyn/dtif';
+import { createTransformMatrix, type COMP } from '@dyn/dtif';
 import { BannerEditor } from '@/components';
 
 const WIDTH = 1500;
 const HEIGHT = 500;
-const DTIF: TComposition = {
+const DTIF: COMP.DTIFComposition = {
 	version: '0.0.1',
 	name: 'Test',
 	width: WIDTH,

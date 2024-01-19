@@ -4,8 +4,7 @@ import React from 'react';
 import type { Composition } from '@dyn/svg-composition';
 import { Button, CircleIcon, SquareIcon } from '@dyn/ui';
 
-import { Canvas, type TCanvasProps } from './components';
-import { CompositionControl } from './components/CompositionControl';
+import { Canvas, CompositionControl, type TCanvasProps } from './components';
 
 export const BannerEditor: React.FC<TBannerEditorProps> = (props) => {
 	const { width, height, dtif } = props;

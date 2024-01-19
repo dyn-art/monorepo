@@ -1,4 +1,4 @@
-import type { TNode } from '@dyn/dtif';
+import type { COMP } from '@dyn/dtif';
 
 import { InvisibleNodeException } from '../../exceptions';
 import type { TToTransformNode } from '../../FigmaNodeTreeProcessor';
@@ -10,7 +10,7 @@ import { transformTextNode } from './transform-text-node';
 export async function transformNode(
 	toTransformNode: TToTransformNode,
 	config: TTransformNodeConfig
-): Promise<TNode> {
+): Promise<COMP.NodeBundle> {
 	// Check whether node is visible
 	if (!toTransformNode.node.visible && !config.includeInvisible) {
 		throw new InvisibleNodeException(toTransformNode.node);

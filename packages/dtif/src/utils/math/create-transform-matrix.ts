@@ -1,7 +1,8 @@
+import type { COMP } from '../../comp';
 import { mat3 } from './mat3';
 import { vec3 } from './vec3';
 
-export function createTransformMatrix(x: number, y: number, angleDegrees: number) {
+export function createTransformMatrix(x: number, y: number, angleDegrees: number): COMP.Mat3 {
 	const angleRadians = (angleDegrees * Math.PI) / 180; // Convert angle to radians
 
 	return mat3(

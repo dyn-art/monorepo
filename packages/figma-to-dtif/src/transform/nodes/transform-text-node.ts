@@ -1,4 +1,4 @@
-import type { TTextNodeBundle, TTextSegment } from '@dyn/dtif';
+import type { COMP } from '@dyn/dtif';
 
 import type { TToTransformTextNode } from '../../FigmaNodeTreeProcessor';
 import {
@@ -12,7 +12,7 @@ export function transformTextNode(
 	node: TextNode,
 	segments: TToTransformTextNode['segments'],
 	config: TTransformTextNodeNodeConfig
-): { type: 'Text' } & TTextNodeBundle {
+): { type: 'Text' } & COMP.TextNodeBundle {
 	const { paintIds } = config;
 
 	return {
@@ -40,7 +40,7 @@ export function transformTextNode(
 								? { Percent: segment.lineHeight.value }
 								: 'Auto'
 					}
-				}) as TTextSegment
+				}) as COMP.TextSegment
 		),
 		horizontalTextAlignment: convertFigmaHorizontalTextAlignmentToDTIF(node.textAlignHorizontal),
 		verticalTextAlignment: convertFigmaVerticalTextAlignmentToDTIF(node.textAlignVertical),

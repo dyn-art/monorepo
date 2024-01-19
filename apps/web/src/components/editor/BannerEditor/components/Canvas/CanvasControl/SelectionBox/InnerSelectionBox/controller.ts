@@ -1,4 +1,4 @@
-import type { Vec2 } from '@dyn/svg-composition';
+import type { COMP } from '@dyn/svg-composition';
 
 import { ResizeCursor, RotateCursor } from './Cursor';
 
@@ -144,7 +144,7 @@ export function getHandleMetaData(width: number, height: number): THandleMetaDat
 
 export interface THandleMetaData {
 	corner: number;
-	position: Vec2;
+	position: COMP.Vec2;
 	resizeHandle: {
 		width: number;
 		height: number;
@@ -155,7 +155,7 @@ export interface THandleMetaData {
 		| {
 				width: number;
 				height: number;
-				offset: Vec2;
+				offset: COMP.Vec2;
 				cursor: RotateCursor;
 		  }
 		| false;

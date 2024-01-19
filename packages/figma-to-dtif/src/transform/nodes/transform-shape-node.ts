@@ -1,10 +1,12 @@
-import { TNode } from '@dyn/dtif';
+import type { COMP } from '@dyn/dtif';
 
 import { UnsupportedFigmaNodeException } from '../../exceptions';
-import { TToTransformShapeNode } from '../../FigmaNodeTreeProcessor';
+import type { TToTransformShapeNode } from '../../FigmaNodeTreeProcessor';
 import { transformRectangleNode } from './transform-rectangle-node';
 
-export async function transformShapeNode(toTransformNode: TToTransformShapeNode): Promise<TNode> {
+export async function transformShapeNode(
+	toTransformNode: TToTransformShapeNode
+): Promise<COMP.NodeBundle> {
 	switch (toTransformNode.node.type) {
 		case 'RECTANGLE':
 			return transformRectangleNode(toTransformNode.node, { paintIds: toTransformNode.paintIds });

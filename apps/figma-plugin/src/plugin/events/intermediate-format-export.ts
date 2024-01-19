@@ -1,4 +1,4 @@
-import { NodeException, Transformer, type TComposition } from '@dyn/figma-to-dtif';
+import { NodeException, Transformer, type COMP } from '@dyn/figma-to-dtif';
 import { extractErrorData } from '@dyn/utils';
 
 import { type TPluginHandler } from '../../types';
@@ -54,7 +54,11 @@ async function processNode(node: FrameNode, instance: TPluginHandler): Promise<v
 	}
 }
 
-function handleSuccess(result: TComposition, node: SceneNode, instance: TPluginHandler): void {
+function handleSuccess(
+	result: COMP.DTIFComposition,
+	node: SceneNode,
+	instance: TPluginHandler
+): void {
 	instance.post('intermediate-format-export-result', {
 		type: 'success',
 		content: result

@@ -1,5 +1,5 @@
 import React from 'react';
-import type { Vec2 } from '@dyn/svg-composition';
+import type { COMP } from '@dyn/svg-composition';
 
 import { ResizeHandle, type TResizeHandleProps } from './ResizeHandle';
 import { RotateHandle, type TRotateHandleProps } from './RotateHandle';
@@ -22,7 +22,7 @@ export const Handle: React.FC<TProps> = (props) => {
 };
 
 interface TProps {
-	position: Vec2;
+	position: COMP.Vec2;
 	pointerEvents: 'auto' | 'none';
 	resizeHandle: TResizeHandleProps;
 	rotateHandle?: TRotateHandleProps | false;

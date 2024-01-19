@@ -1,8 +1,8 @@
 import React from 'react';
-import type { Composition, InteractionModeForFrontend } from '@dyn/svg-composition';
+import type { COMP, Composition } from '@dyn/svg-composition';
 
-export function useInteractionMode(composition?: Composition): InteractionModeForFrontend {
-	const [interactionMode, setInteractionMode] = React.useState<InteractionModeForFrontend>({
+export function useInteractionMode(composition?: Composition): COMP.InteractionModeForFrontend {
+	const [interactionMode, setInteractionMode] = React.useState<COMP.InteractionModeForFrontend>({
 		type: 'None'
 	});
 

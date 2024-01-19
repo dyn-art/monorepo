@@ -1,8 +1,8 @@
-import type { TVerticalTextAlignment } from '@dyn/dtif';
+import type { COMP } from '@dyn/dtif';
 
 export function convertFigmaVerticalTextAlignmentToDTIF(
 	figmaBlendMode: TextNode['textAlignVertical']
-): TVerticalTextAlignment {
+): COMP.VerticalTextAlignment {
 	switch (figmaBlendMode) {
 		case 'CENTER':
 			return 'Center';

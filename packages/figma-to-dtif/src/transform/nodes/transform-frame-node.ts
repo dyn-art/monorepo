@@ -1,11 +1,11 @@
-import type { TFrameNodeBundle } from '@dyn/dtif';
+import type { COMP } from '@dyn/dtif';
 
 import { convertFigmaBlendModeToDTIF, convertFigmaTransformToMat3 } from '../../utils';
 
 export function transformFrameNode(
 	node: FrameNode | ComponentNode | InstanceNode,
 	config: TTransformFrameNodeConfig
-): { type: 'Frame' } & TFrameNodeBundle {
+): { type: 'Frame' } & COMP.FrameNodeBundle {
 	const { childrenIds, paintIds } = config;
 
 	return {

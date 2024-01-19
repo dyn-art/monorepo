@@ -1,12 +1,6 @@
 import React from 'react';
 import { radiansToDegrees } from '@dyn/dtif';
-import {
-	type Composition,
-	type Entity,
-	type SVGRenderer,
-	type Vec2,
-	type XYWH
-} from '@dyn/svg-composition';
+import type { COMP, Composition, SVGRender } from '@dyn/svg-composition';
 
 import { useInteractionMode, useMatrixTransform, useWatchEntity } from '../../../../../hooks';
 import { getHandleMetaData as getHandlePositions, type EHandleSide } from './controller';
@@ -124,7 +118,7 @@ export const InnerSelectionBox: React.FC<TProps> = React.memo((props) => {
 										e.stopPropagation();
 										// TODO: Can this be done more typesafe?
 										onResizeHandlePointerUp(
-											(composition.renderer[0] as SVGRenderer).pointerEventToCompositionPoint(
+											(composition.renderer[0] as SVGRender).pointerEventToCompositionPoint(
 												e as unknown as PointerEvent
 											)
 										);
@@ -145,7 +139,7 @@ export const InnerSelectionBox: React.FC<TProps> = React.memo((props) => {
 													e.stopPropagation();
 													// TODO: Can this be done more typesafe?
 													onRotateHandlePointerUp(
-														(composition.renderer[0] as SVGRenderer).pointerEventToCompositionPoint(
+														(composition.renderer[0] as SVGRender).pointerEventToCompositionPoint(
 															e as unknown as PointerEvent
 														)
 													);
@@ -163,15 +157,15 @@ export const InnerSelectionBox: React.FC<TProps> = React.memo((props) => {
 InnerSelectionBox.displayName = 'InnerSelectionBox';
 
 interface TProps {
-	entity: Entity;
+	entity: COMP.Entity;
 	composition: Composition;
 	showHandles: boolean;
 	onResizeHandlePointerDown: (
 		corner: EHandleSide,
-		initialBounds: XYWH,
+		initialBounds: COMP.XYWH,
 		rotationInRadians: number
 	) => void;
-	onResizeHandlePointerUp: (position: Vec2) => void;
+	onResizeHandlePointerUp: (position: COMP.Vec2) => void;
 	onRotateHandlePointerDown: (corner: EHandleSide, rotationInRadians: number) => void;
-	onRotateHandlePointerUp: (position: Vec2) => void;
+	onRotateHandlePointerUp: (position: COMP.Vec2) => void;
 }

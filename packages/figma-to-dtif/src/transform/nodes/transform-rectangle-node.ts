@@ -1,11 +1,11 @@
-import type { TRectangleNodeBundle } from '@dyn/dtif';
+import type { COMP } from '@dyn/dtif';
 
 import { convertFigmaBlendModeToDTIF, convertFigmaTransformToMat3 } from '../../utils';
 
 export function transformRectangleNode(
 	node: RectangleNode,
 	config: TTransformRectangleNodeConfig
-): { type: 'Rectangle' } & TRectangleNodeBundle {
+): { type: 'Rectangle' } & COMP.RectangleNodeBundle {
 	const { paintIds } = config;
 
 	return {

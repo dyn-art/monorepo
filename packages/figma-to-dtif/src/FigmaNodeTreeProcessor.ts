@@ -1,5 +1,5 @@
 import { MD5 } from 'object-hash';
-import type { TFontMetadata } from '@dyn/dtif';
+import type { COMP } from '@dyn/dtif';
 import { ContinuousId, type TContinuousId } from '@dyn/utils';
 
 import { UnsupportedFigmaNodeException } from './exceptions';
@@ -122,7 +122,7 @@ export class FigmaNodeTreeProcessor {
 	}
 
 	// Helper to extract font metadata from a node
-	private extractFontMetadata(segment: Omit<TTextNodeSegment, 'fontId'>): TFontMetadata {
+	private extractFontMetadata(segment: Omit<TTextNodeSegment, 'fontId'>): COMP.FontMetadata {
 		return {
 			family: segment.fontName.family,
 			name: segment.fontName.style,
@@ -212,7 +212,7 @@ export interface TToTransformPaint {
 export interface TToTransformFont {
 	id: TContinuousId;
 	nodeIds: SceneNode['id'][];
-	fontMetadata: TFontMetadata;
+	fontMetadata: COMP.FontMetadata;
 }
 
 interface TToTransformHashmapItem {

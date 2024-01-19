@@ -1,5 +1,5 @@
 import type { TPluginMessageEvent } from '@dyn/figma-handler/app';
-import type { TComposition, TTransformStatusUpdate } from '@dyn/figma-to-dtif';
+import type { COMP, TTransformStatusUpdate } from '@dyn/figma-to-dtif';
 
 export interface TOnSelectFrameEvent extends TPluginMessageEvent {
 	key: 'on-select-frame';
@@ -37,7 +37,7 @@ export interface TIntermediateFormatExportResultEvent extends TPluginMessageEven
 		  }
 		| {
 				type: 'success';
-				content: TComposition;
+				content: COMP.DTIFComposition;
 		  };
 }
 

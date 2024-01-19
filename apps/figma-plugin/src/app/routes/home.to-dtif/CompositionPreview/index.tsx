@@ -1,5 +1,5 @@
 import React from 'react';
-import type { TComposition } from '@dyn/figma-to-dtif';
+import type { COMP } from '@dyn/figma-to-dtif';
 import { ScrollArea, SpinnerIcon } from '@dyn/ui';
 
 import { appHandler } from '../../../app-handler';
@@ -16,7 +16,7 @@ const HEIGHT = 256;
 export const CompositionPreview: React.FC<TProps> = (props) => {
 	const { isTransforming } = props;
 
-	const [dtif, setDTIF] = React.useState<TComposition | null>(null);
+	const [dtif, setDTIF] = React.useState<COMP.DTIFComposition | null>(null);
 	const { svgContainerRef, composition, isLoading } = useSVGComposition({
 		dtif: dtif ?? undefined,
 		deps: [isTransforming]

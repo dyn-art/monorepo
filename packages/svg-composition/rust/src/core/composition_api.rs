@@ -106,7 +106,7 @@ impl JsCompositionHandle {
         while let Ok(event) = self.svg_output_event_receiver.try_recv() {
             match event {
                 SVGRenderOutputEvent::ElementChange(event) => {
-                    output_events.push(OutputEvent::ElementUpdate(event))
+                    output_events.push(OutputEvent::ElementChange(event))
                 }
             }
         }

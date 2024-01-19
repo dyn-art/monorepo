@@ -6,7 +6,7 @@ import { SelectionBox } from './SelectionBox';
 
 export const CanvasControl: React.FC<TProps> = (props) => {
 	const { composition, svgContainerRef } = props;
-	useWatchComposition(composition); // TODO: Don't have Composition mixins instead have one containing the entire Composition
+	useWatchComposition(composition);
 	useMouseViewBox(composition, svgContainerRef);
 
 	return (

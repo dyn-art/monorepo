@@ -1,4 +1,4 @@
-import type { TFont, TFontMetadata } from '@dyn/dtif';
+import type { COMP } from '@dyn/dtif';
 
 import type { TToTransformFont } from '../../FigmaNodeTreeProcessor';
 import type { TContentType, TExportOptions } from '../../types';
@@ -6,7 +6,7 @@ import type { TContentType, TExportOptions } from '../../types';
 export async function transformFont(
 	toTransformFont: TToTransformFont,
 	config: TTransformFontConfig
-): Promise<TFont> {
+): Promise<COMP.Font> {
 	// TODO
 	return null as any;
 }
@@ -17,5 +17,5 @@ export interface TTransformFontConfig {
 }
 
 export type TResolveFontContent = (
-	fontMetadata: TFontMetadata
+	fontMetadata: COMP.FontMetadata
 ) => Promise<{ content: Uint8Array | null; contentType: TContentType }>;

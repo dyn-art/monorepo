@@ -1,8 +1,8 @@
 import React from 'react';
-import type { Composition, CursorForFrontend } from '@dyn/svg-composition';
+import type { COMP, Composition } from '@dyn/svg-composition';
 
-export function useCursor(composition?: Composition): CursorForFrontend {
-	const [cursor, setCursor] = React.useState<CursorForFrontend>({
+export function useCursor(composition?: Composition): COMP.CursorForFrontend {
+	const [cursor, setCursor] = React.useState<COMP.CursorForFrontend>({
 		type: 'Default'
 	});
 

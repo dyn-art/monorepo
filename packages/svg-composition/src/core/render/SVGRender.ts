@@ -1,4 +1,5 @@
 import type {
+	CompositionChange,
 	CompositionChangeEvent,
 	ElementChangeEvent,
 	SVGAttribute,
@@ -7,13 +8,13 @@ import type {
 } from '@/rust/dyn_svg_composition_api/bindings';
 
 import type { Composition } from '../composition';
-import { Renderer } from './Renderer';
+import { Render } from './Render';
 
 export const VERSION = '1.1';
 export const NS = 'http://www.w3.org/2000/svg';
 export const XLINK = 'http://www.w3.org/1999/xlink';
 
-export class SVGRenderer extends Renderer {
+export class SVGRender extends Render {
 	private _domElement: Element;
 	private _svgElement: SVGElement;
 
@@ -87,8 +88,10 @@ export class SVGRenderer extends Renderer {
 	}
 
 	public applyCompositionChanges(events: CompositionChangeEvent[]): void {
-		for (const event of events) {
-			this.renderComposition(event);
+		if (events.length > 0) {
+			this.renderComposition(
+				(events[events.length - 1] as unknown as CompositionChangeEvent).change
+			);
 		}
 	}
 
@@ -98,25 +101,19 @@ export class SVGRenderer extends Renderer {
 		}
 	}
 
-	private renderComposition(renderChange: CompositionChangeEvent): void {
-		for (const change of renderChange.changes) {
-			switch (change.type) {
-				case 'SizeChanged':
-					this._width = change.width;
-					this._height = change.height;
-					this._svgElement.setAttribute('width', `${change.width}px`);
-					this._svgElement.setAttribute('height', `${change.height}px`);
-					break;
-				case 'ViewBoxChanged': {
-					const viewBox = change.viewBox;
-					this._svgElement.setAttribute(
-						'viewBox',
-						`${viewBox.minX} ${viewBox.minY} ${viewBox.width} ${viewBox.height}`
-					);
-					break;
-				}
-			}
-		}
+	private renderComposition(changed: CompositionChange): void {
+		// Apply dimensions
+		this._width = changed.width;
+		this._height = changed.height;
+		this._svgElement.setAttribute('width', `${changed.width}px`);
+		this._svgElement.setAttribute('height', `${changed.height}px`);
+
+		// Apply view box
+		const viewBox = changed.viewBox;
+		this._svgElement.setAttribute(
+			'viewBox',
+			`${viewBox.minX} ${viewBox.minY} ${viewBox.width} ${viewBox.height}`
+		);
 	}
 
 	private renderElement(renderChange: ElementChangeEvent): void {

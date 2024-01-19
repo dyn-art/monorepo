@@ -25,14 +25,14 @@ import type {
 } from '@/rust/dyn_svg_composition_api/bindings';
 
 import type { TRustEnumKeyArray } from '../../wasm';
-import type { Renderer } from '../render';
+import type { Render } from '../render';
 import { groupByType } from '../utils';
 
 export class Composition {
 	public readonly id: string;
 	private readonly _compositionHandle: JsCompositionHandle;
 
-	private _renderer: Renderer[] = [];
+	private _renderer: Render[] = [];
 
 	private _width: number;
 	private _height: number;
@@ -119,7 +119,7 @@ export class Composition {
 		return this._viewBox;
 	}
 
-	public get renderer(): Renderer[] {
+	public get renderer(): Render[] {
 		return this._renderer;
 	}
 
@@ -133,10 +133,10 @@ export class Composition {
 			const groupedEvent = groupedEvents[eventType];
 			if (groupedEvent != null) {
 				switch (eventType) {
-					case 'CompositionUpdate':
+					case 'CompositionChange':
 						this.handleCompositionUpdates(groupedEvent as CompositionChangeEvent[]);
 						break;
-					case 'ElementUpdate':
+					case 'ElementChange':
 						this.handleElementUpdates(groupedEvent as ElementChangeEvent[]);
 						break;
 					case 'TrackUpdate':
@@ -160,7 +160,7 @@ export class Composition {
 	// Renderer
 	// =========================================================================
 
-	public registerRenderer(renderer: Renderer): void {
+	public registerRenderer(renderer: Render): void {
 		this._renderer.push(renderer);
 	}
 
@@ -180,12 +180,8 @@ export class Composition {
 			});
 
 			// Call the watch composition callbacks with the aggregated changes
-			const aggregatedChanges = events.reduce<CompositionChange[]>((accumulator, event) => {
-				const changes = event.changes as unknown as CompositionChange[];
-				return accumulator.concat(changes);
-			}, []);
 			this._watchCompositionCallbacks.forEach((callback) => {
-				callback(aggregatedChanges);
+				callback((events[events.length - 1] as unknown as CompositionChangeEvent).change);
 			});
 		}
 	}
@@ -501,7 +497,7 @@ export interface TCompositionConfig {
 	isCallbackBased?: boolean;
 }
 
-type TWatchCompositionCallback = (changes: CompositionChange[]) => void;
+type TWatchCompositionCallback = (change: CompositionChange) => void;
 type TWatchEntityCallback = (entity: Entity, changes: MixinChange[]) => void;
 type TOnSelectionChangeCallback = (selected: Entity[]) => void;
 type TOnInteractionModeChangeCallback = (interactionMode: InteractionModeForFrontend) => void;

@@ -1,4 +1,4 @@
-import type { TPaint } from '@dyn/dtif';
+import type { COMP } from '@dyn/dtif';
 
 import { UnsupportedFigmaPaintException } from '../../exceptions';
 import type { TToTransformPaint } from '../../FigmaNodeTreeProcessor';
@@ -8,7 +8,7 @@ import { transformSolidPaint } from './transform-solid-paint';
 export async function transformPaint(
 	toTransformPaint: TToTransformPaint,
 	config: TTransformPaintConfig
-): Promise<TPaint> {
+): Promise<COMP.Paint> {
 	const paint = toTransformPaint.paint;
 	switch (paint.type) {
 		case 'SOLID':

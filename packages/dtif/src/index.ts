@@ -1,3 +1,3 @@
-export * from './dtif';
+export * from './comp';
 export * from './rustify';
-export * from './utils/math';
+export * from './utils';

@@ -1,4 +1,4 @@
-import type { TComposition, TFont, TNode, TPaint } from '@dyn/dtif';
+import type { COMP } from '@dyn/dtif';
 
 import { FailedToResolveRootNodeException } from './exceptions';
 import {
@@ -24,7 +24,7 @@ export class Transformer {
 	private _nodesFailedToTransform: TToTransformNode[] = [];
 
 	// DTIF Nodes
-	public readonly nodes = new Map<number, TNode>();
+	public readonly nodes = new Map<number, COMP.NodeBundle>();
 	private _rootNodeId: number;
 
 	// Figma Paints
@@ -32,14 +32,14 @@ export class Transformer {
 	private _paintsFailedToTransform: TToTransformPaint[] = [];
 
 	// DTIF Paints
-	public readonly paints = new Map<number, TPaint>();
+	public readonly paints = new Map<number, COMP.Paint>();
 
 	// Fonts
 	private _toTransformFonts: TToTransformFont[] = [];
 	private _fontsFailedToTransform: TToTransformFont[] = [];
 
 	// DTIF Fonts
-	public readonly fonts = new Map<number, TFont>();
+	public readonly fonts = new Map<number, COMP.Font>();
 
 	// Callbacks
 	private _onTransformStatusUpdate: TOnTransformStatusUpdate | null = null;
@@ -50,7 +50,7 @@ export class Transformer {
 		this._onTransformStatusUpdate = onTransformStatusUpdate;
 	}
 
-	public async transform(config: TTransformConfig): Promise<TComposition> {
+	public async transform(config: TTransformConfig): Promise<COMP.DTIFComposition> {
 		const nodeConfig: TTransformNodeConfig = { includeInvisible: true, ...(config.node ?? {}) };
 		const paintConfig = config.paint;
 		const fontConfig = config.font;
@@ -94,7 +94,7 @@ export class Transformer {
 
 		// Construct composition
 		this._onTransformStatusUpdate?.({ type: ETransformStatus.CONSTRUCTING_COMPOSITON });
-		const composition: TComposition = {
+		const composition: COMP.DTIFComposition = {
 			version: '1.0',
 			name: this._toTransformRootNode.name,
 			width: this._toTransformRootNode.width,

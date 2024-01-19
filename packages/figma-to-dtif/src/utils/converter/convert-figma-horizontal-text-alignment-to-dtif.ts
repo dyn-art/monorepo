@@ -1,8 +1,8 @@
-import type { THorizontalTextAlignment } from '@dyn/dtif';
+import type { COMP } from '@dyn/dtif';
 
 export function convertFigmaHorizontalTextAlignmentToDTIF(
 	figmaBlendMode: TextNode['textAlignHorizontal']
-): THorizontalTextAlignment {
+): COMP.HorizontalTextAlignment {
 	switch (figmaBlendMode) {
 		case 'CENTER':
 			return 'Center';

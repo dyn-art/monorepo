@@ -5,7 +5,7 @@ import type {
 
 import type { Composition } from '../composition';
 
-export abstract class Renderer {
+export abstract class Render {
 	private _composition: () => Composition; // TODO: Bad practice?
 
 	constructor(composition: Composition) {

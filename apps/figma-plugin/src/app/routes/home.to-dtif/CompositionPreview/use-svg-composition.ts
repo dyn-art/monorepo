@@ -1,11 +1,6 @@
 import React from 'react';
-import { rustify, type TComposition } from '@dyn/figma-to-dtif';
-import {
-	createSVGComposition,
-	initWasm,
-	type Composition,
-	type DTIFComposition
-} from '@dyn/svg-composition';
+import { rustify, type COMP } from '@dyn/figma-to-dtif';
+import { createSVGComposition, initWasm, type Composition } from '@dyn/svg-composition';
 
 export const useSVGComposition = (
 	props: UseSVGCompositionProps
@@ -18,7 +13,7 @@ export const useSVGComposition = (
 	const svgContainerRef = React.useRef<HTMLDivElement>(null);
 	const [composition, setComposition] = React.useState<Composition | null>(null);
 	const [isLoading, setIsLoading] = React.useState(false);
-	const [rustifiedDTIF, setRustifiedDTIF] = React.useState<DTIFComposition | null>(null);
+	const [rustifiedDTIF, setRustifiedDTIF] = React.useState<COMP.DTIFComposition | null>(null);
 
 	// Load WASM and rustify DTIF
 	React.useEffect(() => {
@@ -55,7 +50,7 @@ export const useSVGComposition = (
 				const newComposition = createSVGComposition({
 					width: rustifiedDTIF.width,
 					height: rustifiedDTIF.height,
-					renderer: {
+					render: {
 						domElement: svgContainerRef.current
 					},
 					dtif: rustifiedDTIF
@@ -79,6 +74,6 @@ export const useSVGComposition = (
 };
 
 interface UseSVGCompositionProps {
-	dtif?: TComposition;
+	dtif?: COMP.DTIFComposition;
 	deps?: React.DependencyList;
 }

@@ -1,7 +1,7 @@
-import type { bindings, TComposition } from './dtif';
+import type { COMP } from './comp';
 
-export async function rustify(dtif: TComposition): Promise<bindings.DTIFComposition> {
-	const finalDTIF: bindings.DTIFComposition = {
+export async function rustify(dtif: COMP.DTIFComposition): Promise<COMP.DTIFComposition> {
+	const finalDTIF: COMP.DTIFComposition = {
 		version: dtif.version,
 		name: dtif.name,
 		height: dtif.height,
@@ -16,10 +16,8 @@ export async function rustify(dtif: TComposition): Promise<bindings.DTIFComposit
 	return finalDTIF;
 }
 
-async function resolveFonts(
-	fonts: Record<string, bindings.Font>
-): Promise<Record<string, bindings.Font>> {
-	const transformedFonts: Record<string, bindings.Font> = {};
+async function resolveFonts(fonts: Record<string, COMP.Font>): Promise<Record<string, COMP.Font>> {
+	const transformedFonts: Record<string, COMP.Font> = {};
 
 	// Check if content is a string (URL), then load the font, else use the existing number array
 	for (const [key, font] of Object.entries(fonts)) {
