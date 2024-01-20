@@ -1,5 +1,6 @@
 export * from './use-cursor';
 export * from './use-cursor-style';
+export * from './use-forward-events';
 export * from './use-interaction-mode';
 export * from './use-matrix-transform';
 export * from './use-mouse-view-box';

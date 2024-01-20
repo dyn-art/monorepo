@@ -88,6 +88,10 @@ export class SVGRender extends Render {
 		});
 	}
 
+	public get svgElement(): Readonly<SVGElement> {
+		return this._svgElement;
+	}
+
 	public setViewBox(width: number, height: number): void {
 		this._viewBox = { width, height };
 		this._svgElement.setAttribute('viewBox', `0 0 ${width} ${height}`);

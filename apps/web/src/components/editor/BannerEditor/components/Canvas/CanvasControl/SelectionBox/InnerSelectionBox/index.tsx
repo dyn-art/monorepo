@@ -52,8 +52,8 @@ export const InnerSelectionBox: React.FC<TProps> = React.memo((props) => {
 	return (
 		<g
 			style={{
-				transform: `translate(${x * viewWidthFactor - composition.viewBox.minX}px, ${
-					y * viewHeightFactor - composition.viewBox.minY
+				transform: `translate(${(x - composition.viewBox.minX) * viewWidthFactor}px, ${
+					(y - composition.viewBox.minY) * viewHeightFactor
 				}px) rotate(${-rotationInDegrees}deg)`
 			}}
 		>
@@ -90,6 +90,7 @@ export const InnerSelectionBox: React.FC<TProps> = React.memo((props) => {
 				? handlePositions.map((handle) => {
 						return (
 							<Handle
+								composition={composition}
 								key={handle.corner}
 								pointerEvents={
 									interactionMode.type === 'Resizing' || interactionMode.type === 'Rotating'
