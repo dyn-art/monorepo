@@ -3,7 +3,9 @@ use glam::{Mat3, Vec2};
 
 use crate::core::modules::{
     composition::resources::composition::CompositionRes,
-    interactive_composition::{events::CursorMovedOnComposition, utils::apply_view_box_offset},
+    interactive_composition::{
+        events::CursorMovedOnComposition, utils::transform_point_to_view_box,
+    },
     node::components::{mixins::RelativeTransformMixin, states::Selected},
 };
 
@@ -17,13 +19,14 @@ pub fn handle_translating(
         position: cursor_position,
         ..
     } = event;
+    let cursor_position = transform_point_to_view_box(composition, cursor_position);
 
-    let offset = apply_view_box_offset(composition, &(*cursor_position - *current));
+    let offset = cursor_position - *current;
 
     selected_nodes_query.for_each_mut(|mut relative_transform_mixin| {
         let translation = Mat3::from_translation(offset);
         relative_transform_mixin.0 = translation * relative_transform_mixin.0;
     });
 
-    *current = *cursor_position;
+    *current = cursor_position;
 }

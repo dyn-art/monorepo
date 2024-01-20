@@ -6,7 +6,7 @@ use crate::core::modules::{
     interactive_composition::{
         events::CursorMovedOnComposition,
         resources::{HandleSide, XYWH},
-        utils::apply_view_box_offset,
+        utils::transform_point_to_view_box,
     },
     node::{
         components::{
@@ -31,7 +31,7 @@ pub fn handle_resizing(
         position: cursor_position,
         ..
     } = event;
-    let cursor_position = apply_view_box_offset(composition, cursor_position);
+    let cursor_position = transform_point_to_view_box(composition, cursor_position);
 
     selected_nodes_query.for_each_mut(|(mut relative_transform_mixin, mut dimension_mixin)| {
         let (node_angle, _, _) = extract_transform_data(&relative_transform_mixin.0);

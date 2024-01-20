@@ -4,7 +4,7 @@ use glam::Vec2;
 use crate::core::modules::{
     composition::resources::composition::CompositionRes,
     interactive_composition::{
-        events::CursorMovedOnComposition, resources::HandleSide, utils::apply_view_box_offset,
+        events::CursorMovedOnComposition, resources::HandleSide, utils::transform_point_to_view_box,
     },
     node::{
         components::{
@@ -34,7 +34,7 @@ pub fn handle_rotating(
         position: cursor_position,
         ..
     } = event;
-    let cursor_position = apply_view_box_offset(composition, cursor_position);
+    let cursor_position = transform_point_to_view_box(composition, cursor_position);
 
     selected_nodes_query.for_each_mut(
         |(mut relative_transform_mixin, absolute_transform_mixin, dimension_mixin)| {
