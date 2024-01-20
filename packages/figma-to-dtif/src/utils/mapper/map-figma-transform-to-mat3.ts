@@ -1,6 +1,6 @@
 import type { COMP } from '@dyn/dtif';
 
-export function convertFigmaTransformToMat3(transform: Transform): COMP.Mat3 {
+export function mapFigmaTransformToMat3(transform: Transform): COMP.Mat3 {
 	const [a, c, e] = transform[0];
 	const [b, d, f] = transform[1];
 

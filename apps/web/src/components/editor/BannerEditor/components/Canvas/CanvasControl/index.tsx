@@ -32,7 +32,9 @@ export const CanvasControl: React.FC<TProps> = (props) => {
 					]);
 				}}
 				onResizeHandlePointerUp={(position) => {
-					composition.emitInteractionEvents([{ type: 'CursorUpOnComposition', position }]);
+					composition.emitInteractionEvents([
+						{ type: 'CursorUpOnComposition', position, button: 'Left' }
+					]);
 				}}
 				onRotateHandlePointerDown={(corner, rotationInRadians) => {
 					composition.emitInteractionEvents([
@@ -44,7 +46,9 @@ export const CanvasControl: React.FC<TProps> = (props) => {
 					]);
 				}}
 				onRotateHandlePointerUp={(position) => {
-					composition.emitInteractionEvents([{ type: 'CursorUpOnComposition', position }]);
+					composition.emitInteractionEvents([
+						{ type: 'CursorUpOnComposition', position, button: 'Left' }
+					]);
 				}}
 			/>
 		</svg>

@@ -32,6 +32,7 @@ pub fn handle_resizing(
 ) {
     let CursorMovedOnComposition {
         position: cursor_position,
+        ..
     } = event;
     let cursor_position = apply_view_box_offset(composition, cursor_position);
 

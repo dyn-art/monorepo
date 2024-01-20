@@ -1,5 +1,4 @@
 use bevy_ecs::{event::EventReader, system::ResMut};
-use log::info;
 
 use crate::core::modules::interactive_composition::{
     events::CursorExitedComposition,
@@ -12,7 +11,7 @@ pub fn handle_cursor_exited_composition(
 ) {
     for event in event_reader.read() {
         #[cfg(feature = "tracing")]
-        info!("handle_cursor_exited_composition");
+        log::info!("handle_cursor_exited_composition");
 
         interactive_composition.interaction_mode = InteractionMode::None;
     }

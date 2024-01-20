@@ -139,9 +139,9 @@ export type CoreInputEvent = ({ type: "EntityMoved" } & EntityMoved) | ({ type: 
 
 export type CursorChangeEvent = { cursor: CursorForFrontend }
 
-export type CursorDownOnComposition = { position: Vec2 }
+export type CursorDownOnComposition = { position: Vec2; button: MouseButton }
 
-export type CursorDownOnEntity = { entity: Entity; position: Vec2 }
+export type CursorDownOnEntity = { entity: Entity; position: Vec2; button: MouseButton }
 
 export type CursorDownOnResizeHandle = { initialBounds: XYWH; corner: number; rotationInRadians: number }
 
@@ -155,7 +155,7 @@ export type CursorForFrontend = { type: "Default" } | { type: "Resize"; rotation
 
 export type CursorMovedOnComposition = { position: Vec2 }
 
-export type CursorUpOnComposition = { position: Vec2 }
+export type CursorUpOnComposition = { position: Vec2; button: MouseButton }
 
 /**
  * Represents the composition in which all nodes exist.
@@ -496,6 +496,8 @@ export type MixinChange = ({ type: "RectangleCorner" } & RectangleCornerMixin) |
 export type MixinChangeChildrenMixin = { children: ChildrenMixin }
 
 export type MixinChangeRelativeTransformMixin = { relativeTransform: RelativeTransformMixin }
+
+export type MouseButton = "Left" | "Middle" | "Right" | "Unkown"
 
 /**
  * Represents a basic node in the composition.

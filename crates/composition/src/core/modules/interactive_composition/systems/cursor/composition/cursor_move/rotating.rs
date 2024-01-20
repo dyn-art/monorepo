@@ -35,6 +35,7 @@ pub fn handle_rotating(
 ) {
     let CursorMovedOnComposition {
         position: cursor_position,
+        ..
     } = event;
     let cursor_position = apply_view_box_offset(composition, cursor_position);
 

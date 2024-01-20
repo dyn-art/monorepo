@@ -1,3 +1,4 @@
+import { toMouseButton } from '@dyn/dtif';
 import type {
 	CompositionChange,
 	CompositionChangeEvent,
@@ -55,13 +56,18 @@ export class SVGRender extends Render {
 			this.composition.emitInteractionEvents([
 				{
 					type: 'CursorDownOnComposition',
-					position: this.pointerEventToCompositionPoint(e)
+					position: this.pointerEventToCompositionPoint(e),
+					button: toMouseButton(e.button)
 				}
 			]);
 		});
 		this._svgElement.addEventListener('pointerup', (e) => {
 			this.composition.emitInteractionEvents([
-				{ type: 'CursorUpOnComposition', position: this.pointerEventToCompositionPoint(e) }
+				{
+					type: 'CursorUpOnComposition',
+					position: this.pointerEventToCompositionPoint(e),
+					button: toMouseButton(e.button)
+				}
 			]);
 		});
 		this._svgElement.addEventListener('pointerenter', () => {
@@ -157,7 +163,8 @@ export class SVGRender extends Render {
 								{
 									type: 'CursorDownOnEntity',
 									entity,
-									position: this.pointerEventToCompositionPoint(e)
+									position: this.pointerEventToCompositionPoint(e),
+									button: toMouseButton(e.button)
 								}
 							]);
 						});

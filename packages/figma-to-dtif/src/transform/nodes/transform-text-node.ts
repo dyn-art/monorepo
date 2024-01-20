@@ -2,10 +2,10 @@ import type { COMP } from '@dyn/dtif';
 
 import type { TToTransformTextNode } from '../../FigmaNodeTreeProcessor';
 import {
-	convertFigmaBlendModeToDTIF,
-	convertFigmaHorizontalTextAlignmentToDTIF,
-	convertFigmaTransformToMat3,
-	convertFigmaVerticalTextAlignmentToDTIF
+	mapFigmaBlendModeToDTIF,
+	mapFigmaHorizontalTextAlignmentToDTIF,
+	mapFigmaTransformToMat3,
+	mapFigmaVerticalTextAlignmentToDTIF
 } from '../../utils';
 
 export function transformTextNode(
@@ -42,8 +42,8 @@ export function transformTextNode(
 					}
 				}) as COMP.TextSegment
 		),
-		horizontalTextAlignment: convertFigmaHorizontalTextAlignmentToDTIF(node.textAlignHorizontal),
-		verticalTextAlignment: convertFigmaVerticalTextAlignmentToDTIF(node.textAlignVertical),
+		horizontalTextAlignment: mapFigmaHorizontalTextAlignmentToDTIF(node.textAlignHorizontal),
+		verticalTextAlignment: mapFigmaVerticalTextAlignmentToDTIF(node.textAlignVertical),
 		linebreakBehavior: 'WordBoundary',
 		compositionMixin: {
 			isLocked: node.locked,
@@ -53,9 +53,9 @@ export function transformTextNode(
 			height: node.height,
 			width: node.width
 		},
-		relativeTransform: convertFigmaTransformToMat3(node.relativeTransform),
+		relativeTransform: mapFigmaTransformToMat3(node.relativeTransform),
 		blendMixin: {
-			blendMode: convertFigmaBlendModeToDTIF(node.blendMode),
+			blendMode: mapFigmaBlendModeToDTIF(node.blendMode),
 			opacity: node.opacity,
 			isMask: node.isMask
 		},

@@ -52,8 +52,8 @@ export const InnerSelectionBox: React.FC<TProps> = React.memo((props) => {
 	return (
 		<g
 			style={{
-				transform: `translate(${x * viewWidthFactor}px, ${
-					y * viewHeightFactor
+				transform: `translate(${x * viewWidthFactor - composition.viewBox.minX}px, ${
+					y * viewHeightFactor - composition.viewBox.minY
 				}px) rotate(${-rotationInDegrees}deg)`
 			}}
 		>
@@ -87,10 +87,10 @@ export const InnerSelectionBox: React.FC<TProps> = React.memo((props) => {
 			) : null}
 
 			{showHandles
-				? handlePositions.map((handle, index) => {
+				? handlePositions.map((handle) => {
 						return (
 							<Handle
-								key={index}
+								key={handle.corner}
 								pointerEvents={
 									interactionMode.type === 'Resizing' || interactionMode.type === 'Rotating'
 										? 'none'
@@ -104,24 +104,30 @@ export const InnerSelectionBox: React.FC<TProps> = React.memo((props) => {
 									cursor: handle.resizeHandle.cursor.toString(rotationInDegrees),
 									onPointerDown: (e) => {
 										e.stopPropagation();
-										onResizeHandlePointerDown(
-											handle.corner,
-											{
-												position: [x, y],
-												height,
-												width
-											},
-											rotationInRadians
-										);
+
+										if (e.button === 0) {
+											onResizeHandlePointerDown(
+												handle.corner,
+												{
+													position: [x, y],
+													height,
+													width
+												},
+												rotationInRadians
+											);
+										}
 									},
 									onPointerUp: (e) => {
 										e.stopPropagation();
+
 										// TODO: Can this be done more typesafe?
-										onResizeHandlePointerUp(
-											(composition.renderer[0] as SVGRender).pointerEventToCompositionPoint(
-												e as unknown as PointerEvent
-											)
-										);
+										if (e.button === 0) {
+											onResizeHandlePointerUp(
+												(composition.renderer[0] as SVGRender).pointerEventToCompositionPoint(
+													e as unknown as PointerEvent
+												)
+											);
+										}
 									}
 								}}
 								rotateHandle={
@@ -133,16 +139,22 @@ export const InnerSelectionBox: React.FC<TProps> = React.memo((props) => {
 												offset: handle.rotateHandle.offset,
 												onPointerDown: (e) => {
 													e.stopPropagation();
-													onRotateHandlePointerDown(handle.corner, rotationInRadians);
+
+													if (e.button === 0) {
+														onRotateHandlePointerDown(handle.corner, rotationInRadians);
+													}
 												},
 												onPointerUp: (e) => {
 													e.stopPropagation();
+
 													// TODO: Can this be done more typesafe?
-													onRotateHandlePointerUp(
-														(composition.renderer[0] as SVGRender).pointerEventToCompositionPoint(
-															e as unknown as PointerEvent
-														)
-													);
+													if (e.button === 0) {
+														onRotateHandlePointerUp(
+															(composition.renderer[0] as SVGRender).pointerEventToCompositionPoint(
+																e as unknown as PointerEvent
+															)
+														);
+													}
 												}
 										  }
 										: false

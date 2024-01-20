@@ -139,7 +139,6 @@ impl ShapeSVGNode {
     pub fn new(entity: Entity, id_generator: &mut ContinuousId) -> Self {
         // Create root element
         let mut element = SVGElement::new(SVGTag::Group, id_generator);
-        let element_id = element.get_id();
         #[cfg(feature = "tracing")]
         element.set_attribute(SVGAttribute::Name {
             name: ShapeSVGNode::create_element_name(element.get_id(), String::from("root"), false),

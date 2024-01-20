@@ -7,7 +7,7 @@ use bevy_ecs::{
 use crate::core::modules::{
     composition::resources::composition::CompositionRes,
     interactive_composition::{
-        events::CursorMovedOnComposition,
+        events::{CursorMovedOnComposition, MouseButton},
         resources::{InteractionMode, InteractiveCompositionRes},
     },
     node::components::{

@@ -55,6 +55,14 @@ impl InputEvent for InteractionInputEvent {
 // Cursor Events
 // =============================================================================
 
+#[derive(Serialize, Deserialize, PartialEq, Type, Clone, Debug)]
+pub enum MouseButton {
+    Left,
+    Middle,
+    Right,
+    Unkown,
+}
+
 #[derive(Event, Debug, Deserialize, Type, Clone)]
 pub struct CursorMovedOnComposition {
     pub position: Vec2,
@@ -70,30 +78,32 @@ pub struct CursorExitedComposition;
 pub struct CursorDownOnEntity {
     pub entity: Entity,
     pub position: Vec2,
+    pub button: MouseButton,
 }
 
 #[derive(Event, Debug, Serialize, Deserialize, Type, Clone)]
 pub struct CursorDownOnComposition {
     pub position: Vec2,
+    pub button: MouseButton,
 }
 
 #[derive(Event, Debug, Serialize, Deserialize, Type, Clone)]
 pub struct CursorUpOnComposition {
     pub position: Vec2,
+    pub button: MouseButton,
 }
 
 #[derive(Event, Debug, Serialize, Deserialize, Type, Clone)]
+#[serde(rename_all = "camelCase")]
 pub struct CursorDownOnResizeHandle {
-    #[serde(rename = "initialBounds")]
     pub initial_bounds: XYWH,
     pub corner: u8,
-    #[serde(rename = "rotationInRadians")]
     pub rotation_in_radians: f32,
 }
 
 #[derive(Event, Debug, Serialize, Deserialize, Type, Clone)]
+#[serde(rename_all = "camelCase")]
 pub struct CursorDownOnRotateHandle {
     pub corner: u8,
-    #[serde(rename = "initialRotationInRadians")]
     pub initial_rotation_in_radians: f32,
 }

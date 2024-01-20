@@ -1,5 +1,4 @@
 use bevy_ecs::{event::EventReader, system::ResMut};
-use log::info;
 
 use crate::core::modules::interactive_composition::{
     events::CursorDownOnRotateHandle,
@@ -12,7 +11,7 @@ pub fn handle_cursor_down_on_rotate_handle(
 ) {
     for event in event_reader.read() {
         #[cfg(feature = "tracing")]
-        info!("handle_cursor_down_on_rotate_handle: {:#?}", event);
+        log::info!("handle_cursor_down_on_rotate_handle: {:#?}", event);
 
         interactive_composition.interaction_mode = InteractionMode::Rotating {
             corner: event.corner,

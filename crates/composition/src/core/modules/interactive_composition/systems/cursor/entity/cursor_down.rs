@@ -5,11 +5,10 @@ use bevy_ecs::{
     system::{Commands, Query, ResMut},
 };
 use glam::Vec2;
-use log::info;
 
 use crate::core::modules::{
     interactive_composition::{
-        events::CursorDownOnEntity,
+        events::{CursorDownOnEntity, MouseButton},
         resources::{InteractionMode, InteractiveCompositionRes},
     },
     node::components::{
@@ -53,7 +52,13 @@ pub fn handle_cursor_down_on_entity_event(
 ) {
     let raycast_entities: Vec<(Entity, Vec2)> = event_reader
         .read()
-        .map(|event| (event.entity, event.position))
+        .filter_map(|event| {
+            if event.button == MouseButton::Left {
+                Some((event.entity, event.position))
+            } else {
+                None
+            }
+        })
         .collect();
     if raycast_entities.is_empty() {
         return;
@@ -74,7 +79,7 @@ pub fn handle_cursor_down_on_entity_event(
             commands.entity(entity).insert(Selected);
 
             #[cfg(feature = "tracing")]
-            info!("Selected Entity {:#?} at {:#?}", entity, pos);
+            log::info!("Selected Entity {:#?} at {:#?}", entity, pos);
         }
 
         interactive_composition.interaction_mode = InteractionMode::Translating {
@@ -88,7 +93,7 @@ pub fn handle_cursor_down_on_entity_event(
         if selected_entity.map_or(true, |(selected, _, _)| selected != entity) {
             commands.entity(entity).remove::<Selected>();
             #[cfg(feature = "tracing")]
-            info!("Unselected Entity: {:#?}", entity);
+            log::info!("Unselected Entity: {:#?}", entity);
         }
     });
 }

@@ -18,6 +18,7 @@ pub fn handle_translating(
 ) {
     let CursorMovedOnComposition {
         position: cursor_position,
+        ..
     } = event;
 
     let offset = apply_view_box_offset(composition, &(*cursor_position - *current));
