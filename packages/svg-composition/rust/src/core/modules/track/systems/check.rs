@@ -70,6 +70,7 @@ pub fn check_interaction_mode_changes(
             InteractionMode::Translating { .. } => InteractionModeForFrontend::Translating,
             InteractionMode::Resizing { .. } => InteractionModeForFrontend::Resizing,
             InteractionMode::Rotating { .. } => InteractionModeForFrontend::Rotating,
+            InteractionMode::Dragging { .. } => InteractionModeForFrontend::Dragging,
         };
 
         // Check whether the interaction mode has changed

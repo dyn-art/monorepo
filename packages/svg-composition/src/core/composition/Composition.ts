@@ -174,14 +174,20 @@ export class Composition {
 
 	private handleCompositionUpdates(events: CompositionChangeEvent[]): void {
 		if (events.length > 0) {
+			const { change } = events[events.length - 1] as unknown as CompositionChangeEvent;
+
 			// Apply composition changes to each renderer
 			this._renderer.forEach((renderer) => {
-				renderer.applyCompositionChanges(events);
+				renderer.applyCompositionChange(change);
 			});
+
+			this._viewBox = change.viewBox;
+			this._width = change.width;
+			this._height = change.height;
 
 			// Call the watch composition callbacks with the aggregated changes
 			this._watchCompositionCallbacks.forEach((callback) => {
-				callback((events[events.length - 1] as unknown as CompositionChangeEvent).change);
+				callback(change);
 			});
 		}
 	}

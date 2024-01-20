@@ -14,7 +14,9 @@ pub enum InteractionMode {
     #[default]
     None,
     /// When the user's pointer is pressed.
-    Pressing { origin: Vec2 },
+    Pressing { origin: Vec2, button: MouseButton },
+    /// When the user is dragging.
+    Dragging { current: Vec2 },
     /// When the user is moving selected nodes.
     Translating { origin: Vec2, current: Vec2 },
     /// When the user is resizing the selected nodes.
@@ -44,4 +46,12 @@ pub enum HandleSide {
     Bottom = 2,
     Left = 4,
     Right = 8,
+}
+
+#[derive(Serialize, Deserialize, PartialEq, Type, Copy, Clone, Debug)]
+pub enum MouseButton {
+    Left,
+    Middle,
+    Right,
+    Unkown,
 }

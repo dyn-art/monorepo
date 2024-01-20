@@ -1,8 +1,8 @@
 use bevy_ecs::{event::EventReader, system::ResMut};
 
 use crate::core::modules::interactive_composition::{
-    events::{CursorDownOnComposition, MouseButton},
-    resources::{InteractionMode, InteractiveCompositionRes},
+    events::CursorDownOnComposition,
+    resources::{InteractionMode, InteractiveCompositionRes, MouseButton},
 };
 
 pub fn handle_cursor_down_on_composition(
@@ -13,9 +13,14 @@ pub fn handle_cursor_down_on_composition(
         #[cfg(feature = "tracing")]
         log::info!("handle_cursor_down_on_composition: {:#?}", event);
 
-        if event.button == MouseButton::Left {
+        if event.button == MouseButton::Middle {
+            interactive_composition.interaction_mode = InteractionMode::Dragging {
+                current: event.position,
+            };
+        } else {
             interactive_composition.interaction_mode = InteractionMode::Pressing {
                 origin: event.position,
+                button: event.button,
             };
         }
     }

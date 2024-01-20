@@ -17,9 +17,7 @@ export const CanvasInner: React.FC<TProps> = (props) => {
 			className={cn('bg-gray-100', other.className)}
 			style={{ ...other.style, cursor }}
 		>
-			{composition ? (
-				<CanvasControl composition={composition} svgContainerRef={svgContainerRef} />
-			) : null}
+			{composition ? <CanvasControl composition={composition} /> : null}
 			<div ref={svgContainerRef} />
 		</div>
 	);

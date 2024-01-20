@@ -1,13 +1,13 @@
 use bevy_ecs::{
     event::EventReader,
     query::With,
-    system::{ParamSet, Query, Res, ResMut},
+    system::{ParamSet, Query, ResMut},
 };
 
 use crate::core::modules::{
     composition::resources::composition::CompositionRes,
     interactive_composition::{
-        events::{CursorMovedOnComposition, MouseButton},
+        events::CursorMovedOnComposition,
         resources::{InteractionMode, InteractiveCompositionRes},
     },
     node::components::{
@@ -16,8 +16,12 @@ use crate::core::modules::{
     },
 };
 
-use self::{resizing::handle_resizing, rotating::handle_rotating, translating::handle_translating};
+use self::{
+    dragging::handle_dragging, resizing::handle_resizing, rotating::handle_rotating,
+    translating::handle_translating,
+};
 
+mod dragging;
 mod resizing;
 mod rotating;
 mod translating;
@@ -25,7 +29,7 @@ mod translating;
 pub fn handle_cursor_moved_on_composition(
     mut event_reader: EventReader<CursorMovedOnComposition>,
     mut interactive_composition: ResMut<InteractiveCompositionRes>,
-    composition: Res<CompositionRes>,
+    mut composition: ResMut<CompositionRes>,
     // https://bevy-cheatbook.github.io/programming/paramset.html
     mut selected_nodes_query: ParamSet<(
         // Translating
@@ -46,21 +50,19 @@ pub fn handle_cursor_moved_on_composition(
     for event in event_reader.read() {
         match &mut interactive_composition.interaction_mode {
             InteractionMode::Translating { current, .. } => {
-                handle_translating(&composition, &mut selected_nodes_query.p0(), event, current);
+                handle_translating(&composition, &mut selected_nodes_query.p0(), event, current)
             }
             InteractionMode::Resizing {
                 corner,
                 initial_bounds,
                 ..
-            } => {
-                handle_resizing(
-                    &composition,
-                    &mut selected_nodes_query.p1(),
-                    event,
-                    *corner,
-                    initial_bounds,
-                );
-            }
+            } => handle_resizing(
+                &composition,
+                &mut selected_nodes_query.p1(),
+                event,
+                *corner,
+                initial_bounds,
+            ),
             InteractionMode::Rotating {
                 corner,
                 initial_rotation_in_radians,
@@ -73,6 +75,9 @@ pub fn handle_cursor_moved_on_composition(
                 *initial_rotation_in_radians,
                 rotation_in_degrees,
             ),
+            InteractionMode::Dragging { current } => {
+                handle_dragging(&mut composition, event, current)
+            }
             _ => {}
         }
     }

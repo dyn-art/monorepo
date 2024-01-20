@@ -5,7 +5,7 @@ use self::{
     events::{
         CursorDownOnComposition, CursorDownOnEntity, CursorDownOnResizeHandle,
         CursorDownOnRotateHandle, CursorEnteredComposition, CursorExitedComposition,
-        CursorMovedOnComposition, CursorUpOnComposition,
+        CursorMovedOnComposition, CursorUpOnComposition, WheeledOnComposition,
     },
     resources::{InteractionMode, InteractiveCompositionRes},
     systems::cursor::{
@@ -14,7 +14,7 @@ use self::{
             cursor_entered::handle_cursor_entered_composition,
             cursor_exited::handle_cursor_exited_composition,
             cursor_move::handle_cursor_moved_on_composition,
-            cursor_up::handle_cursor_up_on_composition,
+            cursor_up::handle_cursor_up_on_composition, wheel::handle_wheel_on_composition,
         },
         entity::cursor_down::handle_cursor_down_on_entity_event,
         ui::{
@@ -49,6 +49,7 @@ impl Plugin for InteractiveCompositionPlugin {
         app.add_event::<CursorDownOnEntity>();
         app.add_event::<CursorDownOnComposition>();
         app.add_event::<CursorUpOnComposition>();
+        app.add_event::<WheeledOnComposition>();
         app.add_event::<CursorDownOnResizeHandle>();
         app.add_event::<CursorDownOnRotateHandle>();
 
@@ -86,6 +87,7 @@ impl Plugin for InteractiveCompositionPlugin {
                     .in_set(InteractionSet::Initial)
                     .after(handle_cursor_down_on_composition),
                 handle_cursor_moved_on_composition.in_set(InteractionSet::Continuous),
+                handle_wheel_on_composition.in_set(InteractionSet::Continuous),
                 handle_cursor_up_on_composition.in_set(InteractionSet::Completion),
                 handle_cursor_exited_composition.in_set(InteractionSet::Last),
             ),

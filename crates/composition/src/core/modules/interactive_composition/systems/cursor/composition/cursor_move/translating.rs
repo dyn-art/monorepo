@@ -1,7 +1,4 @@
-use bevy_ecs::{
-    query::With,
-    system::{Query, Res},
-};
+use bevy_ecs::{query::With, system::Query};
 use glam::{Mat3, Vec2};
 
 use crate::core::modules::{
@@ -11,7 +8,7 @@ use crate::core::modules::{
 };
 
 pub fn handle_translating(
-    composition: &Res<CompositionRes>,
+    composition: &CompositionRes,
     selected_nodes_query: &mut Query<&mut RelativeTransformMixin, With<Selected>>,
     event: &CursorMovedOnComposition,
     current: &mut Vec2,
@@ -28,5 +25,5 @@ pub fn handle_translating(
         relative_transform_mixin.0 = translation * relative_transform_mixin.0;
     });
 
-    *current = cursor_position.clone();
+    *current = *cursor_position;
 }

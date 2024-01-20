@@ -2,7 +2,12 @@ import React from 'react';
 import { radiansToDegrees } from '@dyn/dtif';
 import type { COMP, Composition, SVGRender } from '@dyn/svg-composition';
 
-import { useInteractionMode, useMatrixTransform, useWatchEntity } from '../../../../../hooks';
+import {
+	useInteractionMode,
+	useMatrixTransform,
+	useWatchComposition,
+	useWatchEntity
+} from '../../../../../hooks';
 import { getHandleMetaData as getHandlePositions, type EHandleSide } from './controller';
 import { Handle } from './Handle';
 
@@ -20,6 +25,7 @@ export const InnerSelectionBox: React.FC<TProps> = React.memo((props) => {
 		Dimension: { width = undefined, height = undefined } = {},
 		RelativeTransform: { relativeTransform = undefined } = {}
 	} = useWatchEntity(composition, entity, ['Dimension', 'RelativeTransform']);
+	useWatchComposition(composition); // As we use memo and the composition itself (pointer) doesn't change
 	const viewWidthFactor = React.useMemo(
 		() => composition.width / composition.viewBox.width,
 		[composition.width, composition.viewBox.width]

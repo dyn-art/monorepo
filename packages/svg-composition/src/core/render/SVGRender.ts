@@ -1,7 +1,6 @@
 import { toMouseButton } from '@dyn/dtif';
 import type {
 	CompositionChange,
-	CompositionChangeEvent,
 	ElementChangeEvent,
 	SVGAttribute,
 	SVGStyle,
@@ -46,6 +45,21 @@ export class SVGRender extends Render {
 					{
 						type: 'CursorMovedOnComposition',
 						position: this.pointerEventToCompositionPoint(e)
+					}
+				],
+				false
+			);
+		});
+		this._svgElement.addEventListener('wheel', (e) => {
+			e.preventDefault();
+			this.composition.emitInteractionEvents(
+				[
+					{
+						type: 'WheeledOnComposition',
+						position: this.clientWindowPointToCompositionPoint([e.clientX, e.clientY]),
+						ctrlKeyPressed: e.ctrlKey,
+						metaKeyPressed: e.metaKey,
+						delta: this.clientWindowPointToCompositionPoint([e.deltaX, e.deltaY])
 					}
 				],
 				false
@@ -97,12 +111,8 @@ export class SVGRender extends Render {
 		this._svgElement.setAttribute('viewBox', `0 0 ${width} ${height}`);
 	}
 
-	public applyCompositionChanges(events: CompositionChangeEvent[]): void {
-		if (events.length > 0) {
-			this.renderComposition(
-				(events[events.length - 1] as unknown as CompositionChangeEvent).change
-			);
-		}
+	public applyCompositionChange(change: CompositionChange): void {
+		this.renderComposition(change);
 	}
 
 	public applyElementChanges(events: ElementChangeEvent[]): void {

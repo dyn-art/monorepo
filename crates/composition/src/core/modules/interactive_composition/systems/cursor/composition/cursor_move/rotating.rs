@@ -1,7 +1,4 @@
-use bevy_ecs::{
-    query::With,
-    system::{Query, Res},
-};
+use bevy_ecs::{query::With, system::Query};
 use glam::Vec2;
 
 use crate::core::modules::{
@@ -19,7 +16,7 @@ use crate::core::modules::{
 };
 
 pub fn handle_rotating(
-    composition: &Res<CompositionRes>,
+    composition: &CompositionRes,
     selected_nodes_query: &mut Query<
         (
             &mut RelativeTransformMixin,

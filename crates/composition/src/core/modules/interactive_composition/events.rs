@@ -5,7 +5,7 @@ use specta::Type;
 
 use crate::core::events::input_event::InputEvent;
 
-use super::resources::XYWH;
+use super::resources::{MouseButton, XYWH};
 
 #[derive(Debug, Deserialize, Type, Clone)]
 #[serde(tag = "type")]
@@ -16,6 +16,7 @@ pub enum InteractionInputEvent {
     CursorExitedComposition(CursorExitedComposition),
     CursorDownOnComposition(CursorDownOnComposition),
     CursorUpOnComposition(CursorUpOnComposition),
+    WheeledOnComposition(WheeledOnComposition),
     CursorDownOnResizeHandle(CursorDownOnResizeHandle),
     CursorDownOnRotateHandle(CursorDownOnRotateHandle),
 }
@@ -47,6 +48,9 @@ impl InputEvent for InteractionInputEvent {
             InteractionInputEvent::CursorDownOnRotateHandle(event) => {
                 world.send_event(event);
             }
+            InteractionInputEvent::WheeledOnComposition(event) => {
+                world.send_event(event);
+            }
         }
     }
 }
@@ -54,14 +58,6 @@ impl InputEvent for InteractionInputEvent {
 // =============================================================================
 // Cursor Events
 // =============================================================================
-
-#[derive(Serialize, Deserialize, PartialEq, Type, Clone, Debug)]
-pub enum MouseButton {
-    Left,
-    Middle,
-    Right,
-    Unkown,
-}
 
 #[derive(Event, Debug, Deserialize, Type, Clone)]
 pub struct CursorMovedOnComposition {
@@ -91,6 +87,15 @@ pub struct CursorDownOnComposition {
 pub struct CursorUpOnComposition {
     pub position: Vec2,
     pub button: MouseButton,
+}
+
+#[derive(Event, Debug, Serialize, Deserialize, Type, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct WheeledOnComposition {
+    pub position: Vec2,
+    pub delta: Vec2,
+    pub ctrl_key_pressed: bool,
+    pub meta_key_pressed: bool,
 }
 
 #[derive(Event, Debug, Serialize, Deserialize, Type, Clone)]

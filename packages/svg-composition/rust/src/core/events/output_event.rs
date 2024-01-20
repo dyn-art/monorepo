@@ -54,6 +54,7 @@ pub enum InteractionModeForFrontend {
     Translating,
     Resizing,
     Rotating,
+    Dragging,
 }
 
 impl Default for InteractionModeForFrontend {

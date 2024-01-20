@@ -8,8 +8,8 @@ use glam::Vec2;
 
 use crate::core::modules::{
     interactive_composition::{
-        events::{CursorDownOnEntity, MouseButton},
-        resources::{InteractionMode, InteractiveCompositionRes},
+        events::CursorDownOnEntity,
+        resources::{InteractionMode, InteractiveCompositionRes, MouseButton},
     },
     node::components::{
         states::{Locked, Selected},

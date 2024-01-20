@@ -439,11 +439,11 @@ export type HorizontalTextAlignment =
  */
 "Justified"
 
-export type InteractionInputEvent = ({ type: "CursorDownOnEntity" } & CursorDownOnEntity) | ({ type: "CursorMovedOnComposition" } & CursorMovedOnComposition) | ({ type: "CursorEnteredComposition" }) | ({ type: "CursorExitedComposition" }) | ({ type: "CursorDownOnComposition" } & CursorDownOnComposition) | ({ type: "CursorUpOnComposition" } & CursorUpOnComposition) | ({ type: "CursorDownOnResizeHandle" } & CursorDownOnResizeHandle) | ({ type: "CursorDownOnRotateHandle" } & CursorDownOnRotateHandle)
+export type InteractionInputEvent = ({ type: "CursorDownOnEntity" } & CursorDownOnEntity) | ({ type: "CursorMovedOnComposition" } & CursorMovedOnComposition) | ({ type: "CursorEnteredComposition" }) | ({ type: "CursorExitedComposition" }) | ({ type: "CursorDownOnComposition" } & CursorDownOnComposition) | ({ type: "CursorUpOnComposition" } & CursorUpOnComposition) | ({ type: "WheeledOnComposition" } & WheeledOnComposition) | ({ type: "CursorDownOnResizeHandle" } & CursorDownOnResizeHandle) | ({ type: "CursorDownOnRotateHandle" } & CursorDownOnRotateHandle)
 
 export type InteractionModeChangeEvent = { interactionMode: InteractionModeForFrontend }
 
-export type InteractionModeForFrontend = { type: "None" } | { type: "Pressing" } | { type: "Translating" } | { type: "Resizing" } | { type: "Rotating" }
+export type InteractionModeForFrontend = { type: "None" } | { type: "Pressing" } | { type: "Translating" } | { type: "Resizing" } | { type: "Rotating" } | { type: "Dragging" }
 
 /**
  * Options for spacing between characters in a text segment.
@@ -804,6 +804,8 @@ export type VerticalTextAlignment =
 "Bottom"
 
 export type ViewBox = { width: number; height: number; minX: number; minY: number }
+
+export type WheeledOnComposition = { position: Vec2; delta: Vec2; ctrlKeyPressed: boolean; metaKeyPressed: boolean }
 
 export type XYWH = { position: Vec2; width: number; height: number }
 
