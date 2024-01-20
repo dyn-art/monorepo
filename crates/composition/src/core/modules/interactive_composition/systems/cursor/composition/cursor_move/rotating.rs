@@ -34,7 +34,7 @@ pub fn handle_rotating(
         position: cursor_position,
         ..
     } = event;
-    let cursor_position = transform_point_to_view_box(composition, cursor_position);
+    let cursor_position = transform_point_to_view_box(composition, cursor_position, true);
 
     selected_nodes_query.for_each_mut(
         |(mut relative_transform_mixin, absolute_transform_mixin, dimension_mixin)| {

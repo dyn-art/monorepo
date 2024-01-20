@@ -19,14 +19,13 @@ pub fn handle_translating(
         position: cursor_position,
         ..
     } = event;
-    let cursor_position = transform_point_to_view_box(composition, cursor_position);
 
-    let offset = cursor_position - *current;
+    let offset = transform_point_to_view_box(composition, &(*cursor_position - *current), false);
 
     selected_nodes_query.for_each_mut(|mut relative_transform_mixin| {
         let translation = Mat3::from_translation(offset);
         relative_transform_mixin.0 = translation * relative_transform_mixin.0;
     });
 
-    *current = cursor_position;
+    *current = *cursor_position;
 }

@@ -31,7 +31,7 @@ pub fn handle_resizing(
         position: cursor_position,
         ..
     } = event;
-    let cursor_position = transform_point_to_view_box(composition, cursor_position);
+    let cursor_position = transform_point_to_view_box(composition, cursor_position, true);
 
     selected_nodes_query.for_each_mut(|(mut relative_transform_mixin, mut dimension_mixin)| {
         let (node_angle, _, _) = extract_transform_data(&relative_transform_mixin.0);
