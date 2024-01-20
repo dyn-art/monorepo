@@ -10,7 +10,13 @@ export async function rustify(dtif: COMP.DTIFComposition): Promise<COMP.DTIFComp
 		nodes: dtif.nodes,
 		paints: dtif.paints,
 		fonts: dtif.fonts != null ? await resolveFonts(dtif.fonts) : null,
-		changes: dtif.changes
+		changes: dtif.changes,
+		viewBox: {
+			width: dtif.width,
+			height: dtif.height,
+			minX: 0,
+			minY: 0
+		}
 	};
 
 	return finalDTIF;

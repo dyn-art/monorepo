@@ -108,11 +108,11 @@ fn insert_dtif_into_world(world: &mut World, dtif: &DTIFComposition) {
         width: dtif.width,
         height: dtif.height,
         root_node: root_node_entity,
-        view_box: ViewBox {
+        view_box: dtif.view_box.unwrap_or(ViewBox {
             width: dtif.width,
             height: dtif.height,
             min_y: 0.0,
             min_x: 0.0,
-        },
+        }),
     });
 }

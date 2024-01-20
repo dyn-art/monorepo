@@ -5,11 +5,10 @@ use bevy_hierarchy::BuildWorldChildren;
 use glam::Mat3;
 
 use crate::core::modules::{
-    composition::events::{CoreInputEvent, NodeCreated},
+    composition::events::CoreInputEvent,
     node::components::{
         bundles::{FrameNodeBundle, GroupNodeBundle, RectangleNodeBundle, TextNodeBundle},
         mixins::{AbsoluteTransformMixin, ChildrenMixin, FillMixin, RelativeTransformMixin},
-        types::Node,
     },
 };
 

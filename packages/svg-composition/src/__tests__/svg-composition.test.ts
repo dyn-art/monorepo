@@ -1,6 +1,6 @@
-import { beforeEach, describe, expect, it } from 'vitest';
-import { mat3, vec3 } from '@dyn/dtif';
 import type { DTIFComposition } from '@/rust/dyn_svg_composition_api/bindings';
+import { mat3, vec3 } from '@dyn/dtif';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 import { createSVGComposition } from '../core';
 import { initWasm } from '../wasm';
@@ -54,8 +54,6 @@ describe('SVGComposition class tests', () => {
 	it('should create Composition', async () => {
 		const composition = createSVGComposition({
 			dtif: COMPOSITION_WITH_ONE_RECT(500, 500),
-			width: 500,
-			height: 500
 		});
 		composition.update();
 		expect(composition).toBeDefined();

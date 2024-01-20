@@ -17,12 +17,14 @@ export const CompositionPreview: React.FC<TProps> = (props) => {
 	const { isTransforming } = props;
 
 	const [dtif, setDTIF] = React.useState<COMP.DTIFComposition | null>(null);
-	const { svgContainerRef, composition, isLoading } = useSVGComposition({
+	const { svgContainerRef, isLoading } = useSVGComposition({
 		dtif: dtif ?? undefined,
-		deps: [isTransforming]
+		deps: [isTransforming],
+		dimensions: {
+			width: WIDTH,
+			height: HEIGHT
+		}
 	});
-
-	const [scale, setScale] = React.useState(1);
 
 	// =========================================================================
 	// Lifecycle
@@ -43,16 +45,6 @@ export const CompositionPreview: React.FC<TProps> = (props) => {
 		[]
 	);
 
-	React.useEffect(() => {
-		if (composition != null) {
-			const scaleX = WIDTH / composition.width;
-			const scaleY = HEIGHT / composition.height;
-			const newScale = Math.min(scaleX, scaleY, 1);
-
-			setScale(newScale);
-		}
-	}, [composition]);
-
 	// =========================================================================
 	// UI
 	// =========================================================================
@@ -64,16 +56,16 @@ export const CompositionPreview: React.FC<TProps> = (props) => {
 	return (
 		<ScrollArea className="border-base-300 mt-2 border">
 			<div
-				className="preview flex items-center justify-center overflow-hidden p-4"
+				className="preview flex items-center justify-center overflow-hidden"
 				style={{ width: WIDTH, height: HEIGHT }}
 			>
 				{isLoading && (
 					<div className="flex flex-grow flex-col items-center justify-center">
-						<SpinnerIcon className="mr-2 h-4 w-4 animate-spin" />
+						<SpinnerIcon className="h-4 w-4 animate-spin" />
 						<p className="mt-2">Loading Preview</p>
 					</div>
 				)}
-				<div ref={svgContainerRef} style={{ transform: `scale(${scale})` }} />
+				<div ref={svgContainerRef} />
 			</div>
 		</ScrollArea>
 	);

@@ -5,7 +5,10 @@ use serde::{Deserialize, Serialize};
 use specta::Type;
 
 use super::modules::{
-    composition::{events::CoreInputEvent, resources::font_cache::font::Font},
+    composition::{
+        events::CoreInputEvent,
+        resources::{composition::ViewBox, font_cache::font::Font},
+    },
     node::components::{bundles::NodeBundle, mixins::Paint},
 };
 
@@ -13,6 +16,7 @@ pub mod dtif_processor;
 
 /// Represents the composition in which all nodes exist.
 #[derive(Serialize, Deserialize, Debug, Type)]
+#[serde(rename_all = "camelCase")]
 pub struct DTIFComposition {
     /// The version of the composition type declaration, used internally.
     /// Defaults to the latest version.
@@ -29,8 +33,10 @@ pub struct DTIFComposition {
     /// The height of the composition, in units.
     pub height: f32,
 
+    #[serde(default)]
+    pub view_box: Option<ViewBox>,
+
     /// The identifier of the root node in the composition.
-    #[serde(rename = "rootNodeId")]
     pub root_node_id: Entity,
 
     /// A mapping of node identifiers to their corresponding nodes within the composition.

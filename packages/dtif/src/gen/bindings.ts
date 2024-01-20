@@ -178,7 +178,7 @@ width: number;
 /**
  * The height of the composition, in units.
  */
-height: number; 
+height: number; viewBox?: ViewBox | null; 
 /**
  * The identifier of the root node in the composition.
  */

@@ -12,7 +12,7 @@ export function useWatchComposition(composition: Composition): COMP.CompositionC
 		return () => {
 			unwatch();
 		};
-	}, []);
+	}, [composition]);
 
 	return change;
 }

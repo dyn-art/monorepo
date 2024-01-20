@@ -56,49 +56,18 @@ export class Composition {
 	private readonly debounceDelay: number = 100; // ms
 
 	constructor(config: TCompositionConfig) {
-		const {
-			width,
-			height,
-			dtif = {
-				version: '0.0.1',
-				name: 'Test',
-				width,
-				height,
-				rootNodeId: 0,
-				nodes: {
-					0: {
-						type: 'Frame',
-						children: [],
-						dimension: {
-							width,
-							height
-						},
-						relativeTransform: mat3(vec3(1, 0, 0), vec3(0, 1, 0), vec3(0, 0, 1)),
-						fill: {
-							paintIds: [1]
-						}
-					}
-				},
-				paints: {
-					1: {
-						type: 'Solid',
-						color: [0, 191, 255]
-					}
-				}
-			},
-			isCallbackBased = true
-		} = config;
+		const { dtif, isCallbackBased = true } = config;
 		this.id = shortId();
 		this._compositionHandle = new JsCompositionHandle(dtif, (events: OutputEvent[]) => {
 			this.onWasmEvents(events);
 		});
-		this._width = width;
-		this._height = height;
-		this._viewBox = {
+		this._width = dtif.width;
+		this._height = dtif.height;
+		this._viewBox = dtif.viewBox ?? {
+			width: dtif.width,
+			height: dtif.height,
 			minX: 0,
-			minY: 0,
-			width,
-			height
+			minY: 0
 		};
 		this._isCallbackBased = isCallbackBased;
 	}
@@ -497,9 +466,7 @@ export class Composition {
 }
 
 export interface TCompositionConfig {
-	width: number;
-	height: number;
-	dtif?: DTIFComposition;
+	dtif: DTIFComposition;
 	isCallbackBased?: boolean;
 }
 
