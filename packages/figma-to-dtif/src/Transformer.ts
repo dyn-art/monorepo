@@ -102,7 +102,13 @@ export class Transformer {
 			nodes: Object.fromEntries(this.nodes),
 			paints: Object.fromEntries(this.paints),
 			fonts: Object.fromEntries(this.fonts),
-			rootNodeId: this._rootNodeId
+			rootNodeId: this._rootNodeId,
+			viewBox: {
+				minX: 0,
+				minY: 0,
+				width: this._toTransformRootNode.width,
+				height: this._toTransformRootNode.height
+			}
 		};
 
 		this._onTransformStatusUpdate?.({ type: ETransformStatus.END });

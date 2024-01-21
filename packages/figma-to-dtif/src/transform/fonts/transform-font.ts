@@ -1,7 +1,7 @@
 import type { COMP } from '@dyn/dtif';
 
 import type { TToTransformFont } from '../../FigmaNodeTreeProcessor';
-import type { TContentType, TExportOptions } from '../../types';
+import type { TContentType, TExportConfig } from '../../types';
 
 export async function transformFont(
 	toTransformFont: TToTransformFont,
@@ -12,7 +12,7 @@ export async function transformFont(
 }
 
 export interface TTransformFontConfig {
-	exportOptions: TExportOptions;
+	export: TExportConfig;
 	resolveFontContent: TResolveFontContent;
 }
 

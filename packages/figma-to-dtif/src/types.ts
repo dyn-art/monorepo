@@ -1,4 +1,10 @@
-export type TExportOptions = { inline: true } | { upload: TUploadStaticData };
+export type TExportConfig = { mode: 'Inline' } | ({ mode: 'External' } & TExternalConfig);
+
+export type TExportImageConfig = { format: 'PNG' | 'JPG' } & TExportConfig;
+
+export interface TExternalConfig {
+	uploadData: TUploadStaticData;
+}
 
 export interface TContentType {
 	mimeType: 'image/jpeg' | 'image/png' | 'image/svg+xml' | 'image/gif' | string;
@@ -11,8 +17,7 @@ export type TUploadStaticData = (
 ) => Promise<TUploadStaticDataResponse>;
 
 export interface TUploadStaticDataResponse {
-	key: string;
-	url?: string;
+	url: string;
 }
 
 export type TFigmaNodeWithChildren = FrameNode | InstanceNode | ComponentNode | GroupNode;

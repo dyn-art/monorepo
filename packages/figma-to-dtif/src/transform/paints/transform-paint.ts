@@ -2,7 +2,11 @@ import type { COMP } from '@dyn/dtif';
 
 import { UnsupportedFigmaPaintException } from '../../exceptions';
 import type { TToTransformPaint } from '../../FigmaNodeTreeProcessor';
-import type { TExportOptions } from '../../types';
+import {
+	transformGradientPaint,
+	type TTransformGradientPaintConfig
+} from './transform-gradient-paint';
+import type { TTransformImagePaintConfig } from './transform-image-paint';
 import { transformSolidPaint } from './transform-solid-paint';
 
 export async function transformPaint(
@@ -13,10 +17,11 @@ export async function transformPaint(
 	switch (paint.type) {
 		case 'SOLID':
 			return transformSolidPaint(paint);
-		// case 'GRADIENT_LINEAR':
-		// case 'GRADIENT_RADIAL':
-		// case 'GRADIENT_ANGULAR':
-		// case 'GRADIENT_DIAMOND':
+		case 'GRADIENT_LINEAR':
+		case 'GRADIENT_RADIAL':
+		case 'GRADIENT_ANGULAR':
+		case 'GRADIENT_DIAMOND':
+			return transformGradientPaint(paint, config.gradient);
 		// case 'IMAGE':
 		default:
 			throw new UnsupportedFigmaPaintException(paint, toTransformPaint.nodeIds[0] as any);
@@ -24,6 +29,6 @@ export async function transformPaint(
 }
 
 export interface TTransformPaintConfig {
-	imageExportOptions: TExportOptions;
-	gradientExportOptions: TExportOptions;
+	gradient: TTransformGradientPaintConfig;
+	image: TTransformImagePaintConfig;
 }
