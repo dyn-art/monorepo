@@ -1,28 +1,9 @@
 import type { COMP } from '@dyn/dtif';
 import type { GradientVariant } from '@dyn/dtif/dist/types/gen/bindings';
 
-import type { TExportImageConfig } from '../../types';
 import { mapFigmaBlendModeToDTIF, mapFigmaRGBToDTIF, mapFigmaTransformToMat3 } from '../../utils';
 
 export function transformGradientPaint(
-	paint: GradientPaint,
-	config: TTransformGradientPaintConfig
-): ({ type: 'Gradient' } & COMP.GradientPaint) | ({ type: 'Image' } & COMP.ImagePaint) {
-	if (config.inline === true) {
-		return transformGradientPaintToInline(paint);
-	}
-	return transformGradientPaintToImage(paint, config.inline.export);
-}
-
-function transformGradientPaintToImage(
-	paint: GradientPaint,
-	exportConfig: TExportImageConfig
-): { type: 'Image' } & COMP.ImagePaint {
-	// TODO:
-	return null as any;
-}
-
-function transformGradientPaintToInline(
 	paint: GradientPaint
 ): { type: 'Gradient' } & COMP.GradientPaint {
 	return {
@@ -50,8 +31,4 @@ function mapFigmaGradientTypeToDTIF(variant: GradientPaint['type']): GradientVar
 		case 'GRADIENT_DIAMOND':
 			return 'Diamond';
 	}
-}
-
-export interface TTransformGradientPaintConfig {
-	inline: true | { export: TExportImageConfig };
 }

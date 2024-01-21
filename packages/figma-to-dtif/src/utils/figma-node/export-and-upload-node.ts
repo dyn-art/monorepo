@@ -1,19 +1,14 @@
-import type { TExportImageConfig } from '../../types';
+import type { TExportExternalConfig } from '../../types';
 import { exportFigmaNode } from './export-node';
 
 export async function exportAndUploadFigmaNode(
 	node: SceneNode,
 	config: TExportAndUploadFigmaNodeConfig
-) {
-	const { export: exportConfig } = config;
-	const data = await exportFigmaNode(node, { format: exportConfig.format });
-
-	if (exportConfig.mode === 'External') {
-		const response = exportConfig.uploadData(data);
-		// TODO:
-	}
+): Promise<{ url: string }> {
+	const { format, uploadData } = config;
+	const data = await exportFigmaNode(node, { format });
+	const response = await uploadData(data);
+	return { url: response.url };
 }
 
-interface TExportAndUploadFigmaNodeConfig {
-	export: TExportImageConfig;
-}
+type TExportAndUploadFigmaNodeConfig = TExportExternalConfig & { format: 'PNG' | 'JPG' };

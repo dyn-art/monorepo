@@ -1,4 +1,5 @@
 export * from './CompositionException';
+export * from './ExportImagePaintException';
 export * from './ExportNodeException';
 export * from './FailedToResolveRootNodeException';
 export * from './InvisibleNodeException';

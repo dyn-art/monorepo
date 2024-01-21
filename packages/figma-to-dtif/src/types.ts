@@ -1,8 +1,8 @@
-export type TExportConfig = { mode: 'Inline' } | ({ mode: 'External' } & TExternalConfig);
+export type TExportConfig = { mode: 'Inline' } | ({ mode: 'External' } & TExportExternalConfig);
 
 export type TExportImageConfig = { format: 'PNG' | 'JPG' } & TExportConfig;
 
-export interface TExternalConfig {
+export interface TExportExternalConfig {
 	uploadData: TUploadStaticData;
 }
 
@@ -13,7 +13,10 @@ export interface TContentType {
 
 export type TUploadStaticData = (
 	content: Uint8Array,
-	contentType?: TContentType
+	config?: {
+		contentType?: TContentType;
+		key?: string;
+	}
 ) => Promise<TUploadStaticDataResponse>;
 
 export interface TUploadStaticDataResponse {

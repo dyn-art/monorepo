@@ -2,16 +2,14 @@ import { extractErrorData } from '@dyn/utils';
 
 import { NodeException } from './NodeException';
 
-export class ExportNodeException extends NodeException {
+export class ExportImagePaintException extends NodeException {
 	public readonly throwable?: Error;
 
-	constructor(format: string, node: SceneNode, throwable?: unknown) {
+	constructor(nodeIds: SceneNode['id'][], throwable?: unknown) {
 		const errorData = throwable != null ? extractErrorData(throwable) : null;
 		super(
-			`Failed to export node '${node.name}' as ${format}${
-				errorData != null ? ` by error: ${errorData.message}` : '!'
-			}`,
-			node.id
+			`Failed to export image paint${errorData != null ? ` by error: ${errorData.message}` : '!'}`,
+			nodeIds
 		);
 		this.throwable = errorData?.error ?? undefined;
 	}

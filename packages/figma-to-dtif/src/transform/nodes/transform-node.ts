@@ -37,4 +37,5 @@ export async function transformNode(
 
 export interface TTransformNodeConfig {
 	includeInvisible: boolean;
+	exportContainerNode: FrameNode;
 }

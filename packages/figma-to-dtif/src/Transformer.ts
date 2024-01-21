@@ -51,7 +51,13 @@ export class Transformer {
 	}
 
 	public async transform(config: TTransformConfig): Promise<COMP.DTIFComposition> {
-		const nodeConfig: TTransformNodeConfig = { includeInvisible: true, ...(config.node ?? {}) };
+		const nodeConfig: TTransformNodeConfig = {
+			includeInvisible: true,
+			exportContainerNode: this.createExportContainerNode(
+				'⏳ Temp export container | Delete if dyn.art plugin not active'
+			),
+			...(config.node ?? {})
+		};
 		const paintConfig = config.paint;
 		const fontConfig = config.font;
 
@@ -111,6 +117,7 @@ export class Transformer {
 			}
 		};
 
+		nodeConfig.exportContainerNode.remove();
 		this._onTransformStatusUpdate?.({ type: ETransformStatus.END });
 		return composition;
 	}
@@ -168,6 +175,14 @@ export class Transformer {
 				this._fontsFailedToTransform.push(toTransformFont);
 			}
 		}
+	}
+
+	private createExportContainerNode(name: string): FrameNode {
+		const node = figma.createFrame();
+		node.name = name;
+		node.resize(1, 1);
+		node.clipsContent = false; // With clip content active figma would just export the visible piece in the frame
+		return node;
 	}
 }
 
