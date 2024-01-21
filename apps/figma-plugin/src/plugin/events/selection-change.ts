@@ -1,11 +1,14 @@
 import { pickProperties } from '@dyn/utils';
 
-import { EAppRoutes, type TPluginHandler } from '../../types';
+import {
+	EAppRoutes,
+	type TCustomPluginCallbackRegistration,
+	type TPluginHandler
+} from '../../types';
 import { ACTIVE_APP_ROUTE, SELECTED_NODE_IDS } from '../core/ui';
 import { getObjectPropertyKeys } from '../core/utils';
-import { registerPluginEventCallback } from '../plugin-handler';
 
-registerPluginEventCallback({
+export const selectionChange: TCustomPluginCallbackRegistration = {
 	type: 'selectionchange',
 	key: 'selection-change',
 	callback: async (instance: TPluginHandler) => {
@@ -25,6 +28,10 @@ registerPluginEventCallback({
 		});
 
 		// Post on select frame to app part
+		console.log('Route: ', {
+			activeAppRoute: ACTIVE_APP_ROUTE.get()?.toString(),
+			expected: `${EAppRoutes.HOME}${EAppRoutes.HOME__TO_DTIF}`
+		});
 		if (ACTIVE_APP_ROUTE.get()?.toString() === `${EAppRoutes.HOME}${EAppRoutes.HOME__TO_DTIF}`) {
 			if (selectedFrames.length > 0) {
 				instance.post('on-select-frame', {
@@ -46,4 +53,4 @@ registerPluginEventCallback({
 			});
 		}
 	}
-});
+};

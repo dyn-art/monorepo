@@ -49,8 +49,8 @@ export class FigmaAppHandler<
 
 		const eventListener = (...args: any[]): void => {
 			if (appCallback.shouldCall()) {
-				this.onEvent(appCallback, args).catch(() => {
-					// Handle errors or do nothing
+				this.onEvent(appCallback, args).catch((error) => {
+					console.error('An error occurred while handling app callback', error);
 				});
 			} else {
 				removeEventListener(type, eventListener);
@@ -72,6 +72,9 @@ export class FigmaAppHandler<
 		if (appCallback.type === 'plugin.message') {
 			const data = args[0]?.data;
 			const pluginMessage = data?.pluginMessage;
+			// console.log(`"${appCallback.key}" === "${pluginMessage?.key}"`, {
+			// 	args: pluginMessage?.args
+			// });
 			if (
 				pluginMessage != null &&
 				pluginMessage?.key === appCallback.key &&

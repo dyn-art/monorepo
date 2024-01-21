@@ -1,10 +1,9 @@
 import { NodeException, Transformer, type COMP } from '@dyn/figma-to-dtif';
-import { extractErrorData } from '@dyn/utils';
+import { extractErrorData, notEmpty } from '@dyn/utils';
 
-import { type TPluginHandler } from '../../types';
-import { registerPluginEventCallback } from '../plugin-handler';
+import type { TCustomPluginCallbackRegistration, TPluginHandler } from '../../types';
 
-registerPluginEventCallback({
+export const intermediateFormatExport: TCustomPluginCallbackRegistration = {
 	type: 'app.message',
 	key: 'intermediate-format-export',
 	callback: async (instance: TPluginHandler, args) => {
@@ -22,7 +21,7 @@ registerPluginEventCallback({
 			await processNode(node, instance);
 		}
 	}
-});
+};
 
 async function processNode(node: FrameNode, instance: TPluginHandler): Promise<void> {
 	const transformer = new Transformer(node, {
@@ -41,7 +40,6 @@ async function processNode(node: FrameNode, instance: TPluginHandler): Promise<v
 				}
 			},
 			paint: {
-				gradient: { inline: true },
 				image: { export: { format: 'PNG', mode: 'Inline' } }
 			}
 			// node: {
@@ -78,9 +76,11 @@ function handleError(error: unknown, node: SceneNode, instance: TPluginHandler):
 		error: true
 	});
 	if (error instanceof NodeException) {
-		const errorCausingNode = figma.getNodeById(error.nodeId);
-		if (errorCausingNode != null) {
-			figma.currentPage.selection = [errorCausingNode as SceneNode];
+		const errorCausingNodes: SceneNode[] = error.nodeIds
+			.map((nodeId) => figma.getNodeById(nodeId) as SceneNode)
+			.filter(notEmpty);
+		if (errorCausingNodes.length > 0) {
+			figma.currentPage.selection = errorCausingNodes;
 		}
 	}
 }

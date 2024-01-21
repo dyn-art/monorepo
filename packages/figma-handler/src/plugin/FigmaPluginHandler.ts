@@ -57,8 +57,8 @@ export class FigmaPluginHandler<
 		const eventMethod = pluginCallback.once ? 'once' : 'on';
 
 		const eventListener = (...args: any[]) => {
-			this.onEvent(pluginCallback, args).catch(() => {
-				// Error handling or do nothing
+			this.onEvent(pluginCallback, args).catch((error) => {
+				console.error('An error occurred while handling plugin callback', error);
 			});
 		};
 
@@ -75,8 +75,14 @@ export class FigmaPluginHandler<
 		pluginCallback: PluginCallback<GAppMessageEvent>,
 		args: any[]
 	): Promise<void> {
-		if (pluginCallback.type === 'app.message' && args[0]?.key === pluginCallback.key) {
-			await pluginCallback.callback(this, args[0].args);
+		if (pluginCallback.type === 'app.message') {
+			const arg = args[0];
+			// console.log(`"${pluginCallback.key}" === "${arg?.key}"`, {
+			// 	args: arg?.args
+			// });
+			if (arg?.key === pluginCallback.key && typeof arg?.args === 'object') {
+				await pluginCallback.callback(this, arg.args);
+			}
 		} else {
 			await pluginCallback.callback(this, ...args);
 		}

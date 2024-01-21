@@ -1,7 +1,7 @@
-import { registerPluginEventCallback } from '../../plugin-handler';
+import type { TCustomPluginCallbackRegistration } from '../../../types';
 import { onPropertyChange } from './events';
 
-registerPluginEventCallback({
+export const documentChangeEvent: TCustomPluginCallbackRegistration = {
 	type: 'documentchange',
 	key: 'document-change-event',
 	callback: async (instance, args) => {
@@ -15,4 +15,4 @@ registerPluginEventCallback({
 			}
 		}
 	}
-});
+};
