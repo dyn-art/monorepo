@@ -125,6 +125,16 @@ export type BreakLineOn =
  */
 export type ChildrenMixin = Entity[]
 
+export type ColorStop = { 
+/**
+ * The position of the color stop in the gradient, ranging from 0.0 to 1.0.
+ */
+position: number; 
+/**
+ * The color of the stop, represented as an RGB array.
+ */
+color: [number, number, number] }
+
 export type CompositionChange = { rootNode: Entity; viewBox: ViewBox; width: number; height: number }
 
 export type CompositionChangeEvent = { change: CompositionChange }
@@ -395,6 +405,36 @@ name?: string | null }) & ({ frame?: null | null;
  */
 clipContent?: boolean }) & { node?: Node; rectangleCornerMixin?: RectangleCornerMixin; children: ChildrenMixin; compositionMixin?: NodeCompositionMixin; relativeTransform: RelativeTransformMixin; dimension: DimensionMixin; blendMixin?: BlendMixin; fill?: FillMixin }
 
+export type GradientPaint = ({ 
+/**
+ * The opacity of the paint,
+ * ranging from 0.0 (completely transparent) to 1.0 (completely opaque).
+ */
+opacity?: number; 
+/**
+ * The blend mode used when applying the paint,
+ * which determines how the paint's color blends with colors underneath it.
+ */
+blendMode?: BlendMode; 
+/**
+ * Determines whether the paint is visible.
+ */
+isVisible?: boolean }) & { 
+/**
+ * Specifies the variant of the gradient.
+ */
+variant?: GradientVariant; 
+/**
+ * Transformation matrix for the gradient.
+ */
+transform?: Mat3; 
+/**
+ * A list of color stops defining the gradient.
+ */
+gradientStops: ColorStop[] }
+
+export type GradientVariant = "Linear" | "Radial" | "Angular" | "Diamond"
+
 /**
  * Serves as a container used to semantically group related nodes,
  * analogous to a folder in a layers panel.
@@ -438,6 +478,68 @@ export type HorizontalTextAlignment =
  * Justifies text across the container width.
  */
 "Justified"
+
+export type ImageContent = 
+/**
+ * Image content stored as binary data.
+ */
+{ type: "Binary"; content: number[] } | 
+/**
+ * Image content referenced by a URL.
+ * 
+ * This variant is only supported when the `resolve-url` feature is enabled.
+ */
+{ type: "Url"; url: string }
+
+export type ImagePaint = ({ 
+/**
+ * The opacity of the paint,
+ * ranging from 0.0 (completely transparent) to 1.0 (completely opaque).
+ */
+opacity?: number; 
+/**
+ * The blend mode used when applying the paint,
+ * which determines how the paint's color blends with colors underneath it.
+ */
+blendMode?: BlendMode; 
+/**
+ * Determines whether the paint is visible.
+ */
+isVisible?: boolean }) & { 
+/**
+ * Defines the scale mode of the image.
+ */
+scaleMode?: ImagePaintScaleMode; 
+/**
+ * The width of the image in pixels.
+ */
+width: number; 
+/**
+ * The height of the image in pixels.
+ */
+height: number; 
+/**
+ * The actual content of the image.
+ */
+content: ImageContent }
+
+export type ImagePaintScaleMode = 
+/**
+ * Fills the area completely with the image.
+ */
+{ type: "Fill"; rotation: number } | 
+/**
+ * Fits the image within the area while maintaining its aspect ratio.
+ */
+{ type: "Fit"; rotation: number } | 
+/**
+ * Crops the image to fill the area.
+ */
+{ type: "Crop"; transform: Mat3 } | 
+/**
+ * Tiles the image within the area.
+ */
+{ type: "Tile"; rotation: number; scalingFactor: number }
 
 export type InteractionInputEvent = ({ type: "CursorDownOnEntity" } & CursorDownOnEntity) | ({ type: "CursorMovedOnComposition" } & CursorMovedOnComposition) | ({ type: "CursorEnteredComposition" }) | ({ type: "CursorExitedComposition" }) | ({ type: "CursorDownOnComposition" } & CursorDownOnComposition) | ({ type: "CursorUpOnComposition" } & CursorUpOnComposition) | ({ type: "WheeledOnComposition" } & WheeledOnComposition) | ({ type: "CursorDownOnResizeHandle" } & CursorDownOnResizeHandle) | ({ type: "CursorDownOnRotateHandle" } & CursorDownOnRotateHandle)
 
@@ -548,7 +650,11 @@ export type Paint =
 /**
  * Represents a solid color paint.
  */
-({ type: "Solid" } & SolidPaint)
+({ type: "Solid" } & SolidPaint) | 
+/**
+ * Represents an image-based paint.
+ */
+({ type: "Image" } & ImagePaint) | ({ type: "Gradient" } & GradientPaint)
 
 /**
  * Represents a path in a graphical composition, defined by a series of vertices.

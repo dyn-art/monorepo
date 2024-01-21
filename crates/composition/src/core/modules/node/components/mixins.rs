@@ -242,8 +242,10 @@ pub struct Anchor {
 pub enum AnchorCommand {
     /// Moves the path to a new location without drawing anything.
     MoveTo,
+
     /// Draws a straight line from the current position to the anchor point.
     LineTo,
+
     /// Draws a curve to the anchor point using two control points.
     #[serde(rename_all = "camelCase")]
     CurveTo {
@@ -253,6 +255,7 @@ pub enum AnchorCommand {
         /// The second control point for the curve.
         control_point_2: Vec2,
     },
+
     /// Draws an arc to the anchor point.
     #[serde(rename_all = "camelCase")]
     ArcTo {
@@ -268,6 +271,7 @@ pub enum AnchorCommand {
         /// A flag to determine the direction of the arc sweep.
         sweep_flag: bool,
     },
+
     /// Closes the path by drawing a line to the start point.
     ClosePath,
 }
@@ -299,6 +303,12 @@ impl Default for FillMixin {
 pub enum Paint {
     /// Represents a solid color paint.
     Solid(SolidPaint),
+
+    /// Represents an image-based paint.
+    Image(ImagePaint),
+
+    // Represents a gradient paint.
+    Gradient(GradientPaint),
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, Type)]
@@ -329,11 +339,96 @@ pub struct SolidPaint {
     pub color: (u8, u8, u8),
 }
 
-// #[derive(Serialize, Deserialize, Clone, Debug, Type)]
-// pub struct SolidPaint {
-//     pub
+#[derive(Serialize, Deserialize, Clone, Debug, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct ImagePaint {
+    #[serde(flatten)]
+    pub base_paint: BasePaint,
 
-// }
+    /// Defines the scale mode of the image.
+    #[serde(default)]
+    pub scale_mode: ImagePaintScaleMode,
+
+    /// The width of the image in pixels.
+    width: f32,
+
+    /// The height of the image in pixels.
+    height: f32,
+
+    /// The actual content of the image.
+    content: ImageContent,
+}
+
+#[derive(Serialize, Deserialize, Eq, PartialEq, Hash, Clone, Debug, Type)]
+#[serde(tag = "type")]
+pub enum ImageContent {
+    /// Image content stored as binary data.
+    Binary { content: Vec<u8> },
+
+    /// Image content referenced by a URL.
+    ///
+    /// This variant is only supported when the `resolve-url` feature is enabled.
+    Url { url: String },
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, Type)]
+#[serde(tag = "type")]
+pub enum ImagePaintScaleMode {
+    /// Fills the area completely with the image.
+    Fill { rotation: f32 },
+
+    /// Fits the image within the area while maintaining its aspect ratio.
+    Fit { rotation: f32 },
+
+    /// Crops the image to fill the area.
+    Crop { transform: Mat3 },
+
+    /// Tiles the image within the area.
+    #[serde(rename_all = "camelCase")]
+    Tile { rotation: f32, scaling_factor: f32 },
+}
+
+impl Default for ImagePaintScaleMode {
+    fn default() -> Self {
+        Self::Fill { rotation: 0.0 }
+    }
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct GradientPaint {
+    #[serde(flatten)]
+    pub base_paint: BasePaint,
+
+    /// Specifies the variant of the gradient.
+    #[serde(default)]
+    variant: GradientVariant,
+
+    /// Transformation matrix for the gradient.
+    #[serde(default)]
+    transform: Mat3,
+
+    /// A list of color stops defining the gradient.
+    gradient_stops: Vec<ColorStop>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, Type)]
+pub struct ColorStop {
+    /// The position of the color stop in the gradient, ranging from 0.0 to 1.0.
+    position: f32,
+
+    /// The color of the stop, represented as an RGB array.
+    color: (u8, u8, u8),
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, Default, Type)]
+pub enum GradientVariant {
+    #[default]
+    Linear,
+    Radial,
+    Angular,
+    Diamond,
+}
 
 // =============================================================================
 // Effects

@@ -115,6 +115,7 @@ impl SVGCompositionRes {
     fn create_paint(&mut self, paint: &Paint, entity: Entity) -> Option<Box<dyn SVGPaint>> {
         match paint {
             Paint::Solid(..) => Some(Box::new(SolidSVGPaint::new(entity, &mut self.id_generator))),
+            _ => None, // TODO
         }
     }
 

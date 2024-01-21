@@ -94,7 +94,6 @@ export class SVGRender extends Render {
 			const compositionPoint = this.pointerEventToCompositionPoint(e);
 			// Check whether cursor actually left composition
 			// or whether its just on some UI layer like the selection box
-			// TODO: Or put UI layers into the composition SVG?
 			if (compositionPoint[0] < 0 || compositionPoint[1] < 0) {
 				this.composition.emitInteractionEvents([{ type: 'CursorExitedComposition' }]);
 				this._isCursorOutOfComposion = true;

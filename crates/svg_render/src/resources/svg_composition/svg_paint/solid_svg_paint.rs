@@ -82,6 +82,7 @@ impl SVGPaint for SolidSVGPaint {
                     ])
                 }
             }
+            _ => {}
         }
     }
 }
