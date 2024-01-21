@@ -59,7 +59,7 @@ export class SVGRender extends Render {
 						position: this.clientWindowPointToCompositionPoint([e.clientX, e.clientY]),
 						ctrlKeyPressed: e.ctrlKey,
 						metaKeyPressed: e.metaKey,
-						delta: this.clientWindowPointToCompositionPoint([e.deltaX, e.deltaY])
+						delta: [e.deltaX, e.deltaY]
 					}
 				],
 				false

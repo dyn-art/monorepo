@@ -46,6 +46,9 @@ pub fn handle_wheel_on_composition(
             composition.view_box.min_y = new_min.y;
             composition.view_box.width = new_dimensions.x;
             composition.view_box.height = new_dimensions.y;
+        } else {
+            composition.view_box.min_x += delta.x;
+            composition.view_box.min_y += delta.y;
         }
     }
 }

@@ -20,7 +20,7 @@ export const useSVGComposition = (
 		let isMounted = true;
 		setIsLoading(true);
 
-		const initializeAndRustify = async () => {
+		const initializeAndRustify = async (): Promise<void> => {
 			await initWasm();
 			if (dtif && isMounted) {
 				const rustified = await rustify(dtif);
