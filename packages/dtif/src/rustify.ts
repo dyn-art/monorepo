@@ -8,7 +8,7 @@ export async function rustify(dtif: COMP.DTIFComposition): Promise<COMP.DTIFComp
 		width: dtif.width,
 		rootNodeId: dtif.rootNodeId,
 		nodes: dtif.nodes,
-		paints: dtif.paints,
+		paints: await resolvePaints(dtif.paints),
 		fonts: dtif.fonts != null ? await resolveFonts(dtif.fonts) : null,
 		changes: dtif.changes,
 		viewBox: {
@@ -22,27 +22,36 @@ export async function rustify(dtif: COMP.DTIFComposition): Promise<COMP.DTIFComp
 	return finalDTIF;
 }
 
-async function resolveFonts(fonts: Record<string, COMP.Font>): Promise<Record<string, COMP.Font>> {
-	const transformedFonts: Record<string, COMP.Font> = {};
-
-	// Check if content is a string (URL), then load the font, else use the existing number array
-	for (const [key, font] of Object.entries(fonts)) {
-		if (font.content.type === 'Url') {
-			const content = await loadFont(font.content.url);
-			transformedFonts[key] = {
-				...font,
-				content: {
-					type: 'Binary',
-					content
-				}
+async function resolvePaints(
+	paints: Record<string, COMP.Paint>
+): Promise<Record<string, COMP.Paint>> {
+	for (const paint of Object.values(paints)) {
+		if (paint.type === 'Image' && paint.content.type === 'Url') {
+			const content = await loadContent(paint.content.url);
+			paint.content = {
+				type: 'Binary',
+				content
 			};
 		}
 	}
-
-	return transformedFonts;
+	return paints;
 }
 
-async function loadFont(url: string): Promise<number[]> {
+async function resolveFonts(fonts: Record<string, COMP.Font>): Promise<Record<string, COMP.Font>> {
+	// Check if content is a string (URL), then load the font, else use the existing number array
+	for (const font of Object.values(fonts)) {
+		if (font.content.type === 'Url') {
+			const content = await loadContent(font.content.url);
+			font.content = {
+				type: 'Binary',
+				content
+			};
+		}
+	}
+	return fonts;
+}
+
+async function loadContent(url: string): Promise<number[]> {
 	try {
 		const response = await fetch(url);
 

@@ -1,19 +1,42 @@
 'use client';
 
 import React from 'react';
-import type { Composition } from '@dyn/svg-composition';
-import { Button, CircleIcon, SquareIcon } from '@dyn/ui';
+import type { COMP, Composition } from '@dyn/svg-composition';
+import { Button, CircleIcon, Component2Icon, Skeleton, SquareIcon } from '@dyn/ui';
 
 import { Canvas, CompositionControl, type TCanvasProps } from './components';
 
 export const BannerEditor: React.FC<TBannerEditorProps> = (props) => {
-	const { width, height, dtif } = props;
+	const { width, height, dtif: defaultDTIF } = props;
 	const [composition, setComposition] = React.useState<Composition | null>(null);
+	const [dtif, setDTIF] = React.useState<COMP.DTIFComposition | null>(null);
+
+	React.useEffect(() => {
+		(async () => {
+			const text = await navigator.clipboard.readText();
+			try {
+				const maybeDTIF = JSON.parse(text);
+				if ('version' in maybeDTIF) {
+					setDTIF(maybeDTIF as COMP.DTIFComposition);
+				} else {
+					throw new Error('Invalid DTIF');
+				}
+			} catch (e) {
+				setDTIF(defaultDTIF);
+			}
+		})().catch(() => {
+			// do nothing
+		});
+	}, []);
 
 	return (
 		<div className="flex flex-col items-center justify-center">
 			<div style={{ width: width + 4, height: height + 4 }}>
-				<Canvas dtif={dtif} height={height} onLoadedComposition={setComposition} width={width} />
+				{dtif != null ? (
+					<Canvas dtif={dtif} height={height} onLoadedComposition={setComposition} width={width} />
+				) : (
+					<Skeleton className="h-full w-full" />
+				)}
 			</div>
 			<div className="flex w-full flex-row items-center justify-between ">
 				<div>TODO</div>
@@ -39,6 +62,19 @@ export const BannerEditor: React.FC<TBannerEditorProps> = (props) => {
 					</Button>
 					<Button size="icon" variant="outline">
 						<CircleIcon className="h-4 w-4" />
+					</Button>
+					<Button size="icon" variant="outline">
+						<Component2Icon
+							className="h-4 w-4"
+							onClick={() => {
+								composition?.updateViewBox({
+									minX: 0,
+									minY: 0,
+									width: composition.width,
+									height: composition.height
+								});
+							}}
+						/>
 					</Button>
 				</div>
 				<div className="flex flex-row gap-2">
