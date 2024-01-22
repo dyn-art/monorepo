@@ -1,4 +1,5 @@
 import type { COMP } from '@dyn/dtif';
+import { sleep } from '@dyn/utils';
 
 import { FailedToResolveRootNodeException } from './exceptions';
 import {
@@ -61,7 +62,7 @@ export class Transformer {
 		const paintConfig = config.paint;
 		const fontConfig = config.font;
 
-		this._onTransformStatusUpdate?.({ type: ETransformStatus.START });
+		await this.onTransformStatusUpdate({ type: ETransformStatus.START });
 
 		// Walk Figma tree and discover to transform nodes, paints and fonts
 		const { rootId, toTransformNodes, toTransformPaints, toTransformFonts } =
@@ -79,15 +80,15 @@ export class Transformer {
 		});
 
 		// Transform nodes
-		this._onTransformStatusUpdate?.({ type: ETransformStatus.TRANSFORMING_NODES });
+		await this.onTransformStatusUpdate({ type: ETransformStatus.TRANSFORMING_NODES });
 		await this.transformNodes(nodeConfig);
 
 		// Transform paints
-		this._onTransformStatusUpdate?.({ type: ETransformStatus.TRANSFORMING_PAINTS });
+		await this.onTransformStatusUpdate({ type: ETransformStatus.TRANSFORMING_PAINTS });
 		await this.transformPaints(paintConfig);
 
 		// Transform fonts
-		this._onTransformStatusUpdate?.({ type: ETransformStatus.TRANSFORMING_FONTS });
+		await this.onTransformStatusUpdate({ type: ETransformStatus.TRANSFORMING_FONTS });
 		await this.transformFonts(fontConfig);
 
 		// Reset root node layout
@@ -99,7 +100,7 @@ export class Transformer {
 		}
 
 		// Construct composition
-		this._onTransformStatusUpdate?.({ type: ETransformStatus.CONSTRUCTING_COMPOSITON });
+		await this.onTransformStatusUpdate({ type: ETransformStatus.CONSTRUCTING_COMPOSITON });
 		const composition: COMP.DTIFComposition = {
 			version: '1.0',
 			name: this._toTransformRootNode.name,
@@ -118,8 +119,15 @@ export class Transformer {
 		};
 
 		nodeConfig.exportContainerNode.remove();
-		this._onTransformStatusUpdate?.({ type: ETransformStatus.END });
+		await this.onTransformStatusUpdate({ type: ETransformStatus.END });
 		return composition;
+	}
+
+	private async onTransformStatusUpdate(status: TTransformStatusUpdate): Promise<void> {
+		this._onTransformStatusUpdate?.(status);
+		// Sleep to give Figma time to send the status update to the "frontend"
+		// before it might get blocked e.g. due to image export
+		await sleep(100);
 	}
 
 	// =========================================================================

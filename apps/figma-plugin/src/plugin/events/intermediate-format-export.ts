@@ -1,5 +1,5 @@
 import { NodeException, Transformer, type COMP } from '@dyn/figma-to-dtif';
-import { extractErrorData, notEmpty } from '@dyn/utils';
+import { extractErrorData, notEmpty, sleep } from '@dyn/utils';
 
 import type { TCustomPluginCallbackRegistration, TPluginHandler } from '../../types';
 
@@ -24,9 +24,10 @@ export const intermediateFormatExport: TCustomPluginCallbackRegistration = {
 };
 
 async function processNode(node: FrameNode, instance: TPluginHandler): Promise<void> {
+	instance.post('on-transform-status-update', { type: 'Start' });
 	const transformer = new Transformer(node, {
 		onTransformStatusUpdate: (status) => {
-			instance.post('on-transform-status-update', { status });
+			instance.post('on-transform-status-update', { type: 'Transform', status });
 		}
 	});
 
@@ -46,17 +47,20 @@ async function processNode(node: FrameNode, instance: TPluginHandler): Promise<v
 			// 	includeInvisible: false
 			// }
 		});
-		handleSuccess(result, node, instance);
+		await handleSuccess(result, node, instance);
 	} catch (error) {
 		handleError(error, node, instance);
 	}
+	instance.post('on-transform-status-update', { type: 'End' });
 }
 
-function handleSuccess(
+async function handleSuccess(
 	result: COMP.DTIFComposition,
 	node: SceneNode,
 	instance: TPluginHandler
-): void {
+): Promise<void> {
+	instance.post('on-transform-status-update', { type: 'Transmit' });
+	await sleep(100);
 	instance.post('intermediate-format-export-result', {
 		type: 'success',
 		content: result

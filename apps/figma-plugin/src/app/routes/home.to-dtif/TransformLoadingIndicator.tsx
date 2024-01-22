@@ -5,10 +5,17 @@ import { SpinnerIcon } from '@dyn/ui';
 import { appHandler } from '../../app-handler';
 import { useAppCallback } from '../../hooks';
 
+const randomFacts = [
+	'This is a random fact :)',
+	'DTIF means "Design Tree Interchange Format"'
+] as const;
+
 export const TransformLoadingIndicator: React.FC<TProps> = (props) => {
 	const { isTransforming } = props;
 	const [message, setMessage] = React.useState('Loading');
-	const [subMessage, setSubMessage] = React.useState<string>('TODO: Random facts here');
+	const [subMessage, setSubMessage] = React.useState<string>(
+		randomFacts[Math.floor(Math.random() * randomFacts.length)] ?? randomFacts[0]
+	);
 
 	// =========================================================================
 	// Lifecycle
@@ -20,29 +27,44 @@ export const TransformLoadingIndicator: React.FC<TProps> = (props) => {
 			type: 'plugin.message',
 			key: 'on-transform-status-update',
 			callback: async (instance, args) => {
-				switch (args.status.type) {
-					case ETransformStatus.START:
-						setMessage('Traversing Figma Node Tree');
+				switch (args.type) {
+					case 'Start':
+						setMessage('Getting Ready');
 						break;
-					case ETransformStatus.TRAVERSED_TREE:
-						setSubMessage(
-							`Transforming ${args.status.toTransformNodesCount} Nodes, ${args.status.toTransformPaintsCount} Paints and  ${args.status.toTransformFontsCount} Fonts`
-						);
+					case 'Transform': {
+						switch (args.status.type) {
+							case ETransformStatus.START:
+								setMessage('Traversing Figma Node Tree');
+								break;
+							case ETransformStatus.TRAVERSED_TREE:
+								setSubMessage(
+									`Transforming ${args.status.toTransformNodesCount} Nodes, ${args.status.toTransformPaintsCount} Paints and  ${args.status.toTransformFontsCount} Fonts`
+								);
+								break;
+							case ETransformStatus.TRANSFORMING_NODES:
+								setMessage('Transforming Nodes');
+								break;
+							case ETransformStatus.TRANSFORMING_PAINTS:
+								setMessage('Transforming Paints');
+								break;
+							case ETransformStatus.TRANSFORMING_FONTS:
+								setMessage('Transforming Fonts');
+								break;
+							case ETransformStatus.CONSTRUCTING_COMPOSITON:
+								setMessage('Constructing Composition');
+								break;
+							case ETransformStatus.END:
+								setMessage('Completed transforming Frame to DTIF');
+								break;
+						}
 						break;
-					case ETransformStatus.TRANSFORMING_NODES:
-						setMessage('Transforming Nodes');
+					}
+					case 'Transmit':
+						setMessage('Sending DTIF to Figma Plugin Frontend');
 						break;
-					case ETransformStatus.TRANSFORMING_PAINTS:
-						setMessage('Transforming Paints');
+					case 'End':
+						setMessage('Preparing');
 						break;
-					case ETransformStatus.TRANSFORMING_FONTS:
-						setMessage('Transforming Fonts');
-						break;
-					case ETransformStatus.CONSTRUCTING_COMPOSITON:
-						setMessage('Constructing Composition');
-						break;
-					default:
-					// do nothing
 				}
 			}
 		},

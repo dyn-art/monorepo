@@ -25,7 +25,11 @@ export interface TOnChangeSelectedNodePropertiesEvent extends TPluginMessageEven
 
 export interface TOnTransformStatusUpdateEvent extends TPluginMessageEvent {
 	key: 'on-transform-status-update';
-	args: { status: TTransformStatusUpdate };
+	args:
+		| { type: 'Start' }
+		| { type: 'Transform'; status: TTransformStatusUpdate }
+		| { type: 'Transmit' }
+		| { type: 'End' };
 }
 
 export interface TIntermediateFormatExportResultEvent extends TPluginMessageEvent {
