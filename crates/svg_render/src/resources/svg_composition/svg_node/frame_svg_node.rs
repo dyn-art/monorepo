@@ -27,20 +27,20 @@ use super::SVGNode;
 pub struct FrameSVGNode {
     bundle: BaseSVGBundle,
 
+    defs: ElementReference,
+
     // Content elements
-    content_wrapper: ElementReference,
     content_clip_path: ElementReference,
-    content_clip_path_defs: ElementReference,
-    content_clipped_shape: ElementReference,
+    content_clipped_rect: ElementReference,
+    content_wrapper_g: ElementReference,
 
     // Children elements
-    children_wrapper: ElementReference,
+    children_wrapper_g: ElementReference,
 
     // Fill elements
     fill_clip_path: ElementReference,
-    fill_clip_path_defs: ElementReference,
-    fill_clipped_shape: ElementReference,
-    fill_wrapper: ElementReference,
+    fill_clipped_path: ElementReference,
+    fill_wrapper_g: ElementReference,
 }
 
 impl SVGBundle for FrameSVGNode {
@@ -77,7 +77,7 @@ impl SVGNode for FrameSVGNode {
                         },
                     ]);
                     self.bundle
-                        .get_child_mut(self.fill_clipped_shape.index)
+                        .get_child_mut(self.fill_clipped_path.index)
                         .unwrap()
                         .set_attributes(vec![
                             SVGAttribute::Width {
@@ -90,7 +90,7 @@ impl SVGNode for FrameSVGNode {
                             },
                         ]);
                     self.bundle
-                        .get_child_mut(self.content_clipped_shape.index)
+                        .get_child_mut(self.content_clipped_rect.index)
                         .unwrap()
                         .set_attributes(vec![
                             SVGAttribute::Width {
@@ -132,7 +132,7 @@ impl SVGNode for FrameSVGNode {
                 }
                 MixinChange::Children(mixin) => {
                     self.bundle
-                        .get_child_mut(self.children_wrapper.index)
+                        .get_child_mut(self.children_wrapper_g.index)
                         .unwrap()
                         .reorder_children(&mixin.children.0);
                 }
@@ -144,11 +144,11 @@ impl SVGNode for FrameSVGNode {
     }
 
     fn get_node_append_id(&self) -> Option<&ElementReference> {
-        Some(&self.children_wrapper)
+        Some(&self.children_wrapper_g)
     }
 
     fn get_paint_append_id(&self) -> Option<&ElementReference> {
-        Some(&self.fill_wrapper)
+        Some(&self.fill_wrapper_g)
     }
 }
 
@@ -167,183 +167,165 @@ impl FrameSVGNode {
         });
         let mut bundle = BaseSVGBundle::new(element, entity);
 
-        // Create content elements
-        let mut content_clip_path_defs_element = SVGElement::new(SVGTag::Defs, id_generator);
-        let content_clip_path_defs_id = content_clip_path_defs_element.get_id();
+        let mut defs_element = SVGElement::new(SVGTag::Defs, id_generator);
+        let defs_id = defs_element.get_id();
         #[cfg(feature = "tracing")]
-        content_clip_path_defs_element.set_attribute(SVGAttribute::Name {
-            name: FrameSVGNode::create_element_name(
-                content_clip_path_defs_id,
-                String::from("content-defs"),
-                false,
-            ),
+        defs_element.set_attribute(SVGAttribute::Name {
+            name: FrameSVGNode::create_element_name(defs_id, String::from("defs"), false),
         });
-        let content_clip_path_defs_index = bundle.append_child(content_clip_path_defs_element);
+        let defs_index = bundle.append_child(defs_element);
 
+        // Create content elements
         let mut content_clip_path_element = SVGElement::new(SVGTag::ClipPath, id_generator);
         let content_clip_path_id = content_clip_path_element.get_id();
         #[cfg(feature = "tracing")]
         content_clip_path_element.set_attribute(SVGAttribute::Name {
             name: FrameSVGNode::create_element_name(
                 content_clip_path_id,
-                String::from("content-clip"),
+                String::from("content-clip-path"),
                 true,
             ),
         });
         let content_clip_path_index = bundle
-            .append_child_to(content_clip_path_defs_index, content_clip_path_element)
+            .append_child_to(defs_index, content_clip_path_element)
             .unwrap();
 
-        let mut content_clipped_shape_element = SVGElement::new(SVGTag::Rect, id_generator);
-        let content_clipped_shape_id = content_clipped_shape_element.get_id();
+        let mut content_clipped_rect_element = SVGElement::new(SVGTag::Rect, id_generator);
+        let content_clipped_rect_id = content_clipped_rect_element.get_id();
         #[cfg(feature = "tracing")]
-        content_clipped_shape_element.set_attribute(SVGAttribute::Name {
+        content_clipped_rect_element.set_attribute(SVGAttribute::Name {
             name: FrameSVGNode::create_element_name(
-                content_clipped_shape_id,
-                String::from("content-clipped-shape"),
+                content_clipped_rect_id,
+                String::from("content-clipped-rect"),
                 false,
             ),
         });
-        let content_clipped_shape_index = bundle
-            .append_child_to(content_clip_path_index, content_clipped_shape_element)
+        let content_clipped_rect_index = bundle
+            .append_child_to(content_clip_path_index, content_clipped_rect_element)
             .unwrap();
 
-        let mut content_wrapper = SVGElement::new(SVGTag::Group, id_generator);
-        let content_wrapper_id = content_wrapper.get_id();
+        let mut content_wrapper_g = SVGElement::new(SVGTag::Group, id_generator);
+        let content_wrapper_g_id = content_wrapper_g.get_id();
         #[cfg(feature = "tracing")]
-        content_wrapper.set_attribute(SVGAttribute::Name {
+        content_wrapper_g.set_attribute(SVGAttribute::Name {
             name: FrameSVGNode::create_element_name(
-                content_wrapper_id,
-                String::from("content"),
+                content_wrapper_g_id,
+                String::from("content-wrapper-g"),
                 false,
             ),
         });
-        content_wrapper.set_attribute(SVGAttribute::ClipPath {
+        content_wrapper_g.set_attribute(SVGAttribute::ClipPath {
             clip_path: content_clip_path_id,
         });
-        let content_wrapper_index = bundle.append_child(content_wrapper);
+        let content_wrapper_g_index = bundle.append_child(content_wrapper_g);
 
         // Create fill elements
-        let mut fill_clip_path_defs = SVGElement::new(SVGTag::Defs, id_generator);
-        let fill_clip_path_defs_id = fill_clip_path_defs.get_id();
-        #[cfg(feature = "tracing")]
-        fill_clip_path_defs.set_attribute(SVGAttribute::Name {
-            name: FrameSVGNode::create_element_name(
-                fill_clip_path_defs_id,
-                String::from("fill-defs"),
-                false,
-            ),
-        });
-        let fill_clip_path_defs_index = bundle
-            .append_child_to(content_wrapper_index, fill_clip_path_defs)
-            .unwrap();
-
         let mut fill_clip_path_element = SVGElement::new(SVGTag::ClipPath, id_generator);
         let fill_clip_path_id = fill_clip_path_element.get_id();
         #[cfg(feature = "tracing")]
         fill_clip_path_element.set_attribute(SVGAttribute::Name {
             name: FrameSVGNode::create_element_name(
                 fill_clip_path_id,
-                String::from("fill-clip"),
+                String::from("fill-clip-path"),
                 true,
             ),
         });
         let fill_clip_path_index = bundle
-            .append_child_to(fill_clip_path_defs_index, fill_clip_path_element)
+            .append_child_to(defs_index, fill_clip_path_element)
             .unwrap();
 
-        let mut fill_clipped_shape_element = SVGElement::new(SVGTag::Rect, id_generator);
-        let fill_clipped_shape_id = fill_clipped_shape_element.get_id();
+        let mut fill_clipped_path_element = SVGElement::new(SVGTag::Rect, id_generator);
+        let fill_clipped_path_id = fill_clipped_path_element.get_id();
         #[cfg(feature = "tracing")]
-        fill_clipped_shape_element.set_attribute(SVGAttribute::Name {
+        fill_clipped_path_element.set_attribute(SVGAttribute::Name {
             name: FrameSVGNode::create_element_name(
-                fill_clipped_shape_id,
-                String::from("fill-clipped-shape"),
+                fill_clipped_path_id,
+                String::from("fill-clipped-path"),
                 false,
             ),
         });
-        let fill_clipped_shape_index = bundle
-            .append_child_to(fill_clip_path_index, fill_clipped_shape_element)
+        let fill_clipped_path_index = bundle
+            .append_child_to(fill_clip_path_index, fill_clipped_path_element)
             .unwrap();
 
-        let mut fill_wrapper_element = SVGElement::new(SVGTag::Group, id_generator);
-        let fill_wrapper_id = fill_wrapper_element.get_id();
+        let mut fill_wrapper_g_element = SVGElement::new(SVGTag::Group, id_generator);
+        let fill_wrapper_g_id = fill_wrapper_g_element.get_id();
         #[cfg(feature = "tracing")]
-        fill_wrapper_element.set_attribute(SVGAttribute::Name {
-            name: FrameSVGNode::create_element_name(fill_wrapper_id, String::from("fill"), false),
+        fill_wrapper_g_element.set_attribute(SVGAttribute::Name {
+            name: FrameSVGNode::create_element_name(
+                fill_wrapper_g_id,
+                String::from("fill-wrapper-g"),
+                false,
+            ),
         });
-        fill_wrapper_element.set_attribute(SVGAttribute::ClipPath {
+        fill_wrapper_g_element.set_attribute(SVGAttribute::ClipPath {
             clip_path: fill_clip_path_id,
         });
-        let fill_wrapper_index = bundle
-            .append_child_to(content_wrapper_index, fill_wrapper_element)
+        let fill_wrapper_g_index = bundle
+            .append_child_to(content_wrapper_g_index, fill_wrapper_g_element)
             .unwrap();
 
         // Create children wrapper element
-        let mut children_wrapper = SVGElement::new(SVGTag::Group, id_generator);
-        let children_wrapper_id = children_wrapper.get_id();
+        let mut children_wrapper_g = SVGElement::new(SVGTag::Group, id_generator);
+        let children_wrapper_g_id = children_wrapper_g.get_id();
         #[cfg(feature = "tracing")]
-        children_wrapper.set_attribute(SVGAttribute::Name {
+        children_wrapper_g.set_attribute(SVGAttribute::Name {
             name: FrameSVGNode::create_element_name(
-                children_wrapper_id,
-                String::from("children"),
+                children_wrapper_g_id,
+                String::from("children-wrapper-g"),
                 false,
             ),
         });
-        let children_wrapper_index = bundle
-            .append_child_to(content_wrapper_index, children_wrapper)
+        let children_wrapper_g_index = bundle
+            .append_child_to(content_wrapper_g_index, children_wrapper_g)
             .unwrap();
 
         Self {
             bundle,
 
             // Content element references
-            content_clip_path_defs: ElementReference {
-                id: content_clip_path_defs_id,
-                index: content_clip_path_defs_index,
+            defs: ElementReference {
+                id: defs_id,
+                index: defs_index,
             },
             content_clip_path: ElementReference {
                 id: content_clip_path_id,
                 index: content_clip_path_index,
             },
-            content_clipped_shape: ElementReference {
-                id: content_clipped_shape_id,
-                index: content_clipped_shape_index,
+            content_clipped_rect: ElementReference {
+                id: content_clipped_rect_id,
+                index: content_clipped_rect_index,
             },
-            content_wrapper: ElementReference {
-                id: content_wrapper_id,
-                index: content_wrapper_index,
+            content_wrapper_g: ElementReference {
+                id: content_wrapper_g_id,
+                index: content_wrapper_g_index,
             },
 
             // Children element references
-            children_wrapper: ElementReference {
-                id: children_wrapper_id,
-                index: children_wrapper_index,
+            children_wrapper_g: ElementReference {
+                id: children_wrapper_g_id,
+                index: children_wrapper_g_index,
             },
 
             // Fill element references
-            fill_clip_path_defs: ElementReference {
-                id: fill_clip_path_defs_id,
-                index: fill_clip_path_defs_index,
-            },
             fill_clip_path: ElementReference {
                 id: fill_clip_path_id,
                 index: fill_clip_path_index,
             },
-            fill_clipped_shape: ElementReference {
-                id: fill_clipped_shape_id,
-                index: fill_clipped_shape_index,
+            fill_clipped_path: ElementReference {
+                id: fill_clipped_path_id,
+                index: fill_clipped_path_index,
             },
-            fill_wrapper: ElementReference {
-                id: fill_wrapper_id,
-                index: fill_wrapper_index,
+            fill_wrapper_g: ElementReference {
+                id: fill_wrapper_g_id,
+                index: fill_wrapper_g_index,
             },
         }
     }
 
     #[cfg(feature = "tracing")]
     fn create_element_name(id: ContinuousId, category: String, is_definition: bool) -> String {
-        let def_part = if is_definition { "def" } else { "" };
+        let def_part = if is_definition { "_def" } else { "" };
         format!("frame_{}_{}{}", category, id, def_part)
     }
 }
