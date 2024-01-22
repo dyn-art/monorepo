@@ -41,6 +41,7 @@ export const ToTransformSelection: React.FC<TProps> = (props) => {
 				if (selected.length > 0) {
 					setSelectedFrames(selected);
 					setSelectedFrameIndex(selected.length - 1);
+					setIsOpen(true);
 				} else {
 					setSelectedFrames([]);
 					setSelectedFrameIndex(null);

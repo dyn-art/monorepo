@@ -19,7 +19,6 @@ const ToDTIFPlugin: React.FC = () => {
 			type: 'plugin.message',
 			key: 'on-transform-status-update',
 			callback: async (instance, args) => {
-				console.log('OnTransformStatusUpdate', args);
 				switch (args.type) {
 					case 'Start':
 						setIsTransforming(true);
