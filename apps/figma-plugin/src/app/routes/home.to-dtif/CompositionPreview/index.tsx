@@ -54,7 +54,7 @@ export const CompositionPreview: React.FC<TProps> = (props) => {
 	}
 
 	return (
-		<ScrollArea className="mt-6">
+		<ScrollArea className="mt-4">
 			<div className="flex flex-row items-center gap-1 text-blue-400">
 				<FrameIcon className="h-4 w-4" />
 				<kbd className="bg-muted text-muted-foreground pointer-events-none inline-flex select-none items-center gap-1 rounded border px-1.5 font-mono text-[10px] font-medium opacity-100">
