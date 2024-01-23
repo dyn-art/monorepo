@@ -7,7 +7,9 @@ use glam::Mat3;
 use crate::core::modules::{
     composition::events::CoreInputEvent,
     node::components::{
-        bundles::{FrameNodeBundle, GroupNodeBundle, RectangleNodeBundle, TextNodeBundle},
+        bundles::{
+            FrameNodeBundle, GroupNodeBundle, PaintBundle, RectangleNodeBundle, TextNodeBundle,
+        },
         mixins::{AbsoluteTransformMixin, ChildrenMixin, FillMixin, RelativeTransformMixin},
     },
 };
@@ -104,7 +106,7 @@ impl DTIFProcessor {
                 world.entity_mut(node_entity).push_children(&new_paints);
             }
 
-            // Remove the temporary `ChildrenMixin` component.
+            // Remove the temporary `FillMixin` component.
             // Explanation:
             // After successfully establishing Bevy's internal parent-child relationships,
             // the `FillMixin` component, initially used to manage child entities
@@ -193,11 +195,20 @@ impl DTIFProcessor {
     ) -> Option<Entity> {
         dtif.paints.get(&paint_eid).map(|paint| {
             // Spawn paint
-            let paint_entity = world.spawn(paint.clone()).id();
+            let paint_entity = self.spawn_paint(world, paint);
             self.eid_to_entity.insert(paint_eid, paint_entity);
 
             return paint_entity;
         })
+    }
+
+    /// Spawns a DTIF paint into the ECS world.
+    fn spawn_paint(&self, world: &mut World, paint: &PaintBundle) -> Entity {
+        match paint {
+            PaintBundle::Solid(bundle) => world.spawn(bundle.clone()).id(),
+            PaintBundle::Image(bundle) => world.spawn(bundle.clone()).id(),
+            PaintBundle::Gradient(bundle) => world.spawn(bundle.clone()).id(),
+        }
     }
 
     // =========================================================================

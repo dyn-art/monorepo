@@ -4,11 +4,19 @@ use specta::Type;
 
 use super::{
     mixins::{
-        BlendMixin, ChildrenMixin, DimensionMixin, FillMixin, NodeCompositionMixin, NodeMetaMixin,
-        RectangleCornerMixin, RelativeTransformMixin,
+        BlendMixin, ChildrenMixin, DimensionMixin, FillMixin, ImageContentMixin,
+        NodeCompositionMixin, NodeMetaMixin, PaintCompositionMixin, RectangleCornerMixin,
+        RelativeTransformMixin,
     },
-    types::{Frame, Group, Node, NodeType, Rectangle, Text},
+    types::{
+        Frame, GradientPaint, Group, ImagePaint, Node, NodeType, Paint, PaintType, Rectangle,
+        SolidPaint, Text,
+    },
 };
+
+// =============================================================================
+// Node Bundle
+// =============================================================================
 
 #[derive(Serialize, Deserialize, Clone, Debug, Type)]
 #[serde(tag = "type")]
@@ -20,7 +28,7 @@ pub enum NodeBundle {
 }
 
 // =============================================================================
-// Frame
+// Frame Node Bundle
 // =============================================================================
 
 #[derive(Bundle, Debug, Serialize, Deserialize, Clone, Type)]
@@ -81,7 +89,7 @@ impl Default for FrameNodeBundle {
 }
 
 // =============================================================================
-// Group
+// Group Node Bundle
 // =============================================================================
 
 #[derive(Bundle, Debug, Serialize, Deserialize, Clone, Type)]
@@ -134,7 +142,7 @@ impl Default for GroupNodeBundle {
 }
 
 // =============================================================================
-// Rectangle
+// Rectangle Node Bundle
 // =============================================================================
 
 #[derive(Bundle, Debug, Serialize, Deserialize, Clone, Type)]
@@ -191,7 +199,7 @@ impl Default for RectangleNodeBundle {
 }
 
 // =============================================================================
-// Text
+// Text Node Bundle
 // =============================================================================
 
 #[derive(Bundle, Debug, Serialize, Deserialize, Clone, Type)]
@@ -239,6 +247,135 @@ impl Default for TextNodeBundle {
             dimension_mixin: DimensionMixin::default(),
             blend_mixin: BlendMixin::default(),
             fill_mixin: FillMixin::default(),
+        }
+    }
+}
+
+// =============================================================================
+// Paint Bundle
+// =============================================================================
+
+#[derive(Serialize, Deserialize, Clone, Debug, Type)]
+#[serde(tag = "type")]
+pub enum PaintBundle {
+    Solid(SolidPaintBundle),
+    Image(ImagePaintBundle),
+    Gradient(GradientPaintBundle),
+}
+
+// =============================================================================
+// Solid Paint Bundle
+// =============================================================================
+
+#[derive(Bundle, Debug, Serialize, Deserialize, Clone, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct SolidPaintBundle {
+    #[serde(default = "default_solid_paint_bundle")]
+    pub paint: Paint,
+
+    #[serde(flatten)]
+    pub solid: SolidPaint,
+
+    #[serde(default)]
+    pub composition_mixin: PaintCompositionMixin,
+
+    #[serde(default)]
+    pub blend_mixin: BlendMixin,
+}
+
+#[inline]
+fn default_solid_paint_bundle() -> Paint {
+    Paint {
+        paint_type: PaintType::Solid,
+    }
+}
+
+impl Default for SolidPaintBundle {
+    fn default() -> Self {
+        Self {
+            paint: default_solid_paint_bundle(),
+            solid: SolidPaint::default(),
+            composition_mixin: PaintCompositionMixin::default(),
+            blend_mixin: BlendMixin::default(),
+        }
+    }
+}
+
+// =============================================================================
+// Image Paint Bundle
+// =============================================================================
+
+#[derive(Bundle, Debug, Serialize, Deserialize, Clone, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct ImagePaintBundle {
+    #[serde(default = "default_image_paint_bundle")]
+    pub paint: Paint,
+
+    #[serde(flatten)]
+    pub image: ImagePaint,
+
+    pub image_content: ImageContentMixin,
+
+    #[serde(default)]
+    pub composition_mixin: PaintCompositionMixin,
+
+    #[serde(default)]
+    pub blend_mixin: BlendMixin,
+}
+
+#[inline]
+fn default_image_paint_bundle() -> Paint {
+    Paint {
+        paint_type: PaintType::Image,
+    }
+}
+
+impl Default for ImagePaintBundle {
+    fn default() -> Self {
+        Self {
+            paint: default_image_paint_bundle(),
+            image: ImagePaint::default(),
+            image_content: ImageContentMixin::default(),
+            composition_mixin: PaintCompositionMixin::default(),
+            blend_mixin: BlendMixin::default(),
+        }
+    }
+}
+
+// =============================================================================
+// Gradient Paint Bundle
+// =============================================================================
+
+#[derive(Bundle, Debug, Serialize, Deserialize, Clone, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct GradientPaintBundle {
+    #[serde(default = "default_gradient_paint_bundle")]
+    pub paint: Paint,
+
+    #[serde(flatten)]
+    pub gradient: GradientPaint,
+
+    #[serde(default)]
+    pub composition_mixin: PaintCompositionMixin,
+
+    #[serde(default)]
+    pub blend_mixin: BlendMixin,
+}
+
+#[inline]
+fn default_gradient_paint_bundle() -> Paint {
+    Paint {
+        paint_type: PaintType::Gradient,
+    }
+}
+
+impl Default for GradientPaintBundle {
+    fn default() -> Self {
+        Self {
+            paint: default_gradient_paint_bundle(),
+            gradient: GradientPaint::default(),
+            composition_mixin: PaintCompositionMixin::default(),
+            blend_mixin: BlendMixin::default(),
         }
     }
 }

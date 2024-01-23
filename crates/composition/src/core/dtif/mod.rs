@@ -9,7 +9,7 @@ use super::modules::{
         events::CoreInputEvent,
         resources::{composition::ViewBox, font_cache::font::Font},
     },
-    node::components::{bundles::NodeBundle, mixins::Paint},
+    node::components::bundles::{NodeBundle, PaintBundle},
 };
 
 pub mod dtif_processor;
@@ -47,7 +47,7 @@ pub struct DTIFComposition {
     /// A mapping of paint identifiers to their corresponding paints within the composition.
     /// Note: Planned to directly use `Entity` as a key once the referenced serde issue is resolved.
     ///       https://github.com/serde-rs/serde/issues/1183
-    pub paints: HashMap<String, Paint>,
+    pub paints: HashMap<String, PaintBundle>,
 
     /// A mapping of font identifiers to their corresponding font data within the composition.
     /// Note: Planned to directly use `u64` as a key once the referenced serde issue is resolved.

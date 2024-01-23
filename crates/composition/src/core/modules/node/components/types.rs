@@ -1,4 +1,5 @@
 use bevy_ecs::component::Component;
+use glam::Mat3;
 use serde::{Deserialize, Serialize};
 use specta::Type;
 
@@ -18,7 +19,7 @@ pub struct Root;
 // =============================================================================
 
 /// Represents a basic node in the composition.
-#[derive(Component, Serialize, Deserialize, Clone, Debug, Type)]
+#[derive(Component, Serialize, Deserialize, Clone, Debug, Default, Type)]
 pub struct Node {
     /// Represents the specific type of the node, such as `Rectangle`, `Ellipse`, `Star`, etc.
     /// This field is redundant but neccessary to distinguish different nodes in the rendering process,
@@ -26,14 +27,6 @@ pub struct Node {
     /// Note that the NodeType should be equivalent to the 'NodeBundle' enum
     /// and when creating a new `NodeBundle` always use the default of that specific bundle!
     pub node_type: NodeType,
-}
-
-impl Default for Node {
-    fn default() -> Self {
-        Self {
-            node_type: NodeType::None,
-        }
-    }
 }
 
 #[derive(Default, Serialize, Deserialize, Clone, Debug, Type, Eq, PartialEq)]
@@ -54,7 +47,7 @@ pub enum NodeType {
 /// It functions similarly to an HTML `<div>` element.
 /// This is distinct from a `GroupNode`, which is more akin to a folder for layers in its use and functionality.
 #[derive(Component, Serialize, Deserialize, Clone, Default, Debug, Type)]
-#[serde(rename_all = "camelCase")]
+// TODO: Rename to "FrameNode"
 pub struct Frame {
     #[serde(default)]
     _frame: Option<()>,
@@ -62,7 +55,7 @@ pub struct Frame {
     /// Indicates whether the frame clips its content to its bounding box.
     /// When set to `true`, content that extends beyond the frame's boundaries will be clipped.
     /// When `false`, content can extend beyond the frame's boundaries without being clipped.
-    #[serde(default = "default_clip_content")]
+    #[serde(default = "default_clip_content", rename = "clipContent")]
     clip_content: bool,
 }
 
@@ -84,6 +77,7 @@ fn default_clip_content() -> bool {
 /// As a result, while it is possible to move or resize a `Group`, be aware that its
 /// position and size are subject to change in response to modifications of its content.
 #[derive(Component, Serialize, Deserialize, Clone, Default, Debug, Type)]
+// TODO: Rename to "GroupNode"
 pub struct Group {
     #[serde(default)]
     _group: Option<()>,
@@ -97,6 +91,7 @@ pub struct Group {
 /// It is a fundamental building block used to create and manipulate rectangular shapes
 /// within the composition.
 #[derive(Component, Serialize, Deserialize, Clone, Default, Debug, Type)]
+// TODO: Rename to "RectangleNode"
 pub struct Rectangle {
     #[serde(default)]
     _rectangle: Option<()>,
@@ -109,7 +104,7 @@ pub struct Rectangle {
 /// Represents a basic shape node for an ellipse.
 /// Note that a circle is a special case of an ellipse where the width equals the height.
 #[derive(Component, Serialize, Deserialize, Clone, Default, Debug, Type)]
-#[serde(rename_all = "camelCase")]
+// TODO: Rename to "EllipseNode"
 pub struct Ellipse {
     #[serde(default)]
     _ellipse: Option<()>,
@@ -117,7 +112,7 @@ pub struct Ellipse {
     /// Contains the arc data for the ellipse,
     /// which includes the starting angle, ending angle, and the inner radius ratio.
     /// These properties are used to create arcs and donuts shapes.
-    #[serde(default)]
+    #[serde(default, rename = "arcData")]
     pub arc_data: EllipseArcData,
 }
 
@@ -144,18 +139,19 @@ pub struct EllipseArcData {
 
 /// Represents a basic shape node for a star with a set number of points.
 #[derive(Component, Serialize, Deserialize, Clone, Default, Debug, Type)]
-#[serde(rename_all = "camelCase")]
+// TODO: Rename to "StarNode"
 pub struct Star {
     #[serde(default)]
     _star: Option<()>,
 
     /// The number of "spikes", or outer points of the star.
     /// This value must be an integer greater than or equal to 3.
-    #[serde(default = "default_star_point_count")]
+    #[serde(default = "default_star_point_count", rename = "pointCount")]
     pub point_count: u8,
 
     /// The ratio of the inner radius to the outer radius of the star.
     /// This value is used to define the sharpness of the star's points.
+    #[serde(rename = "innerRadiusRatio")]
     pub inner_radius_ratio: f32,
 }
 
@@ -170,14 +166,14 @@ fn default_star_point_count() -> u8 {
 
 /// Represents a basic shape node for a regular convex polygon with three or more sides.
 #[derive(Component, Serialize, Deserialize, Clone, Default, Debug, Type)]
-#[serde(rename_all = "camelCase")]
+// TODO: Rename to "PolygonNode"
 pub struct Polygon {
     #[serde(default)]
     _polygon: Option<()>,
 
     /// The number of sides of the polygon.
     /// This value must be an integer greater than or equal to 3.
-    #[serde(default = "default_polygon_point_count")]
+    #[serde(default = "default_polygon_point_count", rename = "pointCount")]
     pub point_count: u8,
 }
 
@@ -192,7 +188,7 @@ fn default_polygon_point_count() -> u8 {
 
 /// Represents a text node with customizable style and layout properties.
 #[derive(Component, Serialize, Deserialize, Clone, Default, Debug, Type)]
-#[serde(rename_all = "camelCase")]
+// TODO: Rename to "TextNode"
 pub struct Text {
     #[serde(default)]
     _text: Option<()>,
@@ -201,15 +197,15 @@ pub struct Text {
     pub segments: Vec<TextSegment>,
 
     /// Horizontal alignment of the text within its container.
-    #[serde(default)]
+    #[serde(default, rename = "horizontalTextAlignment")]
     pub horizontal_text_alignment: HorizontalTextAlignment,
 
     /// Vertical alignment of the text within its container.
-    #[serde(default)]
+    #[serde(default, rename = "verticalTextAlignment")]
     pub vertical_text_alignment: VerticalTextAlignment,
 
     /// Behavior of text line breaking at the bounds of its container.
-    #[serde(default)]
+    #[serde(default, rename = "linebreakBehavior")]
     pub linebreak_behavior: BreakLineOn,
 }
 
@@ -301,4 +297,119 @@ pub enum BreakLineOn {
     AnyCharacter,
     /// Disables automatic line breaking. Respects explicit line breaks like '\n'.
     NoWrap,
+}
+
+// =============================================================================
+// Paint
+// =============================================================================
+
+/// Represents a basic paint in the composition.
+#[derive(Component, Serialize, Deserialize, Clone, Debug, Type)]
+pub struct Paint {
+    /// Represents the specific type of the paint, such as `Solid`, `Image`, `Gradient`, etc.
+    /// This field is redundant but neccessary to distinguish different paints in the rendering process,
+    /// without a big overhead like a separate system for each paint type/variant.
+    /// Note that the PaintType should be equivalent to the 'PaintBundle' enum
+    /// and when creating a new `PaintBundle` always use the default of that specific bundle!
+    pub paint_type: PaintType,
+}
+
+#[derive(Default, Serialize, Deserialize, Clone, Debug, Type, Eq, PartialEq)]
+pub enum PaintType {
+    #[default]
+    None,
+    Solid,
+    Gradient,
+    Image,
+}
+
+// =============================================================================
+// Solid Paint
+// =============================================================================
+
+#[derive(Component, Serialize, Deserialize, Clone, Default, Debug, Type)]
+pub struct SolidPaint {
+    #[serde(default)]
+    _solid_paint: Option<()>,
+
+    /// The color of the paint, represented as an RGB array
+    /// where each component ranges from 0 to 255.
+    pub color: (u8, u8, u8),
+}
+
+// =============================================================================
+// Image Paint
+// =============================================================================
+
+#[derive(Component, Serialize, Deserialize, Clone, Default, Debug, Type)]
+pub struct ImagePaint {
+    #[serde(default)]
+    _image_paint: Option<()>,
+
+    /// Defines the scale mode of the image.
+    #[serde(default, rename = "scaleMode")]
+    pub scale_mode: ImagePaintScaleMode,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, Type)]
+#[serde(tag = "type")]
+pub enum ImagePaintScaleMode {
+    /// Fills the area completely with the image.
+    Fill { rotation: f32 },
+
+    /// Fits the image within the area while maintaining its aspect ratio.
+    Fit { rotation: f32 },
+
+    /// Crops the image to fill the area.
+    Crop { transform: Mat3 },
+
+    /// Tiles the image within the area.
+    #[serde(rename_all = "camelCase")]
+    Tile { rotation: f32, scaling_factor: f32 },
+}
+
+impl Default for ImagePaintScaleMode {
+    fn default() -> Self {
+        Self::Fill { rotation: 0.0 }
+    }
+}
+
+// =============================================================================
+// Gradient Paint
+// =============================================================================
+
+#[derive(Component, Serialize, Deserialize, Clone, Default, Debug, Type)]
+pub struct GradientPaint {
+    #[serde(default)]
+    _gradient_paint: Option<()>,
+
+    /// Specifies the variant of the gradient.
+    #[serde(default)]
+    variant: GradientVariant,
+
+    /// Transformation matrix for the gradient.
+    #[serde(default)]
+    transform: Mat3,
+
+    /// A list of color stops defining the gradient.
+    #[serde(rename = "gradientStops")]
+    gradient_stops: Vec<ColorStop>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, Type)]
+pub struct ColorStop {
+    /// The position of the color stop in the gradient, ranging from 0.0 to 1.0.
+    position: f32,
+
+    /// The color of the stop, represented as an RGB array.
+    color: (u8, u8, u8),
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, Default, Type)]
+pub enum GradientVariant {
+    #[default]
+    Linear,
+    Radial,
+    Angular,
+    Diamond,
 }

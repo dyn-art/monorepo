@@ -298,65 +298,53 @@ impl Default for FillMixin {
     }
 }
 
+// =============================================================================
+// Paint Composition Mixin
+// =============================================================================
+
+/// Contains properties related to the composition settings of a paint.
 #[derive(Component, Serialize, Deserialize, Clone, Debug, Type)]
-#[serde(tag = "type")]
-pub enum Paint {
-    /// Represents a solid color paint.
-    Solid(SolidPaint),
-
-    /// Represents an image-based paint.
-    Image(ImagePaint),
-
-    // Represents a gradient paint.
-    Gradient(GradientPaint),
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug, Type)]
 #[serde(rename_all = "camelCase")]
-pub struct BasePaint {
-    /// The opacity of the paint,
-    /// ranging from 0.0 (completely transparent) to 1.0 (completely opaque).
-    #[serde(default = "default_opacity")]
-    pub opacity: f32,
-
-    /// The blend mode used when applying the paint,
-    /// which determines how the paint's color blends with colors underneath it.
-    #[serde(default)]
-    pub blend_mode: BlendMode,
-
-    /// Determines whether the paint is visible.
+pub struct PaintCompositionMixin {
+    /// Determines the visibility of the paint.
     #[serde(default = "default_is_visible")]
     pub is_visible: bool,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug, Type)]
-pub struct SolidPaint {
-    #[serde(flatten)]
-    pub base_paint: BasePaint,
-
-    /// The color of the paint, represented as an RGB array
-    /// where each component ranges from 0 to 255.
-    pub color: (u8, u8, u8),
+impl Default for PaintCompositionMixin {
+    fn default() -> Self {
+        Self {
+            is_visible: default_is_visible(),
+        }
+    }
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug, Type)]
-#[serde(rename_all = "camelCase")]
-pub struct ImagePaint {
-    #[serde(flatten)]
-    pub base_paint: BasePaint,
+// =============================================================================
+// Image Content Mixin
+// =============================================================================
 
-    /// Defines the scale mode of the image.
-    #[serde(default)]
-    pub scale_mode: ImagePaintScaleMode,
-
+#[derive(Component, Serialize, Deserialize, Clone, Debug, Type)]
+pub struct ImageContentMixin {
     /// The width of the image in pixels.
-    width: f32,
+    pub width: f32,
 
     /// The height of the image in pixels.
-    height: f32,
+    pub height: f32,
 
     /// The actual content of the image.
-    content: ImageContent,
+    pub content: ImageContent,
+}
+
+impl Default for ImageContentMixin {
+    fn default() -> Self {
+        Self {
+            width: 0.0,
+            height: 0.0,
+            content: ImageContent::Binary {
+                content: Vec::new(),
+            },
+        }
+    }
 }
 
 #[derive(Serialize, Deserialize, Eq, PartialEq, Hash, Clone, Debug, Type)]
@@ -371,64 +359,127 @@ pub enum ImageContent {
     Url { url: String },
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug, Type)]
-#[serde(tag = "type")]
-pub enum ImagePaintScaleMode {
-    /// Fills the area completely with the image.
-    Fill { rotation: f32 },
+// TODO: REMOVE
+//
+// #[derive(Component, Serialize, Deserialize, Clone, Debug, Type)]
+// #[serde(tag = "type")]
+// pub enum Paint {
+//     /// Represents a solid color paint.
+//     Solid(SolidPaint),
 
-    /// Fits the image within the area while maintaining its aspect ratio.
-    Fit { rotation: f32 },
+//     /// Represents an image-based paint.
+//     Image(ImagePaint),
 
-    /// Crops the image to fill the area.
-    Crop { transform: Mat3 },
+//     // Represents a gradient paint.
+//     Gradient(GradientPaint),
+// }
 
-    /// Tiles the image within the area.
-    #[serde(rename_all = "camelCase")]
-    Tile { rotation: f32, scaling_factor: f32 },
-}
+// #[derive(Serialize, Deserialize, Clone, Debug, Type)]
+// #[serde(rename_all = "camelCase")]
+// pub struct BasePaint {
+//     /// The opacity of the paint,
+//     /// ranging from 0.0 (completely transparent) to 1.0 (completely opaque).
+//     #[serde(default = "default_opacity")]
+//     pub opacity: f32,
 
-impl Default for ImagePaintScaleMode {
-    fn default() -> Self {
-        Self::Fill { rotation: 0.0 }
-    }
-}
+//     /// The blend mode used when applying the paint,
+//     /// which determines how the paint's color blends with colors underneath it.
+//     #[serde(default)]
+//     pub blend_mode: BlendMode,
 
-#[derive(Serialize, Deserialize, Clone, Debug, Type)]
-#[serde(rename_all = "camelCase")]
-pub struct GradientPaint {
-    #[serde(flatten)]
-    pub base_paint: BasePaint,
+//     /// Determines whether the paint is visible.
+//     #[serde(default = "default_is_visible")]
+//     pub is_visible: bool,
+// }
 
-    /// Specifies the variant of the gradient.
-    #[serde(default)]
-    variant: GradientVariant,
+// #[derive(Serialize, Deserialize, Clone, Debug, Type)]
+// pub struct SolidPaint {
+//     #[serde(flatten)]
+//     pub base_paint: BasePaint,
 
-    /// Transformation matrix for the gradient.
-    #[serde(default)]
-    transform: Mat3,
+//     /// The color of the paint, represented as an RGB array
+//     /// where each component ranges from 0 to 255.
+//     pub color: (u8, u8, u8),
+// }
 
-    /// A list of color stops defining the gradient.
-    gradient_stops: Vec<ColorStop>,
-}
+// #[derive(Serialize, Deserialize, Clone, Debug, Type)]
+// #[serde(rename_all = "camelCase")]
+// pub struct ImagePaint {
+//     #[serde(flatten)]
+//     pub base_paint: BasePaint,
 
-#[derive(Serialize, Deserialize, Clone, Debug, Type)]
-pub struct ColorStop {
-    /// The position of the color stop in the gradient, ranging from 0.0 to 1.0.
-    position: f32,
+//     /// Defines the scale mode of the image.
+//     #[serde(default)]
+//     pub scale_mode: ImagePaintScaleMode,
 
-    /// The color of the stop, represented as an RGB array.
-    color: (u8, u8, u8),
-}
+//     /// The width of the image in pixels.
+//     pub width: f32,
 
-#[derive(Serialize, Deserialize, Clone, Debug, Default, Type)]
-pub enum GradientVariant {
-    #[default]
-    Linear,
-    Radial,
-    Angular,
-    Diamond,
-}
+//     /// The height of the image in pixels.
+//     pub height: f32,
+
+//     /// The actual content of the image.
+//     pub content: ImageContent,
+// }
+
+// #[derive(Serialize, Deserialize, Clone, Debug, Type)]
+// #[serde(tag = "type")]
+// pub enum ImagePaintScaleMode {
+//     /// Fills the area completely with the image.
+//     Fill { rotation: f32 },
+
+//     /// Fits the image within the area while maintaining its aspect ratio.
+//     Fit { rotation: f32 },
+
+//     /// Crops the image to fill the area.
+//     Crop { transform: Mat3 },
+
+//     /// Tiles the image within the area.
+//     #[serde(rename_all = "camelCase")]
+//     Tile { rotation: f32, scaling_factor: f32 },
+// }
+
+// impl Default for ImagePaintScaleMode {
+//     fn default() -> Self {
+//         Self::Fill { rotation: 0.0 }
+//     }
+// }
+
+// #[derive(Serialize, Deserialize, Clone, Debug, Type)]
+// #[serde(rename_all = "camelCase")]
+// pub struct GradientPaint {
+//     #[serde(flatten)]
+//     pub base_paint: BasePaint,
+
+//     /// Specifies the variant of the gradient.
+//     #[serde(default)]
+//     variant: GradientVariant,
+
+//     /// Transformation matrix for the gradient.
+//     #[serde(default)]
+//     transform: Mat3,
+
+//     /// A list of color stops defining the gradient.
+//     gradient_stops: Vec<ColorStop>,
+// }
+
+// #[derive(Serialize, Deserialize, Clone, Debug, Type)]
+// pub struct ColorStop {
+//     /// The position of the color stop in the gradient, ranging from 0.0 to 1.0.
+//     position: f32,
+
+//     /// The color of the stop, represented as an RGB array.
+//     color: (u8, u8, u8),
+// }
+
+// #[derive(Serialize, Deserialize, Clone, Debug, Default, Type)]
+// pub enum GradientVariant {
+//     #[default]
+//     Linear,
+//     Radial,
+//     Angular,
+//     Diamond,
+// }
 
 // =============================================================================
 // Effects
