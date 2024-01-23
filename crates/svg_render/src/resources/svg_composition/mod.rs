@@ -122,7 +122,6 @@ impl SVGCompositionRes {
         entity: Entity,
         initial_changes: &[PaintMixinChange],
     ) -> Option<Box<dyn SVGPaint>> {
-        log::info!("Create Paint: {:?} - {:#?}", paint_type, initial_changes);
         match paint_type {
             // Handle solid paint
             PaintType::Solid => Some(Box::new(SolidSVGPaint::new(entity, &mut self.id_generator))),
