@@ -33,7 +33,7 @@ export class Transformer {
 	private _paintsFailedToTransform: TToTransformPaint[] = [];
 
 	// DTIF Paints
-	public readonly paints = new Map<number, COMP.Paint>();
+	public readonly paints = new Map<number, COMP.PaintBundle>();
 
 	// Fonts
 	private _toTransformFonts: TToTransformFont[] = [];

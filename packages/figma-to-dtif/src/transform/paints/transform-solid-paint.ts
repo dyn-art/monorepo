@@ -2,12 +2,16 @@ import type { COMP } from '@dyn/dtif';
 
 import { mapFigmaBlendModeToDTIF, mapFigmaRGBToDTIF } from '../../utils';
 
-export function transformSolidPaint(paint: SolidPaint): { type: 'Solid' } & COMP.SolidPaint {
+export function transformSolidPaint(paint: SolidPaint): { type: 'Solid' } & COMP.SolidPaintBundle {
 	return {
 		type: 'Solid',
-		blendMode: mapFigmaBlendModeToDTIF(paint.blendMode),
+		compositionMixin: {
+			isVisible: paint.visible ?? true
+		},
 		color: mapFigmaRGBToDTIF(paint.color),
-		opacity: paint.opacity ?? 1,
-		isVisible: paint.visible ?? true
+		blendMixin: {
+			blendMode: mapFigmaBlendModeToDTIF(paint.blendMode),
+			opacity: paint.opacity ?? 1
+		}
 	};
 }

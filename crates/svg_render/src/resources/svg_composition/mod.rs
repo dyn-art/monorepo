@@ -2,13 +2,14 @@ use std::{collections::HashMap, sync::mpsc::Sender};
 
 use bevy_ecs::{entity::Entity, system::Resource};
 use dyn_composition::core::{
-    modules::node::components::types::{NodeType, PaintType},
+    modules::node::components::types::{ImagePaintScaleMode, NodeType, PaintType},
     utils::continuous_id::ContinuousId,
 };
 
 use crate::{
     element_change::ElementChange,
     events::output_event::{ElementChangeEvent, SVGRenderOutputEvent},
+    mixin_change::PaintMixinChange,
 };
 
 use self::{
@@ -96,11 +97,12 @@ impl SVGCompositionRes {
         &mut self,
         entity: Entity,
         paint_type: &PaintType,
+        inital_changes: &[PaintMixinChange],
         maybe_parent_id: &Option<Entity>,
     ) -> Option<&mut Box<dyn SVGPaint>> {
         // Create paint
         if !self.bundles.contains_key(&entity) {
-            match self.create_paint(paint_type, entity.clone()) {
+            match self.create_paint(paint_type, entity.clone(), inital_changes) {
                 Some(new_paint) => {
                     self.insert_bundle(entity, SVGBundleVariant::Paint(new_paint), maybe_parent_id);
                 }
@@ -118,10 +120,30 @@ impl SVGCompositionRes {
         &mut self,
         paint_type: &PaintType,
         entity: Entity,
+        initial_changes: &[PaintMixinChange],
     ) -> Option<Box<dyn SVGPaint>> {
+        log::info!("Create Paint: {:?} - {:#?}", paint_type, initial_changes);
         match paint_type {
+            // Handle solid paint
             PaintType::Solid => Some(Box::new(SolidSVGPaint::new(entity, &mut self.id_generator))),
-            PaintType::Image => None, // TODO: Can't just do Image as there are different Image Paint variants
+
+            // Handle image paint
+            PaintType::Image => initial_changes.iter().find_map(|change| {
+                if let PaintMixinChange::ImagePaint(paint) = change {
+                    return match paint.scale_mode {
+                        ImagePaintScaleMode::Fill { .. } => Some(Box::new(ImageFillSVGPaint::new(
+                            entity,
+                            &mut self.id_generator,
+                        ))
+                            as Box<dyn SVGPaint>),
+                        _ => None,
+                    };
+                } else {
+                    return None;
+                }
+            }),
+
+            // Handle other cases
             _ => None,
         }
     }

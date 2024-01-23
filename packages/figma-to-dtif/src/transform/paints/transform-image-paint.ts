@@ -12,18 +12,20 @@ export async function transformImagePaint(
 	paint: ImagePaint,
 	nodeIds: SceneNode['id'][],
 	config: TTransformImagePaintConfig
-): Promise<{ type: 'Image' } & COMP.ImagePaint> {
-	const { content, size } = await resolveImage(paint, nodeIds, config);
+): Promise<{ type: 'Image' } & COMP.ImagePaintBundle> {
+	const imageContent = await resolveImage(paint, nodeIds, config);
 
 	return {
 		type: 'Image',
-		content,
+		compositionMixin: {
+			isVisible: paint.visible ?? true
+		},
+		imageContent,
 		scaleMode: resolveScaleMode(paint),
-		width: size.width,
-		height: size.height,
-		blendMode: mapFigmaBlendModeToDTIF(paint.blendMode),
-		opacity: paint.opacity ?? 1,
-		isVisible: paint.visible ?? true
+		blendMixin: {
+			blendMode: mapFigmaBlendModeToDTIF(paint.blendMode),
+			opacity: paint.opacity ?? 1
+		}
 	};
 }
 
@@ -31,7 +33,7 @@ async function resolveImage(
 	paint: ImagePaint,
 	nodeIds: SceneNode['id'][],
 	config: TTransformImagePaintConfig
-): Promise<{ content: COMP.ImagePaint['content']; size: { width: number; height: number } }> {
+): Promise<COMP.ImageContentMixin> {
 	const imageHash = paint.imageHash;
 	if (imageHash == null) {
 		throw new ExportImagePaintException(nodeIds, `No valid image hash found!`);
@@ -39,7 +41,7 @@ async function resolveImage(
 
 	const { size, content: binary } = await exportFigmaImageData(imageHash, nodeIds);
 
-	let content: COMP.ImagePaint['content'];
+	let content: COMP.ImageContentMixin['content'];
 	if (config.export.mode === 'External') {
 		const response = await config.export.uploadData(binary, { key: imageHash });
 		content = {
@@ -53,7 +55,11 @@ async function resolveImage(
 		};
 	}
 
-	return { content, size };
+	return {
+		width: size.width,
+		height: size.height,
+		content
+	};
 }
 
 function resolveScaleMode(paint: ImagePaint): COMP.ImagePaint['scaleMode'] {

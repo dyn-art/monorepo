@@ -63,6 +63,7 @@ fn process_paint(
     let maybe_paint = svg_composition.get_or_create_paint(
         entity,
         &changed_paint.paint_type,
+        &changed_paint.changes,
         &changed_paint.parent_id,
     );
 

@@ -5,18 +5,22 @@ import { mapFigmaBlendModeToDTIF, mapFigmaRGBToDTIF, mapFigmaTransformToMat3 } f
 
 export function transformGradientPaint(
 	paint: GradientPaint
-): { type: 'Gradient' } & COMP.GradientPaint {
+): { type: 'Gradient' } & COMP.GradientPaintBundle {
 	return {
 		type: 'Gradient',
+		compositionMixin: {
+			isVisible: paint.visible ?? true
+		},
 		variant: mapFigmaGradientTypeToDTIF(paint.type),
 		gradientStops: paint.gradientStops.map((stop) => ({
 			color: mapFigmaRGBToDTIF(stop.color),
 			position: stop.position
 		})),
 		transform: mapFigmaTransformToMat3(paint.gradientTransform),
-		blendMode: mapFigmaBlendModeToDTIF(paint.blendMode),
-		opacity: paint.opacity ?? 1,
-		isVisible: paint.visible ?? true
+		blendMixin: {
+			blendMode: mapFigmaBlendModeToDTIF(paint.blendMode),
+			opacity: paint.opacity ?? 1
+		}
 	};
 }
 

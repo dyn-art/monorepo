@@ -9,7 +9,7 @@ import { transformSolidPaint } from './transform-solid-paint';
 export async function transformPaint(
 	toTransformPaint: TToTransformPaint,
 	config: TTransformPaintConfig
-): Promise<COMP.Paint> {
+): Promise<COMP.PaintBundle> {
 	const paint = toTransformPaint.paint;
 	switch (paint.type) {
 		case 'SOLID':
