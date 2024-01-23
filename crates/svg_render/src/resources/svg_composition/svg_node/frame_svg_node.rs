@@ -3,7 +3,7 @@ use dyn_composition::core::utils::continuous_id::ContinuousId;
 
 use crate::{
     events::output_event::ElementChangeEvent,
-    mixin_change::MixinChange,
+    mixin_change::NodeMixinChange,
     resources::{
         changed_components::ChangedNode,
         svg_composition::{
@@ -65,7 +65,7 @@ impl SVGNode for FrameSVGNode {
     fn apply_node_change(&mut self, changed_node: &ChangedNode) {
         for change in &changed_node.changes {
             match change {
-                MixinChange::Dimension(mixin) => {
+                NodeMixinChange::Dimension(mixin) => {
                     self.bundle.get_root_mut().set_attributes(vec![
                         SVGAttribute::Width {
                             width: mixin.width,
@@ -103,14 +103,14 @@ impl SVGNode for FrameSVGNode {
                             },
                         ]);
                 }
-                MixinChange::RelativeTransform(mixin) => {
+                NodeMixinChange::RelativeTransform(mixin) => {
                     self.bundle.get_root_mut().set_attributes(vec![
                         (SVGAttribute::Transform {
                             transform: mat3_to_svg_transform(mixin.relative_transform.0),
                         }),
                     ]);
                 }
-                MixinChange::Blend(mixin) => {
+                NodeMixinChange::Blend(mixin) => {
                     let root_element = self.bundle.get_root_mut();
                     root_element.set_attributes(vec![SVGAttribute::Opacity {
                         opacity: mixin.opacity,
@@ -119,7 +119,7 @@ impl SVGNode for FrameSVGNode {
                         blend_mode: map_blend_mode(&mixin.blend_mode),
                     }]);
                 }
-                MixinChange::Composition(mixin) => {
+                NodeMixinChange::NodeComposition(mixin) => {
                     self.bundle
                         .get_root_mut()
                         .set_styles(vec![SVGStyle::Display {
@@ -130,7 +130,7 @@ impl SVGNode for FrameSVGNode {
                             },
                         }]);
                 }
-                MixinChange::Children(mixin) => {
+                NodeMixinChange::Children(mixin) => {
                     self.bundle
                         .get_child_mut(self.children_wrapper_g.index)
                         .unwrap()

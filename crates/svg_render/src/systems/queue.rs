@@ -5,7 +5,7 @@ use dyn_composition::core::modules::node::components::types::NodeType;
 
 use crate::{
     events::output_event::ElementChangeEvent,
-    mixin_change::{MixinChange, MixinChangeChildrenMixin},
+    mixin_change::{MixinChangeChildrenMixin, NodeMixinChange},
     resources::{
         changed_components::{ChangedComponentsRes, ChangedNode, ChangedPaint},
         svg_composition::SVGCompositionRes,
@@ -60,8 +60,11 @@ fn process_paint(
     element_change_events: &mut Vec<ElementChangeEvent>,
 ) {
     // Attempt to get or create the paint associated with the entity
-    let maybe_paint =
-        svg_composition.get_or_create_paint(entity, &changed_paint.paint, &changed_paint.parent_id);
+    let maybe_paint = svg_composition.get_or_create_paint(
+        entity,
+        &changed_paint.paint_type,
+        &changed_paint.parent_id,
+    );
 
     // Apply collected changes to the SVG paint and drain changes
     if let Some(svg_paint) = maybe_paint {
@@ -170,9 +173,9 @@ fn build_branch<'a>(
 }
 
 /// Finds children mixin change from a list of changes.
-fn find_children_mixin(changes: &[MixinChange]) -> Option<&MixinChangeChildrenMixin> {
+fn find_children_mixin(changes: &[NodeMixinChange]) -> Option<&MixinChangeChildrenMixin> {
     changes.iter().find_map(|change| match change {
-        MixinChange::Children(children_mixin) => Some(children_mixin),
+        NodeMixinChange::Children(children_mixin) => Some(children_mixin),
         _ => None,
     })
 }

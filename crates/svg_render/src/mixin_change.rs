@@ -1,25 +1,29 @@
 use dyn_composition::core::modules::node::components::mixins::{
-    BlendMixin, ChildrenMixin, DimensionMixin, FillMixin, NodeCompositionMixin, PathMixin,
-    RectangleCornerMixin, RelativeTransformMixin,
+    BlendMixin, ChildrenMixin, DimensionMixin, FillMixin, ImageContentMixin, NodeCompositionMixin,
+    PaintCompositionMixin, PathMixin, RectangleCornerMixin, RelativeTransformMixin,
 };
 use serde::Serialize;
 use specta::Type;
 
+// =============================================================================
+// Node
+// =============================================================================
+
 #[derive(Serialize, Clone, Debug, Type)]
 #[serde(tag = "type")]
-pub enum MixinChange {
+pub enum NodeMixinChange {
     RectangleCorner(RectangleCornerMixin),
     Children(MixinChangeChildrenMixin),
     Dimension(DimensionMixin),
     RelativeTransform(MixinChangeRelativeTransformMixin),
-    Composition(NodeCompositionMixin),
+    NodeComposition(NodeCompositionMixin),
     Blend(BlendMixin),
     Path(PathMixin),
     Fill(FillMixin),
 }
 
-pub trait ToMixinChange {
-    fn to_mixin_change(&self) -> MixinChange;
+pub trait ToNodeMixinChange {
+    fn to_mixin_change(&self) -> NodeMixinChange;
 }
 
 /// Represents the change in the ChildrenMixin.
@@ -33,17 +37,17 @@ pub struct MixinChangeChildrenMixin {
     pub children: ChildrenMixin,
 }
 
-impl ToMixinChange for ChildrenMixin {
-    fn to_mixin_change(&self) -> MixinChange {
-        MixinChange::Children(MixinChangeChildrenMixin {
+impl ToNodeMixinChange for ChildrenMixin {
+    fn to_mixin_change(&self) -> NodeMixinChange {
+        NodeMixinChange::Children(MixinChangeChildrenMixin {
             children: self.clone(),
         })
     }
 }
 
-impl ToMixinChange for DimensionMixin {
-    fn to_mixin_change(&self) -> MixinChange {
-        MixinChange::Dimension(self.clone())
+impl ToNodeMixinChange for DimensionMixin {
+    fn to_mixin_change(&self) -> NodeMixinChange {
+        NodeMixinChange::Dimension(self.clone())
     }
 }
 
@@ -53,34 +57,75 @@ pub struct MixinChangeRelativeTransformMixin {
     pub relative_transform: RelativeTransformMixin,
 }
 
-impl ToMixinChange for RelativeTransformMixin {
-    fn to_mixin_change(&self) -> MixinChange {
-        MixinChange::RelativeTransform(MixinChangeRelativeTransformMixin {
+impl ToNodeMixinChange for RelativeTransformMixin {
+    fn to_mixin_change(&self) -> NodeMixinChange {
+        NodeMixinChange::RelativeTransform(MixinChangeRelativeTransformMixin {
             relative_transform: self.clone(),
         })
     }
 }
 
-impl ToMixinChange for NodeCompositionMixin {
-    fn to_mixin_change(&self) -> MixinChange {
-        MixinChange::Composition(self.clone())
+impl ToNodeMixinChange for NodeCompositionMixin {
+    fn to_mixin_change(&self) -> NodeMixinChange {
+        NodeMixinChange::NodeComposition(self.clone())
     }
 }
 
-impl ToMixinChange for BlendMixin {
-    fn to_mixin_change(&self) -> MixinChange {
-        MixinChange::Blend(self.clone())
+impl ToNodeMixinChange for BlendMixin {
+    fn to_mixin_change(&self) -> NodeMixinChange {
+        NodeMixinChange::Blend(self.clone())
     }
 }
 
-impl ToMixinChange for PathMixin {
-    fn to_mixin_change(&self) -> MixinChange {
-        MixinChange::Path(self.clone())
+impl ToNodeMixinChange for PathMixin {
+    fn to_mixin_change(&self) -> NodeMixinChange {
+        NodeMixinChange::Path(self.clone())
     }
 }
 
-impl ToMixinChange for RectangleCornerMixin {
-    fn to_mixin_change(&self) -> MixinChange {
-        MixinChange::RectangleCorner(self.clone())
+impl ToNodeMixinChange for RectangleCornerMixin {
+    fn to_mixin_change(&self) -> NodeMixinChange {
+        NodeMixinChange::RectangleCorner(self.clone())
+    }
+}
+
+// =============================================================================
+// Paint
+// =============================================================================
+
+#[derive(Serialize, Clone, Debug, Type)]
+#[serde(tag = "type")]
+pub enum PaintMixinChange {
+    Dimension(DimensionMixin),
+    Blend(BlendMixin),
+    PaintComposition(PaintCompositionMixin),
+    ImageContent(ImageContentMixin),
+}
+
+impl ToPaintMixinChange for BlendMixin {
+    fn to_mixin_change(&self) -> PaintMixinChange {
+        PaintMixinChange::Blend(self.clone())
+    }
+}
+
+impl ToPaintMixinChange for DimensionMixin {
+    fn to_mixin_change(&self) -> PaintMixinChange {
+        PaintMixinChange::Dimension(self.clone())
+    }
+}
+
+pub trait ToPaintMixinChange {
+    fn to_mixin_change(&self) -> PaintMixinChange;
+}
+
+impl ToPaintMixinChange for PaintCompositionMixin {
+    fn to_mixin_change(&self) -> PaintMixinChange {
+        PaintMixinChange::PaintComposition(self.clone())
+    }
+}
+
+impl ToPaintMixinChange for ImageContentMixin {
+    fn to_mixin_change(&self) -> PaintMixinChange {
+        PaintMixinChange::ImageContent(self.clone())
     }
 }

@@ -1,7 +1,5 @@
 use bevy_ecs::entity::Entity;
-use dyn_composition::core::{
-    modules::node::components::mixins::Paint, utils::continuous_id::ContinuousId,
-};
+use dyn_composition::core::utils::continuous_id::ContinuousId;
 
 use crate::{
     events::output_event::ElementChangeEvent,
@@ -9,25 +7,21 @@ use crate::{
         changed_components::ChangedPaint,
         svg_composition::{
             svg_bundle::{BaseSVGBundle, SVGBundle},
-            svg_element::{
-                attributes::{SVGAttribute, SVGMeasurementUnit},
-                styles::{SVGDisplayStyle, SVGStyle},
-                SVGElement, SVGTag,
-            },
+            svg_element::{SVGElement, SVGTag},
             svg_node::ElementReference,
             SVGCompositionRes,
         },
     },
 };
 
-use super::{utils::rgb_to_hex, SVGPaint};
+use super::SVGPaint;
 
 #[derive(Debug)]
 pub struct SolidSVGPaint {
     bundle: BaseSVGBundle,
 
     // Elements
-    paint_shape: ElementReference,
+    paint_rect: ElementReference,
 }
 
 impl SVGBundle for SolidSVGPaint {
@@ -50,40 +44,40 @@ impl SVGBundle for SolidSVGPaint {
 
 impl SVGPaint for SolidSVGPaint {
     fn apply_paint_change(&mut self, changed_paint: &ChangedPaint) {
-        match &changed_paint.paint {
-            Paint::Solid(paint) => {
-                let root_element = self.bundle.get_root_mut();
-                root_element.set_attributes(vec![SVGAttribute::Opacity {
-                    opacity: paint.base_paint.opacity,
-                }]);
-                root_element.set_styles(vec![SVGStyle::Display {
-                    display: if paint.base_paint.is_visible {
-                        SVGDisplayStyle::Block
-                    } else {
-                        SVGDisplayStyle::None
-                    },
-                }]);
+        // TODO
+        // match &changed_paint.paint {
+        //     Paint::Solid(paint) => {
+        //         let root_element = self.bundle.get_root_mut();
+        //         root_element.set_attributes(vec![SVGAttribute::Opacity {
+        //             opacity: paint.base_paint.opacity,
+        //         }]);
+        //         root_element.set_styles(vec![SVGStyle::Display {
+        //             display: if paint.base_paint.is_visible {
+        //                 SVGDisplayStyle::Block
+        //             } else {
+        //                 SVGDisplayStyle::None
+        //             },
+        //         }]);
 
-                let paint_shape_element =
-                    self.bundle.get_child_mut(self.paint_shape.index).unwrap();
-                paint_shape_element.set_attributes(vec![SVGAttribute::Fill {
-                    fill: rgb_to_hex(paint.color),
-                }]);
-                if let Some(dimension) = &changed_paint.parent_dimension_mixin {
-                    paint_shape_element.set_attributes(vec![
-                        SVGAttribute::Width {
-                            width: dimension.width,
-                            unit: SVGMeasurementUnit::Pixel,
-                        },
-                        SVGAttribute::Height {
-                            height: dimension.height,
-                            unit: SVGMeasurementUnit::Pixel,
-                        },
-                    ])
-                }
-            }
-            _ => {}
-        }
+        //         let paint_rect_element = self.bundle.get_child_mut(self.paint_rect.index).unwrap();
+        //         paint_rect_element.set_attributes(vec![SVGAttribute::Fill {
+        //             fill: rgb_to_hex(paint.color),
+        //         }]);
+        //         if let Some(dimension) = &changed_paint.parent_dimension_mixin {
+        //             paint_rect_element.set_attributes(vec![
+        //                 SVGAttribute::Width {
+        //                     width: dimension.width,
+        //                     unit: SVGMeasurementUnit::Pixel,
+        //                 },
+        //                 SVGAttribute::Height {
+        //                     height: dimension.height,
+        //                     unit: SVGMeasurementUnit::Pixel,
+        //                 },
+        //             ]);
+        //         }
+        //     }
+        //     _ => {}
+        // }
     }
 }
 
@@ -98,23 +92,23 @@ impl SolidSVGPaint {
         let mut bundle = BaseSVGBundle::new(element, entity);
 
         // Create paint elements
-        let mut paint_shape_element = SVGElement::new(SVGTag::Rect, id_generator);
-        let paint_shape_element_id = paint_shape_element.get_id();
+        let mut paint_rect_element = SVGElement::new(SVGTag::Rect, id_generator);
+        let paint_rect_element_id = paint_rect_element.get_id();
         #[cfg(feature = "tracing")]
-        paint_shape_element.set_attribute(SVGAttribute::Name {
+        paint_rect_element.set_attribute(SVGAttribute::Name {
             name: SolidSVGPaint::create_element_name(
-                paint_shape_element_id,
-                String::from("shape"),
+                paint_rect_element_id,
+                String::from("paint-rect"),
                 false,
             ),
         });
-        let paint_shape_element_index = bundle.append_child(paint_shape_element);
+        let paint_rect_element_index = bundle.append_child(paint_rect_element);
 
         Self {
             bundle,
-            paint_shape: ElementReference {
-                id: paint_shape_element_id,
-                index: paint_shape_element_index,
+            paint_rect: ElementReference {
+                id: paint_rect_element_id,
+                index: paint_rect_element_index,
             },
         }
     }

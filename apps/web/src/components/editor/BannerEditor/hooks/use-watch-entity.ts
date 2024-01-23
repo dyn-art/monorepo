@@ -35,17 +35,17 @@ export function useWatchEntity<T extends TTrackableMixinKey[]>(
 
 function changesReducer<T extends TTrackableMixinKey[]>(
 	state: TCombinedMixin<T>,
-	action: COMP.MixinChange
+	action: COMP.NodeMixinChange
 ): TCombinedMixin<T> {
 	const { type, ...change } = action;
 	return { ...state, [type]: change };
 }
 
 type TCombinedMixin<T extends TTrackableMixinKey[]> = {
-	[K in T[number]]?: Extract<COMP.MixinChange, { type: K }>;
+	[K in T[number]]?: Extract<COMP.NodeMixinChange, { type: K }>;
 };
 type TTrackableMixinKey = TRustEnumKeyArray<COMP.TrackableMixinType>;
-type TMiddleware<T> = (change: COMP.MixinChange) => T;
+type TMiddleware<T> = (change: COMP.NodeMixinChange) => T;
 
 // TODO: figure out how to solve this as tuple
 

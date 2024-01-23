@@ -51,5 +51,6 @@
 		"crates/bevy_render_skeleton/Cargo.toml",
 		"crates/composition/Cargo.toml",
 		"crates/svg_render/Cargo.toml"
-	]
+	],
+	"rust-analyzer.rename.allowExternalItems": true
 }

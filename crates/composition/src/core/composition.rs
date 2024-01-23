@@ -10,7 +10,9 @@ use super::{
     events::input_event::InputEvent,
     modules::node::{
         components::{
-            bundles::{FrameNodeBundle, NodeBundle, RectangleNodeBundle, TextNodeBundle},
+            bundles::{
+                FrameNodeBundle, NodeBundle, PaintBundle, RectangleNodeBundle, TextNodeBundle,
+            },
             types::Root,
         },
         NodePlugin,
@@ -85,6 +87,21 @@ impl Composition {
                 entity.push_children(&fill_mixin.paint_ids);
             }
         }
+
+        return entity_id;
+    }
+
+    #[cfg(feature = "interactive")]
+    pub fn spawn_paint_bundle(
+        &mut self,
+        bundle: PaintBundle,
+        maybe_parent_id: Option<Entity>,
+    ) -> Entity {
+        let entity_id = match bundle {
+            PaintBundle::Solid(bundle) => self.spawn_bundle(bundle, maybe_parent_id),
+            PaintBundle::Image(bundle) => self.spawn_bundle(bundle, maybe_parent_id),
+            PaintBundle::Gradient(bundle) => self.spawn_bundle(bundle, maybe_parent_id),
+        };
 
         return entity_id;
     }

@@ -1,12 +1,9 @@
 use std::collections::HashMap;
 
 use bevy_ecs::{entity::Entity, system::Resource};
-use dyn_composition::core::modules::node::components::{
-    mixins::{DimensionMixin, Paint},
-    types::NodeType,
-};
+use dyn_composition::core::modules::node::components::types::{NodeType, PaintType};
 
-use crate::mixin_change::MixinChange;
+use crate::mixin_change::{NodeMixinChange, PaintMixinChange};
 
 #[derive(Resource, Debug, Default)]
 pub struct ChangedComponentsRes {
@@ -18,12 +15,12 @@ pub struct ChangedComponentsRes {
 pub struct ChangedNode {
     pub node_type: NodeType,
     pub parent_id: Option<Entity>,
-    pub changes: Vec<MixinChange>,
+    pub changes: Vec<NodeMixinChange>,
 }
 
 #[derive(Debug)]
 pub struct ChangedPaint {
-    pub paint: Paint,
+    pub paint_type: PaintType,
     pub parent_id: Option<Entity>,
-    pub parent_dimension_mixin: Option<DimensionMixin>,
+    pub changes: Vec<PaintMixinChange>,
 }

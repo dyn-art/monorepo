@@ -4,14 +4,16 @@ use bevy_app::{App, Plugin};
 use bevy_ecs::schedule::IntoSystemConfigs;
 use dyn_bevy_render_skeleton::{ExtractSchedule, Render, RenderApp, RenderSet};
 use dyn_composition::core::modules::node::components::mixins::{
-    BlendMixin, DimensionMixin, NodeCompositionMixin, PathMixin, RelativeTransformMixin,
+    BlendMixin, DimensionMixin, ImageContentMixin, NodeCompositionMixin, PaintCompositionMixin,
+    PathMixin, RelativeTransformMixin,
 };
 use events::output_event::SVGRenderOutputEvent;
+use systems::extract::extract_paint_mixin_generic;
 
 use self::{
     resources::{changed_components::ChangedComponentsRes, svg_composition::SVGCompositionRes},
     systems::{
-        extract::{extract_children, extract_mixin_generic, extract_paint},
+        extract::{extract_children, extract_node_mixin_generic},
         queue::queue_element_changes,
     },
 };
@@ -42,13 +44,18 @@ impl Plugin for SvgRenderPlugin {
             .add_systems(
                 ExtractSchedule,
                 (
-                    extract_mixin_generic::<DimensionMixin>,
-                    extract_mixin_generic::<RelativeTransformMixin>,
-                    extract_mixin_generic::<NodeCompositionMixin>,
-                    extract_mixin_generic::<BlendMixin>,
-                    extract_mixin_generic::<PathMixin>,
+                    // Node
+                    extract_node_mixin_generic::<DimensionMixin>,
+                    extract_node_mixin_generic::<RelativeTransformMixin>,
+                    extract_node_mixin_generic::<NodeCompositionMixin>,
+                    extract_node_mixin_generic::<BlendMixin>,
+                    extract_node_mixin_generic::<PathMixin>,
                     extract_children,
-                    extract_paint,
+                    // Paint
+                    extract_paint_mixin_generic::<BlendMixin>,
+                    extract_paint_mixin_generic::<DimensionMixin>,
+                    extract_paint_mixin_generic::<PaintCompositionMixin>,
+                    extract_paint_mixin_generic::<ImageContentMixin>,
                 ),
             )
             .add_systems(Render, (queue_element_changes.in_set(RenderSet::Queue),));

@@ -2,7 +2,7 @@ use std::{collections::HashMap, sync::mpsc::Sender};
 
 use bevy_ecs::{entity::Entity, system::Resource};
 use dyn_composition::core::{
-    modules::node::components::{mixins::Paint, types::NodeType},
+    modules::node::components::types::{NodeType, PaintType},
     utils::continuous_id::ContinuousId,
 };
 
@@ -93,12 +93,12 @@ impl SVGCompositionRes {
     pub fn get_or_create_paint(
         &mut self,
         entity: Entity,
-        paint: &Paint,
+        paint_type: &PaintType,
         maybe_parent_id: &Option<Entity>,
     ) -> Option<&mut Box<dyn SVGPaint>> {
         // Create paint
         if !self.bundles.contains_key(&entity) {
-            match self.create_paint(paint, entity.clone()) {
+            match self.create_paint(paint_type, entity.clone()) {
                 Some(new_paint) => {
                     self.insert_bundle(entity, SVGBundleVariant::Paint(new_paint), maybe_parent_id);
                 }
@@ -112,9 +112,13 @@ impl SVGCompositionRes {
         };
     }
 
-    fn create_paint(&mut self, paint: &Paint, entity: Entity) -> Option<Box<dyn SVGPaint>> {
-        match paint {
-            Paint::Solid(..) => Some(Box::new(SolidSVGPaint::new(entity, &mut self.id_generator))),
+    fn create_paint(
+        &mut self,
+        paint_type: &PaintType,
+        entity: Entity,
+    ) -> Option<Box<dyn SVGPaint>> {
+        match paint_type {
+            PaintType::Solid => Some(Box::new(SolidSVGPaint::new(entity, &mut self.id_generator))),
             _ => None, // TODO
         }
     }

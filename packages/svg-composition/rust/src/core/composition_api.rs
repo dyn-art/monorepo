@@ -5,12 +5,12 @@ use bevy_ecs::entity::Entity;
 use dyn_bevy_render_skeleton::RenderApp;
 use dyn_composition::core::composition::Composition;
 use dyn_composition::core::dtif::DTIFComposition;
-use dyn_composition::core::modules::node::components::bundles::NodeBundle;
+use dyn_composition::core::modules::node::components::bundles::{NodeBundle, PaintBundle};
 use dyn_composition::core::modules::node::components::mixins::{
-    DimensionMixin, Paint, RelativeTransformMixin,
+    DimensionMixin, RelativeTransformMixin,
 };
 use dyn_svg_render::events::output_event::SVGRenderOutputEvent;
-use dyn_svg_render::mixin_change::{MixinChange, MixinChangeRelativeTransformMixin};
+use dyn_svg_render::mixin_change::{MixinChangeRelativeTransformMixin, NodeMixinChange};
 use dyn_svg_render::resources::svg_composition::SVGCompositionRes;
 use dyn_svg_render::SvgRenderPlugin;
 use wasm_bindgen::prelude::wasm_bindgen;
@@ -145,18 +145,18 @@ impl JsCompositionHandle {
         let app = self.composition.get_app_mut();
 
         // Collect intial values
-        let mut changes: Vec<MixinChange> = Vec::with_capacity(to_track_mixins.len());
+        let mut changes: Vec<NodeMixinChange> = Vec::with_capacity(to_track_mixins.len());
         if initial_value {
             for component_type in &to_track_mixins {
                 match component_type {
                     TrackableMixinType::Dimension => {
                         if let Some(mixin) = app.world.get::<DimensionMixin>(entity) {
-                            changes.push(MixinChange::Dimension(mixin.clone()))
+                            changes.push(NodeMixinChange::Dimension(mixin.clone()))
                         }
                     }
                     TrackableMixinType::RelativeTransform => {
                         if let Some(mixin) = app.world.get::<RelativeTransformMixin>(entity) {
-                            changes.push(MixinChange::RelativeTransform(
+                            changes.push(NodeMixinChange::RelativeTransform(
                                 MixinChangeRelativeTransformMixin {
                                     relative_transform: mixin.clone(),
                                 },
@@ -208,13 +208,13 @@ impl JsCompositionHandle {
 
     #[wasm_bindgen(js_name = spawnPaint)]
     pub fn spawn_paint(&mut self, paint: JsValue) -> JsValue {
-        let paint: Paint = match serde_wasm_bindgen::from_value(paint) {
+        let paint: PaintBundle = match serde_wasm_bindgen::from_value(paint) {
             Ok(mixin) => mixin,
             Err(_) => return JsValue::NULL,
         };
 
         // Spawn a new paint in the composition
-        let entity = self.composition.spawn_bundle(paint, None);
+        let entity = self.composition.spawn_paint_bundle(paint, None);
 
         return serde_wasm_bindgen::to_value(&entity).unwrap_or(JsValue::NULL);
     }

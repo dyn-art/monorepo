@@ -62,22 +62,6 @@ export type AttributeRemoved = { key: string }
  */
 export type AttributeUpdated = { newValue: SVGAttribute }
 
-export type BasePaint = { 
-/**
- * The opacity of the paint,
- * ranging from 0.0 (completely transparent) to 1.0 (completely opaque).
- */
-opacity?: number; 
-/**
- * The blend mode used when applying the paint,
- * which determines how the paint's color blends with colors underneath it.
- */
-blendMode?: BlendMode; 
-/**
- * Determines whether the paint is visible.
- */
-isVisible?: boolean }
-
 /**
  * Defines blending properties for a node.
  */
@@ -204,7 +188,7 @@ nodes: { [key in string]: NodeBundle };
  * Note: Planned to directly use `Entity` as a key once the referenced serde issue is resolved.
  * https://github.com/serde-rs/serde/issues/1183
  */
-paints: { [key in string]: Paint }; 
+paints: { [key in string]: PaintBundle }; 
 /**
  * A mapping of font identifiers to their corresponding font data within the composition.
  * Note: Planned to directly use `u64` as a key once the referenced serde issue is resolved.
@@ -270,7 +254,7 @@ export type ElementDeleted = Record<string, never>
  * Represents a basic shape node for an ellipse.
  * Note that a circle is a special case of an ellipse where the width equals the height.
  */
-export type Ellipse = { ellipse?: null | null; 
+export type Ellipse = { _ellipse?: null | null; 
 /**
  * Contains the arc data for the ellipse,
  * which includes the starting angle, ending angle, and the inner radius ratio.
@@ -382,7 +366,7 @@ export type FontStyle =
  * It functions similarly to an HTML `<div>` element.
  * This is distinct from a `GroupNode`, which is more akin to a folder for layers in its use and functionality.
  */
-export type Frame = { frame?: null | null; 
+export type Frame = { _frame?: null | null; 
 /**
  * Indicates whether the frame clips its content to its bounding box.
  * When set to `true`, content that extends beyond the frame's boundaries will be clipped.
@@ -397,7 +381,7 @@ export type FrameNodeBundle = ({
  * such as 'Cool Node'.
  * If not provided, it defaults to `None`.
  */
-name?: string | null }) & ({ frame?: null | null; 
+name?: string | null }) & ({ _frame?: null | null; 
 /**
  * Indicates whether the frame clips its content to its bounding box.
  * When set to `true`, content that extends beyond the frame's boundaries will be clipped.
@@ -405,21 +389,7 @@ name?: string | null }) & ({ frame?: null | null;
  */
 clipContent?: boolean }) & { node?: Node; rectangleCornerMixin?: RectangleCornerMixin; children: ChildrenMixin; compositionMixin?: NodeCompositionMixin; relativeTransform: RelativeTransformMixin; dimension: DimensionMixin; blendMixin?: BlendMixin; fill?: FillMixin }
 
-export type GradientPaint = ({ 
-/**
- * The opacity of the paint,
- * ranging from 0.0 (completely transparent) to 1.0 (completely opaque).
- */
-opacity?: number; 
-/**
- * The blend mode used when applying the paint,
- * which determines how the paint's color blends with colors underneath it.
- */
-blendMode?: BlendMode; 
-/**
- * Determines whether the paint is visible.
- */
-isVisible?: boolean }) & { 
+export type GradientPaint = { _gradient_paint?: null | null; 
 /**
  * Specifies the variant of the gradient.
  */
@@ -432,6 +402,20 @@ transform?: Mat3;
  * A list of color stops defining the gradient.
  */
 gradientStops: ColorStop[] }
+
+export type GradientPaintBundle = ({ _gradient_paint?: null | null; 
+/**
+ * Specifies the variant of the gradient.
+ */
+variant?: GradientVariant; 
+/**
+ * Transformation matrix for the gradient.
+ */
+transform?: Mat3; 
+/**
+ * A list of color stops defining the gradient.
+ */
+gradientStops: ColorStop[] }) & { paint?: Paint; compositionMixin?: PaintCompositionMixin; blendMixin?: BlendMixin }
 
 export type GradientVariant = "Linear" | "Radial" | "Angular" | "Diamond"
 
@@ -479,6 +463,8 @@ export type HorizontalTextAlignment =
  */
 "Justified"
 
+export type HrefVariant = { type: "Binary"; content: number[] } | { type: "Url"; url: string }
+
 export type ImageContent = 
 /**
  * Image content stored as binary data.
@@ -491,25 +477,7 @@ export type ImageContent =
  */
 { type: "Url"; url: string }
 
-export type ImagePaint = ({ 
-/**
- * The opacity of the paint,
- * ranging from 0.0 (completely transparent) to 1.0 (completely opaque).
- */
-opacity?: number; 
-/**
- * The blend mode used when applying the paint,
- * which determines how the paint's color blends with colors underneath it.
- */
-blendMode?: BlendMode; 
-/**
- * Determines whether the paint is visible.
- */
-isVisible?: boolean }) & { 
-/**
- * Defines the scale mode of the image.
- */
-scaleMode?: ImagePaintScaleMode; 
+export type ImageContentMixin = { 
 /**
  * The width of the image in pixels.
  */
@@ -522,6 +490,18 @@ height: number;
  * The actual content of the image.
  */
 content: ImageContent }
+
+export type ImagePaint = { _image_paint?: null | null; 
+/**
+ * Defines the scale mode of the image.
+ */
+scaleMode?: ImagePaintScaleMode }
+
+export type ImagePaintBundle = ({ _image_paint?: null | null; 
+/**
+ * Defines the scale mode of the image.
+ */
+scaleMode?: ImagePaintScaleMode }) & { paint?: Paint; imageContent: ImageContentMixin; compositionMixin?: PaintCompositionMixin; blendMixin?: BlendMixin }
 
 export type ImagePaintScaleMode = 
 /**
@@ -585,8 +565,6 @@ export type Locked = null
 
 export type Mat3 = [number, number, number, number, number, number, number, number, number]
 
-export type MixinChange = ({ type: "RectangleCorner" } & RectangleCornerMixin) | ({ type: "Children" } & MixinChangeChildrenMixin) | ({ type: "Dimension" } & DimensionMixin) | ({ type: "RelativeTransform" } & MixinChangeRelativeTransformMixin) | ({ type: "Composition" } & NodeCompositionMixin) | ({ type: "Blend" } & BlendMixin) | ({ type: "Path" } & PathMixin) | ({ type: "Fill" } & FillMixin)
-
 /**
  * Represents the change in the ChildrenMixin.
  * 
@@ -642,19 +620,39 @@ export type NodeMetaMixin = {
  */
 name?: string | null }
 
+export type NodeMixinChange = ({ type: "RectangleCorner" } & RectangleCornerMixin) | ({ type: "Children" } & MixinChangeChildrenMixin) | ({ type: "Dimension" } & DimensionMixin) | ({ type: "RelativeTransform" } & MixinChangeRelativeTransformMixin) | ({ type: "NodeComposition" } & NodeCompositionMixin) | ({ type: "Blend" } & BlendMixin) | ({ type: "Path" } & PathMixin) | ({ type: "Fill" } & FillMixin)
+
 export type NodeType = "None" | "Group" | "Rectangle" | "Frame" | "Text"
 
 export type OutputEvent = ({ type: "ElementChange" } & ElementChangeEvent) | ({ type: "CompositionChange" } & CompositionChangeEvent) | ({ type: "TrackUpdate" } & TrackUpdateEvent) | ({ type: "SelectionChange" } & SelectionChangeEvent) | ({ type: "InteractionModeChange" } & InteractionModeChangeEvent) | ({ type: "CursorChange" } & CursorChangeEvent)
 
-export type Paint = 
 /**
- * Represents a solid color paint.
+ * Represents a basic paint in the composition.
  */
-({ type: "Solid" } & SolidPaint) | 
+export type Paint = { 
 /**
- * Represents an image-based paint.
+ * Represents the specific type of the paint, such as `Solid`, `Image`, `Gradient`, etc.
+ * This field is redundant but neccessary to distinguish different paints in the rendering process,
+ * without a big overhead like a separate system for each paint type/variant.
+ * Note that the PaintType should be equivalent to the 'PaintBundle' enum
+ * and when creating a new `PaintBundle` always use the default of that specific bundle!
  */
-({ type: "Image" } & ImagePaint) | ({ type: "Gradient" } & GradientPaint)
+paint_type: PaintType }
+
+export type PaintBundle = ({ type: "Solid" } & SolidPaintBundle) | ({ type: "Image" } & ImagePaintBundle) | ({ type: "Gradient" } & GradientPaintBundle)
+
+/**
+ * Contains properties related to the composition settings of a paint.
+ */
+export type PaintCompositionMixin = { 
+/**
+ * Determines the visibility of the paint.
+ */
+isVisible?: boolean }
+
+export type PaintMixinChange = ({ type: "Dimension" } & DimensionMixin) | ({ type: "Blend" } & BlendMixin) | ({ type: "PaintComposition" } & PaintCompositionMixin) | ({ type: "ImageContent" } & ImageContentMixin)
+
+export type PaintType = "None" | "Solid" | "Gradient" | "Image"
 
 /**
  * Represents a path in a graphical composition, defined by a series of vertices.
@@ -667,10 +665,12 @@ export type PathMixin = {
  */
 vertices: Anchor[] }
 
+export type PatternUnit = { type: "UserSpaceOnUse" } | { type: "ObjectBoundingBox" }
+
 /**
  * Represents a basic shape node for a regular convex polygon with three or more sides.
  */
-export type Polygon = { polygon?: null | null; 
+export type Polygon = { _polygon?: null | null; 
 /**
  * The number of sides of the polygon.
  * This value must be an integer greater than or equal to 3.
@@ -740,7 +740,7 @@ export type RelativeTransformMixin = Mat3
  */
 export type Root = null
 
-export type SVGAttribute = { type: "Id"; id: ContinuousId } | { type: "Width"; width: number; unit: SVGMeasurementUnit } | { type: "Height"; height: number; unit: SVGMeasurementUnit } | { type: "Opacity"; opacity: number } | { type: "Transform"; transform: SVGTransformAttribute } | { type: "D"; d: SVGPathCommand[] } | { type: "ClipPath"; clipPath: ContinuousId } | { type: "Fill"; fill: string } | { type: "Name"; name: string }
+export type SVGAttribute = { type: "Id"; id: ContinuousId } | { type: "Width"; width: number; unit: SVGMeasurementUnit } | { type: "Height"; height: number; unit: SVGMeasurementUnit } | { type: "Opacity"; opacity: number } | { type: "Transform"; transform: SVGTransformAttribute } | { type: "D"; d: SVGPathCommand[] } | { type: "ClipPath"; clipPath: ContinuousId } | { type: "Fill"; fill: string } | { type: "ReferencedFill"; id: ContinuousId } | { type: "Name"; name: string } | { type: "PatternUnits"; unit: PatternUnit } | { type: "Href"; href: HrefVariant }
 
 export type SVGBlendMode = { type: "Normal" } | { type: "Multiply" } | { type: "Screen" } | { type: "Overlay" } | { type: "Darken" } | { type: "Lighten" } | { type: "ColorDodge" } | { type: "ColorBurn" } | { type: "HardLight" } | { type: "SoftLight" } | { type: "Difference" } | { type: "Exclusion" } | { type: "Hue" } | { type: "Saturation" } | { type: "Color" } | { type: "Luminosity" }
 
@@ -760,31 +760,24 @@ export type Selected = null
 
 export type SelectionChangeEvent = { selected: Entity[] }
 
-export type SolidPaint = ({ 
-/**
- * The opacity of the paint,
- * ranging from 0.0 (completely transparent) to 1.0 (completely opaque).
- */
-opacity?: number; 
-/**
- * The blend mode used when applying the paint,
- * which determines how the paint's color blends with colors underneath it.
- */
-blendMode?: BlendMode; 
-/**
- * Determines whether the paint is visible.
- */
-isVisible?: boolean }) & { 
+export type SolidPaint = { _solid_paint?: null | null; 
 /**
  * The color of the paint, represented as an RGB array
  * where each component ranges from 0 to 255.
  */
 color: [number, number, number] }
 
+export type SolidPaintBundle = ({ _solid_paint?: null | null; 
+/**
+ * The color of the paint, represented as an RGB array
+ * where each component ranges from 0 to 255.
+ */
+color: [number, number, number] }) & { paint?: Paint; compositionMixin?: PaintCompositionMixin; blendMixin?: BlendMixin }
+
 /**
  * Represents a basic shape node for a star with a set number of points.
  */
-export type Star = { star?: null | null; 
+export type Star = { _star?: null | null; 
 /**
  * The number of "spikes", or outer points of the star.
  * This value must be an integer greater than or equal to 3.
@@ -809,7 +802,7 @@ export type StyleUpdated = { newValue: SVGStyle }
 /**
  * Represents a text node with customizable style and layout properties.
  */
-export type Text = { text?: null | null; 
+export type Text = { _text?: null | null; 
 /**
  * Sections of the text, each with its own style.
  */
@@ -827,7 +820,7 @@ verticalTextAlignment?: VerticalTextAlignment;
  */
 linebreakBehavior?: BreakLineOn }
 
-export type TextNodeBundle = ({ text?: null | null; 
+export type TextNodeBundle = ({ _text?: null | null; 
 /**
  * Sections of the text, each with its own style.
  */
@@ -886,7 +879,7 @@ letterSpacing?: LetterSpacing;
  */
 lineHeight?: LineHeight }
 
-export type TrackUpdateEvent = { id: Entity; updates: MixinChange[] }
+export type TrackUpdateEvent = { id: Entity; updates: NodeMixinChange[] }
 
 export type TrackableMixinType = { type: "Dimension" } | { type: "RelativeTransform" }
 

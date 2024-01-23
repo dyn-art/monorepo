@@ -23,14 +23,17 @@ export async function rustify(dtif: COMP.DTIFComposition): Promise<COMP.DTIFComp
 }
 
 async function resolvePaints(
-	paints: Record<string, COMP.Paint>
-): Promise<Record<string, COMP.Paint>> {
+	paints: Record<string, COMP.PaintBundle>
+): Promise<Record<string, COMP.PaintBundle>> {
 	for (const paint of Object.values(paints)) {
-		if (paint.type === 'Image' && paint.content.type === 'Url') {
-			const content = await loadContent(paint.content.url);
-			paint.content = {
-				type: 'Binary',
-				content
+		if (paint.type === 'Image' && paint.imageContent.content.type === 'Url') {
+			const content = await loadContent(paint.imageContent.content.url);
+			paint.imageContent = {
+				...paint.imageContent,
+				content: {
+					type: 'Binary',
+					content
+				}
 			};
 		}
 	}

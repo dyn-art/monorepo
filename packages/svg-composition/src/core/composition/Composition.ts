@@ -14,10 +14,10 @@ import type {
 	InteractionInputEvent,
 	InteractionModeChangeEvent,
 	InteractionModeForFrontend,
-	MixinChange,
 	NodeBundle,
+	NodeMixinChange,
 	OutputEvent,
-	Paint,
+	PaintBundle,
 	SelectionChangeEvent,
 	TrackableMixinType,
 	TrackUpdateEvent,
@@ -240,7 +240,7 @@ export class Composition {
 		entity: Entity,
 		toTrackMixins: TrackableMixinType[],
 		intialValue = true
-	): MixinChange[] | boolean {
+	): NodeMixinChange[] | boolean {
 		return this._compositionHandle.trackEntity(entity, toTrackMixins, intialValue);
 	}
 
@@ -378,7 +378,7 @@ export class Composition {
 	// Entity Creation
 	// =========================================================================
 
-	public spawnPaint(paint: Paint): Entity {
+	public spawnPaint(paint: PaintBundle): Entity {
 		return this._compositionHandle.spawnPaint(paint);
 	}
 
@@ -471,7 +471,7 @@ export interface TCompositionConfig {
 }
 
 type TWatchCompositionCallback = (change: CompositionChange) => void;
-type TWatchEntityCallback = (entity: Entity, changes: MixinChange[]) => void;
+type TWatchEntityCallback = (entity: Entity, changes: NodeMixinChange[]) => void;
 type TOnSelectionChangeCallback = (selected: Entity[]) => void;
 type TOnInteractionModeChangeCallback = (interactionMode: InteractionModeForFrontend) => void;
 type TOnCursorChangeCallback = (cursor: CursorForFrontend) => void;

@@ -327,6 +327,8 @@ pub enum SVGTag {
     Group,
     Defs,
     ClipPath,
+    Pattern,
+    Image,
 }
 
 impl SVGTag {
@@ -343,6 +345,8 @@ impl SVGTag {
             SVGTag::Group => "g",
             SVGTag::Defs => "defs",
             SVGTag::ClipPath => "clipPath",
+            SVGTag::Pattern => "pattern",
+            SVGTag::Image => "image",
         }
     }
 }
