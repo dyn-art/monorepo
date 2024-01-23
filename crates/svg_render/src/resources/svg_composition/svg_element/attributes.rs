@@ -3,13 +3,6 @@ use serde::Serialize;
 use specta::Type;
 
 #[derive(Debug, Serialize, Clone, Type)]
-#[serde(tag = "type")]
-pub enum SVGMeasurementUnit {
-    Pixel,
-    Percent,
-}
-
-#[derive(Debug, Serialize, Clone, Type)]
 // Using struct variants over tuples to use serde tag feature which enables efficient property access in TypeScript,
 // allowing for faster and simpler type checks, e.g., `change.type === "Width"`
 #[serde(tag = "type")]
@@ -41,8 +34,17 @@ pub enum SVGAttribute {
     Fill {
         fill: String,
     },
+    ReferencedFill {
+        id: ContinuousId,
+    },
     Name {
         name: String,
+    },
+    PatternUnits {
+        unit: PatternUnit,
+    },
+    Href {
+        href: HrefVariant,
     },
 }
 
@@ -56,8 +58,10 @@ impl SVGAttribute {
             Self::Transform { .. } => "transform",
             Self::D { .. } => "d",
             Self::ClipPath { .. } => "clip-path",
-            Self::Fill { .. } => "fill",
+            Self::Fill { .. } | Self::ReferencedFill { .. } => "fill",
             Self::Name { .. } => "name",
+            Self::PatternUnits { .. } => "patternUnits",
+            Self::Href { .. } => "href",
         }
     }
 
@@ -113,7 +117,16 @@ impl SVGAttribute {
                 .join(" "),
             Self::ClipPath { clip_path } => format!("url(#{clip_path})"),
             Self::Fill { fill } => fill.clone(),
+            Self::ReferencedFill { id } => format!("url(#{id})"),
             Self::Name { name } => name.clone(),
+            Self::PatternUnits { unit } => match unit {
+                PatternUnit::ObjectBoundingBox => "objectBoundingBox".to_string(),
+                PatternUnit::UserSpaceOnUse => "userSpaceOnUse".to_string()
+            },
+            Self::Href { href } => match href {
+                HrefVariant::Base64 { content } => format!("data:image/png;base64,{content}"),
+                HrefVariant::Url { url } => url.clone()
+            }
         }
     }
 }
@@ -165,4 +178,25 @@ pub enum SVGTransformAttribute {
         tx: f32,
         ty: f32,
     },
+}
+
+#[derive(Debug, Serialize, Clone, Type)]
+#[serde(tag = "type")]
+pub enum SVGMeasurementUnit {
+    Pixel,
+    Percent,
+}
+
+#[derive(Debug, Serialize, Clone, Type)]
+#[serde(tag = "type")]
+pub enum PatternUnit {
+    UserSpaceOnUse,
+    ObjectBoundingBox,
+}
+
+#[derive(Debug, Serialize, Clone, Type)]
+#[serde(tag = "type")]
+pub enum HrefVariant {
+    Base64 { content: String },
+    Url { url: String },
 }

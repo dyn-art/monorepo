@@ -463,7 +463,7 @@ export type HorizontalTextAlignment =
  */
 "Justified"
 
-export type HrefVariant = { type: "Binary"; content: number[] } | { type: "Url"; url: string }
+export type HrefVariant = { type: "Base64"; content: string } | { type: "Url"; url: string }
 
 export type ImageContent = 
 /**

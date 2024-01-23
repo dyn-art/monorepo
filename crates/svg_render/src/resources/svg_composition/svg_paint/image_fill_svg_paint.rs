@@ -1,14 +1,22 @@
 use bevy_ecs::entity::Entity;
-use dyn_composition::core::utils::continuous_id::ContinuousId;
+use dyn_composition::core::{
+    modules::node::components::mixins::ImageContent, utils::continuous_id::ContinuousId,
+};
 
 use crate::{
     events::output_event::ElementChangeEvent,
+    mixin_change::PaintMixinChange,
     resources::{
         changed_components::ChangedPaint,
         svg_composition::{
             svg_bundle::{BaseSVGBundle, SVGBundle},
             svg_element::{
-                attributes::{PatternUnit, SVGAttribute, SVGTransformAttribute},
+                attributes::{
+                    HrefVariant, PatternUnit, SVGAttribute, SVGMeasurementUnit,
+                    SVGTransformAttribute,
+                },
+                mapper::map_blend_mode,
+                styles::{SVGDisplayStyle, SVGStyle},
                 SVGElement, SVGTag,
             },
             svg_node::ElementReference,
@@ -16,6 +24,7 @@ use crate::{
         },
     },
 };
+use base64::prelude::*;
 
 use super::SVGPaint;
 
@@ -51,86 +60,88 @@ impl SVGBundle for ImageFillSVGPaint {
 
 impl SVGPaint for ImageFillSVGPaint {
     fn apply_paint_change(&mut self, changed_paint: &ChangedPaint) {
-        // TODO
-        // match &changed_paint.paint {
-        //     Paint::Image(paint) => {
-        //         let root_element = self.bundle.get_root_mut();
-        //         root_element.set_attributes(vec![SVGAttribute::Opacity {
-        //             opacity: paint.base_paint.opacity,
-        //         }]);
-        //         root_element.set_styles(vec![SVGStyle::Display {
-        //             display: if paint.base_paint.is_visible {
-        //                 SVGDisplayStyle::Block
-        //             } else {
-        //                 SVGDisplayStyle::None
-        //             },
-        //         }]);
+        for change in &changed_paint.changes {
+            match change {
+                PaintMixinChange::PaintComposition(mixin) => {
+                    self.bundle
+                        .get_root_mut()
+                        .set_styles(vec![SVGStyle::Display {
+                            display: if mixin.is_visible {
+                                SVGDisplayStyle::Block
+                            } else {
+                                SVGDisplayStyle::None
+                            },
+                        }]);
+                }
+                PaintMixinChange::Dimension(mixin) => {
+                    self.bundle
+                        .get_child_mut(self.paint_rect.index)
+                        .unwrap()
+                        .set_attributes(vec![
+                            SVGAttribute::Width {
+                                width: mixin.width,
+                                unit: SVGMeasurementUnit::Pixel,
+                            },
+                            SVGAttribute::Height {
+                                height: mixin.height,
+                                unit: SVGMeasurementUnit::Pixel,
+                            },
+                        ]);
 
-        //         let paint_clipped_image_element = self
-        //             .bundle
-        //             .get_child_mut(self.paint_clipped_image.index)
-        //             .unwrap();
-        //         paint_clipped_image_element.set_attribute(SVGAttribute::Href {
-        //             href: match &paint.content {
-        //                 ImageContent::Binary { content } => HrefVariant::Binary {
-        //                     content: content.clone(),
-        //                 },
-        //                 ImageContent::Url { url } => HrefVariant::Url { url: url.clone() },
-        //             },
-        //         });
+                    self.bundle
+                        .get_child_mut(self.paint_pattern.index)
+                        .unwrap()
+                        .set_attributes(vec![
+                            SVGAttribute::Width {
+                                width: mixin.width,
+                                unit: SVGMeasurementUnit::Pixel,
+                            },
+                            SVGAttribute::Height {
+                                height: mixin.height,
+                                unit: SVGMeasurementUnit::Pixel,
+                            },
+                        ]);
 
-        //         if let Some(dimension) = &changed_paint.parent_dimension_mixin {
-        //             let paint_rect_element =
-        //                 self.bundle.get_child_mut(self.paint_rect.index).unwrap();
-        //             paint_rect_element.set_attributes(vec![
-        //                 SVGAttribute::Width {
-        //                     width: dimension.width,
-        //                     unit: SVGMeasurementUnit::Pixel,
-        //                 },
-        //                 SVGAttribute::Height {
-        //                     height: dimension.height,
-        //                     unit: SVGMeasurementUnit::Pixel,
-        //                 },
-        //             ]);
+                    self.bundle
+                        .get_child_mut(self.paint_clipped_image.index)
+                        .unwrap()
+                        .set_attributes(vec![
+                            SVGAttribute::Width {
+                                width: mixin.width,
+                                unit: SVGMeasurementUnit::Pixel,
+                            },
+                            SVGAttribute::Height {
+                                height: mixin.height,
+                                unit: SVGMeasurementUnit::Pixel,
+                            },
+                        ]);
+                }
+                PaintMixinChange::Blend(mixin) => {
+                    let root_element = self.bundle.get_root_mut();
+                    root_element.set_attributes(vec![SVGAttribute::Opacity {
+                        opacity: mixin.opacity,
+                    }]);
+                    root_element.set_styles(vec![SVGStyle::BlendMode {
+                        blend_mode: map_blend_mode(&mixin.blend_mode),
+                    }]);
+                }
+                PaintMixinChange::ImageContent(mixin) => {
+                    self.bundle
+                        .get_child_mut(self.paint_clipped_image.index)
+                        .unwrap()
+                        .set_attribute(SVGAttribute::Href {
+                            href: match &mixin.content {
+                                ImageContent::Binary { content } => HrefVariant::Base64 {
+                                    content: BASE64_STANDARD.encode(content),
+                                },
 
-        //             let paint_pattern_element =
-        //                 self.bundle.get_child_mut(self.paint_pattern.index).unwrap();
-        //             paint_pattern_element.set_attributes(vec![
-        //                 SVGAttribute::Width {
-        //                     width: dimension.width,
-        //                     unit: SVGMeasurementUnit::Pixel,
-        //                 },
-        //                 SVGAttribute::Height {
-        //                     height: dimension.height,
-        //                     unit: SVGMeasurementUnit::Pixel,
-        //                 },
-        //             ]);
-
-        //             let paint_clipped_image_element = self
-        //                 .bundle
-        //                 .get_child_mut(self.paint_clipped_image.index)
-        //                 .unwrap();
-        //             paint_clipped_image_element.set_attributes(vec![
-        //                 SVGAttribute::Width {
-        //                     width: dimension.width,
-        //                     unit: SVGMeasurementUnit::Pixel,
-        //                 },
-        //                 SVGAttribute::Height {
-        //                     height: dimension.height,
-        //                     unit: SVGMeasurementUnit::Pixel,
-        //                 },
-        //             ]);
-        //         }
-
-        //         match paint.scale_mode {
-        //             ImagePaintScaleMode::Fill { rotation } => {
-        //                 // TODO
-        //             }
-        //             _ => {}
-        //         }
-        //     }
-        //     _ => {}
-        // }
+                                ImageContent::Url { url } => HrefVariant::Url { url: url.clone() },
+                            },
+                        });
+                }
+                _ => {}
+            }
+        }
     }
 }
 
@@ -183,16 +194,6 @@ impl ImageFillSVGPaint {
                 String::from("paint-clipped-image"),
                 false,
             ),
-        });
-        paint_clipped_image_element.set_attribute(SVGAttribute::Transform {
-            transform: SVGTransformAttribute::Matrix {
-                a: 0.0,
-                b: 0.0,
-                c: 0.0,
-                d: 0.0,
-                tx: 0.0,
-                ty: 0.0,
-            },
         });
         let paint_clipped_image_index = bundle
             .append_child_to(paint_pattern_index, paint_clipped_image_element)

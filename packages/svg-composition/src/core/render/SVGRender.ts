@@ -318,10 +318,30 @@ export class SVGRender extends Render {
 				return ['clip-path', `url(#${attribute.clipPath})`];
 			case 'Fill':
 				return ['fill', attribute.fill];
+			case 'ReferencedFill':
+				return ['fill', `url(#${attribute.id})`];
 			case 'Name':
 				return ['name', attribute.name];
-			default:
-				return null;
+			case 'PatternUnits': {
+				switch (attribute.unit.type) {
+					case 'UserSpaceOnUse':
+						return ['patternUnits', 'userSpaceOnUse'];
+					case 'ObjectBoundingBox':
+						return ['patternUnits', 'objectBoundingBox'];
+					default:
+						return ['', ''];
+				}
+			}
+			case 'Href': {
+				switch (attribute.href.type) {
+					case 'Base64':
+						return ['href', `data:image/png;base64,${attribute.href.content}`];
+					case 'Url':
+						return ['href', attribute.href.url];
+					default:
+						return ['', ''];
+				}
+			}
 		}
 	}
 

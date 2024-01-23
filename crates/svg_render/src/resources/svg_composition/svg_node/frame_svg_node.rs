@@ -65,6 +65,17 @@ impl SVGNode for FrameSVGNode {
     fn apply_node_change(&mut self, changed_node: &ChangedNode) {
         for change in &changed_node.changes {
             match change {
+                NodeMixinChange::NodeComposition(mixin) => {
+                    self.bundle
+                        .get_root_mut()
+                        .set_styles(vec![SVGStyle::Display {
+                            display: if mixin.is_visible {
+                                SVGDisplayStyle::Block
+                            } else {
+                                SVGDisplayStyle::None
+                            },
+                        }]);
+                }
                 NodeMixinChange::Dimension(mixin) => {
                     self.bundle.get_root_mut().set_attributes(vec![
                         SVGAttribute::Width {
@@ -118,17 +129,6 @@ impl SVGNode for FrameSVGNode {
                     root_element.set_styles(vec![SVGStyle::BlendMode {
                         blend_mode: map_blend_mode(&mixin.blend_mode),
                     }]);
-                }
-                NodeMixinChange::NodeComposition(mixin) => {
-                    self.bundle
-                        .get_root_mut()
-                        .set_styles(vec![SVGStyle::Display {
-                            display: if mixin.is_visible {
-                                SVGDisplayStyle::Block
-                            } else {
-                                SVGDisplayStyle::None
-                            },
-                        }]);
                 }
                 NodeMixinChange::Children(mixin) => {
                     self.bundle

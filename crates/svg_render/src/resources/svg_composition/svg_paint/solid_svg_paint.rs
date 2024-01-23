@@ -11,7 +11,7 @@ use crate::{
             svg_element::{
                 attributes::{SVGAttribute, SVGMeasurementUnit},
                 mapper::map_blend_mode,
-                styles::SVGStyle,
+                styles::{SVGDisplayStyle, SVGStyle},
                 SVGElement, SVGTag,
             },
             svg_node::ElementReference,
@@ -52,6 +52,17 @@ impl SVGPaint for SolidSVGPaint {
     fn apply_paint_change(&mut self, changed_paint: &ChangedPaint) {
         for change in &changed_paint.changes {
             match change {
+                PaintMixinChange::PaintComposition(mixin) => {
+                    self.bundle
+                        .get_root_mut()
+                        .set_styles(vec![SVGStyle::Display {
+                            display: if mixin.is_visible {
+                                SVGDisplayStyle::Block
+                            } else {
+                                SVGDisplayStyle::None
+                            },
+                        }]);
+                }
                 PaintMixinChange::Dimension(mixin) => {
                     self.bundle
                         .get_child_mut(self.paint_rect.index)
