@@ -3,18 +3,24 @@ use dyn_composition::core::utils::continuous_id::ContinuousId;
 
 use crate::{
     events::output_event::ElementChangeEvent,
+    mixin_change::PaintMixinChange,
     resources::{
         changed_components::ChangedPaint,
         svg_composition::{
             svg_bundle::{BaseSVGBundle, SVGBundle},
-            svg_element::{SVGElement, SVGTag},
+            svg_element::{
+                attributes::{SVGAttribute, SVGMeasurementUnit},
+                mapper::map_blend_mode,
+                styles::SVGStyle,
+                SVGElement, SVGTag,
+            },
             svg_node::ElementReference,
             SVGCompositionRes,
         },
     },
 };
 
-use super::SVGPaint;
+use super::{utils::rgb_to_hex, SVGPaint};
 
 #[derive(Debug)]
 pub struct SolidSVGPaint {
@@ -44,40 +50,43 @@ impl SVGBundle for SolidSVGPaint {
 
 impl SVGPaint for SolidSVGPaint {
     fn apply_paint_change(&mut self, changed_paint: &ChangedPaint) {
-        // TODO
-        // match &changed_paint.paint {
-        //     Paint::Solid(paint) => {
-        //         let root_element = self.bundle.get_root_mut();
-        //         root_element.set_attributes(vec![SVGAttribute::Opacity {
-        //             opacity: paint.base_paint.opacity,
-        //         }]);
-        //         root_element.set_styles(vec![SVGStyle::Display {
-        //             display: if paint.base_paint.is_visible {
-        //                 SVGDisplayStyle::Block
-        //             } else {
-        //                 SVGDisplayStyle::None
-        //             },
-        //         }]);
-
-        //         let paint_rect_element = self.bundle.get_child_mut(self.paint_rect.index).unwrap();
-        //         paint_rect_element.set_attributes(vec![SVGAttribute::Fill {
-        //             fill: rgb_to_hex(paint.color),
-        //         }]);
-        //         if let Some(dimension) = &changed_paint.parent_dimension_mixin {
-        //             paint_rect_element.set_attributes(vec![
-        //                 SVGAttribute::Width {
-        //                     width: dimension.width,
-        //                     unit: SVGMeasurementUnit::Pixel,
-        //                 },
-        //                 SVGAttribute::Height {
-        //                     height: dimension.height,
-        //                     unit: SVGMeasurementUnit::Pixel,
-        //                 },
-        //             ]);
-        //         }
-        //     }
-        //     _ => {}
-        // }
+        for change in &changed_paint.changes {
+            match change {
+                PaintMixinChange::Dimension(mixin) => {
+                    self.bundle
+                        .get_child_mut(self.paint_rect.index)
+                        .unwrap()
+                        .set_attributes(vec![
+                            SVGAttribute::Width {
+                                width: mixin.width,
+                                unit: SVGMeasurementUnit::Pixel,
+                            },
+                            SVGAttribute::Height {
+                                height: mixin.height,
+                                unit: SVGMeasurementUnit::Pixel,
+                            },
+                        ]);
+                }
+                PaintMixinChange::Blend(mixin) => {
+                    let root_element = self.bundle.get_root_mut();
+                    root_element.set_attributes(vec![SVGAttribute::Opacity {
+                        opacity: mixin.opacity,
+                    }]);
+                    root_element.set_styles(vec![SVGStyle::BlendMode {
+                        blend_mode: map_blend_mode(&mixin.blend_mode),
+                    }]);
+                }
+                PaintMixinChange::SolidPaint(mixin) => {
+                    self.bundle
+                        .get_child_mut(self.paint_rect.index)
+                        .unwrap()
+                        .set_attributes(vec![SVGAttribute::Fill {
+                            fill: rgb_to_hex(mixin.color),
+                        }]);
+                }
+                _ => {}
+            }
+        }
     }
 }
 

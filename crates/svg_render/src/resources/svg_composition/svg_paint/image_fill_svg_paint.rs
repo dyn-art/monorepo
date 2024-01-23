@@ -140,7 +140,11 @@ impl ImageFillSVGPaint {
         let mut element = SVGElement::new(SVGTag::Group, id_generator);
         #[cfg(feature = "tracing")]
         element.set_attribute(SVGAttribute::Name {
-            name: ShapeSVGNode::create_element_name(element.get_id(), String::from("root"), false),
+            name: ImageFillSVGPaint::create_element_name(
+                element.get_id(),
+                String::from("root"),
+                false,
+            ),
         });
         let mut bundle = BaseSVGBundle::new(element, entity);
 
@@ -148,7 +152,7 @@ impl ImageFillSVGPaint {
         let defs_id = defs_element.get_id();
         #[cfg(feature = "tracing")]
         defs_element.set_attribute(SVGAttribute::Name {
-            name: ShapeSVGNode::create_element_name(defs_id, String::from("defs"), false),
+            name: ImageFillSVGPaint::create_element_name(defs_id, String::from("defs"), false),
         });
         let defs_index = bundle.append_child(defs_element);
 
@@ -157,7 +161,7 @@ impl ImageFillSVGPaint {
         let paint_pattern_id = paint_pattern_element.get_id();
         #[cfg(feature = "tracing")]
         paint_pattern_element.set_attribute(SVGAttribute::Name {
-            name: ShapeSVGNode::create_element_name(
+            name: ImageFillSVGPaint::create_element_name(
                 paint_pattern_id,
                 String::from("paint-pattern"),
                 true,
@@ -174,7 +178,7 @@ impl ImageFillSVGPaint {
         let paint_clipped_image_id = paint_clipped_image_element.get_id();
         #[cfg(feature = "tracing")]
         paint_clipped_image_element.set_attribute(SVGAttribute::Name {
-            name: ShapeSVGNode::create_element_name(
+            name: ImageFillSVGPaint::create_element_name(
                 paint_clipped_image_id,
                 String::from("paint-clipped-image"),
                 false,
@@ -198,7 +202,7 @@ impl ImageFillSVGPaint {
         let paint_rect_id = paint_rect_element.get_id();
         #[cfg(feature = "tracing")]
         paint_rect_element.set_attribute(SVGAttribute::Name {
-            name: ShapeSVGNode::create_element_name(
+            name: ImageFillSVGPaint::create_element_name(
                 paint_rect_id,
                 String::from("paint-rect"),
                 false,

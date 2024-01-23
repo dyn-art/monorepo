@@ -1,6 +1,10 @@
-use dyn_composition::core::modules::node::components::mixins::{
-    BlendMixin, ChildrenMixin, DimensionMixin, FillMixin, ImageContentMixin, NodeCompositionMixin,
-    PaintCompositionMixin, PathMixin, RectangleCornerMixin, RelativeTransformMixin,
+use dyn_composition::core::modules::node::components::{
+    mixins::{
+        BlendMixin, ChildrenMixin, DimensionMixin, FillMixin, ImageContentMixin,
+        NodeCompositionMixin, PaintCompositionMixin, PathMixin, RectangleCornerMixin,
+        RelativeTransformMixin,
+    },
+    types::{GradientPaint, ImagePaint, SolidPaint},
 };
 use serde::Serialize;
 use specta::Type;
@@ -100,6 +104,9 @@ pub enum PaintMixinChange {
     Blend(BlendMixin),
     PaintComposition(PaintCompositionMixin),
     ImageContent(ImageContentMixin),
+    SolidPaint(SolidPaint),
+    ImagePaint(ImagePaint),
+    GradientPaint(GradientPaint),
 }
 
 impl ToPaintMixinChange for BlendMixin {
@@ -127,5 +134,23 @@ impl ToPaintMixinChange for PaintCompositionMixin {
 impl ToPaintMixinChange for ImageContentMixin {
     fn to_mixin_change(&self) -> PaintMixinChange {
         PaintMixinChange::ImageContent(self.clone())
+    }
+}
+
+impl ToPaintMixinChange for SolidPaint {
+    fn to_mixin_change(&self) -> PaintMixinChange {
+        PaintMixinChange::SolidPaint(self.clone())
+    }
+}
+
+impl ToPaintMixinChange for ImagePaint {
+    fn to_mixin_change(&self) -> PaintMixinChange {
+        PaintMixinChange::ImagePaint(self.clone())
+    }
+}
+
+impl ToPaintMixinChange for GradientPaint {
+    fn to_mixin_change(&self) -> PaintMixinChange {
+        PaintMixinChange::GradientPaint(self.clone())
     }
 }

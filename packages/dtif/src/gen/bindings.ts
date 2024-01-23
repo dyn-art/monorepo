@@ -650,7 +650,7 @@ export type PaintCompositionMixin = {
  */
 isVisible?: boolean }
 
-export type PaintMixinChange = ({ type: "Dimension" } & DimensionMixin) | ({ type: "Blend" } & BlendMixin) | ({ type: "PaintComposition" } & PaintCompositionMixin) | ({ type: "ImageContent" } & ImageContentMixin)
+export type PaintMixinChange = ({ type: "Dimension" } & DimensionMixin) | ({ type: "Blend" } & BlendMixin) | ({ type: "PaintComposition" } & PaintCompositionMixin) | ({ type: "ImageContent" } & ImageContentMixin) | ({ type: "SolidPaint" } & SolidPaint) | ({ type: "ImagePaint" } & ImagePaint) | ({ type: "GradientPaint" } & GradientPaint)
 
 export type PaintType = "None" | "Solid" | "Gradient" | "Image"
 

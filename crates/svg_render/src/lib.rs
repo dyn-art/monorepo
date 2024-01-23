@@ -3,9 +3,12 @@ use std::sync::mpsc::Sender;
 use bevy_app::{App, Plugin};
 use bevy_ecs::schedule::IntoSystemConfigs;
 use dyn_bevy_render_skeleton::{ExtractSchedule, Render, RenderApp, RenderSet};
-use dyn_composition::core::modules::node::components::mixins::{
-    BlendMixin, DimensionMixin, ImageContentMixin, NodeCompositionMixin, PaintCompositionMixin,
-    PathMixin, RelativeTransformMixin,
+use dyn_composition::core::modules::node::components::{
+    mixins::{
+        BlendMixin, DimensionMixin, ImageContentMixin, NodeCompositionMixin, PaintCompositionMixin,
+        PathMixin, RelativeTransformMixin,
+    },
+    types::{GradientPaint, ImagePaint, SolidPaint},
 };
 use events::output_event::SVGRenderOutputEvent;
 use systems::extract::extract_paint_mixin_generic;
@@ -56,6 +59,9 @@ impl Plugin for SvgRenderPlugin {
                     extract_paint_mixin_generic::<DimensionMixin>,
                     extract_paint_mixin_generic::<PaintCompositionMixin>,
                     extract_paint_mixin_generic::<ImageContentMixin>,
+                    extract_paint_mixin_generic::<SolidPaint>,
+                    extract_paint_mixin_generic::<ImagePaint>,
+                    extract_paint_mixin_generic::<GradientPaint>,
                 ),
             )
             .add_systems(Render, (queue_element_changes.in_set(RenderSet::Queue),));

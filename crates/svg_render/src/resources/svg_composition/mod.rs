@@ -15,7 +15,9 @@ use self::{
     svg_bundle_variant::{get_bundle_mut, SVGBundleVariant},
     svg_element::SVGChildElementIdentifier,
     svg_node::{frame_svg_node::FrameSVGNode, shape_svg_node::ShapeSVGNode, SVGNode},
-    svg_paint::{solid_svg_paint::SolidSVGPaint, SVGPaint},
+    svg_paint::{
+        image_fill_svg_paint::ImageFillSVGPaint, solid_svg_paint::SolidSVGPaint, SVGPaint,
+    },
 };
 
 pub mod svg_bundle;
@@ -119,7 +121,8 @@ impl SVGCompositionRes {
     ) -> Option<Box<dyn SVGPaint>> {
         match paint_type {
             PaintType::Solid => Some(Box::new(SolidSVGPaint::new(entity, &mut self.id_generator))),
-            _ => None, // TODO
+            PaintType::Image => None, // TODO: Can't just do Image as there are different Image Paint variants
+            _ => None,
         }
     }
 
