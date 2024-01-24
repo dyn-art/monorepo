@@ -2,7 +2,7 @@ use bevy_ecs::entity::Entity;
 use dyn_composition::core::{
     modules::node::components::{
         mixins::ImageContent,
-        types::{ImageFillFitPaintTransform, ImagePaintScaleMode},
+        types::{ImageFillFitPaintTransform, ImagePaintScaleMode, ImageTilePaintTransform},
     },
     utils::continuous_id::ContinuousId,
 };
@@ -33,7 +33,7 @@ use base64::prelude::*;
 use super::SVGPaint;
 
 #[derive(Debug)]
-pub struct ImageFillSVGPaint {
+pub struct ImageSVGPaint {
     bundle: BaseSVGBundle,
 
     defs: ElementReference,
@@ -44,7 +44,7 @@ pub struct ImageFillSVGPaint {
     paint_rect: ElementReference,
 }
 
-impl SVGBundle for ImageFillSVGPaint {
+impl SVGBundle for ImageSVGPaint {
     fn get_bundle(&self) -> &BaseSVGBundle {
         &self.bundle
     }
@@ -62,12 +62,13 @@ impl SVGBundle for ImageFillSVGPaint {
     }
 }
 
-impl SVGPaint for ImageFillSVGPaint {
+impl SVGPaint for ImageSVGPaint {
     fn apply_paint_change(&mut self, changed_paint: &ChangedPaint) {
         for change in &changed_paint.changes {
             match change {
                 PaintMixinChange::ImagePaint(mixin) => match &mixin.scale_mode {
-                    ImagePaintScaleMode::Fill { transform } => match transform {
+                    ImagePaintScaleMode::Fill { transform }
+                    | ImagePaintScaleMode::Fit { transform } => match transform {
                         ImageFillFitPaintTransform::Transform { transform } => {
                             self.bundle
                                 .get_child_mut(self.paint_clipped_image.index)
@@ -78,6 +79,25 @@ impl SVGPaint for ImageFillSVGPaint {
                         }
                         _ => {}
                     },
+                    ImagePaintScaleMode::Tile { transform } => match transform {
+                        ImageTilePaintTransform::Transform { transform } => {
+                            self.bundle
+                                .get_child_mut(self.paint_clipped_image.index)
+                                .unwrap()
+                                .set_attribute(SVGAttribute::Transform {
+                                    transform: mat3_to_svg_transform(transform),
+                                });
+                        }
+                        _ => {}
+                    },
+                    ImagePaintScaleMode::Crop { transform } => {
+                        self.bundle
+                            .get_child_mut(self.paint_clipped_image.index)
+                            .unwrap()
+                            .set_attribute(SVGAttribute::Transform {
+                                transform: mat3_to_svg_transform(transform),
+                            });
+                    }
                     _ => {}
                 },
                 PaintMixinChange::PaintComposition(mixin) => {
@@ -120,6 +140,7 @@ impl SVGPaint for ImageFillSVGPaint {
                             },
                         ]);
 
+                    // TODO: check scale mode and only set if Fit and Fill
                     self.bundle
                         .get_child_mut(self.paint_clipped_image.index)
                         .unwrap()
@@ -164,17 +185,17 @@ impl SVGPaint for ImageFillSVGPaint {
     }
 }
 
-impl ImageFillSVGPaint {
-    pub fn new(entity: Entity, id_generator: &mut ContinuousId) -> Self {
+impl ImageSVGPaint {
+    pub fn new(
+        entity: Entity,
+        id_generator: &mut ContinuousId,
+        scale_mode: &ImagePaintScaleMode,
+    ) -> Self {
         // Create root element
         let mut element = SVGElement::new(SVGTag::Group, id_generator);
         #[cfg(feature = "tracing")]
         element.set_attribute(SVGAttribute::Name {
-            name: ImageFillSVGPaint::create_element_name(
-                element.get_id(),
-                String::from("root"),
-                false,
-            ),
+            name: ImageSVGPaint::create_element_name(element.get_id(), String::from("root"), false),
         });
         let mut bundle = BaseSVGBundle::new(element, entity);
 
@@ -182,7 +203,7 @@ impl ImageFillSVGPaint {
         let defs_id = defs_element.get_id();
         #[cfg(feature = "tracing")]
         defs_element.set_attribute(SVGAttribute::Name {
-            name: ImageFillSVGPaint::create_element_name(defs_id, String::from("defs"), false),
+            name: ImageSVGPaint::create_element_name(defs_id, String::from("defs"), false),
         });
         let defs_index = bundle.append_child(defs_element);
 
@@ -191,7 +212,7 @@ impl ImageFillSVGPaint {
         let paint_pattern_id = paint_pattern_element.get_id();
         #[cfg(feature = "tracing")]
         paint_pattern_element.set_attribute(SVGAttribute::Name {
-            name: ImageFillSVGPaint::create_element_name(
+            name: ImageSVGPaint::create_element_name(
                 paint_pattern_id,
                 String::from("paint-pattern"),
                 true,
@@ -208,15 +229,20 @@ impl ImageFillSVGPaint {
         let paint_clipped_image_id = paint_clipped_image_element.get_id();
         #[cfg(feature = "tracing")]
         paint_clipped_image_element.set_attribute(SVGAttribute::Name {
-            name: ImageFillSVGPaint::create_element_name(
+            name: ImageSVGPaint::create_element_name(
                 paint_clipped_image_id,
                 String::from("paint-clipped-image"),
                 false,
             ),
         });
-        paint_clipped_image_element.set_attribute(SVGAttribute::PreserveAspectRatio {
-            preserve_aspect_ratio: String::from("xMidYMid slice"),
-        });
+        match scale_mode {
+            ImagePaintScaleMode::Fill { .. } => {
+                paint_clipped_image_element.set_attribute(SVGAttribute::PreserveAspectRatio {
+                    preserve_aspect_ratio: String::from("xMidYMid slice"),
+                });
+            }
+            _ => {}
+        }
         let paint_clipped_image_index = bundle
             .append_child_to(paint_pattern_index, paint_clipped_image_element)
             .unwrap();
@@ -225,7 +251,7 @@ impl ImageFillSVGPaint {
         let paint_rect_id = paint_rect_element.get_id();
         #[cfg(feature = "tracing")]
         paint_rect_element.set_attribute(SVGAttribute::Name {
-            name: ImageFillSVGPaint::create_element_name(
+            name: ImageSVGPaint::create_element_name(
                 paint_rect_id,
                 String::from("paint-rect"),
                 false,

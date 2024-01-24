@@ -16,9 +16,7 @@ use self::{
     svg_bundle_variant::{get_bundle_mut, SVGBundleVariant},
     svg_element::SVGChildElementIdentifier,
     svg_node::{frame_svg_node::FrameSVGNode, shape_svg_node::ShapeSVGNode, SVGNode},
-    svg_paint::{
-        image_fill_svg_paint::ImageFillSVGPaint, solid_svg_paint::SolidSVGPaint, SVGPaint,
-    },
+    svg_paint::{image_svg_paint::ImageSVGPaint, solid_svg_paint::SolidSVGPaint, SVGPaint},
 };
 
 pub mod svg_bundle;
@@ -129,14 +127,11 @@ impl SVGCompositionRes {
             // Handle image paint
             PaintType::Image => initial_changes.iter().find_map(|change| {
                 if let PaintMixinChange::ImagePaint(paint) = change {
-                    return match paint.scale_mode {
-                        ImagePaintScaleMode::Fill { .. } => Some(Box::new(ImageFillSVGPaint::new(
-                            entity,
-                            &mut self.id_generator,
-                        ))
-                            as Box<dyn SVGPaint>),
-                        _ => None,
-                    };
+                    return Some(Box::new(ImageSVGPaint::new(
+                        entity,
+                        &mut self.id_generator,
+                        &paint.scale_mode,
+                    )) as Box<dyn SVGPaint>);
                 } else {
                     return None;
                 }
