@@ -2,7 +2,7 @@ use std::{collections::HashMap, sync::mpsc::Sender};
 
 use bevy_ecs::{entity::Entity, system::Resource};
 use dyn_composition::core::{
-    modules::node::components::types::{ImagePaintScaleMode, NodeType, PaintType},
+    modules::node::components::types::{NodeType, PaintType},
     utils::continuous_id::ContinuousId,
 };
 
