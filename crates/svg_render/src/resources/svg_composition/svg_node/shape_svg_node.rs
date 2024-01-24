@@ -100,7 +100,7 @@ impl SVGNode for ShapeSVGNode {
                 NodeMixinChange::RelativeTransform(mixin) => {
                     self.bundle.get_root_mut().set_attributes(vec![
                         (SVGAttribute::Transform {
-                            transform: mat3_to_svg_transform(mixin.relative_transform.0),
+                            transform: mat3_to_svg_transform(&mixin.relative_transform.0),
                         }),
                     ]);
                 }

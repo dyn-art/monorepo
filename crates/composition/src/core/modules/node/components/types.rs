@@ -355,22 +355,67 @@ pub struct ImagePaint {
 #[serde(tag = "type")]
 pub enum ImagePaintScaleMode {
     /// Fills the area completely with the image.
-    Fill { rotation: f32 },
+    Fill {
+        #[serde(default)]
+        transform: ImageFillFitPaintTransform,
+    },
 
     /// Fits the image within the area while maintaining its aspect ratio.
-    Fit { rotation: f32 },
+    Fit {
+        #[serde(default)]
+        transform: ImageFillFitPaintTransform,
+    },
 
     /// Crops the image to fill the area.
     Crop { transform: Mat3 },
 
     /// Tiles the image within the area.
-    #[serde(rename_all = "camelCase")]
-    Tile { rotation: f32, scaling_factor: f32 },
+    Tile {
+        #[serde(default)]
+        transform: ImageTilePaintTransform,
+    },
 }
 
 impl Default for ImagePaintScaleMode {
     fn default() -> Self {
-        Self::Fill { rotation: 0.0 }
+        Self::Fill {
+            transform: ImageFillFitPaintTransform::default(),
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, Type)]
+#[serde(tag = "type")]
+pub enum ImageFillFitPaintTransform {
+    Simple { rotation: f32 },
+    Transform { transform: Mat3 },
+}
+
+impl Default for ImageFillFitPaintTransform {
+    fn default() -> Self {
+        Self::Simple { rotation: 0.0 }
+    }
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, Type)]
+#[serde(tag = "type")]
+pub enum ImageTilePaintTransform {
+    #[serde(rename_all = "camelCase")]
+    Simple {
+        rotation: f32,
+        scaling_factor: f32,
+    },
+    Transform {
+        transform: Mat3,
+    },
+}
+
+impl Default for ImageTilePaintTransform {
+    fn default() -> Self {
+        Self::Simple {
+            rotation: 0.0,
+            scaling_factor: 1.0,
+        }
     }
 }
 

@@ -323,7 +323,7 @@ export class SVGRender extends Render {
 			case 'Name':
 				return ['name', attribute.name];
 			case 'PatternUnits': {
-				switch (attribute.unit.type) {
+				switch (attribute.patternUnits.type) {
 					case 'UserSpaceOnUse':
 						return ['patternUnits', 'userSpaceOnUse'];
 					case 'ObjectBoundingBox':
@@ -342,6 +342,8 @@ export class SVGRender extends Render {
 						return ['', ''];
 				}
 			}
+			case 'PreserveAspectRatio':
+				return ['preserveAspectRatio', attribute.preserveAspectRatio];
 		}
 	}
 

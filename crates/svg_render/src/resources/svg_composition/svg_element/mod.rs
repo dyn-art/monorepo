@@ -164,8 +164,8 @@ impl SVGElement {
         self.children.clear()
     }
 
+    // TODO
     pub fn reorder_children(&mut self, new_order: &Vec<Entity>) {
-        // TODO
         // In the creation update cycle the correct order should be established
         // when constructing the dependency tree based on the changed nodes
         if self.was_created_in_current_update_cycle {

@@ -3,7 +3,7 @@ use glam::{Mat3, Vec2};
 
 use super::attributes::{SVGPathCommand, SVGTransformAttribute};
 
-pub fn mat3_to_svg_transform(transform: Mat3) -> SVGTransformAttribute {
+pub fn mat3_to_svg_transform(transform: &Mat3) -> SVGTransformAttribute {
     //   x y z
     // | a d tx |
     // | b e ty |

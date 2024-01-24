@@ -27,8 +27,8 @@ pub enum SVGAttribute {
     D {
         d: Vec<SVGPathCommand>,
     },
+    #[serde(rename_all = "camelCase")]
     ClipPath {
-        #[serde(rename = "clipPath")]
         clip_path: ContinuousId,
     },
     Fill {
@@ -40,11 +40,16 @@ pub enum SVGAttribute {
     Name {
         name: String,
     },
+    #[serde(rename_all = "camelCase")]
     PatternUnits {
-        unit: PatternUnit,
+        pattern_units: SVGPatternUnitsVariant,
     },
     Href {
-        href: HrefVariant,
+        href: SVGHrefVariant,
+    },
+    #[serde(rename_all = "camelCase")]
+    PreserveAspectRatio {
+        preserve_aspect_ratio: String,
     },
 }
 
@@ -62,6 +67,7 @@ impl SVGAttribute {
             Self::Name { .. } => "name",
             Self::PatternUnits { .. } => "patternUnits",
             Self::Href { .. } => "href",
+            Self::PreserveAspectRatio { .. } => "preserveAspectRatio",
         }
     }
 
@@ -119,14 +125,15 @@ impl SVGAttribute {
             Self::Fill { fill } => fill.clone(),
             Self::ReferencedFill { id } => format!("url(#{id})"),
             Self::Name { name } => name.clone(),
-            Self::PatternUnits { unit } => match unit {
-                PatternUnit::ObjectBoundingBox => "objectBoundingBox".to_string(),
-                PatternUnit::UserSpaceOnUse => "userSpaceOnUse".to_string()
+            Self::PatternUnits { pattern_units: unit } => match unit {
+                SVGPatternUnitsVariant::ObjectBoundingBox => "objectBoundingBox".to_string(),
+                SVGPatternUnitsVariant::UserSpaceOnUse => "userSpaceOnUse".to_string()
             },
             Self::Href { href } => match href {
-                HrefVariant::Base64 { content } => format!("data:image/png;base64,{content}"),
-                HrefVariant::Url { url } => url.clone()
+                SVGHrefVariant::Base64 { content } => format!("data:image/png;base64,{content}"),
+                SVGHrefVariant::Url { url } => url.clone()
             }
+            Self::PreserveAspectRatio { preserve_aspect_ratio } => preserve_aspect_ratio.clone()
         }
     }
 }
@@ -189,14 +196,14 @@ pub enum SVGMeasurementUnit {
 
 #[derive(Debug, Serialize, Clone, Type)]
 #[serde(tag = "type")]
-pub enum PatternUnit {
+pub enum SVGPatternUnitsVariant {
     UserSpaceOnUse,
     ObjectBoundingBox,
 }
 
 #[derive(Debug, Serialize, Clone, Type)]
 #[serde(tag = "type")]
-pub enum HrefVariant {
+pub enum SVGHrefVariant {
     Base64 { content: String },
     Url { url: String },
 }

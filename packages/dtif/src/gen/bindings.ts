@@ -463,8 +463,6 @@ export type HorizontalTextAlignment =
  */
 "Justified"
 
-export type HrefVariant = { type: "Base64"; content: string } | { type: "Url"; url: string }
-
 export type ImageContent = 
 /**
  * Image content stored as binary data.
@@ -491,6 +489,8 @@ height: number;
  */
 content: ImageContent }
 
+export type ImageFillFitPaintTransform = { type: "Simple"; rotation: number } | { type: "Transform"; transform: Mat3 }
+
 export type ImagePaint = { _image_paint?: null | null; 
 /**
  * Defines the scale mode of the image.
@@ -507,11 +507,11 @@ export type ImagePaintScaleMode =
 /**
  * Fills the area completely with the image.
  */
-{ type: "Fill"; rotation: number } | 
+{ type: "Fill"; transform?: ImageFillFitPaintTransform } | 
 /**
  * Fits the image within the area while maintaining its aspect ratio.
  */
-{ type: "Fit"; rotation: number } | 
+{ type: "Fit"; transform?: ImageFillFitPaintTransform } | 
 /**
  * Crops the image to fill the area.
  */
@@ -519,7 +519,9 @@ export type ImagePaintScaleMode =
 /**
  * Tiles the image within the area.
  */
-{ type: "Tile"; rotation: number; scalingFactor: number }
+{ type: "Tile"; transform?: ImageTilePaintTransform }
+
+export type ImageTilePaintTransform = { type: "Simple"; rotation: number; scalingFactor: number } | { type: "Transform"; transform: Mat3 }
 
 export type InteractionInputEvent = ({ type: "CursorDownOnEntity" } & CursorDownOnEntity) | ({ type: "CursorMovedOnComposition" } & CursorMovedOnComposition) | ({ type: "CursorEnteredComposition" }) | ({ type: "CursorExitedComposition" }) | ({ type: "CursorDownOnComposition" } & CursorDownOnComposition) | ({ type: "CursorUpOnComposition" } & CursorUpOnComposition) | ({ type: "WheeledOnComposition" } & WheeledOnComposition) | ({ type: "CursorDownOnResizeHandle" } & CursorDownOnResizeHandle) | ({ type: "CursorDownOnRotateHandle" } & CursorDownOnRotateHandle)
 
@@ -665,8 +667,6 @@ export type PathMixin = {
  */
 vertices: Anchor[] }
 
-export type PatternUnit = { type: "UserSpaceOnUse" } | { type: "ObjectBoundingBox" }
-
 /**
  * Represents a basic shape node for a regular convex polygon with three or more sides.
  */
@@ -740,15 +740,19 @@ export type RelativeTransformMixin = Mat3
  */
 export type Root = null
 
-export type SVGAttribute = { type: "Id"; id: ContinuousId } | { type: "Width"; width: number; unit: SVGMeasurementUnit } | { type: "Height"; height: number; unit: SVGMeasurementUnit } | { type: "Opacity"; opacity: number } | { type: "Transform"; transform: SVGTransformAttribute } | { type: "D"; d: SVGPathCommand[] } | { type: "ClipPath"; clipPath: ContinuousId } | { type: "Fill"; fill: string } | { type: "ReferencedFill"; id: ContinuousId } | { type: "Name"; name: string } | { type: "PatternUnits"; unit: PatternUnit } | { type: "Href"; href: HrefVariant }
+export type SVGAttribute = { type: "Id"; id: ContinuousId } | { type: "Width"; width: number; unit: SVGMeasurementUnit } | { type: "Height"; height: number; unit: SVGMeasurementUnit } | { type: "Opacity"; opacity: number } | { type: "Transform"; transform: SVGTransformAttribute } | { type: "D"; d: SVGPathCommand[] } | { type: "ClipPath"; clipPath: ContinuousId } | { type: "Fill"; fill: string } | { type: "ReferencedFill"; id: ContinuousId } | { type: "Name"; name: string } | { type: "PatternUnits"; patternUnits: SVGPatternUnitsVariant } | { type: "Href"; href: SVGHrefVariant } | { type: "PreserveAspectRatio"; preserveAspectRatio: string }
 
 export type SVGBlendMode = { type: "Normal" } | { type: "Multiply" } | { type: "Screen" } | { type: "Overlay" } | { type: "Darken" } | { type: "Lighten" } | { type: "ColorDodge" } | { type: "ColorBurn" } | { type: "HardLight" } | { type: "SoftLight" } | { type: "Difference" } | { type: "Exclusion" } | { type: "Hue" } | { type: "Saturation" } | { type: "Color" } | { type: "Luminosity" }
 
 export type SVGDisplayStyle = { type: "Block" } | { type: "None" }
 
+export type SVGHrefVariant = { type: "Base64"; content: string } | { type: "Url"; url: string }
+
 export type SVGMeasurementUnit = { type: "Pixel" } | { type: "Percent" }
 
 export type SVGPathCommand = { type: "MoveTo"; x: number; y: number } | { type: "LineTo"; x: number; y: number } | { type: "CurveTo"; cx1: number; cy1: number; cx2: number; cy2: number; x: number; y: number } | { type: "ArcTo"; rx: number; ry: number; xAxisRotation: number; largeArcFlag: boolean; sweepFlag: boolean; x: number; y: number } | { type: "ClosePath" }
+
+export type SVGPatternUnitsVariant = { type: "UserSpaceOnUse" } | { type: "ObjectBoundingBox" }
 
 export type SVGRenderOutputEvent = ({ type: "ElementChange" } & ElementChangeEvent)
 

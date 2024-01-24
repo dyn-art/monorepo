@@ -1,6 +1,10 @@
 use bevy_ecs::entity::Entity;
 use dyn_composition::core::{
-    modules::node::components::mixins::ImageContent, utils::continuous_id::ContinuousId,
+    modules::node::components::{
+        mixins::ImageContent,
+        types::{ImageFillFitPaintTransform, ImagePaintScaleMode},
+    },
+    utils::continuous_id::ContinuousId,
 };
 
 use crate::{
@@ -12,9 +16,9 @@ use crate::{
             svg_bundle::{BaseSVGBundle, SVGBundle},
             svg_element::{
                 attributes::{
-                    HrefVariant, PatternUnit, SVGAttribute, SVGMeasurementUnit,
-                    SVGTransformAttribute,
+                    SVGAttribute, SVGHrefVariant, SVGMeasurementUnit, SVGPatternUnitsVariant,
                 },
+                helper::mat3_to_svg_transform,
                 mapper::map_blend_mode,
                 styles::{SVGDisplayStyle, SVGStyle},
                 SVGElement, SVGTag,
@@ -62,6 +66,20 @@ impl SVGPaint for ImageFillSVGPaint {
     fn apply_paint_change(&mut self, changed_paint: &ChangedPaint) {
         for change in &changed_paint.changes {
             match change {
+                PaintMixinChange::ImagePaint(mixin) => match &mixin.scale_mode {
+                    ImagePaintScaleMode::Fill { transform } => match transform {
+                        ImageFillFitPaintTransform::Transform { transform } => {
+                            self.bundle
+                                .get_child_mut(self.paint_clipped_image.index)
+                                .unwrap()
+                                .set_attribute(SVGAttribute::Transform {
+                                    transform: mat3_to_svg_transform(transform),
+                                });
+                        }
+                        _ => {}
+                    },
+                    _ => {}
+                },
                 PaintMixinChange::PaintComposition(mixin) => {
                     self.bundle
                         .get_root_mut()
@@ -131,11 +149,12 @@ impl SVGPaint for ImageFillSVGPaint {
                         .unwrap()
                         .set_attribute(SVGAttribute::Href {
                             href: match &mixin.content {
-                                ImageContent::Binary { content } => HrefVariant::Base64 {
+                                ImageContent::Binary { content } => SVGHrefVariant::Base64 {
                                     content: BASE64_STANDARD.encode(content),
                                 },
-
-                                ImageContent::Url { url } => HrefVariant::Url { url: url.clone() },
+                                ImageContent::Url { url } => {
+                                    SVGHrefVariant::Url { url: url.clone() }
+                                }
                             },
                         });
                 }
@@ -179,7 +198,7 @@ impl ImageFillSVGPaint {
             ),
         });
         paint_pattern_element.set_attribute(SVGAttribute::PatternUnits {
-            unit: PatternUnit::UserSpaceOnUse,
+            pattern_units: SVGPatternUnitsVariant::UserSpaceOnUse,
         });
         let paint_pattern_index = bundle
             .append_child_to(defs_index, paint_pattern_element)
@@ -194,6 +213,9 @@ impl ImageFillSVGPaint {
                 String::from("paint-clipped-image"),
                 false,
             ),
+        });
+        paint_clipped_image_element.set_attribute(SVGAttribute::PreserveAspectRatio {
+            preserve_aspect_ratio: String::from("xMidYMid slice"),
         });
         let paint_clipped_image_index = bundle
             .append_child_to(paint_pattern_index, paint_clipped_image_element)
