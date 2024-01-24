@@ -74,16 +74,11 @@ pub fn update_image_paint_transform(
                         let center_y = dimension.height / 2.0;
                         let rotation_angle = rotation.to_radians();
 
-                        let mut mat3_transform =
-                            Mat3::from_translation(Vec2::new(-center_x, -center_y))
-                                * Mat3::from_rotation_z(rotation_angle)
-                                * Mat3::from_translation(Vec2::new(center_x, center_y));
-                        mat3_transform.z_axis.x = dimension.width;
-                        mat3_transform.z_axis.y = dimension.height;
-
                         // Translate to origin, rotate, translate back
                         *transform = ImageFillFitPaintTransform::Transform {
-                            transform: mat3_transform,
+                            transform: Mat3::from_translation(Vec2::new(center_x, center_y))
+                                * Mat3::from_rotation_z(rotation_angle)
+                                * Mat3::from_translation(Vec2::new(-center_x, -center_y)),
                         };
                     }
                     ImageFillFitPaintTransform::Transform { transform } => {
@@ -100,13 +95,14 @@ pub fn update_image_paint_transform(
                     } => {
                         let center_x = dimension.width / 2.0;
                         let center_y = dimension.height / 2.0;
+                        let rotation_angle = rotation.to_radians();
 
                         // Translate to origin, scale, rotate, translate back
                         *transform = ImageTilePaintTransform::Transform {
-                            transform: Mat3::from_translation(Vec2::new(-center_x, -center_y))
+                            transform: Mat3::from_translation(Vec2::new(center_x, center_y))
                                 * Mat3::from_scale(Vec2::splat(*scaling_factor))
-                                * Mat3::from_rotation_z(*rotation)
-                                * Mat3::from_translation(Vec2::new(center_x, center_y)),
+                                * Mat3::from_rotation_z(rotation_angle)
+                                * Mat3::from_translation(Vec2::new(-center_x, -center_y)),
                         };
                     }
                     ImageTilePaintTransform::Transform { transform } => {
