@@ -489,7 +489,7 @@ height: number;
  */
 content: ImageContent }
 
-export type ImageFillFitPaintTransform = { type: "Simple"; rotation: number } | { type: "Render"; transform: Mat3 }
+export type ImageCropPaintTransform = { type: "Basic"; transform: Mat3 } | { type: "Internal"; cropTransform: Mat3; transform: Mat3; imageWidth: number; imageHeight: number }
 
 export type ImagePaint = { _image_paint?: null | null; 
 /**
@@ -507,21 +507,21 @@ export type ImagePaintScaleMode =
 /**
  * Fills the area completely with the image.
  */
-{ type: "Fill"; transform?: ImageFillFitPaintTransform } | 
+{ type: "Fill"; _image_fill_paint?: null | null } | 
 /**
  * Fits the image within the area while maintaining its aspect ratio.
  */
-{ type: "Fit"; transform?: ImageFillFitPaintTransform } | 
+{ type: "Fit"; _image_fit_paint?: null | null } | 
 /**
  * Crops the image to fill the area.
  */
-{ type: "Crop"; transform: Mat3 } | 
+{ type: "Crop"; transform: ImageCropPaintTransform } | 
 /**
  * Tiles the image within the area.
  */
 { type: "Tile"; transform?: ImageTilePaintTransform }
 
-export type ImageTilePaintTransform = { type: "Simple"; rotation: number; scalingFactor: number } | { type: "Render"; rotation: number; tileWidth: number; tileHeight: number }
+export type ImageTilePaintTransform = { type: "Basic"; rotation: number; scalingFactor: number } | { type: "Internal"; rotation: number; tileWidth: number; tileHeight: number }
 
 export type InteractionInputEvent = ({ type: "CursorDownOnEntity" } & CursorDownOnEntity) | ({ type: "CursorMovedOnComposition" } & CursorMovedOnComposition) | ({ type: "CursorEnteredComposition" }) | ({ type: "CursorExitedComposition" }) | ({ type: "CursorDownOnComposition" } & CursorDownOnComposition) | ({ type: "CursorUpOnComposition" } & CursorUpOnComposition) | ({ type: "WheeledOnComposition" } & WheeledOnComposition) | ({ type: "CursorDownOnResizeHandle" } & CursorDownOnResizeHandle) | ({ type: "CursorDownOnRotateHandle" } & CursorDownOnRotateHandle)
 

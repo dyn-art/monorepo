@@ -67,28 +67,29 @@ function resolveScaleMode(paint: ImagePaint): COMP.ImagePaint['scaleMode'] {
 		case 'CROP':
 			return {
 				type: 'Crop',
-				transform: mapFigmaTransformToMat3(
-					paint.imageTransform ?? [
-						[0, 0, 1],
-						[1, 0, 0]
-					]
-				)
+				transform: {
+					type: 'Basic',
+					transform: mapFigmaTransformToMat3(
+						paint.imageTransform ?? [
+							[0, 0, 1],
+							[1, 0, 0]
+						]
+					)
+				}
 			};
 		case 'FILL':
 			return {
-				type: 'Fill',
-				transform: { type: 'Simple', rotation: paint.rotation ?? 0 }
+				type: 'Fill'
 			};
 		case 'FIT':
 			return {
-				type: 'Fit',
-				transform: { type: 'Simple', rotation: paint.rotation ?? 0 }
+				type: 'Fit'
 			};
 		case 'TILE':
 			return {
 				type: 'Tile',
 				transform: {
-					type: 'Simple',
+					type: 'Basic',
 					rotation: paint.rotation ?? 0,
 					scalingFactor: paint.scalingFactor ?? 1
 				}

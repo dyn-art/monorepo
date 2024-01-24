@@ -357,17 +357,17 @@ pub enum ImagePaintScaleMode {
     /// Fills the area completely with the image.
     Fill {
         #[serde(default)]
-        transform: ImageFillFitPaintTransform,
+        _image_fill_paint: Option<()>,
     },
 
     /// Fits the image within the area while maintaining its aspect ratio.
     Fit {
         #[serde(default)]
-        transform: ImageFillFitPaintTransform,
+        _image_fit_paint: Option<()>,
     },
 
     /// Crops the image to fill the area.
-    Crop { transform: Mat3 },
+    Crop { transform: ImageCropPaintTransform },
 
     /// Tiles the image within the area.
     Tile {
@@ -379,21 +379,8 @@ pub enum ImagePaintScaleMode {
 impl Default for ImagePaintScaleMode {
     fn default() -> Self {
         Self::Fill {
-            transform: ImageFillFitPaintTransform::default(),
+            _image_fill_paint: None,
         }
-    }
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug, Type)]
-#[serde(tag = "type")]
-pub enum ImageFillFitPaintTransform {
-    Simple { rotation: f32 },
-    Render { transform: Mat3 },
-}
-
-impl Default for ImageFillFitPaintTransform {
-    fn default() -> Self {
-        Self::Simple { rotation: 0.0 }
     }
 }
 
@@ -401,18 +388,33 @@ impl Default for ImageFillFitPaintTransform {
 #[serde(tag = "type")]
 pub enum ImageTilePaintTransform {
     #[serde(rename_all = "camelCase")]
-    Simple { rotation: f32, scaling_factor: f32 },
+    Basic { rotation: f32, scaling_factor: f32 },
     #[serde(rename_all = "camelCase")]
-    Render {
+    Internal {
         rotation: f32,
         tile_width: f32,
         tile_height: f32,
     },
 }
 
+#[derive(Serialize, Deserialize, Clone, Debug, Type)]
+#[serde(tag = "type")]
+pub enum ImageCropPaintTransform {
+    Basic {
+        transform: Mat3,
+    },
+    #[serde(rename_all = "camelCase")]
+    Internal {
+        crop_transform: Mat3,
+        applied_transform: Mat3,
+        image_width: f32,
+        image_height: f32,
+    },
+}
+
 impl Default for ImageTilePaintTransform {
     fn default() -> Self {
-        Self::Simple {
+        Self::Basic {
             rotation: 0.0,
             scaling_factor: 1.0,
         }

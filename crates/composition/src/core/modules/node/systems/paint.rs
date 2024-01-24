@@ -9,7 +9,7 @@ use glam::{Mat3, Vec2};
 use crate::core::modules::node::components::{
     mixins::{DimensionMixin, ImageContentMixin},
     types::{
-        ImageFillFitPaintTransform, ImagePaint, ImagePaintScaleMode, ImageTilePaintTransform, Node,
+        ImageCropPaintTransform, ImagePaint, ImagePaintScaleMode, ImageTilePaintTransform, Node,
         Paint,
     },
 };
@@ -71,32 +71,12 @@ pub fn update_image_paint_transform(
 ) {
     for (dimension, mut paint, image_content) in query.iter_mut() {
         match &mut paint.scale_mode {
-            ImagePaintScaleMode::Fill { transform } | ImagePaintScaleMode::Fit { transform } => {
-                match transform {
-                    ImageFillFitPaintTransform::Simple { rotation } => {
-                        let center_x = dimension.width / 2.0;
-                        let center_y = dimension.height / 2.0;
-                        let rotation_angle = rotation.to_radians();
-
-                        // Translate to origin, rotate, translate back
-                        *transform = ImageFillFitPaintTransform::Render {
-                            transform: Mat3::from_translation(Vec2::new(center_x, center_y))
-                                * Mat3::from_rotation_z(rotation_angle)
-                                * Mat3::from_translation(Vec2::new(-center_x, -center_y)),
-                        };
-                    }
-                    ImageFillFitPaintTransform::Render { transform } => {
-                        transform.z_axis.x = dimension.width;
-                        transform.z_axis.y = dimension.height;
-                    }
-                }
-            }
             ImagePaintScaleMode::Tile { transform } => match transform {
-                ImageTilePaintTransform::Simple {
+                ImageTilePaintTransform::Basic {
                     rotation,
                     scaling_factor,
                 } => {
-                    *transform = ImageTilePaintTransform::Render {
+                    *transform = ImageTilePaintTransform::Internal {
                         rotation: *rotation,
                         tile_width: image_content.width * *scaling_factor,
                         tile_height: image_content.height * *scaling_factor,
@@ -104,7 +84,90 @@ pub fn update_image_paint_transform(
                 }
                 _ => {}
             },
+            ImagePaintScaleMode::Crop {
+                transform: outer_transform,
+            } => match outer_transform {
+                ImageCropPaintTransform::Basic { transform } => {
+                    let (new_image_width, new_image_height, new_image_transform) =
+                        calculate_cropped_image_transform(
+                            (dimension.width, dimension.height),
+                            (image_content.width, image_content.height),
+                            transform,
+                        );
+
+                    *outer_transform = ImageCropPaintTransform::Internal {
+                        applied_transform: new_image_transform,
+                        image_width: new_image_width,
+                        image_height: new_image_height,
+                        crop_transform: *transform,
+                    };
+                }
+                ImageCropPaintTransform::Internal {
+                    crop_transform,
+                    image_width,
+                    image_height,
+                    applied_transform: transform,
+                } => {
+                    let (new_image_width, new_image_height, new_image_transform) =
+                        calculate_cropped_image_transform(
+                            (dimension.width, dimension.height),
+                            (image_content.width, image_content.height),
+                            crop_transform,
+                        );
+
+                    *image_width = new_image_width;
+                    *image_height = new_image_height;
+                    *transform = new_image_transform;
+                }
+            },
             _ => {}
         }
     }
+}
+
+fn calculate_cropped_image_transform(
+    container_dimensions: (f32, f32),
+    image_content: (f32, f32),
+    transform: &Mat3,
+) -> (f32, f32, Mat3) {
+    let (container_width, container_height) = container_dimensions;
+    let (image_width, image_height) = image_content;
+
+    // Calculate aspect ratios for container and image
+    let container_ratio = container_width / container_height;
+    let image_ratio = image_width / image_height;
+
+    // Determine new image dimensions based on aspect ratio comparison
+    let (adjusted_image_width, adjusted_image_height) = if image_ratio > container_ratio {
+        (container_height * image_ratio, container_height)
+    } else {
+        (container_width, container_width / image_ratio)
+    };
+
+    // Calculate scale adjustment ratios
+    let x_ratio = container_width / adjusted_image_width;
+    let y_ratio = container_height / adjusted_image_height;
+
+    // Extract scale components from the matrix and adjust them
+    let scale_x = transform.x_axis.x;
+    let scale_y = transform.y_axis.y;
+    let adjusted_scale_x = (1.0 / scale_x) * x_ratio;
+    let adjusted_scale_y = (1.0 / scale_y) * y_ratio;
+
+    // Calculate adjusted translation.
+    let tx = -adjusted_image_width * transform.z_axis.x * adjusted_scale_x;
+    let ty = -adjusted_image_height * transform.z_axis.y * adjusted_scale_y;
+
+    // Construct the adjusted transformation matrix
+    let adjusted_transform = Mat3::from_scale_angle_translation(
+        Vec2::new(adjusted_scale_x, adjusted_scale_y),
+        0.0,
+        Vec2::new(tx, ty),
+    );
+
+    return (
+        adjusted_image_width,
+        adjusted_image_height,
+        adjusted_transform,
+    );
 }

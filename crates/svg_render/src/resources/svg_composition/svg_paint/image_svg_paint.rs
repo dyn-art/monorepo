@@ -2,7 +2,7 @@ use bevy_ecs::entity::Entity;
 use dyn_composition::core::{
     modules::node::components::{
         mixins::ImageContent,
-        types::{ImageFillFitPaintTransform, ImagePaintScaleMode, ImageTilePaintTransform},
+        types::{ImageCropPaintTransform, ImagePaintScaleMode, ImageTilePaintTransform},
     },
     utils::continuous_id::ContinuousId,
 };
@@ -77,20 +77,8 @@ impl SVGPaint for ImageSVGPaint {
         for change in &changed_paint.changes {
             match change {
                 PaintMixinChange::ImagePaint(mixin) => match &mixin.scale_mode {
-                    ImagePaintScaleMode::Fill { transform }
-                    | ImagePaintScaleMode::Fit { transform } => match transform {
-                        ImageFillFitPaintTransform::Render { transform } => {
-                            self.bundle
-                                .get_child_mut(self.paint_clipped_image.index)
-                                .unwrap()
-                                .set_attribute(SVGAttribute::Transform {
-                                    transform: mat3_to_svg_transform(transform),
-                                });
-                        }
-                        _ => {}
-                    },
                     ImagePaintScaleMode::Tile { transform } => match transform {
-                        ImageTilePaintTransform::Render {
+                        ImageTilePaintTransform::Internal {
                             rotation,
                             tile_width,
                             tile_height,
@@ -129,14 +117,45 @@ impl SVGPaint for ImageSVGPaint {
                         }
                         _ => {}
                     },
-                    ImagePaintScaleMode::Crop { transform } => {
-                        self.bundle
-                            .get_child_mut(self.paint_clipped_image.index)
-                            .unwrap()
-                            .set_attribute(SVGAttribute::Transform {
-                                transform: mat3_to_svg_transform(transform),
-                            });
-                    }
+                    ImagePaintScaleMode::Crop { transform } => match transform {
+                        ImageCropPaintTransform::Internal {
+                            applied_transform: transform,
+                            image_width,
+                            image_height,
+                            ..
+                        } => {
+                            self.bundle
+                                .get_child_mut(self.paint_pattern.index)
+                                .unwrap()
+                                .set_attributes(vec![
+                                    SVGAttribute::Width {
+                                        width: *image_width,
+                                        unit: SVGMeasurementUnit::Pixel,
+                                    },
+                                    SVGAttribute::Height {
+                                        height: *image_height,
+                                        unit: SVGMeasurementUnit::Pixel,
+                                    },
+                                ]);
+                            self.bundle
+                                .get_child_mut(self.paint_clipped_image.index)
+                                .unwrap()
+                                .set_attributes(vec![
+                                    SVGAttribute::Transform {
+                                        transform: mat3_to_svg_transform(transform),
+                                    },
+                                    SVGAttribute::Width {
+                                        width: *image_width,
+                                        unit: SVGMeasurementUnit::Pixel,
+                                    },
+                                    SVGAttribute::Height {
+                                        height: *image_height,
+                                        unit: SVGMeasurementUnit::Pixel,
+                                    },
+                                ]);
+                        }
+                        _ => {}
+                    },
                     _ => {}
                 },
                 PaintMixinChange::PaintComposition(mixin) => {
@@ -166,9 +185,7 @@ impl SVGPaint for ImageSVGPaint {
                         ]);
 
                     match self.variant {
-                        ImageSVGPaintVariant::Fill
-                        | ImageSVGPaintVariant::Fit
-                        | ImageSVGPaintVariant::Crop => {
+                        ImageSVGPaintVariant::Fill | ImageSVGPaintVariant::Fit => {
                             self.bundle
                                 .get_child_mut(self.paint_pattern.index)
                                 .unwrap()
