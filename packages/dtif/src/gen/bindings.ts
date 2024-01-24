@@ -489,7 +489,7 @@ height: number;
  */
 content: ImageContent }
 
-export type ImageFillFitPaintTransform = { type: "Simple"; rotation: number } | { type: "Transform"; transform: Mat3 }
+export type ImageFillFitPaintTransform = { type: "Simple"; rotation: number } | { type: "Render"; transform: Mat3 }
 
 export type ImagePaint = { _image_paint?: null | null; 
 /**
@@ -521,7 +521,7 @@ export type ImagePaintScaleMode =
  */
 { type: "Tile"; transform?: ImageTilePaintTransform }
 
-export type ImageTilePaintTransform = { type: "Simple"; rotation: number; scalingFactor: number } | { type: "Transform"; transform: Mat3 }
+export type ImageTilePaintTransform = { type: "Simple"; rotation: number; scalingFactor: number } | { type: "Render"; rotation: number; tileWidth: number; tileHeight: number }
 
 export type InteractionInputEvent = ({ type: "CursorDownOnEntity" } & CursorDownOnEntity) | ({ type: "CursorMovedOnComposition" } & CursorMovedOnComposition) | ({ type: "CursorEnteredComposition" }) | ({ type: "CursorExitedComposition" }) | ({ type: "CursorDownOnComposition" } & CursorDownOnComposition) | ({ type: "CursorUpOnComposition" } & CursorUpOnComposition) | ({ type: "WheeledOnComposition" } & WheeledOnComposition) | ({ type: "CursorDownOnResizeHandle" } & CursorDownOnResizeHandle) | ({ type: "CursorDownOnRotateHandle" } & CursorDownOnRotateHandle)
 
@@ -740,7 +740,7 @@ export type RelativeTransformMixin = Mat3
  */
 export type Root = null
 
-export type SVGAttribute = { type: "Id"; id: ContinuousId } | { type: "Width"; width: number; unit: SVGMeasurementUnit } | { type: "Height"; height: number; unit: SVGMeasurementUnit } | { type: "Opacity"; opacity: number } | { type: "Transform"; transform: SVGTransformAttribute } | { type: "D"; d: SVGPathCommand[] } | { type: "ClipPath"; clipPath: ContinuousId } | { type: "Fill"; fill: string } | { type: "ReferencedFill"; id: ContinuousId } | { type: "Name"; name: string } | { type: "PatternUnits"; patternUnits: SVGPatternUnitsVariant } | { type: "Href"; href: SVGHrefVariant } | { type: "PreserveAspectRatio"; preserveAspectRatio: string }
+export type SVGAttribute = { type: "Id"; id: ContinuousId } | { type: "Width"; width: number; unit: SVGMeasurementUnit } | { type: "Height"; height: number; unit: SVGMeasurementUnit } | { type: "Opacity"; opacity: number } | { type: "Transform"; transform: SVGTransformAttribute } | { type: "PatternTransform"; transform: SVGTransformAttribute } | { type: "D"; d: SVGPathCommand[] } | { type: "ClipPath"; clipPath: ContinuousId } | { type: "Fill"; fill: string } | { type: "ReferencedFill"; id: ContinuousId } | { type: "Name"; name: string } | { type: "PatternUnits"; patternUnits: SVGPatternUnitsVariant } | { type: "Href"; href: SVGHrefVariant } | { type: "PreserveAspectRatio"; preserveAspectRatio: string }
 
 export type SVGBlendMode = { type: "Normal" } | { type: "Multiply" } | { type: "Screen" } | { type: "Overlay" } | { type: "Darken" } | { type: "Lighten" } | { type: "ColorDodge" } | { type: "ColorBurn" } | { type: "HardLight" } | { type: "SoftLight" } | { type: "Difference" } | { type: "Exclusion" } | { type: "Hue" } | { type: "Saturation" } | { type: "Color" } | { type: "Luminosity" }
 
@@ -758,7 +758,7 @@ export type SVGRenderOutputEvent = ({ type: "ElementChange" } & ElementChangeEve
 
 export type SVGStyle = { type: "Display"; display: SVGDisplayStyle } | { type: "BlendMode"; blendMode: SVGBlendMode }
 
-export type SVGTransformAttribute = { type: "Matrix"; a: number; b: number; c: number; d: number; tx: number; ty: number }
+export type SVGTransformAttribute = { type: "Matrix"; a: number; b: number; c: number; d: number; tx: number; ty: number } | { type: "Rotate"; rotation: number }
 
 export type Selected = null
 

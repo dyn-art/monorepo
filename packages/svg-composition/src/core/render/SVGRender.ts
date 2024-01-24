@@ -286,6 +286,22 @@ export class SVGRender extends Render {
 							'transform',
 							`matrix(${transform.a}, ${transform.b}, ${transform.c}, ${transform.d}, ${transform.tx}, ${transform.ty})`
 						];
+					case 'Rotate':
+						return ['transform', `rotate(${transform.rotation})`];
+					default:
+						return ['', ''];
+				}
+			}
+			case 'PatternTransform': {
+				const transform = attribute.transform;
+				switch (transform.type) {
+					case 'Matrix':
+						return [
+							'patternTransform',
+							`matrix(${transform.a}, ${transform.b}, ${transform.c}, ${transform.d}, ${transform.tx}, ${transform.ty})`
+						];
+					case 'Rotate':
+						return ['patternTransform', `rotate(${transform.rotation})`];
 					default:
 						return ['', ''];
 				}

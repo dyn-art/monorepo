@@ -388,7 +388,7 @@ impl Default for ImagePaintScaleMode {
 #[serde(tag = "type")]
 pub enum ImageFillFitPaintTransform {
     Simple { rotation: f32 },
-    Transform { transform: Mat3 },
+    Render { transform: Mat3 },
 }
 
 impl Default for ImageFillFitPaintTransform {
@@ -401,12 +401,12 @@ impl Default for ImageFillFitPaintTransform {
 #[serde(tag = "type")]
 pub enum ImageTilePaintTransform {
     #[serde(rename_all = "camelCase")]
-    Simple {
+    Simple { rotation: f32, scaling_factor: f32 },
+    #[serde(rename_all = "camelCase")]
+    Render {
         rotation: f32,
-        scaling_factor: f32,
-    },
-    Transform {
-        transform: Mat3,
+        tile_width: f32,
+        tile_height: f32,
     },
 }
 

@@ -17,6 +17,7 @@ use crate::{
             svg_element::{
                 attributes::{
                     SVGAttribute, SVGHrefVariant, SVGMeasurementUnit, SVGPatternUnitsVariant,
+                    SVGTransformAttribute,
                 },
                 helper::mat3_to_svg_transform,
                 mapper::map_blend_mode,
@@ -35,6 +36,7 @@ use super::SVGPaint;
 #[derive(Debug)]
 pub struct ImageSVGPaint {
     bundle: BaseSVGBundle,
+    variant: ImageSVGPaintVariant,
 
     defs: ElementReference,
 
@@ -42,6 +44,14 @@ pub struct ImageSVGPaint {
     paint_pattern: ElementReference,
     paint_clipped_image: ElementReference,
     paint_rect: ElementReference,
+}
+
+#[derive(Debug)]
+enum ImageSVGPaintVariant {
+    Fill,
+    Fit,
+    Crop,
+    Tile,
 }
 
 impl SVGBundle for ImageSVGPaint {
@@ -69,7 +79,7 @@ impl SVGPaint for ImageSVGPaint {
                 PaintMixinChange::ImagePaint(mixin) => match &mixin.scale_mode {
                     ImagePaintScaleMode::Fill { transform }
                     | ImagePaintScaleMode::Fit { transform } => match transform {
-                        ImageFillFitPaintTransform::Transform { transform } => {
+                        ImageFillFitPaintTransform::Render { transform } => {
                             self.bundle
                                 .get_child_mut(self.paint_clipped_image.index)
                                 .unwrap()
@@ -80,13 +90,42 @@ impl SVGPaint for ImageSVGPaint {
                         _ => {}
                     },
                     ImagePaintScaleMode::Tile { transform } => match transform {
-                        ImageTilePaintTransform::Transform { transform } => {
+                        ImageTilePaintTransform::Render {
+                            rotation,
+                            tile_width,
+                            tile_height,
+                        } => {
+                            self.bundle
+                                .get_child_mut(self.paint_pattern.index)
+                                .unwrap()
+                                .set_attributes(vec![
+                                    SVGAttribute::PatternTransform {
+                                        transform: SVGTransformAttribute::Rotate {
+                                            rotation: *rotation,
+                                        },
+                                    },
+                                    SVGAttribute::Width {
+                                        width: *tile_width,
+                                        unit: SVGMeasurementUnit::Pixel,
+                                    },
+                                    SVGAttribute::Height {
+                                        height: *tile_height,
+                                        unit: SVGMeasurementUnit::Pixel,
+                                    },
+                                ]);
                             self.bundle
                                 .get_child_mut(self.paint_clipped_image.index)
                                 .unwrap()
-                                .set_attribute(SVGAttribute::Transform {
-                                    transform: mat3_to_svg_transform(transform),
-                                });
+                                .set_attributes(vec![
+                                    SVGAttribute::Width {
+                                        width: *tile_width,
+                                        unit: SVGMeasurementUnit::Pixel,
+                                    },
+                                    SVGAttribute::Height {
+                                        height: *tile_height,
+                                        unit: SVGMeasurementUnit::Pixel,
+                                    },
+                                ]);
                         }
                         _ => {}
                     },
@@ -126,34 +165,39 @@ impl SVGPaint for ImageSVGPaint {
                             },
                         ]);
 
-                    self.bundle
-                        .get_child_mut(self.paint_pattern.index)
-                        .unwrap()
-                        .set_attributes(vec![
-                            SVGAttribute::Width {
-                                width: mixin.width,
-                                unit: SVGMeasurementUnit::Pixel,
-                            },
-                            SVGAttribute::Height {
-                                height: mixin.height,
-                                unit: SVGMeasurementUnit::Pixel,
-                            },
-                        ]);
-
-                    // TODO: check scale mode and only set if Fit and Fill
-                    self.bundle
-                        .get_child_mut(self.paint_clipped_image.index)
-                        .unwrap()
-                        .set_attributes(vec![
-                            SVGAttribute::Width {
-                                width: mixin.width,
-                                unit: SVGMeasurementUnit::Pixel,
-                            },
-                            SVGAttribute::Height {
-                                height: mixin.height,
-                                unit: SVGMeasurementUnit::Pixel,
-                            },
-                        ]);
+                    match self.variant {
+                        ImageSVGPaintVariant::Fill
+                        | ImageSVGPaintVariant::Fit
+                        | ImageSVGPaintVariant::Crop => {
+                            self.bundle
+                                .get_child_mut(self.paint_pattern.index)
+                                .unwrap()
+                                .set_attributes(vec![
+                                    SVGAttribute::Width {
+                                        width: mixin.width,
+                                        unit: SVGMeasurementUnit::Pixel,
+                                    },
+                                    SVGAttribute::Height {
+                                        height: mixin.height,
+                                        unit: SVGMeasurementUnit::Pixel,
+                                    },
+                                ]);
+                            self.bundle
+                                .get_child_mut(self.paint_clipped_image.index)
+                                .unwrap()
+                                .set_attributes(vec![
+                                    SVGAttribute::Width {
+                                        width: mixin.width,
+                                        unit: SVGMeasurementUnit::Pixel,
+                                    },
+                                    SVGAttribute::Height {
+                                        height: mixin.height,
+                                        unit: SVGMeasurementUnit::Pixel,
+                                    },
+                                ]);
+                        }
+                        _ => {}
+                    }
                 }
                 PaintMixinChange::Blend(mixin) => {
                     let root_element = self.bundle.get_root_mut();
@@ -264,6 +308,12 @@ impl ImageSVGPaint {
 
         Self {
             bundle,
+            variant: match scale_mode {
+                ImagePaintScaleMode::Fill { .. } => ImageSVGPaintVariant::Fill,
+                ImagePaintScaleMode::Fit { .. } => ImageSVGPaintVariant::Fit,
+                ImagePaintScaleMode::Crop { .. } => ImageSVGPaintVariant::Crop,
+                ImagePaintScaleMode::Tile { .. } => ImageSVGPaintVariant::Tile,
+            },
             defs: ElementReference {
                 id: defs_id,
                 index: defs_index,

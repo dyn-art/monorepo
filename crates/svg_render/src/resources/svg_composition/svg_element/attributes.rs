@@ -24,6 +24,9 @@ pub enum SVGAttribute {
     Transform {
         transform: SVGTransformAttribute,
     },
+    PatternTransform {
+        transform: SVGTransformAttribute,
+    },
     D {
         d: Vec<SVGPathCommand>,
     },
@@ -61,6 +64,7 @@ impl SVGAttribute {
             Self::Height { .. } => "height",
             Self::Opacity { .. } => "opacity",
             Self::Transform { .. } => "transform",
+            Self::PatternTransform { .. } => "patternTransform",
             Self::D { .. } => "d",
             Self::ClipPath { .. } => "clip-path",
             Self::Fill { .. } | Self::ReferencedFill { .. } => "fill",
@@ -83,9 +87,12 @@ impl SVGAttribute {
                 SVGMeasurementUnit::Percent => format!("{height}%")
             },
             Self::Opacity { opacity } => opacity.to_string(),
-            Self::Transform { transform } => match transform {
+            Self::Transform { transform } | Self::PatternTransform { transform } => match transform {
                 SVGTransformAttribute::Matrix { a, b, c, d, tx, ty } => {
                     format!("matrix({a}, {b}, {c}, {d}, {tx}, {ty})")
+                }
+                SVGTransformAttribute::Rotate { rotation } => {
+                    format!("rotate({rotation})")
                 }
             },
             Self::D { d } => d
@@ -184,6 +191,9 @@ pub enum SVGTransformAttribute {
         d: f32,
         tx: f32,
         ty: f32,
+    },
+    Rotate {
+        rotation: f32,
     },
 }
 

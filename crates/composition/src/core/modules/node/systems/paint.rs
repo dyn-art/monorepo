@@ -7,7 +7,7 @@ use bevy_hierarchy::{Children, Parent};
 use glam::{Mat3, Vec2};
 
 use crate::core::modules::node::components::{
-    mixins::DimensionMixin,
+    mixins::{DimensionMixin, ImageContentMixin},
     types::{
         ImageFillFitPaintTransform, ImagePaint, ImagePaintScaleMode, ImageTilePaintTransform, Node,
         Paint,
@@ -61,11 +61,15 @@ pub fn update_paint_dimension_based_on_parent_node(
 
 pub fn update_image_paint_transform(
     mut query: Query<
-        (&DimensionMixin, &mut ImagePaint),
-        Or<(Changed<DimensionMixin>, Changed<ImagePaint>)>,
+        (&DimensionMixin, &mut ImagePaint, &ImageContentMixin),
+        Or<(
+            Changed<DimensionMixin>,
+            Changed<ImagePaint>,
+            Changed<ImageContentMixin>,
+        )>,
     >,
 ) {
-    for (dimension, mut paint) in query.iter_mut() {
+    for (dimension, mut paint, image_content) in query.iter_mut() {
         match &mut paint.scale_mode {
             ImagePaintScaleMode::Fill { transform } | ImagePaintScaleMode::Fit { transform } => {
                 match transform {
@@ -75,42 +79,31 @@ pub fn update_image_paint_transform(
                         let rotation_angle = rotation.to_radians();
 
                         // Translate to origin, rotate, translate back
-                        *transform = ImageFillFitPaintTransform::Transform {
+                        *transform = ImageFillFitPaintTransform::Render {
                             transform: Mat3::from_translation(Vec2::new(center_x, center_y))
                                 * Mat3::from_rotation_z(rotation_angle)
                                 * Mat3::from_translation(Vec2::new(-center_x, -center_y)),
                         };
                     }
-                    ImageFillFitPaintTransform::Transform { transform } => {
+                    ImageFillFitPaintTransform::Render { transform } => {
                         transform.z_axis.x = dimension.width;
                         transform.z_axis.y = dimension.height;
                     }
                 }
             }
-            ImagePaintScaleMode::Tile { transform } => {
-                match transform {
-                    ImageTilePaintTransform::Simple {
-                        rotation,
-                        scaling_factor,
-                    } => {
-                        let center_x = dimension.width / 2.0;
-                        let center_y = dimension.height / 2.0;
-                        let rotation_angle = rotation.to_radians();
-
-                        // Translate to origin, scale, rotate, translate back
-                        *transform = ImageTilePaintTransform::Transform {
-                            transform: Mat3::from_translation(Vec2::new(center_x, center_y))
-                                * Mat3::from_scale(Vec2::splat(*scaling_factor))
-                                * Mat3::from_rotation_z(rotation_angle)
-                                * Mat3::from_translation(Vec2::new(-center_x, -center_y)),
-                        };
-                    }
-                    ImageTilePaintTransform::Transform { transform } => {
-                        transform.z_axis.x = dimension.width;
-                        transform.z_axis.y = dimension.height;
-                    }
+            ImagePaintScaleMode::Tile { transform } => match transform {
+                ImageTilePaintTransform::Simple {
+                    rotation,
+                    scaling_factor,
+                } => {
+                    *transform = ImageTilePaintTransform::Render {
+                        rotation: *rotation,
+                        tile_width: image_content.width * *scaling_factor,
+                        tile_height: image_content.height * *scaling_factor,
+                    };
                 }
-            }
+                _ => {}
+            },
             _ => {}
         }
     }
