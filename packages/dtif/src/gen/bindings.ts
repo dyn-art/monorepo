@@ -489,7 +489,7 @@ height: number;
  */
 content: ImageContent }
 
-export type ImageCropPaintTransform = { type: "Basic"; transform: Mat3 } | { type: "Internal"; cropTransform: Mat3; transform: Mat3; imageWidth: number; imageHeight: number }
+export type ImageCropPaintTransform = { type: "Basic"; transform: Mat3 } | { type: "Internal"; cropTransform: Mat3; appliedTransform: Mat3; imageWidth: number; imageHeight: number }
 
 export type ImagePaint = { _image_paint?: null | null; 
 /**

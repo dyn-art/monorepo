@@ -33,7 +33,7 @@ pub struct GradientSVGPaint {
 
     // Paint elements
     paint_gradient: ElementReference,
-    paint_gradient_stops: Vec<ElementReference>,
+    paint_gradient_stops: ElementReference,
     paint_rect: ElementReference,
 }
 
@@ -63,20 +63,32 @@ impl SVGBundle for GradientSVGPaint {
 }
 
 impl SVGPaint for GradientSVGPaint {
-    fn apply_paint_change(&mut self, changed_paint: &ChangedPaint) {
+    fn apply_paint_change(
+        &mut self,
+        changed_paint: &ChangedPaint,
+        id_generator: &mut ContinuousId,
+    ) {
         for change in &changed_paint.changes {
             match change {
                 PaintMixinChange::GradientPaint(mixin) => {
-                    // Clear children
-                    self.bundle
-                        .get_child_item_mut(self.paint_gradient.index)
+                    let parent_id = self
+                        .bundle
+                        .get_child_element(self.paint_gradient.index)
                         .unwrap()
-                        .clear_children();
+                        .get_id();
+                    let elements = self
+                        .bundle
+                        .get_child_portal_mut(self.paint_gradient_stops.index)
+                        .unwrap();
 
-                    // TODO: Add new stops
+                    // Remove old gradient stop elements
+                    elements.iter_mut().for_each(|element| element.remove());
+
+                    // Add new gradient stop elements
                     for gradient_stop in &mixin.gradient_stops {
-                        self.bundle
-                            .append_child_to(self.paint_gradient.index, todo!());
+                        let mut gradient_stop_element = SVGElement::new(SVGTag::Stop, id_generator);
+                        gradient_stop_element.append_to_parent(parent_id);
+                        elements.push(gradient_stop_element);
                     }
                 }
                 PaintMixinChange::PaintComposition(mixin) => {
@@ -92,7 +104,7 @@ impl SVGPaint for GradientSVGPaint {
                 }
                 PaintMixinChange::Dimension(mixin) => {
                     self.bundle
-                        .get_child_item_mut(self.paint_rect.index)
+                        .get_child_element_mut(self.paint_rect.index)
                         .unwrap()
                         .set_attributes(vec![
                             SVGAttribute::Width {
@@ -140,7 +152,7 @@ impl GradientSVGPaint {
         defs_element.set_attribute(SVGAttribute::Name {
             name: GradientSVGPaint::create_element_name(defs_id, String::from("defs"), false),
         });
-        let defs_index = bundle.append_child(defs_element);
+        let defs_index = bundle.append_child_element(defs_element);
 
         // Create paint elements
         let mut paint_gradient_element = SVGElement::new(SVGTag::Image, id_generator);
@@ -154,10 +166,11 @@ impl GradientSVGPaint {
             ),
         });
         let paint_gradient_index = bundle
-            .append_child_to(defs_index, paint_gradient_element)
+            .append_child_element_to(defs_index, paint_gradient_element)
             .unwrap();
 
-        // TODO: Add stops here or in update?
+        let paint_gradient_stops_index =
+            bundle.append_child_portal_to(paint_gradient_index).unwrap();
 
         let mut paint_rect_element = SVGElement::new(SVGTag::Rect, id_generator);
         let paint_rect_id = paint_rect_element.get_id();
@@ -172,7 +185,7 @@ impl GradientSVGPaint {
         paint_rect_element.set_attribute(SVGAttribute::ReferencedFill {
             id: paint_gradient_id,
         });
-        let paint_rect_index = bundle.append_child(paint_rect_element);
+        let paint_rect_index = bundle.append_child_element(paint_rect_element);
 
         Self {
             bundle,
@@ -191,7 +204,9 @@ impl GradientSVGPaint {
                 // id: paint_gradient_id,
                 index: paint_gradient_index,
             },
-            paint_gradient_stops: Vec::new(),
+            paint_gradient_stops: ElementReference {
+                index: paint_gradient_stops_index,
+            },
             paint_rect: ElementReference {
                 // id: paint_rect_id,
                 index: paint_rect_index,

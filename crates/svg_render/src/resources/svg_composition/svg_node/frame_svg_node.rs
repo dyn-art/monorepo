@@ -88,7 +88,7 @@ impl SVGNode for FrameSVGNode {
                         },
                     ]);
                     self.bundle
-                        .get_child_item_mut(self.fill_clipped_path.index)
+                        .get_child_element_mut(self.fill_clipped_path.index)
                         .unwrap()
                         .set_attributes(vec![
                             SVGAttribute::Width {
@@ -101,7 +101,7 @@ impl SVGNode for FrameSVGNode {
                             },
                         ]);
                     self.bundle
-                        .get_child_item_mut(self.content_clipped_rect.index)
+                        .get_child_element_mut(self.content_clipped_rect.index)
                         .unwrap()
                         .set_attributes(vec![
                             SVGAttribute::Width {
@@ -132,7 +132,7 @@ impl SVGNode for FrameSVGNode {
                 }
                 NodeMixinChange::Children(mixin) => {
                     self.bundle
-                        .get_child_item_mut(self.children_wrapper_g.index)
+                        .get_child_element_mut(self.children_wrapper_g.index)
                         .unwrap()
                         .reorder_children(&mixin.children.0);
                 }
@@ -173,7 +173,7 @@ impl FrameSVGNode {
         defs_element.set_attribute(SVGAttribute::Name {
             name: FrameSVGNode::create_element_name(defs_id, String::from("defs"), false),
         });
-        let defs_index = bundle.append_child(defs_element);
+        let defs_index = bundle.append_child_element(defs_element);
 
         // Create content elements
         let mut content_clip_path_element = SVGElement::new(SVGTag::ClipPath, id_generator);
@@ -187,7 +187,7 @@ impl FrameSVGNode {
             ),
         });
         let content_clip_path_index = bundle
-            .append_child_to(defs_index, content_clip_path_element)
+            .append_child_element_to(defs_index, content_clip_path_element)
             .unwrap();
 
         let mut content_clipped_rect_element = SVGElement::new(SVGTag::Rect, id_generator);
@@ -201,7 +201,7 @@ impl FrameSVGNode {
             ),
         });
         let content_clipped_rect_index = bundle
-            .append_child_to(content_clip_path_index, content_clipped_rect_element)
+            .append_child_element_to(content_clip_path_index, content_clipped_rect_element)
             .unwrap();
 
         let mut content_wrapper_g = SVGElement::new(SVGTag::Group, id_generator);
@@ -217,7 +217,7 @@ impl FrameSVGNode {
         content_wrapper_g.set_attribute(SVGAttribute::ClipPath {
             clip_path: content_clip_path_id,
         });
-        let content_wrapper_g_index = bundle.append_child(content_wrapper_g);
+        let content_wrapper_g_index = bundle.append_child_element(content_wrapper_g);
 
         // Create fill elements
         let mut fill_clip_path_element = SVGElement::new(SVGTag::ClipPath, id_generator);
@@ -231,7 +231,7 @@ impl FrameSVGNode {
             ),
         });
         let fill_clip_path_index = bundle
-            .append_child_to(defs_index, fill_clip_path_element)
+            .append_child_element_to(defs_index, fill_clip_path_element)
             .unwrap();
 
         let mut fill_clipped_path_element = SVGElement::new(SVGTag::Rect, id_generator);
@@ -245,7 +245,7 @@ impl FrameSVGNode {
             ),
         });
         let fill_clipped_path_index = bundle
-            .append_child_to(fill_clip_path_index, fill_clipped_path_element)
+            .append_child_element_to(fill_clip_path_index, fill_clipped_path_element)
             .unwrap();
 
         let mut fill_wrapper_g_element = SVGElement::new(SVGTag::Group, id_generator);
@@ -262,7 +262,7 @@ impl FrameSVGNode {
             clip_path: fill_clip_path_id,
         });
         let fill_wrapper_g_index = bundle
-            .append_child_to(content_wrapper_g_index, fill_wrapper_g_element)
+            .append_child_element_to(content_wrapper_g_index, fill_wrapper_g_element)
             .unwrap();
 
         // Create children wrapper element
@@ -277,7 +277,7 @@ impl FrameSVGNode {
             ),
         });
         let children_wrapper_g_index = bundle
-            .append_child_to(content_wrapper_g_index, children_wrapper_g)
+            .append_child_element_to(content_wrapper_g_index, children_wrapper_g)
             .unwrap();
 
         Self {

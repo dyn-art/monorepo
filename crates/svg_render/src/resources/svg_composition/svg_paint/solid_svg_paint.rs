@@ -49,7 +49,11 @@ impl SVGBundle for SolidSVGPaint {
 }
 
 impl SVGPaint for SolidSVGPaint {
-    fn apply_paint_change(&mut self, changed_paint: &ChangedPaint) {
+    fn apply_paint_change(
+        &mut self,
+        changed_paint: &ChangedPaint,
+        id_generator: &mut ContinuousId,
+    ) {
         for change in &changed_paint.changes {
             match change {
                 PaintMixinChange::PaintComposition(mixin) => {
@@ -65,7 +69,7 @@ impl SVGPaint for SolidSVGPaint {
                 }
                 PaintMixinChange::Dimension(mixin) => {
                     self.bundle
-                        .get_child_item_mut(self.paint_rect.index)
+                        .get_child_element_mut(self.paint_rect.index)
                         .unwrap()
                         .set_attributes(vec![
                             SVGAttribute::Width {
@@ -89,7 +93,7 @@ impl SVGPaint for SolidSVGPaint {
                 }
                 PaintMixinChange::SolidPaint(mixin) => {
                     self.bundle
-                        .get_child_item_mut(self.paint_rect.index)
+                        .get_child_element_mut(self.paint_rect.index)
                         .unwrap()
                         .set_attributes(vec![SVGAttribute::Fill {
                             fill: rgb_to_hex(mixin.color),
@@ -122,7 +126,7 @@ impl SolidSVGPaint {
                 false,
             ),
         });
-        let paint_rect_element_index = bundle.append_child(paint_rect_element);
+        let paint_rect_element_index = bundle.append_child_element(paint_rect_element);
 
         Self {
             bundle,

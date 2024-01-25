@@ -20,19 +20,24 @@ pub struct BaseSVGBundle {
     entity: Entity,
     // The primary SVG element associated with this bundle
     element: SVGElement,
-    // Children that are directly related to this bundles's context
-    // whose order doesn't change.
+    // Children that are directly related to this bundles's context.
+    // The Vector is fixed and the items order shouldn't change after initialization
+    // because SVGElements point to SVGElements in this Vector who is the owner!
     // Using a Vector for child_elements as:
     // - The size is known at compile time, minimizing dynamic changes
     // - Offers efficient O(1) access by index, suitable for this use case
     // - More memory-efficient and simpler than a HashMap for fixed-size collections
-    child_elements: Vec<BundleChildSVGElement>,
+    children: Vec<SVGBundleChildElement>,
 }
 
 #[derive(Debug)]
-pub enum BundleChildSVGElement {
-    Item(SVGElement),
-    Collection(Vec<SVGElement>),
+pub enum SVGBundleChildElement {
+    // Fixed SVGElement
+    Element(SVGElement),
+    // Dynamic Vector of SVGElement whose content can change without side effects.
+    // But these SVGElement have to be end branches of the SVG Tree
+    // and can't have dynamic children.
+    Portal(Vec<SVGElement>),
 }
 
 impl BaseSVGBundle {
@@ -41,7 +46,7 @@ impl BaseSVGBundle {
         Self {
             entity,
             element,
-            child_elements: Vec::new(),
+            children: Vec::new(),
         }
     }
 
@@ -49,8 +54,8 @@ impl BaseSVGBundle {
     // Getter & Setter
     // =========================================================================
 
-    pub fn get_children(&self) -> &Vec<BundleChildSVGElement> {
-        &self.child_elements
+    pub fn get_children(&self) -> &Vec<SVGBundleChildElement> {
+        &self.children
     }
 
     pub fn get_root(&self) -> &SVGElement {
@@ -61,12 +66,12 @@ impl BaseSVGBundle {
         &mut self.element
     }
 
-    pub fn get_child_item(&self, index: usize) -> Option<&SVGElement> {
-        let maybe_child = self.child_elements.get(index);
+    pub fn get_child_element(&self, index: usize) -> Option<&SVGElement> {
+        let maybe_child = self.children.get(index);
         if let Some(child) = maybe_child {
             match child {
-                BundleChildSVGElement::Item(item) => {
-                    return Some(item);
+                SVGBundleChildElement::Element(element) => {
+                    return Some(element);
                 }
                 _ => {}
             }
@@ -74,12 +79,25 @@ impl BaseSVGBundle {
         return None;
     }
 
-    pub fn get_child_item_mut(&mut self, index: usize) -> Option<&mut SVGElement> {
-        let maybe_child = self.child_elements.get_mut(index);
+    pub fn get_child_element_mut(&mut self, index: usize) -> Option<&mut SVGElement> {
+        let maybe_child = self.children.get_mut(index);
         if let Some(child) = maybe_child {
             match child {
-                BundleChildSVGElement::Item(item) => {
-                    return Some(item);
+                SVGBundleChildElement::Element(element) => {
+                    return Some(element);
+                }
+                _ => {}
+            }
+        }
+        return None;
+    }
+
+    pub fn get_child_portal_mut(&mut self, index: usize) -> Option<&mut Vec<SVGElement>> {
+        let maybe_child = self.children.get_mut(index);
+        if let Some(child) = maybe_child {
+            match child {
+                SVGBundleChildElement::Portal(elements) => {
+                    return Some(elements);
                 }
                 _ => {}
             }
@@ -91,36 +109,54 @@ impl BaseSVGBundle {
     // Children
     // =========================================================================
 
-    pub fn append_child_to(&mut self, index: usize, mut element: SVGElement) -> Option<usize> {
+    pub fn append_child_element_to(
+        &mut self,
+        index: usize,
+        mut element: SVGElement,
+    ) -> Option<usize> {
         let next_index = self.get_next_child_index();
-        if let Some(target_element) = self.child_elements.get_mut(index) {
-            if let BundleChildSVGElement::Item(target_element) = target_element {
-                target_element.append_child(
+        if let Some(target_element) = self.children.get_mut(index) {
+            if let SVGBundleChildElement::Element(target_element) = target_element {
+                target_element.append_child_element(
                     &mut element,
                     SVGChildElementIdentifier::InBundleContext(self.entity, next_index),
                 );
-                self.child_elements
-                    .push(BundleChildSVGElement::Item(element));
+                self.children.push(SVGBundleChildElement::Element(element));
                 return Some(next_index);
             }
         }
         return None;
     }
 
-    pub fn append_child(&mut self, mut element: SVGElement) -> usize {
+    pub fn append_child_portal_to(&mut self, index: usize) -> Option<usize> {
         let next_index = self.get_next_child_index();
-        self.element.append_child(
+        if let Some(target_element) = self.children.get_mut(index) {
+            if let SVGBundleChildElement::Element(target_element) = target_element {
+                target_element.append_child_portal(
+                    &mut Vec::new(),
+                    SVGChildElementIdentifier::InBundleContext(self.entity, next_index),
+                );
+                self.children
+                    .push(SVGBundleChildElement::Portal(Vec::new()));
+                return Some(next_index);
+            }
+        }
+        return None;
+    }
+
+    pub fn append_child_element(&mut self, mut element: SVGElement) -> usize {
+        let next_index = self.get_next_child_index();
+        self.element.append_child_element(
             &mut element,
             SVGChildElementIdentifier::InBundleContext(self.entity, next_index),
         );
-        self.child_elements
-            .push(BundleChildSVGElement::Item(element));
+        self.children.push(SVGBundleChildElement::Element(element));
         return next_index;
     }
 
     #[inline]
     pub fn get_next_child_index(&self) -> usize {
-        self.child_elements.len()
+        self.children.len()
     }
 
     // =========================================================================
@@ -128,7 +164,7 @@ impl BaseSVGBundle {
     // =========================================================================
 
     pub fn drain_changes(&mut self) -> Vec<ElementChangeEvent> {
-        let mut drained_updates = Vec::new();
+        let mut drained_updates: Vec<ElementChangeEvent> = Vec::new();
 
         // Drain updates from root element
         drained_updates.push(ElementChangeEvent {
@@ -137,32 +173,33 @@ impl BaseSVGBundle {
         });
 
         // Drain updates from child elements
-        for child in &mut self.child_elements {
+        for child in &mut self.children {
             match child {
-                BundleChildSVGElement::Item(child_element) => {
-                    let changes = child_element.drain_changes();
-                    if !changes.is_empty() {
-                        drained_updates.push(ElementChangeEvent {
-                            id: child_element.get_id(),
-                            changes,
-                        })
-                    }
+                SVGBundleChildElement::Element(element) => {
+                    BaseSVGBundle::drain_svg_element_changes(&mut drained_updates, element);
                 }
-                BundleChildSVGElement::Collection(child_elements) => {
-                    for child_element in child_elements {
-                        let changes = child_element.drain_changes();
-                        if !changes.is_empty() {
-                            drained_updates.push(ElementChangeEvent {
-                                id: child_element.get_id(),
-                                changes,
-                            })
-                        }
+                SVGBundleChildElement::Portal(elements) => {
+                    for element in elements {
+                        BaseSVGBundle::drain_svg_element_changes(&mut drained_updates, element);
                     }
                 }
             }
         }
 
         return drained_updates;
+    }
+
+    fn drain_svg_element_changes(
+        drained_updates: &mut Vec<ElementChangeEvent>,
+        element: &mut SVGElement,
+    ) {
+        let changes = element.drain_changes();
+        if !changes.is_empty() {
+            drained_updates.push(ElementChangeEvent {
+                id: element.get_id(),
+                changes,
+            })
+        }
     }
 
     pub fn to_string(&self, composition: &SVGCompositionRes) -> String {

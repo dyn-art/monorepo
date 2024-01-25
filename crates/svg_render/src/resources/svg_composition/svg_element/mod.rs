@@ -12,7 +12,7 @@ use self::{
 };
 
 use super::{
-    svg_bundle::{BaseSVGBundle, BundleChildSVGElement},
+    svg_bundle::{BaseSVGBundle, SVGBundleChildElement},
     svg_bundle_variant::bundle_to_string,
     SVGCompositionRes,
 };
@@ -46,7 +46,7 @@ pub struct SVGElement {
 
 #[derive(Debug)]
 pub struct SVGChildElement {
-    pub id: ContinuousId,
+    pub id: Option<ContinuousId>,
     pub identifier: SVGChildElementIdentifier,
 }
 
@@ -161,14 +161,28 @@ impl SVGElement {
     // Children
     // =========================================================================
 
-    pub fn append_child(
+    pub fn append_child_element(
         &mut self,
         element: &mut SVGElement,
         identifier: SVGChildElementIdentifier,
     ) {
         element.append_to_parent(self.id);
         self.children.push(SVGChildElement {
-            id: element.get_id(),
+            id: Some(element.get_id()),
+            identifier,
+        });
+    }
+
+    pub fn append_child_portal(
+        &mut self,
+        elements: &mut Vec<SVGElement>,
+        identifier: SVGChildElementIdentifier,
+    ) {
+        for element in elements {
+            element.append_to_parent(self.id);
+        }
+        self.children.push(SVGChildElement {
+            id: None,
             identifier,
         });
     }
@@ -179,7 +193,7 @@ impl SVGElement {
 
     pub fn remove_child(&mut self, id: ContinuousId) -> bool {
         let initial_len = self.children.len();
-        self.children.retain(|child| child.id != id);
+        self.children.retain(|child| child.id != Some(id));
         let new_len = self.children.len();
 
         // Return true if the length of the vector changed, indicating a child was removed
@@ -238,7 +252,7 @@ impl SVGElement {
         }
     }
 
-    fn append_to_parent(&mut self, parent_id: ContinuousId) {
+    pub fn append_to_parent(&mut self, parent_id: ContinuousId) {
         // Attempt to set the parent id of the first 'ElementCreated' render change for the element.
         // This ensures the element is correctly attached to its parent during the initial rendering.
         if self.was_created_in_current_update_cycle {
@@ -328,12 +342,12 @@ impl SVGElement {
                 SVGChildElementIdentifier::InBundleContext(_, child_index) => {
                     if let Some(child_element) = bundle.get_children().get(child_index) {
                         match child_element {
-                            BundleChildSVGElement::Item(child_element) => {
-                                result.push_str(&child_element.to_string(bundle, composition));
+                            SVGBundleChildElement::Element(element) => {
+                                result.push_str(&element.to_string(bundle, composition));
                             }
-                            BundleChildSVGElement::Collection(child_elements) => {
-                                for child_element in child_elements {
-                                    result.push_str(&child_element.to_string(bundle, composition));
+                            SVGBundleChildElement::Portal(elements) => {
+                                for element in elements {
+                                    result.push_str(&element.to_string(bundle, composition));
                                 }
                             }
                         }
@@ -369,6 +383,7 @@ pub enum SVGTag {
     ClipPath,
     Pattern,
     Image,
+    Stop,
 }
 
 impl SVGTag {
@@ -387,6 +402,7 @@ impl SVGTag {
             SVGTag::ClipPath => "clipPath",
             SVGTag::Pattern => "pattern",
             SVGTag::Image => "image",
+            SVGTag::Stop => "stop",
         }
     }
 }

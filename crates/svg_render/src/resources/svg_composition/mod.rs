@@ -16,7 +16,10 @@ use self::{
     svg_bundle_variant::{get_bundle_mut, SVGBundleVariant},
     svg_element::SVGChildElementIdentifier,
     svg_node::{frame_svg_node::FrameSVGNode, shape_svg_node::ShapeSVGNode, SVGNode},
-    svg_paint::{image_svg_paint::ImageSVGPaint, solid_svg_paint::SolidSVGPaint, SVGPaint},
+    svg_paint::{
+        gradient_svg_paint::GradientSVGPaint, image_svg_paint::ImageSVGPaint,
+        solid_svg_paint::SolidSVGPaint, SVGPaint,
+    },
 };
 
 pub mod svg_bundle;
@@ -34,7 +37,7 @@ pub struct SVGCompositionRes {
     // Sender to enque events for frontend
     output_event_sender: Option<Sender<SVGRenderOutputEvent>>,
     // SVG Element ID generator
-    id_generator: ContinuousId,
+    pub id_generator: ContinuousId,
 }
 
 impl SVGCompositionRes {
@@ -97,7 +100,7 @@ impl SVGCompositionRes {
         paint_type: &PaintType,
         inital_changes: &[PaintMixinChange],
         maybe_parent_id: &Option<Entity>,
-    ) -> Option<&mut Box<dyn SVGPaint>> {
+    ) -> Option<(&mut Box<dyn SVGPaint>, &mut ContinuousId)> {
         // Create paint
         if !self.bundles.contains_key(&entity) {
             match self.create_paint(paint_type, entity.clone(), inital_changes) {
@@ -109,7 +112,7 @@ impl SVGCompositionRes {
         }
 
         return match self.bundles.get_mut(&entity) {
-            Some(SVGBundleVariant::Paint(paint)) => Some(paint),
+            Some(SVGBundleVariant::Paint(paint)) => Some((paint, &mut self.id_generator)),
             _ => None,
         };
     }
@@ -121,10 +124,8 @@ impl SVGCompositionRes {
         initial_changes: &[PaintMixinChange],
     ) -> Option<Box<dyn SVGPaint>> {
         match paint_type {
-            // Handle solid paint
             PaintType::Solid => Some(Box::new(SolidSVGPaint::new(entity, &mut self.id_generator))),
 
-            // Handle image paint
             PaintType::Image => initial_changes.iter().find_map(|change| {
                 if let PaintMixinChange::ImagePaint(paint) = change {
                     return Some(Box::new(ImageSVGPaint::new(
@@ -137,7 +138,18 @@ impl SVGCompositionRes {
                 }
             }),
 
-            // Handle other cases
+            PaintType::Gradient => initial_changes.iter().find_map(|change| {
+                if let PaintMixinChange::GradientPaint(paint) = change {
+                    return Some(Box::new(GradientSVGPaint::new(
+                        entity,
+                        &mut self.id_generator,
+                        &paint.variant,
+                    )) as Box<dyn SVGPaint>);
+                } else {
+                    return None;
+                }
+            }),
+
             _ => None,
         }
     }
@@ -259,9 +271,9 @@ impl SVGCompositionRes {
             // Append child
             if let Some(parent_append_element) = parent_node
                 .get_bundle_mut()
-                .get_child_item_mut(child_append_index)
+                .get_child_element_mut(child_append_index)
             {
-                parent_append_element.append_child(
+                parent_append_element.append_child_element(
                     get_bundle_mut(&mut bundle_variant).get_root_mut(),
                     SVGChildElementIdentifier::InCompositionContext(entity),
                 );

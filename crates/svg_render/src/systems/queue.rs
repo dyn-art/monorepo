@@ -68,8 +68,8 @@ fn process_paint(
     );
 
     // Apply collected changes to the SVG paint and drain changes
-    if let Some(svg_paint) = maybe_paint {
-        svg_paint.apply_paint_change(&changed_paint);
+    if let Some((svg_paint, id_generator)) = maybe_paint {
+        svg_paint.apply_paint_change(&changed_paint, id_generator);
         element_change_events.extend(svg_paint.drain_changes());
     }
 }
