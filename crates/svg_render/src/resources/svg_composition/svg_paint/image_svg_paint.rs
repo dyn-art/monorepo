@@ -73,11 +73,7 @@ impl SVGBundle for ImageSVGPaint {
 }
 
 impl SVGPaint for ImageSVGPaint {
-    fn apply_paint_change(
-        &mut self,
-        changed_paint: &ChangedPaint,
-        id_generator: &mut ContinuousId,
-    ) {
+    fn apply_paint_change(&mut self, changed_paint: &ChangedPaint, _: &mut ContinuousId) {
         for change in &changed_paint.changes {
             match change {
                 PaintMixinChange::ImagePaint(mixin) => match &mixin.scale_mode {
@@ -253,8 +249,8 @@ impl SVGPaint for ImageSVGPaint {
 impl ImageSVGPaint {
     pub fn new(
         entity: Entity,
-        id_generator: &mut ContinuousId,
         scale_mode: &ImagePaintScaleMode,
+        id_generator: &mut ContinuousId,
     ) -> Self {
         // Create root element
         let mut element = SVGElement::new(SVGTag::Group, id_generator);
@@ -265,7 +261,6 @@ impl ImageSVGPaint {
         let mut bundle = BaseSVGBundle::new(element, entity);
 
         let mut defs_element = SVGElement::new(SVGTag::Defs, id_generator);
-        let defs_id = defs_element.get_id();
         #[cfg(feature = "tracing")]
         defs_element.set_attribute(SVGAttribute::Name {
             name: ImageSVGPaint::create_element_name(defs_id, String::from("defs"), false),
@@ -291,7 +286,6 @@ impl ImageSVGPaint {
             .unwrap();
 
         let mut paint_clipped_image_element = SVGElement::new(SVGTag::Image, id_generator);
-        let paint_clipped_image_id = paint_clipped_image_element.get_id();
         #[cfg(feature = "tracing")]
         paint_clipped_image_element.set_attribute(SVGAttribute::Name {
             name: ImageSVGPaint::create_element_name(
@@ -313,7 +307,6 @@ impl ImageSVGPaint {
             .unwrap();
 
         let mut paint_rect_element = SVGElement::new(SVGTag::Rect, id_generator);
-        let paint_rect_id = paint_rect_element.get_id();
         #[cfg(feature = "tracing")]
         paint_rect_element.set_attribute(SVGAttribute::Name {
             name: ImageSVGPaint::create_element_name(

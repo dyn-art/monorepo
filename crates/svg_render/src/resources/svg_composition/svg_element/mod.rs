@@ -46,7 +46,6 @@ pub struct SVGElement {
 
 #[derive(Debug)]
 pub struct SVGChildElement {
-    pub id: Option<ContinuousId>,
     pub identifier: SVGChildElementIdentifier,
 }
 
@@ -167,10 +166,7 @@ impl SVGElement {
         identifier: SVGChildElementIdentifier,
     ) {
         element.append_to_parent(self.id);
-        self.children.push(SVGChildElement {
-            id: Some(element.get_id()),
-            identifier,
-        });
+        self.children.push(SVGChildElement { identifier });
     }
 
     pub fn append_child_portal(
@@ -181,23 +177,11 @@ impl SVGElement {
         for element in elements {
             element.append_to_parent(self.id);
         }
-        self.children.push(SVGChildElement {
-            id: None,
-            identifier,
-        });
+        self.children.push(SVGChildElement { identifier });
     }
 
     pub fn clear_children(&mut self) {
         self.children.clear()
-    }
-
-    pub fn remove_child(&mut self, id: ContinuousId) -> bool {
-        let initial_len = self.children.len();
-        self.children.retain(|child| child.id != Some(id));
-        let new_len = self.children.len();
-
-        // Return true if the length of the vector changed, indicating a child was removed
-        initial_len != new_len
     }
 
     // TODO

@@ -133,7 +133,7 @@ impl SVGPaint for GradientSVGPaint {
 }
 
 impl GradientSVGPaint {
-    pub fn new(entity: Entity, id_generator: &mut ContinuousId, variant: &GradientVariant) -> Self {
+    pub fn new(entity: Entity, variant: &GradientVariant, id_generator: &mut ContinuousId) -> Self {
         // Create root element
         let mut element = SVGElement::new(SVGTag::Group, id_generator);
         #[cfg(feature = "tracing")]
@@ -147,7 +147,6 @@ impl GradientSVGPaint {
         let mut bundle = BaseSVGBundle::new(element, entity);
 
         let mut defs_element = SVGElement::new(SVGTag::Defs, id_generator);
-        let defs_id = defs_element.get_id();
         #[cfg(feature = "tracing")]
         defs_element.set_attribute(SVGAttribute::Name {
             name: GradientSVGPaint::create_element_name(defs_id, String::from("defs"), false),
@@ -173,7 +172,6 @@ impl GradientSVGPaint {
             bundle.append_child_portal_to(paint_gradient_index).unwrap();
 
         let mut paint_rect_element = SVGElement::new(SVGTag::Rect, id_generator);
-        let paint_rect_id = paint_rect_element.get_id();
         #[cfg(feature = "tracing")]
         paint_rect_element.set_attribute(SVGAttribute::Name {
             name: GradientSVGPaint::create_element_name(

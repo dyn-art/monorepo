@@ -125,31 +125,28 @@ impl SVGCompositionRes {
     ) -> Option<Box<dyn SVGPaint>> {
         match paint_type {
             PaintType::Solid => Some(Box::new(SolidSVGPaint::new(entity, &mut self.id_generator))),
-
             PaintType::Image => initial_changes.iter().find_map(|change| {
                 if let PaintMixinChange::ImagePaint(paint) = change {
                     return Some(Box::new(ImageSVGPaint::new(
                         entity,
-                        &mut self.id_generator,
                         &paint.scale_mode,
+                        &mut self.id_generator,
                     )) as Box<dyn SVGPaint>);
                 } else {
                     return None;
                 }
             }),
-
             PaintType::Gradient => initial_changes.iter().find_map(|change| {
                 if let PaintMixinChange::GradientPaint(paint) = change {
                     return Some(Box::new(GradientSVGPaint::new(
                         entity,
-                        &mut self.id_generator,
                         &paint.variant,
+                        &mut self.id_generator,
                     )) as Box<dyn SVGPaint>);
                 } else {
                     return None;
                 }
             }),
-
             _ => None,
         }
     }
@@ -163,7 +160,7 @@ impl SVGCompositionRes {
         entity: Entity,
         node_type: &NodeType,
         maybe_parent_id: &Option<Entity>,
-    ) -> Option<&mut Box<dyn SVGNode>> {
+    ) -> Option<(&mut Box<dyn SVGNode>, &mut ContinuousId)> {
         // Create node
         if !self.bundles.contains_key(&entity) {
             match self.create_node(node_type, entity.clone()) {
@@ -175,7 +172,7 @@ impl SVGCompositionRes {
         }
 
         return match self.bundles.get_mut(&entity) {
-            Some(SVGBundleVariant::Node(node)) => Some(node),
+            Some(SVGBundleVariant::Node(node)) => Some((node, &mut self.id_generator)),
             _ => None,
         };
     }

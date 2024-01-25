@@ -49,11 +49,7 @@ impl SVGBundle for SolidSVGPaint {
 }
 
 impl SVGPaint for SolidSVGPaint {
-    fn apply_paint_change(
-        &mut self,
-        changed_paint: &ChangedPaint,
-        id_generator: &mut ContinuousId,
-    ) {
+    fn apply_paint_change(&mut self, changed_paint: &ChangedPaint, _: &mut ContinuousId) {
         for change in &changed_paint.changes {
             match change {
                 PaintMixinChange::PaintComposition(mixin) => {
@@ -117,7 +113,6 @@ impl SolidSVGPaint {
 
         // Create paint elements
         let mut paint_rect_element = SVGElement::new(SVGTag::Rect, id_generator);
-        let paint_rect_element_id = paint_rect_element.get_id();
         #[cfg(feature = "tracing")]
         paint_rect_element.set_attribute(SVGAttribute::Name {
             name: SolidSVGPaint::create_element_name(

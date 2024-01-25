@@ -57,7 +57,7 @@ impl SVGBundle for ShapeSVGNode {
 }
 
 impl SVGNode for ShapeSVGNode {
-    fn apply_node_change(&mut self, changed_node: &ChangedNode) {
+    fn apply_node_change(&mut self, changed_node: &ChangedNode, _: &mut ContinuousId) {
         for change in &changed_node.changes {
             match change {
                 NodeMixinChange::NodeComposition(mixin) => {
@@ -192,7 +192,6 @@ impl ShapeSVGNode {
             .unwrap();
 
         let mut fill_clipped_path_element = SVGElement::new(SVGTag::Path, id_generator);
-        let fill_clipped_path_id = fill_clipped_path_element.get_id();
         #[cfg(feature = "tracing")]
         fill_clipped_path_element.set_attribute(SVGAttribute::Name {
             name: ShapeSVGNode::create_element_name(
@@ -206,7 +205,6 @@ impl ShapeSVGNode {
             .unwrap();
 
         let mut fill_wrapper_g_element = SVGElement::new(SVGTag::Group, id_generator);
-        let fill_wrapper_g_id = fill_wrapper_g_element.get_id();
         #[cfg(feature = "tracing")]
         fill_wrapper_g_element.set_attribute(SVGAttribute::Name {
             name: ShapeSVGNode::create_element_name(
@@ -222,28 +220,21 @@ impl ShapeSVGNode {
 
         Self {
             bundle,
-            defs: ElementReference {
-                // id: defs_id,
-                index: defs_index,
-            },
+            defs: ElementReference { index: defs_index },
 
             // Click area element references
             click_area_rect: ElementReference {
-                // id: click_area_rect_id,
                 index: click_area_rect_index,
             },
 
             // Fill element references
             fill_clip_path: ElementReference {
-                // id: fill_clip_path_id,
                 index: fill_clip_path_index,
             },
             fill_clipped_path: ElementReference {
-                // id: fill_clipped_path_id,
                 index: fill_clipped_path_index,
             },
             fill_wrapper_g: ElementReference {
-                // id: fill_wrapper_g_id,
                 index: fill_wrapper_g_index,
             },
         }

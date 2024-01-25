@@ -217,8 +217,8 @@ fn process_node(
     );
 
     // Apply collected changes to the SVG node and drain changes
-    if let Some(node) = maybe_node {
-        node.apply_node_change(changed_node);
+    if let Some((node, id_generator)) = maybe_node {
+        node.apply_node_change(changed_node, id_generator);
         element_change_events.extend(node.drain_changes());
     }
 }
