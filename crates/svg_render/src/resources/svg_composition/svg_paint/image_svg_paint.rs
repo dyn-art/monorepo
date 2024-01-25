@@ -332,21 +332,21 @@ impl ImageSVGPaint {
                 ImagePaintScaleMode::Tile { .. } => ImageSVGPaintVariant::Tile,
             },
             defs: ElementReference {
-                id: defs_id,
+                // id: defs_id,
                 index: defs_index,
             },
 
             // Paint element references
             paint_pattern: ElementReference {
-                id: paint_pattern_id,
+                // id: paint_pattern_id,
                 index: paint_pattern_index,
             },
             paint_clipped_image: ElementReference {
-                id: paint_clipped_image_id,
+                // id: paint_clipped_image_id,
                 index: paint_clipped_image_index,
             },
             paint_rect: ElementReference {
-                id: paint_rect_id,
+                // id: paint_rect_id,
                 index: paint_rect_index,
             },
         }

@@ -7,11 +7,15 @@ use crate::element_change::ElementChange;
 
 use self::{
     attributes::SVGAttribute,
-    events::{AttributeUpdated, ElementAppended, ElementCreated, StyleUpdated},
+    events::{AttributeUpdated, ElementAppended, ElementCreated, ElementDeleted, StyleUpdated},
     styles::SVGStyle,
 };
 
-use super::{svg_bundle::BaseSVGBundle, svg_bundle_variant::bundle_to_string, SVGCompositionRes};
+use super::{
+    svg_bundle::{BaseSVGBundle, BundleChildSVGElement},
+    svg_bundle_variant::bundle_to_string,
+    SVGCompositionRes,
+};
 
 pub mod attributes;
 pub mod events;
@@ -31,13 +35,19 @@ pub struct SVGElement {
     /// The style properties of the SVG element
     styles: HashMap<&'static str, SVGStyle>,
     /// Identifiers for child elements, supporting both in-context and out-of-context children.
-    children: Vec<SVGChildElementIdentifier>,
+    children: Vec<SVGChildElement>,
     /// Render change updates
     changes: Vec<ElementChange>,
     /// Whether the SVG element is the root of a SVG bundle.
     is_bundle_root: bool,
     /// Whether the element was created in the current update cycle (before first update drain).
     was_created_in_current_update_cycle: bool,
+}
+
+#[derive(Debug)]
+pub struct SVGChildElement {
+    pub id: ContinuousId,
+    pub identifier: SVGChildElementIdentifier,
 }
 
 /// Used to efficiently locate SVG child elements within various SVG structures.
@@ -157,11 +167,23 @@ impl SVGElement {
         identifier: SVGChildElementIdentifier,
     ) {
         element.append_to_parent(self.id);
-        self.children.push(identifier);
+        self.children.push(SVGChildElement {
+            id: element.get_id(),
+            identifier,
+        });
     }
 
     pub fn clear_children(&mut self) {
         self.children.clear()
+    }
+
+    pub fn remove_child(&mut self, id: ContinuousId) -> bool {
+        let initial_len = self.children.len();
+        self.children.retain(|child| child.id != id);
+        let new_len = self.children.len();
+
+        // Return true if the length of the vector changed, indicating a child was removed
+        initial_len != new_len
     }
 
     // TODO
@@ -176,7 +198,7 @@ impl SVGElement {
 
         // Mapping each Entity to its index in the children vector
         for (index, child) in self.children.iter().enumerate() {
-            let entity = child.entity();
+            let entity = child.identifier.entity();
             index_map.insert(entity, index);
         }
 
@@ -239,6 +261,15 @@ impl SVGElement {
     }
 
     // =========================================================================
+    // Remove
+    // =========================================================================
+
+    pub fn remove(&mut self) {
+        self.changes
+            .push(ElementChange::ElementDeleted(ElementDeleted {}));
+    }
+
+    // =========================================================================
     // Other
     // =========================================================================
 
@@ -293,14 +324,23 @@ impl SVGElement {
 
         // Append children
         for child in &self.children {
-            match child {
+            match child.identifier {
                 SVGChildElementIdentifier::InBundleContext(_, child_index) => {
-                    if let Some(child_element) = bundle.get_children().get(*child_index) {
-                        result.push_str(&child_element.to_string(bundle, composition));
+                    if let Some(child_element) = bundle.get_children().get(child_index) {
+                        match child_element {
+                            BundleChildSVGElement::Item(child_element) => {
+                                result.push_str(&child_element.to_string(bundle, composition));
+                            }
+                            BundleChildSVGElement::Collection(child_elements) => {
+                                for child_element in child_elements {
+                                    result.push_str(&child_element.to_string(bundle, composition));
+                                }
+                            }
+                        }
                     }
                 }
                 SVGChildElementIdentifier::InCompositionContext(entity) => {
-                    if let Some(bundle) = composition.get_bundle(entity) {
+                    if let Some(bundle) = composition.get_bundle(&entity) {
                         result.push_str(&bundle_to_string(&bundle, composition))
                     }
                 }

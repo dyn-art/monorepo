@@ -223,27 +223,27 @@ impl ShapeSVGNode {
         Self {
             bundle,
             defs: ElementReference {
-                id: defs_id,
+                // id: defs_id,
                 index: defs_index,
             },
 
             // Click area element references
             click_area_rect: ElementReference {
-                id: click_area_rect_id,
+                // id: click_area_rect_id,
                 index: click_area_rect_index,
             },
 
             // Fill element references
             fill_clip_path: ElementReference {
-                id: fill_clip_path_id,
+                // id: fill_clip_path_id,
                 index: fill_clip_path_index,
             },
             fill_clipped_path: ElementReference {
-                id: fill_clipped_path_id,
+                // id: fill_clipped_path_id,
                 index: fill_clipped_path_index,
             },
             fill_wrapper_g: ElementReference {
-                id: fill_wrapper_g_id,
+                // id: fill_wrapper_g_id,
                 index: fill_wrapper_g_index,
             },
         }

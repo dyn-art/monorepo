@@ -432,24 +432,24 @@ pub struct GradientPaint {
 
     /// Specifies the variant of the gradient.
     #[serde(default)]
-    variant: GradientVariant,
+    pub variant: GradientVariant,
 
     /// Transformation matrix for the gradient.
     #[serde(default)]
-    transform: Mat3,
+    pub transform: Mat3,
 
     /// A list of color stops defining the gradient.
     #[serde(rename = "gradientStops")]
-    gradient_stops: Vec<ColorStop>,
+    pub gradient_stops: Vec<ColorStop>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, Type)]
 pub struct ColorStop {
     /// The position of the color stop in the gradient, ranging from 0.0 to 1.0.
-    position: f32,
+    pub position: f32,
 
     /// The color of the stop, represented as an RGB array.
-    color: (u8, u8, u8),
+    pub color: (u8, u8, u8),
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, Default, Type)]

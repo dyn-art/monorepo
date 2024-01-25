@@ -285,39 +285,39 @@ impl FrameSVGNode {
 
             // Content element references
             defs: ElementReference {
-                id: defs_id,
+                // id: defs_id,
                 index: defs_index,
             },
             content_clip_path: ElementReference {
-                id: content_clip_path_id,
+                // id: content_clip_path_id,
                 index: content_clip_path_index,
             },
             content_clipped_rect: ElementReference {
-                id: content_clipped_rect_id,
+                // id: content_clipped_rect_id,
                 index: content_clipped_rect_index,
             },
             content_wrapper_g: ElementReference {
-                id: content_wrapper_g_id,
+                // id: content_wrapper_g_id,
                 index: content_wrapper_g_index,
             },
 
             // Children element references
             children_wrapper_g: ElementReference {
-                id: children_wrapper_g_id,
+                // id: children_wrapper_g_id,
                 index: children_wrapper_g_index,
             },
 
             // Fill element references
             fill_clip_path: ElementReference {
-                id: fill_clip_path_id,
+                // id: fill_clip_path_id,
                 index: fill_clip_path_index,
             },
             fill_clipped_path: ElementReference {
-                id: fill_clipped_path_id,
+                // id: fill_clipped_path_id,
                 index: fill_clipped_path_index,
             },
             fill_wrapper_g: ElementReference {
-                id: fill_wrapper_g_id,
+                // id: fill_wrapper_g_id,
                 index: fill_wrapper_g_index,
             },
         }

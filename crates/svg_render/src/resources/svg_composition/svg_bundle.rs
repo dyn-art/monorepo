@@ -26,7 +26,13 @@ pub struct BaseSVGBundle {
     // - The size is known at compile time, minimizing dynamic changes
     // - Offers efficient O(1) access by index, suitable for this use case
     // - More memory-efficient and simpler than a HashMap for fixed-size collections
-    child_elements: Vec<SVGElement>,
+    child_elements: Vec<BundleChildSVGElement>,
+}
+
+#[derive(Debug)]
+pub enum BundleChildSVGElement {
+    Item(SVGElement),
+    Collection(Vec<SVGElement>),
 }
 
 impl BaseSVGBundle {
@@ -43,7 +49,7 @@ impl BaseSVGBundle {
     // Getter & Setter
     // =========================================================================
 
-    pub fn get_children(&self) -> &Vec<SVGElement> {
+    pub fn get_children(&self) -> &Vec<BundleChildSVGElement> {
         &self.child_elements
     }
 
@@ -56,11 +62,29 @@ impl BaseSVGBundle {
     }
 
     pub fn get_child(&self, index: usize) -> Option<&SVGElement> {
-        self.child_elements.get(index)
+        let maybe_child = self.child_elements.get(index);
+        if let Some(child) = maybe_child {
+            match child {
+                BundleChildSVGElement::Item(item) => {
+                    return Some(item);
+                }
+                _ => {}
+            }
+        }
+        return None;
     }
 
     pub fn get_child_mut(&mut self, index: usize) -> Option<&mut SVGElement> {
-        self.child_elements.get_mut(index)
+        let maybe_child = self.child_elements.get_mut(index);
+        if let Some(child) = maybe_child {
+            match child {
+                BundleChildSVGElement::Item(item) => {
+                    return Some(item);
+                }
+                _ => {}
+            }
+        }
+        return None;
     }
 
     // =========================================================================
@@ -70,12 +94,15 @@ impl BaseSVGBundle {
     pub fn append_child_to(&mut self, index: usize, mut element: SVGElement) -> Option<usize> {
         let next_index = self.get_next_child_index();
         if let Some(target_element) = self.child_elements.get_mut(index) {
-            target_element.append_child(
-                &mut element,
-                SVGChildElementIdentifier::InBundleContext(self.entity, next_index),
-            );
-            self.child_elements.push(element);
-            return Some(next_index);
+            if let BundleChildSVGElement::Item(target_element) = target_element {
+                target_element.append_child(
+                    &mut element,
+                    SVGChildElementIdentifier::InBundleContext(self.entity, next_index),
+                );
+                self.child_elements
+                    .push(BundleChildSVGElement::Item(element));
+                return Some(next_index);
+            }
         }
         return None;
     }
@@ -86,7 +113,8 @@ impl BaseSVGBundle {
             &mut element,
             SVGChildElementIdentifier::InBundleContext(self.entity, next_index),
         );
-        self.child_elements.push(element);
+        self.child_elements
+            .push(BundleChildSVGElement::Item(element));
         return next_index;
     }
 
@@ -110,12 +138,27 @@ impl BaseSVGBundle {
 
         // Drain updates from child elements
         for child in &mut self.child_elements {
-            let changes = child.drain_changes();
-            if !changes.is_empty() {
-                drained_updates.push(ElementChangeEvent {
-                    id: child.get_id(),
-                    changes,
-                })
+            match child {
+                BundleChildSVGElement::Item(child) => {
+                    let changes = child.drain_changes();
+                    if !changes.is_empty() {
+                        drained_updates.push(ElementChangeEvent {
+                            id: child.get_id(),
+                            changes,
+                        })
+                    }
+                }
+                BundleChildSVGElement::Collection(children) => {
+                    for child in children {
+                        let changes = child.drain_changes();
+                        if !changes.is_empty() {
+                            drained_updates.push(ElementChangeEvent {
+                                id: child.get_id(),
+                                changes,
+                            })
+                        }
+                    }
+                }
             }
         }
 

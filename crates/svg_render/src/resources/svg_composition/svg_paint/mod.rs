@@ -4,6 +4,7 @@ use crate::resources::changed_components::ChangedPaint;
 
 use super::svg_bundle::SVGBundle;
 
+pub mod gradient_svg_paint;
 pub mod image_svg_paint;
 pub mod solid_svg_paint;
 mod utils;

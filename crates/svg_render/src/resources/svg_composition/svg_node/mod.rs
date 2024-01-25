@@ -1,5 +1,3 @@
-use dyn_composition::core::utils::continuous_id::ContinuousId;
-
 use crate::resources::changed_components::ChangedNode;
 
 use super::svg_bundle::SVGBundle;
@@ -10,7 +8,7 @@ pub mod shape_svg_node;
 
 #[derive(Debug)]
 pub struct ElementReference {
-    pub id: ContinuousId,
+    // pub id: ContinuousId,
     pub index: usize,
 }
 
