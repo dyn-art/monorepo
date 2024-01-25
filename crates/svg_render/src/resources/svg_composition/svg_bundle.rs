@@ -61,7 +61,7 @@ impl BaseSVGBundle {
         &mut self.element
     }
 
-    pub fn get_child(&self, index: usize) -> Option<&SVGElement> {
+    pub fn get_child_item(&self, index: usize) -> Option<&SVGElement> {
         let maybe_child = self.child_elements.get(index);
         if let Some(child) = maybe_child {
             match child {
@@ -74,7 +74,7 @@ impl BaseSVGBundle {
         return None;
     }
 
-    pub fn get_child_mut(&mut self, index: usize) -> Option<&mut SVGElement> {
+    pub fn get_child_item_mut(&mut self, index: usize) -> Option<&mut SVGElement> {
         let maybe_child = self.child_elements.get_mut(index);
         if let Some(child) = maybe_child {
             match child {
@@ -139,21 +139,21 @@ impl BaseSVGBundle {
         // Drain updates from child elements
         for child in &mut self.child_elements {
             match child {
-                BundleChildSVGElement::Item(child) => {
-                    let changes = child.drain_changes();
+                BundleChildSVGElement::Item(child_element) => {
+                    let changes = child_element.drain_changes();
                     if !changes.is_empty() {
                         drained_updates.push(ElementChangeEvent {
-                            id: child.get_id(),
+                            id: child_element.get_id(),
                             changes,
                         })
                     }
                 }
-                BundleChildSVGElement::Collection(children) => {
-                    for child in children {
-                        let changes = child.drain_changes();
+                BundleChildSVGElement::Collection(child_elements) => {
+                    for child_element in child_elements {
+                        let changes = child_element.drain_changes();
                         if !changes.is_empty() {
                             drained_updates.push(ElementChangeEvent {
-                                id: child.get_id(),
+                                id: child_element.get_id(),
                                 changes,
                             })
                         }

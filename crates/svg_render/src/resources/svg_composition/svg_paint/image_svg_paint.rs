@@ -84,7 +84,7 @@ impl SVGPaint for ImageSVGPaint {
                             tile_height,
                         } => {
                             self.bundle
-                                .get_child_mut(self.paint_pattern.index)
+                                .get_child_item_mut(self.paint_pattern.index)
                                 .unwrap()
                                 .set_attributes(vec![
                                     SVGAttribute::PatternTransform {
@@ -102,7 +102,7 @@ impl SVGPaint for ImageSVGPaint {
                                     },
                                 ]);
                             self.bundle
-                                .get_child_mut(self.paint_clipped_image.index)
+                                .get_child_item_mut(self.paint_clipped_image.index)
                                 .unwrap()
                                 .set_attributes(vec![
                                     SVGAttribute::Width {
@@ -125,7 +125,7 @@ impl SVGPaint for ImageSVGPaint {
                             ..
                         } => {
                             self.bundle
-                                .get_child_mut(self.paint_pattern.index)
+                                .get_child_item_mut(self.paint_pattern.index)
                                 .unwrap()
                                 .set_attributes(vec![
                                     SVGAttribute::Width {
@@ -138,7 +138,7 @@ impl SVGPaint for ImageSVGPaint {
                                     },
                                 ]);
                             self.bundle
-                                .get_child_mut(self.paint_clipped_image.index)
+                                .get_child_item_mut(self.paint_clipped_image.index)
                                 .unwrap()
                                 .set_attributes(vec![
                                     SVGAttribute::Transform {
@@ -171,7 +171,7 @@ impl SVGPaint for ImageSVGPaint {
                 }
                 PaintMixinChange::Dimension(mixin) => {
                     self.bundle
-                        .get_child_mut(self.paint_rect.index)
+                        .get_child_item_mut(self.paint_rect.index)
                         .unwrap()
                         .set_attributes(vec![
                             SVGAttribute::Width {
@@ -187,7 +187,7 @@ impl SVGPaint for ImageSVGPaint {
                     match self.variant {
                         ImageSVGPaintVariant::Fill | ImageSVGPaintVariant::Fit => {
                             self.bundle
-                                .get_child_mut(self.paint_pattern.index)
+                                .get_child_item_mut(self.paint_pattern.index)
                                 .unwrap()
                                 .set_attributes(vec![
                                     SVGAttribute::Width {
@@ -200,7 +200,7 @@ impl SVGPaint for ImageSVGPaint {
                                     },
                                 ]);
                             self.bundle
-                                .get_child_mut(self.paint_clipped_image.index)
+                                .get_child_item_mut(self.paint_clipped_image.index)
                                 .unwrap()
                                 .set_attributes(vec![
                                     SVGAttribute::Width {
@@ -227,7 +227,7 @@ impl SVGPaint for ImageSVGPaint {
                 }
                 PaintMixinChange::ImageContent(mixin) => {
                     self.bundle
-                        .get_child_mut(self.paint_clipped_image.index)
+                        .get_child_item_mut(self.paint_clipped_image.index)
                         .unwrap()
                         .set_attribute(SVGAttribute::Href {
                             href: match &mixin.content {

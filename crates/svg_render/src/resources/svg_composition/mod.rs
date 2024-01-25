@@ -259,7 +259,7 @@ impl SVGCompositionRes {
             // Append child
             if let Some(parent_append_element) = parent_node
                 .get_bundle_mut()
-                .get_child_mut(child_append_index)
+                .get_child_item_mut(child_append_index)
             {
                 parent_append_element.append_child(
                     get_bundle_mut(&mut bundle_variant).get_root_mut(),

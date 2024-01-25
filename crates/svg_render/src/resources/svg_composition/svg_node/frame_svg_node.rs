@@ -88,7 +88,7 @@ impl SVGNode for FrameSVGNode {
                         },
                     ]);
                     self.bundle
-                        .get_child_mut(self.fill_clipped_path.index)
+                        .get_child_item_mut(self.fill_clipped_path.index)
                         .unwrap()
                         .set_attributes(vec![
                             SVGAttribute::Width {
@@ -101,7 +101,7 @@ impl SVGNode for FrameSVGNode {
                             },
                         ]);
                     self.bundle
-                        .get_child_mut(self.content_clipped_rect.index)
+                        .get_child_item_mut(self.content_clipped_rect.index)
                         .unwrap()
                         .set_attributes(vec![
                             SVGAttribute::Width {
@@ -132,7 +132,7 @@ impl SVGNode for FrameSVGNode {
                 }
                 NodeMixinChange::Children(mixin) => {
                     self.bundle
-                        .get_child_mut(self.children_wrapper_g.index)
+                        .get_child_item_mut(self.children_wrapper_g.index)
                         .unwrap()
                         .reorder_children(&mixin.children.0);
                 }

@@ -84,7 +84,7 @@ impl SVGNode for ShapeSVGNode {
                     ]);
 
                     self.bundle
-                        .get_child_mut(self.click_area_rect.index)
+                        .get_child_item_mut(self.click_area_rect.index)
                         .unwrap()
                         .set_attributes(vec![
                             SVGAttribute::Width {
@@ -106,7 +106,7 @@ impl SVGNode for ShapeSVGNode {
                 }
                 NodeMixinChange::Path(mixin) => self
                     .bundle
-                    .get_child_mut(self.fill_clipped_path.index)
+                    .get_child_item_mut(self.fill_clipped_path.index)
                     .unwrap()
                     .set_attributes(vec![SVGAttribute::D {
                         d: construct_svg_path(&mixin.vertices),

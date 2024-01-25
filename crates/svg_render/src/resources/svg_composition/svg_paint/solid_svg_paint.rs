@@ -65,7 +65,7 @@ impl SVGPaint for SolidSVGPaint {
                 }
                 PaintMixinChange::Dimension(mixin) => {
                     self.bundle
-                        .get_child_mut(self.paint_rect.index)
+                        .get_child_item_mut(self.paint_rect.index)
                         .unwrap()
                         .set_attributes(vec![
                             SVGAttribute::Width {
@@ -89,7 +89,7 @@ impl SVGPaint for SolidSVGPaint {
                 }
                 PaintMixinChange::SolidPaint(mixin) => {
                     self.bundle
-                        .get_child_mut(self.paint_rect.index)
+                        .get_child_item_mut(self.paint_rect.index)
                         .unwrap()
                         .set_attributes(vec![SVGAttribute::Fill {
                             fill: rgb_to_hex(mixin.color),
