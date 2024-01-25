@@ -1,5 +1,5 @@
 use bevy_ecs::component::Component;
-use glam::Mat3;
+use glam::{Mat3, Vec2};
 use serde::{Deserialize, Serialize};
 use specta::Type;
 
@@ -397,6 +397,15 @@ pub enum ImageTilePaintTransform {
     },
 }
 
+impl Default for ImageTilePaintTransform {
+    fn default() -> Self {
+        Self::Basic {
+            rotation: 0.0,
+            scaling_factor: 1.0,
+        }
+    }
+}
+
 #[derive(Serialize, Deserialize, Clone, Debug, Type)]
 #[serde(tag = "type")]
 pub enum ImageCropPaintTransform {
@@ -412,15 +421,6 @@ pub enum ImageCropPaintTransform {
     },
 }
 
-impl Default for ImageTilePaintTransform {
-    fn default() -> Self {
-        Self::Basic {
-            rotation: 0.0,
-            scaling_factor: 1.0,
-        }
-    }
-}
-
 // =============================================================================
 // Gradient Paint
 // =============================================================================
@@ -432,11 +432,7 @@ pub struct GradientPaint {
 
     /// Specifies the variant of the gradient.
     #[serde(default)]
-    pub variant: GradientVariant,
-
-    /// Transformation matrix for the gradient.
-    #[serde(default)]
-    pub transform: Mat3,
+    pub variant: GradientPaintVariant,
 
     /// A list of color stops defining the gradient.
     #[serde(rename = "gradientStops")]
@@ -452,11 +448,67 @@ pub struct ColorStop {
     pub color: (u8, u8, u8),
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug, Default, Type)]
-pub enum GradientVariant {
-    #[default]
-    Linear,
-    Radial,
-    Angular,
-    Diamond,
+#[derive(Serialize, Deserialize, Clone, Debug, Type)]
+#[serde(tag = "type")]
+pub enum GradientPaintVariant {
+    Linear {
+        #[serde(default)]
+        transform: LinearGradientPaintTransform,
+    },
+    Radial {
+        #[serde(default)]
+        transform: RadialGradientPaintTransform,
+    },
+}
+
+impl Default for GradientPaintVariant {
+    fn default() -> Self {
+        Self::Linear {
+            transform: LinearGradientPaintTransform::default(),
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, Type)]
+#[serde(tag = "type")]
+pub enum LinearGradientPaintTransform {
+    Basic {
+        /// Transformation matrix for the gradient.
+        #[serde(default)]
+        transform: Mat3,
+    },
+    #[serde(rename_all = "camelCase")]
+    Internal { start: Vec2, end: Vec2 },
+}
+
+impl Default for LinearGradientPaintTransform {
+    fn default() -> Self {
+        Self::Basic {
+            transform: Mat3::default(),
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, Type)]
+#[serde(tag = "type")]
+pub enum RadialGradientPaintTransform {
+    Basic {
+        /// Transformation matrix for the gradient.
+        #[serde(default)]
+        transform: Mat3,
+    },
+    #[serde(rename_all = "camelCase")]
+    Internal {
+        center: Vec2,
+        radius: Vec2,
+        rotation: f32,
+    },
+}
+
+impl Default for RadialGradientPaintTransform {
+    fn default() -> Self {
+        Self::Basic {
+            transform: Mat3::default(),
+        }
+    }
 }

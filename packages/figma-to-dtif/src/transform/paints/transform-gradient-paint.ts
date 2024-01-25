@@ -1,5 +1,4 @@
 import type { COMP } from '@dyn/dtif';
-import type { GradientVariant } from '@dyn/dtif/dist/types/gen/bindings';
 
 import { mapFigmaBlendModeToDTIF, mapFigmaRGBToDTIF, mapFigmaTransformToMat3 } from '../../utils';
 
@@ -11,12 +10,11 @@ export function transformGradientPaint(
 		compositionMixin: {
 			isVisible: paint.visible ?? true
 		},
-		variant: mapFigmaGradientTypeToDTIF(paint.type),
+		variant: mapFigmaGradientTypeToDTIF(paint.type, paint.gradientTransform),
 		gradientStops: paint.gradientStops.map((stop) => ({
 			color: mapFigmaRGBToDTIF(stop.color),
 			position: stop.position
 		})),
-		transform: mapFigmaTransformToMat3(paint.gradientTransform),
 		blendMixin: {
 			blendMode: mapFigmaBlendModeToDTIF(paint.blendMode),
 			opacity: paint.opacity ?? 1
@@ -24,15 +22,22 @@ export function transformGradientPaint(
 	};
 }
 
-function mapFigmaGradientTypeToDTIF(variant: GradientPaint['type']): GradientVariant {
+function mapFigmaGradientTypeToDTIF(
+	variant: GradientPaint['type'],
+	transform: Transform
+): COMP.GradientPaintVariant {
 	switch (variant) {
 		case 'GRADIENT_LINEAR':
-			return 'Linear';
+			return {
+				type: 'Linear',
+				transform: { type: 'Basic', transform: mapFigmaTransformToMat3(transform) }
+			};
 		case 'GRADIENT_RADIAL':
-			return 'Radial';
-		case 'GRADIENT_ANGULAR':
-			return 'Angular';
-		case 'GRADIENT_DIAMOND':
-			return 'Diamond';
+			return {
+				type: 'Radial',
+				transform: { type: 'Basic', transform: mapFigmaTransformToMat3(transform) }
+			};
+		default:
+			throw Error('todo');
 	}
 }

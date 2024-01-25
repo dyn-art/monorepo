@@ -367,6 +367,8 @@ pub enum SVGTag {
     ClipPath,
     Pattern,
     Image,
+    LinearGradient,
+    RadialGradient,
     Stop,
 }
 
@@ -386,6 +388,8 @@ impl SVGTag {
             SVGTag::ClipPath => "clipPath",
             SVGTag::Pattern => "pattern",
             SVGTag::Image => "image",
+            SVGTag::LinearGradient => "linearGradient",
+            SVGTag::RadialGradient => "radialGradient",
             SVGTag::Stop => "stop",
         }
     }

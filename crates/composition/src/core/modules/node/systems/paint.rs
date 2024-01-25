@@ -9,8 +9,9 @@ use glam::{Mat3, Vec2};
 use crate::core::modules::node::components::{
     mixins::{DimensionMixin, ImageContentMixin},
     types::{
-        ImageCropPaintTransform, ImagePaint, ImagePaintScaleMode, ImageTilePaintTransform, Node,
-        Paint,
+        GradientPaint, GradientPaintVariant, ImageCropPaintTransform, ImagePaint,
+        ImagePaintScaleMode, ImageTilePaintTransform, LinearGradientPaintTransform, Node, Paint,
+        RadialGradientPaintTransform,
     },
 };
 
@@ -170,4 +171,54 @@ fn calculate_cropped_image_transform(
         adjusted_image_height,
         adjusted_transform,
     );
+}
+
+pub fn update_gradient_paint_transform(
+    mut query: Query<
+        (&DimensionMixin, &mut GradientPaint),
+        Or<(Changed<DimensionMixin>, Changed<GradientPaint>)>,
+    >,
+) {
+    for (dimension, mut paint) in query.iter_mut() {
+        match &mut paint.variant {
+            GradientPaintVariant::Linear {
+                transform: outer_transform,
+            } => match outer_transform {
+                LinearGradientPaintTransform::Basic { transform } => {
+                    let (start, end) = extract_linear_gradient_params_from_transform(
+                        dimension.width,
+                        dimension.height,
+                        transform,
+                    );
+                    *outer_transform = LinearGradientPaintTransform::Internal { start, end };
+                }
+                _ => {}
+            },
+            GradientPaintVariant::Radial { transform } => match transform {
+                RadialGradientPaintTransform::Basic { transform } => {
+                    // TODO
+                }
+                _ => {}
+            },
+        }
+    }
+}
+
+/// Helper function to extract the x and y positions of the start and end of the linear gradient
+/// (scale is not important here).
+///
+/// Credits:
+/// https://github.com/figma-plugin-helper-functions/figma-plugin-helpers/tree/master
+fn extract_linear_gradient_params_from_transform(
+    shape_width: f32,
+    shape_height: f32,
+    transform: &Mat3,
+) -> (Vec2, Vec2) {
+    let mx_inv = transform.inverse();
+    let start_end = [Vec2::new(0.0, 0.5), Vec2::new(1.0, 0.5)].map(|p| mx_inv.transform_point2(p));
+
+    (
+        Vec2::new(start_end[0].x * shape_width, start_end[0].y * shape_height),
+        Vec2::new(start_end[1].x * shape_width, start_end[1].y * shape_height),
+    )
 }

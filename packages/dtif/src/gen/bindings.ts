@@ -393,11 +393,7 @@ export type GradientPaint = { _gradient_paint?: null | null;
 /**
  * Specifies the variant of the gradient.
  */
-variant?: GradientVariant; 
-/**
- * Transformation matrix for the gradient.
- */
-transform?: Mat3; 
+variant?: GradientPaintVariant; 
 /**
  * A list of color stops defining the gradient.
  */
@@ -407,17 +403,13 @@ export type GradientPaintBundle = ({ _gradient_paint?: null | null;
 /**
  * Specifies the variant of the gradient.
  */
-variant?: GradientVariant; 
-/**
- * Transformation matrix for the gradient.
- */
-transform?: Mat3; 
+variant?: GradientPaintVariant; 
 /**
  * A list of color stops defining the gradient.
  */
 gradientStops: ColorStop[] }) & { paint?: Paint; compositionMixin?: PaintCompositionMixin; blendMixin?: BlendMixin }
 
-export type GradientVariant = "Linear" | "Radial" | "Angular" | "Diamond"
+export type GradientPaintVariant = { type: "Linear"; transform?: LinearGradientPaintTransform } | { type: "Radial"; transform?: RadialGradientPaintTransform }
 
 /**
  * Serves as a container used to semantically group related nodes,
@@ -563,6 +555,8 @@ export type LineHeight =
  */
 { Percent: number }
 
+export type LinearGradientPaintTransform = { type: "Basic"; transform?: Mat3 } | { type: "Internal"; start: Vec2; end: Vec2 }
+
 export type Locked = null
 
 export type Mat3 = [number, number, number, number, number, number, number, number, number]
@@ -677,6 +671,8 @@ export type Polygon = { _polygon?: null | null;
  */
 pointCount?: number }
 
+export type RadialGradientPaintTransform = { type: "Basic"; transform?: Mat3 } | { type: "Internal"; center: Vec2; radius: Vec2; rotation: number }
+
 /**
  * Represents a basic shape node for a rectangle.
  * It is a fundamental building block used to create and manipulate rectangular shapes
@@ -740,7 +736,7 @@ export type RelativeTransformMixin = Mat3
  */
 export type Root = null
 
-export type SVGAttribute = { type: "Id"; id: ContinuousId } | { type: "Width"; width: number; unit: SVGMeasurementUnit } | { type: "Height"; height: number; unit: SVGMeasurementUnit } | { type: "Opacity"; opacity: number } | { type: "Transform"; transform: SVGTransformAttribute } | { type: "PatternTransform"; transform: SVGTransformAttribute } | { type: "D"; d: SVGPathCommand[] } | { type: "ClipPath"; clipPath: ContinuousId } | { type: "Fill"; fill: string } | { type: "ReferencedFill"; id: ContinuousId } | { type: "Name"; name: string } | { type: "PatternUnits"; patternUnits: SVGPatternUnitsVariant } | { type: "Href"; href: SVGHrefVariant } | { type: "PreserveAspectRatio"; preserveAspectRatio: string }
+export type SVGAttribute = { type: "Id"; id: ContinuousId } | { type: "Width"; width: number; unit: SVGMeasurementUnit } | { type: "Height"; height: number; unit: SVGMeasurementUnit } | { type: "Opacity"; opacity: number } | { type: "Transform"; transform: SVGTransformAttribute } | { type: "PatternTransform"; transform: SVGTransformAttribute } | { type: "D"; d: SVGPathCommand[] } | { type: "ClipPath"; clipPath: ContinuousId } | { type: "Fill"; fill: string } | { type: "ReferencedFill"; id: ContinuousId } | { type: "Name"; name: string } | { type: "PatternUnits"; patternUnits: SVGUnitsVariant } | { type: "GradientUnits"; gradientUnits: SVGUnitsVariant } | { type: "Href"; href: SVGHrefVariant } | { type: "PreserveAspectRatio"; preserveAspectRatio: string } | { type: "X1"; x1: number } | { type: "Y1"; y1: number } | { type: "X2"; x2: number } | { type: "Y2"; y2: number } | { type: "Offset"; offset: number } | { type: "StopColor"; stopColor: string }
 
 export type SVGBlendMode = { type: "Normal" } | { type: "Multiply" } | { type: "Screen" } | { type: "Overlay" } | { type: "Darken" } | { type: "Lighten" } | { type: "ColorDodge" } | { type: "ColorBurn" } | { type: "HardLight" } | { type: "SoftLight" } | { type: "Difference" } | { type: "Exclusion" } | { type: "Hue" } | { type: "Saturation" } | { type: "Color" } | { type: "Luminosity" }
 
@@ -752,13 +748,13 @@ export type SVGMeasurementUnit = { type: "Pixel" } | { type: "Percent" }
 
 export type SVGPathCommand = { type: "MoveTo"; x: number; y: number } | { type: "LineTo"; x: number; y: number } | { type: "CurveTo"; cx1: number; cy1: number; cx2: number; cy2: number; x: number; y: number } | { type: "ArcTo"; rx: number; ry: number; xAxisRotation: number; largeArcFlag: boolean; sweepFlag: boolean; x: number; y: number } | { type: "ClosePath" }
 
-export type SVGPatternUnitsVariant = { type: "UserSpaceOnUse" } | { type: "ObjectBoundingBox" }
-
 export type SVGRenderOutputEvent = ({ type: "ElementChange" } & ElementChangeEvent)
 
 export type SVGStyle = { type: "Display"; display: SVGDisplayStyle } | { type: "BlendMode"; blendMode: SVGBlendMode }
 
 export type SVGTransformAttribute = { type: "Matrix"; a: number; b: number; c: number; d: number; tx: number; ty: number } | { type: "Rotate"; rotation: number }
+
+export type SVGUnitsVariant = { type: "UserSpaceOnUse" } | { type: "ObjectBoundingBox" }
 
 export type Selected = null
 

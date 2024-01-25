@@ -2,7 +2,9 @@ use std::{collections::HashMap, sync::mpsc::Sender};
 
 use bevy_ecs::{entity::Entity, system::Resource};
 use dyn_composition::core::{
-    modules::node::components::types::{NodeType, PaintType},
+    modules::node::components::types::{
+        GradientPaintVariant, ImagePaintScaleMode, NodeType, PaintType,
+    },
     utils::continuous_id::ContinuousId,
 };
 
@@ -17,8 +19,10 @@ use self::{
     svg_element::SVGChildElementIdentifier,
     svg_node::{frame_svg_node::FrameSVGNode, shape_svg_node::ShapeSVGNode, SVGNode},
     svg_paint::{
-        gradient_svg_paint::GradientSVGPaint, image_svg_paint::ImageSVGPaint,
-        solid_svg_paint::SolidSVGPaint, SVGPaint,
+        gradient_svg_paint::{GradientSVGPaint, GradientSVGPaintVariant},
+        image_svg_paint::{ImageSVGPaint, ImageSVGPaintVariant},
+        solid_svg_paint::SolidSVGPaint,
+        SVGPaint,
     },
 };
 
@@ -129,7 +133,12 @@ impl SVGCompositionRes {
                 if let PaintMixinChange::ImagePaint(paint) = change {
                     return Some(Box::new(ImageSVGPaint::new(
                         entity,
-                        &paint.scale_mode,
+                        match paint.scale_mode {
+                            ImagePaintScaleMode::Fill { .. } => ImageSVGPaintVariant::Fill,
+                            ImagePaintScaleMode::Fit { .. } => ImageSVGPaintVariant::Fit,
+                            ImagePaintScaleMode::Crop { .. } => ImageSVGPaintVariant::Crop,
+                            ImagePaintScaleMode::Tile { .. } => ImageSVGPaintVariant::Tile,
+                        },
                         &mut self.id_generator,
                     )) as Box<dyn SVGPaint>);
                 } else {
@@ -140,7 +149,13 @@ impl SVGCompositionRes {
                 if let PaintMixinChange::GradientPaint(paint) = change {
                     return Some(Box::new(GradientSVGPaint::new(
                         entity,
-                        &paint.variant,
+                        match paint.variant {
+                            GradientPaintVariant::Linear { .. } => GradientSVGPaintVariant::Linear,
+                            GradientPaintVariant::Radial { .. } => GradientSVGPaintVariant::Radial,
+                            _ => {
+                                return None;
+                            }
+                        },
                         &mut self.id_generator,
                     )) as Box<dyn SVGPaint>);
                 } else {

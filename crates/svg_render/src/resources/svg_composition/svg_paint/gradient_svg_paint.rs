@@ -1,7 +1,11 @@
 use bevy_ecs::entity::Entity;
 use dyn_composition::core::{
-    modules::node::components::types::GradientVariant, utils::continuous_id::ContinuousId,
+    modules::node::components::types::{
+        GradientPaintVariant, LinearGradientPaintTransform, RadialGradientPaintTransform,
+    },
+    utils::continuous_id::ContinuousId,
 };
+use glam::{Mat3, Vec2};
 
 use crate::{
     events::output_event::ElementChangeEvent,
@@ -11,7 +15,7 @@ use crate::{
         svg_composition::{
             svg_bundle::{BaseSVGBundle, SVGBundle},
             svg_element::{
-                attributes::{SVGAttribute, SVGMeasurementUnit},
+                attributes::{SVGAttribute, SVGMeasurementUnit, SVGUnitsVariant},
                 mapper::map_blend_mode,
                 styles::{SVGDisplayStyle, SVGStyle},
                 SVGElement, SVGTag,
@@ -22,7 +26,7 @@ use crate::{
     },
 };
 
-use super::SVGPaint;
+use super::{utils::rgb_to_hex, SVGPaint};
 
 #[derive(Debug)]
 pub struct GradientSVGPaint {
@@ -38,10 +42,9 @@ pub struct GradientSVGPaint {
 }
 
 #[derive(Debug)]
-enum GradientSVGPaintVariant {
+pub enum GradientSVGPaintVariant {
     Linear,
     Radial,
-    Unsupported,
 }
 
 impl SVGBundle for GradientSVGPaint {
@@ -71,11 +74,35 @@ impl SVGPaint for GradientSVGPaint {
         for change in &changed_paint.changes {
             match change {
                 PaintMixinChange::GradientPaint(mixin) => {
-                    let parent_id = self
+                    let mut paint_gradient_element = self
                         .bundle
-                        .get_child_element(self.paint_gradient.index)
-                        .unwrap()
-                        .get_id();
+                        .get_child_element_mut(self.paint_gradient.index)
+                        .unwrap();
+                    match &mixin.variant {
+                        GradientPaintVariant::Linear { transform } => match transform {
+                            LinearGradientPaintTransform::Internal { start, end } => {
+                                paint_gradient_element.set_attributes(vec![
+                                    SVGAttribute::X1 { x1: start.x },
+                                    SVGAttribute::Y1 { y1: start.y },
+                                    SVGAttribute::X2 { x2: end.x },
+                                    SVGAttribute::Y2 { y2: end.y },
+                                ]);
+                            }
+                            _ => {}
+                        },
+                        GradientPaintVariant::Radial { transform } => match transform {
+                            RadialGradientPaintTransform::Internal {
+                                center,
+                                radius,
+                                rotation,
+                            } => {
+                                // TODO
+                            }
+                            _ => {}
+                        },
+                    }
+                    let paint_gradient_id = paint_gradient_element.get_id();
+
                     let elements = self
                         .bundle
                         .get_child_portal_mut(self.paint_gradient_stops.index)
@@ -87,7 +114,15 @@ impl SVGPaint for GradientSVGPaint {
                     // Add new gradient stop elements
                     for gradient_stop in &mixin.gradient_stops {
                         let mut gradient_stop_element = SVGElement::new(SVGTag::Stop, id_generator);
-                        gradient_stop_element.append_to_parent(parent_id);
+                        gradient_stop_element.set_attributes(vec![
+                            SVGAttribute::Offset {
+                                offset: gradient_stop.position,
+                            },
+                            SVGAttribute::StopColor {
+                                stop_color: rgb_to_hex(gradient_stop.color),
+                            },
+                        ]);
+                        gradient_stop_element.append_to_parent(paint_gradient_id);
                         elements.push(gradient_stop_element);
                     }
                 }
@@ -133,7 +168,11 @@ impl SVGPaint for GradientSVGPaint {
 }
 
 impl GradientSVGPaint {
-    pub fn new(entity: Entity, variant: &GradientVariant, id_generator: &mut ContinuousId) -> Self {
+    pub fn new(
+        entity: Entity,
+        variant: GradientSVGPaintVariant,
+        id_generator: &mut ContinuousId,
+    ) -> Self {
         // Create root element
         let mut element = SVGElement::new(SVGTag::Group, id_generator);
         #[cfg(feature = "tracing")]
@@ -154,15 +193,24 @@ impl GradientSVGPaint {
         let defs_index = bundle.append_child_element(defs_element);
 
         // Create paint elements
-        let mut paint_gradient_element = SVGElement::new(SVGTag::Image, id_generator);
+        let mut paint_gradient_element = SVGElement::new(
+            match variant {
+                GradientSVGPaintVariant::Linear => SVGTag::LinearGradient,
+                GradientSVGPaintVariant::Radial => SVGTag::RadialGradient,
+            },
+            id_generator,
+        );
         let paint_gradient_id = paint_gradient_element.get_id();
         #[cfg(feature = "tracing")]
         paint_gradient_element.set_attribute(SVGAttribute::Name {
             name: GradientSVGPaint::create_element_name(
                 paint_gradient_id,
-                String::from("paint-clipped-image"),
+                String::from("paint-gradient"),
                 false,
             ),
+        });
+        paint_gradient_element.set_attribute(SVGAttribute::GradientUnits {
+            gradient_units: SVGUnitsVariant::UserSpaceOnUse,
         });
         let paint_gradient_index = bundle
             .append_child_element_to(defs_index, paint_gradient_element)
@@ -187,26 +235,17 @@ impl GradientSVGPaint {
 
         Self {
             bundle,
-            variant: match variant {
-                GradientVariant::Linear { .. } => GradientSVGPaintVariant::Linear,
-                GradientVariant::Radial { .. } => GradientSVGPaintVariant::Radial,
-                _ => GradientSVGPaintVariant::Unsupported,
-            },
-            defs: ElementReference {
-                // id: defs_id,
-                index: defs_index,
-            },
+            variant,
+            defs: ElementReference { index: defs_index },
 
             // Paint element references
             paint_gradient: ElementReference {
-                // id: paint_gradient_id,
                 index: paint_gradient_index,
             },
             paint_gradient_stops: ElementReference {
                 index: paint_gradient_stops_index,
             },
             paint_rect: ElementReference {
-                // id: paint_rect_id,
                 index: paint_rect_index,
             },
         }

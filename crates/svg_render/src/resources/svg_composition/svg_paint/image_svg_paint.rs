@@ -16,8 +16,8 @@ use crate::{
             svg_bundle::{BaseSVGBundle, SVGBundle},
             svg_element::{
                 attributes::{
-                    SVGAttribute, SVGHrefVariant, SVGMeasurementUnit, SVGPatternUnitsVariant,
-                    SVGTransformAttribute,
+                    SVGAttribute, SVGHrefVariant, SVGMeasurementUnit, SVGTransformAttribute,
+                    SVGUnitsVariant,
                 },
                 helper::mat3_to_svg_transform,
                 mapper::map_blend_mode,
@@ -47,7 +47,7 @@ pub struct ImageSVGPaint {
 }
 
 #[derive(Debug)]
-enum ImageSVGPaintVariant {
+pub enum ImageSVGPaintVariant {
     Fill,
     Fit,
     Crop,
@@ -249,7 +249,7 @@ impl SVGPaint for ImageSVGPaint {
 impl ImageSVGPaint {
     pub fn new(
         entity: Entity,
-        scale_mode: &ImagePaintScaleMode,
+        variant: ImageSVGPaintVariant,
         id_generator: &mut ContinuousId,
     ) -> Self {
         // Create root element
@@ -279,7 +279,7 @@ impl ImageSVGPaint {
             ),
         });
         paint_pattern_element.set_attribute(SVGAttribute::PatternUnits {
-            pattern_units: SVGPatternUnitsVariant::UserSpaceOnUse,
+            pattern_units: SVGUnitsVariant::UserSpaceOnUse,
         });
         let paint_pattern_index = bundle
             .append_child_element_to(defs_index, paint_pattern_element)
@@ -294,8 +294,8 @@ impl ImageSVGPaint {
                 false,
             ),
         });
-        match scale_mode {
-            ImagePaintScaleMode::Fill { .. } => {
+        match variant {
+            ImageSVGPaintVariant::Fill => {
                 paint_clipped_image_element.set_attribute(SVGAttribute::PreserveAspectRatio {
                     preserve_aspect_ratio: String::from("xMidYMid slice"),
                 });
@@ -322,12 +322,7 @@ impl ImageSVGPaint {
 
         Self {
             bundle,
-            variant: match scale_mode {
-                ImagePaintScaleMode::Fill { .. } => ImageSVGPaintVariant::Fill,
-                ImagePaintScaleMode::Fit { .. } => ImageSVGPaintVariant::Fit,
-                ImagePaintScaleMode::Crop { .. } => ImageSVGPaintVariant::Crop,
-                ImagePaintScaleMode::Tile { .. } => ImageSVGPaintVariant::Tile,
-            },
+            variant,
             defs: ElementReference {
                 // id: defs_id,
                 index: defs_index,

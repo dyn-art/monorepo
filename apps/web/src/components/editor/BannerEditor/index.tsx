@@ -79,7 +79,13 @@ export const BannerEditor: React.FC<TBannerEditorProps> = (props) => {
 				</div>
 				<div className="flex flex-row gap-2">
 					<Button variant="outline">Preview</Button>
-					<Button>Export</Button>
+					<Button
+						onClick={() => {
+							console.log(composition?.toString());
+						}}
+					>
+						Export
+					</Button>
 				</div>
 			</div>
 			{composition != null && <CompositionControl composition={composition} />}

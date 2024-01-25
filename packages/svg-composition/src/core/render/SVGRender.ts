@@ -348,6 +348,16 @@ export class SVGRender extends Render {
 						return ['', ''];
 				}
 			}
+			case 'GradientUnits': {
+				switch (attribute.gradientUnits.type) {
+					case 'UserSpaceOnUse':
+						return ['gradientUnits', 'userSpaceOnUse'];
+					case 'ObjectBoundingBox':
+						return ['gradientUnits', 'objectBoundingBox'];
+					default:
+						return ['', ''];
+				}
+			}
 			case 'Href': {
 				switch (attribute.href.type) {
 					case 'Base64':
@@ -360,6 +370,18 @@ export class SVGRender extends Render {
 			}
 			case 'PreserveAspectRatio':
 				return ['preserveAspectRatio', attribute.preserveAspectRatio];
+			case 'X1':
+				return ['x1', `${attribute.x1}`];
+			case 'Y1':
+				return ['y1', `${attribute.y1}`];
+			case 'X2':
+				return ['x2', `${attribute.x2}`];
+			case 'Y2':
+				return ['y2', `${attribute.y2}`];
+			case 'Offset':
+				return ['offset', `${attribute.offset}`];
+			case 'StopColor':
+				return ['stopColor', attribute.stopColor];
 		}
 	}
 

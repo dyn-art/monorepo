@@ -45,7 +45,11 @@ pub enum SVGAttribute {
     },
     #[serde(rename_all = "camelCase")]
     PatternUnits {
-        pattern_units: SVGPatternUnitsVariant,
+        pattern_units: SVGUnitsVariant,
+    },
+    #[serde(rename_all = "camelCase")]
+    GradientUnits {
+        gradient_units: SVGUnitsVariant,
     },
     Href {
         href: SVGHrefVariant,
@@ -53,6 +57,25 @@ pub enum SVGAttribute {
     #[serde(rename_all = "camelCase")]
     PreserveAspectRatio {
         preserve_aspect_ratio: String,
+    },
+    X1 {
+        x1: f32,
+    },
+    Y1 {
+        y1: f32,
+    },
+    X2 {
+        x2: f32,
+    },
+    Y2 {
+        y2: f32,
+    },
+    Offset {
+        offset: f32,
+    },
+    #[serde(rename_all = "camelCase")]
+    StopColor {
+        stop_color: String,
     },
 }
 
@@ -70,8 +93,15 @@ impl SVGAttribute {
             Self::Fill { .. } | Self::ReferencedFill { .. } => "fill",
             Self::Name { .. } => "name",
             Self::PatternUnits { .. } => "patternUnits",
+            Self::GradientUnits { .. } => "gradientUnits",
             Self::Href { .. } => "href",
             Self::PreserveAspectRatio { .. } => "preserveAspectRatio",
+            Self::X1 { .. } => "x1",
+            Self::Y1 { .. } => "y1",
+            Self::X2 { .. } => "x2",
+            Self::Y2 { .. } => "y2",
+            Self::Offset { .. } => "offset",
+            Self::StopColor { .. } => "stopColor",
         }
     }
 
@@ -132,15 +162,21 @@ impl SVGAttribute {
             Self::Fill { fill } => fill.clone(),
             Self::ReferencedFill { id } => format!("url(#{id})"),
             Self::Name { name } => name.clone(),
-            Self::PatternUnits { pattern_units: unit } => match unit {
-                SVGPatternUnitsVariant::ObjectBoundingBox => "objectBoundingBox".to_string(),
-                SVGPatternUnitsVariant::UserSpaceOnUse => "userSpaceOnUse".to_string()
+            Self::PatternUnits { pattern_units: unit } | Self::GradientUnits { gradient_units: unit } => match unit {
+                SVGUnitsVariant::ObjectBoundingBox => "objectBoundingBox".to_string(),
+                SVGUnitsVariant::UserSpaceOnUse => "userSpaceOnUse".to_string()
             },
             Self::Href { href } => match href {
                 SVGHrefVariant::Base64 { content } => format!("data:image/png;base64,{content}"),
                 SVGHrefVariant::Url { url } => url.clone()
             }
-            Self::PreserveAspectRatio { preserve_aspect_ratio } => preserve_aspect_ratio.clone()
+            Self::PreserveAspectRatio { preserve_aspect_ratio } => preserve_aspect_ratio.clone(),
+            Self::X1 { x1 } => x1.to_string(),
+            Self::Y1 { y1 } => y1.to_string(),
+            Self::X2 { x2 } => x2.to_string(),
+            Self::Y2 { y2 } => y2.to_string(),
+            Self::Offset { offset } => offset.to_string(),
+            Self::StopColor { stop_color } => stop_color.clone()
         }
     }
 }
@@ -206,7 +242,7 @@ pub enum SVGMeasurementUnit {
 
 #[derive(Debug, Serialize, Clone, Type)]
 #[serde(tag = "type")]
-pub enum SVGPatternUnitsVariant {
+pub enum SVGUnitsVariant {
     UserSpaceOnUse,
     ObjectBoundingBox,
 }
