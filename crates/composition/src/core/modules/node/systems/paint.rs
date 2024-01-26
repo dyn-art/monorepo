@@ -190,9 +190,24 @@ pub fn update_gradient_paint_transform(
                         dimension.height,
                         transform,
                     );
-                    *outer_transform = LinearGradientPaintTransform::Internal { start, end };
+                    *outer_transform = LinearGradientPaintTransform::Internal {
+                        start,
+                        end,
+                        transform: *transform,
+                    };
                 }
-                _ => {}
+                LinearGradientPaintTransform::Internal { transform, .. } => {
+                    let (start, end) = extract_linear_gradient_params_from_transform(
+                        dimension.width,
+                        dimension.height,
+                        transform,
+                    );
+                    *outer_transform = LinearGradientPaintTransform::Internal {
+                        start,
+                        end,
+                        transform: *transform,
+                    };
+                }
             },
             GradientPaintVariant::Radial { transform } => match transform {
                 RadialGradientPaintTransform::Basic { transform } => {

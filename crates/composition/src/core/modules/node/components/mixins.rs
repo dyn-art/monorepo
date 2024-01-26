@@ -360,6 +360,26 @@ pub enum ImageContent {
 }
 
 // =============================================================================
+// Gradient Stops Mixin
+// =============================================================================
+
+#[derive(Component, Serialize, Deserialize, Clone, Debug, Default, Type)]
+pub struct GradientStopsMixin {
+    /// A list of color stops defining the gradient.
+    #[serde(rename = "gradientStops")]
+    pub gradient_stops: Vec<ColorStop>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, Type)]
+pub struct ColorStop {
+    /// The position of the color stop in the gradient, ranging from 0.0 to 1.0.
+    pub position: f32,
+
+    /// The color of the stop, represented as an RGB array.
+    pub color: (u8, u8, u8),
+}
+
+// =============================================================================
 // Effects
 // =============================================================================
 

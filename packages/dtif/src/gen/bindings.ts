@@ -393,23 +393,25 @@ export type GradientPaint = { _gradient_paint?: null | null;
 /**
  * Specifies the variant of the gradient.
  */
-variant?: GradientPaintVariant; 
-/**
- * A list of color stops defining the gradient.
- */
-gradientStops: ColorStop[] }
+variant?: GradientPaintVariant }
 
 export type GradientPaintBundle = ({ _gradient_paint?: null | null; 
 /**
  * Specifies the variant of the gradient.
  */
-variant?: GradientPaintVariant; 
+variant?: GradientPaintVariant }) & ({ 
 /**
  * A list of color stops defining the gradient.
  */
 gradientStops: ColorStop[] }) & { paint?: Paint; compositionMixin?: PaintCompositionMixin; blendMixin?: BlendMixin }
 
 export type GradientPaintVariant = { type: "Linear"; transform?: LinearGradientPaintTransform } | { type: "Radial"; transform?: RadialGradientPaintTransform }
+
+export type GradientStopsMixin = { 
+/**
+ * A list of color stops defining the gradient.
+ */
+gradientStops: ColorStop[] }
 
 /**
  * Serves as a container used to semantically group related nodes,
@@ -555,7 +557,7 @@ export type LineHeight =
  */
 { Percent: number }
 
-export type LinearGradientPaintTransform = { type: "Basic"; transform?: Mat3 } | { type: "Internal"; start: Vec2; end: Vec2 }
+export type LinearGradientPaintTransform = { type: "Basic"; transform?: Mat3 } | { type: "Internal"; start: Vec2; end: Vec2; transform: Mat3 }
 
 export type Locked = null
 
@@ -646,7 +648,7 @@ export type PaintCompositionMixin = {
  */
 isVisible?: boolean }
 
-export type PaintMixinChange = ({ type: "Dimension" } & DimensionMixin) | ({ type: "Blend" } & BlendMixin) | ({ type: "PaintComposition" } & PaintCompositionMixin) | ({ type: "ImageContent" } & ImageContentMixin) | ({ type: "SolidPaint" } & SolidPaint) | ({ type: "ImagePaint" } & ImagePaint) | ({ type: "GradientPaint" } & GradientPaint)
+export type PaintMixinChange = ({ type: "Dimension" } & DimensionMixin) | ({ type: "Blend" } & BlendMixin) | ({ type: "PaintComposition" } & PaintCompositionMixin) | ({ type: "ImageContent" } & ImageContentMixin) | ({ type: "SolidPaint" } & SolidPaint) | ({ type: "ImagePaint" } & ImagePaint) | ({ type: "GradientPaint" } & GradientPaint) | ({ type: "GradientStopsMixin" } & GradientStopsMixin)
 
 export type PaintType = "None" | "Solid" | "Gradient" | "Image"
 

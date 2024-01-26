@@ -5,7 +5,6 @@ use dyn_composition::core::{
     },
     utils::continuous_id::ContinuousId,
 };
-use glam::{Mat3, Vec2};
 
 use crate::{
     events::output_event::ElementChangeEvent,
@@ -74,19 +73,18 @@ impl SVGPaint for GradientSVGPaint {
         for change in &changed_paint.changes {
             match change {
                 PaintMixinChange::GradientPaint(mixin) => {
-                    let mut paint_gradient_element = self
-                        .bundle
-                        .get_child_element_mut(self.paint_gradient.index)
-                        .unwrap();
                     match &mixin.variant {
                         GradientPaintVariant::Linear { transform } => match transform {
-                            LinearGradientPaintTransform::Internal { start, end } => {
-                                paint_gradient_element.set_attributes(vec![
-                                    SVGAttribute::X1 { x1: start.x },
-                                    SVGAttribute::Y1 { y1: start.y },
-                                    SVGAttribute::X2 { x2: end.x },
-                                    SVGAttribute::Y2 { y2: end.y },
-                                ]);
+                            LinearGradientPaintTransform::Internal { start, end, .. } => {
+                                self.bundle
+                                    .get_child_element_mut(self.paint_gradient.index)
+                                    .unwrap()
+                                    .set_attributes(vec![
+                                        SVGAttribute::X1 { x1: start.x },
+                                        SVGAttribute::Y1 { y1: start.y },
+                                        SVGAttribute::X2 { x2: end.x },
+                                        SVGAttribute::Y2 { y2: end.y },
+                                    ]);
                             }
                             _ => {}
                         },
@@ -101,7 +99,13 @@ impl SVGPaint for GradientSVGPaint {
                             _ => {}
                         },
                     }
-                    let paint_gradient_id = paint_gradient_element.get_id();
+                }
+                PaintMixinChange::GradientStopsMixin(mixin) => {
+                    let paint_gradient_id = self
+                        .bundle
+                        .get_child_element_mut(self.paint_gradient.index)
+                        .unwrap()
+                        .get_id();
 
                     let elements = self
                         .bundle

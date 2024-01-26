@@ -4,9 +4,9 @@ use specta::Type;
 
 use super::{
     mixins::{
-        BlendMixin, ChildrenMixin, DimensionMixin, FillMixin, ImageContentMixin,
-        NodeCompositionMixin, NodeMetaMixin, PaintCompositionMixin, RectangleCornerMixin,
-        RelativeTransformMixin,
+        BlendMixin, ChildrenMixin, DimensionMixin, FillMixin, GradientStopsMixin,
+        ImageContentMixin, NodeCompositionMixin, NodeMetaMixin, PaintCompositionMixin,
+        RectangleCornerMixin, RelativeTransformMixin,
     },
     types::{
         Frame, GradientPaint, Group, ImagePaint, Node, NodeType, Paint, PaintType, Rectangle,
@@ -355,6 +355,9 @@ pub struct GradientPaintBundle {
     #[serde(flatten)]
     pub gradient: GradientPaint,
 
+    #[serde(flatten)]
+    pub gradient_stops_mixin: GradientStopsMixin,
+
     #[serde(default)]
     pub composition_mixin: PaintCompositionMixin,
 
@@ -374,6 +377,7 @@ impl Default for GradientPaintBundle {
         Self {
             paint: default_gradient_paint_bundle(),
             gradient: GradientPaint::default(),
+            gradient_stops_mixin: GradientStopsMixin::default(),
             composition_mixin: PaintCompositionMixin::default(),
             blend_mixin: BlendMixin::default(),
         }

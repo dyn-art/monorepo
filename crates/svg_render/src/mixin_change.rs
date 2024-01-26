@@ -1,8 +1,8 @@
 use dyn_composition::core::modules::node::components::{
     mixins::{
-        BlendMixin, ChildrenMixin, DimensionMixin, FillMixin, ImageContentMixin,
-        NodeCompositionMixin, PaintCompositionMixin, PathMixin, RectangleCornerMixin,
-        RelativeTransformMixin,
+        BlendMixin, ChildrenMixin, DimensionMixin, FillMixin, GradientStopsMixin,
+        ImageContentMixin, NodeCompositionMixin, PaintCompositionMixin, PathMixin,
+        RectangleCornerMixin, RelativeTransformMixin,
     },
     types::{GradientPaint, ImagePaint, SolidPaint},
 };
@@ -107,6 +107,7 @@ pub enum PaintMixinChange {
     SolidPaint(SolidPaint),
     ImagePaint(ImagePaint),
     GradientPaint(GradientPaint),
+    GradientStopsMixin(GradientStopsMixin),
 }
 
 impl ToPaintMixinChange for BlendMixin {
@@ -152,5 +153,11 @@ impl ToPaintMixinChange for ImagePaint {
 impl ToPaintMixinChange for GradientPaint {
     fn to_mixin_change(&self) -> PaintMixinChange {
         PaintMixinChange::GradientPaint(self.clone())
+    }
+}
+
+impl ToPaintMixinChange for GradientStopsMixin {
+    fn to_mixin_change(&self) -> PaintMixinChange {
+        PaintMixinChange::GradientStopsMixin(self.clone())
     }
 }

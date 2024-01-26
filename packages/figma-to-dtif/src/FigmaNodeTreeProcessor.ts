@@ -94,12 +94,14 @@ export class FigmaNodeTreeProcessor {
 	// Processes paints of a node
 	private processPaints(node: TFigmaNodeWithPaints): TContinuousId[] {
 		const fills = dropMixed(node, 'fills');
-		return fills.map((paint) =>
-			this.getOrGenerateId(this._toTransformPaintsHashmap, this._toTransformPaints, {
-				nodeIds: [node.id],
-				paint
-			})
-		);
+		return fills
+			.map((paint) =>
+				this.getOrGenerateId(this._toTransformPaintsHashmap, this._toTransformPaints, {
+					nodeIds: [node.id],
+					paint
+				})
+			)
+			.reverse();
 	}
 
 	// Processes fonts of a node

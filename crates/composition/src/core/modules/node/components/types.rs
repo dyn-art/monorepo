@@ -433,19 +433,6 @@ pub struct GradientPaint {
     /// Specifies the variant of the gradient.
     #[serde(default)]
     pub variant: GradientPaintVariant,
-
-    /// A list of color stops defining the gradient.
-    #[serde(rename = "gradientStops")]
-    pub gradient_stops: Vec<ColorStop>,
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug, Type)]
-pub struct ColorStop {
-    /// The position of the color stop in the gradient, ranging from 0.0 to 1.0.
-    pub position: f32,
-
-    /// The color of the stop, represented as an RGB array.
-    pub color: (u8, u8, u8),
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, Type)]
@@ -478,7 +465,11 @@ pub enum LinearGradientPaintTransform {
         transform: Mat3,
     },
     #[serde(rename_all = "camelCase")]
-    Internal { start: Vec2, end: Vec2 },
+    Internal {
+        start: Vec2,
+        end: Vec2,
+        transform: Mat3,
+    },
 }
 
 impl Default for LinearGradientPaintTransform {
