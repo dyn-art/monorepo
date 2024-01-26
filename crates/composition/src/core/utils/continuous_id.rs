@@ -3,7 +3,7 @@ use std::fmt::Display;
 use serde::Serialize;
 use specta::Type;
 
-#[derive(Clone, Copy, PartialEq, Eq, Hash, Debug, Serialize, Type)]
+#[derive(Clone, Copy, PartialEq, Eq, Hash, Debug, Serialize, PartialOrd, Ord, Type)]
 pub struct ContinuousId(usize);
 
 impl ContinuousId {
