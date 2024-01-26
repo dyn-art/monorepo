@@ -14,6 +14,7 @@ use self::{
     systems::{
         composition::{handle_composition_resized, handle_composition_view_box_changed},
         entity::{handle_entity_moved, handle_entity_set_position},
+        node::handle_node_deleted,
     },
 };
 
@@ -47,6 +48,7 @@ impl Plugin for CompositionPlugin {
                 handle_composition_view_box_changed,
                 handle_entity_moved,
                 handle_entity_set_position,
+                handle_node_deleted,
                 // handle_node_created, // TODO: damaged
             ),
         );

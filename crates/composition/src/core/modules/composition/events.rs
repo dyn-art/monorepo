@@ -14,6 +14,7 @@ pub enum CoreInputEvent {
     EntityMoved(EntityMoved),
     EntitySetPosition(EntitySetPosition),
     NodeCreated(NodeCreated),
+    NodeDeleted(NodeDeleted),
     CompositionResized(CompositionResized),
     CompositionViewBoxChanged(CompositionViewBoxChanged),
 }
@@ -31,6 +32,9 @@ impl InputEvent for CoreInputEvent {
 
             // Node Events
             CoreInputEvent::NodeCreated(event) => {
+                world.send_event(event);
+            }
+            CoreInputEvent::NodeDeleted(event) => {
                 world.send_event(event);
             }
 
@@ -70,6 +74,11 @@ pub struct CompositionViewBoxChanged {
 pub struct NodeCreated {
     pub parent_entity: Option<Entity>,
     pub node: NodeBundle,
+}
+
+#[derive(Event, Debug, Serialize, Deserialize, Type, Clone)]
+pub struct NodeDeleted {
+    pub entity: Entity,
 }
 
 // =============================================================================

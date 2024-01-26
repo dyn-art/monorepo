@@ -250,6 +250,12 @@ impl DTIFProcessor {
                     world.send_event(event);
                 }
             }
+            CoreInputEvent::NodeDeleted(mut event) => {
+                if let Some(entity) = self.find_entity(&event.entity) {
+                    event.entity = entity;
+                    world.send_event(event);
+                }
+            }
 
             // Entity Events
             CoreInputEvent::EntityMoved(mut event) => {

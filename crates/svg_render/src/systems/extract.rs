@@ -24,7 +24,6 @@ pub fn extract_children(
     mut changed: ResMut<ChangedComponentsRes>,
     query: Extract<Query<(Entity, &Node, &Children), (With<Node>, Changed<Children>)>>,
     parent_query: Extract<Query<&Parent>>,
-    node_query: Extract<Query<Entity, With<Node>>>,
 ) {
     query.for_each(|(entity, node, children)| {
         let changed_component = changed.changed_entities.entry(entity).or_insert_with(|| {

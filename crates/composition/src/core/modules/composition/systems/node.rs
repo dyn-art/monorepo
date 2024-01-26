@@ -8,12 +8,17 @@ use bevy_ecs::{
 use bevy_hierarchy::BuildChildren;
 
 use crate::core::modules::{
-    composition::events::NodeCreated,
+    composition::events::{NodeCreated, NodeDeleted},
     node::components::{bundles::NodeBundle, types::Root},
 };
 
-// TODO: WIP - Not working yet
+pub fn handle_node_deleted(mut commands: Commands, mut event_reader: EventReader<NodeDeleted>) {
+    for event in event_reader.read() {
+        commands.entity(event.entity).despawn();
+    }
+}
 
+// TODO: WIP - Not working yet
 pub fn handle_node_created(
     mut commands: Commands,
     mut event_reader: EventReader<NodeCreated>,
