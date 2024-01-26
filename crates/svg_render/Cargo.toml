@@ -29,3 +29,4 @@ specta = { version = "2.0.0-rc.7", features = [
     "functions",
 ] }
 base64 = "0.21.7"
+smallvec = "1.13.1"

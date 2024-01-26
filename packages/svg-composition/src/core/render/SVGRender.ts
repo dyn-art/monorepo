@@ -381,7 +381,7 @@ export class SVGRender extends Render {
 			case 'Offset':
 				return ['offset', `${attribute.offset}`];
 			case 'StopColor':
-				return ['stopColor', attribute.stopColor];
+				return ['stop-color', attribute.stopColor];
 		}
 	}
 

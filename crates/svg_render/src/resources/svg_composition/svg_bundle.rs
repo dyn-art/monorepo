@@ -1,4 +1,5 @@
 use bevy_ecs::entity::Entity;
+use smallvec::SmallVec;
 
 use crate::events::output_event::ElementChangeEvent;
 
@@ -27,7 +28,7 @@ pub struct BaseSVGBundle {
     // - The size is known at compile time, minimizing dynamic changes
     // - Offers efficient O(1) access by index, suitable for this use case
     // - More memory-efficient and simpler than a HashMap for fixed-size collections
-    children: Vec<SVGBundleChildElement>,
+    children: SmallVec<[SVGBundleChildElement; 6]>,
 }
 
 #[derive(Debug)]
@@ -46,7 +47,7 @@ impl BaseSVGBundle {
         Self {
             entity,
             element,
-            children: Vec::new(),
+            children: SmallVec::new(),
         }
     }
 
@@ -54,7 +55,7 @@ impl BaseSVGBundle {
     // Getter & Setter
     // =========================================================================
 
-    pub fn get_children(&self) -> &Vec<SVGBundleChildElement> {
+    pub fn get_children(&self) -> &SmallVec<[SVGBundleChildElement; 6]> {
         &self.children
     }
 

@@ -101,7 +101,7 @@ impl SVGAttribute {
             Self::X2 { .. } => "x2",
             Self::Y2 { .. } => "y2",
             Self::Offset { .. } => "offset",
-            Self::StopColor { .. } => "stopColor",
+            Self::StopColor { .. } => "stop-color",
         }
     }
 
