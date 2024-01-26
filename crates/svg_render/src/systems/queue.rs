@@ -30,7 +30,7 @@ pub fn queue_element_changes(
         &changed_paints,
         &mut svg_composition,
         &mut element_change_events,
-    );
+    ); // TODO: Paints are not processed in the correct order -> Need Dependency Tree similar too Nodes
 
     // Forward render changes into output event channel
     for event in element_change_events {
