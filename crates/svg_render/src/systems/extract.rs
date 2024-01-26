@@ -13,7 +13,9 @@ use dyn_composition::core::modules::node::components::{
 
 use crate::{
     mixin_change::{ToNodeMixinChange, ToPaintMixinChange},
-    resources::changed_components::{ChangedComponentsRes, ChangedNode, ChangedPaint},
+    resources::changed_components::{
+        ChangedComponentsRes, ChangedEntity, ChangedNode, ChangedPaint,
+    },
 };
 
 // Special handling for ChildrenMixin as the ChildrenMixin is no Component itself in the ECS
@@ -25,7 +27,7 @@ pub fn extract_children(
     node_query: Extract<Query<Entity, With<Node>>>,
 ) {
     query.for_each(|(entity, node, children)| {
-        let changed_component = changed.changed_nodes.entry(entity).or_insert_with(|| {
+        let changed_component = changed.changed_entities.entry(entity).or_insert_with(|| {
             let mut parent_id: Option<Entity> = None;
 
             // Try to get the parent entity id
@@ -33,32 +35,21 @@ pub fn extract_children(
                 parent_id = Some(parent.get());
             }
 
-            return ChangedNode {
+            return ChangedEntity::Node(ChangedNode {
                 node_type: node.node_type.clone(),
                 changes: Vec::new(),
                 parent_id,
-            };
+            });
         });
 
-        // TODO: Improve
-        // Note: Also paints are included here as they are managed with Bevy child parent relation too
-
-        // Filter children to include only those that are Nodes
-        let node_children: Vec<_> = children
-            .iter()
-            .filter_map(|child_entity| {
-                if node_query.get(*child_entity).is_ok() {
-                    Some(child_entity.clone())
-                } else {
-                    None
-                }
-            })
-            .clone()
-            .collect();
-
-        changed_component
-            .changes
-            .push(ChildrenMixin(node_children).to_mixin_change());
+        match changed_component {
+            ChangedEntity::Node(changed_node) => {
+                changed_node
+                    .changes
+                    .push(ChildrenMixin(children.to_vec()).to_mixin_change());
+            }
+            _ => {}
+        }
     });
 }
 
@@ -68,7 +59,7 @@ pub fn extract_node_mixin_generic<C: Component + ToNodeMixinChange>(
     parent_query: Extract<Query<&Parent>>,
 ) {
     query.for_each(|(entity, node, mixin)| {
-        let changed_component = changed.changed_nodes.entry(entity).or_insert_with(|| {
+        let changed_component = changed.changed_entities.entry(entity).or_insert_with(|| {
             let mut parent_id: Option<Entity> = None;
 
             // Try to get the parent entity id
@@ -76,14 +67,19 @@ pub fn extract_node_mixin_generic<C: Component + ToNodeMixinChange>(
                 parent_id = Some(parent.get());
             }
 
-            return ChangedNode {
+            return ChangedEntity::Node(ChangedNode {
                 node_type: node.node_type.clone(),
                 changes: Vec::new(),
                 parent_id,
-            };
+            });
         });
 
-        changed_component.changes.push(mixin.to_mixin_change());
+        match changed_component {
+            ChangedEntity::Node(changed_node) => {
+                changed_node.changes.push(mixin.to_mixin_change());
+            }
+            _ => {}
+        }
     });
 }
 
@@ -93,7 +89,7 @@ pub fn extract_paint_mixin_generic<C: Component + ToPaintMixinChange>(
     parent_query: Extract<Query<&Parent>>,
 ) {
     query.for_each(|(entity, paint, mixin)| {
-        let changed_component = changed.changed_paints.entry(entity).or_insert_with(|| {
+        let changed_component = changed.changed_entities.entry(entity).or_insert_with(|| {
             let mut parent_id: Option<Entity> = None;
 
             // Try to get the parent entity id
@@ -101,13 +97,18 @@ pub fn extract_paint_mixin_generic<C: Component + ToPaintMixinChange>(
                 parent_id = Some(parent.get());
             }
 
-            return ChangedPaint {
+            return ChangedEntity::Paint(ChangedPaint {
                 paint_type: paint.paint_type.clone(),
                 changes: Vec::new(),
                 parent_id,
-            };
+            });
         });
 
-        changed_component.changes.push(mixin.to_mixin_change());
+        match changed_component {
+            ChangedEntity::Paint(changed_paint) => {
+                changed_paint.changes.push(mixin.to_mixin_change());
+            }
+            _ => {}
+        }
     });
 }

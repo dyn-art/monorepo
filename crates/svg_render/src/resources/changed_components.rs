@@ -7,8 +7,13 @@ use crate::mixin_change::{NodeMixinChange, PaintMixinChange};
 
 #[derive(Resource, Debug, Default)]
 pub struct ChangedComponentsRes {
-    pub changed_nodes: HashMap<Entity, ChangedNode>,
-    pub changed_paints: HashMap<Entity, ChangedPaint>,
+    pub changed_entities: HashMap<Entity, ChangedEntity>,
+}
+
+#[derive(Debug, Clone)]
+pub enum ChangedEntity {
+    Node(ChangedNode),
+    Paint(ChangedPaint),
 }
 
 #[derive(Debug, Clone)]
@@ -18,7 +23,7 @@ pub struct ChangedNode {
     pub changes: Vec<NodeMixinChange>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ChangedPaint {
     pub paint_type: PaintType,
     pub parent_id: Option<Entity>,
