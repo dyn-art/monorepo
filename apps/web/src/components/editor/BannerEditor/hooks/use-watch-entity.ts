@@ -28,7 +28,7 @@ export function useWatchEntity<T extends TTrackableMixinKey[]>(
 		return () => {
 			unwatch();
 		};
-	}, [entity, composition]); // Not active effect on toTrackMixinKeys as its an inline array and thus endless loop
+	}, [entity, composition]); // Not active effect on toTrackMixinKeys as its an inline array and thus the pointer changes every render
 
 	return changes;
 }

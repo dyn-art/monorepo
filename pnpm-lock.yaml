@@ -488,7 +488,7 @@ importers:
   packages/svg-composition:
     dependencies:
       '@dyn/dtif':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../dtif
       '@dyn/utils':
         specifier: workspace:*
@@ -822,11 +822,6 @@ packages:
     resolution: {integrity: sha512-Y4OZ+ytlatR8AI+8KZfKuL5urKp7qey08ha31L8b3BwewJAoJamTzyvxPR/5D+KkdJCGPq/+8TukHBlY10FX9A==}
     engines: {node: '>=6.9.0'}
 
-  /@babel/helper-validator-option@7.22.15:
-    resolution: {integrity: sha512-bMn7RmyFjY/mdECUbgn9eoSY4vqvacUnS9i9vGAGttgFWesO6B4CYWA7XlpbWgBt71iv/hfbPlynohStqnu5hA==}
-    engines: {node: '>=6.9.0'}
-    dev: true
-
   /@babel/helper-validator-option@7.23.5:
     resolution: {integrity: sha512-85ttAOMLsr53VgXkTbkx8oA6YTfT4q7/HzXSLEYmjcSTJPMPQtvq1BD79Byep5xMUYbGRzEpDsjUf3dyp54IKw==}
     engines: {node: '>=6.9.0'}
@@ -957,7 +952,7 @@ packages:
     dependencies:
       '@babel/core': 7.23.2
       '@babel/helper-plugin-utils': 7.22.5
-      '@babel/helper-validator-option': 7.22.15
+      '@babel/helper-validator-option': 7.23.5
       '@babel/plugin-transform-react-display-name': 7.22.5(@babel/core@7.23.2)
       '@babel/plugin-transform-react-jsx': 7.22.15(@babel/core@7.23.2)
       '@babel/plugin-transform-react-jsx-development': 7.22.5(@babel/core@7.23.2)
@@ -2934,7 +2929,7 @@ packages:
     resolution: {integrity: sha512-qoQprZvz5wQFJwMDqeseRXWv3rqMvhgpbXFfVyWhbx9X47POIA6i/+dXefEmZKoAgOaTdaIgNSMqMIU61yRyzA==}
     dependencies:
       '@babel/parser': 7.23.0
-      '@babel/types': 7.23.0
+      '@babel/types': 7.23.6
       '@types/babel__generator': 7.6.7
       '@types/babel__template': 7.4.4
       '@types/babel__traverse': 7.20.4
