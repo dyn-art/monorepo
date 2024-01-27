@@ -8,7 +8,10 @@ use bevy_hierarchy::{Children, Parent};
 use dyn_bevy_render_skeleton::extract_param::Extract;
 use dyn_composition::core::modules::node::components::{
     mixins::ChildrenMixin,
-    types::{Node, NodeType, Paint},
+    types::{
+        GradientPaint, GradientPaintVariant, ImagePaint, ImagePaintScaleMode, Node, NodeType,
+        Paint, PaintType,
+    },
 };
 
 use crate::{
@@ -38,6 +41,8 @@ pub fn extract_children(
                     entity,
                     entity_type: match node.node_type {
                         NodeType::Frame => ChangedEntityType::FrameNode,
+                        NodeType::Rectangle => ChangedEntityType::ShapeNode,
+                        NodeType::Text => ChangedEntityType::ShapeNode,
                         _ => ChangedEntityType::Unkown,
                     },
                     changes: Vec::new(),
@@ -71,7 +76,8 @@ pub fn extract_node_mixin_generic<C: Component + ToMixinChange>(
                     entity,
                     entity_type: match node.node_type {
                         NodeType::Frame => ChangedEntityType::FrameNode,
-                        // TODO
+                        NodeType::Rectangle => ChangedEntityType::ShapeNode,
+                        NodeType::Text => ChangedEntityType::ShapeNode,
                         _ => ChangedEntityType::Unkown,
                     },
                     changes: Vec::new(),
@@ -85,31 +91,81 @@ pub fn extract_node_mixin_generic<C: Component + ToMixinChange>(
 
 pub fn extract_paint_mixin_generic<C: Component + ToMixinChange>(
     mut changed_entities: ResMut<ChangedEntitiesRes>,
-    query: Extract<Query<(Entity, &Paint, &C), (With<Paint>, Changed<C>)>>,
+    query: Extract<
+        Query<
+            (
+                Entity,
+                &Paint,
+                Option<&ImagePaint>,
+                Option<&GradientPaint>,
+                &C,
+            ),
+            (With<Paint>, Changed<C>),
+        >,
+    >,
     parent_query: Extract<Query<&Parent>>,
 ) {
-    query.for_each(|(entity, paint, mixin)| {
-        let changed_entity = changed_entities
-            .changed_entities
-            .entry(entity)
-            .or_insert_with(|| {
-                // Try to get the parent entity id
-                let mut parent_id: Option<Entity> = None;
-                if let Ok(parent) = parent_query.get(entity) {
-                    parent_id = Some(parent.get());
-                }
+    query.for_each(
+        |(entity, paint, maybe_image_paint, maybe_gradient_paint, mixin)| {
+            let changed_entity = changed_entities
+                .changed_entities
+                .entry(entity)
+                .or_insert_with(|| {
+                    // Try to get the parent entity id
+                    let mut parent_id: Option<Entity> = None;
+                    if let Ok(parent) = parent_query.get(entity) {
+                        parent_id = Some(parent.get());
+                    }
 
-                return ChangedEntity {
-                    entity,
-                    entity_type: match paint.paint_type {
-                        // TODO
-                        _ => ChangedEntityType::Unkown,
-                    },
-                    changes: Vec::new(),
-                    parent_id,
-                };
-            });
+                    return ChangedEntity {
+                        entity,
+                        entity_type: match paint.paint_type {
+                            PaintType::Solid => ChangedEntityType::SolidPaint,
+                            PaintType::Image => {
+                                if let Some(image_paint) = maybe_image_paint {
+                                    match image_paint.scale_mode {
+                                        ImagePaintScaleMode::Fill { .. } => {
+                                            ChangedEntityType::ImageFillPaint
+                                        }
 
-        changed_entity.changes.push(mixin.to_mixin_change());
-    });
+                                        ImagePaintScaleMode::Fit { .. } => {
+                                            ChangedEntityType::ImageFitPaint
+                                        }
+
+                                        ImagePaintScaleMode::Crop { .. } => {
+                                            ChangedEntityType::ImageCropPaint
+                                        }
+
+                                        ImagePaintScaleMode::Tile { .. } => {
+                                            ChangedEntityType::ImageTilePaint
+                                        }
+                                    }
+                                } else {
+                                    ChangedEntityType::Unkown
+                                }
+                            }
+                            PaintType::Gradient => {
+                                if let Some(gradient_paint) = maybe_gradient_paint {
+                                    match gradient_paint.variant {
+                                        GradientPaintVariant::Linear { .. } => {
+                                            ChangedEntityType::LinearGradientPaint
+                                        }
+                                        GradientPaintVariant::Radial { .. } => {
+                                            ChangedEntityType::RadialGradientPaint
+                                        }
+                                    }
+                                } else {
+                                    ChangedEntityType::Unkown
+                                }
+                            }
+                            _ => ChangedEntityType::Unkown,
+                        },
+                        changes: Vec::new(),
+                        parent_id,
+                    };
+                });
+
+            changed_entity.changes.push(mixin.to_mixin_change());
+        },
+    );
 }

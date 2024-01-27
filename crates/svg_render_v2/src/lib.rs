@@ -4,8 +4,12 @@ use bevy_app::{App, Plugin};
 
 use bevy_ecs::schedule::IntoSystemConfigs;
 use dyn_bevy_render_skeleton::{ExtractSchedule, Render, RenderApp, RenderSet};
-use dyn_composition::core::modules::node::components::mixins::{
-    DimensionMixin, RelativeTransformMixin,
+use dyn_composition::core::modules::node::components::{
+    mixins::{
+        BlendMixin, DimensionMixin, NodeCompositionMixin, PaintCompositionMixin, PathMixin,
+        RelativeTransformMixin,
+    },
+    types::SolidPaint,
 };
 use events::output_event::SVGRenderOutputEvent;
 use resources::{changed_entities::ChangedEntitiesRes, svg_composition::SVGCompositionRes};
@@ -44,8 +48,14 @@ impl Plugin for SVGRenderPlugin {
                     // Node
                     extract_node_mixin_generic::<DimensionMixin>,
                     extract_node_mixin_generic::<RelativeTransformMixin>,
+                    extract_node_mixin_generic::<NodeCompositionMixin>,
+                    extract_node_mixin_generic::<BlendMixin>,
+                    extract_node_mixin_generic::<PathMixin>,
                     // Paint
                     extract_paint_mixin_generic::<DimensionMixin>,
+                    extract_paint_mixin_generic::<BlendMixin>,
+                    extract_paint_mixin_generic::<PaintCompositionMixin>,
+                    extract_paint_mixin_generic::<SolidPaint>,
                 ),
             )
             .add_systems(Render, queue_element_changes.in_set(RenderSet::Queue));

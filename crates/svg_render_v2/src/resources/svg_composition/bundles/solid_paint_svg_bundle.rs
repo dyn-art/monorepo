@@ -12,7 +12,8 @@ use crate::{
             svg_context::SVGContext,
             svg_element::{
                 attributes::{SVGAttribute, SVGMeasurementUnit},
-                mapper::map_mat3_to_svg_transform,
+                mapper::{map_blend_mode, map_mat3_to_svg_transform},
+                styles::{SVGDisplayStyle, SVGStyle},
                 SVGElement, SVGTag,
             },
         },
@@ -43,6 +44,20 @@ impl SVGBundle for SolidPaintSVGBundle {
     fn update(&mut self, changed_entity: ChangedEntity, cx: &mut SVGContext) -> () {
         for change in &changed_entity.changes {
             match change {
+                MixinChange::PaintComposition(mixin) => {
+                    self.root.set_styles(vec![SVGStyle::Display {
+                        display: if mixin.is_visible {
+                            SVGDisplayStyle::Block
+                        } else {
+                            SVGDisplayStyle::None
+                        },
+                    }]);
+                }
+                MixinChange::SolidPaint(mixin) => {
+                    self.paint_rect.set_attributes(vec![SVGAttribute::Fill {
+                        fill: rgb_to_hex(mixin.color),
+                    }]);
+                }
                 MixinChange::Dimension(mixin) => {
                     self.paint_rect.set_attributes(vec![
                         SVGAttribute::Width {
@@ -55,10 +70,13 @@ impl SVGBundle for SolidPaintSVGBundle {
                         },
                     ]);
                 }
-                MixinChange::RelativeTransform(mixin) => {
-                    self.root.set_attribute(SVGAttribute::Transform {
-                        transform: map_mat3_to_svg_transform(&mixin.relative_transform.0),
-                    });
+                MixinChange::Blend(mixin) => {
+                    self.root.set_attributes(vec![SVGAttribute::Opacity {
+                        opacity: mixin.opacity,
+                    }]);
+                    self.root.set_styles(vec![SVGStyle::BlendMode {
+                        blend_mode: map_blend_mode(&mixin.blend_mode),
+                    }]);
                 }
                 _ => {}
             }
@@ -94,8 +112,6 @@ impl SolidPaintSVGBundle {
     pub fn new(entity: Entity, cx: &mut SVGContext) -> Self {
         let mut root_element = cx.create_element(SVGTag::Group);
 
-        // Create  elements
-
         let mut paint_rect = cx.create_element(SVGTag::Rect);
         root_element.append_child_in_bundle_context(entity, &mut paint_rect);
 
@@ -105,4 +121,8 @@ impl SolidPaintSVGBundle {
             paint_rect: paint_rect,
         }
     }
+}
+
+fn rgb_to_hex(rgb: (u8, u8, u8)) -> String {
+    format!("#{:02X}{:02X}{:02X}", rgb.0, rgb.1, rgb.2)
 }

@@ -1,5 +1,9 @@
-use dyn_composition::core::modules::node::components::mixins::{
-    ChildrenMixin, DimensionMixin, RelativeTransformMixin,
+use dyn_composition::core::modules::node::components::{
+    mixins::{
+        BlendMixin, ChildrenMixin, DimensionMixin, NodeCompositionMixin, PaintCompositionMixin,
+        PathMixin, RelativeTransformMixin,
+    },
+    types::SolidPaint,
 };
 use serde::Serialize;
 use specta::Type;
@@ -7,9 +11,19 @@ use specta::Type;
 #[derive(Serialize, Clone, Debug, Type)]
 #[serde(tag = "type")]
 pub enum MixinChange {
+    // Shared
     Dimension(DimensionMixin),
+    Blend(BlendMixin),
+
+    // Node
+    NodeComposition(NodeCompositionMixin),
     Children(MixinChangeChildrenMixin),
     RelativeTransform(MixinChangeRelativeTransformMixin),
+    Path(PathMixin),
+
+    // Paint
+    PaintComposition(PaintCompositionMixin),
+    SolidPaint(SolidPaint),
 }
 
 pub trait ToMixinChange {
@@ -46,5 +60,35 @@ impl ToMixinChange for RelativeTransformMixin {
         MixinChange::RelativeTransform(MixinChangeRelativeTransformMixin {
             relative_transform: self.clone(),
         })
+    }
+}
+
+impl ToMixinChange for NodeCompositionMixin {
+    fn to_mixin_change(&self) -> MixinChange {
+        MixinChange::NodeComposition(self.clone())
+    }
+}
+
+impl ToMixinChange for BlendMixin {
+    fn to_mixin_change(&self) -> MixinChange {
+        MixinChange::Blend(self.clone())
+    }
+}
+
+impl ToMixinChange for PathMixin {
+    fn to_mixin_change(&self) -> MixinChange {
+        MixinChange::Path(self.clone())
+    }
+}
+
+impl ToMixinChange for PaintCompositionMixin {
+    fn to_mixin_change(&self) -> MixinChange {
+        MixinChange::PaintComposition(self.clone())
+    }
+}
+
+impl ToMixinChange for SolidPaint {
+    fn to_mixin_change(&self) -> MixinChange {
+        MixinChange::SolidPaint(self.clone())
     }
 }
