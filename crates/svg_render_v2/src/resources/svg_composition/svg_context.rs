@@ -9,7 +9,9 @@ use crate::{
 };
 
 use super::{
-    bundles::frame_svg_bundle::FrameSVGBundle,
+    bundles::{
+        frame_node_svg_bundle::FrameNodeSVGBundle, solid_paint_svg_bundle::SolidPaintSVGBundle,
+    },
     svg_bundle::SVGBundle,
     svg_element::{SVGElement, SVGTag},
 };
@@ -70,7 +72,10 @@ impl SVGContext {
         entity_type: ChangedEntityType,
     ) -> Option<Box<dyn SVGBundle>> {
         match entity_type {
-            ChangedEntityType::FrameNode => Some(Box::new(FrameSVGBundle::new(entity, self))),
+            // Node
+            ChangedEntityType::FrameNode => Some(Box::new(FrameNodeSVGBundle::new(entity, self))),
+            // Paint
+            ChangedEntityType::SolidPaint => Some(Box::new(SolidPaintSVGBundle::new(entity, self))),
             _ => None,
         }
     }

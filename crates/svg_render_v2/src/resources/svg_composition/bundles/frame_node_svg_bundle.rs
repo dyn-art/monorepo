@@ -20,7 +20,7 @@ use crate::{
 };
 
 #[derive(Debug)]
-pub struct FrameSVGBundle {
+pub struct FrameNodeSVGBundle {
     entity: Entity,
 
     root: SVGElement,
@@ -44,7 +44,7 @@ pub struct FrameSVGBundle {
     node_children: Vec<Entity>,
 }
 
-impl SVGBundle for FrameSVGBundle {
+impl SVGBundle for FrameNodeSVGBundle {
     fn get_entity(&self) -> &Entity {
         &self.entity
     }
@@ -119,18 +119,29 @@ impl SVGBundle for FrameSVGBundle {
                     let mut new_paint_children = Vec::new();
                     let mut new_node_children = Vec::new();
 
+                    log::info!("[MixinChange::Children] Start {:?}", mixin.children.0);
+                    log::info!("{:#?}", cx);
+
                     // Classify new children into paint and node categories
                     for &entity in new_children.iter() {
-                        match cx.get_bundle(&entity).unwrap().get_type() {
-                            ChangedEntityType::FrameNode | ChangedEntityType::ShapeNode => {
-                                new_node_children.push(entity);
+                        if let Some(bundle) = cx.get_bundle(&entity) {
+                            match bundle.get_type() {
+                                ChangedEntityType::FrameNode | ChangedEntityType::ShapeNode => {
+                                    new_node_children.push(entity);
+                                }
+                                ChangedEntityType::SolidPaint => {
+                                    new_paint_children.push(entity);
+                                }
+                                _ => {}
                             }
-                            ChangedEntityType::SolidPaint => {
-                                new_paint_children.push(entity);
-                            }
-                            _ => {}
                         }
                     }
+
+                    log::info!(
+                        "[MixinChange::Children] Clasified: Paint {:?} | Node {:?}",
+                        new_paint_children,
+                        new_node_children
+                    );
 
                     // Process node children
                     let current_node_children_set: HashSet<_> =
@@ -147,11 +158,20 @@ impl SVGBundle for FrameSVGBundle {
                         .collect();
 
                     // 2. Identify newly added elements
-                    let added_node_elements: Vec<_> = new_children
+                    let added_node_elements: Vec<_> = new_node_children
                         .iter()
                         .filter(|&e| !current_node_children_set.contains(e))
                         .cloned()
                         .collect();
+
+                    log::info!(
+                        "[MixinChange::Children] removed_node_elements: {:#?}",
+                        removed_node_elements
+                    );
+                    log::info!(
+                        "[MixinChange::Children] added_node_elements: {:#?}",
+                        added_node_elements
+                    );
 
                     // Process paint children
                     let current_paint_children_set: HashSet<_> =
@@ -168,11 +188,20 @@ impl SVGBundle for FrameSVGBundle {
                         .collect();
 
                     // 2. Identify newly added elements
-                    let added_paint_elements: Vec<_> = new_children
+                    let added_paint_elements: Vec<_> = new_paint_children
                         .iter()
                         .filter(|&e| !current_paint_children_set.contains(e))
                         .cloned()
                         .collect();
+
+                    log::info!(
+                        "[MixinChange::Children] removed_paint_elements: {:#?}",
+                        removed_paint_elements
+                    );
+                    log::info!(
+                        "[MixinChange::Children] added_paint_elements: {:#?}",
+                        added_paint_elements
+                    );
 
                     // Process removed elements
                     // TODO
@@ -240,7 +269,7 @@ impl SVGBundle for FrameSVGBundle {
     }
 }
 
-impl FrameSVGBundle {
+impl FrameNodeSVGBundle {
     pub fn new(entity: Entity, cx: &mut SVGContext) -> Self {
         let mut root_element = cx.create_element(SVGTag::Group);
 

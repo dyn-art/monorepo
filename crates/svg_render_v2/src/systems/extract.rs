@@ -24,7 +24,7 @@ pub fn extract_children(
     parent_query: Extract<Query<&Parent>>,
 ) {
     query.for_each(|(entity, node, children)| {
-        changed_entities
+        let changed_entity = changed_entities
             .changed_entities
             .entry(entity)
             .or_insert_with(|| {
@@ -40,10 +40,14 @@ pub fn extract_children(
                         NodeType::Frame => ChangedEntityType::FrameNode,
                         _ => ChangedEntityType::Unkown,
                     },
-                    changes: vec![ChildrenMixin(children.to_vec()).to_mixin_change()],
+                    changes: Vec::new(),
                     parent_id,
                 };
             });
+
+        changed_entity
+            .changes
+            .push(ChildrenMixin(children.to_vec()).to_mixin_change());
     });
 }
 
@@ -53,7 +57,7 @@ pub fn extract_node_mixin_generic<C: Component + ToMixinChange>(
     parent_query: Extract<Query<&Parent>>,
 ) {
     query.for_each(|(entity, node, mixin)| {
-        changed_entities
+        let changed_entity = changed_entities
             .changed_entities
             .entry(entity)
             .or_insert_with(|| {
@@ -70,10 +74,12 @@ pub fn extract_node_mixin_generic<C: Component + ToMixinChange>(
                         // TODO
                         _ => ChangedEntityType::Unkown,
                     },
-                    changes: vec![mixin.to_mixin_change()],
+                    changes: Vec::new(),
                     parent_id,
                 };
             });
+
+        changed_entity.changes.push(mixin.to_mixin_change());
     });
 }
 
@@ -83,7 +89,7 @@ pub fn extract_paint_mixin_generic<C: Component + ToMixinChange>(
     parent_query: Extract<Query<&Parent>>,
 ) {
     query.for_each(|(entity, paint, mixin)| {
-        changed_entities
+        let changed_entity = changed_entities
             .changed_entities
             .entry(entity)
             .or_insert_with(|| {
@@ -99,9 +105,11 @@ pub fn extract_paint_mixin_generic<C: Component + ToMixinChange>(
                         // TODO
                         _ => ChangedEntityType::Unkown,
                     },
-                    changes: vec![mixin.to_mixin_change()],
+                    changes: Vec::new(),
                     parent_id,
                 };
             });
+
+        changed_entity.changes.push(mixin.to_mixin_change());
     });
 }
