@@ -12,7 +12,7 @@ use crate::{
             svg_context::SVGContext,
             svg_element::{
                 attributes::{SVGAttribute, SVGMeasurementUnit},
-                mapper::{map_blend_mode, map_mat3_to_svg_transform},
+                mapper::map_blend_mode,
                 styles::{SVGDisplayStyle, SVGStyle},
                 SVGElement, SVGTag,
             },
@@ -37,11 +37,11 @@ impl SVGBundle for SolidPaintSVGBundle {
         ChangedEntityType::ShapeNode
     }
 
-    fn append_child(&mut self, svg_bundle: &mut Box<dyn SVGBundle>) -> () {
+    fn append_child(&mut self, _: &mut Box<dyn SVGBundle>) -> () {
         // Do nothing as a paint can't have children
     }
 
-    fn update(&mut self, changed_entity: ChangedEntity, cx: &mut SVGContext) -> () {
+    fn update(&mut self, changed_entity: ChangedEntity, _: &mut SVGContext) -> () {
         for change in &changed_entity.changes {
             match change {
                 MixinChange::PaintComposition(mixin) => {
@@ -111,15 +111,37 @@ impl SVGBundle for SolidPaintSVGBundle {
 impl SolidPaintSVGBundle {
     pub fn new(entity: Entity, cx: &mut SVGContext) -> Self {
         let mut root_element = cx.create_element(SVGTag::Group);
+        #[cfg(feature = "tracing")]
+        root_element.set_attribute(SVGAttribute::Name {
+            name: SolidPaintSVGBundle::create_element_name(
+                root_element.get_id(),
+                String::from("root"),
+                false,
+            ),
+        });
 
-        let mut paint_rect = cx.create_element(SVGTag::Rect);
-        root_element.append_child_in_bundle_context(entity, &mut paint_rect);
+        let mut paint_rect_element = cx.create_element(SVGTag::Rect);
+        #[cfg(feature = "tracing")]
+        paint_rect_element.set_attribute(SVGAttribute::Name {
+            name: SolidPaintSVGBundle::create_element_name(
+                paint_rect_element.get_id(),
+                String::from("paint-rect"),
+                false,
+            ),
+        });
+        root_element.append_child_in_bundle_context(entity, &mut paint_rect_element);
 
         Self {
             entity,
             root: root_element,
-            paint_rect: paint_rect,
+            paint_rect: paint_rect_element,
         }
+    }
+
+    #[cfg(feature = "tracing")]
+    fn create_element_name(id: ContinuousId, category: String, is_definition: bool) -> String {
+        let def_part = if is_definition { "def" } else { "" };
+        format!("solid-paint_{}_{}{}", category, id, def_part)
     }
 }
 

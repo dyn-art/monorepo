@@ -1,4 +1,4 @@
-use std::collections::{BTreeMap, HashSet};
+use std::collections::BTreeMap;
 
 use bevy_ecs::entity::Entity;
 use dyn_composition::core::utils::continuous_id::ContinuousId;
@@ -161,34 +161,86 @@ impl SVGBundle for ShapeNodeSVGBundle {
 impl ShapeNodeSVGBundle {
     pub fn new(entity: Entity, cx: &mut SVGContext) -> Self {
         let mut root_element = cx.create_element(SVGTag::Group);
+        #[cfg(feature = "tracing")]
+        root_element.set_attribute(SVGAttribute::Name {
+            name: ShapeNodeSVGBundle::create_element_name(
+                root_element.get_id(),
+                String::from("root"),
+                false,
+            ),
+        });
 
         let mut defs_element = cx.create_element(SVGTag::Defs);
+        #[cfg(feature = "tracing")]
+        defs_element.set_attribute(SVGAttribute::Name {
+            name: ShapeNodeSVGBundle::create_element_name(
+                defs_element.get_id(),
+                String::from("defs"),
+                false,
+            ),
+        });
         root_element.append_child_in_bundle_context(entity, &mut defs_element);
 
         // Create click area element
 
         let mut click_area_rect_element = cx.create_element(SVGTag::Rect);
+        #[cfg(feature = "tracing")]
+        click_area_rect_element.set_attributes(vec![
+            SVGAttribute::Name {
+                name: ShapeNodeSVGBundle::create_element_name(
+                    click_area_rect_element.get_id(),
+                    String::from("click-area-rect"),
+                    false,
+                ),
+            },
+            SVGAttribute::Fill {
+                fill: String::from("rgba(255, 204, 203, 0.5)"),
+            },
+        ]);
+        #[cfg(not(feature = "tracing"))]
+        click_area_rect_element.set_attribute(SVGAttribute::Fill {
+            fill: String::from("transparent"),
+        });
         root_element.append_child_in_bundle_context(entity, &mut click_area_rect_element);
 
         // Create fill elements
 
         let mut fill_clip_path_element = cx.create_element(SVGTag::ClipPath);
+        #[cfg(feature = "tracing")]
+        fill_clip_path_element.set_attribute(SVGAttribute::Name {
+            name: ShapeNodeSVGBundle::create_element_name(
+                fill_clip_path_element.get_id(),
+                String::from("fill-clip-path"),
+                true,
+            ),
+        });
         defs_element.append_child_in_bundle_context(entity, &mut fill_clip_path_element);
 
         let mut fill_clipped_path_element = cx.create_element(SVGTag::Rect);
+        #[cfg(feature = "tracing")]
+        fill_clipped_path_element.set_attribute(SVGAttribute::Name {
+            name: ShapeNodeSVGBundle::create_element_name(
+                fill_clipped_path_element.get_id(),
+                String::from("fill-clipped-path"),
+                false,
+            ),
+        });
         fill_clip_path_element
             .append_child_in_bundle_context(entity, &mut fill_clipped_path_element);
 
         let mut fill_wrapper_g_element = cx.create_element(SVGTag::Group);
+        #[cfg(feature = "tracing")]
+        fill_wrapper_g_element.set_attribute(SVGAttribute::Name {
+            name: ShapeNodeSVGBundle::create_element_name(
+                fill_wrapper_g_element.get_id(),
+                String::from("fill-wrapper-g"),
+                false,
+            ),
+        });
         fill_wrapper_g_element.set_attribute(SVGAttribute::ClipPath {
             clip_path: fill_clip_path_element.get_id(),
         });
         root_element.append_child_in_bundle_context(entity, &mut fill_wrapper_g_element);
-
-        // Create children wrapper element
-
-        let mut children_wrapper_g_element = cx.create_element(SVGTag::Group);
-        root_element.append_child_in_bundle_context(entity, &mut children_wrapper_g_element);
 
         Self {
             entity,
@@ -200,5 +252,11 @@ impl ShapeNodeSVGBundle {
             fill_wrapper_g: fill_wrapper_g_element,
             paint_children: Vec::new(),
         }
+    }
+
+    #[cfg(feature = "tracing")]
+    fn create_element_name(id: ContinuousId, category: String, is_definition: bool) -> String {
+        let def_part = if is_definition { "_def" } else { "" };
+        format!("shape_{}_{}{}", category, id, def_part)
     }
 }
