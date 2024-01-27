@@ -174,7 +174,7 @@ impl SVGElement {
         self.changes.drain(..).collect()
     }
 
-    pub fn to_string(&self, bundle: &Box<dyn SVGBundle>, cx: &SVGContext) -> String {
+    pub fn to_string(&self, bundle: &dyn SVGBundle, cx: &SVGContext) -> String {
         String::from("todo")
     }
 }

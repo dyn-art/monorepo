@@ -90,33 +90,6 @@ impl SVGBundle for FrameSVGBundle {
         }
     }
 
-    fn drain_changes(&mut self) -> Vec<ElementChangeEvent> {
-        let mut drained_updates: Vec<ElementChangeEvent> = Vec::new();
-
-        // Drain updates from root element
-        let root = self.get_root_element_mut();
-        let changes = root.drain_changes();
-        if !changes.is_empty() {
-            drained_updates.push(ElementChangeEvent {
-                id: root.get_id(),
-                changes,
-            });
-        }
-
-        // Drain updates from children
-        for (_, child_element) in self.get_child_elements_mut() {
-            let changes = child_element.drain_changes();
-            if !changes.is_empty() {
-                drained_updates.push(ElementChangeEvent {
-                    id: child_element.get_id(),
-                    changes,
-                });
-            }
-        }
-
-        return drained_updates;
-    }
-
     fn get_child_elements(&self) -> BTreeMap<ContinuousId, &SVGElement> {
         let mut children = BTreeMap::new();
         children.insert(self.defs.get_id(), &self.defs);
@@ -140,8 +113,7 @@ impl SVGBundle for FrameSVGBundle {
     }
 
     fn to_string(&self, cx: &SVGContext) -> String {
-        self.get_root_element()
-            .to_string(cx.get_bundle(&self.entity).unwrap(), cx)
+        self.get_root_element().to_string(self, cx)
     }
 }
 
@@ -154,6 +126,14 @@ impl FrameSVGBundle {
         root.append_child_element(
             &mut defs_element,
             SVGElementChildIdentifier::InSVGBundleContext(entity, defs_element_id),
+        );
+
+        let mut content_clip_path_element =
+            SVGElement::new(SVGTag::ClipPath, cx.id_generator.next_id());
+        let content_clip_path_element_id = content_clip_path_element.get_id();
+        defs_element.append_child_element(
+            &mut content_clip_path_element,
+            SVGElementChildIdentifier::InSVGBundleContext(entity, content_clip_path_element_id),
         );
 
         // TODO
