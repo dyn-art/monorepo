@@ -47,6 +47,8 @@ fn build_dependency_tree(
                     .or_insert_with(Vec::new)
                     .push(*entity);
             }
+            // TODO: Issue here as a each entity can be a root even if it has a parent_id
+            // because a root is each entity that has no parent in this update cycle (changed_entities)
             None => roots.push(*entity),
         }
     }
