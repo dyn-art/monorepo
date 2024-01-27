@@ -347,6 +347,7 @@ impl FrameNodeSVGBundle {
         content_wrapper_g_element.set_attribute(SVGAttribute::ClipPath {
             clip_path: content_clip_path_element.get_id(),
         });
+        root_element.append_child_in_bundle_context(entity, &mut content_wrapper_g_element);
 
         // Create fill elements
 
