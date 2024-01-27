@@ -112,4 +112,44 @@ impl SVGContext {
             }
         }
     }
+
+    // =========================================================================
+    // Other
+    // =========================================================================
+
+    pub fn to_string(&self) -> Option<String> {
+        let mut svg_strings = Vec::new();
+
+        // Construct SVG string
+        for bundle_id in self.root_bundle_ids.iter() {
+            let root = match self.get_bundle(bundle_id) {
+                Some(root) => root,
+                _ => continue,
+            };
+
+            let element = root.get_root_element();
+            let mut result = String::new();
+
+            // Open the SVG tag
+            result.push_str(&format!(
+                            "<svg width=\"{}\" height=\"{}\" xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\">",
+                            element.get_attribute("width")?.to_svg_string(),
+                            element.get_attribute("height")?.to_svg_string()
+                        ));
+
+            // Append the content from the root node
+            result.push_str(&root.to_string(self));
+
+            // Close the SVG tag
+            result.push_str("</svg>");
+
+            svg_strings.push(result);
+        }
+
+        return if svg_strings.is_empty() {
+            None
+        } else {
+            Some(svg_strings.join("\n"))
+        };
+    }
 }

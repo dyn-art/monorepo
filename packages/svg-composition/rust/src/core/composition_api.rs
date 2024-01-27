@@ -10,9 +10,9 @@ use dyn_composition::core::modules::node::components::mixins::{
     DimensionMixin, RelativeTransformMixin,
 };
 use dyn_svg_render::events::output_event::SVGRenderOutputEvent;
-use dyn_svg_render::mixin_change::{MixinChangeRelativeTransformMixin, NodeMixinChange};
+use dyn_svg_render::mixin_change::{MixinChange, MixinChangeRelativeTransformMixin};
 use dyn_svg_render::resources::svg_composition::SVGCompositionRes;
-use dyn_svg_render::SvgRenderPlugin;
+use dyn_svg_render::SVGRenderPlugin;
 use wasm_bindgen::prelude::wasm_bindgen;
 use wasm_bindgen::JsValue;
 
@@ -55,7 +55,7 @@ impl JsCompositionHandle {
 
         // Register plugins
         app.add_plugins((
-            SvgRenderPlugin {
+            SVGRenderPlugin {
                 output_event_sender: Some(svg_output_event_sender),
             },
             TrackPlugin,
@@ -145,18 +145,18 @@ impl JsCompositionHandle {
         let app = self.composition.get_app_mut();
 
         // Collect intial values
-        let mut changes: Vec<NodeMixinChange> = Vec::with_capacity(to_track_mixins.len());
+        let mut changes: Vec<MixinChange> = Vec::with_capacity(to_track_mixins.len());
         if initial_value {
             for component_type in &to_track_mixins {
                 match component_type {
                     TrackableMixinType::Dimension => {
                         if let Some(mixin) = app.world.get::<DimensionMixin>(entity) {
-                            changes.push(NodeMixinChange::Dimension(mixin.clone()))
+                            changes.push(MixinChange::Dimension(mixin.clone()))
                         }
                     }
                     TrackableMixinType::RelativeTransform => {
                         if let Some(mixin) = app.world.get::<RelativeTransformMixin>(entity) {
-                            changes.push(NodeMixinChange::RelativeTransform(
+                            changes.push(MixinChange::RelativeTransform(
                                 MixinChangeRelativeTransformMixin {
                                     relative_transform: mixin.clone(),
                                 },
@@ -264,7 +264,7 @@ impl JsCompositionHandle {
 
     #[wasm_bindgen(js_name = toString)]
     pub fn to_string(&self) -> Option<String> {
-        self.get_svg_composition()?.to_string()
+        self.get_svg_composition()?.context.to_string()
     }
 
     // =========================================================================
