@@ -18,7 +18,7 @@ pub fn queue_element_changes(
         process_tree_branch(root_branch, &mut svg_composition.context);
     }
 
-    // TODO: apply updates
+    svg_composition.context.process_changed_entities();
 }
 
 #[derive(Debug)]
@@ -88,7 +88,7 @@ fn process_tree_branch(branch: ChangedEntityBranch, cx: &mut SVGContext) {
 
 fn process_entity(entity: Entity, changed_entity: ChangedEntity, cx: &mut SVGContext) {
     if let Some(bundle) = cx.create_bundle(entity, changed_entity.entity_type) {
-        cx.insert_bundle(bundle);
-        cx.changed_entities.push(changed_entity);
+        cx.insert_bundle(bundle, changed_entity.parent_id);
+        cx.add_changed_entity(changed_entity);
     }
 }

@@ -1,5 +1,5 @@
 [package]
-name = "dyn_svg_render_v2"
+name = "dyn_svg_render"
 version = "0.0.1"
 edition = "2021"
 description = "SVG rendering functionality for Composition"

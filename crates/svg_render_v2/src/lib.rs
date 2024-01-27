@@ -14,11 +14,11 @@ use systems::{
     queue::queue_element_changes,
 };
 
-mod element_change;
-mod events;
-mod mixin_change;
-mod resources;
-mod systems;
+pub mod element_change;
+pub mod events;
+pub mod mixin_change;
+pub mod resources;
+pub mod systems;
 
 pub struct SVGRenderPlugin {
     pub output_event_sender: Option<Sender<SVGRenderOutputEvent>>,

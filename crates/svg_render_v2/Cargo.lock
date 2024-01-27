@@ -499,7 +499,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "dyn_svg_render_v2"
+name = "dyn_svg_render"
 version = "0.0.1"
 dependencies = [
  "base64",
