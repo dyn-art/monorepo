@@ -11,21 +11,16 @@ pub fn queue_element_changes(
     mut changed_entities_res: ResMut<ChangedEntitiesRes>,
     mut svg_composition: ResMut<SVGCompositionRes>,
 ) {
-    log::info!("[queue_element_changes] Start");
     let changed_entities = take(&mut changed_entities_res.changed_entities);
     let dependency_tree = build_dependency_tree(changed_entities);
     log::info!(
         "[queue_element_changes] Dependency Tree: {:#?}",
         dependency_tree
-    );
+    ); // TODO: REMOVE
 
     for root_branch in dependency_tree {
         process_tree_branch(root_branch, &mut svg_composition.context);
     }
-    log::info!(
-        "[queue_element_changes] After Creating Elements: {:#?}",
-        svg_composition.context
-    );
 
     svg_composition.context.process_changed_entities();
 }

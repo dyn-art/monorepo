@@ -54,27 +54,6 @@ impl SVGBundle for FrameNodeSVGBundle {
         ChangedEntityType::ShapeNode
     }
 
-    fn append_child(&mut self, svg_bundle: &mut Box<dyn SVGBundle>) -> () {
-        let svg_bundle_type = svg_bundle.get_type();
-        match svg_bundle_type {
-            ChangedEntityType::SolidPaint
-            | ChangedEntityType::ImageFillPaint
-            | ChangedEntityType::ImageFitPaint
-            | ChangedEntityType::ImageCropPaint
-            | ChangedEntityType::ImageTilePaint
-            | ChangedEntityType::LinearGradientPaint
-            | ChangedEntityType::RadialGradientPaint => {
-                self.fill_wrapper_g
-                    .append_child_in_svg_context(self.entity, svg_bundle.get_root_element_mut());
-            }
-            ChangedEntityType::FrameNode | ChangedEntityType::ShapeNode => {
-                self.children_wrapper_g
-                    .append_child_in_svg_context(self.entity, svg_bundle.get_root_element_mut());
-            }
-            _ => {}
-        }
-    }
-
     fn update(&mut self, changed_entity: ChangedEntity, cx: &mut SVGContext) -> () {
         for change in &changed_entity.changes {
             match change {
@@ -137,9 +116,6 @@ impl SVGBundle for FrameNodeSVGBundle {
                     let mut new_paint_children = Vec::new();
                     let mut new_node_children = Vec::new();
 
-                    log::info!("[MixinChange::Children] Start {:?}", mixin.children.0);
-                    log::info!("{:#?}", cx);
-
                     // Classify new children into paint and node categories
                     for &entity in new_children.iter() {
                         if let Some(bundle) = cx.get_bundle(&entity) {
@@ -155,79 +131,63 @@ impl SVGBundle for FrameNodeSVGBundle {
                         }
                     }
 
-                    log::info!(
-                        "[MixinChange::Children] Clasified: Paint {:?} | Node {:?}",
-                        new_paint_children,
-                        new_node_children
-                    );
-
-                    // Process node children
+                    // Identify added and removed node elements
                     let current_node_children_set: HashSet<_> =
                         self.node_children.iter().cloned().collect();
                     let new_node_children_set: HashSet<_> =
                         new_node_children.iter().cloned().collect();
-
-                    // 1. Identify removed elements
-                    let removed_node_elements: Vec<_> = self
+                    let removed_node_entities: Vec<_> = self
                         .node_children
                         .iter()
                         .filter(|&e| !new_node_children_set.contains(e))
                         .cloned()
                         .collect();
-
-                    // 2. Identify newly added elements
-                    let added_node_elements: Vec<_> = new_node_children
+                    let added_node_enntities: Vec<_> = new_node_children
                         .iter()
                         .filter(|&e| !current_node_children_set.contains(e))
                         .cloned()
                         .collect();
 
-                    log::info!(
-                        "[MixinChange::Children] removed_node_elements: {:#?}",
-                        removed_node_elements
-                    );
-                    log::info!(
-                        "[MixinChange::Children] added_node_elements: {:#?}",
-                        added_node_elements
-                    );
-
-                    // Process paint children
+                    // Identify added and removed paint elements
                     let current_paint_children_set: HashSet<_> =
                         self.paint_children.iter().cloned().collect();
                     let new_paint_children_set: HashSet<_> =
                         new_paint_children.iter().cloned().collect();
-
-                    // 1. Identify removed elements
-                    let removed_paint_elements: Vec<_> = self
+                    let removed_paint_entities: Vec<_> = self
                         .paint_children
                         .iter()
                         .filter(|&e| !new_paint_children_set.contains(e))
                         .cloned()
                         .collect();
-
-                    // 2. Identify newly added elements
-                    let added_paint_elements: Vec<_> = new_paint_children
+                    let added_paint_entities: Vec<_> = new_paint_children
                         .iter()
                         .filter(|&e| !current_paint_children_set.contains(e))
                         .cloned()
                         .collect();
 
-                    log::info!(
-                        "[MixinChange::Children] removed_paint_elements: {:#?}",
-                        removed_paint_elements
-                    );
-                    log::info!(
-                        "[MixinChange::Children] added_paint_elements: {:#?}",
-                        added_paint_elements
-                    );
+                    // Process removed entities
+                    for entity in removed_node_entities {
+                        cx.remove_bundle(&entity);
+                    }
+                    for entity in removed_paint_entities {
+                        cx.remove_bundle(&entity);
+                    }
 
-                    // Process removed elements
-                    // TODO
+                    // Process added entities
+                    for entity in added_node_enntities {
+                        if let Some(bundle) = cx.get_bundle_mut(&entity) {
+                            self.children_wrapper_g
+                                .append_child_in_svg_context(entity, bundle.get_root_element_mut());
+                        }
+                    }
+                    for entity in added_paint_entities {
+                        if let Some(bundle) = cx.get_bundle_mut(&entity) {
+                            self.fill_wrapper_g
+                                .append_child_in_svg_context(entity, bundle.get_root_element_mut());
+                        }
+                    }
 
-                    // Process added elements
-                    // TODO
-
-                    // Reorder elements
+                    // Reorder entities
                     // TODO
 
                     // Update the current children

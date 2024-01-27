@@ -14,7 +14,7 @@ use super::{svg_context::SVGContext, svg_element::SVGElement};
 pub trait SVGBundle: Sync + Send + Debug {
     fn get_entity(&self) -> &Entity;
     fn get_type(&self) -> ChangedEntityType;
-    fn append_child(&mut self, svg_bundle: &mut Box<dyn SVGBundle>) -> ();
+    // fn append_child(&mut self, svg_bundle: &mut Box<dyn SVGBundle>) -> ();
     fn update(&mut self, changed_entity: ChangedEntity, cx: &mut SVGContext) -> ();
     fn get_child_elements(&self) -> BTreeMap<ContinuousId, &SVGElement>;
     fn get_child_elements_mut(&mut self) -> BTreeMap<ContinuousId, &mut SVGElement>;

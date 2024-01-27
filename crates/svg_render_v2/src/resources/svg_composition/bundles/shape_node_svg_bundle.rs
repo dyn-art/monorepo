@@ -1,4 +1,4 @@
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, HashSet};
 
 use bevy_ecs::entity::Entity;
 use dyn_composition::core::utils::continuous_id::ContinuousId;
@@ -46,23 +46,6 @@ impl SVGBundle for ShapeNodeSVGBundle {
 
     fn get_type(&self) -> ChangedEntityType {
         ChangedEntityType::ShapeNode
-    }
-
-    fn append_child(&mut self, svg_bundle: &mut Box<dyn SVGBundle>) -> () {
-        let svg_bundle_type = svg_bundle.get_type();
-        match svg_bundle_type {
-            ChangedEntityType::SolidPaint
-            | ChangedEntityType::ImageFillPaint
-            | ChangedEntityType::ImageFitPaint
-            | ChangedEntityType::ImageCropPaint
-            | ChangedEntityType::ImageTilePaint
-            | ChangedEntityType::LinearGradientPaint
-            | ChangedEntityType::RadialGradientPaint => {
-                self.fill_wrapper_g
-                    .append_child_in_svg_context(self.entity, svg_bundle.get_root_element_mut());
-            }
-            _ => {}
-        }
     }
 
     fn update(&mut self, changed_entity: ChangedEntity, cx: &mut SVGContext) -> () {
@@ -118,7 +101,56 @@ impl SVGBundle for ShapeNodeSVGBundle {
                     }]);
                 }
                 MixinChange::Children(mixin) => {
-                    // TODO: Handle Paint children
+                    let new_children = &mixin.children.0;
+                    let mut new_paint_children = Vec::new();
+
+                    // Classify new children into paint and node categories
+                    for &entity in new_children.iter() {
+                        if let Some(bundle) = cx.get_bundle(&entity) {
+                            match bundle.get_type() {
+                                ChangedEntityType::SolidPaint => {
+                                    new_paint_children.push(entity);
+                                }
+                                _ => {}
+                            }
+                        }
+                    }
+
+                    // Identify added and removed paint elements
+                    let current_paint_children_set: HashSet<_> =
+                        self.paint_children.iter().cloned().collect();
+                    let new_paint_children_set: HashSet<_> =
+                        new_paint_children.iter().cloned().collect();
+                    let removed_paint_entities: Vec<_> = self
+                        .paint_children
+                        .iter()
+                        .filter(|&e| !new_paint_children_set.contains(e))
+                        .cloned()
+                        .collect();
+                    let added_paint_entities: Vec<_> = new_paint_children
+                        .iter()
+                        .filter(|&e| !current_paint_children_set.contains(e))
+                        .cloned()
+                        .collect();
+
+                    // Process removed entities
+                    for entity in removed_paint_entities {
+                        cx.remove_bundle(&entity);
+                    }
+
+                    // Process added entities
+                    for entity in added_paint_entities {
+                        if let Some(bundle) = cx.get_bundle_mut(&entity) {
+                            self.fill_wrapper_g
+                                .append_child_in_svg_context(entity, bundle.get_root_element_mut());
+                        }
+                    }
+
+                    // Reorder entities
+                    // TODO
+
+                    // Update the current children
+                    self.paint_children = new_paint_children;
                 }
                 _ => {}
             }
@@ -216,7 +248,7 @@ impl ShapeNodeSVGBundle {
         });
         defs_element.append_child_in_bundle_context(entity, &mut fill_clip_path_element);
 
-        let mut fill_clipped_path_element = cx.create_element(SVGTag::Rect);
+        let mut fill_clipped_path_element = cx.create_element(SVGTag::Path);
         #[cfg(feature = "tracing")]
         fill_clipped_path_element.set_attribute(SVGAttribute::Name {
             name: ShapeNodeSVGBundle::create_element_name(

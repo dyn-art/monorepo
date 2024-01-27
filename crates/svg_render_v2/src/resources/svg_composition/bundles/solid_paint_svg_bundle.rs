@@ -34,11 +34,7 @@ impl SVGBundle for SolidPaintSVGBundle {
     }
 
     fn get_type(&self) -> ChangedEntityType {
-        ChangedEntityType::ShapeNode
-    }
-
-    fn append_child(&mut self, _: &mut Box<dyn SVGBundle>) -> () {
-        // Do nothing as a paint can't have children
+        ChangedEntityType::SolidPaint
     }
 
     fn update(&mut self, changed_entity: ChangedEntity, _: &mut SVGContext) -> () {
