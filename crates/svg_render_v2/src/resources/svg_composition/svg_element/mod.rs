@@ -29,12 +29,27 @@ pub struct SVGElement {
     children: Vec<SVGElementChild>,
     /// Render change updates
     changes: Vec<ElementChange>,
+    /// Whether the SVG element is the root of a SVG bundle.
+    is_bundle_root: bool,
     /// Whether the element was created in the current update cycle (before first update drain).
     was_created_in_current_update_cycle: bool,
 }
 
 impl SVGElement {
+    pub fn new_as_bundle_root(tag: SVGTag, entity: Entity, id: ContinuousId) -> Self {
+        Self::new_internal(tag, true, Some(entity), id)
+    }
+
     pub fn new(tag: SVGTag, id: ContinuousId) -> Self {
+        Self::new_internal(tag, false, None, id)
+    }
+
+    fn new_internal(
+        tag: SVGTag,
+        is_bundle_root: bool,
+        entity: Option<Entity>,
+        id: ContinuousId,
+    ) -> Self {
         let id_attribute = SVGAttribute::Id { id };
         let inital_attributes: HashMap<&'static str, SVGAttribute> =
             HashMap::from([(id_attribute.key(), id_attribute)]);
@@ -44,8 +59,8 @@ impl SVGElement {
             tag_name: tag.as_str(),
             attributes: inital_attributes.values().cloned().collect(),
             styles: intial_styles.values().cloned().collect(),
-            is_bundle_root: false,
-            entity: None,
+            is_bundle_root,
+            entity,
         })];
 
         return Self {
@@ -55,6 +70,7 @@ impl SVGElement {
             styles: intial_styles,
             children: Vec::new(),
             changes: initial_changes,
+            is_bundle_root,
             was_created_in_current_update_cycle: true,
         };
     }

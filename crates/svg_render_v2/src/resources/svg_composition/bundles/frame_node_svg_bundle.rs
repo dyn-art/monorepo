@@ -249,7 +249,7 @@ impl SVGBundle for FrameNodeSVGBundle {
 
 impl FrameNodeSVGBundle {
     pub fn new(entity: Entity, cx: &mut SVGContext) -> Self {
-        let mut root_element = cx.create_element(SVGTag::Group);
+        let mut root_element = cx.create_bundle_root_element(SVGTag::Group, entity);
         #[cfg(feature = "tracing")]
         root_element.set_attribute(SVGAttribute::Name {
             name: FrameNodeSVGBundle::create_element_name(

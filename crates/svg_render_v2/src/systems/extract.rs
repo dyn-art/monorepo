@@ -13,6 +13,7 @@ use dyn_composition::core::modules::node::components::{
         Paint, PaintType,
     },
 };
+use std::fmt::Debug;
 
 use crate::{
     mixin_change::ToMixinChange,
@@ -56,13 +57,13 @@ pub fn extract_children(
     });
 }
 
-pub fn extract_node_mixin_generic<C: Component + ToMixinChange>(
-    mut changed_entities: ResMut<ChangedEntitiesRes>,
+pub fn extract_node_mixin_generic<C: Component + ToMixinChange + Debug>(
+    mut changed_entities_res: ResMut<ChangedEntitiesRes>,
     query: Extract<Query<(Entity, &Node, &C), (With<Node>, Changed<C>)>>,
     parent_query: Extract<Query<&Parent>>,
 ) {
     query.for_each(|(entity, node, mixin)| {
-        let changed_entity = changed_entities
+        let changed_entity = changed_entities_res
             .changed_entities
             .entry(entity)
             .or_insert_with(|| {
@@ -89,8 +90,8 @@ pub fn extract_node_mixin_generic<C: Component + ToMixinChange>(
     });
 }
 
-pub fn extract_paint_mixin_generic<C: Component + ToMixinChange>(
-    mut changed_entities: ResMut<ChangedEntitiesRes>,
+pub fn extract_paint_mixin_generic<C: Component + ToMixinChange + Debug>(
+    mut changed_entities_res: ResMut<ChangedEntitiesRes>,
     query: Extract<
         Query<
             (
@@ -107,7 +108,7 @@ pub fn extract_paint_mixin_generic<C: Component + ToMixinChange>(
 ) {
     query.for_each(
         |(entity, paint, maybe_image_paint, maybe_gradient_paint, mixin)| {
-            let changed_entity = changed_entities
+            let changed_entity = changed_entities_res
                 .changed_entities
                 .entry(entity)
                 .or_insert_with(|| {

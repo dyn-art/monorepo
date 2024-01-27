@@ -512,7 +512,6 @@ dependencies = [
  "log",
  "serde",
  "serde_with",
- "smallvec",
  "specta",
 ]
 
