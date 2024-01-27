@@ -210,7 +210,51 @@ impl SVGElement {
     }
 
     pub fn to_string(&self, bundle: &dyn SVGBundle, cx: &SVGContext) -> String {
-        String::from("todo")
+        let mut result = String::new();
+
+        // Open SVG tag
+        {
+            result.push_str(&format!("<{}", self.tag.as_str()));
+
+            // Append attributes
+            for (key, value) in &self.attributes {
+                result.push_str(&format!(" {}=\"{}\"", key, value.to_svg_string()));
+            }
+
+            // Append styles as a single 'style' attribute
+            if !self.styles.is_empty() {
+                let style_string: String = self
+                    .styles
+                    .iter()
+                    .map(|(key, value)| format!("{}: {}", key, value.to_svg_string()))
+                    .collect::<Vec<String>>()
+                    .join("; ");
+                result.push_str(&format!(" style=\"{}\"", style_string));
+            }
+
+            result.push('>');
+        }
+
+        // Append children
+        for child in &self.children {
+            match child.identifier {
+                SVGElementChildIdentifier::InSVGBundleContext(_, child_id) => {
+                    if let Some(child_element) = bundle.get_child_elements().get(&child_id) {
+                        result.push_str(&child_element.to_string(bundle, cx));
+                    }
+                }
+                SVGElementChildIdentifier::InSVGContext(entity) => {
+                    if let Some(bundle) = cx.get_bundle(&entity) {
+                        result.push_str(&bundle.to_string(cx));
+                    }
+                }
+            }
+        }
+
+        // Close SVG tag
+        result.push_str(&format!("</{}>", self.tag.as_str()));
+
+        return result;
     }
 }
 
