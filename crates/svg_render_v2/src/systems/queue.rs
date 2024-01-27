@@ -1,7 +1,4 @@
-use std::{
-    collections::{HashMap, HashSet},
-    mem::take,
-};
+use std::{collections::HashMap, mem::take};
 
 use bevy_ecs::{entity::Entity, system::ResMut};
 
