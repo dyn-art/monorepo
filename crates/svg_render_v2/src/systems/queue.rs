@@ -1,4 +1,7 @@
-use std::{collections::HashMap, mem::take};
+use std::{
+    collections::{HashMap, HashSet},
+    mem::take,
+};
 
 use bevy_ecs::{entity::Entity, system::ResMut};
 
@@ -13,10 +16,10 @@ pub fn queue_element_changes(
 ) {
     let changed_entities = take(&mut changed_entities_res.changed_entities);
     let dependency_tree = build_dependency_tree(changed_entities);
-    log::info!(
-        "[queue_element_changes] Dependency Tree: {:#?}",
-        dependency_tree
-    ); // TODO: REMOVE
+    // log::info!(
+    //     "[queue_element_changes] Dependency Tree: {:#?}",
+    //     dependency_tree
+    // ); // TODO: REMOVE
 
     for root_branch in dependency_tree {
         process_tree_branch(root_branch, &mut svg_composition.context);
@@ -38,18 +41,19 @@ fn build_dependency_tree(
     let mut children_map: HashMap<Entity, Vec<Entity>> = HashMap::new();
     let mut roots: Vec<Entity> = Vec::new();
 
-    // Identify root nodes and prepare a map of children for each parent
+    // Identify root entities and prepare a map of children for each parent
     for (entity, changed_entity) in &changed_entities {
-        match changed_entity.parent_id {
-            Some(parent_id) => {
+        if let Some(parent_id) = changed_entity.parent_id {
+            if changed_entities.contains_key(&parent_id) {
                 children_map
                     .entry(parent_id)
                     .or_insert_with(Vec::new)
                     .push(*entity);
+            } else {
+                roots.push(*entity);
             }
-            // TODO: Issue here as a each entity can be a root even if it has a parent_id
-            // because a root is each entity that has no parent in this update cycle (changed_entities)
-            None => roots.push(*entity),
+        } else {
+            roots.push(*entity);
         }
     }
 
