@@ -2,9 +2,17 @@ use std::sync::mpsc::Sender;
 
 use bevy_app::{App, Plugin};
 
-use dyn_bevy_render_skeleton::RenderApp;
+use bevy_ecs::schedule::IntoSystemConfigs;
+use dyn_bevy_render_skeleton::{ExtractSchedule, Render, RenderApp, RenderSet};
+use dyn_composition::core::modules::node::components::mixins::{
+    DimensionMixin, RelativeTransformMixin,
+};
 use events::output_event::SVGRenderOutputEvent;
 use resources::{changed_entities::ChangedEntitiesRes, svg_composition::SVGCompositionRes};
+use systems::{
+    extract::{extract_children, extract_node_mixin_generic, extract_paint_mixin_generic},
+    queue::queue_element_changes,
+};
 
 mod element_change;
 mod events;
@@ -26,5 +34,20 @@ impl Plugin for SVGRenderPlugin {
         // Register resources
         render_app.init_resource::<ChangedEntitiesRes>();
         render_app.insert_resource(SVGCompositionRes::new(self.output_event_sender.clone()));
+
+        // Register systems
+        render_app
+            .add_systems(
+                ExtractSchedule,
+                (
+                    extract_children,
+                    // Node
+                    extract_node_mixin_generic::<DimensionMixin>,
+                    extract_node_mixin_generic::<RelativeTransformMixin>,
+                    // Paint
+                    extract_paint_mixin_generic::<DimensionMixin>,
+                ),
+            )
+            .add_systems(Render, queue_element_changes.in_set(RenderSet::Queue));
     }
 }

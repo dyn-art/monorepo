@@ -1,4 +1,6 @@
-use dyn_composition::core::modules::node::components::mixins::{ChildrenMixin, DimensionMixin};
+use dyn_composition::core::modules::node::components::mixins::{
+    ChildrenMixin, DimensionMixin, RelativeTransformMixin,
+};
 use serde::Serialize;
 use specta::Type;
 
@@ -7,6 +9,7 @@ use specta::Type;
 pub enum MixinChange {
     Dimension(DimensionMixin),
     Children(MixinChangeChildrenMixin),
+    RelativeTransform(MixinChangeRelativeTransformMixin),
 }
 
 pub trait ToMixinChange {
@@ -22,4 +25,26 @@ impl ToMixinChange for DimensionMixin {
 #[derive(Serialize, Clone, Debug, Type)]
 pub struct MixinChangeChildrenMixin {
     pub children: ChildrenMixin,
+}
+
+impl ToMixinChange for ChildrenMixin {
+    fn to_mixin_change(&self) -> MixinChange {
+        MixinChange::Children(MixinChangeChildrenMixin {
+            children: self.clone(),
+        })
+    }
+}
+
+#[derive(Serialize, Clone, Debug, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct MixinChangeRelativeTransformMixin {
+    pub relative_transform: RelativeTransformMixin,
+}
+
+impl ToMixinChange for RelativeTransformMixin {
+    fn to_mixin_change(&self) -> MixinChange {
+        MixinChange::RelativeTransform(MixinChangeRelativeTransformMixin {
+            relative_transform: self.clone(),
+        })
+    }
 }

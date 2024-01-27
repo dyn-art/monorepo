@@ -122,7 +122,26 @@ impl SVGElement {
         self.children.clear()
     }
 
-    pub fn append_child_element(
+    pub fn append_child_in_svg_context(&mut self, entity: Entity, child_element: &mut SVGElement) {
+        self.append_child_element(
+            child_element,
+            SVGElementChildIdentifier::InSVGContext(entity),
+        )
+    }
+
+    pub fn append_child_in_bundle_context(
+        &mut self,
+        entity: Entity,
+        child_element: &mut SVGElement,
+    ) {
+        let id = child_element.get_id();
+        self.append_child_element(
+            child_element,
+            SVGElementChildIdentifier::InSVGBundleContext(entity, id),
+        );
+    }
+
+    fn append_child_element(
         &mut self,
         child_element: &mut SVGElement,
         identifier: SVGElementChildIdentifier,

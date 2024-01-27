@@ -1,17 +1,20 @@
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, HashSet};
 
 use bevy_ecs::entity::Entity;
 use dyn_composition::core::utils::continuous_id::ContinuousId;
 
 use crate::{
-    events::output_event::ElementChangeEvent,
     mixin_change::MixinChange,
     resources::{
         changed_entities::{ChangedEntity, ChangedEntityType},
         svg_composition::{
             svg_bundle::SVGBundle,
             svg_context::SVGContext,
-            svg_element::{SVGElement, SVGElementChildIdentifier, SVGTag},
+            svg_element::{
+                attributes::{SVGAttribute, SVGMeasurementUnit},
+                mapper::map_mat3_to_svg_transform,
+                SVGElement, SVGTag,
+            },
         },
     },
 };
@@ -60,7 +63,12 @@ impl SVGBundle for FrameSVGBundle {
             | ChangedEntityType::ImageTilePaint
             | ChangedEntityType::LinearGradientPaint
             | ChangedEntityType::RadialGradientPaint => {
-                // TODO
+                self.fill_wrapper_g
+                    .append_child_in_svg_context(self.entity, svg_bundle.get_root_element_mut());
+            }
+            ChangedEntityType::FrameNode | ChangedEntityType::ShapeNode => {
+                self.children_wrapper_g
+                    .append_child_in_svg_context(self.entity, svg_bundle.get_root_element_mut());
             }
             _ => {}
         }
@@ -70,20 +78,114 @@ impl SVGBundle for FrameSVGBundle {
         for change in &changed_entity.changes {
             match change {
                 MixinChange::Dimension(mixin) => {
-                    // TODO
+                    self.root.set_attributes(vec![
+                        SVGAttribute::Width {
+                            width: mixin.width,
+                            unit: SVGMeasurementUnit::Pixel,
+                        },
+                        SVGAttribute::Height {
+                            height: mixin.height,
+                            unit: SVGMeasurementUnit::Pixel,
+                        },
+                    ]);
+                    self.fill_clipped_path.set_attributes(vec![
+                        SVGAttribute::Width {
+                            width: mixin.width,
+                            unit: SVGMeasurementUnit::Pixel,
+                        },
+                        SVGAttribute::Height {
+                            height: mixin.height,
+                            unit: SVGMeasurementUnit::Pixel,
+                        },
+                    ]);
+                    self.content_clipped_rect.set_attributes(vec![
+                        SVGAttribute::Width {
+                            width: mixin.width,
+                            unit: SVGMeasurementUnit::Pixel,
+                        },
+                        SVGAttribute::Height {
+                            height: mixin.height,
+                            unit: SVGMeasurementUnit::Pixel,
+                        },
+                    ]);
+                }
+                MixinChange::RelativeTransform(mixin) => {
+                    self.root.set_attribute(SVGAttribute::Transform {
+                        transform: map_mat3_to_svg_transform(&mixin.relative_transform.0),
+                    });
                 }
                 MixinChange::Children(mixin) => {
-                    let children = &mixin.children.0;
+                    let new_children = &mixin.children.0;
+                    let mut new_paint_children = Vec::new();
+                    let mut new_node_children = Vec::new();
 
+                    // Classify new children into paint and node categories
+                    for &entity in new_children.iter() {
+                        match cx.get_bundle(&entity).unwrap().get_type() {
+                            ChangedEntityType::FrameNode | ChangedEntityType::ShapeNode => {
+                                new_node_children.push(entity);
+                            }
+                            ChangedEntityType::SolidPaint => {
+                                new_paint_children.push(entity);
+                            }
+                            _ => {}
+                        }
+                    }
+
+                    // Process node children
+                    let current_node_children_set: HashSet<_> =
+                        self.node_children.iter().cloned().collect();
+                    let new_node_children_set: HashSet<_> =
+                        new_node_children.iter().cloned().collect();
+
+                    // 1. Identify removed elements
+                    let removed_node_elements: Vec<_> = self
+                        .node_children
+                        .iter()
+                        .filter(|&e| !new_node_children_set.contains(e))
+                        .cloned()
+                        .collect();
+
+                    // 2. Identify newly added elements
+                    let added_node_elements: Vec<_> = new_children
+                        .iter()
+                        .filter(|&e| !current_node_children_set.contains(e))
+                        .cloned()
+                        .collect();
+
+                    // Process paint children
+                    let current_paint_children_set: HashSet<_> =
+                        self.paint_children.iter().cloned().collect();
+                    let new_paint_children_set: HashSet<_> =
+                        new_paint_children.iter().cloned().collect();
+
+                    // 1. Identify removed elements
+                    let removed_paint_elements: Vec<_> = self
+                        .paint_children
+                        .iter()
+                        .filter(|&e| !new_paint_children_set.contains(e))
+                        .cloned()
+                        .collect();
+
+                    // 2. Identify newly added elements
+                    let added_paint_elements: Vec<_> = new_children
+                        .iter()
+                        .filter(|&e| !current_paint_children_set.contains(e))
+                        .cloned()
+                        .collect();
+
+                    // Process removed elements
                     // TODO
-                    // 1. Detect removed elements and remove those
-                    // 2. Detect newly added elements and add those
-                    // 3. Reorder elements
-                    //
-                    // Note to make this work we first need to create all elements so that they are preent in the SVGContext
-                    // and THEN apply the changes via the "update" method
 
-                    self.node_children = children.clone();
+                    // Process added elements
+                    // TODO
+
+                    // Reorder elements
+                    // TODO
+
+                    // Update the current children
+                    self.node_children = new_node_children;
+                    self.paint_children = new_paint_children;
                 }
                 _ => {}
             }
@@ -93,14 +195,35 @@ impl SVGBundle for FrameSVGBundle {
     fn get_child_elements(&self) -> BTreeMap<ContinuousId, &SVGElement> {
         let mut children = BTreeMap::new();
         children.insert(self.defs.get_id(), &self.defs);
-        // .. (from top to bottom as updates should be drained from the most top element first)
+        children.insert(self.content_clip_path.get_id(), &self.content_clip_path);
+        children.insert(
+            self.content_clipped_rect.get_id(),
+            &self.content_clipped_rect,
+        );
+        children.insert(self.content_wrapper_g.get_id(), &self.content_wrapper_g);
+        children.insert(self.fill_clip_path.get_id(), &self.fill_clip_path);
+        children.insert(self.fill_clipped_path.get_id(), &self.fill_clipped_path);
+        children.insert(self.fill_wrapper_g.get_id(), &self.fill_wrapper_g);
+        children.insert(self.children_wrapper_g.get_id(), &self.children_wrapper_g);
         return children;
     }
 
     fn get_child_elements_mut(&mut self) -> BTreeMap<ContinuousId, &mut SVGElement> {
         let mut children = BTreeMap::new();
         children.insert(self.defs.get_id(), &mut self.defs);
-        // .. (from top to bottom as updates should be drained from the most top element first)
+        children.insert(self.content_clip_path.get_id(), &mut self.content_clip_path);
+        children.insert(
+            self.content_clipped_rect.get_id(),
+            &mut self.content_clipped_rect,
+        );
+        children.insert(self.content_wrapper_g.get_id(), &mut self.content_wrapper_g);
+        children.insert(self.fill_clip_path.get_id(), &mut self.fill_clip_path);
+        children.insert(self.fill_clipped_path.get_id(), &mut self.fill_clipped_path);
+        children.insert(self.fill_wrapper_g.get_id(), &mut self.fill_wrapper_g);
+        children.insert(
+            self.children_wrapper_g.get_id(),
+            &mut self.children_wrapper_g,
+        );
         return children;
     }
 
@@ -119,38 +242,60 @@ impl SVGBundle for FrameSVGBundle {
 
 impl FrameSVGBundle {
     pub fn new(entity: Entity, cx: &mut SVGContext) -> Self {
-        let mut root = SVGElement::new(SVGTag::Group, cx.id_generator.next_id());
+        let mut root_element = cx.create_element(SVGTag::Group);
 
-        let mut defs_element = SVGElement::new(SVGTag::Defs, cx.id_generator.next_id());
-        let defs_element_id = defs_element.get_id();
-        root.append_child_element(
-            &mut defs_element,
-            SVGElementChildIdentifier::InSVGBundleContext(entity, defs_element_id),
-        );
+        // Create content elements
 
-        let mut content_clip_path_element =
-            SVGElement::new(SVGTag::ClipPath, cx.id_generator.next_id());
-        let content_clip_path_element_id = content_clip_path_element.get_id();
-        defs_element.append_child_element(
-            &mut content_clip_path_element,
-            SVGElementChildIdentifier::InSVGBundleContext(entity, content_clip_path_element_id),
-        );
+        let mut defs_element = cx.create_element(SVGTag::Defs);
+        root_element.append_child_in_bundle_context(entity, &mut defs_element);
 
-        // TODO
+        let mut content_clip_path_element = cx.create_element(SVGTag::ClipPath);
+        defs_element.append_child_in_bundle_context(entity, &mut content_clip_path_element);
+
+        let mut content_clipped_rect_element = cx.create_element(SVGTag::Rect);
+        content_clip_path_element
+            .append_child_in_bundle_context(entity, &mut content_clipped_rect_element);
+
+        let mut content_wrapper_g_element = cx.create_element(SVGTag::Group);
+        content_wrapper_g_element.set_attribute(SVGAttribute::ClipPath {
+            clip_path: content_clip_path_element.get_id(),
+        });
+
+        // Create fill elements
+
+        let mut fill_clip_path_element = cx.create_element(SVGTag::ClipPath);
+        defs_element.append_child_in_bundle_context(entity, &mut fill_clip_path_element);
+
+        let mut fill_clipped_path_element = cx.create_element(SVGTag::Rect);
+        fill_clip_path_element
+            .append_child_in_bundle_context(entity, &mut fill_clipped_path_element);
+
+        let mut fill_wrapper_g_element = cx.create_element(SVGTag::Group);
+        fill_wrapper_g_element.set_attribute(SVGAttribute::ClipPath {
+            clip_path: fill_clip_path_element.get_id(),
+        });
+        content_wrapper_g_element
+            .append_child_in_bundle_context(entity, &mut fill_wrapper_g_element);
+
+        // Create children wrapper element
+
+        let mut children_wrapper_g_element = cx.create_element(SVGTag::Group);
+        content_wrapper_g_element
+            .append_child_in_bundle_context(entity, &mut children_wrapper_g_element);
 
         Self {
             entity,
-            root: todo!(),
-            defs: todo!(),
-            content_clip_path: todo!(),
-            content_clipped_rect: todo!(),
-            content_wrapper_g: todo!(),
-            children_wrapper_g: todo!(),
-            fill_clip_path: todo!(),
-            fill_clipped_path: todo!(),
-            fill_wrapper_g: todo!(),
-            paint_children: todo!(),
-            node_children: todo!(),
+            root: root_element,
+            defs: defs_element,
+            content_clip_path: content_clip_path_element,
+            content_clipped_rect: content_clipped_rect_element,
+            content_wrapper_g: content_wrapper_g_element,
+            children_wrapper_g: children_wrapper_g_element,
+            fill_clip_path: fill_clip_path_element,
+            fill_clipped_path: fill_clipped_path_element,
+            fill_wrapper_g: fill_wrapper_g_element,
+            paint_children: Vec::new(),
+            node_children: Vec::new(),
         }
     }
 }

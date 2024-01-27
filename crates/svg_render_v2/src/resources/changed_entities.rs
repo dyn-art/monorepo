@@ -28,4 +28,5 @@ pub enum ChangedEntityType {
     ImageTilePaint,
     LinearGradientPaint,
     RadialGradientPaint,
+    Unkown,
 }

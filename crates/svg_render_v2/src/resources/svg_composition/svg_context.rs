@@ -8,7 +8,11 @@ use crate::{
     resources::changed_entities::{ChangedEntity, ChangedEntityType},
 };
 
-use super::{bundles::frame_svg_bundle::FrameSVGBundle, svg_bundle::SVGBundle};
+use super::{
+    bundles::frame_svg_bundle::FrameSVGBundle,
+    svg_bundle::SVGBundle,
+    svg_element::{SVGElement, SVGTag},
+};
 
 #[derive(Debug)]
 pub struct SVGContext {
@@ -38,6 +42,10 @@ impl SVGContext {
         self.bundles.get_mut(&entity)
     }
 
+    pub fn remove_bundle(&mut self, entity: &Entity) {
+        // TODO
+    }
+
     pub fn insert_bundle(&mut self, bundle: Box<dyn SVGBundle>) -> () {
         let entity = bundle.get_entity().clone();
         if !self.bundles.contains_key(&entity) {
@@ -57,7 +65,7 @@ impl SVGContext {
     }
 
     // TODO: Improve so its not necessary to remove element?
-    pub fn apply_updates(&mut self) {
+    pub fn apply_changes(&mut self) {
         let changed_entities: Vec<ChangedEntity> = self.changed_entities.drain(..).collect();
         for changed_entity in changed_entities {
             if let Some(mut bundle) = self.bundles.remove(&changed_entity.entity) {
@@ -65,5 +73,9 @@ impl SVGContext {
                 self.bundles.insert(*bundle.get_entity(), bundle);
             }
         }
+    }
+
+    pub fn create_element(&mut self, tag: SVGTag) -> SVGElement {
+        SVGElement::new(tag, self.id_generator.next_id())
     }
 }
