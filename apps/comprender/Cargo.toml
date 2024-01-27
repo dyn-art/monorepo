@@ -29,7 +29,7 @@ path = "src/bin/cli.rs"
 dyn_composition = { path = "../../crates/composition", features = [
     'resolve-url',
 ] }
-dyn_svg_render = { path = "../../crates/svg_render" }
+dyn_svg_render = { path = "../../crates/svg_render_v2" }
 dyn_bevy_render_skeleton = { path = "../../crates/bevy_render_skeleton" }
 axum = "0.7.3"
 serde = { version = "1.0.195", features = ["derive"] }
