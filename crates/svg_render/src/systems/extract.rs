@@ -6,7 +6,7 @@ use bevy_ecs::{
 };
 use bevy_hierarchy::{Children, Parent};
 use dyn_bevy_render_skeleton::extract_param::Extract;
-use dyn_composition::core::modules::node::components::{
+use dyn_composition::modules::node::components::{
     mixins::ChildrenMixin,
     types::{Node, Paint},
 };

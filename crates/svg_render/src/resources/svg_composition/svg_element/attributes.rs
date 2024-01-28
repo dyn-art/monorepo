@@ -1,4 +1,4 @@
-use dyn_composition::core::utils::continuous_id::ContinuousId;
+use dyn_composition::utils::continuous_id::ContinuousId;
 use serde::Serialize;
 use specta::Type;
 

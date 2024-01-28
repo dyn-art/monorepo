@@ -1,5 +1,5 @@
 use bevy_ecs::entity::Entity;
-use dyn_composition::core::{
+use dyn_composition::{
     modules::node::components::{
         mixins::ImageContent,
         types::{ImageCropPaintTransform, ImagePaintScaleMode, ImageTilePaintTransform},

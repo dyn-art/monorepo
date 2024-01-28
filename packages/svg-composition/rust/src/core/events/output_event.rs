@@ -1,5 +1,5 @@
 use bevy_ecs::entity::Entity;
-use dyn_composition::core::modules::composition::resources::composition::ViewBox;
+use dyn_composition::modules::composition::resources::composition::ViewBox;
 use dyn_svg_render::{events::output_event::ElementChangeEvent, mixin_change::MixinChange};
 use serde::Serialize;
 use specta::Type;

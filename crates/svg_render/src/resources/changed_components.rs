@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use bevy_ecs::{entity::Entity, system::Resource};
-use dyn_composition::core::modules::node::components::types::{NodeType, PaintType};
+use dyn_composition::modules::node::components::types::{NodeType, PaintType};
 
 use crate::mixin_change::{NodeMixinChange, PaintMixinChange};
 

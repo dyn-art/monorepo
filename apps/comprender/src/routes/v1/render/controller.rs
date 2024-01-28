@@ -8,7 +8,7 @@ use axum::{
     Json,
 };
 use dyn_bevy_render_skeleton::RenderApp;
-use dyn_composition::core::{
+use dyn_composition::{
     composition::Composition, dtif::DTIFComposition,
     modules::composition::resources::font_cache::font::FontContent,
 };

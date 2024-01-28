@@ -1,6 +1,6 @@
 use std::fmt::Debug;
 
-use dyn_composition::core::utils::continuous_id::ContinuousId;
+use dyn_composition::utils::continuous_id::ContinuousId;
 
 use crate::resources::changed_components::ChangedPaint;
 

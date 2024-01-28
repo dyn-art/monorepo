@@ -1,7 +1,7 @@
-use dyn_composition::core::modules::node::components::mixins::BlendMode;
+use dyn_composition::modules::node::components::mixins::BlendMode;
 
 use super::styles::SVGBlendMode;
-use dyn_composition::core::modules::node::components::mixins::{Anchor, AnchorCommand};
+use dyn_composition::modules::node::components::mixins::{Anchor, AnchorCommand};
 use glam::{Mat3, Vec2};
 
 use super::attributes::{SVGPathCommand, SVGTransformAttribute};

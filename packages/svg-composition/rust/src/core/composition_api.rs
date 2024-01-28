@@ -3,12 +3,10 @@ use std::sync::mpsc::{channel, Receiver};
 
 use bevy_ecs::entity::Entity;
 use dyn_bevy_render_skeleton::RenderApp;
-use dyn_composition::core::composition::Composition;
-use dyn_composition::core::dtif::DTIFComposition;
-use dyn_composition::core::modules::node::components::bundles::{NodeBundle, PaintBundle};
-use dyn_composition::core::modules::node::components::mixins::{
-    DimensionMixin, RelativeTransformMixin,
-};
+use dyn_composition::composition::Composition;
+use dyn_composition::dtif::DTIFComposition;
+use dyn_composition::modules::node::components::bundles::{NodeBundle, PaintBundle};
+use dyn_composition::modules::node::components::mixins::{DimensionMixin, RelativeTransformMixin};
 use dyn_svg_render::events::output_event::SVGRenderOutputEvent;
 use dyn_svg_render::mixin_change::{MixinChange, MixinChangeRelativeTransformMixin};
 use dyn_svg_render::resources::svg_composition::SVGCompositionRes;
@@ -248,7 +246,7 @@ impl JsCompositionHandle {
                 Err(_) => return,
             };
 
-            dyn_composition::core::modules::node::utils::logging::log_entity_components(
+            dyn_composition::modules::node::utils::logging::log_entity_components(
                 &self.composition.get_app().world,
                 entity,
             );

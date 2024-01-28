@@ -1,7 +1,7 @@
 use std::{collections::HashMap, sync::mpsc::Sender};
 
 use bevy_ecs::{entity::Entity, system::Resource};
-use dyn_composition::core::{
+use dyn_composition::{
     modules::node::components::types::{
         GradientPaintVariant, ImagePaintScaleMode, NodeType, PaintType,
     },

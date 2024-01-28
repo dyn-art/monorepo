@@ -3,7 +3,7 @@ use std::sync::mpsc::Sender;
 use bevy_app::{App, Plugin};
 use bevy_ecs::schedule::IntoSystemConfigs;
 use dyn_bevy_render_skeleton::{ExtractSchedule, Render, RenderApp, RenderSet};
-use dyn_composition::core::modules::node::components::{
+use dyn_composition::modules::node::components::{
     mixins::{
         BlendMixin, DimensionMixin, GradientStopsMixin, ImageContentMixin, NodeCompositionMixin,
         PaintCompositionMixin, PathMixin, RelativeTransformMixin,

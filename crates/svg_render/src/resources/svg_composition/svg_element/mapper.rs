@@ -1,4 +1,4 @@
-use dyn_composition::core::modules::node::components::mixins::BlendMode;
+use dyn_composition::modules::node::components::mixins::BlendMode;
 
 use super::styles::SVGBlendMode;
 

@@ -4,9 +4,7 @@ use bevy_ecs::{
     query::Changed,
     system::{Query, Res, ResMut},
 };
-use dyn_composition::core::modules::node::components::mixins::{
-    DimensionMixin, RelativeTransformMixin,
-};
+use dyn_composition::modules::node::components::mixins::{DimensionMixin, RelativeTransformMixin};
 use dyn_svg_render::mixin_change::ToMixinChange;
 
 use crate::core::modules::track::resources::{

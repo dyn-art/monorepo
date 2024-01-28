@@ -1,4 +1,4 @@
-use dyn_composition::core::modules::node::components::{
+use dyn_composition::modules::node::components::{
     mixins::{
         BlendMixin, ChildrenMixin, DimensionMixin, NodeCompositionMixin, PaintCompositionMixin,
         PathMixin, RelativeTransformMixin,
