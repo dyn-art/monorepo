@@ -3,14 +3,11 @@ use std::collections::BTreeMap;
 use base64::prelude::*;
 use bevy_ecs::entity::Entity;
 use dyn_composition::{
-    modules::node::components::{
-        mixins::ImageContent,
-        types::{ImageCropPaintTransform, ImagePaintScaleMode, ImageTilePaintTransform},
-    },
-    utils::continuous_id::ContinuousId,
+    modules::node::components::mixins::ImageContent, utils::continuous_id::ContinuousId,
 };
 
 use crate::{
+    components::SVGImagePaintScaleMode,
     mixin_change::MixinChange,
     resources::{
         changed_entities::{ChangedEntity, ChangedEntityImagePaintType, ChangedEntityType},
@@ -66,73 +63,66 @@ impl SVGBundle for ImagePaintSVGBundle {
                     }]);
                 }
                 MixinChange::ImagePaint(mixin) => match &mixin.scale_mode {
-                    ImagePaintScaleMode::Tile { transform } => match transform {
-                        ImageTilePaintTransform::Internal {
-                            rotation,
-                            tile_width,
-                            tile_height,
-                        } => {
-                            self.paint_pattern.set_attributes(vec![
-                                SVGAttribute::PatternTransform {
-                                    transform: SVGTransformAttribute::Rotate {
-                                        rotation: *rotation,
-                                    },
+                    SVGImagePaintScaleMode::Tile {
+                        rotation,
+                        tile_width,
+                        tile_height,
+                    } => {
+                        self.paint_pattern.set_attributes(vec![
+                            SVGAttribute::PatternTransform {
+                                transform: SVGTransformAttribute::Rotate {
+                                    rotation: *rotation,
                                 },
-                                SVGAttribute::Width {
-                                    width: *tile_width,
-                                    unit: SVGMeasurementUnit::Pixel,
-                                },
-                                SVGAttribute::Height {
-                                    height: *tile_height,
-                                    unit: SVGMeasurementUnit::Pixel,
-                                },
-                            ]);
-                            self.paint_clipped_image.set_attributes(vec![
-                                SVGAttribute::Width {
-                                    width: *tile_width,
-                                    unit: SVGMeasurementUnit::Pixel,
-                                },
-                                SVGAttribute::Height {
-                                    height: *tile_height,
-                                    unit: SVGMeasurementUnit::Pixel,
-                                },
-                            ]);
-                        }
-                        _ => {}
-                    },
-                    ImagePaintScaleMode::Crop { transform } => match transform {
-                        ImageCropPaintTransform::Internal {
-                            applied_transform: transform,
-                            image_width,
-                            image_height,
-                            ..
-                        } => {
-                            self.paint_pattern.set_attributes(vec![
-                                SVGAttribute::Width {
-                                    width: *image_width,
-                                    unit: SVGMeasurementUnit::Pixel,
-                                },
-                                SVGAttribute::Height {
-                                    height: *image_height,
-                                    unit: SVGMeasurementUnit::Pixel,
-                                },
-                            ]);
-                            self.paint_clipped_image.set_attributes(vec![
-                                SVGAttribute::Transform {
-                                    transform: map_mat3_to_svg_transform(transform),
-                                },
-                                SVGAttribute::Width {
-                                    width: *image_width,
-                                    unit: SVGMeasurementUnit::Pixel,
-                                },
-                                SVGAttribute::Height {
-                                    height: *image_height,
-                                    unit: SVGMeasurementUnit::Pixel,
-                                },
-                            ]);
-                        }
-                        _ => {}
-                    },
+                            },
+                            SVGAttribute::Width {
+                                width: *tile_width,
+                                unit: SVGMeasurementUnit::Pixel,
+                            },
+                            SVGAttribute::Height {
+                                height: *tile_height,
+                                unit: SVGMeasurementUnit::Pixel,
+                            },
+                        ]);
+                        self.paint_clipped_image.set_attributes(vec![
+                            SVGAttribute::Width {
+                                width: *tile_width,
+                                unit: SVGMeasurementUnit::Pixel,
+                            },
+                            SVGAttribute::Height {
+                                height: *tile_height,
+                                unit: SVGMeasurementUnit::Pixel,
+                            },
+                        ]);
+                    }
+                    SVGImagePaintScaleMode::Crop {
+                        transform,
+                        image_width,
+                        image_height,
+                    } => {
+                        self.paint_pattern.set_attributes(vec![
+                            SVGAttribute::Width {
+                                width: *image_width,
+                                unit: SVGMeasurementUnit::Pixel,
+                            },
+                            SVGAttribute::Height {
+                                height: *image_height,
+                                unit: SVGMeasurementUnit::Pixel,
+                            },
+                        ]);
+                        self.paint_clipped_image.set_attributes(vec![
+                            SVGAttribute::Transform {
+                                transform: map_mat3_to_svg_transform(transform),
+                            },
+                            SVGAttribute::Width {
+                                width: *image_width,
+                                unit: SVGMeasurementUnit::Pixel,
+                            },
+                            SVGAttribute::Height {
+                                height: *image_height,
+                                unit: SVGMeasurementUnit::Pixel,
+                            },
+                        ]);
+                    }
                     _ => {}
                 },
                 MixinChange::ImageContent(mixin) => {

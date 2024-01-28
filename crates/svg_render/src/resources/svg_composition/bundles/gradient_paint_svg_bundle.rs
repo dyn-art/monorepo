@@ -1,14 +1,10 @@
 use std::collections::BTreeMap;
 
 use bevy_ecs::entity::Entity;
-use dyn_composition::{
-    modules::node::components::types::{
-        GradientPaintVariant, LinearGradientPaintTransform, RadialGradientPaintTransform,
-    },
-    utils::continuous_id::ContinuousId,
-};
+use dyn_composition::utils::continuous_id::ContinuousId;
 
 use crate::{
+    components::SVGGradientPaintVariant,
     mixin_change::MixinChange,
     resources::{
         changed_entities::{ChangedEntity, ChangedEntityGradientPaintType, ChangedEntityType},
@@ -63,27 +59,21 @@ impl SVGBundle for GradientPaintSVGBundle {
                 // TODO: Remove this Basic & Internal stuff and instead create a separate mixin for the Internal Mixin
                 MixinChange::GradientPaint(mixin) => {
                     match &mixin.variant {
-                        GradientPaintVariant::Linear { transform } => match transform {
-                            LinearGradientPaintTransform::Internal { start, end, .. } => {
-                                self.paint_gradient.set_attributes(vec![
-                                    SVGAttribute::X1 { x1: start.x },
-                                    SVGAttribute::Y1 { y1: start.y },
-                                    SVGAttribute::X2 { x2: end.x },
-                                    SVGAttribute::Y2 { y2: end.y },
-                                ]);
-                            }
-                            _ => {}
-                        },
-                        GradientPaintVariant::Radial { transform } => match transform {
-                            RadialGradientPaintTransform::Internal {
-                                center,
-                                radius,
-                                rotation,
-                            } => {
-                                // TODO
-                            }
-                            _ => {}
-                        },
+                        SVGGradientPaintVariant::Linear { start, end } => {
+                            self.paint_gradient.set_attributes(vec![
+                                SVGAttribute::X1 { x1: start.x },
+                                SVGAttribute::Y1 { y1: start.y },
+                                SVGAttribute::X2 { x2: end.x },
+                                SVGAttribute::Y2 { y2: end.y },
+                            ]);
+                        }
+                        SVGGradientPaintVariant::Radial {
+                            center,
+                            radius,
+                            rotation,
+                        } => {
+                            // TODO
+                        }
                     }
                 }
                 MixinChange::GradientStopsMixin(mixin) => {

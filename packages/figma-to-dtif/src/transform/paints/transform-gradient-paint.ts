@@ -30,12 +30,12 @@ function mapFigmaGradientTypeToDTIF(
 		case 'GRADIENT_LINEAR':
 			return {
 				type: 'Linear',
-				transform: { type: 'Basic', transform: mapFigmaTransformToMat3(transform) }
+				transform: mapFigmaTransformToMat3(transform)
 			};
 		case 'GRADIENT_RADIAL':
 			return {
 				type: 'Radial',
-				transform: { type: 'Basic', transform: mapFigmaTransformToMat3(transform) }
+				transform: mapFigmaTransformToMat3(transform)
 			};
 		default:
 			throw Error('todo');

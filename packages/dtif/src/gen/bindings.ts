@@ -392,7 +392,7 @@ variant?: GradientPaintVariant }) & ({
  */
 gradientStops: ColorStop[] }) & { paint?: Paint; compositionMixin?: PaintCompositionMixin; blendMixin?: BlendMixin }
 
-export type GradientPaintVariant = { type: "Linear"; transform?: LinearGradientPaintTransform } | { type: "Radial"; transform?: RadialGradientPaintTransform }
+export type GradientPaintVariant = { type: "Linear"; transform?: Mat3 } | { type: "Radial"; transform?: Mat3 }
 
 export type GradientStopsMixin = { 
 /**
@@ -470,8 +470,6 @@ height: number;
  */
 content: ImageContent }
 
-export type ImageCropPaintTransform = { type: "Basic"; transform: Mat3 } | { type: "Internal"; cropTransform: Mat3; appliedTransform: Mat3; imageWidth: number; imageHeight: number }
-
 export type ImagePaint = { _image_paint?: null | null; 
 /**
  * Defines the scale mode of the image.
@@ -496,13 +494,11 @@ export type ImagePaintScaleMode =
 /**
  * Crops the image to fill the area.
  */
-{ type: "Crop"; transform: ImageCropPaintTransform } | 
+{ type: "Crop"; _image_crop_paint?: null | null; transform?: Mat3 } | 
 /**
  * Tiles the image within the area.
  */
-{ type: "Tile"; transform?: ImageTilePaintTransform }
-
-export type ImageTilePaintTransform = { type: "Basic"; rotation: number; scalingFactor: number } | { type: "Internal"; rotation: number; tileWidth: number; tileHeight: number }
+{ type: "Tile"; imageTilePaint?: null | null; rotation?: number; scalingFactor: number }
 
 export type InteractionInputEvent = ({ type: "CursorDownOnEntity" } & CursorDownOnEntity) | ({ type: "CursorMovedOnComposition" } & CursorMovedOnComposition) | ({ type: "CursorEnteredComposition" }) | ({ type: "CursorExitedComposition" }) | ({ type: "CursorDownOnComposition" } & CursorDownOnComposition) | ({ type: "CursorUpOnComposition" } & CursorUpOnComposition) | ({ type: "WheeledOnComposition" } & WheeledOnComposition) | ({ type: "CursorDownOnResizeHandle" } & CursorDownOnResizeHandle) | ({ type: "CursorDownOnRotateHandle" } & CursorDownOnRotateHandle)
 
@@ -544,13 +540,11 @@ export type LineHeight =
  */
 { Percent: number }
 
-export type LinearGradientPaintTransform = { type: "Basic"; transform?: Mat3 } | { type: "Internal"; start: Vec2; end: Vec2; transform: Mat3 }
-
 export type Locked = null
 
 export type Mat3 = [number, number, number, number, number, number, number, number, number]
 
-export type MixinChange = ({ type: "Dimension" } & DimensionMixin) | ({ type: "Blend" } & BlendMixin) | ({ type: "NodeComposition" } & NodeCompositionMixin) | ({ type: "Children" } & MixinChangeChildrenMixin) | ({ type: "RelativeTransform" } & MixinChangeRelativeTransformMixin) | ({ type: "Path" } & PathMixin) | ({ type: "PaintComposition" } & PaintCompositionMixin) | ({ type: "SolidPaint" } & SolidPaint) | ({ type: "ImagePaint" } & ImagePaint) | ({ type: "ImageContent" } & ImageContentMixin) | ({ type: "GradientPaint" } & GradientPaint) | ({ type: "GradientStopsMixin" } & GradientStopsMixin)
+export type MixinChange = ({ type: "Dimension" } & DimensionMixin) | ({ type: "Blend" } & BlendMixin) | ({ type: "NodeComposition" } & NodeCompositionMixin) | ({ type: "Children" } & MixinChangeChildrenMixin) | ({ type: "RelativeTransform" } & MixinChangeRelativeTransformMixin) | ({ type: "Path" } & PathMixin) | ({ type: "PaintComposition" } & PaintCompositionMixin) | ({ type: "SolidPaint" } & SolidPaint) | ({ type: "ImagePaint" } & SVGImagePaint) | ({ type: "ImageContent" } & ImageContentMixin) | ({ type: "GradientPaint" } & SVGGradientPaint) | ({ type: "GradientStopsMixin" } & GradientStopsMixin)
 
 export type MixinChangeChildrenMixin = { children: ChildrenMixin }
 
@@ -650,8 +644,6 @@ export type Polygon = { _polygon?: null | null;
  */
 pointCount?: number }
 
-export type RadialGradientPaintTransform = { type: "Basic"; transform?: Mat3 } | { type: "Internal"; center: Vec2; radius: Vec2; rotation: number }
-
 /**
  * Represents a basic shape node for a rectangle.
  * It is a fundamental building block used to create and manipulate rectangular shapes
@@ -721,7 +713,15 @@ export type SVGBlendMode = { type: "Normal" } | { type: "Multiply" } | { type: "
 
 export type SVGDisplayStyle = { type: "Block" } | { type: "None" }
 
+export type SVGGradientPaint = { variant: SVGGradientPaintVariant }
+
+export type SVGGradientPaintVariant = { Linear: { start: Vec2; end: Vec2 } } | { Radial: { center: Vec2; radius: Vec2; rotation: number } }
+
 export type SVGHrefVariant = { type: "Base64"; content: string } | { type: "Url"; url: string }
+
+export type SVGImagePaint = { scale_mode: SVGImagePaintScaleMode }
+
+export type SVGImagePaintScaleMode = "Fill" | "Fit" | { Crop: { transform: Mat3; image_width: number; image_height: number } } | { Tile: { rotation: number; tile_width: number; tile_height: number } }
 
 export type SVGMeasurementUnit = { type: "Pixel" } | { type: "Percent" }
 

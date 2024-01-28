@@ -1,5 +1,5 @@
 use bevy_ecs::component::Component;
-use glam::{Mat3, Vec2};
+use glam::Mat3;
 use serde::{Deserialize, Serialize};
 use specta::Type;
 
@@ -367,12 +367,22 @@ pub enum ImagePaintScaleMode {
     },
 
     /// Crops the image to fill the area.
-    Crop { transform: ImageCropPaintTransform },
+    Crop {
+        #[serde(default)]
+        _image_crop_paint: Option<()>,
+
+        #[serde(default)]
+        transform: Mat3,
+    },
 
     /// Tiles the image within the area.
+    #[serde(rename_all = "camelCase")]
     Tile {
         #[serde(default)]
-        transform: ImageTilePaintTransform,
+        _image_tile_paint: Option<()>,
+        #[serde(default)]
+        rotation: f32,
+        scaling_factor: f32,
     },
 }
 
@@ -382,43 +392,6 @@ impl Default for ImagePaintScaleMode {
             _image_fill_paint: None,
         }
     }
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug, Type)]
-#[serde(tag = "type")]
-pub enum ImageTilePaintTransform {
-    #[serde(rename_all = "camelCase")]
-    Basic { rotation: f32, scaling_factor: f32 },
-    #[serde(rename_all = "camelCase")]
-    Internal {
-        rotation: f32,
-        tile_width: f32,
-        tile_height: f32,
-    },
-}
-
-impl Default for ImageTilePaintTransform {
-    fn default() -> Self {
-        Self::Basic {
-            rotation: 0.0,
-            scaling_factor: 1.0,
-        }
-    }
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug, Type)]
-#[serde(tag = "type")]
-pub enum ImageCropPaintTransform {
-    Basic {
-        transform: Mat3,
-    },
-    #[serde(rename_all = "camelCase")]
-    Internal {
-        crop_transform: Mat3,
-        applied_transform: Mat3,
-        image_width: f32,
-        image_height: f32,
-    },
 }
 
 // =============================================================================
@@ -440,65 +413,17 @@ pub struct GradientPaint {
 pub enum GradientPaintVariant {
     Linear {
         #[serde(default)]
-        transform: LinearGradientPaintTransform,
+        transform: Mat3,
     },
     Radial {
         #[serde(default)]
-        transform: RadialGradientPaintTransform,
+        transform: Mat3,
     },
 }
 
 impl Default for GradientPaintVariant {
     fn default() -> Self {
         Self::Linear {
-            transform: LinearGradientPaintTransform::default(),
-        }
-    }
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug, Type)]
-#[serde(tag = "type")]
-pub enum LinearGradientPaintTransform {
-    Basic {
-        /// Transformation matrix for the gradient.
-        #[serde(default)]
-        transform: Mat3,
-    },
-    #[serde(rename_all = "camelCase")]
-    Internal {
-        start: Vec2,
-        end: Vec2,
-        transform: Mat3,
-    },
-}
-
-impl Default for LinearGradientPaintTransform {
-    fn default() -> Self {
-        Self::Basic {
-            transform: Mat3::default(),
-        }
-    }
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug, Type)]
-#[serde(tag = "type")]
-pub enum RadialGradientPaintTransform {
-    Basic {
-        /// Transformation matrix for the gradient.
-        #[serde(default)]
-        transform: Mat3,
-    },
-    #[serde(rename_all = "camelCase")]
-    Internal {
-        center: Vec2,
-        radius: Vec2,
-        rotation: f32,
-    },
-}
-
-impl Default for RadialGradientPaintTransform {
-    fn default() -> Self {
-        Self::Basic {
             transform: Mat3::default(),
         }
     }

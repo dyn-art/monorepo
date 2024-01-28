@@ -3,10 +3,12 @@ use dyn_composition::modules::node::components::{
         BlendMixin, ChildrenMixin, DimensionMixin, GradientStopsMixin, ImageContentMixin,
         NodeCompositionMixin, PaintCompositionMixin, PathMixin, RelativeTransformMixin,
     },
-    types::{GradientPaint, ImagePaint, SolidPaint},
+    types::SolidPaint,
 };
 use serde::Serialize;
 use specta::Type;
+
+use crate::components::{SVGGradientPaint, SVGImagePaint};
 
 #[derive(Serialize, Clone, Debug, Type)]
 #[serde(tag = "type")]
@@ -24,9 +26,9 @@ pub enum MixinChange {
     // Paint
     PaintComposition(PaintCompositionMixin),
     SolidPaint(SolidPaint),
-    ImagePaint(ImagePaint),
+    ImagePaint(SVGImagePaint),
     ImageContent(ImageContentMixin),
-    GradientPaint(GradientPaint),
+    GradientPaint(SVGGradientPaint),
     GradientStopsMixin(GradientStopsMixin),
 }
 
@@ -97,7 +99,7 @@ impl ToMixinChange for SolidPaint {
     }
 }
 
-impl ToMixinChange for ImagePaint {
+impl ToMixinChange for SVGImagePaint {
     fn to_mixin_change(&self) -> MixinChange {
         MixinChange::ImagePaint(self.clone())
     }
@@ -109,7 +111,7 @@ impl ToMixinChange for ImageContentMixin {
     }
 }
 
-impl ToMixinChange for GradientPaint {
+impl ToMixinChange for SVGGradientPaint {
     fn to_mixin_change(&self) -> MixinChange {
         MixinChange::GradientPaint(self.clone())
     }
