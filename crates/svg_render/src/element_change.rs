@@ -1,24 +1,10 @@
+use bevy_ecs::entity::Entity;
+use dyn_composition::utils::continuous_id::ContinuousId;
 use serde::Serialize;
 use specta::Type;
 
-use super::resources::svg_composition::svg_element::events::{
-    AttributeRemoved, AttributeUpdated, ElementAppended, ElementCreated, ElementDeleted,
-    StyleRemoved, StyleUpdated,
-};
+use crate::resources::svg_composition::svg_element::{attributes::SVGAttribute, styles::SVGStyle};
 
-/// Represents the different types of events that can be emitted by a SVGElement
-/// to synchronize its state with the frontend.
-///
-/// Note on Child Element Management:
-/// - Child elements are managed implicitly through their own lifecycle events rather than
-///   explicit child addition or removal events.
-/// - When a child element is created (`ElementCreated`), it includes an optional `parent_id`
-///   indicating its parent. This way, the frontend knows to append this new child element
-///   to the specified parent element.
-/// - When a child element is deleted (`ElementDeleted`), it is responsible for removing itself
-///   from the DOM. The parent element implicitly recognizes this removal.
-/// - This approach avoids the need for separate `ChildAdded` or `ChildRemoved` events, simplifying
-///   the event model and reducing the number of events needed to manage the DOM structure.
 #[derive(Debug, Serialize, Clone, Type)]
 #[serde(tag = "type")]
 pub enum ElementChange {
@@ -29,4 +15,53 @@ pub enum ElementChange {
     AttributeRemoved(AttributeRemoved),
     StyleUpdated(StyleUpdated),
     StyleRemoved(StyleRemoved),
+}
+
+/// Emitted when a new SVGElement is created.
+#[derive(Debug, Serialize, Clone, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct ElementCreated {
+    pub tag_name: &'static str,
+    pub attributes: Vec<SVGAttribute>,
+    pub styles: Vec<SVGStyle>,
+    pub parent_id: Option<ContinuousId>,
+    pub is_bundle_root: bool,
+    pub entity: Option<Entity>,
+}
+
+/// Emitted when a SVGElement is deleted.
+#[derive(Debug, Serialize, Clone, Type)]
+pub struct ElementDeleted {}
+
+/// Emitted when a SVGElement (child) is append to another SVGElement (parent).
+#[derive(Debug, Serialize, Clone, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct ElementAppended {
+    pub parent_id: ContinuousId,
+}
+
+/// Emitted when an attribute of an SVGElement is updated.
+#[derive(Debug, Serialize, Clone, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct AttributeUpdated {
+    pub new_value: SVGAttribute,
+}
+
+/// Emitted when an attribute of a SVGElement is removed.
+#[derive(Debug, Serialize, Clone, Type)]
+pub struct AttributeRemoved {
+    pub key: &'static str,
+}
+
+/// Emitted when a style property of a SVGElement is updated.
+#[derive(Debug, Serialize, Clone, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct StyleUpdated {
+    pub new_value: SVGStyle,
+}
+
+/// Emitted when a style property of a SVGElement is removed.
+#[derive(Debug, Serialize, Clone, Type)]
+pub struct StyleRemoved {
+    key: &'static str,
 }

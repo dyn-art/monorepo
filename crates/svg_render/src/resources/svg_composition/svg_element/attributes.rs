@@ -3,8 +3,6 @@ use serde::Serialize;
 use specta::Type;
 
 #[derive(Debug, Serialize, Clone, Type)]
-// Using struct variants over tuples to use serde tag feature which enables efficient property access in TypeScript,
-// allowing for faster and simpler type checks, e.g., `change.type === "Width"`
 #[serde(tag = "type")]
 pub enum SVGAttribute {
     Id {

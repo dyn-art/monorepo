@@ -29,7 +29,7 @@ cli = ["dep:clap", "specta/export"]
 dyn_composition = { path = "../../../crates/composition", features = [
     "interactive",
 ] }
-dyn_svg_render = { path = "../../../crates/svg_render_v2", features = [
+dyn_svg_render = { path = "../../../crates/svg_render", features = [
     "output-event",
 ] }
 dyn_bevy_render_skeleton = { path = "../../../crates/bevy_render_skeleton" }
