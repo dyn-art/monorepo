@@ -89,14 +89,11 @@ impl SVGBundle for GradientPaintSVGBundle {
                 MixinChange::GradientStopsMixin(mixin) => {
                     // Remove old gradient stop elements
                     self.paint_gradient.clear_children();
-                    #[cfg(feature = "output-event")]
                     self.paint_gradient_stops
                         .drain(..)
                         .for_each(|mut paint_gradient_stop| {
-                            paint_gradient_stop.remove();
+                            cx.destroy_element(&mut paint_gradient_stop);
                         });
-                    #[cfg(not(feature = "output-event"))]
-                    self.paint_gradient_stops.clear();
 
                     // Add new gradient stop elements
                     for gradient_stop in &mixin.gradient_stops {

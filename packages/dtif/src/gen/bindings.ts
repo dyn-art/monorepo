@@ -129,7 +129,7 @@ export type CompositionViewBoxChanged = { viewBox: ViewBox }
 
 export type ContinuousId = number
 
-export type CoreInputEvent = ({ type: "EntityMoved" } & EntityMoved) | ({ type: "EntitySetPosition" } & EntitySetPosition) | ({ type: "NodeCreated" } & NodeCreated) | ({ type: "NodeDeleted" } & NodeDeleted) | ({ type: "CompositionResized" } & CompositionResized) | ({ type: "CompositionViewBoxChanged" } & CompositionViewBoxChanged)
+export type CoreInputEvent = ({ type: "EntityMoved" } & EntityMoved) | ({ type: "EntitySetPosition" } & EntitySetPosition) | ({ type: "EntityDeleted" } & EntityDeleted) | ({ type: "NodeCreated" } & NodeCreated) | ({ type: "CompositionResized" } & CompositionResized) | ({ type: "CompositionViewBoxChanged" } & CompositionViewBoxChanged)
 
 export type CursorChangeEvent = { cursor: CursorForFrontend }
 
@@ -268,6 +268,8 @@ endingAngle: number;
 innerRadiusRatio: number }
 
 export type Entity = number
+
+export type EntityDeleted = { entity: Entity }
 
 export type EntityMoved = { entity: Entity; dx: number; dy: number }
 
@@ -587,8 +589,6 @@ isVisible?: boolean;
 isLocked?: boolean }
 
 export type NodeCreated = { parentEntity: Entity | null; node: NodeBundle }
-
-export type NodeDeleted = { entity: Entity }
 
 export type NodeMetaMixin = { 
 /**

@@ -63,7 +63,13 @@ impl SVGContext {
     }
 
     pub fn remove_bundle(&mut self, entity: &Entity) {
-        // TODO
+        if let Some(mut bundle) = self.bundles.remove(entity) {
+            // Destory bundle elements
+            for (_, child_element) in bundle.get_child_elements_mut() {
+                self.destroy_element(child_element);
+            }
+            self.destroy_element(bundle.get_root_element_mut());
+        }
     }
 
     pub fn insert_bundle(
@@ -108,6 +114,15 @@ impl SVGContext {
 
     pub fn create_bundle_root_element(&mut self, tag: SVGTag, entity: Entity) -> SVGElement {
         SVGElement::new_as_bundle_root(tag, entity, self.id_generator.next_id())
+    }
+
+    pub fn destroy_element(&mut self, element: &mut SVGElement) {
+        element.destroy();
+        #[cfg(feature = "output-event")]
+        self.forward_element_change_events(vec![ElementChangeEvent {
+            id: element.get_id(),
+            changes: element.drain_changes(),
+        }]);
     }
 
     // =========================================================================

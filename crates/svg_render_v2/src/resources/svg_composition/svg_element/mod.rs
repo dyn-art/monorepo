@@ -3,6 +3,7 @@ use std::collections::HashMap;
 use bevy_ecs::entity::Entity;
 use dyn_composition::utils::continuous_id::ContinuousId;
 
+#[cfg(feature = "output-event")]
 use crate::element_change::{
     AttributeUpdated, ElementAppended, ElementChange, ElementCreated, ElementDeleted, StyleUpdated,
 };
@@ -30,9 +31,8 @@ pub struct SVGElement {
     /// Render change updates
     #[cfg(feature = "output-event")]
     changes: Vec<ElementChange>,
-    /// Whether the SVG element is the root of a SVG bundle.
-    is_bundle_root: bool,
     /// Whether the element was created in the current update cycle (before first update drain).
+    #[cfg(feature = "output-event")]
     was_created_in_current_update_cycle: bool,
 }
 
@@ -73,13 +73,21 @@ impl SVGElement {
             children: Vec::new(),
             #[cfg(feature = "output-event")]
             changes: initial_changes,
-            is_bundle_root,
+            #[cfg(feature = "output-event")]
             was_created_in_current_update_cycle: true,
         };
     }
 
+    pub fn get_id(&self) -> ContinuousId {
+        self.id
+    }
+
+    pub fn get_tag(&self) -> &SVGTag {
+        &self.tag
+    }
+
     // =========================================================================
-    // Getter & Setter
+    // Attributes
     // =========================================================================
 
     pub fn set_attribute(&mut self, attribute: SVGAttribute) {
@@ -105,6 +113,10 @@ impl SVGElement {
         self.attributes.values().cloned().collect()
     }
 
+    // =========================================================================
+    // Styles
+    // =========================================================================
+
     pub fn set_style(&mut self, style: SVGStyle) {
         #[cfg(feature = "output-event")]
         self.changes.push(ElementChange::StyleUpdated(StyleUpdated {
@@ -125,14 +137,6 @@ impl SVGElement {
 
     pub fn get_styles(&self) -> Vec<SVGStyle> {
         self.styles.values().cloned().collect()
-    }
-
-    pub fn get_id(&self) -> ContinuousId {
-        self.id
-    }
-
-    pub fn get_tag(&self) -> &SVGTag {
-        &self.tag
     }
 
     // =========================================================================
@@ -199,18 +203,14 @@ impl SVGElement {
     }
 
     // =========================================================================
-    // Remove
+    // Other
     // =========================================================================
 
-    #[cfg(feature = "output-event")]
-    pub fn remove(&mut self) {
+    pub fn destroy(&mut self) {
+        #[cfg(feature = "output-event")]
         self.changes
             .push(ElementChange::ElementDeleted(ElementDeleted {}));
     }
-
-    // =========================================================================
-    // Other
-    // =========================================================================
 
     #[cfg(feature = "output-event")]
     pub fn drain_changes(&mut self) -> Vec<ElementChange> {
@@ -275,8 +275,10 @@ pub struct SVGElementChild {
 
 #[derive(Debug)]
 pub enum SVGElementChildIdentifier {
-    InSVGBundleContext(Entity, ContinuousId),
+    /// Child element is root element of SVGBundle.
     InSVGContext(Entity),
+    /// Child element is child element of SVGBundle.
+    InSVGBundleContext(Entity, ContinuousId),
 }
 
 #[derive(Debug, Clone)]

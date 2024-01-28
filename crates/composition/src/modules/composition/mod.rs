@@ -5,8 +5,8 @@ use crate::dtif::{dtif_processor::DTIFProcessor, DTIFComposition};
 
 use self::{
     events::{
-        CompositionResized, CompositionViewBoxChanged, EntityMoved, EntitySetPosition, NodeCreated,
-        NodeDeleted,
+        CompositionResized, CompositionViewBoxChanged, EntityDeleted, EntityMoved,
+        EntitySetPosition, NodeCreated,
     },
     resources::{
         composition::{CompositionRes, ViewBox},
@@ -14,8 +14,7 @@ use self::{
     },
     systems::{
         composition::{handle_composition_resized, handle_composition_view_box_changed},
-        entity::{handle_entity_moved, handle_entity_set_position},
-        node::handle_node_deleted,
+        entity::{handle_entity_deleted, handle_entity_moved, handle_entity_set_position},
     },
 };
 
@@ -37,7 +36,7 @@ impl Plugin for CompositionPlugin {
         app.add_event::<EntityMoved>();
         app.add_event::<EntitySetPosition>();
         app.add_event::<NodeCreated>();
-        app.add_event::<NodeDeleted>();
+        app.add_event::<EntityDeleted>();
 
         // Register resources
         app.world.init_resource::<FontCacheRes>();
@@ -50,7 +49,7 @@ impl Plugin for CompositionPlugin {
                 handle_composition_view_box_changed,
                 handle_entity_moved,
                 handle_entity_set_position,
-                // handle_node_deleted, // TODO
+                handle_entity_deleted,
                 // handle_node_created, // TODO: damaged
             ),
         );

@@ -1,10 +1,22 @@
-use bevy_ecs::{event::EventReader, system::Query};
+use bevy_ecs::{
+    event::EventReader,
+    system::{Commands, Query},
+};
+use bevy_hierarchy::DespawnRecursiveExt;
 use glam::{Mat3, Vec2};
 
 use crate::modules::{
-    composition::events::{EntityMoved, EntitySetPosition},
+    composition::events::{EntityDeleted, EntityMoved, EntitySetPosition},
     node::components::mixins::RelativeTransformMixin,
 };
+
+// https://bevy-cheatbook.github.io/fundamentals/hierarchy.html#despawning-child-entities
+// https://github.com/bevyengine/bevy/issues/5584
+pub fn handle_entity_deleted(mut commands: Commands, mut event_reader: EventReader<EntityDeleted>) {
+    for event in event_reader.read() {
+        commands.entity(event.entity).despawn_recursive();
+    }
+}
 
 pub fn handle_entity_moved(
     mut event_reader: EventReader<EntityMoved>,

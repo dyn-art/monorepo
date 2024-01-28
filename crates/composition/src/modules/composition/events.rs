@@ -11,8 +11,8 @@ use super::resources::composition::ViewBox;
 pub enum CoreInputEvent {
     EntityMoved(EntityMoved),
     EntitySetPosition(EntitySetPosition),
+    EntityDeleted(EntityDeleted),
     NodeCreated(NodeCreated),
-    NodeDeleted(NodeDeleted),
     CompositionResized(CompositionResized),
     CompositionViewBoxChanged(CompositionViewBoxChanged),
 }
@@ -32,7 +32,7 @@ impl InputEvent for CoreInputEvent {
             CoreInputEvent::NodeCreated(event) => {
                 world.send_event(event);
             }
-            CoreInputEvent::NodeDeleted(event) => {
+            CoreInputEvent::EntityDeleted(event) => {
                 world.send_event(event);
             }
 
@@ -74,11 +74,6 @@ pub struct NodeCreated {
     pub node: NodeBundle,
 }
 
-#[derive(Event, Debug, Serialize, Deserialize, Type, Clone)]
-pub struct NodeDeleted {
-    pub entity: Entity,
-}
-
 // =============================================================================
 // Entity Events
 // =============================================================================
@@ -95,4 +90,9 @@ pub struct EntitySetPosition {
     pub entity: Entity,
     pub x: f32,
     pub y: f32,
+}
+
+#[derive(Event, Debug, Serialize, Deserialize, Type, Clone)]
+pub struct EntityDeleted {
+    pub entity: Entity,
 }
