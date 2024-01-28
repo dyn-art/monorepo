@@ -1,2 +1,2 @@
-pub mod changed_components;
+pub mod changed_entities;
 pub mod svg_composition;

@@ -112,7 +112,7 @@ async function spawnAndMoveRectangles(
 				const endTime = performance.now();
 				durations.push(endTime - startTime);
 			} else {
-				composition.destory();
+				composition.destroy();
 				resolve(durations);
 			}
 		}

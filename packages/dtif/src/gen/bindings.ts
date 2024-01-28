@@ -129,7 +129,7 @@ export type CompositionViewBoxChanged = { viewBox: ViewBox }
 
 export type ContinuousId = number
 
-export type CoreInputEvent = ({ type: "EntityMoved" } & EntityMoved) | ({ type: "EntitySetPosition" } & EntitySetPosition) | ({ type: "NodeCreated" } & NodeCreated) | ({ type: "CompositionResized" } & CompositionResized) | ({ type: "CompositionViewBoxChanged" } & CompositionViewBoxChanged)
+export type CoreInputEvent = ({ type: "EntityMoved" } & EntityMoved) | ({ type: "EntitySetPosition" } & EntitySetPosition) | ({ type: "EntityDeleted" } & EntityDeleted) | ({ type: "NodeCreated" } & NodeCreated) | ({ type: "CompositionResized" } & CompositionResized) | ({ type: "CompositionViewBoxChanged" } & CompositionViewBoxChanged)
 
 export type CursorChangeEvent = { cursor: CursorForFrontend }
 
@@ -221,21 +221,6 @@ height: number }
  */
 export type ElementAppended = { parentId: ContinuousId }
 
-/**
- * Represents the different types of events that can be emitted by a SVGElement
- * to synchronize its state with the frontend.
- * 
- * Note on Child Element Management:
- * - Child elements are managed implicitly through their own lifecycle events rather than
- * explicit child addition or removal events.
- * - When a child element is created (`ElementCreated`), it includes an optional `parent_id`
- * indicating its parent. This way, the frontend knows to append this new child element
- * to the specified parent element.
- * - When a child element is deleted (`ElementDeleted`), it is responsible for removing itself
- * from the DOM. The parent element implicitly recognizes this removal.
- * - This approach avoids the need for separate `ChildAdded` or `ChildRemoved` events, simplifying
- * the event model and reducing the number of events needed to manage the DOM structure.
- */
 export type ElementChange = ({ type: "ElementCreated" } & ElementCreated) | ({ type: "ElementDeleted" }) | ({ type: "ElementAppended" } & ElementAppended) | ({ type: "AttributeUpdated" } & AttributeUpdated) | ({ type: "AttributeRemoved" } & AttributeRemoved) | ({ type: "StyleUpdated" } & StyleUpdated) | ({ type: "StyleRemoved" } & StyleRemoved)
 
 export type ElementChangeEvent = { id: ContinuousId; changes: ElementChange[] }
@@ -283,6 +268,8 @@ endingAngle: number;
 innerRadiusRatio: number }
 
 export type Entity = number
+
+export type EntityDeleted = { entity: Entity }
 
 export type EntityMoved = { entity: Entity; dx: number; dy: number }
 
@@ -563,14 +550,8 @@ export type Locked = null
 
 export type Mat3 = [number, number, number, number, number, number, number, number, number]
 
-/**
- * Represents the change in the ChildrenMixin.
- * 
- * This struct separates `ChildrenMixin` due to a type conflict between Rust and TypeScript.
- * In Rust, `ChildrenMixin` is a `Vec<Entity>`, but in TypeScript, it's represented as `Entity[]`.
- * The TypeScript representation can't merge with an object type like
- * `({type: 'Children'} & Entity[])` without conflict.
- */
+export type MixinChange = ({ type: "Dimension" } & DimensionMixin) | ({ type: "Blend" } & BlendMixin) | ({ type: "NodeComposition" } & NodeCompositionMixin) | ({ type: "Children" } & MixinChangeChildrenMixin) | ({ type: "RelativeTransform" } & MixinChangeRelativeTransformMixin) | ({ type: "Path" } & PathMixin) | ({ type: "PaintComposition" } & PaintCompositionMixin) | ({ type: "SolidPaint" } & SolidPaint) | ({ type: "ImagePaint" } & ImagePaint) | ({ type: "ImageContent" } & ImageContentMixin) | ({ type: "GradientPaint" } & GradientPaint) | ({ type: "GradientStopsMixin" } & GradientStopsMixin)
+
 export type MixinChangeChildrenMixin = { children: ChildrenMixin }
 
 export type MixinChangeRelativeTransformMixin = { relativeTransform: RelativeTransformMixin }
@@ -618,8 +599,6 @@ export type NodeMetaMixin = {
  */
 name?: string | null }
 
-export type NodeMixinChange = ({ type: "RectangleCorner" } & RectangleCornerMixin) | ({ type: "Children" } & MixinChangeChildrenMixin) | ({ type: "Dimension" } & DimensionMixin) | ({ type: "RelativeTransform" } & MixinChangeRelativeTransformMixin) | ({ type: "NodeComposition" } & NodeCompositionMixin) | ({ type: "Blend" } & BlendMixin) | ({ type: "Path" } & PathMixin) | ({ type: "Fill" } & FillMixin)
-
 export type NodeType = "None" | "Group" | "Rectangle" | "Frame" | "Text"
 
 export type OutputEvent = ({ type: "ElementChange" } & ElementChangeEvent) | ({ type: "CompositionChange" } & CompositionChangeEvent) | ({ type: "TrackUpdate" } & TrackUpdateEvent) | ({ type: "SelectionChange" } & SelectionChangeEvent) | ({ type: "InteractionModeChange" } & InteractionModeChangeEvent) | ({ type: "CursorChange" } & CursorChangeEvent)
@@ -647,8 +626,6 @@ export type PaintCompositionMixin = {
  * Determines the visibility of the paint.
  */
 isVisible?: boolean }
-
-export type PaintMixinChange = ({ type: "Dimension" } & DimensionMixin) | ({ type: "Blend" } & BlendMixin) | ({ type: "PaintComposition" } & PaintCompositionMixin) | ({ type: "ImageContent" } & ImageContentMixin) | ({ type: "SolidPaint" } & SolidPaint) | ({ type: "ImagePaint" } & ImagePaint) | ({ type: "GradientPaint" } & GradientPaint) | ({ type: "GradientStopsMixin" } & GradientStopsMixin)
 
 export type PaintType = "None" | "Solid" | "Gradient" | "Image"
 
@@ -881,7 +858,7 @@ letterSpacing?: LetterSpacing;
  */
 lineHeight?: LineHeight }
 
-export type TrackUpdateEvent = { id: Entity; updates: NodeMixinChange[] }
+export type TrackUpdateEvent = { id: Entity; updates: MixinChange[] }
 
 export type TrackableMixinType = { type: "Dimension" } | { type: "RelativeTransform" }
 

@@ -4,10 +4,8 @@ use bevy_ecs::{
     query::Changed,
     system::{Query, Res, ResMut},
 };
-use dyn_composition::core::modules::node::components::mixins::{
-    DimensionMixin, RelativeTransformMixin,
-};
-use dyn_svg_render::mixin_change::ToNodeMixinChange;
+use dyn_composition::modules::node::components::mixins::{DimensionMixin, RelativeTransformMixin};
+use dyn_svg_render::mixin_change::ToMixinChange;
 
 use crate::core::modules::track::resources::{
     changed_components::ChangedComponentsRes,
@@ -34,7 +32,7 @@ pub fn extract_tracked_mixin_changes(
     }
 }
 
-fn handle_component_change<T: Component + ToNodeMixinChange>(
+fn handle_component_change<T: Component + ToMixinChange>(
     entity: Entity,
     query: &Query<&T, Changed<T>>,
     changed_components: &mut ChangedComponentsRes,

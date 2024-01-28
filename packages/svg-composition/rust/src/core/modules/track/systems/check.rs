@@ -6,7 +6,7 @@ use bevy_ecs::{
     query::With,
     system::{Local, Query, Res, ResMut},
 };
-use dyn_composition::core::modules::{
+use dyn_composition::modules::{
     composition::resources::composition::CompositionRes,
     interactive_composition::resources::{HandleSide, InteractionMode, InteractiveCompositionRes},
     node::components::states::Selected,
