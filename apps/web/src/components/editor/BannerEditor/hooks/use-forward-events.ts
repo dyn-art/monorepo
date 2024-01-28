@@ -28,7 +28,7 @@ export function useForwardEvents<GRef extends Element = HTMLElement>(
 				sourceRef.current?.removeEventListener(eventType, forwardEvent);
 			});
 		};
-	}, [sourceRef, composition, events]);
+	}, [sourceRef, composition]); // Not active effect on events as its an inline array and thus the pointer changes every render
 
 	return sourceRef;
 }

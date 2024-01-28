@@ -16,6 +16,24 @@ export const SelectionBox: React.FC<TProps> = (props) => {
 	const selectedEntities = useSelectedNodes(composition);
 	const interactionMode = useInteractionMode(composition);
 
+	// TODO: Improve and centralize those events
+	React.useEffect(() => {
+		const handleKeyPressed = (event: KeyboardEvent) => {
+			if (event.key === 'Delete') {
+				selectedEntities.forEach((entity) => {
+					composition.emitCoreEvents([{ type: 'EntityDeleted', entity }]);
+					composition.update();
+				});
+			}
+		};
+
+		window.addEventListener('keydown', handleKeyPressed);
+
+		return () => {
+			window.removeEventListener('keydown', handleKeyPressed);
+		};
+	}, [selectedEntities]);
+
 	return (
 		<>
 			{selectedEntities.map((selectedEntity) => (

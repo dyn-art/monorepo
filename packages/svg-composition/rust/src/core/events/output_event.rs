@@ -1,6 +1,6 @@
 use bevy_ecs::entity::Entity;
-use dyn_composition::core::modules::composition::resources::composition::ViewBox;
-use dyn_svg_render::{events::output_event::ElementChangeEvent, mixin_change::NodeMixinChange};
+use dyn_composition::modules::composition::resources::composition::ViewBox;
+use dyn_svg_render::{events::output_event::ElementChangeEvent, mixin_change::MixinChange};
 use serde::Serialize;
 use specta::Type;
 
@@ -32,7 +32,7 @@ pub struct CompositionChange {
 #[derive(Debug, Serialize, Clone, Type)]
 pub struct TrackUpdateEvent {
     pub id: Entity,
-    pub updates: Vec<NodeMixinChange>,
+    pub updates: Vec<MixinChange>,
 }
 
 #[derive(Debug, Serialize, Clone, Type)]

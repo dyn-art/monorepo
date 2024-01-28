@@ -1,102 +1,97 @@
-use std::collections::{BTreeMap, HashMap};
+use std::collections::HashMap;
 
 use bevy_ecs::entity::Entity;
-use dyn_composition::core::utils::continuous_id::ContinuousId;
+use dyn_composition::utils::continuous_id::ContinuousId;
 
-use crate::element_change::ElementChange;
-
-use self::{
-    attributes::SVGAttribute,
-    events::{AttributeUpdated, ElementAppended, ElementCreated, StyleUpdated},
-    styles::SVGStyle,
+#[cfg(feature = "output-event")]
+use crate::element_change::{
+    AttributeUpdated, ElementAppended, ElementChange, ElementCreated, ElementDeleted, StyleUpdated,
 };
 
-use super::{svg_bundle::BaseSVGBundle, svg_bundle_variant::bundle_to_string, SVGCompositionRes};
+use self::{attributes::SVGAttribute, styles::SVGStyle};
+
+use super::{svg_bundle::SVGBundle, svg_context::SVGContext};
 
 pub mod attributes;
-pub mod events;
-pub mod helper;
 pub mod mapper;
 pub mod styles;
 
-/// An individual SVG element
 #[derive(Debug)]
 pub struct SVGElement {
     /// Unique identifier of the SVGElement
     id: ContinuousId,
     /// The type of SVG element (e.g., circle, rect)
-    tag_name: SVGTag,
+    tag: SVGTag,
     /// The attributes of the SVG element
     attributes: HashMap<&'static str, SVGAttribute>,
     /// The style properties of the SVG element
     styles: HashMap<&'static str, SVGStyle>,
     /// Identifiers for child elements, supporting both in-context and out-of-context children.
-    children: Vec<SVGChildElementIdentifier>,
+    children: Vec<SVGElementChild>,
     /// Render change updates
+    #[cfg(feature = "output-event")]
     changes: Vec<ElementChange>,
-    /// Whether the SVG element is the root of a SVG bundle.
-    is_bundle_root: bool,
     /// Whether the element was created in the current update cycle (before first update drain).
+    #[cfg(feature = "output-event")]
     was_created_in_current_update_cycle: bool,
 }
 
-/// Used to efficiently locate SVG child elements within various SVG structures.
-///
-/// This approach is designed to reduce the reliance on hash map lookups,
-/// which can be expensive in terms of performance.
-/// Instead, it categorizes SVG child elements based on their location in the SVG structure,
-/// allowing for more direct and efficient retrieval.
-#[derive(Debug)]
-pub enum SVGChildElementIdentifier {
-    /// Child element is owned by SVGBundle (queried by index in "child_elements").
-    InBundleContext(Entity, usize),
-
-    /// Child element is owned by SVGComposition and can be found there.
-    InCompositionContext(Entity),
-}
-
-impl SVGChildElementIdentifier {
-    fn entity(&self) -> Entity {
-        match self {
-            SVGChildElementIdentifier::InBundleContext(entity, _)
-            | SVGChildElementIdentifier::InCompositionContext(entity) => *entity,
-        }
-    }
-}
-
 impl SVGElement {
-    pub fn new(tag_name: SVGTag, id_generator: &mut ContinuousId) -> Self {
-        let id = id_generator.next_id();
+    pub fn new_as_bundle_root(tag: SVGTag, entity: Entity, id: ContinuousId) -> Self {
+        Self::new_internal(tag, true, Some(entity), id)
+    }
+
+    pub fn new(tag: SVGTag, id: ContinuousId) -> Self {
+        Self::new_internal(tag, false, None, id)
+    }
+
+    fn new_internal(
+        tag: SVGTag,
+        is_bundle_root: bool,
+        entity: Option<Entity>,
+        id: ContinuousId,
+    ) -> Self {
         let id_attribute = SVGAttribute::Id { id };
         let inital_attributes: HashMap<&'static str, SVGAttribute> =
             HashMap::from([(id_attribute.key(), id_attribute)]);
         let intial_styles: HashMap<&'static str, SVGStyle> = HashMap::new();
+        #[cfg(feature = "output-event")]
         let initial_changes = vec![ElementChange::ElementCreated(ElementCreated {
             parent_id: None,
-            tag_name: tag_name.as_str(),
+            tag_name: tag.as_str(),
             attributes: inital_attributes.values().cloned().collect(),
             styles: intial_styles.values().cloned().collect(),
-            is_bundle_root: false,
-            entity: None,
+            is_bundle_root,
+            entity,
         })];
 
         return Self {
             id,
-            tag_name,
+            tag,
             attributes: inital_attributes,
             styles: intial_styles,
             children: Vec::new(),
+            #[cfg(feature = "output-event")]
             changes: initial_changes,
-            is_bundle_root: false,
+            #[cfg(feature = "output-event")]
             was_created_in_current_update_cycle: true,
         };
     }
 
+    pub fn get_id(&self) -> ContinuousId {
+        self.id
+    }
+
+    pub fn get_tag(&self) -> &SVGTag {
+        &self.tag
+    }
+
     // =========================================================================
-    // Getter & Setter
+    // Attributes
     // =========================================================================
 
     pub fn set_attribute(&mut self, attribute: SVGAttribute) {
+        #[cfg(feature = "output-event")]
         self.changes
             .push(ElementChange::AttributeUpdated(AttributeUpdated {
                 new_value: attribute.clone(),
@@ -118,7 +113,12 @@ impl SVGElement {
         self.attributes.values().cloned().collect()
     }
 
+    // =========================================================================
+    // Styles
+    // =========================================================================
+
     pub fn set_style(&mut self, style: SVGStyle) {
+        #[cfg(feature = "output-event")]
         self.changes.push(ElementChange::StyleUpdated(StyleUpdated {
             new_value: style.clone(),
         }));
@@ -139,84 +139,48 @@ impl SVGElement {
         self.styles.values().cloned().collect()
     }
 
-    pub fn get_id(&self) -> ContinuousId {
-        self.id
-    }
-
-    pub fn get_tag_name(&self) -> &SVGTag {
-        &self.tag_name
-    }
-
     // =========================================================================
     // Children
     // =========================================================================
-
-    pub fn append_child(
-        &mut self,
-        element: &mut SVGElement,
-        identifier: SVGChildElementIdentifier,
-    ) {
-        element.append_to_parent(self.id);
-        self.children.push(identifier);
-    }
 
     pub fn clear_children(&mut self) {
         self.children.clear()
     }
 
-    // TODO
-    pub fn reorder_children(&mut self, new_order: &Vec<Entity>) {
-        // In the creation update cycle the correct order should be established
-        // when constructing the dependency tree based on the changed nodes
-        if self.was_created_in_current_update_cycle {
-            return;
-        }
-
-        let mut index_map = BTreeMap::new();
-
-        // Mapping each Entity to its index in the children vector
-        for (index, child) in self.children.iter().enumerate() {
-            let entity = child.entity();
-            index_map.insert(entity, index);
-        }
-
-        // Process new order to determine target positions and insertions
-        let mut target_positions = Vec::with_capacity(new_order.len());
-        let insertions = Vec::new();
-        for entity in new_order {
-            if let Some(&index) = index_map.get(entity) {
-                target_positions.push(Some(index))
-            }
-        }
-
-        // Insert placeholders
-        for (pos, placeholder) in insertions {
-            self.children.insert(pos, placeholder);
-        }
-
-        // Reorder children based on the target positions
-        let mut swap_done = vec![false; self.children.len()];
-        for (new_position, target) in target_positions
-            .iter()
-            .enumerate()
-            .filter_map(|(np, &t)| t.map(|t| (np, t)))
-        {
-            if swap_done[new_position] || swap_done[target] {
-                continue;
-            }
-            self.children.swap(new_position, target);
-            swap_done[new_position] = true;
-            swap_done[target] = true;
-        }
-
-        // Push an update event if order has changed
-        if target_positions.iter().any(|&pos| pos.is_none()) || swap_done.iter().any(|&done| done) {
-            // TODO: fetch actual element ids
-            //  self.changes.push(ElementChange::OrderChanged);
-        }
+    pub fn append_child_in_svg_context(&mut self, entity: Entity, child_element: &mut SVGElement) {
+        self.append_child_element(
+            child_element,
+            SVGElementChildIdentifier::InSVGContext(entity),
+        )
     }
 
-    fn append_to_parent(&mut self, parent_id: ContinuousId) {
+    pub fn append_child_in_bundle_context(
+        &mut self,
+        entity: Entity,
+        child_element: &mut SVGElement,
+    ) {
+        let id = child_element.get_id();
+        self.append_child_element(
+            child_element,
+            SVGElementChildIdentifier::InSVGBundleContext(entity, id),
+        );
+    }
+
+    fn append_child_element(
+        &mut self,
+        child_element: &mut SVGElement,
+        identifier: SVGElementChildIdentifier,
+    ) {
+        self.children.push(SVGElementChild {
+            id: child_element.get_id(),
+            identifier,
+        });
+        #[cfg(feature = "output-event")]
+        child_element.append_to_parent(self.id);
+    }
+
+    #[cfg(feature = "output-event")]
+    pub fn append_to_parent(&mut self, parent_id: ContinuousId) {
         // Attempt to set the parent id of the first 'ElementCreated' render change for the element.
         // This ensures the element is correctly attached to its parent during the initial rendering.
         if self.was_created_in_current_update_cycle {
@@ -242,35 +206,24 @@ impl SVGElement {
     // Other
     // =========================================================================
 
-    pub fn define_as_bundle_root(&mut self, entity: Entity) {
-        self.is_bundle_root = true;
-        if self.was_created_in_current_update_cycle {
-            if let Some(update) = self.changes.first_mut() {
-                match update {
-                    ElementChange::ElementCreated(element_created) => {
-                        element_created.is_bundle_root = true;
-                        element_created.entity = Some(entity);
-                    }
-                    _ => {}
-                }
-            }
-        }
+    pub fn destroy(&mut self) {
+        #[cfg(feature = "output-event")]
+        self.changes
+            .push(ElementChange::ElementDeleted(ElementDeleted {}));
     }
 
+    #[cfg(feature = "output-event")]
     pub fn drain_changes(&mut self) -> Vec<ElementChange> {
-        if self.was_created_in_current_update_cycle {
-            self.was_created_in_current_update_cycle = false;
-        }
-
+        self.was_created_in_current_update_cycle = false;
         self.changes.drain(..).collect()
     }
 
-    pub fn to_string(&self, bundle: &BaseSVGBundle, composition: &SVGCompositionRes) -> String {
+    pub fn to_string(&self, bundle: &dyn SVGBundle, cx: &SVGContext) -> String {
         let mut result = String::new();
 
-        // Open the SVG tag
+        // Open SVG tag
         {
-            result.push_str(&format!("<{}", self.tag_name.as_str()));
+            result.push_str(&format!("<{}", self.tag.as_str()));
 
             // Append attributes
             for (key, value) in &self.attributes {
@@ -293,25 +246,39 @@ impl SVGElement {
 
         // Append children
         for child in &self.children {
-            match child {
-                SVGChildElementIdentifier::InBundleContext(_, child_index) => {
-                    if let Some(child_element) = bundle.get_children().get(*child_index) {
-                        result.push_str(&child_element.to_string(bundle, composition));
+            match child.identifier {
+                SVGElementChildIdentifier::InSVGBundleContext(_, child_id) => {
+                    if let Some(child_element) = bundle.get_child_elements().get(&child_id) {
+                        result.push_str(&child_element.to_string(bundle, cx));
                     }
                 }
-                SVGChildElementIdentifier::InCompositionContext(entity) => {
-                    if let Some(bundle) = composition.get_bundle(entity) {
-                        result.push_str(&bundle_to_string(&bundle, composition))
+                SVGElementChildIdentifier::InSVGContext(entity) => {
+                    if let Some(bundle) = cx.get_bundle(&entity) {
+                        result.push_str(&bundle.to_string(cx));
                     }
                 }
             }
         }
 
-        // Close the SVG tag
-        result.push_str(&format!("</{}>", self.tag_name.as_str()));
+        // Close SVG tag
+        result.push_str(&format!("</{}>", self.tag.as_str()));
 
         return result;
     }
+}
+
+#[derive(Debug)]
+pub struct SVGElementChild {
+    pub id: ContinuousId,
+    pub identifier: SVGElementChildIdentifier,
+}
+
+#[derive(Debug)]
+pub enum SVGElementChildIdentifier {
+    /// Child element is root element of SVGBundle.
+    InSVGContext(Entity),
+    /// Child element is child element of SVGBundle.
+    InSVGBundleContext(Entity, ContinuousId),
 }
 
 #[derive(Debug, Clone)]
@@ -329,6 +296,9 @@ pub enum SVGTag {
     ClipPath,
     Pattern,
     Image,
+    LinearGradient,
+    RadialGradient,
+    Stop,
 }
 
 impl SVGTag {
@@ -347,6 +317,9 @@ impl SVGTag {
             SVGTag::ClipPath => "clipPath",
             SVGTag::Pattern => "pattern",
             SVGTag::Image => "image",
+            SVGTag::LinearGradient => "linearGradient",
+            SVGTag::RadialGradient => "radialGradient",
+            SVGTag::Stop => "stop",
         }
     }
 }

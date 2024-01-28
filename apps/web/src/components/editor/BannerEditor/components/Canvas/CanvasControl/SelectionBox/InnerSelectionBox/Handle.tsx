@@ -5,7 +5,7 @@ import { useForwardEvents } from '../../../../../hooks';
 import { ResizeHandle, type TResizeHandleProps } from './ResizeHandle';
 import { RotateHandle, type TRotateHandleProps } from './RotateHandle';
 
-export const Handle: React.FC<TProps> = (props) => {
+export const Handle: React.FC<TProps> = React.memo((props) => {
 	const { position, pointerEvents, resizeHandle, rotateHandle = false, composition } = props;
 	const ref = useForwardEvents<SVGGElement>(composition, ['wheel']);
 
@@ -22,7 +22,8 @@ export const Handle: React.FC<TProps> = (props) => {
 			{rotateHandle ? <RotateHandle {...rotateHandle} /> : null}
 		</g>
 	);
-};
+});
+Handle.displayName = 'Handle';
 
 interface TProps {
 	composition: Composition;

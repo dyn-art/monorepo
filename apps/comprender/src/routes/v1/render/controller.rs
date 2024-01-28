@@ -8,11 +8,11 @@ use axum::{
     Json,
 };
 use dyn_bevy_render_skeleton::RenderApp;
-use dyn_composition::core::{
+use dyn_composition::{
     composition::Composition, dtif::DTIFComposition,
     modules::composition::resources::font_cache::font::FontContent,
 };
-use dyn_svg_render::{resources::svg_composition::SVGCompositionRes, SvgRenderPlugin};
+use dyn_svg_render::{resources::svg_composition::SVGCompositionRes, SVGRenderPlugin};
 use resvg::usvg::Options;
 use serde::Deserialize;
 use usvg::{TreeParsing, TreeWriting, XmlOptions};
@@ -134,9 +134,7 @@ fn generate_svg(body: DTIFComposition) -> Result<String, AppError> {
     let app = composition.get_app_mut();
 
     // Register plugins
-    app.add_plugins(SvgRenderPlugin {
-        output_event_sender: None,
-    });
+    app.add_plugins(SVGRenderPlugin {});
 
     // Update app once
     app.update();
@@ -162,7 +160,7 @@ fn generate_svg(body: DTIFComposition) -> Result<String, AppError> {
                 })
         })
         .and_then(|svg_composition_res| {
-            svg_composition_res.to_string().ok_or_else(|| {
+            svg_composition_res.context.to_string().ok_or_else(|| {
                 AppError::new(
                     StatusCode::INTERNAL_SERVER_ERROR,
                     ErrorCode::new("SVG_CONVERSION_FAILED"),

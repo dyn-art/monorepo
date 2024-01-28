@@ -150,7 +150,7 @@ export class Composition {
 		this.emitCoreEvents([{ type: 'EntitySetPosition', entity, x, y }]);
 	}
 
-	public destory(): void {
+	public destroy(): void {
 		this._renderer.forEach((renderer) => renderer.destroy());
 	}
 }

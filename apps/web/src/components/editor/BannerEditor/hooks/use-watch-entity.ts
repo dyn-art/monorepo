@@ -28,24 +28,24 @@ export function useWatchEntity<T extends TTrackableMixinKey[]>(
 		return () => {
 			unwatch();
 		};
-	}, [entity, composition]); // Not active effect on toTrackMixinKeys as its an inline array and thus endless loop
+	}, [entity, composition]); // Not active effect on toTrackMixinKeys as its an inline array and thus the pointer changes every render
 
 	return changes;
 }
 
 function changesReducer<T extends TTrackableMixinKey[]>(
 	state: TCombinedMixin<T>,
-	action: COMP.NodeMixinChange
+	action: COMP.MixinChange
 ): TCombinedMixin<T> {
 	const { type, ...change } = action;
 	return { ...state, [type]: change };
 }
 
 type TCombinedMixin<T extends TTrackableMixinKey[]> = {
-	[K in T[number]]?: Extract<COMP.NodeMixinChange, { type: K }>;
+	[K in T[number]]?: Extract<COMP.MixinChange, { type: K }>;
 };
 type TTrackableMixinKey = TRustEnumKeyArray<COMP.TrackableMixinType>;
-type TMiddleware<T> = (change: COMP.NodeMixinChange) => T;
+type TMiddleware<T> = (change: COMP.MixinChange) => T;
 
 // TODO: figure out how to solve this as tuple
 

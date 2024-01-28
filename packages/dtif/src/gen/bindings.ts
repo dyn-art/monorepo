@@ -129,7 +129,7 @@ export type CompositionViewBoxChanged = { viewBox: ViewBox }
 
 export type ContinuousId = number
 
-export type CoreInputEvent = ({ type: "EntityMoved" } & EntityMoved) | ({ type: "EntitySetPosition" } & EntitySetPosition) | ({ type: "NodeCreated" } & NodeCreated) | ({ type: "CompositionResized" } & CompositionResized) | ({ type: "CompositionViewBoxChanged" } & CompositionViewBoxChanged)
+export type CoreInputEvent = ({ type: "EntityMoved" } & EntityMoved) | ({ type: "EntitySetPosition" } & EntitySetPosition) | ({ type: "EntityDeleted" } & EntityDeleted) | ({ type: "NodeCreated" } & NodeCreated) | ({ type: "CompositionResized" } & CompositionResized) | ({ type: "CompositionViewBoxChanged" } & CompositionViewBoxChanged)
 
 export type CursorChangeEvent = { cursor: CursorForFrontend }
 
@@ -221,21 +221,6 @@ height: number }
  */
 export type ElementAppended = { parentId: ContinuousId }
 
-/**
- * Represents the different types of events that can be emitted by a SVGElement
- * to synchronize its state with the frontend.
- * 
- * Note on Child Element Management:
- * - Child elements are managed implicitly through their own lifecycle events rather than
- * explicit child addition or removal events.
- * - When a child element is created (`ElementCreated`), it includes an optional `parent_id`
- * indicating its parent. This way, the frontend knows to append this new child element
- * to the specified parent element.
- * - When a child element is deleted (`ElementDeleted`), it is responsible for removing itself
- * from the DOM. The parent element implicitly recognizes this removal.
- * - This approach avoids the need for separate `ChildAdded` or `ChildRemoved` events, simplifying
- * the event model and reducing the number of events needed to manage the DOM structure.
- */
 export type ElementChange = ({ type: "ElementCreated" } & ElementCreated) | ({ type: "ElementDeleted" }) | ({ type: "ElementAppended" } & ElementAppended) | ({ type: "AttributeUpdated" } & AttributeUpdated) | ({ type: "AttributeRemoved" } & AttributeRemoved) | ({ type: "StyleUpdated" } & StyleUpdated) | ({ type: "StyleRemoved" } & StyleRemoved)
 
 export type ElementChangeEvent = { id: ContinuousId; changes: ElementChange[] }
@@ -283,6 +268,8 @@ endingAngle: number;
 innerRadiusRatio: number }
 
 export type Entity = number
+
+export type EntityDeleted = { entity: Entity }
 
 export type EntityMoved = { entity: Entity; dx: number; dy: number }
 
@@ -393,31 +380,25 @@ export type GradientPaint = { _gradient_paint?: null | null;
 /**
  * Specifies the variant of the gradient.
  */
-variant?: GradientVariant; 
-/**
- * Transformation matrix for the gradient.
- */
-transform?: Mat3; 
-/**
- * A list of color stops defining the gradient.
- */
-gradientStops: ColorStop[] }
+variant?: GradientPaintVariant }
 
 export type GradientPaintBundle = ({ _gradient_paint?: null | null; 
 /**
  * Specifies the variant of the gradient.
  */
-variant?: GradientVariant; 
-/**
- * Transformation matrix for the gradient.
- */
-transform?: Mat3; 
+variant?: GradientPaintVariant }) & ({ 
 /**
  * A list of color stops defining the gradient.
  */
 gradientStops: ColorStop[] }) & { paint?: Paint; compositionMixin?: PaintCompositionMixin; blendMixin?: BlendMixin }
 
-export type GradientVariant = "Linear" | "Radial" | "Angular" | "Diamond"
+export type GradientPaintVariant = { type: "Linear"; transform?: LinearGradientPaintTransform } | { type: "Radial"; transform?: RadialGradientPaintTransform }
+
+export type GradientStopsMixin = { 
+/**
+ * A list of color stops defining the gradient.
+ */
+gradientStops: ColorStop[] }
 
 /**
  * Serves as a container used to semantically group related nodes,
@@ -489,7 +470,7 @@ height: number;
  */
 content: ImageContent }
 
-export type ImageCropPaintTransform = { type: "Basic"; transform: Mat3 } | { type: "Internal"; cropTransform: Mat3; transform: Mat3; imageWidth: number; imageHeight: number }
+export type ImageCropPaintTransform = { type: "Basic"; transform: Mat3 } | { type: "Internal"; cropTransform: Mat3; appliedTransform: Mat3; imageWidth: number; imageHeight: number }
 
 export type ImagePaint = { _image_paint?: null | null; 
 /**
@@ -563,18 +544,14 @@ export type LineHeight =
  */
 { Percent: number }
 
+export type LinearGradientPaintTransform = { type: "Basic"; transform?: Mat3 } | { type: "Internal"; start: Vec2; end: Vec2; transform: Mat3 }
+
 export type Locked = null
 
 export type Mat3 = [number, number, number, number, number, number, number, number, number]
 
-/**
- * Represents the change in the ChildrenMixin.
- * 
- * This struct separates `ChildrenMixin` due to a type conflict between Rust and TypeScript.
- * In Rust, `ChildrenMixin` is a `Vec<Entity>`, but in TypeScript, it's represented as `Entity[]`.
- * The TypeScript representation can't merge with an object type like
- * `({type: 'Children'} & Entity[])` without conflict.
- */
+export type MixinChange = ({ type: "Dimension" } & DimensionMixin) | ({ type: "Blend" } & BlendMixin) | ({ type: "NodeComposition" } & NodeCompositionMixin) | ({ type: "Children" } & MixinChangeChildrenMixin) | ({ type: "RelativeTransform" } & MixinChangeRelativeTransformMixin) | ({ type: "Path" } & PathMixin) | ({ type: "PaintComposition" } & PaintCompositionMixin) | ({ type: "SolidPaint" } & SolidPaint) | ({ type: "ImagePaint" } & ImagePaint) | ({ type: "ImageContent" } & ImageContentMixin) | ({ type: "GradientPaint" } & GradientPaint) | ({ type: "GradientStopsMixin" } & GradientStopsMixin)
+
 export type MixinChangeChildrenMixin = { children: ChildrenMixin }
 
 export type MixinChangeRelativeTransformMixin = { relativeTransform: RelativeTransformMixin }
@@ -622,8 +599,6 @@ export type NodeMetaMixin = {
  */
 name?: string | null }
 
-export type NodeMixinChange = ({ type: "RectangleCorner" } & RectangleCornerMixin) | ({ type: "Children" } & MixinChangeChildrenMixin) | ({ type: "Dimension" } & DimensionMixin) | ({ type: "RelativeTransform" } & MixinChangeRelativeTransformMixin) | ({ type: "NodeComposition" } & NodeCompositionMixin) | ({ type: "Blend" } & BlendMixin) | ({ type: "Path" } & PathMixin) | ({ type: "Fill" } & FillMixin)
-
 export type NodeType = "None" | "Group" | "Rectangle" | "Frame" | "Text"
 
 export type OutputEvent = ({ type: "ElementChange" } & ElementChangeEvent) | ({ type: "CompositionChange" } & CompositionChangeEvent) | ({ type: "TrackUpdate" } & TrackUpdateEvent) | ({ type: "SelectionChange" } & SelectionChangeEvent) | ({ type: "InteractionModeChange" } & InteractionModeChangeEvent) | ({ type: "CursorChange" } & CursorChangeEvent)
@@ -652,8 +627,6 @@ export type PaintCompositionMixin = {
  */
 isVisible?: boolean }
 
-export type PaintMixinChange = ({ type: "Dimension" } & DimensionMixin) | ({ type: "Blend" } & BlendMixin) | ({ type: "PaintComposition" } & PaintCompositionMixin) | ({ type: "ImageContent" } & ImageContentMixin) | ({ type: "SolidPaint" } & SolidPaint) | ({ type: "ImagePaint" } & ImagePaint) | ({ type: "GradientPaint" } & GradientPaint)
-
 export type PaintType = "None" | "Solid" | "Gradient" | "Image"
 
 /**
@@ -676,6 +649,8 @@ export type Polygon = { _polygon?: null | null;
  * This value must be an integer greater than or equal to 3.
  */
 pointCount?: number }
+
+export type RadialGradientPaintTransform = { type: "Basic"; transform?: Mat3 } | { type: "Internal"; center: Vec2; radius: Vec2; rotation: number }
 
 /**
  * Represents a basic shape node for a rectangle.
@@ -740,7 +715,7 @@ export type RelativeTransformMixin = Mat3
  */
 export type Root = null
 
-export type SVGAttribute = { type: "Id"; id: ContinuousId } | { type: "Width"; width: number; unit: SVGMeasurementUnit } | { type: "Height"; height: number; unit: SVGMeasurementUnit } | { type: "Opacity"; opacity: number } | { type: "Transform"; transform: SVGTransformAttribute } | { type: "PatternTransform"; transform: SVGTransformAttribute } | { type: "D"; d: SVGPathCommand[] } | { type: "ClipPath"; clipPath: ContinuousId } | { type: "Fill"; fill: string } | { type: "ReferencedFill"; id: ContinuousId } | { type: "Name"; name: string } | { type: "PatternUnits"; patternUnits: SVGPatternUnitsVariant } | { type: "Href"; href: SVGHrefVariant } | { type: "PreserveAspectRatio"; preserveAspectRatio: string }
+export type SVGAttribute = { type: "Id"; id: ContinuousId } | { type: "Width"; width: number; unit: SVGMeasurementUnit } | { type: "Height"; height: number; unit: SVGMeasurementUnit } | { type: "Opacity"; opacity: number } | { type: "Transform"; transform: SVGTransformAttribute } | { type: "PatternTransform"; transform: SVGTransformAttribute } | { type: "D"; d: SVGPathCommand[] } | { type: "ClipPath"; clipPath: ContinuousId } | { type: "Fill"; fill: string } | { type: "ReferencedFill"; id: ContinuousId } | { type: "Name"; name: string } | { type: "PatternUnits"; patternUnits: SVGUnitsVariant } | { type: "GradientUnits"; gradientUnits: SVGUnitsVariant } | { type: "Href"; href: SVGHrefVariant } | { type: "PreserveAspectRatio"; preserveAspectRatio: string } | { type: "X1"; x1: number } | { type: "Y1"; y1: number } | { type: "X2"; x2: number } | { type: "Y2"; y2: number } | { type: "Offset"; offset: number } | { type: "StopColor"; stopColor: string }
 
 export type SVGBlendMode = { type: "Normal" } | { type: "Multiply" } | { type: "Screen" } | { type: "Overlay" } | { type: "Darken" } | { type: "Lighten" } | { type: "ColorDodge" } | { type: "ColorBurn" } | { type: "HardLight" } | { type: "SoftLight" } | { type: "Difference" } | { type: "Exclusion" } | { type: "Hue" } | { type: "Saturation" } | { type: "Color" } | { type: "Luminosity" }
 
@@ -752,13 +727,13 @@ export type SVGMeasurementUnit = { type: "Pixel" } | { type: "Percent" }
 
 export type SVGPathCommand = { type: "MoveTo"; x: number; y: number } | { type: "LineTo"; x: number; y: number } | { type: "CurveTo"; cx1: number; cy1: number; cx2: number; cy2: number; x: number; y: number } | { type: "ArcTo"; rx: number; ry: number; xAxisRotation: number; largeArcFlag: boolean; sweepFlag: boolean; x: number; y: number } | { type: "ClosePath" }
 
-export type SVGPatternUnitsVariant = { type: "UserSpaceOnUse" } | { type: "ObjectBoundingBox" }
-
 export type SVGRenderOutputEvent = ({ type: "ElementChange" } & ElementChangeEvent)
 
 export type SVGStyle = { type: "Display"; display: SVGDisplayStyle } | { type: "BlendMode"; blendMode: SVGBlendMode }
 
 export type SVGTransformAttribute = { type: "Matrix"; a: number; b: number; c: number; d: number; tx: number; ty: number } | { type: "Rotate"; rotation: number }
+
+export type SVGUnitsVariant = { type: "UserSpaceOnUse" } | { type: "ObjectBoundingBox" }
 
 export type Selected = null
 
@@ -883,7 +858,7 @@ letterSpacing?: LetterSpacing;
  */
 lineHeight?: LineHeight }
 
-export type TrackUpdateEvent = { id: Entity; updates: NodeMixinChange[] }
+export type TrackUpdateEvent = { id: Entity; updates: MixinChange[] }
 
 export type TrackableMixinType = { type: "Dimension" } | { type: "RelativeTransform" }
 
