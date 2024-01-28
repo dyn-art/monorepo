@@ -22,6 +22,7 @@ pub trait SVGBundle: Sync + Send + Debug {
     fn get_root_element_mut(&mut self) -> &mut SVGElement;
     fn to_string(&self, cx: &SVGContext) -> String;
 
+    #[cfg(feature = "output-event")]
     fn drain_changes(&mut self) -> Vec<ElementChangeEvent> {
         let mut drained_updates: Vec<ElementChangeEvent> = Vec::new();
 

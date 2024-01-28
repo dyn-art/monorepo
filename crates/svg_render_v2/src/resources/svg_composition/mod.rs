@@ -17,9 +17,17 @@ pub struct SVGCompositionRes {
 }
 
 impl SVGCompositionRes {
+    #[cfg(feature = "output-event")]
     pub fn new(output_event_sender: Option<Sender<SVGRenderOutputEvent>>) -> Self {
         SVGCompositionRes {
             context: SVGContext::new(output_event_sender),
+        }
+    }
+
+    #[cfg(not(feature = "output-event"))]
+    pub fn new() -> Self {
+        SVGCompositionRes {
+            context: SVGContext::new(),
         }
     }
 }

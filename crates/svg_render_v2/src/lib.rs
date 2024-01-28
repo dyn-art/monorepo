@@ -25,6 +25,7 @@ pub mod resources;
 pub mod systems;
 
 pub struct SVGRenderPlugin {
+    #[cfg(feature = "output-event")]
     pub output_event_sender: Option<Sender<SVGRenderOutputEvent>>,
 }
 
@@ -37,7 +38,10 @@ impl Plugin for SVGRenderPlugin {
 
         // Register resources
         render_app.init_resource::<ChangedEntitiesRes>();
+        #[cfg(feature = "output-event")]
         render_app.insert_resource(SVGCompositionRes::new(self.output_event_sender.clone()));
+        #[cfg(not(feature = "output-event"))]
+        render_app.insert_resource(SVGCompositionRes::new());
 
         // Register systems
         render_app

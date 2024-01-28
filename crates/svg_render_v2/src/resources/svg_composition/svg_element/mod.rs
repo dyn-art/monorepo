@@ -28,6 +28,7 @@ pub struct SVGElement {
     /// Identifiers for child elements, supporting both in-context and out-of-context children.
     children: Vec<SVGElementChild>,
     /// Render change updates
+    #[cfg(feature = "output-event")]
     changes: Vec<ElementChange>,
     /// Whether the SVG element is the root of a SVG bundle.
     is_bundle_root: bool,
@@ -54,6 +55,7 @@ impl SVGElement {
         let inital_attributes: HashMap<&'static str, SVGAttribute> =
             HashMap::from([(id_attribute.key(), id_attribute)]);
         let intial_styles: HashMap<&'static str, SVGStyle> = HashMap::new();
+        #[cfg(feature = "output-event")]
         let initial_changes = vec![ElementChange::ElementCreated(ElementCreated {
             parent_id: None,
             tag_name: tag.as_str(),
@@ -69,6 +71,7 @@ impl SVGElement {
             attributes: inital_attributes,
             styles: intial_styles,
             children: Vec::new(),
+            #[cfg(feature = "output-event")]
             changes: initial_changes,
             is_bundle_root,
             was_created_in_current_update_cycle: true,
@@ -80,6 +83,7 @@ impl SVGElement {
     // =========================================================================
 
     pub fn set_attribute(&mut self, attribute: SVGAttribute) {
+        #[cfg(feature = "output-event")]
         self.changes
             .push(ElementChange::AttributeUpdated(AttributeUpdated {
                 new_value: attribute.clone(),
@@ -102,6 +106,7 @@ impl SVGElement {
     }
 
     pub fn set_style(&mut self, style: SVGStyle) {
+        #[cfg(feature = "output-event")]
         self.changes.push(ElementChange::StyleUpdated(StyleUpdated {
             new_value: style.clone(),
         }));
@@ -162,13 +167,15 @@ impl SVGElement {
         child_element: &mut SVGElement,
         identifier: SVGElementChildIdentifier,
     ) {
-        child_element.append_to_parent(self.id);
         self.children.push(SVGElementChild {
             id: child_element.get_id(),
             identifier,
         });
+        #[cfg(feature = "output-event")]
+        child_element.append_to_parent(self.id);
     }
 
+    #[cfg(feature = "output-event")]
     pub fn append_to_parent(&mut self, parent_id: ContinuousId) {
         // Attempt to set the parent id of the first 'ElementCreated' render change for the element.
         // This ensures the element is correctly attached to its parent during the initial rendering.
@@ -195,6 +202,7 @@ impl SVGElement {
     // Remove
     // =========================================================================
 
+    #[cfg(feature = "output-event")]
     pub fn remove(&mut self) {
         self.changes
             .push(ElementChange::ElementDeleted(ElementDeleted {}));
@@ -204,6 +212,7 @@ impl SVGElement {
     // Other
     // =========================================================================
 
+    #[cfg(feature = "output-event")]
     pub fn drain_changes(&mut self) -> Vec<ElementChange> {
         self.was_created_in_current_update_cycle = false;
         self.changes.drain(..).collect()

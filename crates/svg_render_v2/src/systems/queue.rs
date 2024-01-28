@@ -15,10 +15,19 @@ pub fn queue_element_changes(
     mut svg_composition: ResMut<SVGCompositionRes>,
 ) {
     let changed_entities = take(&mut changed_entities_res.changed_entities);
-    let dependency_trees = build_dependency_trees(changed_entities);
 
-    for dependency_tree in dependency_trees {
-        process_dependency_tree(dependency_tree, &mut svg_composition.context);
+    #[cfg(feature = "output-event")]
+    {
+        let dependency_trees = build_dependency_trees(changed_entities);
+        for dependency_tree in dependency_trees {
+            process_dependency_tree(dependency_tree, &mut svg_composition.context);
+        }
+    }
+    #[cfg(not(feature = "output-event"))]
+    {
+        for (entity, changed_entity) in changed_entities {
+            process_entity(entity, changed_entity, &mut svg_composition.context)
+        }
     }
 
     svg_composition.context.process_changed_entities();

@@ -22,17 +22,29 @@ pub struct SVGContext {
     root_bundle_ids: Vec<Entity>,
     bundles: HashMap<Entity, Box<dyn SVGBundle>>,
     changed_entities: Vec<ChangedEntity>,
+    #[cfg(feature = "output-event")]
     output_event_sender: Option<Sender<SVGRenderOutputEvent>>,
     pub id_generator: ContinuousId,
 }
 
 impl SVGContext {
+    #[cfg(feature = "output-event")]
     pub fn new(output_event_sender: Option<Sender<SVGRenderOutputEvent>>) -> Self {
         SVGContext {
             root_bundle_ids: Vec::new(),
             bundles: HashMap::new(),
             changed_entities: Vec::new(),
             output_event_sender,
+            id_generator: ContinuousId::ZERO,
+        }
+    }
+
+    #[cfg(not(feature = "output-event"))]
+    pub fn new() -> Self {
+        SVGContext {
+            root_bundle_ids: Vec::new(),
+            bundles: HashMap::new(),
+            changed_entities: Vec::new(),
             id_generator: ContinuousId::ZERO,
         }
     }
@@ -109,12 +121,14 @@ impl SVGContext {
         for changed_entity in changed_entities {
             if let Some(mut bundle) = self.bundles.remove(&changed_entity.entity) {
                 bundle.update(changed_entity, self);
+                #[cfg(feature = "output-event")]
                 self.forward_element_change_events(bundle.drain_changes());
                 self.bundles.insert(*bundle.get_entity(), bundle);
             }
         }
     }
 
+    #[cfg(feature = "output-event")]
     fn forward_element_change_events(&mut self, element_change_events: Vec<ElementChangeEvent>) {
         if let Some(output_event_sender) = &self.output_event_sender {
             for element_change_event in element_change_events {

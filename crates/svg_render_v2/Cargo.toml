@@ -10,6 +10,7 @@ license = "AGPL-3.0-or-later"
 [features]
 default = []
 tracing = []
+output-event = []
 
 [dependencies]
 dyn_bevy_render_skeleton = { path = "../bevy_render_skeleton" }
