@@ -548,7 +548,7 @@ export type Locked = null
 
 export type Mat3 = [number, number, number, number, number, number, number, number, number]
 
-export type MixinChange = ({ type: "Dimension" } & DimensionMixin) | ({ type: "Blend" } & BlendMixin) | ({ type: "NodeComposition" } & NodeCompositionMixin) | ({ type: "Children" } & MixinChangeChildrenMixin) | ({ type: "RelativeTransform" } & MixinChangeRelativeTransformMixin) | ({ type: "Path" } & PathMixin) | ({ type: "PaintComposition" } & PaintCompositionMixin) | ({ type: "SolidPaint" } & SolidPaint)
+export type MixinChange = ({ type: "Dimension" } & DimensionMixin) | ({ type: "Blend" } & BlendMixin) | ({ type: "NodeComposition" } & NodeCompositionMixin) | ({ type: "Children" } & MixinChangeChildrenMixin) | ({ type: "RelativeTransform" } & MixinChangeRelativeTransformMixin) | ({ type: "Path" } & PathMixin) | ({ type: "PaintComposition" } & PaintCompositionMixin) | ({ type: "SolidPaint" } & SolidPaint) | ({ type: "ImagePaint" } & ImagePaint) | ({ type: "ImageContent" } & ImageContentMixin) | ({ type: "GradientPaint" } & GradientPaint) | ({ type: "GradientStopsMixin" } & GradientStopsMixin)
 
 export type MixinChangeChildrenMixin = { children: ChildrenMixin }
 

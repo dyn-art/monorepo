@@ -10,8 +10,9 @@ use crate::{
 
 use super::{
     bundles::{
-        frame_node_svg_bundle::FrameNodeSVGBundle, shape_node_svg_bundle::ShapeNodeSVGBundle,
-        solid_paint_svg_bundle::SolidPaintSVGBundle,
+        frame_node_svg_bundle::FrameNodeSVGBundle,
+        gradient_paint_svg_bundle::GradientPaintSVGBundle,
+        shape_node_svg_bundle::ShapeNodeSVGBundle, solid_paint_svg_bundle::SolidPaintSVGBundle,
     },
     svg_bundle::SVGBundle,
     svg_element::{SVGElement, SVGTag},
@@ -90,6 +91,9 @@ impl SVGContext {
             ChangedEntityType::ShapeNode => Some(Box::new(ShapeNodeSVGBundle::new(entity, self))),
             // Paint
             ChangedEntityType::SolidPaint => Some(Box::new(SolidPaintSVGBundle::new(entity, self))),
+            ChangedEntityType::GradientPaint(variant) => {
+                Some(Box::new(GradientPaintSVGBundle::new(entity, variant, self)))
+            }
             _ => None,
         }
     }

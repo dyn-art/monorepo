@@ -195,31 +195,23 @@ impl ShapeNodeSVGBundle {
         let mut root_element = cx.create_bundle_root_element(SVGTag::Group, entity);
         #[cfg(feature = "tracing")]
         root_element.set_attribute(SVGAttribute::Name {
-            name: ShapeNodeSVGBundle::create_element_name(
-                root_element.get_id(),
-                String::from("root"),
-                false,
-            ),
+            name: Self::create_element_name(root_element.get_id(), String::from("root"), false),
         });
 
         let mut defs_element = cx.create_element(SVGTag::Defs);
         #[cfg(feature = "tracing")]
         defs_element.set_attribute(SVGAttribute::Name {
-            name: ShapeNodeSVGBundle::create_element_name(
-                defs_element.get_id(),
-                String::from("defs"),
-                false,
-            ),
+            name: Self::create_element_name(defs_element.get_id(), String::from("defs"), false),
         });
         root_element.append_child_in_bundle_context(entity, &mut defs_element);
 
-        // Create click area element
+        // Create click area elements
 
         let mut click_area_rect_element = cx.create_element(SVGTag::Rect);
         #[cfg(feature = "tracing")]
         click_area_rect_element.set_attributes(vec![
             SVGAttribute::Name {
-                name: ShapeNodeSVGBundle::create_element_name(
+                name: Self::create_element_name(
                     click_area_rect_element.get_id(),
                     String::from("click-area-rect"),
                     false,
@@ -240,7 +232,7 @@ impl ShapeNodeSVGBundle {
         let mut fill_clip_path_element = cx.create_element(SVGTag::ClipPath);
         #[cfg(feature = "tracing")]
         fill_clip_path_element.set_attribute(SVGAttribute::Name {
-            name: ShapeNodeSVGBundle::create_element_name(
+            name: Self::create_element_name(
                 fill_clip_path_element.get_id(),
                 String::from("fill-clip-path"),
                 true,
@@ -251,7 +243,7 @@ impl ShapeNodeSVGBundle {
         let mut fill_clipped_path_element = cx.create_element(SVGTag::Path);
         #[cfg(feature = "tracing")]
         fill_clipped_path_element.set_attribute(SVGAttribute::Name {
-            name: ShapeNodeSVGBundle::create_element_name(
+            name: Self::create_element_name(
                 fill_clipped_path_element.get_id(),
                 String::from("fill-clipped-path"),
                 false,
@@ -263,7 +255,7 @@ impl ShapeNodeSVGBundle {
         let mut fill_wrapper_g_element = cx.create_element(SVGTag::Group);
         #[cfg(feature = "tracing")]
         fill_wrapper_g_element.set_attribute(SVGAttribute::Name {
-            name: ShapeNodeSVGBundle::create_element_name(
+            name: Self::create_element_name(
                 fill_wrapper_g_element.get_id(),
                 String::from("fill-wrapper-g"),
                 false,
@@ -278,10 +270,15 @@ impl ShapeNodeSVGBundle {
             entity,
             root: root_element,
             defs: defs_element,
+
+            // Click area elements
             click_area_rect: click_area_rect_element,
+
+            // Fill elements
             fill_clip_path: fill_clip_path_element,
             fill_clipped_path: fill_clipped_path_element,
             fill_wrapper_g: fill_wrapper_g_element,
+
             paint_children: Vec::new(),
         }
     }

@@ -109,17 +109,13 @@ impl SolidPaintSVGBundle {
         let mut root_element = cx.create_bundle_root_element(SVGTag::Group, entity);
         #[cfg(feature = "tracing")]
         root_element.set_attribute(SVGAttribute::Name {
-            name: SolidPaintSVGBundle::create_element_name(
-                root_element.get_id(),
-                String::from("root"),
-                false,
-            ),
+            name: Self::create_element_name(root_element.get_id(), String::from("root"), false),
         });
 
         let mut paint_rect_element = cx.create_element(SVGTag::Rect);
         #[cfg(feature = "tracing")]
         paint_rect_element.set_attribute(SVGAttribute::Name {
-            name: SolidPaintSVGBundle::create_element_name(
+            name: Self::create_element_name(
                 paint_rect_element.get_id(),
                 String::from("paint-rect"),
                 false,

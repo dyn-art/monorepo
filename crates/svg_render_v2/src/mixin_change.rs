@@ -1,9 +1,9 @@
 use dyn_composition::modules::node::components::{
     mixins::{
-        BlendMixin, ChildrenMixin, DimensionMixin, NodeCompositionMixin, PaintCompositionMixin,
-        PathMixin, RelativeTransformMixin,
+        BlendMixin, ChildrenMixin, DimensionMixin, GradientStopsMixin, ImageContentMixin,
+        NodeCompositionMixin, PaintCompositionMixin, PathMixin, RelativeTransformMixin,
     },
-    types::SolidPaint,
+    types::{GradientPaint, ImagePaint, SolidPaint},
 };
 use serde::Serialize;
 use specta::Type;
@@ -24,6 +24,10 @@ pub enum MixinChange {
     // Paint
     PaintComposition(PaintCompositionMixin),
     SolidPaint(SolidPaint),
+    ImagePaint(ImagePaint),
+    ImageContent(ImageContentMixin),
+    GradientPaint(GradientPaint),
+    GradientStopsMixin(GradientStopsMixin),
 }
 
 pub trait ToMixinChange {
@@ -90,5 +94,29 @@ impl ToMixinChange for PaintCompositionMixin {
 impl ToMixinChange for SolidPaint {
     fn to_mixin_change(&self) -> MixinChange {
         MixinChange::SolidPaint(self.clone())
+    }
+}
+
+impl ToMixinChange for ImagePaint {
+    fn to_mixin_change(&self) -> MixinChange {
+        MixinChange::ImagePaint(self.clone())
+    }
+}
+
+impl ToMixinChange for ImageContentMixin {
+    fn to_mixin_change(&self) -> MixinChange {
+        MixinChange::ImageContent(self.clone())
+    }
+}
+
+impl ToMixinChange for GradientPaint {
+    fn to_mixin_change(&self) -> MixinChange {
+        MixinChange::GradientPaint(self.clone())
+    }
+}
+
+impl ToMixinChange for GradientStopsMixin {
+    fn to_mixin_change(&self) -> MixinChange {
+        MixinChange::GradientStopsMixin(self.clone())
     }
 }

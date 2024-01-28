@@ -22,11 +22,21 @@ pub enum ChangedEntityType {
     ShapeNode,
     FrameNode,
     SolidPaint,
-    ImageFillPaint,
-    ImageFitPaint,
-    ImageCropPaint,
-    ImageTilePaint,
-    LinearGradientPaint,
-    RadialGradientPaint,
+    ImagePaint(ChangedEntityImagePaintType),
+    GradientPaint(ChangedEntityGradientPaintType),
     Unkown,
+}
+
+#[derive(Debug, Clone, Copy)]
+pub enum ChangedEntityGradientPaintType {
+    Linear,
+    Radial,
+}
+
+#[derive(Debug, Clone, Copy)]
+pub enum ChangedEntityImagePaintType {
+    Fill,
+    Fit,
+    Crop,
+    Tile,
 }

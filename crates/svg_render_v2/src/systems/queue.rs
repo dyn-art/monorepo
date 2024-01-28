@@ -16,6 +16,7 @@ pub fn queue_element_changes(
 ) {
     let changed_entities = take(&mut changed_entities_res.changed_entities);
 
+    // TODO: Improve - Could we handle the order when ChildrenMixin is applied? Do we really need to preorder here?
     #[cfg(feature = "output-event")]
     {
         let dependency_trees = build_dependency_trees(changed_entities);

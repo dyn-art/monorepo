@@ -17,7 +17,10 @@ use std::fmt::Debug;
 
 use crate::{
     mixin_change::ToMixinChange,
-    resources::changed_entities::{ChangedEntitiesRes, ChangedEntity, ChangedEntityType},
+    resources::changed_entities::{
+        ChangedEntitiesRes, ChangedEntity, ChangedEntityGradientPaintType,
+        ChangedEntityImagePaintType, ChangedEntityType,
+    },
 };
 
 // Special handling for ChildrenMixin as the ChildrenMixin is no Component itself in the ECS
@@ -126,19 +129,27 @@ pub fn extract_paint_mixin_generic<C: Component + ToMixinChange + Debug>(
                                 if let Some(image_paint) = maybe_image_paint {
                                     match image_paint.scale_mode {
                                         ImagePaintScaleMode::Fill { .. } => {
-                                            ChangedEntityType::ImageFillPaint
+                                            ChangedEntityType::ImagePaint(
+                                                ChangedEntityImagePaintType::Fill,
+                                            )
                                         }
 
                                         ImagePaintScaleMode::Fit { .. } => {
-                                            ChangedEntityType::ImageFitPaint
+                                            ChangedEntityType::ImagePaint(
+                                                ChangedEntityImagePaintType::Fit,
+                                            )
                                         }
 
                                         ImagePaintScaleMode::Crop { .. } => {
-                                            ChangedEntityType::ImageCropPaint
+                                            ChangedEntityType::ImagePaint(
+                                                ChangedEntityImagePaintType::Crop,
+                                            )
                                         }
 
                                         ImagePaintScaleMode::Tile { .. } => {
-                                            ChangedEntityType::ImageTilePaint
+                                            ChangedEntityType::ImagePaint(
+                                                ChangedEntityImagePaintType::Tile,
+                                            )
                                         }
                                     }
                                 } else {
@@ -149,10 +160,14 @@ pub fn extract_paint_mixin_generic<C: Component + ToMixinChange + Debug>(
                                 if let Some(gradient_paint) = maybe_gradient_paint {
                                     match gradient_paint.variant {
                                         GradientPaintVariant::Linear { .. } => {
-                                            ChangedEntityType::LinearGradientPaint
+                                            ChangedEntityType::GradientPaint(
+                                                ChangedEntityGradientPaintType::Linear,
+                                            )
                                         }
                                         GradientPaintVariant::Radial { .. } => {
-                                            ChangedEntityType::RadialGradientPaint
+                                            ChangedEntityType::GradientPaint(
+                                                ChangedEntityGradientPaintType::Linear,
+                                            )
                                         }
                                     }
                                 } else {
