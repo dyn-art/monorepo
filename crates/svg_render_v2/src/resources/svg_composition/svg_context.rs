@@ -1,18 +1,18 @@
-use std::{collections::HashMap, sync::mpsc::Sender};
+use std::collections::HashMap;
 
 use bevy_ecs::entity::Entity;
 use dyn_composition::utils::continuous_id::ContinuousId;
 
-use crate::{
-    events::output_event::{ElementChangeEvent, SVGRenderOutputEvent},
-    resources::changed_entities::{ChangedEntity, ChangedEntityType},
-};
+#[cfg(feature = "output-event")]
+use crate::events::output_event::{ElementChangeEvent, SVGRenderOutputEvent};
+use crate::resources::changed_entities::{ChangedEntity, ChangedEntityType};
 
 use super::{
     bundles::{
         frame_node_svg_bundle::FrameNodeSVGBundle,
         gradient_paint_svg_bundle::GradientPaintSVGBundle,
-        shape_node_svg_bundle::ShapeNodeSVGBundle, solid_paint_svg_bundle::SolidPaintSVGBundle,
+        image_paint_svg_bundle::ImagePaintSVGBundle, shape_node_svg_bundle::ShapeNodeSVGBundle,
+        solid_paint_svg_bundle::SolidPaintSVGBundle,
     },
     svg_bundle::SVGBundle,
     svg_element::{SVGElement, SVGTag},
@@ -24,13 +24,13 @@ pub struct SVGContext {
     bundles: HashMap<Entity, Box<dyn SVGBundle>>,
     changed_entities: Vec<ChangedEntity>,
     #[cfg(feature = "output-event")]
-    output_event_sender: Option<Sender<SVGRenderOutputEvent>>,
+    output_event_sender: Option<std::sync::mpsc::Sender<SVGRenderOutputEvent>>,
     pub id_generator: ContinuousId,
 }
 
 impl SVGContext {
     #[cfg(feature = "output-event")]
-    pub fn new(output_event_sender: Option<Sender<SVGRenderOutputEvent>>) -> Self {
+    pub fn new(output_event_sender: Option<std::sync::mpsc::Sender<SVGRenderOutputEvent>>) -> Self {
         SVGContext {
             root_bundle_ids: Vec::new(),
             bundles: HashMap::new(),
@@ -97,6 +97,9 @@ impl SVGContext {
             ChangedEntityType::ShapeNode => Some(Box::new(ShapeNodeSVGBundle::new(entity, self))),
             // Paint
             ChangedEntityType::SolidPaint => Some(Box::new(SolidPaintSVGBundle::new(entity, self))),
+            ChangedEntityType::ImagePaint(variant) => {
+                Some(Box::new(ImagePaintSVGBundle::new(entity, variant, self)))
+            }
             ChangedEntityType::GradientPaint(variant) => {
                 Some(Box::new(GradientPaintSVGBundle::new(entity, variant, self)))
             }
