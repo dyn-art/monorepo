@@ -108,7 +108,9 @@ impl SVGBundle for ShapeNodeSVGBundle {
                     for &entity in new_children.iter() {
                         if let Some(bundle) = cx.get_bundle(&entity) {
                             match bundle.get_type() {
-                                ChangedEntityType::SolidPaint => {
+                                ChangedEntityType::SolidPaint
+                                | ChangedEntityType::ImagePaint(..)
+                                | ChangedEntityType::GradientPaint(..) => {
                                     new_paint_children.push(entity);
                                 }
                                 _ => {}

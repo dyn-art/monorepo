@@ -123,7 +123,9 @@ impl SVGBundle for FrameNodeSVGBundle {
                                 ChangedEntityType::FrameNode | ChangedEntityType::ShapeNode => {
                                     new_node_children.push(entity);
                                 }
-                                ChangedEntityType::SolidPaint => {
+                                ChangedEntityType::SolidPaint
+                                | ChangedEntityType::ImagePaint(..)
+                                | ChangedEntityType::GradientPaint(..) => {
                                     new_paint_children.push(entity);
                                 }
                                 _ => {}
