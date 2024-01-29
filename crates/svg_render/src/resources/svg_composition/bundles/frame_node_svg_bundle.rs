@@ -169,10 +169,10 @@ impl SVGBundle for FrameNodeSVGBundle {
 
                     // Process removed entities
                     for entity in removed_node_entities {
-                        cx.remove_bundle(&entity);
+                        cx.remove_bundle(&entity, self);
                     }
                     for entity in removed_paint_entities {
-                        cx.remove_bundle(&entity);
+                        cx.remove_bundle(&entity, self);
                     }
 
                     // Process added entities
@@ -242,6 +242,12 @@ impl SVGBundle for FrameNodeSVGBundle {
 
     fn get_root_element_mut(&mut self) -> &mut SVGElement {
         return &mut self.root;
+    }
+
+    fn get_child_entities(&self) -> Vec<Entity> {
+        let mut combined: Vec<Entity> = self.paint_children.iter().copied().collect();
+        combined.extend(self.node_children.iter().copied());
+        return combined;
     }
 
     fn to_string(&self, cx: &SVGContext) -> String {

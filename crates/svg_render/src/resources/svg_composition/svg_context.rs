@@ -62,13 +62,18 @@ impl SVGContext {
         self.bundles.get_mut(&entity)
     }
 
-    pub fn remove_bundle(&mut self, entity: &Entity) {
+    pub fn remove_bundle(&mut self, entity: &Entity, removed_by: &mut dyn SVGBundle) {
         if let Some(mut bundle) = self.bundles.remove(entity) {
-            // Destory bundle elements
-            for (_, child_element) in bundle.get_child_elements_mut() {
-                self.destroy_element(child_element);
+            // Remove child bundles
+            for child_entity in bundle.get_child_entities() {
+                self.remove_bundle(&child_entity, removed_by);
             }
-            self.destroy_element(bundle.get_root_element_mut());
+
+            // Destory elements from bottom to top
+            for (_, child_element) in bundle.get_child_elements_mut().into_iter().rev() {
+                self.destroy_element(child_element, removed_by, false);
+            }
+            self.destroy_element(bundle.get_root_element_mut(), removed_by, false);
         }
     }
 
@@ -77,12 +82,11 @@ impl SVGContext {
         bundle: Box<dyn SVGBundle>,
         maybe_parent_id: Option<Entity>,
     ) -> () {
-        let entity = bundle.get_entity().clone();
-        if !self.bundles.contains_key(&entity) {
+        if !self.bundles.contains_key(bundle.get_entity()) {
             if maybe_parent_id.is_none() {
                 self.root_bundle_ids.push(*bundle.get_entity());
             }
-            self.bundles.insert(bundle.get_entity().clone(), bundle);
+            self.bundles.insert(*bundle.get_entity(), bundle);
         }
     }
 
@@ -119,8 +123,14 @@ impl SVGContext {
         SVGElement::new_as_bundle_root(tag, entity, self.id_generator.next_id())
     }
 
-    pub fn destroy_element(&mut self, element: &mut SVGElement) {
-        element.destroy();
+    pub fn destroy_element(
+        &mut self,
+        element: &mut SVGElement,
+        destroyed_by: &mut dyn SVGBundle,
+        soft: bool,
+    ) {
+        element.destroy(self, destroyed_by, soft);
+
         #[cfg(feature = "output-event")]
         self.forward_element_change_events(vec![ElementChangeEvent {
             id: element.get_id(),
@@ -166,6 +176,12 @@ impl SVGContext {
 
     pub fn to_string(&self) -> Option<String> {
         let mut svg_strings = Vec::new();
+
+        log::info!(
+            "[to_string] Bundles ({:?}): {:#?}",
+            self.bundles.keys(),
+            self.bundles
+        ); // TODO: REMOVE
 
         // Construct SVG string
         for bundle_id in self.root_bundle_ids.iter() {

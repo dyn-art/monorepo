@@ -215,6 +215,10 @@ impl SVGBundle for ImagePaintSVGBundle {
         return &mut self.root;
     }
 
+    fn get_child_entities(&self) -> Vec<Entity> {
+        Vec::new()
+    }
+
     fn to_string(&self, cx: &SVGContext) -> String {
         self.get_root_element().to_string(self, cx)
     }

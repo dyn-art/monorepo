@@ -137,7 +137,7 @@ impl SVGBundle for ShapeNodeSVGBundle {
 
                     // Process removed entities
                     for entity in removed_paint_entities {
-                        cx.remove_bundle(&entity);
+                        cx.remove_bundle(&entity, self);
                     }
 
                     // Process added entities
@@ -185,6 +185,10 @@ impl SVGBundle for ShapeNodeSVGBundle {
 
     fn get_root_element_mut(&mut self) -> &mut SVGElement {
         return &mut self.root;
+    }
+
+    fn get_child_entities(&self) -> Vec<Entity> {
+        self.paint_children.iter().copied().collect()
     }
 
     fn to_string(&self, cx: &SVGContext) -> String {

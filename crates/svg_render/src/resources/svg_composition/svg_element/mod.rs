@@ -28,6 +28,8 @@ pub struct SVGElement {
     styles: HashMap<&'static str, SVGStyle>,
     /// Identifiers for child elements, supporting both in-context and out-of-context children.
     children: Vec<SVGElementChild>,
+    /// Identifier for the parent element.
+    parent: Option<SVGElementChild>,
     /// Render change updates
     #[cfg(feature = "output-event")]
     changes: Vec<ElementChange>,
@@ -71,6 +73,7 @@ impl SVGElement {
             attributes: inital_attributes,
             styles: intial_styles,
             children: Vec::new(),
+            parent: None,
             #[cfg(feature = "output-event")]
             changes: initial_changes,
             #[cfg(feature = "output-event")]
@@ -143,8 +146,8 @@ impl SVGElement {
     // Children
     // =========================================================================
 
-    pub fn clear_children(&mut self) {
-        self.children.clear()
+    pub fn get_parent(&self) -> &Option<SVGElementChild> {
+        &self.parent
     }
 
     pub fn append_child_in_svg_context(&mut self, entity: Entity, child_element: &mut SVGElement) {
@@ -159,10 +162,9 @@ impl SVGElement {
         entity: Entity,
         child_element: &mut SVGElement,
     ) {
-        let id = child_element.get_id();
         self.append_child_element(
             child_element,
-            SVGElementChildIdentifier::InSVGBundleContext(entity, id),
+            SVGElementChildIdentifier::InSVGBundleContext(entity),
         );
     }
 
@@ -176,13 +178,22 @@ impl SVGElement {
             identifier,
         });
         #[cfg(feature = "output-event")]
-        child_element.append_to_parent(self.id);
+        child_element.append_to_parent(self.id, identifier);
     }
 
-    #[cfg(feature = "output-event")]
-    pub fn append_to_parent(&mut self, parent_id: ContinuousId) {
+    pub fn append_to_parent(
+        &mut self,
+        parent_id: ContinuousId,
+        identifier: SVGElementChildIdentifier,
+    ) {
+        self.parent = Some(SVGElementChild {
+            id: parent_id,
+            identifier,
+        });
+
         // Attempt to set the parent id of the first 'ElementCreated' render change for the element.
         // This ensures the element is correctly attached to its parent during the initial rendering.
+        #[cfg(feature = "output-event")]
         if self.was_created_in_current_update_cycle {
             if let Some(update) = self.changes.first_mut() {
                 match update {
@@ -202,11 +213,60 @@ impl SVGElement {
         }
     }
 
+    pub fn remove_child(&mut self, id: ContinuousId) {
+        self.children.retain(|child| child.id != id);
+    }
+
+    pub fn clear_children(&mut self) {
+        self.children.clear()
+    }
+
     // =========================================================================
     // Other
     // =========================================================================
 
-    pub fn destroy(&mut self) {
+    /// Removes an SVG element from its parent in the hierarchy.
+    /// The `destroyed_by` bundle is passed explicitly to handle cases where the element's
+    /// immediate parent is not in the current SVG context. This is particularly relevant
+    /// when updates are being applied to the parent, necessitating its temporary removal
+    /// to allow a mutable reference to the SVGContext.
+    pub fn destroy(&mut self, cx: &mut SVGContext, destroyed_by: &mut dyn SVGBundle, soft: bool) {
+        // Remove element from potential parent element
+        if !soft {
+            if let Some(parent) = &self.parent {
+                match parent.identifier {
+                    SVGElementChildIdentifier::InSVGBundleContext(entity) => {
+                        if entity == *destroyed_by.get_entity() {
+                            if let Some(element) =
+                                destroyed_by.get_child_elements_mut().get_mut(&parent.id)
+                            {
+                                element.remove_child(self.get_id());
+                            }
+                        } else {
+                            if let Some(bundle) = cx.get_bundle_mut(&entity) {
+                                if let Some(element) =
+                                    bundle.get_child_elements_mut().remove(&parent.id)
+                                {
+                                    element.remove_child(self.get_id());
+                                }
+                            }
+                        }
+                    }
+                    SVGElementChildIdentifier::InSVGContext(entity) => {
+                        if entity == *destroyed_by.get_entity() {
+                            destroyed_by
+                                .get_root_element_mut()
+                                .remove_child(self.get_id());
+                        } else {
+                            if let Some(bundle) = cx.get_bundle_mut(&entity) {
+                                bundle.get_root_element_mut().remove_child(self.get_id());
+                            }
+                        }
+                    }
+                };
+            }
+        }
+
         #[cfg(feature = "output-event")]
         self.changes
             .push(ElementChange::ElementDeleted(ElementDeleted {}));
@@ -247,8 +307,8 @@ impl SVGElement {
         // Append children
         for child in &self.children {
             match child.identifier {
-                SVGElementChildIdentifier::InSVGBundleContext(_, child_id) => {
-                    if let Some(child_element) = bundle.get_child_elements().get(&child_id) {
+                SVGElementChildIdentifier::InSVGBundleContext(_) => {
+                    if let Some(child_element) = bundle.get_child_elements().get(&child.id) {
                         result.push_str(&child_element.to_string(bundle, cx));
                     }
                 }
@@ -273,12 +333,12 @@ pub struct SVGElementChild {
     pub identifier: SVGElementChildIdentifier,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub enum SVGElementChildIdentifier {
     /// Child element is root element of SVGBundle.
     InSVGContext(Entity),
     /// Child element is child element of SVGBundle.
-    InSVGBundleContext(Entity, ContinuousId),
+    InSVGBundleContext(Entity),
 }
 
 #[derive(Debug, Clone)]
