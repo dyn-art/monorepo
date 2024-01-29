@@ -8,7 +8,7 @@ use crate::modules::{
     composition::resources::font_cache::FontCacheRes,
     node::components::{
         mixins::{DimensionMixin, PathMixin},
-        types::Text,
+        types::TextNode,
     },
 };
 
@@ -24,7 +24,10 @@ mod token_with_shape;
 pub fn construct_text_path(
     mut commands: Commands,
     mut font_cache: ResMut<FontCacheRes>,
-    query: Query<(Entity, &Text, &DimensionMixin), Or<(Changed<Text>, Changed<DimensionMixin>)>>,
+    query: Query<
+        (Entity, &TextNode, &DimensionMixin),
+        Or<(Changed<TextNode>, Changed<DimensionMixin>)>,
+    >,
 ) {
     for (entity, text, dimension) in query.iter() {
         let mut path = PathMixin {

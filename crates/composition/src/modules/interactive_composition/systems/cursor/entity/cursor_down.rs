@@ -13,7 +13,7 @@ use crate::modules::{
     },
     node::components::{
         states::{Locked, Selected},
-        types::{Frame, Node, Root},
+        types::{FrameNode, Node, Root},
     },
 };
 
@@ -33,7 +33,7 @@ pub fn handle_cursor_down_on_entity_event(
     frame_query: Query<
         Entity,
         (
-            With<Frame>,
+            With<FrameNode>,
             Without<Locked>,
             Without<Root>,
             Without<Selected>,
@@ -44,7 +44,7 @@ pub fn handle_cursor_down_on_entity_event(
         (
             With<Node>,
             Without<Locked>,
-            Without<Frame>,
+            Without<FrameNode>,
             Without<Selected>,
         ),
     >,
@@ -103,7 +103,7 @@ fn select_next_node(
     frame_query: &Query<
         Entity,
         (
-            With<Frame>,
+            With<FrameNode>,
             Without<Locked>,
             Without<Root>,
             Without<Selected>,
@@ -114,7 +114,7 @@ fn select_next_node(
         (
             With<Node>,
             Without<Locked>,
-            Without<Frame>,
+            Without<FrameNode>,
             Without<Selected>,
         ),
     >,

@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use crate::modules::{
-    composition::resources::font_cache::FontCacheRes, node::components::types::Text,
+    composition::resources::font_cache::FontCacheRes, node::components::types::TextNode,
 };
 
 use super::token::{Token, TokenKind};
@@ -12,7 +12,7 @@ pub struct TokenStream<'a> {
 }
 
 impl<'a> TokenStream<'a> {
-    pub fn from_text(text: &Text, font_cache: &'a mut FontCacheRes) -> Self {
+    pub fn from_text(text: &TextNode, font_cache: &'a mut FontCacheRes) -> Self {
         let mut tokens: Vec<Token> = Vec::new();
         let mut font_face_cache: HashMap<u64, rustybuzz::Face<'a>> = HashMap::new();
 

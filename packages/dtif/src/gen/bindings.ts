@@ -236,18 +236,6 @@ export type ElementCreated = { tagName: string; attributes: SVGAttribute[]; styl
 export type ElementDeleted = Record<string, never>
 
 /**
- * Represents a basic shape node for an ellipse.
- * Note that a circle is a special case of an ellipse where the width equals the height.
- */
-export type Ellipse = { _ellipse?: null | null; 
-/**
- * Contains the arc data for the ellipse,
- * which includes the starting angle, ending angle, and the inner radius ratio.
- * These properties are used to create arcs and donuts shapes.
- */
-arcData?: EllipseArcData }
-
-/**
  * Represents the arc data for an ellipse.
  * This includes properties for defining the sweep of the ellipse and its inner radius,
  * which are used in UI elements to create various elliptical shapes.
@@ -266,6 +254,18 @@ endingAngle: number;
  * A value of 0 indicates a full ellipse, while higher values create a 'donut' shape.
  */
 innerRadiusRatio: number }
+
+/**
+ * Represents a basic shape node for an ellipse.
+ * Note that a circle is a special case of an ellipse where the width equals the height.
+ */
+export type EllipseNode = { _ellipse_node?: null | null; 
+/**
+ * Contains the arc data for the ellipse,
+ * which includes the starting angle, ending angle, and the inner radius ratio.
+ * These properties are used to create arcs and donuts shapes.
+ */
+arcData?: EllipseArcData }
 
 export type Entity = number
 
@@ -353,7 +353,7 @@ export type FontStyle =
  * It functions similarly to an HTML `<div>` element.
  * This is distinct from a `GroupNode`, which is more akin to a folder for layers in its use and functionality.
  */
-export type Frame = { _frame?: null | null; 
+export type FrameNode = { _frame_node?: null | null; 
 /**
  * Indicates whether the frame clips its content to its bounding box.
  * When set to `true`, content that extends beyond the frame's boundaries will be clipped.
@@ -368,7 +368,7 @@ export type FrameNodeBundle = ({
  * such as 'Cool Node'.
  * If not provided, it defaults to `None`.
  */
-name?: string | null }) & ({ _frame?: null | null; 
+name?: string | null }) & ({ _frame_node?: null | null; 
 /**
  * Indicates whether the frame clips its content to its bounding box.
  * When set to `true`, content that extends beyond the frame's boundaries will be clipped.
@@ -410,9 +410,9 @@ gradientStops: ColorStop[] }
  * As a result, while it is possible to move or resize a `Group`, be aware that its
  * position and size are subject to change in response to modifications of its content.
  */
-export type Group = { _group?: null | null }
+export type GroupNode = { _group_node?: null | null }
 
-export type GroupNodeBundle = ({ _group?: null | null }) & ({ 
+export type GroupNodeBundle = ({ _group_node?: null | null }) & ({ 
 /**
  * The name of the node.
  * This is an optional field and can be used to label the node with a descriptive name,
@@ -637,19 +637,12 @@ vertices: Anchor[] }
 /**
  * Represents a basic shape node for a regular convex polygon with three or more sides.
  */
-export type Polygon = { _polygon?: null | null; 
+export type PolygonNode = { _polygon_node?: null | null; 
 /**
  * The number of sides of the polygon.
  * This value must be an integer greater than or equal to 3.
  */
 pointCount?: number }
-
-/**
- * Represents a basic shape node for a rectangle.
- * It is a fundamental building block used to create and manipulate rectangular shapes
- * within the composition.
- */
-export type Rectangle = { _rectangle?: null | null }
 
 /**
  * Provides corner radius properties for rectangle like nodes.
@@ -676,7 +669,14 @@ bottomRightRadius?: number;
  */
 bottomLeftRadius?: number }
 
-export type RectangleNodeBundle = ({ _rectangle?: null | null }) & ({ 
+/**
+ * Represents a basic shape node for a rectangle.
+ * It is a fundamental building block used to create and manipulate rectangular shapes
+ * within the composition.
+ */
+export type RectangleNode = { _rectangle_node?: null | null }
+
+export type RectangleNodeBundle = ({ _rectangle_node?: null | null }) & ({ 
 /**
  * The name of the node.
  * This is an optional field and can be used to label the node with a descriptive name,
@@ -756,7 +756,7 @@ color: [number, number, number] }) & { paint?: Paint; compositionMixin?: PaintCo
 /**
  * Represents a basic shape node for a star with a set number of points.
  */
-export type Star = { _star?: null | null; 
+export type StarNode = { _star_node?: null | null; 
 /**
  * The number of "spikes", or outer points of the star.
  * This value must be an integer greater than or equal to 3.
@@ -781,7 +781,7 @@ export type StyleUpdated = { newValue: SVGStyle }
 /**
  * Represents a text node with customizable style and layout properties.
  */
-export type Text = { _text?: null | null; 
+export type TextNode = { _text_node?: null | null; 
 /**
  * Sections of the text, each with its own style.
  */
@@ -799,7 +799,7 @@ verticalTextAlignment?: VerticalTextAlignment;
  */
 linebreakBehavior?: BreakLineOn }
 
-export type TextNodeBundle = ({ _text?: null | null; 
+export type TextNodeBundle = ({ _text_node?: null | null; 
 /**
  * Sections of the text, each with its own style.
  */

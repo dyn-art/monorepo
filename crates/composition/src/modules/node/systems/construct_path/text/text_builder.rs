@@ -9,7 +9,7 @@ use crate::modules::{
     node::{
         components::{
             mixins::{Anchor, AnchorCommand},
-            types::Text,
+            types::TextNode,
         },
         systems::construct_path::text::token::TokenKind,
     },
@@ -54,7 +54,7 @@ impl TextBuilder {
         }
     }
 
-    pub fn process_text(&mut self, text: &Text, font_cache: &mut FontCacheRes) {
+    pub fn process_text(&mut self, text: &TextNode, font_cache: &mut FontCacheRes) {
         let mut token_stream = TokenStream::from_text(text, font_cache);
         let lines = token_stream.drain_into_lines();
 

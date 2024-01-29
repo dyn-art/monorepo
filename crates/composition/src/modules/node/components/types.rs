@@ -40,17 +40,16 @@ pub enum NodeType {
 }
 
 // =============================================================================
-// Frame
+// Frame Node
 // =============================================================================
 
 /// Acts as a container used to define a layout hierarchy.
 /// It functions similarly to an HTML `<div>` element.
 /// This is distinct from a `GroupNode`, which is more akin to a folder for layers in its use and functionality.
 #[derive(Component, Serialize, Deserialize, Clone, Default, Debug, Type)]
-// TODO: Rename to "FrameNode"
-pub struct Frame {
+pub struct FrameNode {
     #[serde(default)]
-    _frame: Option<()>,
+    _frame_node: Option<()>,
 
     /// Indicates whether the frame clips its content to its bounding box.
     /// When set to `true`, content that extends beyond the frame's boundaries will be clipped.
@@ -65,7 +64,7 @@ fn default_clip_content() -> bool {
 }
 
 // =============================================================================
-// Group
+// Group Node
 // =============================================================================
 
 /// Serves as a container used to semantically group related nodes,
@@ -77,37 +76,34 @@ fn default_clip_content() -> bool {
 /// As a result, while it is possible to move or resize a `Group`, be aware that its
 /// position and size are subject to change in response to modifications of its content.
 #[derive(Component, Serialize, Deserialize, Clone, Default, Debug, Type)]
-// TODO: Rename to "GroupNode"
-pub struct Group {
+pub struct GroupNode {
     #[serde(default)]
-    _group: Option<()>,
+    _group_node: Option<()>,
 }
 
 // =============================================================================
-// Rectangle
+// Rectangle Node
 // =============================================================================
 
 /// Represents a basic shape node for a rectangle.
 /// It is a fundamental building block used to create and manipulate rectangular shapes
 /// within the composition.
 #[derive(Component, Serialize, Deserialize, Clone, Default, Debug, Type)]
-// TODO: Rename to "RectangleNode"
-pub struct Rectangle {
+pub struct RectangleNode {
     #[serde(default)]
-    _rectangle: Option<()>,
+    _rectangle_node: Option<()>,
 }
 
 // =============================================================================
-// Ellipse
+// Ellipse Node
 // =============================================================================
 
 /// Represents a basic shape node for an ellipse.
 /// Note that a circle is a special case of an ellipse where the width equals the height.
 #[derive(Component, Serialize, Deserialize, Clone, Default, Debug, Type)]
-// TODO: Rename to "EllipseNode"
-pub struct Ellipse {
+pub struct EllipseNode {
     #[serde(default)]
-    _ellipse: Option<()>,
+    _ellipse_node: Option<()>,
 
     /// Contains the arc data for the ellipse,
     /// which includes the starting angle, ending angle, and the inner radius ratio.
@@ -134,15 +130,14 @@ pub struct EllipseArcData {
 }
 
 // =============================================================================
-// Star
+// Star Node
 // =============================================================================
 
 /// Represents a basic shape node for a star with a set number of points.
 #[derive(Component, Serialize, Deserialize, Clone, Default, Debug, Type)]
-// TODO: Rename to "StarNode"
-pub struct Star {
+pub struct StarNode {
     #[serde(default)]
-    _star: Option<()>,
+    _star_node: Option<()>,
 
     /// The number of "spikes", or outer points of the star.
     /// This value must be an integer greater than or equal to 3.
@@ -161,15 +156,14 @@ fn default_star_point_count() -> u8 {
 }
 
 // =============================================================================
-// Polygon
+// Polygon Node
 // =============================================================================
 
 /// Represents a basic shape node for a regular convex polygon with three or more sides.
 #[derive(Component, Serialize, Deserialize, Clone, Default, Debug, Type)]
-// TODO: Rename to "PolygonNode"
-pub struct Polygon {
+pub struct PolygonNode {
     #[serde(default)]
-    _polygon: Option<()>,
+    _polygon_node: Option<()>,
 
     /// The number of sides of the polygon.
     /// This value must be an integer greater than or equal to 3.
@@ -183,15 +177,14 @@ fn default_polygon_point_count() -> u8 {
 }
 
 // =============================================================================
-// Text
+// Text Node
 // =============================================================================
 
 /// Represents a text node with customizable style and layout properties.
 #[derive(Component, Serialize, Deserialize, Clone, Default, Debug, Type)]
-// TODO: Rename to "TextNode"
-pub struct Text {
+pub struct TextNode {
     #[serde(default)]
-    _text: Option<()>,
+    _text_node: Option<()>,
 
     /// Sections of the text, each with its own style.
     pub segments: Vec<TextSegment>,
@@ -298,6 +291,12 @@ pub enum BreakLineOn {
     /// Disables automatic line breaking. Respects explicit line breaks like '\n'.
     NoWrap,
 }
+
+// =============================================================================
+// Vector Node
+// =============================================================================
+
+// TODO
 
 // =============================================================================
 // Paint
