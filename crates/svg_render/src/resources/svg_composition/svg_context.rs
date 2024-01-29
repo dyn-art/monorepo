@@ -115,8 +115,8 @@ impl SVGContext {
     // Element
     // =========================================================================
 
-    pub fn create_element(&mut self, tag: SVGTag) -> SVGElement {
-        SVGElement::new(tag, self.id_generator.next_id())
+    pub fn create_element(&mut self, tag: SVGTag, entity: Entity) -> SVGElement {
+        SVGElement::new(tag, entity, self.id_generator.next_id())
     }
 
     pub fn create_bundle_root_element(&mut self, tag: SVGTag, entity: Entity) -> SVGElement {

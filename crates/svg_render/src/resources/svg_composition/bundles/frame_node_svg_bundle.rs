@@ -263,7 +263,7 @@ impl FrameNodeSVGBundle {
             name: Self::create_element_name(root_element.get_id(), String::from("root"), false),
         });
 
-        let mut defs_element = cx.create_element(SVGTag::Defs);
+        let mut defs_element = cx.create_element(SVGTag::Defs, entity);
         #[cfg(feature = "tracing")]
         defs_element.set_attribute(SVGAttribute::Name {
             name: Self::create_element_name(defs_element.get_id(), String::from("defs"), false),
@@ -272,7 +272,7 @@ impl FrameNodeSVGBundle {
 
         // Create content elements
 
-        let mut content_clip_path_element = cx.create_element(SVGTag::ClipPath);
+        let mut content_clip_path_element = cx.create_element(SVGTag::ClipPath, entity);
         #[cfg(feature = "tracing")]
         content_clip_path_element.set_attribute(SVGAttribute::Name {
             name: Self::create_element_name(
@@ -283,7 +283,7 @@ impl FrameNodeSVGBundle {
         });
         defs_element.append_child_in_bundle_context(entity, &mut content_clip_path_element);
 
-        let mut content_clipped_rect_element = cx.create_element(SVGTag::Rect);
+        let mut content_clipped_rect_element = cx.create_element(SVGTag::Rect, entity);
         #[cfg(feature = "tracing")]
         content_clipped_rect_element.set_attribute(SVGAttribute::Name {
             name: Self::create_element_name(
@@ -295,7 +295,7 @@ impl FrameNodeSVGBundle {
         content_clip_path_element
             .append_child_in_bundle_context(entity, &mut content_clipped_rect_element);
 
-        let mut content_wrapper_g_element = cx.create_element(SVGTag::Group);
+        let mut content_wrapper_g_element = cx.create_element(SVGTag::Group, entity);
         #[cfg(feature = "tracing")]
         content_wrapper_g_element.set_attribute(SVGAttribute::Name {
             name: Self::create_element_name(
@@ -311,7 +311,7 @@ impl FrameNodeSVGBundle {
 
         // Create fill elements
 
-        let mut fill_clip_path_element = cx.create_element(SVGTag::ClipPath);
+        let mut fill_clip_path_element = cx.create_element(SVGTag::ClipPath, entity);
         #[cfg(feature = "tracing")]
         fill_clip_path_element.set_attribute(SVGAttribute::Name {
             name: Self::create_element_name(
@@ -322,7 +322,7 @@ impl FrameNodeSVGBundle {
         });
         defs_element.append_child_in_bundle_context(entity, &mut fill_clip_path_element);
 
-        let mut fill_clipped_path_element = cx.create_element(SVGTag::Rect);
+        let mut fill_clipped_path_element = cx.create_element(SVGTag::Rect, entity);
         #[cfg(feature = "tracing")]
         fill_clipped_path_element.set_attribute(SVGAttribute::Name {
             name: Self::create_element_name(
@@ -334,7 +334,7 @@ impl FrameNodeSVGBundle {
         fill_clip_path_element
             .append_child_in_bundle_context(entity, &mut fill_clipped_path_element);
 
-        let mut fill_wrapper_g_element = cx.create_element(SVGTag::Group);
+        let mut fill_wrapper_g_element = cx.create_element(SVGTag::Group, entity);
         #[cfg(feature = "tracing")]
         fill_wrapper_g_element.set_attribute(SVGAttribute::Name {
             name: Self::create_element_name(
@@ -351,7 +351,7 @@ impl FrameNodeSVGBundle {
 
         // Create children wrapper element
 
-        let mut children_wrapper_g_element = cx.create_element(SVGTag::Group);
+        let mut children_wrapper_g_element = cx.create_element(SVGTag::Group, entity);
         #[cfg(feature = "tracing")]
         children_wrapper_g_element.set_attribute(SVGAttribute::Name {
             name: Self::create_element_name(

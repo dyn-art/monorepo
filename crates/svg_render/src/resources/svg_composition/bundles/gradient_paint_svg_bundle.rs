@@ -87,7 +87,8 @@ impl SVGBundle for GradientPaintSVGBundle {
 
                     // Add new gradient stop elements
                     for gradient_stop in &mixin.gradient_stops {
-                        let mut gradient_stop_element = cx.create_element(SVGTag::Stop);
+                        let mut gradient_stop_element =
+                            cx.create_element(SVGTag::Stop, self.entity);
                         gradient_stop_element.set_attributes(vec![
                             SVGAttribute::Offset {
                                 offset: gradient_stop.position,
@@ -183,7 +184,7 @@ impl GradientPaintSVGBundle {
             name: Self::create_element_name(root_element.get_id(), String::from("root"), false),
         });
 
-        let mut defs_element = cx.create_element(SVGTag::Defs);
+        let mut defs_element = cx.create_element(SVGTag::Defs, entity);
         #[cfg(feature = "tracing")]
         defs_element.set_attribute(SVGAttribute::Name {
             name: Self::create_element_name(defs_element.get_id(), String::from("defs"), false),
@@ -192,10 +193,13 @@ impl GradientPaintSVGBundle {
 
         // Create paint elements
 
-        let mut paint_gradient_element = cx.create_element(match variant {
-            ChangedEntityGradientPaintType::Linear => SVGTag::LinearGradient,
-            ChangedEntityGradientPaintType::Radial => SVGTag::RadialGradient,
-        });
+        let mut paint_gradient_element = cx.create_element(
+            match variant {
+                ChangedEntityGradientPaintType::Linear => SVGTag::LinearGradient,
+                ChangedEntityGradientPaintType::Radial => SVGTag::RadialGradient,
+            },
+            entity,
+        );
         let paint_gradient_id = paint_gradient_element.get_id();
         #[cfg(feature = "tracing")]
         paint_gradient_element.set_attribute(SVGAttribute::Name {
@@ -210,7 +214,7 @@ impl GradientPaintSVGBundle {
         });
         defs_element.append_child_in_bundle_context(entity, &mut paint_gradient_element);
 
-        let mut paint_rect_element = cx.create_element(SVGTag::Rect);
+        let mut paint_rect_element = cx.create_element(SVGTag::Rect, entity);
         #[cfg(feature = "tracing")]
         paint_rect_element.set_attribute(SVGAttribute::Name {
             name: Self::create_element_name(

@@ -204,7 +204,7 @@ impl ShapeNodeSVGBundle {
             name: Self::create_element_name(root_element.get_id(), String::from("root"), false),
         });
 
-        let mut defs_element = cx.create_element(SVGTag::Defs);
+        let mut defs_element = cx.create_element(SVGTag::Defs, entity);
         #[cfg(feature = "tracing")]
         defs_element.set_attribute(SVGAttribute::Name {
             name: Self::create_element_name(defs_element.get_id(), String::from("defs"), false),
@@ -213,7 +213,7 @@ impl ShapeNodeSVGBundle {
 
         // Create click area elements
 
-        let mut click_area_rect_element = cx.create_element(SVGTag::Rect);
+        let mut click_area_rect_element = cx.create_element(SVGTag::Rect, entity);
         #[cfg(feature = "tracing")]
         click_area_rect_element.set_attributes(vec![
             SVGAttribute::Name {
@@ -235,7 +235,7 @@ impl ShapeNodeSVGBundle {
 
         // Create fill elements
 
-        let mut fill_clip_path_element = cx.create_element(SVGTag::ClipPath);
+        let mut fill_clip_path_element = cx.create_element(SVGTag::ClipPath, entity);
         #[cfg(feature = "tracing")]
         fill_clip_path_element.set_attribute(SVGAttribute::Name {
             name: Self::create_element_name(
@@ -246,7 +246,7 @@ impl ShapeNodeSVGBundle {
         });
         defs_element.append_child_in_bundle_context(entity, &mut fill_clip_path_element);
 
-        let mut fill_clipped_path_element = cx.create_element(SVGTag::Path);
+        let mut fill_clipped_path_element = cx.create_element(SVGTag::Path, entity);
         #[cfg(feature = "tracing")]
         fill_clipped_path_element.set_attribute(SVGAttribute::Name {
             name: Self::create_element_name(
@@ -258,7 +258,7 @@ impl ShapeNodeSVGBundle {
         fill_clip_path_element
             .append_child_in_bundle_context(entity, &mut fill_clipped_path_element);
 
-        let mut fill_wrapper_g_element = cx.create_element(SVGTag::Group);
+        let mut fill_wrapper_g_element = cx.create_element(SVGTag::Group, entity);
         #[cfg(feature = "tracing")]
         fill_wrapper_g_element.set_attribute(SVGAttribute::Name {
             name: Self::create_element_name(

@@ -228,7 +228,7 @@ export type ElementChangeEvent = { id: ContinuousId; changes: ElementChange[] }
 /**
  * Emitted when a new SVGElement is created.
  */
-export type ElementCreated = { tagName: string; attributes: SVGAttribute[]; styles: SVGStyle[]; parentId: ContinuousId | null; isBundleRoot: boolean; entity: Entity | null }
+export type ElementCreated = { tagName: string; attributes: SVGAttribute[]; styles: SVGStyle[]; parentId: ContinuousId | null; isBundleRoot: boolean; entity: Entity }
 
 /**
  * Emitted when a SVGElement is deleted.

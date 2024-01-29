@@ -116,7 +116,7 @@ impl SolidPaintSVGBundle {
             name: Self::create_element_name(root_element.get_id(), String::from("root"), false),
         });
 
-        let mut paint_rect_element = cx.create_element(SVGTag::Rect);
+        let mut paint_rect_element = cx.create_element(SVGTag::Rect, entity);
         #[cfg(feature = "tracing")]
         paint_rect_element.set_attribute(SVGAttribute::Name {
             name: Self::create_element_name(
