@@ -168,12 +168,6 @@ impl SVGContext {
     pub fn to_string(&self) -> Option<String> {
         let mut svg_strings = Vec::new();
 
-        log::info!(
-            "[to_string] Bundles ({:?}): {:#?}",
-            self.bundles.keys(),
-            self.bundles
-        ); // TODO: REMOVE
-
         // Construct SVG string
         for bundle_id in self.root_bundle_ids.iter() {
             let root = match self.get_bundle(bundle_id) {

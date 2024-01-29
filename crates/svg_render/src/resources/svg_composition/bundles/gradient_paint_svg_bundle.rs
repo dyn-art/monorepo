@@ -1,4 +1,4 @@
-use std::{collections::BTreeMap, mem::take};
+use std::collections::BTreeMap;
 
 use bevy_ecs::entity::Entity;
 use dyn_composition::utils::continuous_id::ContinuousId;
@@ -79,11 +79,11 @@ impl SVGBundle for GradientPaintSVGBundle {
                 MixinChange::GradientStopsMixin(mixin) => {
                     // Remove old gradient stop elements
                     self.paint_gradient.clear_children();
-                    take(&mut self.paint_gradient_stops).iter_mut().for_each(
-                        |mut paint_gradient_stop| {
+                    self.paint_gradient_stops
+                        .drain(..)
+                        .for_each(|mut paint_gradient_stop| {
                             cx.destroy_element(&mut paint_gradient_stop);
-                        },
-                    );
+                        });
 
                     // Add new gradient stop elements
                     for gradient_stop in &mixin.gradient_stops {
@@ -160,10 +160,6 @@ impl SVGBundle for GradientPaintSVGBundle {
 
     fn get_root_element_mut(&mut self) -> &mut SVGElement {
         return &mut self.root;
-    }
-
-    fn get_child_entities(&self) -> Vec<Entity> {
-        Vec::new()
     }
 
     fn destroy(&mut self, cx: &mut SVGContext) {

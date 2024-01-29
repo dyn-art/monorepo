@@ -38,9 +38,6 @@ pub trait SVGBundle: Sync + Send + Debug {
     /// Returns a mutable reference to the root `SVGElement`.
     fn get_root_element_mut(&mut self) -> &mut SVGElement;
 
-    /// Returns a vector of child entities (`Entity`) in the bundle, representing nested bundles.
-    fn get_child_entities(&self) -> Vec<Entity>;
-
     /// Destroys the specified SVG bundle and its elements.
     /// This method only handles the destruction of the bundle and its elements itself.
     /// It is the responsibility of the caller to ensure that any references to this bundle are properly managed.

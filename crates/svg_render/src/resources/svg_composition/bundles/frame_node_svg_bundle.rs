@@ -253,12 +253,6 @@ impl SVGBundle for FrameNodeSVGBundle {
         return &mut self.root;
     }
 
-    fn get_child_entities(&self) -> Vec<Entity> {
-        let mut combined: Vec<Entity> = self.paint_children.iter().copied().collect();
-        combined.extend(self.node_children.iter().copied());
-        return combined;
-    }
-
     fn destroy(&mut self, cx: &mut SVGContext) {
         // Destroy child entities
         for entity in take(&mut self.node_children) {

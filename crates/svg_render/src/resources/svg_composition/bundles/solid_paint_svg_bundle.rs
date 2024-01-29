@@ -99,10 +99,6 @@ impl SVGBundle for SolidPaintSVGBundle {
         return &mut self.root;
     }
 
-    fn get_child_entities(&self) -> Vec<Entity> {
-        Vec::new()
-    }
-
     fn destroy(&mut self, cx: &mut SVGContext) {
         // Destroy elements associated with the bundle.
         // Removing the root also implicitly removes its child elements.

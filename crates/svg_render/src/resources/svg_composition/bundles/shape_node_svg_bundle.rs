@@ -193,10 +193,6 @@ impl SVGBundle for ShapeNodeSVGBundle {
         return &mut self.root;
     }
 
-    fn get_child_entities(&self) -> Vec<Entity> {
-        self.paint_children.iter().copied().collect()
-    }
-
     fn destroy(&mut self, cx: &mut SVGContext) {
         // Destroy child entities
         for entity in take(&mut self.paint_children) {
