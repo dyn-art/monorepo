@@ -219,6 +219,12 @@ impl SVGBundle for ImagePaintSVGBundle {
         Vec::new()
     }
 
+    fn destroy(&mut self, cx: &mut SVGContext) {
+        // Destroy elements associated with the bundle.
+        // Removing the root also implicitly removes its child elements.
+        cx.destroy_element(self.get_root_element_mut());
+    }
+
     fn to_string(&self, cx: &SVGContext) -> String {
         self.get_root_element().to_string(self, cx)
     }
@@ -232,7 +238,7 @@ impl ImagePaintSVGBundle {
             name: Self::create_element_name(root_element.get_id(), String::from("root"), false),
         });
 
-        let mut defs_element = cx.create_element(SVGTag::Defs, entity);
+        let mut defs_element = cx.create_element(SVGTag::Defs);
         #[cfg(feature = "tracing")]
         defs_element.set_attribute(SVGAttribute::Name {
             name: Self::create_element_name(defs_element.get_id(), String::from("defs"), false),
@@ -241,7 +247,7 @@ impl ImagePaintSVGBundle {
 
         // Create paint elements
 
-        let mut paint_pattern_element = cx.create_element(SVGTag::Pattern, entity);
+        let mut paint_pattern_element = cx.create_element(SVGTag::Pattern);
         let paint_pattern_id = paint_pattern_element.get_id();
         #[cfg(feature = "tracing")]
         paint_pattern_element.set_attribute(SVGAttribute::Name {
@@ -256,7 +262,7 @@ impl ImagePaintSVGBundle {
         });
         defs_element.append_child_in_bundle_context(entity, &mut paint_pattern_element);
 
-        let mut paint_clipped_image_element = cx.create_element(SVGTag::Image, entity);
+        let mut paint_clipped_image_element = cx.create_element(SVGTag::Image);
         #[cfg(feature = "tracing")]
         paint_clipped_image_element.set_attribute(SVGAttribute::Name {
             name: Self::create_element_name(
@@ -276,7 +282,7 @@ impl ImagePaintSVGBundle {
         paint_pattern_element
             .append_child_in_bundle_context(entity, &mut paint_clipped_image_element);
 
-        let mut paint_rect_element = cx.create_element(SVGTag::Rect, entity);
+        let mut paint_rect_element = cx.create_element(SVGTag::Rect);
         #[cfg(feature = "tracing")]
         paint_rect_element.set_attribute(SVGAttribute::Name {
             name: Self::create_element_name(

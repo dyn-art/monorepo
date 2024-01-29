@@ -62,17 +62,12 @@ impl SVGContext {
         self.bundles.get_mut(&entity)
     }
 
-    pub fn remove_bundle(&mut self, entity: &Entity, removed_by: &mut dyn SVGBundle) {
-        if let Some(mut bundle) = self.bundles.remove(entity) {
-            // Remove child bundles
-            for child_entity in bundle.get_child_entities() {
-                self.remove_bundle(&child_entity, removed_by);
-            }
-
-            // Destroy elements associated with the bundle.
-            // Removing the root also implicitly removes its child elements.
-            self.destroy_element(bundle.get_root_element_mut(), removed_by, false);
+    pub fn remove_bundle(&mut self, entity: &Entity) -> Option<Box<dyn SVGBundle>> {
+        let mut maybe_bundle = self.bundles.remove(entity);
+        if let Some(bundle) = &mut maybe_bundle {
+            bundle.destroy(self);
         }
+        return maybe_bundle;
     }
 
     pub fn insert_bundle(
@@ -113,21 +108,19 @@ impl SVGContext {
     // Element
     // =========================================================================
 
-    pub fn create_element(&mut self, tag: SVGTag, entity: Entity) -> SVGElement {
-        SVGElement::new(tag, entity, self.id_generator.next_id())
+    pub fn create_element(&mut self, tag: SVGTag) -> SVGElement {
+        SVGElement::new(tag, self.id_generator.next_id())
     }
 
     pub fn create_bundle_root_element(&mut self, tag: SVGTag, entity: Entity) -> SVGElement {
         SVGElement::new_as_bundle_root(tag, entity, self.id_generator.next_id())
     }
 
-    pub fn destroy_element(
-        &mut self,
-        element: &mut SVGElement,
-        destroyed_by: &mut dyn SVGBundle,
-        soft: bool,
-    ) {
-        element.destroy(self, destroyed_by, soft);
+    /// Destroys the specified SVG element.
+    /// This method only handles the destruction of the element itself.
+    /// It is the responsibility of the caller to ensure that any references to this element are properly managed.
+    pub fn destroy_element(&mut self, element: &mut SVGElement) {
+        element.destroy();
 
         #[cfg(feature = "output-event")]
         self.forward_element_change_events(vec![ElementChangeEvent {

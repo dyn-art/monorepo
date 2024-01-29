@@ -103,6 +103,12 @@ impl SVGBundle for SolidPaintSVGBundle {
         Vec::new()
     }
 
+    fn destroy(&mut self, cx: &mut SVGContext) {
+        // Destroy elements associated with the bundle.
+        // Removing the root also implicitly removes its child elements.
+        cx.destroy_element(self.get_root_element_mut());
+    }
+
     fn to_string(&self, cx: &SVGContext) -> String {
         self.get_root_element().to_string(self, cx)
     }
@@ -116,7 +122,7 @@ impl SolidPaintSVGBundle {
             name: Self::create_element_name(root_element.get_id(), String::from("root"), false),
         });
 
-        let mut paint_rect_element = cx.create_element(SVGTag::Rect, entity);
+        let mut paint_rect_element = cx.create_element(SVGTag::Rect);
         #[cfg(feature = "tracing")]
         paint_rect_element.set_attribute(SVGAttribute::Name {
             name: Self::create_element_name(

@@ -26,7 +26,7 @@ pub struct ElementCreated {
     pub styles: Vec<SVGStyle>,
     pub parent_id: Option<ContinuousId>,
     pub is_bundle_root: bool,
-    pub entity: Entity,
+    pub entity: Option<Entity>,
 }
 
 /// Emitted when a SVGElement is deleted.

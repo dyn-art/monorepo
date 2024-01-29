@@ -81,14 +81,13 @@ impl SVGBundle for GradientPaintSVGBundle {
                     self.paint_gradient.clear_children();
                     take(&mut self.paint_gradient_stops).iter_mut().for_each(
                         |mut paint_gradient_stop| {
-                            cx.destroy_element(&mut paint_gradient_stop, self, true);
+                            cx.destroy_element(&mut paint_gradient_stop);
                         },
                     );
 
                     // Add new gradient stop elements
                     for gradient_stop in &mixin.gradient_stops {
-                        let mut gradient_stop_element =
-                            cx.create_element(SVGTag::Stop, self.entity);
+                        let mut gradient_stop_element = cx.create_element(SVGTag::Stop);
                         gradient_stop_element.set_attributes(vec![
                             SVGAttribute::Offset {
                                 offset: gradient_stop.position,
@@ -167,6 +166,12 @@ impl SVGBundle for GradientPaintSVGBundle {
         Vec::new()
     }
 
+    fn destroy(&mut self, cx: &mut SVGContext) {
+        // Destroy elements associated with the bundle.
+        // Removing the root also implicitly removes its child elements.
+        cx.destroy_element(self.get_root_element_mut());
+    }
+
     fn to_string(&self, cx: &SVGContext) -> String {
         self.get_root_element().to_string(self, cx)
     }
@@ -184,7 +189,7 @@ impl GradientPaintSVGBundle {
             name: Self::create_element_name(root_element.get_id(), String::from("root"), false),
         });
 
-        let mut defs_element = cx.create_element(SVGTag::Defs, entity);
+        let mut defs_element = cx.create_element(SVGTag::Defs);
         #[cfg(feature = "tracing")]
         defs_element.set_attribute(SVGAttribute::Name {
             name: Self::create_element_name(defs_element.get_id(), String::from("defs"), false),
@@ -193,13 +198,10 @@ impl GradientPaintSVGBundle {
 
         // Create paint elements
 
-        let mut paint_gradient_element = cx.create_element(
-            match variant {
-                ChangedEntityGradientPaintType::Linear => SVGTag::LinearGradient,
-                ChangedEntityGradientPaintType::Radial => SVGTag::RadialGradient,
-            },
-            entity,
-        );
+        let mut paint_gradient_element = cx.create_element(match variant {
+            ChangedEntityGradientPaintType::Linear => SVGTag::LinearGradient,
+            ChangedEntityGradientPaintType::Radial => SVGTag::RadialGradient,
+        });
         let paint_gradient_id = paint_gradient_element.get_id();
         #[cfg(feature = "tracing")]
         paint_gradient_element.set_attribute(SVGAttribute::Name {
@@ -214,7 +216,7 @@ impl GradientPaintSVGBundle {
         });
         defs_element.append_child_in_bundle_context(entity, &mut paint_gradient_element);
 
-        let mut paint_rect_element = cx.create_element(SVGTag::Rect, entity);
+        let mut paint_rect_element = cx.create_element(SVGTag::Rect);
         #[cfg(feature = "tracing")]
         paint_rect_element.set_attribute(SVGAttribute::Name {
             name: Self::create_element_name(

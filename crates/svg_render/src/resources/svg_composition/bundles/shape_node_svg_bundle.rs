@@ -1,4 +1,7 @@
-use std::collections::{BTreeMap, HashSet};
+use std::{
+    collections::{BTreeMap, HashSet},
+    mem::take,
+};
 
 use bevy_ecs::entity::Entity;
 use dyn_composition::utils::continuous_id::ContinuousId;
@@ -137,7 +140,10 @@ impl SVGBundle for ShapeNodeSVGBundle {
 
                     // Process removed entities
                     for entity in removed_paint_entities {
-                        cx.remove_bundle(&entity, self);
+                        if let Some(removed_bundle) = cx.remove_bundle(&entity) {
+                            self.fill_wrapper_g
+                                .remove_child(removed_bundle.get_root_element().get_id());
+                        }
                     }
 
                     // Process added entities
@@ -191,6 +197,20 @@ impl SVGBundle for ShapeNodeSVGBundle {
         self.paint_children.iter().copied().collect()
     }
 
+    fn destroy(&mut self, cx: &mut SVGContext) {
+        // Destroy child entities
+        for entity in take(&mut self.paint_children) {
+            if let Some(removed_bundle) = cx.remove_bundle(&entity) {
+                self.fill_wrapper_g
+                    .remove_child(removed_bundle.get_root_element().get_id());
+            }
+        }
+
+        // Destroy elements associated with the bundle.
+        // Removing the root also implicitly removes its child elements.
+        cx.destroy_element(self.get_root_element_mut());
+    }
+
     fn to_string(&self, cx: &SVGContext) -> String {
         self.get_root_element().to_string(self, cx)
     }
@@ -204,7 +224,7 @@ impl ShapeNodeSVGBundle {
             name: Self::create_element_name(root_element.get_id(), String::from("root"), false),
         });
 
-        let mut defs_element = cx.create_element(SVGTag::Defs, entity);
+        let mut defs_element = cx.create_element(SVGTag::Defs);
         #[cfg(feature = "tracing")]
         defs_element.set_attribute(SVGAttribute::Name {
             name: Self::create_element_name(defs_element.get_id(), String::from("defs"), false),
@@ -213,7 +233,7 @@ impl ShapeNodeSVGBundle {
 
         // Create click area elements
 
-        let mut click_area_rect_element = cx.create_element(SVGTag::Rect, entity);
+        let mut click_area_rect_element = cx.create_element(SVGTag::Rect);
         #[cfg(feature = "tracing")]
         click_area_rect_element.set_attributes(vec![
             SVGAttribute::Name {
@@ -235,7 +255,7 @@ impl ShapeNodeSVGBundle {
 
         // Create fill elements
 
-        let mut fill_clip_path_element = cx.create_element(SVGTag::ClipPath, entity);
+        let mut fill_clip_path_element = cx.create_element(SVGTag::ClipPath);
         #[cfg(feature = "tracing")]
         fill_clip_path_element.set_attribute(SVGAttribute::Name {
             name: Self::create_element_name(
@@ -246,7 +266,7 @@ impl ShapeNodeSVGBundle {
         });
         defs_element.append_child_in_bundle_context(entity, &mut fill_clip_path_element);
 
-        let mut fill_clipped_path_element = cx.create_element(SVGTag::Path, entity);
+        let mut fill_clipped_path_element = cx.create_element(SVGTag::Path);
         #[cfg(feature = "tracing")]
         fill_clipped_path_element.set_attribute(SVGAttribute::Name {
             name: Self::create_element_name(
@@ -258,7 +278,7 @@ impl ShapeNodeSVGBundle {
         fill_clip_path_element
             .append_child_in_bundle_context(entity, &mut fill_clipped_path_element);
 
-        let mut fill_wrapper_g_element = cx.create_element(SVGTag::Group, entity);
+        let mut fill_wrapper_g_element = cx.create_element(SVGTag::Group);
         #[cfg(feature = "tracing")]
         fill_wrapper_g_element.set_attribute(SVGAttribute::Name {
             name: Self::create_element_name(
