@@ -162,6 +162,12 @@ impl SVGBundle for GradientPaintSVGBundle {
         return &mut self.root;
     }
 
+    fn destroy(&mut self, cx: &mut SVGContext) {
+        // Destroy elements associated with the bundle.
+        // Removing the root also implicitly removes its child elements.
+        cx.destroy_element(self.get_root_element_mut());
+    }
+
     fn to_string(&self, cx: &SVGContext) -> String {
         self.get_root_element().to_string(self, cx)
     }

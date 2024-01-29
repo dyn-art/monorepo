@@ -1,4 +1,7 @@
-use std::collections::{BTreeMap, HashSet};
+use std::{
+    collections::{BTreeMap, HashSet},
+    mem::take,
+};
 
 use bevy_ecs::entity::Entity;
 use dyn_composition::utils::continuous_id::ContinuousId;
@@ -137,7 +140,10 @@ impl SVGBundle for ShapeNodeSVGBundle {
 
                     // Process removed entities
                     for entity in removed_paint_entities {
-                        cx.remove_bundle(&entity);
+                        if let Some(removed_bundle) = cx.remove_bundle(&entity) {
+                            self.fill_wrapper_g
+                                .remove_child(removed_bundle.get_root_element().get_id());
+                        }
                     }
 
                     // Process added entities
@@ -185,6 +191,20 @@ impl SVGBundle for ShapeNodeSVGBundle {
 
     fn get_root_element_mut(&mut self) -> &mut SVGElement {
         return &mut self.root;
+    }
+
+    fn destroy(&mut self, cx: &mut SVGContext) {
+        // Destroy child entities
+        for entity in take(&mut self.paint_children) {
+            if let Some(removed_bundle) = cx.remove_bundle(&entity) {
+                self.fill_wrapper_g
+                    .remove_child(removed_bundle.get_root_element().get_id());
+            }
+        }
+
+        // Destroy elements associated with the bundle.
+        // Removing the root also implicitly removes its child elements.
+        cx.destroy_element(self.get_root_element_mut());
     }
 
     fn to_string(&self, cx: &SVGContext) -> String {

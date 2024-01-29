@@ -62,14 +62,12 @@ impl SVGContext {
         self.bundles.get_mut(&entity)
     }
 
-    pub fn remove_bundle(&mut self, entity: &Entity) {
-        if let Some(mut bundle) = self.bundles.remove(entity) {
-            // Destory bundle elements
-            for (_, child_element) in bundle.get_child_elements_mut() {
-                self.destroy_element(child_element);
-            }
-            self.destroy_element(bundle.get_root_element_mut());
+    pub fn remove_bundle(&mut self, entity: &Entity) -> Option<Box<dyn SVGBundle>> {
+        let mut maybe_bundle = self.bundles.remove(entity);
+        if let Some(bundle) = &mut maybe_bundle {
+            bundle.destroy(self);
         }
+        return maybe_bundle;
     }
 
     pub fn insert_bundle(
@@ -77,12 +75,11 @@ impl SVGContext {
         bundle: Box<dyn SVGBundle>,
         maybe_parent_id: Option<Entity>,
     ) -> () {
-        let entity = bundle.get_entity().clone();
-        if !self.bundles.contains_key(&entity) {
+        if !self.bundles.contains_key(bundle.get_entity()) {
             if maybe_parent_id.is_none() {
                 self.root_bundle_ids.push(*bundle.get_entity());
             }
-            self.bundles.insert(bundle.get_entity().clone(), bundle);
+            self.bundles.insert(*bundle.get_entity(), bundle);
         }
     }
 
@@ -119,8 +116,12 @@ impl SVGContext {
         SVGElement::new_as_bundle_root(tag, entity, self.id_generator.next_id())
     }
 
+    /// Destroys the specified SVG element.
+    /// This method only handles the destruction of the element itself.
+    /// It is the responsibility of the caller to ensure that any references to this element are properly managed.
     pub fn destroy_element(&mut self, element: &mut SVGElement) {
         element.destroy();
+
         #[cfg(feature = "output-event")]
         self.forward_element_change_events(vec![ElementChangeEvent {
             id: element.get_id(),
