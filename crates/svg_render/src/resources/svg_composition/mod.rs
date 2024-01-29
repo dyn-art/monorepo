@@ -1,7 +1,6 @@
-use std::sync::mpsc::Sender;
-
 use bevy_ecs::system::Resource;
 
+#[cfg(feature = "output-event")]
 use crate::events::output_event::SVGRenderOutputEvent;
 
 use self::svg_context::SVGContext;
@@ -18,7 +17,7 @@ pub struct SVGCompositionRes {
 
 impl SVGCompositionRes {
     #[cfg(feature = "output-event")]
-    pub fn new(output_event_sender: Option<Sender<SVGRenderOutputEvent>>) -> Self {
+    pub fn new(output_event_sender: Option<std::sync::mpsc::Sender<SVGRenderOutputEvent>>) -> Self {
         SVGCompositionRes {
             context: SVGContext::new(output_event_sender),
         }

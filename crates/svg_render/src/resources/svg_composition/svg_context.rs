@@ -69,10 +69,8 @@ impl SVGContext {
                 self.remove_bundle(&child_entity, removed_by);
             }
 
-            // Destory elements from bottom to top
-            for (_, child_element) in bundle.get_child_elements_mut().into_iter().rev() {
-                self.destroy_element(child_element, removed_by, false);
-            }
+            // Destroy elements associated with the bundle.
+            // Removing the root also implicitly removes its child elements.
             self.destroy_element(bundle.get_root_element_mut(), removed_by, false);
         }
     }
