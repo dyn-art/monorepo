@@ -82,6 +82,7 @@ pub fn extract_node_mixin_generic<C: Component + ToMixinChange + Debug>(
                         NodeType::Frame => ChangedEntityType::FrameNode,
                         NodeType::Rectangle => ChangedEntityType::ShapeNode,
                         NodeType::Text => ChangedEntityType::ShapeNode,
+                        NodeType::Vector => ChangedEntityType::ShapeNode,
                         _ => ChangedEntityType::Unkown,
                     },
                     changes: Vec::new(),

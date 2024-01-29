@@ -565,7 +565,7 @@ export type Node = {
  */
 node_type: NodeType }
 
-export type NodeBundle = ({ type: "Frame" } & FrameNodeBundle) | ({ type: "Group" } & GroupNodeBundle) | ({ type: "Rectangle" } & RectangleNodeBundle) | ({ type: "Text" } & TextNodeBundle)
+export type NodeBundle = ({ type: "Frame" } & FrameNodeBundle) | ({ type: "Group" } & GroupNodeBundle) | ({ type: "Rectangle" } & RectangleNodeBundle) | ({ type: "Text" } & TextNodeBundle) | ({ type: "Vector" } & VectorNodeBundle)
 
 /**
  * Contains properties related to the composition settings of a node.
@@ -593,7 +593,7 @@ export type NodeMetaMixin = {
  */
 name?: string | null }
 
-export type NodeType = "None" | "Group" | "Rectangle" | "Frame" | "Text"
+export type NodeType = "None" | "Group" | "Rectangle" | "Frame" | "Text" | "Vector"
 
 export type OutputEvent = ({ type: "ElementChange" } & ElementChangeEvent) | ({ type: "CompositionChange" } & CompositionChangeEvent) | ({ type: "TrackUpdate" } & TrackUpdateEvent) | ({ type: "SelectionChange" } & SelectionChangeEvent) | ({ type: "InteractionModeChange" } & InteractionModeChangeEvent) | ({ type: "CursorChange" } & CursorChangeEvent)
 
@@ -863,6 +863,25 @@ export type TrackUpdateEvent = { id: Entity; updates: MixinChange[] }
 export type TrackableMixinType = { type: "Dimension" } | { type: "RelativeTransform" }
 
 export type Vec2 = [number, number]
+
+/**
+ * Represents a basic vector. It is the most general representation of a shape.
+ */
+export type VectorNode = { _vector_node?: null | null }
+
+export type VectorNodeBundle = ({ _vector_node?: null | null }) & ({ 
+/**
+ * The name of the node.
+ * This is an optional field and can be used to label the node with a descriptive name,
+ * such as 'Cool Node'.
+ * If not provided, it defaults to `None`.
+ */
+name?: string | null }) & ({ 
+/**
+ * A collection of `Anchor` points that define the shape of the path.
+ * These vertices determine the path's outline through various commands.
+ */
+vertices: Anchor[] }) & { node?: Node; compositionMixin?: NodeCompositionMixin; relativeTransform: RelativeTransformMixin; dimension: DimensionMixin; blendMixin?: BlendMixin; fill?: FillMixin }
 
 /**
  * Vertical alignment options for text within its container.

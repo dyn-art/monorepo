@@ -179,6 +179,7 @@ impl DTIFProcessor {
             NodeBundle::Rectangle(bundle) => world.spawn(bundle.clone()).id(),
             NodeBundle::Group(bundle) => world.spawn(bundle.clone()).id(),
             NodeBundle::Text(bundle) => world.spawn(bundle.clone()).id(),
+            NodeBundle::Vector(bundle) => world.spawn(bundle.clone()).id(),
         }
     }
 

@@ -24,10 +24,11 @@ export interface TUploadStaticDataResponse {
 }
 
 export type TFigmaNodeWithChildren = FrameNode | InstanceNode | ComponentNode | GroupNode;
-export type TFigmaShapeNode = RectangleNode | EllipseNode | PolygonNode | StarNode;
+export type TFigmaShapeNode = RectangleNode | EllipseNode | PolygonNode | StarNode | VectorNode;
 export type TFigmaNodeWithPaints =
 	| FrameNode
 	| InstanceNode
 	| ComponentNode
 	| TFigmaShapeNode
-	| TextNode;
+	| TextNode
+	| VectorNode;

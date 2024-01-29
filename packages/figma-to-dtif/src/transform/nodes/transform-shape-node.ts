@@ -3,6 +3,7 @@ import type { COMP } from '@dyn/dtif';
 import { UnsupportedFigmaNodeException } from '../../exceptions';
 import type { TToTransformShapeNode } from '../../FigmaNodeTreeProcessor';
 import { transformRectangleNode } from './transform-rectangle-node';
+import { transformVectorNode } from './transform-vector-node';
 
 export async function transformShapeNode(
 	toTransformNode: TToTransformShapeNode
@@ -16,8 +17,9 @@ export async function transformShapeNode(
 		// // return transformPolygonNode(node, options);
 		// case 'STAR':
 		// // return transformStarNode(node, options);
+		case 'VECTOR':
+			return transformVectorNode(toTransformNode.node, { paintIds: toTransformNode.paintIds });
 		// case 'LINE':
-		// case 'VECTOR':
 		// case 'BOOLEAN_OPERATION':
 		// // return transformToSVGNode(node, options);
 		default:

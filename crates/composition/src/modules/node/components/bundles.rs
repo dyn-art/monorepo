@@ -5,12 +5,12 @@ use specta::Type;
 use super::{
     mixins::{
         BlendMixin, ChildrenMixin, DimensionMixin, FillMixin, GradientStopsMixin,
-        ImageContentMixin, NodeCompositionMixin, NodeMetaMixin, PaintCompositionMixin,
+        ImageContentMixin, NodeCompositionMixin, NodeMetaMixin, PaintCompositionMixin, PathMixin,
         RectangleCornerMixin, RelativeTransformMixin,
     },
     types::{
         FrameNode, GradientPaint, GroupNode, ImagePaint, Node, NodeType, Paint, PaintType,
-        RectangleNode, SolidPaint, TextNode,
+        RectangleNode, SolidPaint, TextNode, VectorNode,
     },
 };
 
@@ -25,6 +25,7 @@ pub enum NodeBundle {
     Group(GroupNodeBundle),
     Rectangle(RectangleNodeBundle),
     Text(TextNodeBundle),
+    Vector(VectorNodeBundle),
 }
 
 // =============================================================================
@@ -242,6 +243,63 @@ impl Default for TextNodeBundle {
             node: default_text_node_bundle(),
             text: TextNode::default(),
             meta: NodeMetaMixin::default(),
+            composition_mixin: NodeCompositionMixin::default(),
+            relative_transform: RelativeTransformMixin::default(),
+            dimension_mixin: DimensionMixin::default(),
+            blend_mixin: BlendMixin::default(),
+            fill_mixin: FillMixin::default(),
+        }
+    }
+}
+
+// =============================================================================
+// Vector Node Bundle
+// =============================================================================
+
+#[derive(Bundle, Debug, Serialize, Deserialize, Clone, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct VectorNodeBundle {
+    #[serde(default = "default_vector_node_bundle")]
+    pub node: Node,
+
+    #[serde(flatten)]
+    pub vector: VectorNode,
+
+    #[serde(flatten)]
+    pub meta: NodeMetaMixin,
+
+    #[serde(flatten)]
+    pub path_mixin: PathMixin,
+
+    #[serde(default)]
+    pub composition_mixin: NodeCompositionMixin,
+
+    pub relative_transform: RelativeTransformMixin,
+
+    #[serde(rename = "dimension")]
+    pub dimension_mixin: DimensionMixin,
+
+    #[serde(default)]
+    pub blend_mixin: BlendMixin,
+
+    #[serde(rename = "fill", default)]
+    pub fill_mixin: FillMixin,
+}
+
+#[inline]
+fn default_vector_node_bundle() -> Node {
+    Node {
+        node_type: NodeType::Vector,
+    }
+}
+
+impl Default for VectorNodeBundle {
+    fn default() -> Self {
+        Self {
+            node: default_rectangle_node_bundle(),
+            vector: VectorNode::default(),
+            meta: NodeMetaMixin::default(),
+            path_mixin: PathMixin::default(),
             composition_mixin: NodeCompositionMixin::default(),
             relative_transform: RelativeTransformMixin::default(),
             dimension_mixin: DimensionMixin::default(),

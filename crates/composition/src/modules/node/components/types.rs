@@ -37,6 +37,7 @@ pub enum NodeType {
     Rectangle,
     Frame,
     Text,
+    Vector,
 }
 
 // =============================================================================
@@ -296,7 +297,12 @@ pub enum BreakLineOn {
 // Vector Node
 // =============================================================================
 
-// TODO
+/// Represents a basic vector. It is the most general representation of a shape.
+#[derive(Component, Serialize, Deserialize, Clone, Default, Debug, Type)]
+pub struct VectorNode {
+    #[serde(default)]
+    _vector_node: Option<()>,
+}
 
 // =============================================================================
 // Paint
