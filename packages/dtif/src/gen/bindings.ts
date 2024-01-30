@@ -748,7 +748,7 @@ export type SVGGradientPaint = { variant: SVGGradientPaintVariant }
 
 export type SVGGradientPaintVariant = { Linear: { start: Vec2; end: Vec2 } } | { Radial: { center: Vec2; radius: Vec2; rotation: number } }
 
-export type SVGHrefVariant = { type: "Base64"; content: string; content_type: ContentType } | { type: "Url"; url: string }
+export type SVGHrefVariant = { type: "Base64"; content: string; contentType: ContentType } | { type: "Url"; url: string }
 
 export type SVGImagePaint = { scale_mode: SVGImagePaintScaleMode }
 

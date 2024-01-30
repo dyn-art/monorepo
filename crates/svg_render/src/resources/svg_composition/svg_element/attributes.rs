@@ -250,6 +250,7 @@ pub enum SVGUnitsVariant {
 #[derive(Debug, Serialize, Clone, Type)]
 #[serde(tag = "type")]
 pub enum SVGHrefVariant {
+    #[serde(rename_all = "camelCase")]
     Base64 {
         content: String,
         content_type: ContentType,

@@ -1,6 +1,7 @@
 import { toMouseButton } from '@dyn/dtif';
 import type {
 	CompositionChange,
+	ContentType,
 	ElementChangeEvent,
 	SVGAttribute,
 	SVGStyle,
@@ -361,7 +362,12 @@ export class SVGRender extends Render {
 			case 'Href': {
 				switch (attribute.href.type) {
 					case 'Base64':
-						return ['href', `data:image/png;base64,${attribute.href.content}`];
+						return [
+							'href',
+							`data:${this.parseContentType(attribute.href.contentType)};base64,${
+								attribute.href.content
+							}`
+						];
 					case 'Url':
 						return ['href', attribute.href.url];
 					default:
@@ -439,6 +445,17 @@ export class SVGRender extends Render {
 			}
 			default:
 				return null;
+		}
+	}
+
+	private parseContentType(contentType: ContentType): string {
+		switch (contentType) {
+			case 'JPEG':
+				return 'image/jpeg';
+			case 'PNG':
+				return 'image/png';
+			case 'SVG':
+				return 'image/svg+xml';
 		}
 	}
 
