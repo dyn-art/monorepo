@@ -39,6 +39,7 @@ function parseSVGPaths(vectorPaths: VectorPath[]): COMP.Anchor[] {
 		.reduce((acc, anchors) => acc.concat(anchors), []);
 }
 
+// https://www.figma.com/plugin-docs/api/properties/VectorPath-data/
 function parseSVGPath(svgPath: string): COMP.Anchor[] {
 	const commands = svgPath.match(/[MmLlHhVvCcSsQqTtAaZz][^MmLlHhVvCcSsQqTtAaZz]*/g);
 	if (commands == null) {

@@ -9,6 +9,7 @@ use crate::modules::{
     node::components::{
         bundles::{
             FrameNodeBundle, GroupNodeBundle, PaintBundle, RectangleNodeBundle, TextNodeBundle,
+            VectorNodeBundle,
         },
         mixins::{AbsoluteTransformMixin, ChildrenMixin, FillMixin, RelativeTransformMixin},
     },
@@ -88,7 +89,8 @@ impl DTIFProcessor {
     ) {
         if let NodeBundle::Frame(FrameNodeBundle { fill_mixin, .. })
         | NodeBundle::Rectangle(RectangleNodeBundle { fill_mixin, .. })
-        | NodeBundle::Text(TextNodeBundle { fill_mixin, .. }) = dtif_node
+        | NodeBundle::Text(TextNodeBundle { fill_mixin, .. })
+        | NodeBundle::Vector(VectorNodeBundle { fill_mixin, .. }) = dtif_node
         {
             // Process paints and collect their Bevy entity ids
             let new_paints: Vec<Entity> = fill_mixin

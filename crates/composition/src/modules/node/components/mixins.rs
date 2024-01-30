@@ -106,6 +106,12 @@ impl Default for DimensionMixin {
     }
 }
 
+#[derive(Component)]
+pub struct PreviousDimensionMixin {
+    pub width: f32,
+    pub height: f32,
+}
+
 // =============================================================================
 // Relative Transform Mixin
 // =============================================================================
