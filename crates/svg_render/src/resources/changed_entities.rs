@@ -24,7 +24,7 @@ pub enum ChangedEntityType {
     SolidPaint,
     ImagePaint(ChangedEntityImagePaintType),
     GradientPaint(ChangedEntityGradientPaintType),
-    Unkown,
+    Unknown,
 }
 
 #[derive(Debug, Clone, Copy)]

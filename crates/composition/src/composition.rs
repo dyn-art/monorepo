@@ -80,6 +80,9 @@ impl Composition {
             NodeBundle::Group(bundle) => self.spawn_bundle(bundle, maybe_parent_id),
             NodeBundle::Text(bundle) => self.spawn_bundle(bundle, maybe_parent_id),
             NodeBundle::Vector(bundle) => self.spawn_bundle(bundle, maybe_parent_id),
+            NodeBundle::Polygon(bundle) => self.spawn_bundle(bundle, maybe_parent_id),
+            NodeBundle::Ellipse(bundle) => self.spawn_bundle(bundle, maybe_parent_id),
+            NodeBundle::Star(bundle) => self.spawn_bundle(bundle, maybe_parent_id),
         };
 
         if let Some(fill_mixin) = maybe_fill_mixin {

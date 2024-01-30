@@ -2,7 +2,9 @@ use bevy_app::{App, Plugin, PostUpdate, Update};
 
 use self::systems::{
     construct_path::{
-        rectangle::construct_rectangle_path, text::construct_text_path, vector::update_vector_path,
+        ellipse::construct_ellipse_path, polygon::construct_polygon_path,
+        rectangle::construct_rectangle_path, star::construct_star_path, text::construct_text_path,
+        vector::update_vector_path,
     },
     paint::update_paint_dimension_based_on_parent_node,
 };
@@ -22,6 +24,9 @@ impl Plugin for NodePlugin {
             (
                 construct_rectangle_path,
                 construct_text_path,
+                construct_polygon_path,
+                construct_ellipse_path,
+                construct_star_path,
                 update_vector_path,
             ),
         );

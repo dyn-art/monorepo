@@ -32,12 +32,15 @@ pub struct Node {
 #[derive(Default, Serialize, Deserialize, Clone, Debug, Type, Eq, PartialEq)]
 pub enum NodeType {
     #[default]
-    None,
+    Unknown,
     Group,
     Rectangle,
     Frame,
     Text,
     Vector,
+    Polygon,
+    Ellipse,
+    Star,
 }
 
 // =============================================================================
@@ -322,7 +325,7 @@ pub struct Paint {
 #[derive(Default, Serialize, Deserialize, Clone, Debug, Type, Eq, PartialEq)]
 pub enum PaintType {
     #[default]
-    None,
+    Unknown,
     Solid,
     Gradient,
     Image,

@@ -9,8 +9,8 @@ use super::{
         RectangleCornerMixin, RelativeTransformMixin,
     },
     types::{
-        FrameNode, GradientPaint, GroupNode, ImagePaint, Node, NodeType, Paint, PaintType,
-        RectangleNode, SolidPaint, TextNode, VectorNode,
+        EllipseNode, FrameNode, GradientPaint, GroupNode, ImagePaint, Node, NodeType, Paint,
+        PaintType, PolygonNode, RectangleNode, SolidPaint, StarNode, TextNode, VectorNode,
     },
 };
 
@@ -26,6 +26,9 @@ pub enum NodeBundle {
     Rectangle(RectangleNodeBundle),
     Text(TextNodeBundle),
     Vector(VectorNodeBundle),
+    Polygon(PolygonNodeBundle),
+    Ellipse(EllipseNodeBundle),
+    Star(StarNodeBundle),
 }
 
 // =============================================================================
@@ -300,6 +303,165 @@ impl Default for VectorNodeBundle {
             vector: VectorNode::default(),
             meta: NodeMetaMixin::default(),
             path_mixin: PathMixin::default(),
+            composition_mixin: NodeCompositionMixin::default(),
+            relative_transform: RelativeTransformMixin::default(),
+            dimension_mixin: DimensionMixin::default(),
+            blend_mixin: BlendMixin::default(),
+            fill_mixin: FillMixin::default(),
+        }
+    }
+}
+
+// =============================================================================
+// Polygon Node Bundle
+// =============================================================================
+
+#[derive(Bundle, Debug, Serialize, Deserialize, Clone, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct PolygonNodeBundle {
+    #[serde(default = "default_polygon_node_bundle")]
+    pub node: Node,
+
+    #[serde(flatten)]
+    pub polygon: PolygonNode,
+
+    #[serde(flatten)]
+    pub meta: NodeMetaMixin,
+
+    #[serde(default)]
+    pub composition_mixin: NodeCompositionMixin,
+
+    pub relative_transform: RelativeTransformMixin,
+
+    #[serde(rename = "dimension")]
+    pub dimension_mixin: DimensionMixin,
+
+    #[serde(default)]
+    pub blend_mixin: BlendMixin,
+
+    #[serde(rename = "fill", default)]
+    pub fill_mixin: FillMixin,
+}
+
+#[inline]
+fn default_polygon_node_bundle() -> Node {
+    Node {
+        node_type: NodeType::Polygon,
+    }
+}
+
+impl Default for PolygonNodeBundle {
+    fn default() -> Self {
+        Self {
+            node: default_rectangle_node_bundle(),
+            polygon: PolygonNode::default(),
+            meta: NodeMetaMixin::default(),
+            composition_mixin: NodeCompositionMixin::default(),
+            relative_transform: RelativeTransformMixin::default(),
+            dimension_mixin: DimensionMixin::default(),
+            blend_mixin: BlendMixin::default(),
+            fill_mixin: FillMixin::default(),
+        }
+    }
+}
+
+// =============================================================================
+// Ellipse Node Bundle
+// =============================================================================
+
+#[derive(Bundle, Debug, Serialize, Deserialize, Clone, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct EllipseNodeBundle {
+    #[serde(default = "default_ellipse_node_bundle")]
+    pub node: Node,
+
+    #[serde(flatten)]
+    pub ellipse: EllipseNode,
+
+    #[serde(flatten)]
+    pub meta: NodeMetaMixin,
+
+    #[serde(default)]
+    pub composition_mixin: NodeCompositionMixin,
+
+    pub relative_transform: RelativeTransformMixin,
+
+    #[serde(rename = "dimension")]
+    pub dimension_mixin: DimensionMixin,
+
+    #[serde(default)]
+    pub blend_mixin: BlendMixin,
+
+    #[serde(rename = "fill", default)]
+    pub fill_mixin: FillMixin,
+}
+
+#[inline]
+fn default_ellipse_node_bundle() -> Node {
+    Node {
+        node_type: NodeType::Ellipse,
+    }
+}
+
+impl Default for EllipseNodeBundle {
+    fn default() -> Self {
+        Self {
+            node: default_rectangle_node_bundle(),
+            ellipse: EllipseNode::default(),
+            meta: NodeMetaMixin::default(),
+            composition_mixin: NodeCompositionMixin::default(),
+            relative_transform: RelativeTransformMixin::default(),
+            dimension_mixin: DimensionMixin::default(),
+            blend_mixin: BlendMixin::default(),
+            fill_mixin: FillMixin::default(),
+        }
+    }
+}
+
+// =============================================================================
+// Star Node Bundle
+// =============================================================================
+
+#[derive(Bundle, Debug, Serialize, Deserialize, Clone, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct StarNodeBundle {
+    #[serde(default = "default_star_node_bundle")]
+    pub node: Node,
+
+    #[serde(flatten)]
+    pub star: StarNode,
+
+    #[serde(flatten)]
+    pub meta: NodeMetaMixin,
+
+    #[serde(default)]
+    pub composition_mixin: NodeCompositionMixin,
+
+    pub relative_transform: RelativeTransformMixin,
+
+    #[serde(rename = "dimension")]
+    pub dimension_mixin: DimensionMixin,
+
+    #[serde(default)]
+    pub blend_mixin: BlendMixin,
+
+    #[serde(rename = "fill", default)]
+    pub fill_mixin: FillMixin,
+}
+
+#[inline]
+fn default_star_node_bundle() -> Node {
+    Node {
+        node_type: NodeType::Star,
+    }
+}
+
+impl Default for StarNodeBundle {
+    fn default() -> Self {
+        Self {
+            node: default_rectangle_node_bundle(),
+            star: StarNode::default(),
+            meta: NodeMetaMixin::default(),
             composition_mixin: NodeCompositionMixin::default(),
             relative_transform: RelativeTransformMixin::default(),
             dimension_mixin: DimensionMixin::default(),

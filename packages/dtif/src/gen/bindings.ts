@@ -267,6 +267,21 @@ export type EllipseNode = { _ellipse_node?: null | null;
  */
 arcData?: EllipseArcData }
 
+export type EllipseNodeBundle = ({ _ellipse_node?: null | null; 
+/**
+ * Contains the arc data for the ellipse,
+ * which includes the starting angle, ending angle, and the inner radius ratio.
+ * These properties are used to create arcs and donuts shapes.
+ */
+arcData?: EllipseArcData }) & ({ 
+/**
+ * The name of the node.
+ * This is an optional field and can be used to label the node with a descriptive name,
+ * such as 'Cool Node'.
+ * If not provided, it defaults to `None`.
+ */
+name?: string | null }) & { node?: Node; compositionMixin?: NodeCompositionMixin; relativeTransform: RelativeTransformMixin; dimension: DimensionMixin; blendMixin?: BlendMixin; fill?: FillMixin }
+
 export type Entity = number
 
 export type EntityDeleted = { entity: Entity }
@@ -565,7 +580,7 @@ export type Node = {
  */
 node_type: NodeType }
 
-export type NodeBundle = ({ type: "Frame" } & FrameNodeBundle) | ({ type: "Group" } & GroupNodeBundle) | ({ type: "Rectangle" } & RectangleNodeBundle) | ({ type: "Text" } & TextNodeBundle) | ({ type: "Vector" } & VectorNodeBundle)
+export type NodeBundle = ({ type: "Frame" } & FrameNodeBundle) | ({ type: "Group" } & GroupNodeBundle) | ({ type: "Rectangle" } & RectangleNodeBundle) | ({ type: "Text" } & TextNodeBundle) | ({ type: "Vector" } & VectorNodeBundle) | ({ type: "Polygon" } & PolygonNodeBundle) | ({ type: "Ellipse" } & EllipseNodeBundle) | ({ type: "Star" } & StarNodeBundle)
 
 /**
  * Contains properties related to the composition settings of a node.
@@ -593,7 +608,7 @@ export type NodeMetaMixin = {
  */
 name?: string | null }
 
-export type NodeType = "None" | "Group" | "Rectangle" | "Frame" | "Text" | "Vector"
+export type NodeType = "Unknown" | "Group" | "Rectangle" | "Frame" | "Text" | "Vector" | "Polygon" | "Ellipse" | "Star"
 
 export type OutputEvent = ({ type: "ElementChange" } & ElementChangeEvent) | ({ type: "CompositionChange" } & CompositionChangeEvent) | ({ type: "TrackUpdate" } & TrackUpdateEvent) | ({ type: "SelectionChange" } & SelectionChangeEvent) | ({ type: "InteractionModeChange" } & InteractionModeChangeEvent) | ({ type: "CursorChange" } & CursorChangeEvent)
 
@@ -621,7 +636,7 @@ export type PaintCompositionMixin = {
  */
 isVisible?: boolean }
 
-export type PaintType = "None" | "Solid" | "Gradient" | "Image"
+export type PaintType = "Unknown" | "Solid" | "Gradient" | "Image"
 
 /**
  * Represents a path in a graphical composition, defined by a series of vertices.
@@ -643,6 +658,20 @@ export type PolygonNode = { _polygon_node?: null | null;
  * This value must be an integer greater than or equal to 3.
  */
 pointCount?: number }
+
+export type PolygonNodeBundle = ({ _polygon_node?: null | null; 
+/**
+ * The number of sides of the polygon.
+ * This value must be an integer greater than or equal to 3.
+ */
+pointCount?: number }) & ({ 
+/**
+ * The name of the node.
+ * This is an optional field and can be used to label the node with a descriptive name,
+ * such as 'Cool Node'.
+ * If not provided, it defaults to `None`.
+ */
+name?: string | null }) & { node?: Node; compositionMixin?: NodeCompositionMixin; relativeTransform: RelativeTransformMixin; dimension: DimensionMixin; blendMixin?: BlendMixin; fill?: FillMixin }
 
 /**
  * Provides corner radius properties for rectangle like nodes.
@@ -767,6 +796,25 @@ pointCount?: number;
  * This value is used to define the sharpness of the star's points.
  */
 innerRadiusRatio: number }
+
+export type StarNodeBundle = ({ _star_node?: null | null; 
+/**
+ * The number of "spikes", or outer points of the star.
+ * This value must be an integer greater than or equal to 3.
+ */
+pointCount?: number; 
+/**
+ * The ratio of the inner radius to the outer radius of the star.
+ * This value is used to define the sharpness of the star's points.
+ */
+innerRadiusRatio: number }) & ({ 
+/**
+ * The name of the node.
+ * This is an optional field and can be used to label the node with a descriptive name,
+ * such as 'Cool Node'.
+ * If not provided, it defaults to `None`.
+ */
+name?: string | null }) & { node?: Node; compositionMixin?: NodeCompositionMixin; relativeTransform: RelativeTransformMixin; dimension: DimensionMixin; blendMixin?: BlendMixin; fill?: FillMixin }
 
 /**
  * Emitted when a style property of a SVGElement is removed.
