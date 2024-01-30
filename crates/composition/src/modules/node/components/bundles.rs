@@ -5,12 +5,12 @@ use specta::Type;
 use super::{
     mixins::{
         BlendMixin, ChildrenMixin, DimensionMixin, FillMixin, GradientStopsMixin,
-        ImageContentMixin, NodeCompositionMixin, NodeMetaMixin, PaintCompositionMixin,
+        ImageContentMixin, NodeCompositionMixin, NodeMetaMixin, PaintCompositionMixin, PathMixin,
         RectangleCornerMixin, RelativeTransformMixin,
     },
     types::{
-        FrameNode, GradientPaint, GroupNode, ImagePaint, Node, NodeType, Paint, PaintType,
-        RectangleNode, SolidPaint, TextNode,
+        EllipseNode, FrameNode, GradientPaint, GroupNode, ImagePaint, Node, NodeType, Paint,
+        PaintType, PolygonNode, RectangleNode, SolidPaint, StarNode, TextNode, VectorNode,
     },
 };
 
@@ -25,6 +25,10 @@ pub enum NodeBundle {
     Group(GroupNodeBundle),
     Rectangle(RectangleNodeBundle),
     Text(TextNodeBundle),
+    Vector(VectorNodeBundle),
+    Polygon(PolygonNodeBundle),
+    Ellipse(EllipseNodeBundle),
+    Star(StarNodeBundle),
 }
 
 // =============================================================================
@@ -71,23 +75,6 @@ fn default_frame_node_bundle() -> Node {
     }
 }
 
-impl Default for FrameNodeBundle {
-    fn default() -> Self {
-        Self {
-            node: default_frame_node_bundle(),
-            frame: FrameNode::default(),
-            meta: NodeMetaMixin::default(),
-            rectangle_corner_mixin: RectangleCornerMixin::default(),
-            children_mixin: ChildrenMixin::default(),
-            composition_mixin: NodeCompositionMixin::default(),
-            relative_transform: RelativeTransformMixin::default(),
-            dimension_mixin: DimensionMixin::default(),
-            blend_mixin: BlendMixin::default(),
-            fill_mixin: FillMixin::default(),
-        }
-    }
-}
-
 // =============================================================================
 // Group Node Bundle
 // =============================================================================
@@ -123,21 +110,6 @@ pub struct GroupNodeBundle {
 fn default_group_node_bundle() -> Node {
     Node {
         node_type: NodeType::Group,
-    }
-}
-
-impl Default for GroupNodeBundle {
-    fn default() -> Self {
-        Self {
-            node: default_group_node_bundle(),
-            group: GroupNode::default(),
-            meta: NodeMetaMixin::default(),
-            children_mixin: ChildrenMixin::default(),
-            composition_mixin: NodeCompositionMixin::default(),
-            relative_transform: RelativeTransformMixin::default(),
-            dimension_mixin: DimensionMixin::default(),
-            blend_mixin: BlendMixin::default(),
-        }
     }
 }
 
@@ -182,22 +154,6 @@ fn default_rectangle_node_bundle() -> Node {
     }
 }
 
-impl Default for RectangleNodeBundle {
-    fn default() -> Self {
-        Self {
-            node: default_rectangle_node_bundle(),
-            recangle: RectangleNode::default(),
-            meta: NodeMetaMixin::default(),
-            rectangle_corner_mixin: RectangleCornerMixin::default(),
-            composition_mixin: NodeCompositionMixin::default(),
-            relative_transform: RelativeTransformMixin::default(),
-            dimension_mixin: DimensionMixin::default(),
-            blend_mixin: BlendMixin::default(),
-            fill_mixin: FillMixin::default(),
-        }
-    }
-}
-
 // =============================================================================
 // Text Node Bundle
 // =============================================================================
@@ -236,18 +192,158 @@ fn default_text_node_bundle() -> Node {
     }
 }
 
-impl Default for TextNodeBundle {
-    fn default() -> Self {
-        Self {
-            node: default_text_node_bundle(),
-            text: TextNode::default(),
-            meta: NodeMetaMixin::default(),
-            composition_mixin: NodeCompositionMixin::default(),
-            relative_transform: RelativeTransformMixin::default(),
-            dimension_mixin: DimensionMixin::default(),
-            blend_mixin: BlendMixin::default(),
-            fill_mixin: FillMixin::default(),
-        }
+// =============================================================================
+// Vector Node Bundle
+// =============================================================================
+
+#[derive(Bundle, Debug, Serialize, Deserialize, Clone, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct VectorNodeBundle {
+    #[serde(default = "default_vector_node_bundle")]
+    pub node: Node,
+
+    #[serde(flatten)]
+    pub vector: VectorNode,
+
+    #[serde(flatten)]
+    pub meta: NodeMetaMixin,
+
+    #[serde(flatten)]
+    pub path_mixin: PathMixin,
+
+    #[serde(default)]
+    pub composition_mixin: NodeCompositionMixin,
+
+    pub relative_transform: RelativeTransformMixin,
+
+    #[serde(rename = "dimension")]
+    pub dimension_mixin: DimensionMixin,
+
+    #[serde(default)]
+    pub blend_mixin: BlendMixin,
+
+    #[serde(rename = "fill", default)]
+    pub fill_mixin: FillMixin,
+}
+
+#[inline]
+fn default_vector_node_bundle() -> Node {
+    Node {
+        node_type: NodeType::Vector,
+    }
+}
+
+// =============================================================================
+// Polygon Node Bundle
+// =============================================================================
+
+#[derive(Bundle, Debug, Serialize, Deserialize, Clone, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct PolygonNodeBundle {
+    #[serde(default = "default_polygon_node_bundle")]
+    pub node: Node,
+
+    #[serde(flatten)]
+    pub polygon: PolygonNode,
+
+    #[serde(flatten)]
+    pub meta: NodeMetaMixin,
+
+    #[serde(default)]
+    pub composition_mixin: NodeCompositionMixin,
+
+    pub relative_transform: RelativeTransformMixin,
+
+    #[serde(rename = "dimension")]
+    pub dimension_mixin: DimensionMixin,
+
+    #[serde(default)]
+    pub blend_mixin: BlendMixin,
+
+    #[serde(rename = "fill", default)]
+    pub fill_mixin: FillMixin,
+}
+
+#[inline]
+fn default_polygon_node_bundle() -> Node {
+    Node {
+        node_type: NodeType::Polygon,
+    }
+}
+
+// =============================================================================
+// Ellipse Node Bundle
+// =============================================================================
+
+#[derive(Bundle, Debug, Serialize, Deserialize, Clone, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct EllipseNodeBundle {
+    #[serde(default = "default_ellipse_node_bundle")]
+    pub node: Node,
+
+    #[serde(flatten)]
+    pub ellipse: EllipseNode,
+
+    #[serde(flatten)]
+    pub meta: NodeMetaMixin,
+
+    #[serde(default)]
+    pub composition_mixin: NodeCompositionMixin,
+
+    pub relative_transform: RelativeTransformMixin,
+
+    #[serde(rename = "dimension")]
+    pub dimension_mixin: DimensionMixin,
+
+    #[serde(default)]
+    pub blend_mixin: BlendMixin,
+
+    #[serde(rename = "fill", default)]
+    pub fill_mixin: FillMixin,
+}
+
+#[inline]
+fn default_ellipse_node_bundle() -> Node {
+    Node {
+        node_type: NodeType::Ellipse,
+    }
+}
+
+// =============================================================================
+// Star Node Bundle
+// =============================================================================
+
+#[derive(Bundle, Debug, Serialize, Deserialize, Clone, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct StarNodeBundle {
+    #[serde(default = "default_star_node_bundle")]
+    pub node: Node,
+
+    #[serde(flatten)]
+    pub star: StarNode,
+
+    #[serde(flatten)]
+    pub meta: NodeMetaMixin,
+
+    #[serde(default)]
+    pub composition_mixin: NodeCompositionMixin,
+
+    pub relative_transform: RelativeTransformMixin,
+
+    #[serde(rename = "dimension")]
+    pub dimension_mixin: DimensionMixin,
+
+    #[serde(default)]
+    pub blend_mixin: BlendMixin,
+
+    #[serde(rename = "fill", default)]
+    pub fill_mixin: FillMixin,
+}
+
+#[inline]
+fn default_star_node_bundle() -> Node {
+    Node {
+        node_type: NodeType::Star,
     }
 }
 
@@ -290,17 +386,6 @@ fn default_solid_paint_bundle() -> Paint {
     }
 }
 
-impl Default for SolidPaintBundle {
-    fn default() -> Self {
-        Self {
-            paint: default_solid_paint_bundle(),
-            solid: SolidPaint::default(),
-            composition_mixin: PaintCompositionMixin::default(),
-            blend_mixin: BlendMixin::default(),
-        }
-    }
-}
-
 // =============================================================================
 // Image Paint Bundle
 // =============================================================================
@@ -327,18 +412,6 @@ pub struct ImagePaintBundle {
 fn default_image_paint_bundle() -> Paint {
     Paint {
         paint_type: PaintType::Image,
-    }
-}
-
-impl Default for ImagePaintBundle {
-    fn default() -> Self {
-        Self {
-            paint: default_image_paint_bundle(),
-            image: ImagePaint::default(),
-            image_content: ImageContentMixin::default(),
-            composition_mixin: PaintCompositionMixin::default(),
-            blend_mixin: BlendMixin::default(),
-        }
     }
 }
 
@@ -369,17 +442,5 @@ pub struct GradientPaintBundle {
 fn default_gradient_paint_bundle() -> Paint {
     Paint {
         paint_type: PaintType::Gradient,
-    }
-}
-
-impl Default for GradientPaintBundle {
-    fn default() -> Self {
-        Self {
-            paint: default_gradient_paint_bundle(),
-            gradient: GradientPaint::default(),
-            gradient_stops_mixin: GradientStopsMixin::default(),
-            composition_mixin: PaintCompositionMixin::default(),
-            blend_mixin: BlendMixin::default(),
-        }
     }
 }

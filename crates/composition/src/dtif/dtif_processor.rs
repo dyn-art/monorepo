@@ -8,7 +8,8 @@ use crate::modules::{
     composition::events::CoreInputEvent,
     node::components::{
         bundles::{
-            FrameNodeBundle, GroupNodeBundle, PaintBundle, RectangleNodeBundle, TextNodeBundle,
+            EllipseNodeBundle, FrameNodeBundle, GroupNodeBundle, PaintBundle, PolygonNodeBundle,
+            RectangleNodeBundle, StarNodeBundle, TextNodeBundle, VectorNodeBundle,
         },
         mixins::{AbsoluteTransformMixin, ChildrenMixin, FillMixin, RelativeTransformMixin},
     },
@@ -88,7 +89,11 @@ impl DTIFProcessor {
     ) {
         if let NodeBundle::Frame(FrameNodeBundle { fill_mixin, .. })
         | NodeBundle::Rectangle(RectangleNodeBundle { fill_mixin, .. })
-        | NodeBundle::Text(TextNodeBundle { fill_mixin, .. }) = dtif_node
+        | NodeBundle::Text(TextNodeBundle { fill_mixin, .. })
+        | NodeBundle::Vector(VectorNodeBundle { fill_mixin, .. })
+        | NodeBundle::Polygon(PolygonNodeBundle { fill_mixin, .. })
+        | NodeBundle::Ellipse(EllipseNodeBundle { fill_mixin, .. })
+        | NodeBundle::Star(StarNodeBundle { fill_mixin, .. }) = dtif_node
         {
             // Process paints and collect their Bevy entity ids
             let new_paints: Vec<Entity> = fill_mixin
@@ -179,6 +184,10 @@ impl DTIFProcessor {
             NodeBundle::Rectangle(bundle) => world.spawn(bundle.clone()).id(),
             NodeBundle::Group(bundle) => world.spawn(bundle.clone()).id(),
             NodeBundle::Text(bundle) => world.spawn(bundle.clone()).id(),
+            NodeBundle::Vector(bundle) => world.spawn(bundle.clone()).id(),
+            NodeBundle::Polygon(bundle) => world.spawn(bundle.clone()).id(),
+            NodeBundle::Ellipse(bundle) => world.spawn(bundle.clone()).id(),
+            NodeBundle::Star(bundle) => world.spawn(bundle.clone()).id(),
         }
     }
 

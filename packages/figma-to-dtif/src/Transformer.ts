@@ -1,5 +1,5 @@
 import type { COMP } from '@dyn/dtif';
-import { sleep } from '@dyn/utils';
+import { ContinuousId, sleep } from '@dyn/utils';
 
 import { FailedToResolveRootNodeException } from './exceptions';
 import {
@@ -52,11 +52,13 @@ export class Transformer {
 	}
 
 	public async transform(config: TTransformConfig): Promise<COMP.DTIFComposition> {
+		ContinuousId.ZERO;
 		const nodeConfig: TTransformNodeConfig = {
 			includeInvisible: true,
 			exportContainerNode: this.createExportContainerNode(
 				'⏳ Temp export container | Delete if dyn.art plugin not active'
 			),
+			shouldExportFrame: { contentType: 'SVG' },
 			...(config.node ?? {})
 		};
 		const paintConfig = config.paint;
@@ -127,7 +129,7 @@ export class Transformer {
 		this._onTransformStatusUpdate?.(status);
 		// Sleep to give Figma time to send the status update to the "frontend"
 		// before it might get blocked e.g. due to image export
-		await sleep(100);
+		await sleep(50);
 	}
 
 	// =========================================================================
@@ -142,13 +144,17 @@ export class Transformer {
 		// Transform nodes
 		for (const toTransformNode of toTransformNodes) {
 			try {
-				const node = await transformNode(toTransformNode, config);
-				this.nodes.set(toTransformNode.id, node);
+				const node = await transformNode(toTransformNode, this, config);
+				this.insertNode(toTransformNode.id, node);
 			} catch (error) {
 				// TODO: Error
 				this._nodesFailedToTransform.push(toTransformNode);
 			}
 		}
+	}
+
+	public insertNode(id: number, node: COMP.NodeBundle): void {
+		this.nodes.set(id, node);
 	}
 
 	private async transformPaints(config: TTransformPaintConfig): Promise<void> {
@@ -160,12 +166,16 @@ export class Transformer {
 		for (const toTransformPaint of toTransformPaints) {
 			try {
 				const paint = await transformPaint(toTransformPaint, config);
-				this.paints.set(toTransformPaint.id, paint);
+				this.insertPaint(toTransformPaint.id, paint);
 			} catch (error) {
 				// TODO: Error
 				this._paintsFailedToTransform.push(toTransformPaint);
 			}
 		}
+	}
+
+	public insertPaint(id: number, paint: COMP.PaintBundle): void {
+		this.paints.set(id, paint);
 	}
 
 	private async transformFonts(config: TTransformFontConfig): Promise<void> {
@@ -177,12 +187,16 @@ export class Transformer {
 		for (const toTransformFont of toTransformFonts) {
 			try {
 				const font = await transformFont(toTransformFont, config);
-				this.fonts.set(toTransformFont.id, font);
+				this.insertFont(toTransformFont.id, font);
 			} catch (error) {
 				// TODO: Error
 				this._fontsFailedToTransform.push(toTransformFont);
 			}
 		}
+	}
+
+	public insertFont(id: number, font: COMP.Font): void {
+		this.fonts.set(id, font);
 	}
 
 	private createExportContainerNode(name: string): FrameNode {

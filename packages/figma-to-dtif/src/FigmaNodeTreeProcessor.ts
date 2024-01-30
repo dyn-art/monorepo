@@ -47,7 +47,7 @@ export class FigmaNodeTreeProcessor {
 
 	// Recursive method to walk through each node
 	private walk(node: SceneNode, isRoot = false): TContinuousId {
-		const nodeId = isRoot ? ContinuousId.ZERO.toNumber() : ContinuousId.nextId();
+		const nodeId = ContinuousId.nextId();
 
 		if (isFigmaFrameNode(node) || isFigmaComponentNode(node) || isFigmaInstanceNode(node)) {
 			this._toTransformNodes.push({
@@ -55,7 +55,8 @@ export class FigmaNodeTreeProcessor {
 				id: nodeId,
 				node,
 				childrenIds: this.processChildren(node),
-				paintIds: this.processPaints(node)
+				paintIds: this.processPaints(node),
+				isRoot
 			});
 		} else if (isFigmaGroupNode(node)) {
 			this._toTransformNodes.push({
@@ -183,6 +184,7 @@ export interface TToTransformFrameNode extends TToTransformBaseNode {
 	node: FrameNode | ComponentNode | InstanceNode;
 	childrenIds: TContinuousId[];
 	paintIds: TContinuousId[];
+	isRoot: boolean;
 }
 
 export interface TToTransformGroupNode extends TToTransformBaseNode {

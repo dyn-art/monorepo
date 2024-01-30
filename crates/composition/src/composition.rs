@@ -1,23 +1,19 @@
 use bevy_app::App;
+#[cfg(feature = "interactive")]
 use bevy_ecs::{bundle::Bundle, entity::Entity, query::With};
+#[cfg(feature = "interactive")]
 use bevy_hierarchy::BuildWorldChildren;
 use dyn_bevy_render_skeleton::RenderPlugin;
 
 use crate::modules::composition::CompositionPlugin;
 
-use super::{
-    dtif::DTIFComposition,
-    events::input_event::InputEvent,
-    modules::node::{
-        components::{
-            bundles::{
-                FrameNodeBundle, NodeBundle, PaintBundle, RectangleNodeBundle, TextNodeBundle,
-            },
-            types::Root,
-        },
-        NodePlugin,
-    },
+#[cfg(feature = "interactive")]
+use super::modules::node::components::{
+    bundles::{FrameNodeBundle, NodeBundle, PaintBundle, RectangleNodeBundle, TextNodeBundle},
+    types::Root,
 };
+
+use super::{dtif::DTIFComposition, events::input_event::InputEvent, modules::node::NodePlugin};
 
 pub struct Composition {
     app: App,
@@ -69,10 +65,13 @@ impl Composition {
         bundle: NodeBundle,
         maybe_parent_id: Option<Entity>,
     ) -> Entity {
+        use crate::modules::node::components::bundles::VectorNodeBundle;
+
         let maybe_fill_mixin = match &bundle {
             NodeBundle::Rectangle(RectangleNodeBundle { fill_mixin, .. })
             | NodeBundle::Frame(FrameNodeBundle { fill_mixin, .. })
-            | NodeBundle::Text(TextNodeBundle { fill_mixin, .. }) => Some(fill_mixin.clone()),
+            | NodeBundle::Text(TextNodeBundle { fill_mixin, .. })
+            | NodeBundle::Vector(VectorNodeBundle { fill_mixin, .. }) => Some(fill_mixin.clone()),
             _ => None,
         };
         let entity_id = match bundle {
@@ -80,6 +79,10 @@ impl Composition {
             NodeBundle::Rectangle(bundle) => self.spawn_bundle(bundle, maybe_parent_id),
             NodeBundle::Group(bundle) => self.spawn_bundle(bundle, maybe_parent_id),
             NodeBundle::Text(bundle) => self.spawn_bundle(bundle, maybe_parent_id),
+            NodeBundle::Vector(bundle) => self.spawn_bundle(bundle, maybe_parent_id),
+            NodeBundle::Polygon(bundle) => self.spawn_bundle(bundle, maybe_parent_id),
+            NodeBundle::Ellipse(bundle) => self.spawn_bundle(bundle, maybe_parent_id),
+            NodeBundle::Star(bundle) => self.spawn_bundle(bundle, maybe_parent_id),
         };
 
         if let Some(fill_mixin) = maybe_fill_mixin {

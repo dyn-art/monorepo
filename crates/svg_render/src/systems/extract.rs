@@ -47,7 +47,11 @@ pub fn extract_children(
                         NodeType::Frame => ChangedEntityType::FrameNode,
                         NodeType::Rectangle => ChangedEntityType::ShapeNode,
                         NodeType::Text => ChangedEntityType::ShapeNode,
-                        _ => ChangedEntityType::Unkown,
+                        NodeType::Vector => ChangedEntityType::ShapeNode,
+                        NodeType::Polygon => ChangedEntityType::ShapeNode,
+                        NodeType::Ellipse => ChangedEntityType::ShapeNode,
+                        NodeType::Star => ChangedEntityType::ShapeNode,
+                        NodeType::Group => ChangedEntityType::Unknown, // TODO
                     },
                     changes: Vec::new(),
                     parent_id,
@@ -82,7 +86,11 @@ pub fn extract_node_mixin_generic<C: Component + ToMixinChange + Debug>(
                         NodeType::Frame => ChangedEntityType::FrameNode,
                         NodeType::Rectangle => ChangedEntityType::ShapeNode,
                         NodeType::Text => ChangedEntityType::ShapeNode,
-                        _ => ChangedEntityType::Unkown,
+                        NodeType::Vector => ChangedEntityType::ShapeNode,
+                        NodeType::Polygon => ChangedEntityType::ShapeNode,
+                        NodeType::Ellipse => ChangedEntityType::ShapeNode,
+                        NodeType::Star => ChangedEntityType::ShapeNode,
+                        NodeType::Group => ChangedEntityType::Unknown, // TODO
                     },
                     changes: Vec::new(),
                     parent_id,
@@ -153,7 +161,7 @@ pub fn extract_paint_mixin_generic<C: Component + ToMixinChange + Debug>(
                                         }
                                     }
                                 } else {
-                                    ChangedEntityType::Unkown
+                                    ChangedEntityType::Unknown
                                 }
                             }
                             PaintType::Gradient => {
@@ -171,10 +179,9 @@ pub fn extract_paint_mixin_generic<C: Component + ToMixinChange + Debug>(
                                         }
                                     }
                                 } else {
-                                    ChangedEntityType::Unkown
+                                    ChangedEntityType::Unknown
                                 }
                             }
-                            _ => ChangedEntityType::Unkown,
                         },
                         changes: Vec::new(),
                         parent_id,

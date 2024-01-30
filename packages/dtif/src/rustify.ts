@@ -32,7 +32,8 @@ async function resolvePaints(
 				...paint.imageContent,
 				content: {
 					type: 'Binary',
-					content
+					content,
+					contentType: paint.imageContent.content.contentType
 				}
 			};
 		}

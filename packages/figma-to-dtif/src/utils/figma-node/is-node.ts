@@ -66,6 +66,7 @@ export function isFigmaShapeNode(node: any): node is TFigmaShapeNode {
 		isFigmaRectangleNode(node) ||
 		isFigmaEllipseNode(node) ||
 		isFigmaPolygonNode(node) ||
-		isFigmaStarNode(node)
+		isFigmaStarNode(node) ||
+		isFigmaVectorNode(node)
 	);
 }
