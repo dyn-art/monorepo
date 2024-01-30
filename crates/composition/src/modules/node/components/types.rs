@@ -19,7 +19,7 @@ pub struct Root;
 // =============================================================================
 
 /// Represents a basic node in the composition.
-#[derive(Component, Serialize, Deserialize, Clone, Debug, Default, Type)]
+#[derive(Component, Serialize, Deserialize, Clone, Debug, Type)]
 pub struct Node {
     /// Represents the specific type of the node, such as `Rectangle`, `Ellipse`, `Star`, etc.
     /// This field is redundant but neccessary to distinguish different nodes in the rendering process,
@@ -29,10 +29,8 @@ pub struct Node {
     pub node_type: NodeType,
 }
 
-#[derive(Default, Serialize, Deserialize, Clone, Debug, Type, Eq, PartialEq)]
+#[derive(Serialize, Deserialize, Clone, Debug, Type, Eq, PartialEq)]
 pub enum NodeType {
-    #[default]
-    Unknown,
     Group,
     Rectangle,
     Frame,
@@ -119,7 +117,7 @@ pub struct EllipseNode {
 /// Represents the arc data for an ellipse.
 /// This includes properties for defining the sweep of the ellipse and its inner radius,
 /// which are used in UI elements to create various elliptical shapes.
-#[derive(Default, Serialize, Deserialize, Clone, Debug, Type)]
+#[derive(Serialize, Deserialize, Clone, Default, Debug, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct EllipseArcData {
     /// The starting angle of the ellipse's arc.
@@ -138,7 +136,7 @@ pub struct EllipseArcData {
 // =============================================================================
 
 /// Represents a basic shape node for a star with a set number of points.
-#[derive(Component, Serialize, Deserialize, Clone, Default, Debug, Type)]
+#[derive(Component, Serialize, Deserialize, Clone, Debug, Type)]
 pub struct StarNode {
     #[serde(default)]
     _star_node: Option<()>,
@@ -154,6 +152,16 @@ pub struct StarNode {
     pub inner_radius_ratio: f32,
 }
 
+impl Default for StarNode {
+    fn default() -> Self {
+        Self {
+            _star_node: None,
+            point_count: default_star_point_count(),
+            inner_radius_ratio: 0.0,
+        }
+    }
+}
+
 #[inline]
 fn default_star_point_count() -> u8 {
     5
@@ -164,7 +172,7 @@ fn default_star_point_count() -> u8 {
 // =============================================================================
 
 /// Represents a basic shape node for a regular convex polygon with three or more sides.
-#[derive(Component, Serialize, Deserialize, Clone, Default, Debug, Type)]
+#[derive(Component, Serialize, Deserialize, Clone, Debug, Type)]
 pub struct PolygonNode {
     #[serde(default)]
     _polygon_node: Option<()>,
@@ -173,6 +181,15 @@ pub struct PolygonNode {
     /// This value must be an integer greater than or equal to 3.
     #[serde(default = "default_polygon_point_count", rename = "pointCount")]
     pub point_count: u8,
+}
+
+impl Default for PolygonNode {
+    fn default() -> Self {
+        Self {
+            _polygon_node: None,
+            point_count: default_polygon_point_count(),
+        }
+    }
 }
 
 #[inline]
@@ -216,7 +233,7 @@ pub struct TextSegment {
 }
 
 /// Style properties for a text segment, defining its appearance.
-#[derive(Serialize, Deserialize, Clone, Default, Debug, Type)]
+#[derive(Serialize, Deserialize, Clone, Debug, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct TextStyle {
     /// Height of rasterized glyphs in pixels, influenced by window scale.
@@ -322,10 +339,8 @@ pub struct Paint {
     pub paint_type: PaintType,
 }
 
-#[derive(Default, Serialize, Deserialize, Clone, Debug, Type, Eq, PartialEq)]
+#[derive(Serialize, Deserialize, Clone, Debug, Type, Eq, PartialEq)]
 pub enum PaintType {
-    #[default]
-    Unknown,
     Solid,
     Gradient,
     Image,

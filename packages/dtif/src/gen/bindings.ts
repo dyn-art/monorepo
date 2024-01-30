@@ -127,6 +127,8 @@ export type CompositionResized = { width: number; height: number }
 
 export type CompositionViewBoxChanged = { viewBox: ViewBox }
 
+export type ContentType = "JPEG" | "PNG" | "SVG"
+
 export type ContinuousId = number
 
 export type CoreInputEvent = ({ type: "EntityMoved" } & EntityMoved) | ({ type: "EntitySetPosition" } & EntitySetPosition) | ({ type: "EntityDeleted" } & EntityDeleted) | ({ type: "NodeCreated" } & NodeCreated) | ({ type: "CompositionResized" } & CompositionResized) | ({ type: "CompositionViewBoxChanged" } & CompositionViewBoxChanged)
@@ -463,13 +465,13 @@ export type ImageContent =
 /**
  * Image content stored as binary data.
  */
-{ type: "Binary"; content: number[] } | 
+{ type: "Binary"; content: number[]; contentType: ContentType } | 
 /**
  * Image content referenced by a URL.
  * 
  * This variant is only supported when the `resolve-url` feature is enabled.
  */
-{ type: "Url"; url: string }
+{ type: "Url"; url: string; contentType: ContentType }
 
 export type ImageContentMixin = { 
 /**
@@ -608,7 +610,7 @@ export type NodeMetaMixin = {
  */
 name?: string | null }
 
-export type NodeType = "Unknown" | "Group" | "Rectangle" | "Frame" | "Text" | "Vector" | "Polygon" | "Ellipse" | "Star"
+export type NodeType = "Group" | "Rectangle" | "Frame" | "Text" | "Vector" | "Polygon" | "Ellipse" | "Star"
 
 export type OutputEvent = ({ type: "ElementChange" } & ElementChangeEvent) | ({ type: "CompositionChange" } & CompositionChangeEvent) | ({ type: "TrackUpdate" } & TrackUpdateEvent) | ({ type: "SelectionChange" } & SelectionChangeEvent) | ({ type: "InteractionModeChange" } & InteractionModeChangeEvent) | ({ type: "CursorChange" } & CursorChangeEvent)
 
@@ -636,7 +638,7 @@ export type PaintCompositionMixin = {
  */
 isVisible?: boolean }
 
-export type PaintType = "Unknown" | "Solid" | "Gradient" | "Image"
+export type PaintType = "Solid" | "Gradient" | "Image"
 
 /**
  * Represents a path in a graphical composition, defined by a series of vertices.
@@ -746,7 +748,7 @@ export type SVGGradientPaint = { variant: SVGGradientPaintVariant }
 
 export type SVGGradientPaintVariant = { Linear: { start: Vec2; end: Vec2 } } | { Radial: { center: Vec2; radius: Vec2; rotation: number } }
 
-export type SVGHrefVariant = { type: "Base64"; content: string } | { type: "Url"; url: string }
+export type SVGHrefVariant = { type: "Base64"; content: string; content_type: ContentType } | { type: "Url"; url: string }
 
 export type SVGImagePaint = { scale_mode: SVGImagePaintScaleMode }
 

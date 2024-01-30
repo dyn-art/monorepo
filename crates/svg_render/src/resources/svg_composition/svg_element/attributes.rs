@@ -1,4 +1,6 @@
-use dyn_composition::utils::continuous_id::ContinuousId;
+use dyn_composition::{
+    modules::node::components::mixins::ContentType, utils::continuous_id::ContinuousId,
+};
 use serde::Serialize;
 use specta::Type;
 
@@ -165,7 +167,7 @@ impl SVGAttribute {
                 SVGUnitsVariant::UserSpaceOnUse => "userSpaceOnUse".to_string()
             },
             Self::Href { href } => match href {
-                SVGHrefVariant::Base64 { content } => format!("data:image/png;base64,{content}"),
+                SVGHrefVariant::Base64 { content, content_type } => format!("data:{};base64,{}", content_type.mime_type(), content),
                 SVGHrefVariant::Url { url } => url.clone()
             }
             Self::PreserveAspectRatio { preserve_aspect_ratio } => preserve_aspect_ratio.clone(),
@@ -248,6 +250,11 @@ pub enum SVGUnitsVariant {
 #[derive(Debug, Serialize, Clone, Type)]
 #[serde(tag = "type")]
 pub enum SVGHrefVariant {
-    Base64 { content: String },
-    Url { url: String },
+    Base64 {
+        content: String,
+        content_type: ContentType,
+    },
+    Url {
+        url: String,
+    },
 }

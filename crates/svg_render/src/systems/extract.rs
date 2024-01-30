@@ -52,7 +52,6 @@ pub fn extract_children(
                         NodeType::Ellipse => ChangedEntityType::ShapeNode,
                         NodeType::Star => ChangedEntityType::ShapeNode,
                         NodeType::Group => ChangedEntityType::Unknown, // TODO
-                        NodeType::Unknown => ChangedEntityType::Unknown,
                     },
                     changes: Vec::new(),
                     parent_id,
@@ -92,7 +91,6 @@ pub fn extract_node_mixin_generic<C: Component + ToMixinChange + Debug>(
                         NodeType::Ellipse => ChangedEntityType::ShapeNode,
                         NodeType::Star => ChangedEntityType::ShapeNode,
                         NodeType::Group => ChangedEntityType::Unknown, // TODO
-                        NodeType::Unknown => ChangedEntityType::Unknown,
                     },
                     changes: Vec::new(),
                     parent_id,
@@ -184,7 +182,6 @@ pub fn extract_paint_mixin_generic<C: Component + ToMixinChange + Debug>(
                                     ChangedEntityType::Unknown
                                 }
                             }
-                            PaintType::Unknown => ChangedEntityType::Unknown,
                         },
                         changes: Vec::new(),
                         parent_id,

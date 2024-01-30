@@ -72,14 +72,8 @@ impl Default for RectangleCornerMixin {
 /// The children are sorted back-to-front,
 /// meaning the first child in the vector is the bottommost layer in the scene,
 /// and the last child is the topmost layer.
-#[derive(Component, Serialize, Deserialize, Clone, Debug, Type)]
+#[derive(Component, Serialize, Deserialize, Clone, Default, Debug, Type)]
 pub struct ChildrenMixin(pub Vec<Entity>);
-
-impl Default for ChildrenMixin {
-    fn default() -> Self {
-        Self(Vec::new())
-    }
-}
 
 // =============================================================================
 // Dimension Mixin
@@ -97,16 +91,7 @@ pub struct DimensionMixin {
     pub height: f32,
 }
 
-impl Default for DimensionMixin {
-    fn default() -> Self {
-        Self {
-            width: 100.0,
-            height: 100.0,
-        }
-    }
-}
-
-#[derive(Component)]
+#[derive(Component, Debug)]
 pub struct PreviousDimensionMixin {
     pub width: f32,
     pub height: f32,
@@ -122,14 +107,8 @@ pub struct PreviousDimensionMixin {
 ///
 /// Note: This transformation does not include scaling.
 /// For scaling, refer to the `DimensionMixin`.
-#[derive(Component, Serialize, Deserialize, Clone, Debug, Type)]
+#[derive(Component, Serialize, Deserialize, Clone, Default, Debug, Type)]
 pub struct RelativeTransformMixin(pub Mat3);
-
-impl Default for RelativeTransformMixin {
-    fn default() -> Self {
-        Self(Mat3::default())
-    }
-}
 
 // =============================================================================
 // Absolute Transform Mixin
@@ -141,14 +120,8 @@ impl Default for RelativeTransformMixin {
 ///
 /// Note: This transformation does not include scaling.
 /// For scaling, refer to the `DimensionMixin`.
-#[derive(Component, Serialize, Deserialize, Clone, Debug, Type)]
+#[derive(Component, Serialize, Deserialize, Clone, Default, Debug, Type)]
 pub struct AbsoluteTransformMixin(pub Mat3);
-
-impl Default for AbsoluteTransformMixin {
-    fn default() -> Self {
-        Self(Mat3::default())
-    }
-}
 
 // =============================================================================
 // Node Composition Mixin
@@ -217,19 +190,11 @@ impl Default for BlendMixin {
 
 /// Represents a path in a graphical composition, defined by a series of vertices.
 /// Each vertex is an anchor point, and the path is constructed by connecting these points.
-#[derive(Component, Serialize, Deserialize, Clone, Debug, Type)]
+#[derive(Component, Serialize, Deserialize, Clone, Default, Debug, Type)]
 pub struct PathMixin {
     /// A collection of `Anchor` points that define the shape of the path.
     /// These vertices determine the path's outline through various commands.
     pub vertices: Vec<Anchor>,
-}
-
-impl Default for PathMixin {
-    fn default() -> Self {
-        Self {
-            vertices: Vec::new(),
-        }
-    }
 }
 
 /// Represents an anchor point in a path, defining a specific location and command.
@@ -287,21 +252,13 @@ pub enum AnchorCommand {
 // =============================================================================
 
 /// Manages the fill properties of a graphical object.
-#[derive(Component, Serialize, Deserialize, Clone, Debug, Type)]
+#[derive(Component, Serialize, Deserialize, Clone, Default, Debug, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct FillMixin {
     /// A collection of `Paint` objects,
     /// each defining a different aspect of how the object is filled.
     #[serde(default)]
     pub paint_ids: Vec<Entity>,
-}
-
-impl Default for FillMixin {
-    fn default() -> Self {
-        Self {
-            paint_ids: Vec::new(),
-        }
-    }
 }
 
 // =============================================================================
@@ -341,35 +298,48 @@ pub struct ImageContentMixin {
     pub content: ImageContent,
 }
 
-impl Default for ImageContentMixin {
-    fn default() -> Self {
-        Self {
-            width: 0.0,
-            height: 0.0,
-            content: ImageContent::Binary {
-                content: Vec::new(),
-            },
-        }
-    }
-}
-
 #[derive(Serialize, Deserialize, Eq, PartialEq, Hash, Clone, Debug, Type)]
 #[serde(tag = "type")]
 pub enum ImageContent {
     /// Image content stored as binary data.
-    Binary { content: Vec<u8> },
+    #[serde(rename_all = "camelCase")]
+    Binary {
+        content: Vec<u8>,
+        content_type: ContentType,
+    },
 
     /// Image content referenced by a URL.
     ///
     /// This variant is only supported when the `resolve-url` feature is enabled.
-    Url { url: String },
+    #[serde(rename_all = "camelCase")]
+    Url {
+        url: String,
+        content_type: ContentType,
+    },
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Hash, Copy, Type)]
+pub enum ContentType {
+    JPEG,
+    PNG,
+    SVG,
+}
+
+impl ContentType {
+    pub const fn mime_type(&self) -> &'static str {
+        match self {
+            ContentType::JPEG => "image/jpeg",
+            ContentType::PNG => "image/png",
+            ContentType::SVG => "image/svg+xml",
+        }
+    }
 }
 
 // =============================================================================
 // Gradient Stops Mixin
 // =============================================================================
 
-#[derive(Component, Serialize, Deserialize, Clone, Debug, Default, Type)]
+#[derive(Component, Serialize, Deserialize, Clone, Debug, Type)]
 pub struct GradientStopsMixin {
     /// A list of color stops defining the gradient.
     #[serde(rename = "gradientStops")]

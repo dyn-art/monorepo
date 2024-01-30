@@ -128,10 +128,16 @@ impl SVGBundle for ImagePaintSVGBundle {
                 MixinChange::ImageContent(mixin) => {
                     self.paint_clipped_image.set_attribute(SVGAttribute::Href {
                         href: match &mixin.content {
-                            ImageContent::Binary { content } => SVGHrefVariant::Base64 {
+                            ImageContent::Binary {
+                                content,
+                                content_type,
+                            } => SVGHrefVariant::Base64 {
                                 content: BASE64_STANDARD.encode(content),
+                                content_type: *content_type,
                             },
-                            ImageContent::Url { url } => SVGHrefVariant::Url { url: url.clone() },
+                            ImageContent::Url { url, .. } => {
+                                SVGHrefVariant::Url { url: url.clone() }
+                            }
                         },
                     });
                 }

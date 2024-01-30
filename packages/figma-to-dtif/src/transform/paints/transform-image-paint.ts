@@ -46,12 +46,14 @@ async function resolveImage(
 		const response = await config.export.uploadData(binary, { key: imageHash });
 		content = {
 			type: 'Url',
-			url: response.url
+			url: response.url,
+			contentType: 'PNG'
 		};
 	} else {
 		content = {
 			type: 'Binary',
-			content: Array.from(binary)
+			content: Array.from(binary),
+			contentType: 'PNG'
 		};
 	}
 
