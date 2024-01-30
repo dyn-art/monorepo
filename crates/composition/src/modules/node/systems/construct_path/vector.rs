@@ -6,7 +6,7 @@ use bevy_ecs::{
 use glam::Vec2;
 
 use crate::modules::node::components::{
-    mixins::{DimensionMixin, PathMixin, PreviousDimensionMixin},
+    mixins::{AnchorCommand, DimensionMixin, PathMixin, PreviousDimensionMixin},
     types::VectorNode,
 };
 
@@ -29,11 +29,27 @@ pub fn update_vector_path(
                 let scale_x = dimension.width / prev_dimension.width;
                 let scale_y = dimension.height / prev_dimension.height;
 
-                // Update each anchor's position in the path
                 for anchor in &mut path_mixin.vertices {
+                    // Scale the position
                     anchor.position =
                         Vec2::new(anchor.position.x * scale_x, anchor.position.y * scale_y);
-                    // Handle specific AnchorCommands if needed
+
+                    // Handle specific AnchorCommands
+                    match &mut anchor.command {
+                        AnchorCommand::CurveTo {
+                            control_point_1,
+                            control_point_2,
+                        } => {
+                            *control_point_1 =
+                                Vec2::new(control_point_1.x * scale_x, control_point_1.y * scale_y);
+                            *control_point_2 =
+                                Vec2::new(control_point_2.x * scale_x, control_point_2.y * scale_y);
+                        }
+                        AnchorCommand::ArcTo { radius, .. } => {
+                            *radius = Vec2::new(radius.x * scale_x, radius.y * scale_y);
+                        }
+                        _ => {}
+                    }
                 }
 
                 // Update previous dimensions
