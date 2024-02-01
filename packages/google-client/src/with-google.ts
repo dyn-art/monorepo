@@ -10,13 +10,16 @@ import {
 import type { paths } from './gen/v1';
 
 export function withGoogle<GSelectedFeatureKeys extends TFeatureKeys[]>(
-	fetchClient: TFetchClient<TEnforceFeatures<GSelectedFeatureKeys, ['base', 'openapi']>>
+	fetchClient: TFetchClient<TEnforceFeatures<GSelectedFeatureKeys, ['base', 'openapi', 'rapi']>>
 ): TFetchClient<['google', ...GSelectedFeatureKeys], paths> {
-	if (hasFeatures(fetchClient, ['openapi'])) {
+	if (hasFeatures(fetchClient, ['openapi', 'rapi'])) {
 		fetchClient._features.push('google');
 
 		const googleFeature: TSelectFeatures<['google']> = {
-			async getWebFonts(this: TFetchClient<['base', 'openapi', 'google'], paths>, options = {}) {
+			async getWebFonts(
+				this: TFetchClient<['base', 'openapi', 'rapi', 'google'], paths>,
+				options = {}
+			) {
 				return this.get('/webfonts', {
 					queryParams: {
 						key: 'not-set', // Set by middleware,
@@ -24,40 +27,64 @@ export function withGoogle<GSelectedFeatureKeys extends TFeatureKeys[]>(
 					}
 				});
 			},
-			async getFontFileURL(
-				this: TFetchClient<['base', 'openapi', 'google'], paths>,
+			async getFontFileUrl(
+				this: TFetchClient<['base', 'openapi', 'rapi', 'google'], paths>,
 				family,
 				options = {}
 			) {
 				const { fontWeight = 400, fontStyle = 'regular', capability = 'VF' } = options;
-				const searchResult = await this.getWebFonts({
+
+				// Fetch web fonts
+				const response = await this.getWebFonts({
 					capability,
 					family
 				});
-
-				if (searchResult.isErr()) {
-					if (searchResult.error instanceof RequestException && searchResult.error.status === 404) {
+				if (response.isErr()) {
+					if (response.error instanceof RequestException && response.error.status === 404) {
 						return null;
 					}
-					throw searchResult.error;
+					throw response.error;
 				}
 
-				// Find font family
-				const items = searchResult.value.data.items ?? [];
+				// Find the closest match for font family, weight and style
+				const items = response.value.data.items ?? [];
 				const font = items.find((f) => f.family === family);
 				if (font == null) {
 					return null;
 				}
-
-				// Find the closest match for font weight and style
 				const closestVariant = findClosestVariant(font.variants ?? [], fontWeight, fontStyle);
 
 				// Find font file URL
 				if (font.files != null && closestVariant != null) {
-					return font.files[closestVariant] ?? null;
+					const fileUrl = font.files[closestVariant];
+					if (fileUrl != null) {
+						return fileUrl.replace('http://', 'https://');
+					}
 				}
 
 				return null;
+			},
+			async downloadFontFile(
+				this: TFetchClient<['base', 'openapi', 'rapi', 'google'], paths>,
+				family,
+				options = {}
+			) {
+				// Fetch font download url
+				const downloadUrl = await this.getFontFileUrl(family, options);
+				if (downloadUrl == null) {
+					return null;
+				}
+
+				// Fetch font binary
+				const response = await this.rGet(downloadUrl, { parseAs: 'arrayBuffer' });
+				if (response.isErr()) {
+					if (response.error instanceof RequestException && response.error.status === 404) {
+						return null;
+					}
+					throw response.error;
+				}
+
+				return new Uint8Array(response.value.data);
 			}
 		};
 
@@ -67,7 +94,7 @@ export function withGoogle<GSelectedFeatureKeys extends TFeatureKeys[]>(
 		return _fetchClient as TFetchClient<['google', ...GSelectedFeatureKeys], paths>;
 	}
 
-	throw Error('FetchClient must have "openapi" feature to use withGoogle');
+	throw Error('FetchClient must have "openapi" and "rapi" feature to use withGoogle');
 }
 
 function findClosestVariant(

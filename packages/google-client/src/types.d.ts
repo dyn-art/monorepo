@@ -8,7 +8,7 @@ declare module '@dyn/fetch-client' {
 			getWebFonts(
 				options?: Omit<paths['/webfonts']['get']['parameters']['query'], 'key'>
 			): Promise<TOpenApiFetchResponse<paths['/webfonts']['get'], 'json'>>;
-			getFontFileURL(
+			getFontFileUrl(
 				familiy: Omit<paths['/webfonts']['get']['parameters']['query'], 'key'>['family'],
 				options: {
 					fontWeight?: number;
@@ -16,6 +16,14 @@ declare module '@dyn/fetch-client' {
 					capability?: Omit<paths['/webfonts']['get']['parameters']['query'], 'key'>['capability'];
 				}
 			): Promise<string | null>;
+			downloadFontFile(
+				familiy: Omit<paths['/webfonts']['get']['parameters']['query'], 'key'>['family'],
+				options: {
+					fontWeight?: number;
+					fontStyle?: 'italic' | 'regular';
+					capability?: Omit<paths['/webfonts']['get']['parameters']['query'], 'key'>['capability'];
+				}
+			): Promise<Uint8Array | null>;
 		};
 	}
 }

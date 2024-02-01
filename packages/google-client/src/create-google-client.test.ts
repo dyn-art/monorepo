@@ -11,7 +11,7 @@ describe('createGoogleClient function tests', () => {
 		// const response = await client.getWebFonts();
 		// const data = response.unwrap();
 
-		const response = await client.getFontFileURL('Roboto Serif', {
+		const response = await client.downloadFontFile('Roboto Serif', {
 			fontWeight: 100,
 			fontStyle: 'italic'
 		});
