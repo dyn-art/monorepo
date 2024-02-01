@@ -5,6 +5,7 @@ import type { TParseAs, TRequestMethod } from './api';
 import type { TFeatureKeys, TSelectFeatures } from './features';
 
 export type TFetchClient<GSelectedFeatureKeys extends TFeatureKeys[], GPaths extends {} = {}> = {
+	_features: string[];
 	_config: TFetchClientConfig;
 	_baseFetch: <
 		GSuccessResponseBody = any,

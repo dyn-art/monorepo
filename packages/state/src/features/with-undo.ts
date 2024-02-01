@@ -4,6 +4,8 @@ export function withUndo<GValue, GSelectedFeatureKeys extends TFeatureKeys<GValu
 	state: TState<GValue, TEnforceFeatures<GSelectedFeatureKeys, ['base']>>,
 	historyLimit = 50
 ): TState<GValue, ['undo', ...GSelectedFeatureKeys]> {
+	state._features.push('undo');
+
 	const undoFeature: TSelectFeatures<GValue, ['undo']> = {
 		_history: [state._value],
 		undo(this: TState<GValue, ['undo']>) {

@@ -34,6 +34,7 @@ export function createFetchClient<GPaths extends {} = {}>(
 
 	return {
 		_: null,
+		_features: ['base'],
 		_config: config,
 		async _baseFetch(this: TFetchClient<['base']>, path, method, baseFetchOptions = {}) {
 			const {

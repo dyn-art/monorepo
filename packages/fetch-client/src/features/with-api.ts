@@ -3,6 +3,8 @@ import type { TEnforceFeatures, TFeatureKeys, TFetchClient, TSelectFeatures } fr
 export function withApi<GSelectedFeatureKeys extends TFeatureKeys[]>(
 	fetchClient: TFetchClient<TEnforceFeatures<GSelectedFeatureKeys, ['base']>>
 ): TFetchClient<['api', ...GSelectedFeatureKeys]> {
+	fetchClient._features.push('api');
+
 	const apiFeature: TSelectFeatures<['api']> = {
 		get(this: TFetchClient<['base']>, path, options = {}) {
 			return this._baseFetch(path, 'GET', options);

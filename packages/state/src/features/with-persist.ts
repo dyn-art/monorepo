@@ -14,6 +14,8 @@ export function withPersist<GValue, GSelectedFeatureKeys extends TFeatureKeys<GV
 	storage: StorageInterface<GValue>,
 	key: string
 ): TState<GValue, [...GSelectedFeatureKeys, 'persist']> {
+	state._features.push('persist');
+
 	const persistFeature: TSelectFeatures<GValue, ['persist']> = {
 		async persist() {
 			let success = false;

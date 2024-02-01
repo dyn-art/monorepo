@@ -52,5 +52,6 @@
 		"crates/composition/Cargo.toml",
 		"crates/svg_render/Cargo.toml"
 	],
-	"rust-analyzer.rename.allowExternalItems": true
+	"rust-analyzer.rename.allowExternalItems": true,
+	"testing.automaticallyOpenPeekView": "never"
 }

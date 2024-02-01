@@ -5,6 +5,7 @@ import type { TPrimitive, TUnionToIntersection } from '@dyn/types/utility';
 // =============================================================================
 
 export type TState<GValue, GSelectedFeatureKeys extends TFeatureKeys<GValue>[]> = {
+	_features: string[];
 	_value: GValue;
 	_listeners: TListener<GValue>[];
 	/**
