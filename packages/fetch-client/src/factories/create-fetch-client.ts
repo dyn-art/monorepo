@@ -101,7 +101,7 @@ export function createFetchClient<GPaths extends {} = {}>(
 			}
 
 			// Build final URL
-			const finalURL = buildUrl(origin, {
+			const finalUrl = buildUrl(origin, {
 				path: parsedPath,
 				params: urlParams,
 				querySerializer
@@ -110,7 +110,7 @@ export function createFetchClient<GPaths extends {} = {}>(
 			// Send request
 			let response: Response;
 			try {
-				response = await fetchWithRetries(finalURL, {
+				response = await fetchWithRetries(finalUrl, {
 					requestInit
 				});
 			} catch (error) {

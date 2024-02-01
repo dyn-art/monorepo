@@ -1,4 +1,5 @@
 import {
+	createApiFetchClient,
 	hasFeatures,
 	RequestException,
 	type TEnforceFeatures,
@@ -10,16 +11,14 @@ import {
 import type { paths } from './gen/v1';
 
 export function withGoogle<GSelectedFeatureKeys extends TFeatureKeys[]>(
-	fetchClient: TFetchClient<TEnforceFeatures<GSelectedFeatureKeys, ['base', 'openapi', 'rapi']>>
+	fetchClient: TFetchClient<TEnforceFeatures<GSelectedFeatureKeys, ['base', 'openapi']>>
 ): TFetchClient<['google', ...GSelectedFeatureKeys], paths> {
-	if (hasFeatures(fetchClient, ['openapi', 'rapi'])) {
+	if (hasFeatures(fetchClient, ['openapi'])) {
 		fetchClient._features.push('google');
 
 		const googleFeature: TSelectFeatures<['google']> = {
-			async getWebFonts(
-				this: TFetchClient<['base', 'openapi', 'rapi', 'google'], paths>,
-				options = {}
-			) {
+			rawFetchClient: createApiFetchClient(),
+			async getWebFonts(this: TFetchClient<['base', 'openapi', 'google'], paths>, options = {}) {
 				return this.get('/webfonts', {
 					queryParams: {
 						key: 'not-set', // Set by middleware,
@@ -28,7 +27,7 @@ export function withGoogle<GSelectedFeatureKeys extends TFeatureKeys[]>(
 				});
 			},
 			async getFontFileUrl(
-				this: TFetchClient<['base', 'openapi', 'rapi', 'google'], paths>,
+				this: TFetchClient<['base', 'openapi', 'google'], paths>,
 				family,
 				options = {}
 			) {
@@ -65,7 +64,7 @@ export function withGoogle<GSelectedFeatureKeys extends TFeatureKeys[]>(
 				return null;
 			},
 			async downloadFontFile(
-				this: TFetchClient<['base', 'openapi', 'rapi', 'google'], paths>,
+				this: TFetchClient<['base', 'openapi', 'google'], paths>,
 				family,
 				options = {}
 			) {
@@ -76,7 +75,7 @@ export function withGoogle<GSelectedFeatureKeys extends TFeatureKeys[]>(
 				}
 
 				// Fetch font binary
-				const response = await this.rGet(downloadUrl, { parseAs: 'arrayBuffer' });
+				const response = await this.rawFetchClient.get(downloadUrl, { parseAs: 'arrayBuffer' });
 				if (response.isErr()) {
 					if (response.error instanceof RequestException && response.error.status === 404) {
 						return null;
@@ -94,7 +93,7 @@ export function withGoogle<GSelectedFeatureKeys extends TFeatureKeys[]>(
 		return _fetchClient as TFetchClient<['google', ...GSelectedFeatureKeys], paths>;
 	}
 
-	throw Error('FetchClient must have "openapi" and "rapi" feature to use withGoogle');
+	throw Error('FetchClient must have "openapi" feature to use withGoogle');
 }
 
 function findClosestVariant(

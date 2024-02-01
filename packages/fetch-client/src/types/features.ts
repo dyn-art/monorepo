@@ -1,12 +1,11 @@
 import type { TUnionToIntersection } from '@dyn/types/utility';
 
-import type { TApiFeature, TRawApiFeature } from './api-client';
+import type { TApiFeature } from './api-client';
 import type { TOpenApiFeature } from './openapi-client';
 
 export type TFeatures<GPaths extends {} = {}> = {
 	base: { _: null }; // TODO: Placeholder Feature: Figure out how to make the TS infer work with [] (empty array -> no feature)
 	api: TApiFeature;
-	rapi: TRawApiFeature;
 	openapi: TOpenApiFeature<GPaths>;
 } & TThirdPartyFeatures;
 

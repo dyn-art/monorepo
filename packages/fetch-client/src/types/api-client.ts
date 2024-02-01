@@ -55,10 +55,3 @@ export interface TApiFeature {
 	post: TApiPost;
 	del: TApiDelete;
 }
-
-export interface TRawApiFeature {
-	rGet: TApiGet;
-	rPut: TApiPut;
-	rPost: TApiPost;
-	rDel: TApiDelete;
-}
