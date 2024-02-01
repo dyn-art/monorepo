@@ -5,7 +5,8 @@ import type { TExportImageConfig } from '../../types';
 import {
 	exportFigmaImageData,
 	mapFigmaBlendModeToDTIF,
-	mapFigmaTransformToMat3
+	mapFigmaTransformToMat3,
+	uploadStaticData
 } from '../../utils';
 
 export async function transformImagePaint(
@@ -34,32 +35,24 @@ async function resolveImage(
 	nodeIds: SceneNode['id'][],
 	config: TTransformImagePaintConfig
 ): Promise<COMP.ImageContentMixin> {
+	const { export: exportConfig } = config;
+
+	// Resolve image
 	const imageHash = paint.imageHash;
 	if (imageHash == null) {
 		throw new ExportImagePaintException(nodeIds, `No valid image hash found!`);
 	}
+	const image = await exportFigmaImageData(imageHash, nodeIds);
 
-	const { size, content: binary } = await exportFigmaImageData(imageHash, nodeIds);
-
-	let content: COMP.ImageContentMixin['content'];
-	if (config.export.mode === 'External') {
-		const response = await config.export.uploadData(binary, { key: imageHash });
-		content = {
-			type: 'Url',
-			url: response.url,
-			contentType: 'PNG'
-		};
-	} else {
-		content = {
-			type: 'Binary',
-			content: Array.from(binary),
-			contentType: 'PNG'
-		};
-	}
+	// Upload image
+	const content = await uploadStaticData(image.content, {
+		export: exportConfig,
+		key: imageHash
+	});
 
 	return {
-		width: size.width,
-		height: size.height,
+		width: image.size.width,
+		height: image.size.height,
 		content
 	};
 }

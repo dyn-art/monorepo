@@ -35,17 +35,19 @@ async function processNode(node: FrameNode, instance: TPluginHandler): Promise<v
 		const result = await transformer.transform({
 			font: {
 				export: { mode: 'Inline' },
-				resolveFontContent: async () => {
+				resolveFontContent: async (fontMetadata) => {
+					console.log('Resolve Font', { fontMetadata });
 					// TODO
 					return null as any;
 				}
 			},
 			paint: {
 				image: { export: { format: 'PNG', mode: 'Inline' } }
+			},
+			node: {
+				includeInvisible: false,
+				shouldExportFrame: { contentType: 'PNG' }
 			}
-			// node: {
-			// 	includeInvisible: false
-			// }
 		});
 		await handleSuccess(result, node, instance);
 	} catch (error) {
