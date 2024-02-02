@@ -23,8 +23,6 @@ export async function transformShapeNode(
 		case 'VECTOR':
 			return transformVectorNode(toTransformNode.node, { paintIds: toTransformNode.paintIds });
 		// case 'LINE':
-		// case 'BOOLEAN_OPERATION':
-		// // return transformToSVGNode(node, options);
 		default:
 			throw new UnsupportedFigmaNodeException(toTransformNode.node);
 	}

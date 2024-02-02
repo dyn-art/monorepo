@@ -10,6 +10,7 @@ import {
 	isFigmaFrameNode,
 	isFigmaGroupNode,
 	isFigmaInstanceNode,
+	isFigmaSceneNode,
 	isFigmaShapeNode,
 	isFigmaTextNode
 } from './utils';
@@ -79,6 +80,12 @@ export class FigmaNodeTreeProcessor {
 				id: nodeId,
 				node,
 				paintIds: this.processPaints(node)
+			});
+		} else if (isFigmaSceneNode(node)) {
+			this._toTransformNodes.push({
+				type: 'Uncategorized',
+				id: nodeId,
+				node
 			});
 		} else {
 			throw new UnsupportedFigmaNodeException(node);
@@ -155,7 +162,7 @@ export class FigmaNodeTreeProcessor {
 }
 
 interface TToTransformBaseNode {
-	type: 'Text' | 'Frame' | 'Group' | 'Shape';
+	type: 'Text' | 'Frame' | 'Group' | 'Shape' | 'Uncategorized';
 	id: TContinuousId;
 	node: SceneNode;
 }
@@ -199,11 +206,17 @@ export interface TToTransformShapeNode extends TToTransformBaseNode {
 	paintIds: TContinuousId[];
 }
 
+export interface TToTransformUncategorizedSceneNode extends TToTransformBaseNode {
+	type: 'Uncategorized';
+	node: SceneNode;
+}
+
 export type TToTransformNode =
 	| TToTransformTextNode
 	| TToTransformFrameNode
 	| TToTransformGroupNode
-	| TToTransformShapeNode;
+	| TToTransformShapeNode
+	| TToTransformUncategorizedSceneNode;
 
 export interface TToTransformPaint {
 	id: TContinuousId;

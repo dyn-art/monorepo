@@ -5,9 +5,9 @@ import type { TToTransformNode } from '../../FigmaNodeTreeProcessor';
 import type { Transformer } from '../../Transformer';
 import { transformFrameNode } from './transform-frame-node';
 import { transformGroupNode } from './transform-group-node';
+import { transformNodeToImage } from './transform-node-to-image';
 import { transformShapeNode } from './transform-shape-node';
 import { transformTextNode } from './transform-text-node';
-import { transformToImageNode } from './transform-to-image-node';
 
 export async function transformNode(
 	toTransformNode: TToTransformNode,
@@ -29,7 +29,7 @@ export async function transformNode(
 					paintIds: toTransformNode.paintIds
 				});
 			}
-			return transformToImageNode(toTransformNode.node, cx, {
+			return transformNodeToImage(toTransformNode.node, cx, {
 				contentType: shouldExportFrame.contentType
 			});
 		}
@@ -43,6 +43,10 @@ export async function transformNode(
 			});
 		case 'Shape':
 			return transformShapeNode(toTransformNode);
+		case 'Uncategorized':
+			return transformNodeToImage(toTransformNode.node, cx, {
+				contentType: 'PNG'
+			});
 	}
 }
 

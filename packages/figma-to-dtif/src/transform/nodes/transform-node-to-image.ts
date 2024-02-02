@@ -4,10 +4,10 @@ import { ContinuousId } from '@dyn/utils';
 import type { Transformer } from '../../Transformer';
 import { exportFigmaNode, mapDTIFContentTypeToFigma, mapFigmaTransformToMat3 } from '../../utils';
 
-export async function transformToImageNode(
+export async function transformNodeToImage(
 	node: SceneNode,
 	cx: Transformer,
-	config: TTransformToImageNode
+	config: TTransformNodeToImageConfig
 ): Promise<{ type: 'Rectangle' } & COMP.RectangleNodeBundle> {
 	const { contentType } = config;
 
@@ -42,6 +42,6 @@ export async function transformToImageNode(
 	};
 }
 
-interface TTransformToImageNode {
+interface TTransformNodeToImageConfig {
 	contentType: COMP.ContentType;
 }
