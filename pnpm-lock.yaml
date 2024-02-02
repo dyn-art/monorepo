@@ -86,6 +86,9 @@ importers:
       '@dyn/figma-to-dtif':
         specifier: workspace:*
         version: link:../../packages/figma-to-dtif
+      '@dyn/google-client':
+        specifier: workspace:*
+        version: link:../../packages/google-client
       '@dyn/state':
         specifier: workspace:*
         version: link:../../packages/state
@@ -339,7 +342,7 @@ importers:
   packages/fetch-client:
     dependencies:
       '@dyn/utils':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../utils
       ts-results-es:
         specifier: 4.1.0-alpha.1

@@ -2,6 +2,7 @@ import { NodeException, Transformer, type COMP } from '@dyn/figma-to-dtif';
 import { extractErrorData, notEmpty, sleep } from '@dyn/utils';
 
 import type { TCustomPluginCallbackRegistration, TPluginHandler } from '../../types';
+import { googleClient } from '../fetch-client';
 
 export const intermediateFormatExport: TCustomPluginCallbackRegistration = {
 	type: 'app.message',
@@ -36,9 +37,22 @@ async function processNode(node: FrameNode, instance: TPluginHandler): Promise<v
 			font: {
 				export: { mode: 'Inline' },
 				resolveFontContent: async (fontMetadata) => {
-					console.log('Resolve Font', { fontMetadata });
-					// TODO
-					return null as any;
+					const url = (
+						await googleClient.getFontFileUrl(fontMetadata.family, {
+							fontWeight: fontMetadata.weight,
+							fontStyle: fontMetadata.style === 'Italic' ? 'italic' : 'regular',
+							capability: 'VF'
+						})
+					).unwrap();
+					if (url == null) {
+						return null;
+					}
+
+					return {
+						type: 'Url',
+						url,
+						contentType: { mimeType: 'font/ttf' }
+					};
 				}
 			},
 			paint: {

@@ -3,7 +3,7 @@ import type { COMP } from '@dyn/dtif';
 import { ExportFontException } from '../../exceptions';
 import type { TToTransformFont } from '../../FigmaNodeTreeProcessor';
 import type { TContentType, TExportConfig } from '../../types';
-import { uploadStaticData } from '../../utils';
+import { handleExport } from '../../utils';
 
 export async function transformFont(
 	toTransformFont: TToTransformFont,
@@ -13,22 +13,29 @@ export async function transformFont(
 	const { export: exportConfig, resolveFontContent } = config;
 
 	// Resolve font
-	let font;
+	let fontContent;
 	try {
-		font = await resolveFontContent(toTransformFont.fontMetadata);
-		if (font == null) {
+		fontContent = await resolveFontContent(toTransformFont.fontMetadata);
+		if (fontContent == null) {
 			throw new ExportFontException(fontMetadata, nodeIds, 'No font found!');
 		}
 	} catch (error) {
 		throw new ExportFontException(fontMetadata, nodeIds, error);
 	}
 
-	// Upload font
-	const content = await uploadStaticData(font.content, {
-		export: exportConfig,
-		contentType: font.contentType
-	});
+	// Handle Url
+	if (fontContent.type === 'Url') {
+		return {
+			metadata: fontMetadata,
+			content: fontContent
+		};
+	}
 
+	// Handle Binary
+	const content = await handleExport(fontContent.content, {
+		export: exportConfig,
+		contentType: fontContent.contentType
+	});
 	return {
 		metadata: fontMetadata,
 		content
@@ -40,6 +47,9 @@ export interface TTransformFontConfig {
 	resolveFontContent: TResolveFontContent;
 }
 
-export type TResolveFontContent = (
-	fontMetadata: COMP.FontMetadata
-) => Promise<{ content: Uint8Array; contentType: TContentType } | null>;
+export type TResolveFontContent = (fontMetadata: COMP.FontMetadata) => Promise<TFontContent>;
+
+type TFontContent =
+	| { type: 'Binary'; content: Uint8Array; contentType: TContentType }
+	| { type: 'Url'; url: string; contentType: TContentType }
+	| null;

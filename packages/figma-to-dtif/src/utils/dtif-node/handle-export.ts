@@ -3,7 +3,7 @@ import type { COMP } from '@dyn/dtif';
 import { UploadStaticDataException } from '../../exceptions';
 import type { TContentType, TExportConfig } from '../../types';
 
-export async function uploadStaticData(
+export async function handleExport(
 	binary: Uint8Array,
 	config: TUploadStaticDataConfig
 ): Promise<COMP.ImageContentMixin['content']> {

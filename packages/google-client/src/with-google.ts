@@ -1,7 +1,9 @@
 import {
 	createApiFetchClient,
+	Err,
 	hasFeatures,
-	RequestException,
+	isStatusCode,
+	Ok,
 	type TEnforceFeatures,
 	type TFeatureKeys,
 	type TFetchClient,
@@ -39,17 +41,17 @@ export function withGoogle<GSelectedFeatureKeys extends TFeatureKeys[]>(
 					family
 				});
 				if (response.isErr()) {
-					if (response.error instanceof RequestException && response.error.status === 404) {
-						return null;
+					if (isStatusCode(response.error, 404)) {
+						return Ok(null);
 					}
-					throw response.error;
+					return Err(response.error);
 				}
 
 				// Find the closest match for font family, weight and style
 				const items = response.value.data.items ?? [];
 				const font = items.find((f) => f.family === family);
 				if (font == null) {
-					return null;
+					return Ok(null);
 				}
 				const closestVariant = findClosestVariant(font.variants ?? [], fontWeight, fontStyle);
 
@@ -57,11 +59,11 @@ export function withGoogle<GSelectedFeatureKeys extends TFeatureKeys[]>(
 				if (font.files != null && closestVariant != null) {
 					const fileUrl = font.files[closestVariant];
 					if (fileUrl != null) {
-						return fileUrl.replace('http://', 'https://');
+						return Ok(fileUrl.replace('http://', 'https://'));
 					}
 				}
 
-				return null;
+				return Ok(null);
 			},
 			async downloadFontFile(
 				this: TFetchClient<['base', 'openapi', 'google'], paths>,
@@ -69,21 +71,25 @@ export function withGoogle<GSelectedFeatureKeys extends TFeatureKeys[]>(
 				options = {}
 			) {
 				// Fetch font download url
-				const downloadUrl = await this.getFontFileUrl(family, options);
+				const downloadUrlResponse = await this.getFontFileUrl(family, options);
+				if (downloadUrlResponse.isErr()) {
+					return Err(downloadUrlResponse.error);
+				}
+				const downloadUrl = downloadUrlResponse.value;
 				if (downloadUrl == null) {
-					return null;
+					return Ok(null);
 				}
 
 				// Fetch font binary
 				const response = await this.rawFetchClient.get(downloadUrl, { parseAs: 'arrayBuffer' });
 				if (response.isErr()) {
-					if (response.error instanceof RequestException && response.error.status === 404) {
-						return null;
+					if (isStatusCode(response.error, 404)) {
+						return Ok(null);
 					}
-					throw response.error;
+					return Err(response.error);
 				}
 
-				return new Uint8Array(response.value.data);
+				return Ok(new Uint8Array(response.value.data));
 			}
 		};
 

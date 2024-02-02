@@ -120,7 +120,7 @@ export interface TFetchResponseSuccess<GSuccessResponseBody, GParseAs extends TP
 	response: Response;
 }
 
-export type TFetchResponseError<GErrorResponseBody> =
+export type TFetchResponseError<GErrorResponseBody = unknown> =
 	| NetworkException
 	| RequestException<GErrorResponseBody>
 	| ServiceException;

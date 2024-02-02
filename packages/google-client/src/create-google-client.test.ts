@@ -5,7 +5,7 @@ import { createGoogleClient } from './create-google-client';
 describe('createGoogleClient function tests', () => {
 	it('should have correct types', async () => {
 		const client = createGoogleClient({
-			apiKey: 'AIzaSyAjniSH9ih1UdGApW8HaG7PF3AKv2SHUIg'
+			apiKey: '-'
 		});
 
 		// const response = await client.getWebFonts();

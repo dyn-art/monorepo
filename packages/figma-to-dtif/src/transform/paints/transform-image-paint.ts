@@ -4,9 +4,9 @@ import { ExportImagePaintException } from '../../exceptions';
 import type { TExportImageConfig } from '../../types';
 import {
 	exportFigmaImageData,
+	handleExport,
 	mapFigmaBlendModeToDTIF,
-	mapFigmaTransformToMat3,
-	uploadStaticData
+	mapFigmaTransformToMat3
 } from '../../utils';
 
 export async function transformImagePaint(
@@ -45,7 +45,7 @@ async function resolveImage(
 	const image = await exportFigmaImageData(imageHash, nodeIds);
 
 	// Upload image
-	const content = await uploadStaticData(image.content, {
+	const content = await handleExport(image.content, {
 		export: exportConfig,
 		key: imageHash
 	});

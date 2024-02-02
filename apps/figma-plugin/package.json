@@ -29,6 +29,7 @@
 	"dependencies": {
 		"@dyn/figma-handler": "workspace:*",
 		"@dyn/figma-to-dtif": "workspace:*",
+		"@dyn/google-client": "workspace:*",
 		"@dyn/state": "workspace:*",
 		"@dyn/state-react": "workspace:*",
 		"@dyn/svg-composition": "workspace:*",
