@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import type { COMP, Composition } from '@dyn/svg-composition';
+import { isDTIFComposition, rustify, type COMP, type Composition } from '@dyn/svg-composition';
 import { Button, CircleIcon, Component2Icon, Skeleton, SquareIcon } from '@dyn/ui';
 
 import { Canvas, CompositionControl, type TCanvasProps } from './components';
@@ -15,9 +15,10 @@ export const BannerEditor: React.FC<TBannerEditorProps> = (props) => {
 		(async () => {
 			const text = await navigator.clipboard.readText();
 			try {
-				const maybeDTIF = JSON.parse(text);
-				if ('version' in maybeDTIF) {
-					setDTIF(maybeDTIF as COMP.DTIFComposition);
+				const maybeDTIF: unknown = JSON.parse(text);
+				if (isDTIFComposition(maybeDTIF)) {
+					const parsedDTIF = await rustify(maybeDTIF);
+					setDTIF(parsedDTIF);
 				} else {
 					throw new Error('Invalid DTIF');
 				}

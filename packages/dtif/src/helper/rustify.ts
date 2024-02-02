@@ -1,4 +1,4 @@
-import type { COMP } from './comp';
+import type { COMP } from '../comp';
 
 export async function rustify(dtif: COMP.DTIFComposition): Promise<COMP.DTIFComposition> {
 	const finalDTIF: COMP.DTIFComposition = {
