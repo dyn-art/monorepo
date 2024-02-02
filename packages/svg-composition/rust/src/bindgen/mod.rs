@@ -21,7 +21,7 @@ pub fn setup_bindgen() {
     #[cfg(feature = "console_log")]
     setup_console_logger();
 
-    #[cfg(feature = "console_error_panic_hook")]
+    #[cfg(feature = "console_log")]
     setup_panic_hook();
 }
 
@@ -44,7 +44,7 @@ fn setup_console_logger() {
 //
 // For more details see
 // https://github.com/rustwasm/console_error_panic_hook#readme
-#[cfg(feature = "console_error_panic_hook")]
+#[cfg(feature = "console_log")]
 fn setup_panic_hook() {
     use log::info;
 
