@@ -738,9 +738,11 @@ export type RelativeTransformMixin = Mat3
  */
 export type Root = null
 
-export type SVGAttribute = { type: "Id"; id: ContinuousId } | { type: "Width"; width: number; unit: SVGMeasurementUnit } | { type: "Height"; height: number; unit: SVGMeasurementUnit } | { type: "Opacity"; opacity: number } | { type: "Transform"; transform: SVGTransformAttribute } | { type: "PatternTransform"; transform: SVGTransformAttribute } | { type: "D"; d: SVGPathCommand[] } | { type: "ClipPath"; clipPath: ContinuousId } | { type: "Fill"; fill: string } | { type: "ReferencedFill"; id: ContinuousId } | { type: "Name"; name: string } | { type: "PatternUnits"; patternUnits: SVGUnitsVariant } | { type: "GradientUnits"; gradientUnits: SVGUnitsVariant } | { type: "Href"; href: SVGHrefVariant } | { type: "PreserveAspectRatio"; preserveAspectRatio: string } | { type: "X1"; x1: number } | { type: "Y1"; y1: number } | { type: "X2"; x2: number } | { type: "Y2"; y2: number } | { type: "Offset"; offset: number } | { type: "StopColor"; stopColor: string }
+export type SVGAttribute = { type: "Id"; id: ContinuousId } | { type: "Width"; width: number; unit: SVGMeasurementUnit } | { type: "Height"; height: number; unit: SVGMeasurementUnit } | { type: "Opacity"; opacity: number } | { type: "Transform"; transform: SVGTransformAttribute } | { type: "PatternTransform"; transform: SVGTransformAttribute } | { type: "D"; d: SVGDAttribute } | { type: "ClipPath"; clipPath: ContinuousId } | { type: "Fill"; fill: string } | { type: "ReferencedFill"; id: ContinuousId } | { type: "Name"; name: string } | { type: "PatternUnits"; patternUnits: SVGUnitsVariant } | { type: "GradientUnits"; gradientUnits: SVGUnitsVariant } | { type: "Href"; href: SVGHrefVariant } | { type: "PreserveAspectRatio"; preserveAspectRatio: string } | { type: "X1"; x1: number } | { type: "Y1"; y1: number } | { type: "X2"; x2: number } | { type: "Y2"; y2: number } | { type: "Offset"; offset: number } | { type: "StopColor"; stopColor: string }
 
 export type SVGBlendMode = { type: "Normal" } | { type: "Multiply" } | { type: "Screen" } | { type: "Overlay" } | { type: "Darken" } | { type: "Lighten" } | { type: "ColorDodge" } | { type: "ColorBurn" } | { type: "HardLight" } | { type: "SoftLight" } | { type: "Difference" } | { type: "Exclusion" } | { type: "Hue" } | { type: "Saturation" } | { type: "Color" } | { type: "Luminosity" }
+
+export type SVGDAttribute = { type: "Meta"; value: SVGPathCommand[] } | { type: "String"; value: string }
 
 export type SVGDisplayStyle = { type: "Block" } | { type: "None" }
 

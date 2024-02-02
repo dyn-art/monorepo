@@ -237,7 +237,7 @@ pub struct TextSegment {
 #[serde(rename_all = "camelCase")]
 pub struct TextStyle {
     /// Height of rasterized glyphs in pixels, influenced by window scale.
-    pub font_size: u32,
+    pub font_size: f32,
 
     /// Primary font identifier.
     pub font_id: u64,
@@ -284,9 +284,9 @@ pub enum LetterSpacing {
     #[default]
     Auto,
     /// Fixed spacing in pixels.
-    Pixels(u8),
+    Pixels(f32),
     /// Spacing as a percentage of font size.
-    Percent(u8),
+    Percent(f32),
 }
 
 /// Options for controlling line height in text.
@@ -296,9 +296,9 @@ pub enum LineHeight {
     #[default]
     Auto,
     /// Fixed line height in pixels.
-    Pixels(u8),
+    Pixels(f32),
     /// Line height as a percentage of font size.
-    Percent(u8),
+    Percent(f32),
 }
 
 /// Defines how text should break lines within its container.

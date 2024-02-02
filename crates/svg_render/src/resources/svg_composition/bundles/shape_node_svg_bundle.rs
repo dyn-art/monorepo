@@ -14,8 +14,11 @@ use crate::{
             svg_bundle::SVGBundle,
             svg_context::SVGContext,
             svg_element::{
-                attributes::{SVGAttribute, SVGMeasurementUnit},
-                mapper::{map_anchors_to_svg_path, map_blend_mode, map_mat3_to_svg_transform},
+                attributes::{SVGAttribute, SVGDAttribute, SVGMeasurementUnit},
+                mapper::{
+                    map_anchors_to_svg_path_commands, map_anchors_to_svg_path_string,
+                    map_blend_mode, map_mat3_to_svg_transform, map_path_commands_to_string,
+                },
                 styles::{SVGDisplayStyle, SVGStyle},
                 SVGElement, SVGTag,
             },
@@ -100,7 +103,9 @@ impl SVGBundle for ShapeNodeSVGBundle {
                 }
                 MixinChange::Path(mixin) => {
                     self.fill_clipped_path.set_attributes(vec![SVGAttribute::D {
-                        d: map_anchors_to_svg_path(&mixin.vertices),
+                        d: SVGDAttribute::String {
+                            value: map_anchors_to_svg_path_string(&mixin.vertices),
+                        },
                     }]);
                 }
                 MixinChange::Children(mixin) => {

@@ -22,7 +22,42 @@ pub fn map_mat3_to_svg_transform(transform: &Mat3) -> SVGTransformAttribute {
     }
 }
 
-pub fn map_anchors_to_svg_path(vertices: &[Anchor]) -> Vec<SVGPathCommand> {
+pub fn map_anchors_to_svg_path_string(vertices: &[Anchor]) -> String {
+    vertices
+        .iter()
+        .map(|anchor| {
+            let Vec2 { x, y } = anchor.position;
+            match &anchor.command {
+                AnchorCommand::MoveTo => format!("M{} {}", x, y),
+                AnchorCommand::LineTo => format!("L{} {}", x, y),
+                AnchorCommand::ClosePath => String::from("Z"),
+                AnchorCommand::ArcTo {
+                    radius,
+                    x_axis_rotation,
+                    large_arc_flag,
+                    sweep_flag,
+                } => {
+                    let Vec2 { x: rx, y: ry } = *radius;
+                    format!(
+                        "A{} {} {} {} {} {} {}",
+                        rx, ry, x_axis_rotation, *large_arc_flag as u8, *sweep_flag as u8, x, y
+                    )
+                }
+                AnchorCommand::CurveTo {
+                    control_point_1,
+                    control_point_2,
+                } => {
+                    let Vec2 { x: cx1, y: cy1 } = *control_point_1;
+                    let Vec2 { x: cx2, y: cy2 } = *control_point_2;
+                    format!("C{} {} {} {} {} {}", cx1, cy1, cx2, cy2, x, y)
+                }
+            }
+        })
+        .collect::<Vec<_>>()
+        .join(" ")
+}
+
+pub fn map_anchors_to_svg_path_commands(vertices: &[Anchor]) -> Vec<SVGPathCommand> {
     vertices
         .iter()
         .filter_map(|anchor| {
@@ -66,6 +101,42 @@ pub fn map_anchors_to_svg_path(vertices: &[Anchor]) -> Vec<SVGPathCommand> {
             }
         })
         .collect()
+}
+
+pub fn map_path_commands_to_string(commands: &[SVGPathCommand]) -> String {
+    commands
+                .iter()
+                .map(|command| match command {
+                    SVGPathCommand::MoveTo { x, y } => format!("M{x} {y}"),
+                    SVGPathCommand::LineTo { x, y } => format!("L{x} {y}"),
+                    SVGPathCommand::CurveTo {
+                        cx1,
+                        cy1,
+                        cx2,
+                        cy2,
+                        x,
+                        y,
+                    } => {
+                        format!("C{cx1} {cy1} {cx2} {cy2} {x} {y}")
+                    }
+                    SVGPathCommand::ArcTo {
+                        rx,
+                        ry,
+                        x_axis_rotation,
+                        large_arc_flag,
+                        sweep_flag,
+                        x,
+                        y,
+                    } => {
+                        let parsed_large_arc_flag = *large_arc_flag as u8;
+                        let parsed_sweep_flag = *sweep_flag as u8;
+                        format!(
+                        "A{rx} {ry} {x_axis_rotation} {parsed_large_arc_flag} {parsed_sweep_flag} {x} {y}"
+                    )},
+                    SVGPathCommand::ClosePath => "Z".to_string(),
+                })
+                .collect::<Vec<_>>()
+                .join(" ")
 }
 
 pub fn map_blend_mode(blend_mode: &BlendMode) -> SVGBlendMode {

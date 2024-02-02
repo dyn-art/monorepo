@@ -307,30 +307,39 @@ export class SVGRender extends Render {
 						return ['', ''];
 				}
 			}
-			case 'D':
-				return [
-					'd',
-					attribute.d
-						.map((command) => {
-							switch (command.type) {
-								case 'MoveTo':
-									return `M${command.x} ${command.y}`;
-								case 'LineTo':
-									return `L${command.x} ${command.y}`;
-								case 'CurveTo':
-									return `C${command.cx1} ${command.cy1} ${command.cx2} ${command.cy2} ${command.x} ${command.y}`;
-								case 'ArcTo':
-									return `A${command.rx} ${command.ry} ${command.xAxisRotation} ${
-										command.largeArcFlag ? 1 : 0
-									} ${command.sweepFlag ? 1 : 0} ${command.x} ${command.y}`;
-								case 'ClosePath':
-									return 'Z';
-								default:
-									return '';
-							}
-						})
-						.join(' ')
-				];
+			case 'D': {
+				const d = attribute.d;
+				switch (d.type) {
+					case 'Meta':
+						return [
+							'd',
+							d.value
+								.map((command) => {
+									switch (command.type) {
+										case 'MoveTo':
+											return `M${command.x} ${command.y}`;
+										case 'LineTo':
+											return `L${command.x} ${command.y}`;
+										case 'CurveTo':
+											return `C${command.cx1} ${command.cy1} ${command.cx2} ${command.cy2} ${command.x} ${command.y}`;
+										case 'ArcTo':
+											return `A${command.rx} ${command.ry} ${command.xAxisRotation} ${
+												command.largeArcFlag ? 1 : 0
+											} ${command.sweepFlag ? 1 : 0} ${command.x} ${command.y}`;
+										case 'ClosePath':
+											return 'Z';
+										default:
+											return '';
+									}
+								})
+								.join(' ')
+						];
+					case 'String':
+						return ['d', d.value];
+					default:
+						return ['', ''];
+				}
+			}
 			case 'ClipPath':
 				return ['clip-path', `url(#${attribute.clipPath})`];
 			case 'Fill':
