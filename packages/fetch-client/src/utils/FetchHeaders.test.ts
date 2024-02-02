@@ -69,10 +69,23 @@ describe('FetchHeaders class', () => {
 		expect(headers.get('Accept')).toEqual('application/json');
 	});
 
-	it('should convert to HeadersInit format', () => {
-		const headers = new FetchHeaders({ Accept: 'application/json' });
+	it('should convert to HeadersInit format for single values', () => {
+		const headers = new FetchHeaders();
+		headers.append('Accept', 'application/json');
 		const headersInit = headers.toHeadersInit();
-		expect(headersInit).toEqual([['accept', 'application/json']]);
+		expect(headersInit).toEqual({ accept: 'application/json' });
+	});
+
+	it('should handle multiple values for the same header correctly', () => {
+		const headers = new FetchHeaders();
+		headers.append('Accept', 'application/json');
+		headers.append('accept', 'text/plain');
+		headers.append('Content-Type', 'application/x-www-form-urlencoded');
+		const headersInit = headers.toHeadersInit();
+		expect(headersInit).toEqual({
+			'accept': 'application/json, text/plain',
+			'content-type': 'application/x-www-form-urlencoded'
+		});
 	});
 
 	it('should iterate over entries', () => {

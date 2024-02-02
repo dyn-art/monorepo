@@ -37,13 +37,12 @@ async function processNode(node: FrameNode, instance: TPluginHandler): Promise<v
 			font: {
 				export: { mode: 'Inline' },
 				resolveFontContent: async (fontMetadata) => {
-					const url = (
-						await googleClient.getFontFileUrl(fontMetadata.family, {
-							fontWeight: fontMetadata.weight,
-							fontStyle: fontMetadata.style === 'Italic' ? 'italic' : 'regular',
-							capability: 'VF'
-						})
-					).unwrap();
+					const urlResponse = await googleClient.getFontFileUrl(fontMetadata.family, {
+						fontWeight: fontMetadata.weight,
+						fontStyle: fontMetadata.style === 'Italic' ? 'italic' : 'regular',
+						capability: 'VF'
+					});
+					const url = urlResponse.unwrap();
 					if (url == null) {
 						return null;
 					}

@@ -53,11 +53,9 @@ export class FetchHeaders {
 	}
 
 	public toHeadersInit(): RequestInit['headers'] {
-		const headersInit: [string, string][] = [];
+		const headersInit: Record<string, string> = {};
 		this.headers.forEach((values, key) => {
-			values.forEach((value) => {
-				headersInit.push([key, value]);
-			});
+			headersInit[key] = values.join(', ');
 		});
 		return headersInit;
 	}

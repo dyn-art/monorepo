@@ -78,7 +78,7 @@ export function createFetchClient<GPaths extends {} = {}>(
 
 			// Remove `Content-Type` if serialized body is FormData.
 			// Browser will correctly set Content-Type & boundary expression.
-			if (requestInit.body instanceof FormData) {
+			if (typeof FormData !== 'undefined' && requestInit.body instanceof FormData) {
 				mergedHeaders.delete('Content-Type');
 			}
 
