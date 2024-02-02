@@ -4,11 +4,11 @@ import { toArray } from '@dyn/utils';
 import type { TFetchClient, TFetchClientConfig, TFetchClientOptions, TURLParams } from '../types';
 import {
 	buildUrl,
+	FetchHeaders,
 	fetchWithRetries,
 	mapErrorToNetworkException,
 	mapErrorToServiceException,
 	mapResponseToRequestException,
-	mergeHeaders,
 	parseAndValidateUrl,
 	processRequestMiddlewares,
 	serializeBody,
@@ -21,7 +21,7 @@ export function createFetchClient<GPaths extends {} = {}>(
 	const config: TFetchClientConfig = {
 		prefixUrl: options.prefixUrl ?? '',
 		fetchProps: options.fetchProps ?? {},
-		headers: options.headers != null ? new Headers(options.headers) : new Headers(),
+		headers: options.headers != null ? new FetchHeaders(options.headers) : new FetchHeaders(),
 		bodySerializer: options.bodySerializer ?? serializeBody,
 		querySerializer: options.querySerializer ?? serializeQueryParams,
 		middleware: toArray(options.middleware ?? [])
@@ -39,7 +39,6 @@ export function createFetchClient<GPaths extends {} = {}>(
 		async _baseFetch(this: TFetchClient<['base']>, path, method, baseFetchOptions = {}) {
 			const {
 				parseAs = 'json',
-				headers = {},
 				bodySerializer = this._config.bodySerializer,
 				querySerializer = this._config.querySerializer,
 				pathParams,
@@ -49,6 +48,7 @@ export function createFetchClient<GPaths extends {} = {}>(
 				fetchProps = {},
 				middlewareProps
 			} = baseFetchOptions;
+			const headers = new FetchHeaders(baseFetchOptions.headers);
 
 			// Parse and validate URL to ensure that even if path is a full URL and baseUrl is an empty string,
 			// the finalPath and origin can still be correctly extracted
@@ -63,13 +63,13 @@ export function createFetchClient<GPaths extends {} = {}>(
 			};
 
 			// Build request init object
-			const mergedHeaders = mergeHeaders(headers, this._config.headers);
+			const mergedHeaders = FetchHeaders.merge(headers, this._config.headers);
 			let requestInit: RequestInit = {
 				redirect: 'follow',
 				...this._config.fetchProps,
 				...fetchProps,
 				method,
-				headers: mergedHeaders,
+				headers: mergedHeaders.toHeadersInit(),
 				body:
 					body != null
 						? bodySerializer(body, mergedHeaders.get('Content-Type') ?? undefined)

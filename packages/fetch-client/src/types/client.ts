@@ -1,6 +1,7 @@
 import type { Result } from 'ts-results-es';
 
 import type { NetworkException, RequestException, ServiceException } from '../exceptions';
+import type { FetchHeaders } from '../utils';
 import type { TParseAs, TRequestMethod } from './api';
 import type { TFeatureKeys, TSelectFeatures } from './features';
 
@@ -30,7 +31,7 @@ export interface TBaseFetchClientConfig {
 }
 
 export type TFetchClientConfig = {
-	headers: Headers;
+	headers: FetchHeaders;
 	middleware: TRequestMiddleware[];
 } & TBaseFetchClientConfig;
 
