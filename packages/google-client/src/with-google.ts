@@ -12,6 +12,8 @@ import {
 
 import type { paths } from './gen/v1';
 
+const REGULAR_FONT_WEIGHT = 400;
+
 export function withGoogle<GSelectedFeatureKeys extends TFeatureKeys[]>(
 	fetchClient: TFetchClient<TEnforceFeatures<GSelectedFeatureKeys, ['base', 'openapi']>>
 ): TFetchClient<['google', ...GSelectedFeatureKeys], paths> {
@@ -33,7 +35,7 @@ export function withGoogle<GSelectedFeatureKeys extends TFeatureKeys[]>(
 				family,
 				options = {}
 			) {
-				const { fontWeight = 400, fontStyle = 'regular', capability = 'VF' } = options;
+				const { fontWeight = 400, fontStyle = 'regular', capability } = options;
 
 				// Fetch web fonts
 				const response = await this.getWebFonts({
@@ -102,17 +104,29 @@ export function withGoogle<GSelectedFeatureKeys extends TFeatureKeys[]>(
 	throw Error('FetchClient must have "openapi" feature to use withGoogle');
 }
 
+// Find closest font variant identifier key
+// e.g. 'regular', '100', '200', '200itlaic'
 function findClosestVariant(
 	variants: string[],
-	desiredWeight: number,
-	desiredStyle: string
+	fontWeight = REGULAR_FONT_WEIGHT,
+	fontStyle: 'italic' | 'regular' = 'regular'
 ): string | null {
-	const styleSuffix = desiredStyle.toLowerCase() === 'italic' ? 'italic' : '';
-	const desiredVariant = `${desiredWeight}${styleSuffix}`;
-	if (variants.includes(desiredVariant)) {
-		return desiredVariant;
+	let variant;
+	if (fontWeight === REGULAR_FONT_WEIGHT) {
+		variant = fontStyle;
+	} else if (fontStyle === 'regular') {
+		variant = `${fontWeight}`;
+	} else {
+		variant = `${fontWeight}${fontStyle}`;
 	}
 
-	// Fallback to regular if desired variant is not available
-	return variants.includes('regular') ? 'regular' : null;
+	if (variants.includes(variant)) {
+		return variant;
+	} else if (variants.includes(fontStyle)) {
+		return fontStyle;
+	} else if (variants.includes('regular')) {
+		return 'regular';
+	}
+
+	return null;
 }

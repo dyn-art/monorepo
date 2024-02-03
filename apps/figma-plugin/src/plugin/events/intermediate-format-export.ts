@@ -39,8 +39,7 @@ async function processNode(node: FrameNode, instance: TPluginHandler): Promise<v
 				resolveFontContent: async (fontMetadata) => {
 					const urlResponse = await googleClient.getFontFileUrl(fontMetadata.family, {
 						fontWeight: fontMetadata.weight,
-						fontStyle: fontMetadata.style === 'Italic' ? 'italic' : 'regular',
-						capability: 'VF'
+						fontStyle: fontMetadata.style === 'Italic' ? 'italic' : 'regular'
 					});
 					const url = urlResponse.unwrap();
 					if (url == null) {
