@@ -136,7 +136,7 @@ impl TextBuilder {
                 | TokenKind::TextFragment { metric, style, .. } = token_with_shape.token.kind
                 {
                     if let Some(font_face) = token_stream.get_buzz_face(style.font_id) {
-                        self.current_scale = metric.scale;
+                        self.current_scale = metric.font_scale;
                         self.current_ascender = metric.ascender;
                         self.process_glyphs(&token_with_shape.glyph_buffer, font_face);
                     }

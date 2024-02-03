@@ -21,6 +21,9 @@ mod token;
 mod token_stream;
 mod token_with_shape;
 
+// TODO: Improve based on:
+//  https://github.dev/pop-os/cosmic-text/tree/main
+
 pub fn construct_text_path(
     mut commands: Commands,
     mut font_cache: ResMut<FontCacheRes>,
