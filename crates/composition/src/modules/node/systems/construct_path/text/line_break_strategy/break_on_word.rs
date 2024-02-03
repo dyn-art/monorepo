@@ -44,20 +44,6 @@ impl BreakOnWordLineBreakStrategy {
                 })
                 .collect();
 
-            // info!(
-            //     "deterime_line_break_behavior: {:?}[{:?}] - {:?}",
-            //     overflown_tokens
-            //         .iter()
-            //         .map(|token_with_shape| token_with_shape.token.get_str())
-            //         .collect::<Vec<_>>(),
-            //     next_token.token.get_str(),
-            //     current_line
-            //         .tokens
-            //         .iter()
-            //         .map(|token_with_shape| token_with_shape.token.get_str())
-            //         .collect::<Vec<_>>(),
-            // ); // TODO: REMOVE
-
             // Check if the total width of overflown tokens exceeds the maximum width.
             // If it does, avoid appending tokens to next line to prevent endless loop.
             if current_line.tokens.len() > 0

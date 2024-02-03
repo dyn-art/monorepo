@@ -14,27 +14,26 @@ pub struct TokenStream<'a> {
 impl<'a> TokenStream<'a> {
     pub fn from_text(text: &TextNode, font_cache: &'a mut FontCacheRes) -> Self {
         let mut tokens: Vec<Token> = Vec::new();
-        let mut font_face_cache: HashMap<u64, rustybuzz::Face<'a>> = HashMap::new();
+        let mut buzz_face_cache: HashMap<u64, rustybuzz::Face<'a>> = HashMap::new();
 
         // Preload required faces to avoid mutable borrow conflicts during local font face caching
-        for segment in &text.segments {
-            font_cache.load_ttfp_face(&segment.style.font_id);
-        }
+        // TODO: Figure out whether preloading the ttf_face once or reconstructing the ttf_face everytime
+        //  is more performant
+        // for segment in &text.segments {
+        //     font_cache.load_ttfp_face(&segment.style.font_id);
+        // }
 
         // Iterate through text segments, creating tokens
         for segment in &text.segments {
-            let font_hash = segment.style.font_id;
+            let font_id = segment.style.font_id;
             let font_size = segment.style.font_size as f32;
 
             // Cache rustybuzz font face locally
-            if !font_face_cache.contains_key(&font_hash) {
-                if let Some(face) = font_cache.get_buzz_face(&segment.style.font_id) {
-                    font_face_cache.insert(segment.style.font_id, face.clone());
-                } else {
-                    continue;
-                }
-            }
-            let buzz_face = font_face_cache.get(&font_hash).unwrap();
+            let buzz_face = buzz_face_cache.entry(font_id).or_insert_with(|| {
+                font_cache
+                    .create_buzz_face(&segment.style.font_id)
+                    .expect("Font face not found")
+            });
             let token_metric = Token::compute_token_metric(buzz_face, font_size);
 
             // Tokenize the text, considering spaces and line breaks
@@ -47,8 +46,8 @@ impl<'a> TokenStream<'a> {
                 if start != index {
                     tokens.push(Token::new(TokenKind::TextFragment {
                         value: String::from(&segment.value[start..index]),
-                        style: segment.style.clone(),
-                        metric: token_metric.clone(),
+                        style: segment.style,
+                        metric: token_metric,
                     }));
                 }
 
@@ -56,8 +55,8 @@ impl<'a> TokenStream<'a> {
                 tokens.push(match match_str {
                     "\n" => Token::new(TokenKind::Linebreak),
                     _ => Token::new(TokenKind::Space {
-                        style: segment.style.clone(),
-                        metric: token_metric.clone(),
+                        style: segment.style,
+                        metric: token_metric,
                     }),
                 });
 
@@ -68,7 +67,7 @@ impl<'a> TokenStream<'a> {
             if start < segment.value.len() {
                 tokens.push(Token::new(TokenKind::TextFragment {
                     value: String::from(&segment.value[start..]),
-                    style: segment.style.clone(),
+                    style: segment.style,
                     metric: token_metric,
                 }));
             }
@@ -76,7 +75,7 @@ impl<'a> TokenStream<'a> {
 
         return Self {
             tokens,
-            buzz_face_cache: font_face_cache,
+            buzz_face_cache,
         };
     }
 

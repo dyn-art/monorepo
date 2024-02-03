@@ -87,27 +87,14 @@ impl TextBuilder {
                     ) {
                         // Handle line break
                         ShouldBreakLine::True(line_break_behavior) => {
+                            // Process the current line
+                            self.process_current_line(&mut current_line, token_stream);
+
                             // Handle line break behavior
                             match line_break_behavior {
                                 // Requeue overflown tokens and the current token
                                 // to be appended in the next line
                                 LineBreakBehavior::AppendOverflownTokens(overflown_tokens) => {
-                                    // info!(
-                                    //     "lbb (overflow): {:?}[{:?}]{:?}",
-                                    //     overflown_tokens
-                                    //         .iter()
-                                    //         .rev()
-                                    //         .map(|token_with_shape| token_with_shape
-                                    //             .token
-                                    //             .get_str())
-                                    //         .collect::<Vec<_>>(),
-                                    //     token_with_shape.token.get_str(),
-                                    //     to_process_tokens
-                                    //         .iter()
-                                    //         .map(|token| token.get_str())
-                                    //         .collect::<Vec<_>>()
-                                    // ); // TODO: REMOVE
-
                                     to_process_tokens.push_front(token_with_shape.token);
                                     for overflown_token in overflown_tokens
                                         .into_iter()
@@ -120,30 +107,14 @@ impl TextBuilder {
 
                                 // Requeue current token to be appended in the next line
                                 LineBreakBehavior::AppendNextToken => {
-                                    // info!(
-                                    //     "lbb (append): [{:?}]{:?}",
-                                    //     token_with_shape.token.get_str(),
-                                    //     to_process_tokens
-                                    //         .iter()
-                                    //         .map(|token| token.get_str())
-                                    //         .collect::<Vec<_>>()
-                                    // ); // TODO: REMOVE
-
                                     to_process_tokens.push_front(token_with_shape.token);
                                 }
-                                _ => {
-                                    // info!("lbb (none)"); // TODO: REMOVE
-                                }
+                                _ => {}
                             }
-
-                            // Process the current line
-                            self.process_current_line(&mut current_line, token_stream);
                         }
 
                         // Append token to the current line
                         ShouldBreakLine::False => {
-                            // info!("append: [{:?}]", token_with_shape.token.get_str()); // TODO: REMOVE
-
                             current_line.append(token_with_shape);
                         }
                     }
@@ -157,15 +128,6 @@ impl TextBuilder {
 
     fn process_current_line(&mut self, current_line: &mut CurrentLine, token_stream: &TokenStream) {
         self.move_to_new_line(&current_line);
-
-        // info!(
-        //     "---- Apply Line: {:?}",
-        //     current_line
-        //         .tokens
-        //         .iter()
-        //         .map(|t| t.token.get_str())
-        //         .collect::<Vec<_>>()
-        // ); // TODO: REMOVE
 
         // Process current line
         if !current_line.is_empty() {

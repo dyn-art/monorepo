@@ -63,7 +63,7 @@ impl Token {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Copy, Debug)]
 pub struct TokenMetric {
     pub height: f32,
     pub ascender: f32,
