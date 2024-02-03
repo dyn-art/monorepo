@@ -179,8 +179,9 @@ impl TextBuilder {
     fn move_to_new_line(&mut self, current_line: &CurrentLine) {
         let current_line_metric = current_line.compute_line_metric();
         self.current_max_ascender = current_line_metric.max_ascender;
+        // To align the line glyphs with Figma behaviour the inital vertical line offset is 0.78 * height
         self.current_pos.y +=
-            current_line_metric.height * if self.current_pos.y == 0.0 { 0.75 } else { 1.0 };
+            current_line_metric.height * if self.current_pos.y == 0.0 { 0.78 } else { 1.0 };
         self.current_pos.x = 0.0;
     }
 
