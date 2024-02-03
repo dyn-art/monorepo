@@ -45,7 +45,7 @@ impl TokenWithShape {
         // Determine the scale based on the token type
         let scale = match &self.token.kind {
             TokenKind::Space { metric, .. } | TokenKind::TextFragment { metric, .. } => {
-                metric.scale
+                metric.font_scale
             }
             _ => 1.0,
         };

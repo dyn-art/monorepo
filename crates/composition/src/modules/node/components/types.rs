@@ -233,7 +233,7 @@ pub struct TextSegment {
 }
 
 /// Style properties for a text segment, defining its appearance.
-#[derive(Serialize, Deserialize, Clone, Debug, Type)]
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct TextStyle {
     /// Height of rasterized glyphs in pixels, influenced by window scale.
@@ -252,7 +252,7 @@ pub struct TextStyle {
 }
 
 /// Horizontal alignment options for text within its container.
-#[derive(Serialize, Deserialize, Clone, Default, Debug, Type)]
+#[derive(Serialize, Deserialize, Clone, Copy, Default, Debug, Type)]
 pub enum HorizontalTextAlignment {
     /// Aligns text to the left side of its container.
     #[default]
@@ -266,7 +266,7 @@ pub enum HorizontalTextAlignment {
 }
 
 /// Vertical alignment options for text within its container.
-#[derive(Serialize, Deserialize, Clone, Default, Debug, Type)]
+#[derive(Serialize, Deserialize, Clone, Copy, Default, Debug, Type)]
 pub enum VerticalTextAlignment {
     /// Aligns text to the top of its container.
     Top,
@@ -278,7 +278,7 @@ pub enum VerticalTextAlignment {
 }
 
 /// Options for spacing between characters in a text segment.
-#[derive(Serialize, Deserialize, Clone, Default, Debug, Type)]
+#[derive(Serialize, Deserialize, Clone, Copy, Default, Debug, Type)]
 pub enum LetterSpacing {
     /// Automatic spacing based on font metrics.
     #[default]
@@ -290,7 +290,7 @@ pub enum LetterSpacing {
 }
 
 /// Options for controlling line height in text.
-#[derive(Serialize, Deserialize, Clone, Default, Debug, Type)]
+#[derive(Serialize, Deserialize, Clone, Copy, Default, Debug, Type)]
 pub enum LineHeight {
     /// Automatic line height based on font metrics.
     #[default]
@@ -302,7 +302,7 @@ pub enum LineHeight {
 }
 
 /// Defines how text should break lines within its container.
-#[derive(Serialize, Deserialize, Clone, Default, Debug, Type)]
+#[derive(Serialize, Deserialize, Clone, Copy, Default, Debug, Type)]
 pub enum BreakLineOn {
     /// Breaks lines at word boundaries using the Unicode Line Breaking Algorithm.
     #[default]

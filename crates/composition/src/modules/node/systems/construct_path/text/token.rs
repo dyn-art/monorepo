@@ -31,15 +31,15 @@ impl Token {
     }
 
     pub fn compute_token_metric(buzz_face: &rustybuzz::Face, font_size: f32) -> TokenMetric {
-        let scale = font_size / (buzz_face.units_per_em() as f32);
-        let ascender = buzz_face.ascender() as f32 * scale;
-        let descender = buzz_face.descender() as f32 * scale;
+        let font_scale = font_size / (buzz_face.units_per_em() as f32);
+        let ascender = buzz_face.ascender() as f32 * font_scale;
+        let descender = buzz_face.descender() as f32 * font_scale;
         buzz_face.height();
         return TokenMetric {
             ascender,
             descender,
             height: ascender - descender,
-            scale,
+            font_scale,
         };
     }
 
@@ -63,10 +63,10 @@ impl Token {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Copy, Debug)]
 pub struct TokenMetric {
     pub height: f32,
     pub ascender: f32,
     pub descender: f32,
-    pub scale: f32,
+    pub font_scale: f32,
 }
