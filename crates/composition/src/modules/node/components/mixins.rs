@@ -200,26 +200,56 @@ pub struct PathMixin {
 /// Represents an anchor point in a path, defining a specific location and command.
 #[derive(Serialize, Deserialize, Clone, Debug, Type)]
 pub struct Anchor {
-    /// The position of the anchor point in 2D space.
-    pub position: Vec2,
-
     /// The command associated with the anchor point,
     /// defining how the path should proceed from this point.
     pub command: AnchorCommand,
+}
+
+impl Anchor {
+    pub fn get_position(&self) -> Option<Vec2> {
+        match self.command {
+            AnchorCommand::ArcTo { position, .. }
+            | AnchorCommand::CurveTo { position, .. }
+            | AnchorCommand::LineTo { position }
+            | AnchorCommand::MoveTo { position } => Some(position),
+            _ => None,
+        }
+    }
+
+    pub fn set_position(&mut self, value: Vec2) {
+        match &mut self.command {
+            AnchorCommand::ArcTo { position, .. }
+            | AnchorCommand::CurveTo { position, .. }
+            | AnchorCommand::LineTo { position }
+            | AnchorCommand::MoveTo { position } => {
+                *position = value;
+            }
+            _ => {}
+        }
+    }
 }
 
 #[derive(Serialize, Deserialize, Clone, PartialEq, Debug, Type)]
 #[serde(tag = "type")]
 pub enum AnchorCommand {
     /// Moves the path to a new location without drawing anything.
-    MoveTo,
+    MoveTo {
+        /// The position of the anchor point in 2D space.
+        position: Vec2,
+    },
 
     /// Draws a straight line from the current position to the anchor point.
-    LineTo,
+    LineTo {
+        /// The position of the anchor point in 2D space.
+        position: Vec2,
+    },
 
     /// Draws a curve to the anchor point using two control points.
     #[serde(rename_all = "camelCase")]
     CurveTo {
+        /// The position of the anchor point in 2D space.
+        position: Vec2,
+
         /// The first control point for the curve.
         control_point_1: Vec2,
 
@@ -230,6 +260,9 @@ pub enum AnchorCommand {
     /// Draws an arc to the anchor point.
     #[serde(rename_all = "camelCase")]
     ArcTo {
+        /// The position of the anchor point in 2D space.
+        position: Vec2,
+
         /// The radius of the arc in 2D space.
         radius: Vec2,
 

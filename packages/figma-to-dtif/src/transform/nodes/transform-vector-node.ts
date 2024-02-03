@@ -47,7 +47,6 @@ function parseSVGPath(svgPath: string): COMP.Anchor[] {
 	}
 
 	const anchors: COMP.Anchor[] = [];
-	const currentPosition: COMP.Vec2 = [0, 0];
 
 	for (const command of commands) {
 		const type = command.charAt(0);
@@ -62,7 +61,7 @@ function parseSVGPath(svgPath: string): COMP.Anchor[] {
 				processCurveCommand(args, anchors);
 				break;
 			case 'Z':
-				processCloseCommand(currentPosition, anchors);
+				processCloseCommand(anchors);
 				break;
 			default:
 			// do nothing
@@ -82,8 +81,11 @@ function parseArgs(argsStr: string): number[] {
 function processLineCommand(type: string, args: number[], anchors: COMP.Anchor[]): void {
 	const currentPosition: COMP.Vec2 = [args[0], args[1]] as unknown as COMP.Vec2;
 	anchors.push({
-		position: currentPosition,
-		command: { type: type === 'M' ? 'MoveTo' : 'LineTo' }
+		command: {
+			type: type === 'M' ? 'MoveTo' : 'LineTo',
+
+			position: currentPosition
+		}
 	});
 }
 
@@ -92,14 +94,18 @@ function processCurveCommand(args: number[], anchors: COMP.Anchor[]): void {
 	const controlPoint2: COMP.Vec2 = [args[2], args[3]] as unknown as COMP.Vec2;
 	const currentPosition: COMP.Vec2 = [args[4], args[5]] as unknown as COMP.Vec2;
 	anchors.push({
-		position: currentPosition,
-		command: { type: 'CurveTo', controlPoint1, controlPoint2 }
+		command: {
+			type: 'CurveTo',
+			controlPoint1,
+			controlPoint2,
+
+			position: currentPosition
+		}
 	});
 }
 
-function processCloseCommand(currentPosition: COMP.Vec2, anchors: COMP.Anchor[]): void {
+function processCloseCommand(anchors: COMP.Anchor[]): void {
 	anchors.push({
-		position: currentPosition,
 		command: { type: 'ClosePath' }
 	});
 }

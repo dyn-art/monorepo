@@ -28,23 +28,28 @@ pub fn construct_rectangle_path(
 
         // Move to start point, considering the top left radius
         path.vertices.push(Anchor {
-            position: Vec2::new(min_radius(corners.top_left_radius), 0.0),
-            command: AnchorCommand::MoveTo,
+            command: AnchorCommand::MoveTo {
+                position: Vec2::new(min_radius(corners.top_left_radius), 0.0),
+            },
         });
 
         // Top right corner
         path.vertices.push(Anchor {
-            position: Vec2::new(
-                dimension.width as f32 - min_radius(corners.top_right_radius),
-                0.0,
-            ),
-            command: AnchorCommand::LineTo,
+            command: AnchorCommand::LineTo {
+                position: Vec2::new(
+                    dimension.width as f32 - min_radius(corners.top_right_radius),
+                    0.0,
+                ),
+            },
         });
 
         if corners.top_right_radius > 0 {
             path.vertices.push(Anchor {
-                position: Vec2::new(dimension.width as f32, min_radius(corners.top_right_radius)),
                 command: AnchorCommand::ArcTo {
+                    position: Vec2::new(
+                        dimension.width as f32,
+                        min_radius(corners.top_right_radius),
+                    ),
                     radius: Vec2::splat(min_radius(corners.top_right_radius)),
                     x_axis_rotation: 0.0,
                     large_arc_flag: false,
@@ -55,20 +60,21 @@ pub fn construct_rectangle_path(
 
         // Bottom right corner
         path.vertices.push(Anchor {
-            position: Vec2::new(
-                dimension.width as f32,
-                dimension.height as f32 - min_radius(corners.bottom_right_radius),
-            ),
-            command: AnchorCommand::LineTo,
+            command: AnchorCommand::LineTo {
+                position: Vec2::new(
+                    dimension.width as f32,
+                    dimension.height as f32 - min_radius(corners.bottom_right_radius),
+                ),
+            },
         });
 
         if corners.bottom_right_radius > 0 {
             path.vertices.push(Anchor {
-                position: Vec2::new(
-                    dimension.width as f32 - min_radius(corners.bottom_right_radius),
-                    dimension.height as f32,
-                ),
                 command: AnchorCommand::ArcTo {
+                    position: Vec2::new(
+                        dimension.width as f32 - min_radius(corners.bottom_right_radius),
+                        dimension.height as f32,
+                    ),
                     radius: Vec2::splat(min_radius(corners.bottom_right_radius)),
                     x_axis_rotation: 0.0,
                     large_arc_flag: false,
@@ -79,20 +85,21 @@ pub fn construct_rectangle_path(
 
         // Bottom left corner
         path.vertices.push(Anchor {
-            position: Vec2::new(
-                min_radius(corners.bottom_left_radius),
-                dimension.height as f32,
-            ),
-            command: AnchorCommand::LineTo,
+            command: AnchorCommand::LineTo {
+                position: Vec2::new(
+                    min_radius(corners.bottom_left_radius),
+                    dimension.height as f32,
+                ),
+            },
         });
 
         if corners.bottom_left_radius > 0 {
             path.vertices.push(Anchor {
-                position: Vec2::new(
-                    0.0,
-                    dimension.height as f32 - min_radius(corners.bottom_left_radius),
-                ),
                 command: AnchorCommand::ArcTo {
+                    position: Vec2::new(
+                        0.0,
+                        dimension.height as f32 - min_radius(corners.bottom_left_radius),
+                    ),
                     radius: Vec2::splat(min_radius(corners.bottom_left_radius)),
                     x_axis_rotation: 0.0,
                     large_arc_flag: false,
@@ -103,14 +110,15 @@ pub fn construct_rectangle_path(
 
         // Back to top left corner
         path.vertices.push(Anchor {
-            position: Vec2::new(0.0, min_radius(corners.top_left_radius)),
-            command: AnchorCommand::LineTo,
+            command: AnchorCommand::LineTo {
+                position: Vec2::new(0.0, min_radius(corners.top_left_radius)),
+            },
         });
 
         if corners.top_left_radius > 0 {
             path.vertices.push(Anchor {
-                position: Vec2::new(min_radius(corners.top_left_radius), 0.0),
                 command: AnchorCommand::ArcTo {
+                    position: Vec2::new(min_radius(corners.top_left_radius), 0.0),
                     radius: Vec2::splat(min_radius(corners.top_left_radius)),
                     x_axis_rotation: 0.0,
                     large_arc_flag: false,
@@ -121,7 +129,6 @@ pub fn construct_rectangle_path(
 
         // Close the path
         path.vertices.push(Anchor {
-            position: Vec2::ZERO,
             command: AnchorCommand::ClosePath,
         });
 

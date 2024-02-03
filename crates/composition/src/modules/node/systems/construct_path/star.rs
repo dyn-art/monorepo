@@ -45,27 +45,29 @@ pub fn construct_star_path(
             if i == 0 {
                 // MoveTo for the first outer vertex
                 vertices.push(Anchor {
-                    position: Vec2::new(x, y),
-                    command: AnchorCommand::MoveTo,
+                    command: AnchorCommand::MoveTo {
+                        position: Vec2::new(x, y),
+                    },
                 });
             } else {
                 // LineTo the next outer vertex
                 vertices.push(Anchor {
-                    position: Vec2::new(x, y),
-                    command: AnchorCommand::LineTo,
+                    command: AnchorCommand::LineTo {
+                        position: Vec2::new(x, y),
+                    },
                 });
             }
 
             // LineTo the corresponding inner vertex
             vertices.push(Anchor {
-                position: Vec2::new(inner_x, inner_y),
-                command: AnchorCommand::LineTo,
+                command: AnchorCommand::LineTo {
+                    position: Vec2::new(inner_x, inner_y),
+                },
             });
         }
 
         // Close the path to the first outer vertex
         vertices.push(Anchor {
-            position: vertices[0].position,
             command: AnchorCommand::ClosePath,
         });
 

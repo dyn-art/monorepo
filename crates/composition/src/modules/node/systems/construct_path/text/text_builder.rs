@@ -211,22 +211,24 @@ impl OutlineBuilder for TextBuilder {
     fn move_to(&mut self, x: f32, y: f32) {
         self.flush_current_subpath();
         self.current_subpath.push(Anchor {
-            position: self.point(x, y),
-            command: AnchorCommand::MoveTo,
+            command: AnchorCommand::MoveTo {
+                position: self.point(x, y),
+            },
         });
     }
 
     /// Adds a line to the current subpath.
     fn line_to(&mut self, x: f32, y: f32) {
         self.current_subpath.push(Anchor {
-            position: self.point(x, y),
-            command: AnchorCommand::LineTo,
+            command: AnchorCommand::LineTo {
+                position: self.point(x, y),
+            },
         });
     }
 
     /// Converts a quadratic bezier curve to a cubic one and adds it to the current subpath.
     fn quad_to(&mut self, x1: f32, y1: f32, x2: f32, y2: f32) {
-        let current_point = self.current_subpath.last().unwrap().position;
+        let current_point = self.current_subpath.last().unwrap().get_position().unwrap();
         let control_point = self.point(x1, y1);
         let end_point = self.point(x2, y2);
 
@@ -235,8 +237,8 @@ impl OutlineBuilder for TextBuilder {
         let cubic_control_point2 = end_point + 2.0 / 3.0 * (control_point - end_point);
 
         self.current_subpath.push(Anchor {
-            position: end_point,
             command: AnchorCommand::CurveTo {
+                position: end_point,
                 control_point_1: cubic_control_point1,
                 control_point_2: cubic_control_point2,
             },
@@ -246,8 +248,8 @@ impl OutlineBuilder for TextBuilder {
     /// Adds a cubic bezier curve to the current subpath.
     fn curve_to(&mut self, x1: f32, y1: f32, x2: f32, y2: f32, x3: f32, y3: f32) {
         self.current_subpath.push(Anchor {
-            position: self.point(x3, y3),
             command: AnchorCommand::CurveTo {
+                position: self.point(x3, y3),
                 control_point_1: self.point(x1, y1),
                 control_point_2: self.point(x2, y2),
             },
@@ -259,7 +261,6 @@ impl OutlineBuilder for TextBuilder {
         if let Some(first_anchor) = self.current_subpath.first() {
             if first_anchor.command != AnchorCommand::ClosePath {
                 self.current_subpath.push(Anchor {
-                    position: first_anchor.position,
                     command: AnchorCommand::ClosePath,
                 });
             }

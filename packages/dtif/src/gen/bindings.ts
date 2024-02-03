@@ -15,10 +15,6 @@ export type AbsoluteTransformMixin = Mat3
  */
 export type Anchor = { 
 /**
- * The position of the anchor point in 2D space.
- */
-position: Vec2; 
-/**
  * The command associated with the anchor point,
  * defining how the path should proceed from this point.
  */
@@ -28,19 +24,19 @@ export type AnchorCommand =
 /**
  * Moves the path to a new location without drawing anything.
  */
-{ type: "MoveTo" } | 
+{ type: "MoveTo"; position: Vec2 } | 
 /**
  * Draws a straight line from the current position to the anchor point.
  */
-{ type: "LineTo" } | 
+{ type: "LineTo"; position: Vec2 } | 
 /**
  * Draws a curve to the anchor point using two control points.
  */
-{ type: "CurveTo"; controlPoint1: Vec2; controlPoint2: Vec2 } | 
+{ type: "CurveTo"; position: Vec2; controlPoint1: Vec2; controlPoint2: Vec2 } | 
 /**
  * Draws an arc to the anchor point.
  */
-{ type: "ArcTo"; radius: Vec2; xAxisRotation: number; largeArcFlag: boolean; sweepFlag: boolean } | 
+{ type: "ArcTo"; position: Vec2; radius: Vec2; xAxisRotation: number; largeArcFlag: boolean; sweepFlag: boolean } | 
 /**
  * Closes the path by drawing a line to the start point.
  */

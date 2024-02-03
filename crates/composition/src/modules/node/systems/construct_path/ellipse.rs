@@ -89,20 +89,22 @@ pub fn construct_ellipse_path(
 
         // Start at the center of the ellipse
         vertices.push(Anchor {
-            position: inner_start,
-            command: AnchorCommand::MoveTo,
+            command: AnchorCommand::MoveTo {
+                position: inner_start,
+            },
         });
 
         // Draw line to starting point on the boundary of the ellipse
         vertices.push(Anchor {
-            position: outer_start,
-            command: AnchorCommand::LineTo,
+            command: AnchorCommand::LineTo {
+                position: outer_start,
+            },
         });
 
         // Draw the outer arc to the end point on the boundary of the ellipse
         vertices.push(Anchor {
-            position: outer_end,
             command: AnchorCommand::ArcTo {
+                position: outer_end,
                 radius,
                 x_axis_rotation: 0.0,
                 large_arc_flag,
@@ -110,18 +112,18 @@ pub fn construct_ellipse_path(
             },
         });
 
-        // Draw back to the center (initial starting point) if no inner radius,
-        // if inner radius draw to inner radius end
+        // Draw line to inner end
         vertices.push(Anchor {
-            position: inner_end,
-            command: AnchorCommand::LineTo,
+            command: AnchorCommand::LineTo {
+                position: inner_end,
+            },
         });
 
         // If inner radius draw inner radius to the inner start
         if inner_radius_ratio > 0.0 {
             vertices.push(Anchor {
-                position: inner_start,
                 command: AnchorCommand::ArcTo {
+                    position: inner_start,
                     radius: radius * inner_radius_ratio,
                     x_axis_rotation: 0.0,
                     large_arc_flag,
@@ -132,7 +134,6 @@ pub fn construct_ellipse_path(
 
         // Close the path
         vertices.push(Anchor {
-            position: inner_start,
             command: AnchorCommand::ClosePath,
         });
 

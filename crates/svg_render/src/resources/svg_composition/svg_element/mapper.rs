@@ -25,32 +25,33 @@ pub fn map_mat3_to_svg_transform(transform: &Mat3) -> SVGTransformAttribute {
 pub fn map_anchors_to_svg_path_string(vertices: &[Anchor]) -> String {
     vertices
         .iter()
-        .map(|anchor| {
-            let Vec2 { x, y } = anchor.position;
-            match &anchor.command {
-                AnchorCommand::MoveTo => format!("M{} {}", x, y),
-                AnchorCommand::LineTo => format!("L{} {}", x, y),
-                AnchorCommand::ClosePath => String::from("Z"),
-                AnchorCommand::ArcTo {
-                    radius,
-                    x_axis_rotation,
-                    large_arc_flag,
-                    sweep_flag,
-                } => {
-                    let Vec2 { x: rx, y: ry } = *radius;
-                    format!(
-                        "A{} {} {} {} {} {} {}",
-                        rx, ry, x_axis_rotation, *large_arc_flag as u8, *sweep_flag as u8, x, y
-                    )
-                }
-                AnchorCommand::CurveTo {
-                    control_point_1,
-                    control_point_2,
-                } => {
-                    let Vec2 { x: cx1, y: cy1 } = *control_point_1;
-                    let Vec2 { x: cx2, y: cy2 } = *control_point_2;
-                    format!("C{} {} {} {} {} {}", cx1, cy1, cx2, cy2, x, y)
-                }
+        .map(|anchor| match &anchor.command {
+            AnchorCommand::MoveTo { position } => format!("M{} {}", position.x, position.y),
+            AnchorCommand::LineTo { position } => format!("L{} {}", position.x, position.y),
+            AnchorCommand::ClosePath => String::from("Z"),
+            AnchorCommand::ArcTo {
+                radius,
+                x_axis_rotation,
+                large_arc_flag,
+                sweep_flag,
+                position,
+            } => {
+                let Vec2 { x, y } = *position;
+                let Vec2 { x: rx, y: ry } = *radius;
+                format!(
+                    "A{} {} {} {} {} {} {}",
+                    rx, ry, x_axis_rotation, *large_arc_flag as u8, *sweep_flag as u8, x, y
+                )
+            }
+            AnchorCommand::CurveTo {
+                control_point_1,
+                control_point_2,
+                position,
+            } => {
+                let Vec2 { x, y } = *position;
+                let Vec2 { x: cx1, y: cy1 } = *control_point_1;
+                let Vec2 { x: cx2, y: cy2 } = *control_point_2;
+                format!("C{} {} {} {} {} {}", cx1, cy1, cx2, cy2, x, y)
             }
         })
         .collect::<Vec<_>>()
@@ -60,44 +61,51 @@ pub fn map_anchors_to_svg_path_string(vertices: &[Anchor]) -> String {
 pub fn map_anchors_to_svg_path_commands(vertices: &[Anchor]) -> Vec<SVGPathCommand> {
     vertices
         .iter()
-        .filter_map(|anchor| {
-            let Vec2 { x, y } = anchor.position;
-            match &anchor.command {
-                AnchorCommand::MoveTo => Some(SVGPathCommand::MoveTo { x, y }),
-                AnchorCommand::LineTo => Some(SVGPathCommand::LineTo { x, y }),
-                AnchorCommand::ClosePath => Some(SVGPathCommand::ClosePath),
-                AnchorCommand::ArcTo {
-                    radius,
-                    x_axis_rotation,
-                    large_arc_flag,
-                    sweep_flag,
-                } => {
-                    let Vec2 { x: rx, y: ry } = *radius;
-                    Some(SVGPathCommand::ArcTo {
-                        rx,
-                        ry,
-                        x_axis_rotation: *x_axis_rotation,
-                        large_arc_flag: *large_arc_flag,
-                        sweep_flag: *sweep_flag,
-                        x,
-                        y,
-                    })
-                }
-                AnchorCommand::CurveTo {
-                    control_point_1,
-                    control_point_2,
-                } => {
-                    let Vec2 { x: cx1, y: cy1 } = *control_point_1;
-                    let Vec2 { x: cx2, y: cy2 } = *control_point_2;
-                    Some(SVGPathCommand::CurveTo {
-                        cx1,
-                        cy1,
-                        cx2,
-                        cy2,
-                        x,
-                        y,
-                    })
-                }
+        .filter_map(|anchor| match &anchor.command {
+            AnchorCommand::MoveTo { position } => Some(SVGPathCommand::MoveTo {
+                x: position.x,
+                y: position.y,
+            }),
+            AnchorCommand::LineTo { position } => Some(SVGPathCommand::LineTo {
+                x: position.x,
+                y: position.y,
+            }),
+            AnchorCommand::ClosePath => Some(SVGPathCommand::ClosePath),
+            AnchorCommand::ArcTo {
+                radius,
+                x_axis_rotation,
+                large_arc_flag,
+                sweep_flag,
+                position,
+            } => {
+                let Vec2 { x, y } = *position;
+                let Vec2 { x: rx, y: ry } = *radius;
+                Some(SVGPathCommand::ArcTo {
+                    rx,
+                    ry,
+                    x_axis_rotation: *x_axis_rotation,
+                    large_arc_flag: *large_arc_flag,
+                    sweep_flag: *sweep_flag,
+                    x,
+                    y,
+                })
+            }
+            AnchorCommand::CurveTo {
+                control_point_1,
+                control_point_2,
+                position,
+            } => {
+                let Vec2 { x, y } = *position;
+                let Vec2 { x: cx1, y: cy1 } = *control_point_1;
+                let Vec2 { x: cx2, y: cy2 } = *control_point_2;
+                Some(SVGPathCommand::CurveTo {
+                    cx1,
+                    cy1,
+                    cx2,
+                    cy2,
+                    x,
+                    y,
+                })
             }
         })
         .collect()

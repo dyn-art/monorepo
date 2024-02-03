@@ -31,14 +31,16 @@ pub fn update_vector_path(
 
                 for anchor in &mut path_mixin.vertices {
                     // Scale the position
-                    anchor.position =
-                        Vec2::new(anchor.position.x * scale_x, anchor.position.y * scale_y);
+                    if let Some(position) = anchor.get_position() {
+                        anchor.set_position(Vec2::new(position.x * scale_x, position.y * scale_y));
+                    }
 
                     // Handle specific AnchorCommands
                     match &mut anchor.command {
                         AnchorCommand::CurveTo {
                             control_point_1,
                             control_point_2,
+                            ..
                         } => {
                             *control_point_1 =
                                 Vec2::new(control_point_1.x * scale_x, control_point_1.y * scale_y);

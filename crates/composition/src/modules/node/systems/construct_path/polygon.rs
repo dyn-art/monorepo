@@ -37,21 +37,22 @@ pub fn construct_polygon_path(
             if i == 0 {
                 // MoveTo for the first vertex
                 vertices.push(Anchor {
-                    position: Vec2::new(x, y),
-                    command: AnchorCommand::MoveTo,
+                    command: AnchorCommand::MoveTo {
+                        position: Vec2::new(x, y),
+                    },
                 });
             } else {
                 // LineTo for subsequent vertices
                 vertices.push(Anchor {
-                    position: Vec2::new(x, y),
-                    command: AnchorCommand::LineTo,
+                    command: AnchorCommand::LineTo {
+                        position: Vec2::new(x, y),
+                    },
                 });
             }
         }
 
         // Close the path
         vertices.push(Anchor {
-            position: vertices[0].position,
             command: AnchorCommand::ClosePath,
         });
 
