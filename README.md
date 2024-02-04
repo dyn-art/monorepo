@@ -31,6 +31,6 @@
   </p>
 </p>
 
-[dyn.art](https://dyn.art/?source=github) is an open source image generation API alternative to [Bannerbear](https://bannerbear.com/) and co, powered by [Rust](https://www.rust-lang.org/).
+[dyn.art](https://dyn.art/?source=github) is an open source image generation API powered by [Rust](https://www.rust-lang.org/) & [SVG](https://www.w3.org/TR/SVG2/).
 
 > 🆕 UPDATE: [dyn.art](https://dyn.art/?source=github) is under active development, we are in the alpha stage and some features might be missing or disabled.
