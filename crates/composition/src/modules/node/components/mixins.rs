@@ -198,7 +198,7 @@ pub struct PathMixin {
 }
 
 /// Represents an anchor point in a path, defining a specific location and command.
-#[derive(Serialize, Deserialize, Clone, Debug, Type)]
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, Type)]
 pub struct Anchor {
     /// The command associated with the anchor point,
     /// defining how the path should proceed from this point.
@@ -229,7 +229,7 @@ impl Anchor {
     }
 }
 
-#[derive(Serialize, Deserialize, Clone, PartialEq, Debug, Type)]
+#[derive(Serialize, Deserialize, Clone, Copy, PartialEq, Debug, Type)]
 #[serde(tag = "type")]
 pub enum AnchorCommand {
     /// Moves the path to a new location without drawing anything.

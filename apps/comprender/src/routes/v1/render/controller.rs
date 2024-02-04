@@ -68,7 +68,7 @@ pub async fn render_composition(
                 .body(Body::from(png_data))
                 .unwrap())
         }
-        "usvg" => {
+        "svg" => {
             let opts = Options::default();
             let rtree = usvg::Tree::from_str(&svg_string, &opts).unwrap();
 
@@ -80,7 +80,7 @@ pub async fn render_composition(
                 ))
                 .unwrap())
         }
-        "svg" => {
+        "rsvg" => {
             // Return SVG response
             Ok(Response::builder()
                 .status(StatusCode::OK)
