@@ -6,18 +6,36 @@ use bevy_ecs::{
     query::With,
     system::{Local, Query, Res, ResMut},
 };
-use dyn_composition::core::modules::{
+use dyn_composition::modules::{
+    composition::resources::composition::CompositionRes,
     interactive_composition::resources::{HandleSide, InteractionMode, InteractiveCompositionRes},
     node::components::states::Selected,
 };
 
 use crate::core::events::{
     output_event::{
-        CursorChangeEvent, CursorForFrontend, InteractionModeChangeEvent,
-        InteractionModeForFrontend, OutputEvent, SelectionChangeEvent,
+        CompositionChange, CompositionChangeEvent, CursorChangeEvent, CursorForFrontend,
+        InteractionModeChangeEvent, InteractionModeForFrontend, OutputEvent, SelectionChangeEvent,
     },
     output_event_queue::OutputEventQueueRes,
 };
+
+pub fn check_composition_changes(
+    mut output_event_queue: ResMut<OutputEventQueueRes>,
+    composition: Res<CompositionRes>,
+) {
+    // TODO: Can be granulated to avoid sending too much data, but for now, that's good enough
+    if composition.is_changed() {
+        output_event_queue.push_event(OutputEvent::CompositionChange(CompositionChangeEvent {
+            change: CompositionChange {
+                width: composition.width,
+                height: composition.height,
+                view_box: composition.view_box,
+                root_node: composition.root_node,
+            },
+        }));
+    }
+}
 
 pub fn check_selection_changes(
     mut output_event_queue: ResMut<OutputEventQueueRes>,
@@ -52,6 +70,7 @@ pub fn check_interaction_mode_changes(
             InteractionMode::Translating { .. } => InteractionModeForFrontend::Translating,
             InteractionMode::Resizing { .. } => InteractionModeForFrontend::Resizing,
             InteractionMode::Rotating { .. } => InteractionModeForFrontend::Rotating,
+            InteractionMode::Dragging { .. } => InteractionModeForFrontend::Dragging,
         };
 
         // Check whether the interaction mode has changed

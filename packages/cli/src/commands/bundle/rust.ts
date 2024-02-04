@@ -77,7 +77,7 @@ export default class Rust extends DynCommand {
 				'web',
 				'--out-dir',
 				rustOutputDirPath,
-				...(this.isProduction ? [] : ['--features', 'trace'])
+				...(this.isProduction ? [] : ['--features', 'tracing'])
 			],
 			{
 				command: this,

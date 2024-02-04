@@ -1,4 +1,5 @@
-import type { TComposition, TFont, TNode, TPaint } from '@dyn/dtif';
+import type { COMP } from '@dyn/dtif';
+import { ContinuousId, sleep } from '@dyn/utils';
 
 import { FailedToResolveRootNodeException } from './exceptions';
 import {
@@ -15,7 +16,7 @@ import {
 	type TTransformNodeConfig,
 	type TTransformPaintConfig
 } from './transform';
-import { resetDTIFNodeTransform } from './utils';
+import { resetNodeBundleTransform } from './utils';
 
 export class Transformer {
 	// Figma Nodes
@@ -24,7 +25,7 @@ export class Transformer {
 	private _nodesFailedToTransform: TToTransformNode[] = [];
 
 	// DTIF Nodes
-	public readonly nodes = new Map<number, TNode>();
+	public readonly nodes = new Map<number, COMP.NodeBundle>();
 	private _rootNodeId: number;
 
 	// Figma Paints
@@ -32,14 +33,14 @@ export class Transformer {
 	private _paintsFailedToTransform: TToTransformPaint[] = [];
 
 	// DTIF Paints
-	public readonly paints = new Map<number, TPaint>();
+	public readonly paints = new Map<number, COMP.PaintBundle>();
 
 	// Fonts
 	private _toTransformFonts: TToTransformFont[] = [];
 	private _fontsFailedToTransform: TToTransformFont[] = [];
 
 	// DTIF Fonts
-	public readonly fonts = new Map<number, TFont>();
+	public readonly fonts = new Map<number, COMP.Font>();
 
 	// Callbacks
 	private _onTransformStatusUpdate: TOnTransformStatusUpdate | null = null;
@@ -50,12 +51,20 @@ export class Transformer {
 		this._onTransformStatusUpdate = onTransformStatusUpdate;
 	}
 
-	public async transform(config: TTransformConfig): Promise<TComposition> {
-		const nodeConfig: TTransformNodeConfig = { includeInvisible: true, ...(config.node ?? {}) };
+	public async transform(config: TTransformConfig): Promise<COMP.DTIFComposition> {
+		ContinuousId.ZERO;
+		const nodeConfig: TTransformNodeConfig = {
+			includeInvisible: true,
+			exportContainerNode: this.createExportContainerNode(
+				'⏳ Temp export container | Delete if dyn.art plugin not active'
+			),
+			shouldExportFrame: { contentType: 'SVG' },
+			...(config.node ?? {})
+		};
 		const paintConfig = config.paint;
 		const fontConfig = config.font;
 
-		this._onTransformStatusUpdate?.({ type: ETransformStatus.START });
+		await this.onTransformStatusUpdate({ type: ETransformStatus.START });
 
 		// Walk Figma tree and discover to transform nodes, paints and fonts
 		const { rootId, toTransformNodes, toTransformPaints, toTransformFonts } =
@@ -73,28 +82,28 @@ export class Transformer {
 		});
 
 		// Transform nodes
-		this._onTransformStatusUpdate?.({ type: ETransformStatus.TRANSFORMING_NODES });
+		await this.onTransformStatusUpdate({ type: ETransformStatus.TRANSFORMING_NODES });
 		await this.transformNodes(nodeConfig);
 
 		// Transform paints
-		this._onTransformStatusUpdate?.({ type: ETransformStatus.TRANSFORMING_PAINTS });
+		await this.onTransformStatusUpdate({ type: ETransformStatus.TRANSFORMING_PAINTS });
 		await this.transformPaints(paintConfig);
 
 		// Transform fonts
-		this._onTransformStatusUpdate?.({ type: ETransformStatus.TRANSFORMING_FONTS });
+		await this.onTransformStatusUpdate({ type: ETransformStatus.TRANSFORMING_FONTS });
 		await this.transformFonts(fontConfig);
 
 		// Reset root node layout
 		const rootNode = this.nodes.get(this._rootNodeId);
 		if (rootNode != null) {
-			resetDTIFNodeTransform(rootNode);
+			resetNodeBundleTransform(rootNode);
 		} else {
 			throw new FailedToResolveRootNodeException();
 		}
 
 		// Construct composition
-		this._onTransformStatusUpdate?.({ type: ETransformStatus.CONSTRUCTING_COMPOSITON });
-		const composition: TComposition = {
+		await this.onTransformStatusUpdate({ type: ETransformStatus.CONSTRUCTING_COMPOSITON });
+		const composition: COMP.DTIFComposition = {
 			version: '1.0',
 			name: this._toTransformRootNode.name,
 			width: this._toTransformRootNode.width,
@@ -102,11 +111,25 @@ export class Transformer {
 			nodes: Object.fromEntries(this.nodes),
 			paints: Object.fromEntries(this.paints),
 			fonts: Object.fromEntries(this.fonts),
-			rootNodeId: this._rootNodeId
+			rootNodeId: this._rootNodeId,
+			viewBox: {
+				minX: 0,
+				minY: 0,
+				width: this._toTransformRootNode.width,
+				height: this._toTransformRootNode.height
+			}
 		};
 
-		this._onTransformStatusUpdate?.({ type: ETransformStatus.END });
+		nodeConfig.exportContainerNode.remove();
+		await this.onTransformStatusUpdate({ type: ETransformStatus.END });
 		return composition;
+	}
+
+	private async onTransformStatusUpdate(status: TTransformStatusUpdate): Promise<void> {
+		this._onTransformStatusUpdate?.(status);
+		// Sleep to give Figma time to send the status update to the "frontend"
+		// before it might get blocked e.g. due to image export
+		await sleep(50);
 	}
 
 	// =========================================================================
@@ -121,13 +144,17 @@ export class Transformer {
 		// Transform nodes
 		for (const toTransformNode of toTransformNodes) {
 			try {
-				const node = await transformNode(toTransformNode, config);
-				this.nodes.set(toTransformNode.id, node);
+				const node = await transformNode(toTransformNode, this, config);
+				this.insertNode(toTransformNode.id, node);
 			} catch (error) {
 				// TODO: Error
 				this._nodesFailedToTransform.push(toTransformNode);
 			}
 		}
+	}
+
+	public insertNode(id: number, node: COMP.NodeBundle): void {
+		this.nodes.set(id, node);
 	}
 
 	private async transformPaints(config: TTransformPaintConfig): Promise<void> {
@@ -139,12 +166,16 @@ export class Transformer {
 		for (const toTransformPaint of toTransformPaints) {
 			try {
 				const paint = await transformPaint(toTransformPaint, config);
-				this.paints.set(toTransformPaint.id, paint);
+				this.insertPaint(toTransformPaint.id, paint);
 			} catch (error) {
 				// TODO: Error
 				this._paintsFailedToTransform.push(toTransformPaint);
 			}
 		}
+	}
+
+	public insertPaint(id: number, paint: COMP.PaintBundle): void {
+		this.paints.set(id, paint);
 	}
 
 	private async transformFonts(config: TTransformFontConfig): Promise<void> {
@@ -156,12 +187,24 @@ export class Transformer {
 		for (const toTransformFont of toTransformFonts) {
 			try {
 				const font = await transformFont(toTransformFont, config);
-				this.fonts.set(toTransformFont.id, font);
+				this.insertFont(toTransformFont.id, font);
 			} catch (error) {
 				// TODO: Error
 				this._fontsFailedToTransform.push(toTransformFont);
 			}
 		}
+	}
+
+	public insertFont(id: number, font: COMP.Font): void {
+		this.fonts.set(id, font);
+	}
+
+	private createExportContainerNode(name: string): FrameNode {
+		const node = figma.createFrame();
+		node.name = name;
+		node.resize(1, 1);
+		node.clipsContent = false; // With clip content active figma would just export the visible piece in the frame
+		return node;
 	}
 }
 

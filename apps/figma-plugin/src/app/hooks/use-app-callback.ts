@@ -15,7 +15,7 @@ export function useAppCallback<GFigmaAppHandler extends FigmaAppHandler>(
 				unregisterFunction();
 			});
 		};
-	}, [registrations, ...deps]);
+	}, deps); // Note: Not registering "registrations" as dep as its an inline object whose pointer addr changes each render cycle
 }
 
 type ExtractPluginMessageEvent<T> = T extends FigmaAppHandler<infer U> ? U : never;

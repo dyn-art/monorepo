@@ -5,8 +5,8 @@ export function hasFeatures<
 	GFeatureKeys extends TFeatureKeys<GValue>[],
 	GHasFeatureKeys extends TFeatureKeys<GValue>[]
 >(
-	obj: TState<GValue, GFeatureKeys>,
+	state: TState<GValue, GFeatureKeys>,
 	features: GHasFeatureKeys
-): obj is TState<GValue, GHasFeatureKeys> {
-	return features.every((feature) => feature in obj);
+): state is TState<GValue, GHasFeatureKeys> {
+	return features.every((feature) => state._features.includes(feature));
 }

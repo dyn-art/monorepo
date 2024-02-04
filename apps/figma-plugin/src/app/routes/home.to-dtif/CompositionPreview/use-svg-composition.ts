@@ -1,11 +1,6 @@
 import React from 'react';
-import { rustify, type TComposition } from '@dyn/figma-to-dtif';
-import {
-	createSVGComposition,
-	initWasm,
-	type Composition,
-	type DTIFComposition
-} from '@dyn/svg-composition';
+import { applyCanvasDimensions, rustify, type COMP } from '@dyn/figma-to-dtif';
+import { createSVGComposition, initWasm, type Composition } from '@dyn/svg-composition';
 
 export const useSVGComposition = (
 	props: UseSVGCompositionProps
@@ -14,18 +9,18 @@ export const useSVGComposition = (
 	svgContainerRef: React.RefObject<HTMLDivElement>;
 	isLoading: boolean;
 } => {
-	const { dtif, deps = [] } = props;
+	const { dtif, deps = [], dimensions } = props;
 	const svgContainerRef = React.useRef<HTMLDivElement>(null);
 	const [composition, setComposition] = React.useState<Composition | null>(null);
 	const [isLoading, setIsLoading] = React.useState(false);
-	const [rustifiedDTIF, setRustifiedDTIF] = React.useState<DTIFComposition | null>(null);
+	const [rustifiedDTIF, setRustifiedDTIF] = React.useState<COMP.DTIFComposition | null>(null);
 
 	// Load WASM and rustify DTIF
 	React.useEffect(() => {
 		let isMounted = true;
 		setIsLoading(true);
 
-		const initializeAndRustify = async () => {
+		const initializeAndRustify = async (): Promise<void> => {
 			await initWasm();
 			if (dtif && isMounted) {
 				const rustified = await rustify(dtif);
@@ -53,12 +48,10 @@ export const useSVGComposition = (
 		if (rustifiedDTIF != null && svgContainerRef.current != null && composition == null) {
 			try {
 				const newComposition = createSVGComposition({
-					width: rustifiedDTIF.width,
-					height: rustifiedDTIF.height,
-					renderer: {
+					render: {
 						domElement: svgContainerRef.current
 					},
-					dtif: rustifiedDTIF
+					dtif: applyCanvasDimensions(rustifiedDTIF, dimensions)
 				});
 
 				setComposition(newComposition);
@@ -79,6 +72,12 @@ export const useSVGComposition = (
 };
 
 interface UseSVGCompositionProps {
-	dtif?: TComposition;
+	dtif?: COMP.DTIFComposition;
 	deps?: React.DependencyList;
+	dimensions: TDimensions;
+}
+
+interface TDimensions {
+	width: number;
+	height: number;
 }

@@ -27,6 +27,11 @@
 		"url": "https://s.dyn.art/github/issues"
 	},
 	"homepage": "https://s.dyn.art/github",
+	"dependencies": {
+		"@dyn/utils": "workspace:*",
+		"ts-results-es": "4.1.0-alpha.1",
+		"url-parse": "^1.5.10"
+	},
 	"devDependencies": {
 		"@dyn/config": "workspace:*",
 		"@dyn/types": "workspace:*",
@@ -36,10 +41,5 @@
 	"files": [
 		"dist",
 		"README.md"
-	],
-	"dependencies": {
-		"@dyn/utils": "workspace:^",
-		"ts-results-es": "4.1.0-alpha.1",
-		"url-parse": "^1.5.10"
-	}
+	]
 }

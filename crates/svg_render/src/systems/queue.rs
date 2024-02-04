@@ -1,205 +1,145 @@
 use std::{collections::HashMap, mem::take};
 
 use bevy_ecs::{entity::Entity, system::ResMut};
-use dyn_composition::core::modules::node::components::types::NodeType;
 
 use crate::{
-    events::output_event::RenderUpdateEvent,
     mixin_change::{MixinChange, MixinChangeChildrenMixin},
     resources::{
-        changed_components::{ChangedComponentsRes, ChangedNode, ChangedPaint},
-        svg_composition::SVGCompositionRes,
+        changed_entities::{ChangedEntitiesRes, ChangedEntity},
+        svg_composition::{svg_context::SVGContext, SVGCompositionRes},
     },
 };
 
-pub fn queue_render_changes(
-    mut changed: ResMut<ChangedComponentsRes>,
+pub fn queue_element_changes(
+    mut changed_entities_res: ResMut<ChangedEntitiesRes>,
     mut svg_composition: ResMut<SVGCompositionRes>,
 ) {
-    let changed_nodes = take(&mut changed.changed_nodes);
-    let changed_paints = take(&mut changed.changed_paints);
-    let mut updates: Vec<RenderUpdateEvent> = Vec::new();
+    let changed_entities = take(&mut changed_entities_res.changed_entities);
 
-    // Process nodes & paints and collect render updates emitted during this process
-    process_nodes(&changed_nodes, &mut svg_composition, &mut updates);
-    process_paints(&changed_paints, &mut svg_composition, &mut updates);
-
-    // Forward render updates into output event channel
-    svg_composition.forward_render_updates(updates);
-}
-
-// =============================================================================
-// Paint
-// =============================================================================
-
-fn process_paints(
-    changed_paints: &HashMap<Entity, ChangedPaint>,
-    svg_composition: &mut SVGCompositionRes,
-    updates: &mut Vec<RenderUpdateEvent>,
-) {
-    for (entity, paint) in changed_paints {
-        process_paint(*entity, &paint, svg_composition, updates);
+    // TODO: Improve - Could we handle the order when ChildrenMixin is applied? Do we really need to preorder here?
+    #[cfg(feature = "output-event")]
+    {
+        let dependency_trees = build_dependency_trees(changed_entities);
+        for dependency_tree in dependency_trees {
+            process_dependency_tree(dependency_tree, &mut svg_composition.context);
+        }
     }
-}
-
-/// Processes a paint entity by updating its corresponding SVG element/s based on the provided changes.
-fn process_paint(
-    entity: Entity,
-    changed_paint: &ChangedPaint,
-    svg_composition: &mut SVGCompositionRes,
-    updates: &mut Vec<RenderUpdateEvent>,
-) {
-    // Attempt to get or create the paint associated with the entity
-    let maybe_paint =
-        svg_composition.get_or_create_paint(entity, &changed_paint.paint, &changed_paint.parent_id);
-
-    // Apply collected changes to the SVG paint and drain updates
-    if let Some(svg_paint) = maybe_paint {
-        svg_paint.apply_paint_change(&changed_paint);
-        updates.extend(svg_paint.drain_updates());
-    }
-}
-
-// =============================================================================
-// Node
-// =============================================================================
-
-#[derive(Debug)]
-struct ChangedNodeBranch<'a> {
-    entity: Entity,
-    changed: &'a ChangedNode,
-    children: Vec<ChangedNodeBranch<'a>>,
-}
-
-/// Processes nodes by building and traversing dependency trees
-/// to ensure that parents are processed before its children.
-fn process_nodes(
-    changed_nodes: &HashMap<Entity, ChangedNode>,
-    svg_composition: &mut SVGCompositionRes,
-    updates: &mut Vec<RenderUpdateEvent>,
-) {
-    // TODO: Performance improvement
-    let dependency_tree = build_dependency_trees(changed_nodes);
-
-    // Traverse and process each root node and its descendants
-    for root in dependency_tree {
-        process_tree_node(&root, svg_composition, updates);
-    }
-}
-
-/// Builds dependency trees from the changed nodes.
-fn build_dependency_trees<'a>(
-    changed_nodes: &'a HashMap<Entity, ChangedNode>,
-) -> Vec<ChangedNodeBranch<'a>> {
-    let mut children_map = HashMap::new();
-
-    // Preparing a map of children for each parent (for quick lookup)
-    for (&entity, changed_node) in changed_nodes {
-        if let Some(parent_id) = changed_node.parent_id {
-            children_map
-                .entry(parent_id)
-                .or_insert_with(Vec::new)
-                .push(entity);
+    #[cfg(not(feature = "output-event"))]
+    {
+        for (entity, changed_entity) in changed_entities {
+            process_entity(entity, changed_entity, &mut svg_composition.context)
         }
     }
 
-    // Identify root nodes (those without parents or whose parents are not in changed_nodes)
-    return changed_nodes
-        .iter()
-        .filter_map(|(&entity, changed_node)| {
-            (changed_node.parent_id.is_none()
-                || !changed_nodes.contains_key(&changed_node.parent_id.unwrap()))
-            .then(|| build_branch(entity, changed_nodes, &children_map))
-        })
+    svg_composition.context.process_changed_entities();
+}
+
+#[derive(Debug)]
+struct ChangedEntityBranch {
+    entity: Entity,
+    changed: ChangedEntity,
+    children: Vec<ChangedEntityBranch>,
+}
+
+/// Builds dependency trees from changed entities.
+fn build_dependency_trees(
+    mut changed_entities: HashMap<Entity, ChangedEntity>,
+) -> Vec<ChangedEntityBranch> {
+    let mut children_map: HashMap<Entity, Vec<Entity>> = HashMap::new();
+    let mut roots: Vec<Entity> = Vec::new();
+
+    // Identify root entities and prepare a map of children for each parent
+    for (entity, changed_entity) in &changed_entities {
+        if let Some(parent_id) = changed_entity.parent_id {
+            if changed_entities.contains_key(&parent_id) {
+                children_map.entry(parent_id).or_default().push(*entity);
+            } else {
+                roots.push(*entity);
+            }
+        } else {
+            roots.push(*entity);
+        }
+    }
+
+    // Build dependency trees from root entities
+    return roots
+        .into_iter()
+        .map(|root| build_dependency_tree(root, &mut changed_entities, &children_map))
         .collect();
 }
 
-/// Recursively builds a branch in the dependency tree.
-fn build_branch<'a>(
+/// Builds a dependency tree for a given entity and its children.
+fn build_dependency_tree(
     entity: Entity,
-    changed_nodes: &'a HashMap<Entity, ChangedNode>,
+    changed_entities: &mut HashMap<Entity, ChangedEntity>,
     children_map: &HashMap<Entity, Vec<Entity>>,
-) -> ChangedNodeBranch<'a> {
-    let changed_node = changed_nodes
-        .get(&entity)
-        .unwrap_or_else(|| panic!("Node must exist for entity {}", entity.to_bits()));
+) -> ChangedEntityBranch {
+    let changed_entity = changed_entities
+        .remove(&entity)
+        .expect("Entity should exist");
 
-    // Build children branches
-    let children =
-        if changed_node.node_type == NodeType::Frame || changed_node.node_type == NodeType::Group {
-            // If children_mixin is present, sort children accordingly
-            if let Some(children_mixin) = find_children_mixin(&changed_node.changes) {
-                children_mixin
-                    .children
-                    .0
-                    .iter()
-                    .filter_map(|&child_entity| {
-                        changed_nodes
-                            .get(&child_entity)
-                            .map(|_| build_branch(child_entity, changed_nodes, children_map))
-                    })
-                    .collect()
-            } else {
-                // Otherwise, use the children from the children_map (order not relevant)
-                children_map
-                    .get(&entity)
-                    .unwrap_or(&Vec::new())
-                    .iter()
-                    .map(|&child_entity| build_branch(child_entity, changed_nodes, children_map))
-                    .collect()
-            }
-        } else {
-            Vec::new()
-        };
+    let children = find_children_mixin(&changed_entity)
+        // If children_mixin is present, sort children accordingly
+        .map(|children_mixin| {
+            children_mixin
+                .children
+                .0
+                .iter()
+                .filter_map(|&child_entity| {
+                    if changed_entities.contains_key(&child_entity) {
+                        Some(build_dependency_tree(
+                            child_entity,
+                            changed_entities,
+                            children_map,
+                        ))
+                    } else {
+                        None
+                    }
+                })
+                .collect()
+        })
+        // Otherwise, use the children from the children_map (order not relevant)
+        .unwrap_or_else(|| {
+            children_map
+                .get(&entity)
+                .unwrap_or(&Vec::new())
+                .iter()
+                .map(|&child_entity| {
+                    build_dependency_tree(child_entity, changed_entities, children_map)
+                })
+                .collect()
+        });
 
-    return ChangedNodeBranch {
+    return ChangedEntityBranch {
         entity,
-        changed: changed_node,
+        changed: changed_entity,
         children,
     };
 }
 
-/// Finds children mixin change from a list of changes.
-fn find_children_mixin(changes: &[MixinChange]) -> Option<&MixinChangeChildrenMixin> {
-    changes.iter().find_map(|change| match change {
-        MixinChange::Children(children_mixin) => Some(children_mixin),
-        _ => None,
-    })
+/// Finds and returns the children mixin change, if any, from a changed entity.
+fn find_children_mixin(changed_entity: &ChangedEntity) -> Option<&MixinChangeChildrenMixin> {
+    changed_entity
+        .changes
+        .iter()
+        .find_map(|change| match change {
+            MixinChange::Children(children_mixin) => Some(children_mixin),
+            _ => None,
+        })
 }
 
-/// Recursively processes a node in the dependency tree.
-fn process_tree_node(
-    leaf: &ChangedNodeBranch,
-    svg_composition: &mut SVGCompositionRes,
-    updates: &mut Vec<RenderUpdateEvent>,
-) {
-    // Process the current node entity
-    process_node(leaf.entity, leaf.changed, svg_composition, updates);
+fn process_dependency_tree(tree: ChangedEntityBranch, cx: &mut SVGContext) {
+    process_entity(tree.entity, tree.changed, cx);
 
     // Recursively process children, if any
-    for child in &leaf.children {
-        process_tree_node(child, svg_composition, updates);
+    for child in tree.children {
+        process_dependency_tree(child, cx);
     }
 }
 
-/// Processes a node entity by updating its corresponding SVG element/s
-/// based on the provided changes.
-fn process_node(
-    entity: Entity,
-    changed_node: &ChangedNode,
-    svg_composition: &mut SVGCompositionRes,
-    updates: &mut Vec<RenderUpdateEvent>,
-) {
-    // Attempt to get or create the node associated with the entity
-    let maybe_node = svg_composition.get_or_create_node(
-        entity,
-        &changed_node.node_type,
-        &changed_node.parent_id,
-    );
-
-    // Apply collected changes to the SVG node and drain updates
-    if let Some(node) = maybe_node {
-        node.apply_node_change(changed_node);
-        updates.extend(node.drain_updates());
+fn process_entity(entity: Entity, changed_entity: ChangedEntity, cx: &mut SVGContext) {
+    if let Some(bundle) = cx.create_bundle(entity, changed_entity.entity_type) {
+        cx.insert_bundle(bundle, changed_entity.parent_id);
+        cx.add_changed_entity(changed_entity);
     }
 }

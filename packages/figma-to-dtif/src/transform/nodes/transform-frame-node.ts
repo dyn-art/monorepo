@@ -1,22 +1,20 @@
-import type { TFrameNodeBundle } from '@dyn/dtif';
+import type { COMP } from '@dyn/dtif';
 
-import { convertFigmaBlendModeToDTIF, convertFigmaTransformToMat3 } from '../../utils';
+import { mapFigmaBlendModeToDTIF, mapFigmaTransformToMat3 } from '../../utils';
 
 export function transformFrameNode(
 	node: FrameNode | ComponentNode | InstanceNode,
 	config: TTransformFrameNodeConfig
-): { type: 'Frame' } & TFrameNodeBundle {
+): { type: 'Frame' } & COMP.FrameNodeBundle {
 	const { childrenIds, paintIds } = config;
 
 	return {
 		type: 'Frame',
 		node: {
-			name: node.name,
 			node_type: 'Frame'
 		},
-		frame: {
-			clipContent: node.clipsContent
-		},
+		name: node.name,
+		clipContent: node.clipsContent,
 		compositionMixin: {
 			isLocked: node.locked,
 			isVisible: node.visible
@@ -26,7 +24,7 @@ export function transformFrameNode(
 			height: node.height,
 			width: node.width
 		},
-		relativeTransform: convertFigmaTransformToMat3(node.relativeTransform),
+		relativeTransform: mapFigmaTransformToMat3(node.relativeTransform),
 		rectangleCornerMixin: {
 			bottomLeftRadius: node.bottomLeftRadius,
 			bottomRightRadius: node.bottomRightRadius,
@@ -34,7 +32,7 @@ export function transformFrameNode(
 			topRightRadius: node.topRightRadius
 		},
 		blendMixin: {
-			blendMode: convertFigmaBlendModeToDTIF(node.blendMode),
+			blendMode: mapFigmaBlendModeToDTIF(node.blendMode),
 			opacity: node.opacity,
 			isMask: node.isMask
 		},

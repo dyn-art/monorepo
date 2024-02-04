@@ -3,16 +3,14 @@ use std::sync::mpsc::{channel, Receiver};
 
 use bevy_ecs::entity::Entity;
 use dyn_bevy_render_skeleton::RenderApp;
-use dyn_composition::core::composition::Composition;
-use dyn_composition::core::dtif::DTIFComposition;
-use dyn_composition::core::modules::node::components::bundles::RectangleNodeBundle;
-use dyn_composition::core::modules::node::components::mixins::{
-    DimensionMixin, Paint, RelativeTransformMixin,
-};
-use dyn_svg_render::events::output_event::RenderUpdateEvent;
+use dyn_composition::composition::Composition;
+use dyn_composition::dtif::DTIFComposition;
+use dyn_composition::modules::node::components::bundles::{NodeBundle, PaintBundle};
+use dyn_composition::modules::node::components::mixins::{DimensionMixin, RelativeTransformMixin};
+use dyn_svg_render::events::output_event::SVGRenderOutputEvent;
 use dyn_svg_render::mixin_change::{MixinChange, MixinChangeRelativeTransformMixin};
 use dyn_svg_render::resources::svg_composition::SVGCompositionRes;
-use dyn_svg_render::SvgRenderPlugin;
+use dyn_svg_render::SVGRenderPlugin;
 use wasm_bindgen::prelude::wasm_bindgen;
 use wasm_bindgen::JsValue;
 
@@ -31,7 +29,7 @@ pub struct JsCompositionHandle {
     composition: Composition,
     event_callback: js_sys::Function,
     output_event_receiver: Receiver<OutputEvent>,
-    render_event_receiver: Receiver<RenderUpdateEvent>,
+    svg_output_event_receiver: Receiver<SVGRenderOutputEvent>,
 }
 
 #[wasm_bindgen]
@@ -46,16 +44,17 @@ impl JsCompositionHandle {
             }
         };
         let (output_event_sender, output_event_receiver) = channel::<OutputEvent>();
-        let (render_event_sender, render_event_receiver) = channel::<RenderUpdateEvent>();
+        let (svg_output_event_sender, svg_output_event_receiver) =
+            channel::<SVGRenderOutputEvent>();
 
         // Initalize composition
-        let mut composition = Composition::new(Some(parsed_dtif));
+        let mut composition = Composition::new(parsed_dtif);
         let app = composition.get_app_mut();
 
         // Register plugins
         app.add_plugins((
-            SvgRenderPlugin {
-                render_event_sender: Some(render_event_sender),
+            SVGRenderPlugin {
+                output_event_sender: Some(svg_output_event_sender),
             },
             TrackPlugin,
         ));
@@ -68,7 +67,7 @@ impl JsCompositionHandle {
             composition,
             event_callback,
             output_event_receiver,
-            render_event_receiver,
+            svg_output_event_receiver,
         };
     }
 
@@ -102,8 +101,12 @@ impl JsCompositionHandle {
         while let Ok(event) = self.output_event_receiver.try_recv() {
             output_events.push(event);
         }
-        while let Ok(event) = self.render_event_receiver.try_recv() {
-            output_events.push(OutputEvent::RenderUpdate(event));
+        while let Ok(event) = self.svg_output_event_receiver.try_recv() {
+            match event {
+                SVGRenderOutputEvent::ElementChange(event) => {
+                    output_events.push(OutputEvent::ElementChange(event))
+                }
+            }
         }
 
         // Invoke the JavaScript callback if with collected output events
@@ -203,29 +206,29 @@ impl JsCompositionHandle {
 
     #[wasm_bindgen(js_name = spawnPaint)]
     pub fn spawn_paint(&mut self, paint: JsValue) -> JsValue {
-        let paint: Paint = match serde_wasm_bindgen::from_value(paint) {
+        let paint: PaintBundle = match serde_wasm_bindgen::from_value(paint) {
             Ok(mixin) => mixin,
             Err(_) => return JsValue::NULL,
         };
 
         // Spawn a new paint in the composition
-        let entity = self.composition.spawn_node(paint, None);
+        let entity = self.composition.spawn_paint_bundle(paint, None);
 
         return serde_wasm_bindgen::to_value(&entity).unwrap_or(JsValue::NULL);
     }
 
-    #[wasm_bindgen(js_name = spawnRectangleNode)]
-    pub fn spawn_rectangle_node(&mut self, mixin: JsValue, maybe_parent_id: JsValue) -> JsValue {
-        let mixin: RectangleNodeBundle = match serde_wasm_bindgen::from_value(mixin) {
-            Ok(mixin) => mixin,
+    #[wasm_bindgen(js_name = spawnNodeBundle)]
+    pub fn spawn_node_bundle(&mut self, node_bundle: JsValue, maybe_parent_id: JsValue) -> JsValue {
+        let node_bundle: NodeBundle = match serde_wasm_bindgen::from_value(node_bundle) {
+            Ok(node_bundle) => node_bundle,
             Err(_) => return JsValue::NULL,
         };
         let maybe_parent_id = convert_optional_jsvalue::<Entity>(maybe_parent_id);
 
-        // Spawn a new rectangle node in the composition
+        // Spawn a new node bundle (Rectangle, Frame, ..) in the composition
         let entity = self
             .composition
-            .spawn_rectangle_node(mixin, maybe_parent_id);
+            .spawn_node_bundle(node_bundle, maybe_parent_id);
 
         return serde_wasm_bindgen::to_value(&entity).unwrap_or(JsValue::NULL);
     }
@@ -243,7 +246,7 @@ impl JsCompositionHandle {
                 Err(_) => return,
             };
 
-            dyn_composition::core::modules::node::utils::logging::log_entity_components(
+            dyn_composition::modules::node::utils::logging::log_entity_components(
                 &self.composition.get_app().world,
                 entity,
             );
@@ -259,7 +262,7 @@ impl JsCompositionHandle {
 
     #[wasm_bindgen(js_name = toString)]
     pub fn to_string(&self) -> Option<String> {
-        self.get_svg_composition()?.to_string()
+        self.get_svg_composition()?.context.to_string()
     }
 
     // =========================================================================

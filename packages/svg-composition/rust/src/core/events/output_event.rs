@@ -1,16 +1,32 @@
 use bevy_ecs::entity::Entity;
-use dyn_svg_render::{events::output_event::RenderUpdateEvent, mixin_change::MixinChange};
+use dyn_composition::modules::composition::resources::composition::ViewBox;
+use dyn_svg_render::{events::output_event::ElementChangeEvent, mixin_change::MixinChange};
 use serde::Serialize;
 use specta::Type;
 
 #[derive(Debug, Serialize, Clone, Type)]
 #[serde(tag = "type")]
 pub enum OutputEvent {
-    RenderUpdate(RenderUpdateEvent),
+    ElementChange(ElementChangeEvent),
+    CompositionChange(CompositionChangeEvent),
     TrackUpdate(TrackUpdateEvent),
     SelectionChange(SelectionChangeEvent),
     InteractionModeChange(InteractionModeChangeEvent),
     CursorChange(CursorChangeEvent),
+}
+
+#[derive(Debug, Serialize, Clone, Type)]
+pub struct CompositionChangeEvent {
+    pub change: CompositionChange,
+}
+
+#[derive(Serialize, Type, Clone, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct CompositionChange {
+    pub root_node: Entity,
+    pub view_box: ViewBox,
+    pub width: f32,
+    pub height: f32,
 }
 
 #[derive(Debug, Serialize, Clone, Type)]
@@ -38,6 +54,7 @@ pub enum InteractionModeForFrontend {
     Translating,
     Resizing,
     Rotating,
+    Dragging,
 }
 
 impl Default for InteractionModeForFrontend {

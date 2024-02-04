@@ -1,5 +1,4 @@
 import React from 'react';
-import { ETransformStatus } from '@dyn/figma-to-dtif';
 
 import { appHandler } from '../../app-handler';
 import { useAppCallback } from '../../hooks';
@@ -20,14 +19,12 @@ const ToDTIFPlugin: React.FC = () => {
 			type: 'plugin.message',
 			key: 'on-transform-status-update',
 			callback: async (instance, args) => {
-				switch (args.status.type) {
-					case ETransformStatus.START:
+				switch (args.type) {
+					case 'Start':
 						setIsTransforming(true);
 						break;
-					case ETransformStatus.END:
-						setTimeout(() => {
-							setIsTransforming(false);
-						}, 1000);
+					case 'End':
+						setIsTransforming(false);
 						break;
 					default:
 					// do nothing

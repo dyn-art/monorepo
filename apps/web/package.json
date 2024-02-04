@@ -21,6 +21,7 @@
 	},
 	"homepage": "https://s.dyn.art/github",
 	"dependencies": {
+		"@dyn/dtif": "workspace:^",
 		"@dyn/svg-composition": "workspace:^",
 		"@dyn/ui": "workspace:*",
 		"clsx": "^2.0.0",

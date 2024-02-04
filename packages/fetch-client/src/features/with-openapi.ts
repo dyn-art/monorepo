@@ -6,6 +6,8 @@ export function withOpenApi<
 >(
 	fetchClient: TFetchClient<TEnforceFeatures<GSelectedFeatureKeys, ['base']>, GPaths>
 ): TFetchClient<['openapi', ...GSelectedFeatureKeys], GPaths> {
+	fetchClient._features.push('openapi');
+
 	const openApiFeature: TSelectFeatures<['openapi'], GPaths> = {
 		get(this: TFetchClient<['base'], GPaths>, path, options = {} as any) {
 			return this._baseFetch(path as string, 'GET', {

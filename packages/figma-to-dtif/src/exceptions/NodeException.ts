@@ -1,8 +1,10 @@
-export class NodeException extends Error {
-	public readonly nodeId: SceneNode['id'];
+import { toArray } from '@dyn/utils';
 
-	constructor(message: string, nodeId: SceneNode['id']) {
+export class NodeException extends Error {
+	public readonly nodeIds: SceneNode['id'][];
+
+	constructor(message: string, nodeIds: SceneNode['id'] | SceneNode['id'][]) {
 		super(message);
-		this.nodeId = nodeId;
+		this.nodeIds = toArray(nodeIds);
 	}
 }

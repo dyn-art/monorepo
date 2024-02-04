@@ -4,5 +4,6 @@ export * from './DropdownMenu';
 export * from './Progress';
 export * from './Select';
 export * from './Separator';
+export * from './Skeleton';
 export * from './Tooltip';
 export * from './icons';

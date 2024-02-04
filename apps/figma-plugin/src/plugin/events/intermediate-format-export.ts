@@ -1,10 +1,10 @@
-import { NodeException, Transformer, type TComposition } from '@dyn/figma-to-dtif';
-import { extractErrorData } from '@dyn/utils';
+import { NodeException, Transformer, type COMP } from '@dyn/figma-to-dtif';
+import { extractErrorData, notEmpty, sleep } from '@dyn/utils';
 
-import { type TPluginHandler } from '../../types';
-import { registerPluginEventCallback } from '../plugin-handler';
+import type { TCustomPluginCallbackRegistration, TPluginHandler } from '../../types';
+import { googleClient } from '../fetch-client';
 
-registerPluginEventCallback({
+export const intermediateFormatExport: TCustomPluginCallbackRegistration = {
 	type: 'app.message',
 	key: 'intermediate-format-export',
 	callback: async (instance: TPluginHandler, args) => {
@@ -22,39 +22,59 @@ registerPluginEventCallback({
 			await processNode(node, instance);
 		}
 	}
-});
+};
 
 async function processNode(node: FrameNode, instance: TPluginHandler): Promise<void> {
+	instance.post('on-transform-status-update', { type: 'Start' });
 	const transformer = new Transformer(node, {
 		onTransformStatusUpdate: (status) => {
-			instance.post('on-transform-status-update', { status });
+			instance.post('on-transform-status-update', { type: 'Transform', status });
 		}
 	});
 
 	try {
 		const result = await transformer.transform({
 			font: {
-				exportOptions: { inline: true },
-				resolveFontContent: async () => {
-					// TODO
-					return null as any;
+				export: { mode: 'Inline' },
+				resolveFontContent: async (fontMetadata) => {
+					const urlResponse = await googleClient.getFontFileUrl(fontMetadata.family, {
+						fontWeight: fontMetadata.weight,
+						fontStyle: fontMetadata.style === 'Italic' ? 'italic' : 'regular'
+					});
+					const url = urlResponse.unwrap();
+					if (url == null) {
+						return null;
+					}
+
+					return {
+						type: 'Url',
+						url,
+						contentType: { mimeType: 'font/ttf' }
+					};
 				}
 			},
 			paint: {
-				gradientExportOptions: { inline: true },
-				imageExportOptions: { inline: true }
+				image: { export: { format: 'PNG', mode: 'Inline' } }
+			},
+			node: {
+				includeInvisible: false,
+				shouldExportFrame: { contentType: 'PNG' }
 			}
-			// node: {
-			// 	includeInvisible: false
-			// }
 		});
-		handleSuccess(result, node, instance);
+		await handleSuccess(result, node, instance);
 	} catch (error) {
 		handleError(error, node, instance);
 	}
+	instance.post('on-transform-status-update', { type: 'End' });
 }
 
-function handleSuccess(result: TComposition, node: SceneNode, instance: TPluginHandler): void {
+async function handleSuccess(
+	result: COMP.DTIFComposition,
+	node: SceneNode,
+	instance: TPluginHandler
+): Promise<void> {
+	instance.post('on-transform-status-update', { type: 'Transmit' });
+	await sleep(100);
 	instance.post('intermediate-format-export-result', {
 		type: 'success',
 		content: result
@@ -74,9 +94,11 @@ function handleError(error: unknown, node: SceneNode, instance: TPluginHandler):
 		error: true
 	});
 	if (error instanceof NodeException) {
-		const errorCausingNode = figma.getNodeById(error.nodeId);
-		if (errorCausingNode != null) {
-			figma.currentPage.selection = [errorCausingNode as SceneNode];
+		const errorCausingNodes: SceneNode[] = error.nodeIds
+			.map((nodeId) => figma.getNodeById(nodeId) as SceneNode)
+			.filter(notEmpty);
+		if (errorCausingNodes.length > 0) {
+			figma.currentPage.selection = errorCausingNodes;
 		}
 	}
 }

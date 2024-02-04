@@ -20,7 +20,7 @@ path = "src/bin/cli.rs"
 [features]
 default = []
 console_log = ["dep:console_error_panic_hook", "dep:once_cell"]
-tracing = ["console_log", "dyn_composition/tracing"]
+tracing = ["console_log", "dyn_composition/tracing", "dyn_svg_render/tracing"]
 cli = ["dep:clap", "specta/export"]
 
 [dependencies]
@@ -29,7 +29,9 @@ cli = ["dep:clap", "specta/export"]
 dyn_composition = { path = "../../../crates/composition", features = [
     "interactive",
 ] }
-dyn_svg_render = { path = "../../../crates/svg_render" }
+dyn_svg_render = { path = "../../../crates/svg_render", features = [
+    "output-event",
+] }
 dyn_bevy_render_skeleton = { path = "../../../crates/bevy_render_skeleton" }
 bevy_ecs = "0.12.1"
 bevy_app = "0.12.1"

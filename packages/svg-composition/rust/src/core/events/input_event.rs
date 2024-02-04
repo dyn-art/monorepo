@@ -1,4 +1,4 @@
-use dyn_composition::core::modules::{
+use dyn_composition::modules::{
     composition::events::CoreInputEvent, interactive_composition::events::InteractionInputEvent,
 };
 use serde::Deserialize;

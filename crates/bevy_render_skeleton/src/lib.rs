@@ -205,10 +205,10 @@ fn initialize_render_app(app: &mut App) {
         render_app.insert_resource(sender);
 
         app.insert_sub_app(RenderApp, SubApp::new(render_app, move |main_world, render_app| {
-            #[cfg(feature = "trace")]
+            #[cfg(feature = "tracing")]
             let _render_span = bevy_utils::tracing::info_span!("extract main app to render subapp").entered();
             {
-                #[cfg(feature = "trace")]
+                #[cfg(feature = "tracing")]
                 let _stage_span =
                     bevy_utils::tracing::info_span!("reserve_and_flush")
                         .entered();

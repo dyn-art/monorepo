@@ -4,11 +4,11 @@ import { toArray } from '@dyn/utils';
 import type { TFetchClient, TFetchClientConfig, TFetchClientOptions, TURLParams } from '../types';
 import {
 	buildUrl,
+	FetchHeaders,
 	fetchWithRetries,
 	mapErrorToNetworkException,
 	mapErrorToServiceException,
 	mapResponseToRequestException,
-	mergeHeaders,
 	parseAndValidateUrl,
 	processRequestMiddlewares,
 	serializeBody,
@@ -21,7 +21,7 @@ export function createFetchClient<GPaths extends {} = {}>(
 	const config: TFetchClientConfig = {
 		prefixUrl: options.prefixUrl ?? '',
 		fetchProps: options.fetchProps ?? {},
-		headers: options.headers != null ? new Headers(options.headers) : new Headers(),
+		headers: options.headers != null ? new FetchHeaders(options.headers) : new FetchHeaders(),
 		bodySerializer: options.bodySerializer ?? serializeBody,
 		querySerializer: options.querySerializer ?? serializeQueryParams,
 		middleware: toArray(options.middleware ?? [])
@@ -34,11 +34,11 @@ export function createFetchClient<GPaths extends {} = {}>(
 
 	return {
 		_: null,
+		_features: ['base'],
 		_config: config,
 		async _baseFetch(this: TFetchClient<['base']>, path, method, baseFetchOptions = {}) {
 			const {
 				parseAs = 'json',
-				headers = {},
 				bodySerializer = this._config.bodySerializer,
 				querySerializer = this._config.querySerializer,
 				pathParams,
@@ -48,6 +48,7 @@ export function createFetchClient<GPaths extends {} = {}>(
 				fetchProps = {},
 				middlewareProps
 			} = baseFetchOptions;
+			const headers = new FetchHeaders(baseFetchOptions.headers);
 
 			// Parse and validate URL to ensure that even if path is a full URL and baseUrl is an empty string,
 			// the finalPath and origin can still be correctly extracted
@@ -62,13 +63,13 @@ export function createFetchClient<GPaths extends {} = {}>(
 			};
 
 			// Build request init object
-			const mergedHeaders = mergeHeaders(headers, this._config.headers);
+			const mergedHeaders = FetchHeaders.merge(headers, this._config.headers);
 			let requestInit: RequestInit = {
 				redirect: 'follow',
 				...this._config.fetchProps,
 				...fetchProps,
 				method,
-				headers: mergedHeaders,
+				headers: mergedHeaders.toHeadersInit(),
 				body:
 					body != null
 						? bodySerializer(body, mergedHeaders.get('Content-Type') ?? undefined)
@@ -77,7 +78,7 @@ export function createFetchClient<GPaths extends {} = {}>(
 
 			// Remove `Content-Type` if serialized body is FormData.
 			// Browser will correctly set Content-Type & boundary expression.
-			if (requestInit.body instanceof FormData) {
+			if (typeof FormData !== 'undefined' && requestInit.body instanceof FormData) {
 				mergedHeaders.delete('Content-Type');
 			}
 
@@ -100,7 +101,7 @@ export function createFetchClient<GPaths extends {} = {}>(
 			}
 
 			// Build final URL
-			const finalURL = buildUrl(origin, {
+			const finalUrl = buildUrl(origin, {
 				path: parsedPath,
 				params: urlParams,
 				querySerializer
@@ -109,7 +110,7 @@ export function createFetchClient<GPaths extends {} = {}>(
 			// Send request
 			let response: Response;
 			try {
-				response = await fetchWithRetries(finalURL, {
+				response = await fetchWithRetries(finalUrl, {
 					requestInit
 				});
 			} catch (error) {

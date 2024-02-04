@@ -9,7 +9,7 @@ license = "AGPL-3.0-or-later"
 
 [features]
 default = []
-tracing = ["dyn_composition/tracing"]
+tracing = ["dyn_composition/tracing", "dyn_svg_render/tracing"]
 cli = ["dep:clap"]
 
 [lib]

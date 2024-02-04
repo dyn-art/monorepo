@@ -1,10 +1,12 @@
 import type { Result } from 'ts-results-es';
 
 import type { NetworkException, RequestException, ServiceException } from '../exceptions';
+import type { FetchHeaders } from '../utils';
 import type { TParseAs, TRequestMethod } from './api';
 import type { TFeatureKeys, TSelectFeatures } from './features';
 
 export type TFetchClient<GSelectedFeatureKeys extends TFeatureKeys[], GPaths extends {} = {}> = {
+	_features: string[];
 	_config: TFetchClientConfig;
 	_baseFetch: <
 		GSuccessResponseBody = any,
@@ -29,7 +31,7 @@ export interface TBaseFetchClientConfig {
 }
 
 export type TFetchClientConfig = {
-	headers: Headers;
+	headers: FetchHeaders;
 	middleware: TRequestMiddleware[];
 } & TBaseFetchClientConfig;
 
@@ -119,7 +121,7 @@ export interface TFetchResponseSuccess<GSuccessResponseBody, GParseAs extends TP
 	response: Response;
 }
 
-export type TFetchResponseError<GErrorResponseBody> =
+export type TFetchResponseError<GErrorResponseBody = unknown> =
 	| NetworkException
 	| RequestException<GErrorResponseBody>
 	| ServiceException;

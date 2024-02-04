@@ -6,137 +6,189 @@ use bevy_ecs::{
 };
 use bevy_hierarchy::{Children, Parent};
 use dyn_bevy_render_skeleton::extract_param::Extract;
-use dyn_composition::core::modules::node::components::{
-    mixins::{ChildrenMixin, DimensionMixin, Paint},
-    types::Node,
+use dyn_composition::modules::node::components::{
+    mixins::ChildrenMixin,
+    types::{
+        GradientPaint, GradientPaintVariant, ImagePaint, ImagePaintScaleMode, Node, NodeType,
+        Paint, PaintType,
+    },
 };
+use std::fmt::Debug;
 
 use crate::{
     mixin_change::ToMixinChange,
-    resources::changed_components::{ChangedComponentsRes, ChangedNode, ChangedPaint},
+    resources::changed_entities::{
+        ChangedEntitiesRes, ChangedEntity, ChangedEntityGradientPaintType,
+        ChangedEntityImagePaintType, ChangedEntityType,
+    },
 };
 
 // Special handling for ChildrenMixin as the ChildrenMixin is no Component itself in the ECS
 // as the child parent relation is managed by Bevy's children implementation
 pub fn extract_children(
-    mut changed: ResMut<ChangedComponentsRes>,
+    mut changed_entities: ResMut<ChangedEntitiesRes>,
     query: Extract<Query<(Entity, &Node, &Children), (With<Node>, Changed<Children>)>>,
     parent_query: Extract<Query<&Parent>>,
-    node_query: Extract<Query<Entity, With<Node>>>,
 ) {
     query.for_each(|(entity, node, children)| {
-        let changed_component = changed.changed_nodes.entry(entity).or_insert_with(|| {
-            let mut parent_id: Option<Entity> = None;
-
-            // Try to get the parent entity id
-            if let Ok(parent) = parent_query.get(entity) {
-                parent_id = Some(parent.get());
-            }
-
-            return ChangedNode {
-                node_type: node.node_type.clone(),
-                changes: Vec::new(),
-                parent_id,
-            };
-        });
-
-        // TODO: Improve
-        // Note: Also paints are included here as they are managed with Bevy child parent relation too
-
-        // Filter children to include only those that are Nodes
-        let node_children: Vec<_> = children
-            .iter()
-            .filter_map(|child_entity| {
-                if node_query.get(*child_entity).is_ok() {
-                    Some(child_entity.clone())
-                } else {
-                    None
+        let changed_entity = changed_entities
+            .changed_entities
+            .entry(entity)
+            .or_insert_with(|| {
+                // Try to get the parent entity id
+                let mut parent_id: Option<Entity> = None;
+                if let Ok(parent) = parent_query.get(entity) {
+                    parent_id = Some(parent.get());
                 }
-            })
-            .clone()
-            .collect();
 
-        changed_component
+                return ChangedEntity {
+                    entity,
+                    entity_type: match node.node_type {
+                        NodeType::Frame => ChangedEntityType::FrameNode,
+                        NodeType::Rectangle => ChangedEntityType::ShapeNode,
+                        NodeType::Text => ChangedEntityType::ShapeNode,
+                        NodeType::Vector => ChangedEntityType::ShapeNode,
+                        NodeType::Polygon => ChangedEntityType::ShapeNode,
+                        NodeType::Ellipse => ChangedEntityType::ShapeNode,
+                        NodeType::Star => ChangedEntityType::ShapeNode,
+                        NodeType::Group => ChangedEntityType::Unknown, // TODO
+                    },
+                    changes: Vec::new(),
+                    parent_id,
+                };
+            });
+
+        changed_entity
             .changes
-            .push(ChildrenMixin(node_children).to_mixin_change());
+            .push(ChildrenMixin(children.to_vec()).to_mixin_change());
     });
 }
 
-pub fn extract_mixin_generic<C: Component + ToMixinChange>(
-    mut changed: ResMut<ChangedComponentsRes>,
+pub fn extract_node_mixin_generic<C: Component + ToMixinChange + Debug>(
+    mut changed_entities_res: ResMut<ChangedEntitiesRes>,
     query: Extract<Query<(Entity, &Node, &C), (With<Node>, Changed<C>)>>,
     parent_query: Extract<Query<&Parent>>,
 ) {
     query.for_each(|(entity, node, mixin)| {
-        let changed_component = changed.changed_nodes.entry(entity).or_insert_with(|| {
-            let mut parent_id: Option<Entity> = None;
+        let changed_entity = changed_entities_res
+            .changed_entities
+            .entry(entity)
+            .or_insert_with(|| {
+                // Try to get the parent entity id
+                let mut parent_id: Option<Entity> = None;
+                if let Ok(parent) = parent_query.get(entity) {
+                    parent_id = Some(parent.get());
+                }
 
-            // Try to get the parent entity id
-            if let Ok(parent) = parent_query.get(entity) {
-                parent_id = Some(parent.get());
-            }
+                return ChangedEntity {
+                    entity,
+                    entity_type: match node.node_type {
+                        NodeType::Frame => ChangedEntityType::FrameNode,
+                        NodeType::Rectangle => ChangedEntityType::ShapeNode,
+                        NodeType::Text => ChangedEntityType::ShapeNode,
+                        NodeType::Vector => ChangedEntityType::ShapeNode,
+                        NodeType::Polygon => ChangedEntityType::ShapeNode,
+                        NodeType::Ellipse => ChangedEntityType::ShapeNode,
+                        NodeType::Star => ChangedEntityType::ShapeNode,
+                        NodeType::Group => ChangedEntityType::Unknown, // TODO
+                    },
+                    changes: Vec::new(),
+                    parent_id,
+                };
+            });
 
-            return ChangedNode {
-                node_type: node.node_type.clone(),
-                changes: Vec::new(),
-                parent_id,
-            };
-        });
-
-        changed_component.changes.push(mixin.to_mixin_change());
+        changed_entity.changes.push(mixin.to_mixin_change());
     });
 }
 
-pub fn extract_paint(
-    mut changed: ResMut<ChangedComponentsRes>,
-    changed_paint_query: Extract<Query<(Entity, &Paint), Changed<Paint>>>,
+pub fn extract_paint_mixin_generic<C: Component + ToMixinChange + Debug>(
+    mut changed_entities_res: ResMut<ChangedEntitiesRes>,
+    query: Extract<
+        Query<
+            (
+                Entity,
+                &Paint,
+                Option<&ImagePaint>,
+                Option<&GradientPaint>,
+                &C,
+            ),
+            (With<Paint>, Changed<C>),
+        >,
+    >,
     parent_query: Extract<Query<&Parent>>,
-    children_query: Extract<Query<&Children>>,
-    changed_dimension_query: Extract<Query<(Entity, &DimensionMixin), Changed<DimensionMixin>>>,
-    paint_query: Extract<Query<(Entity, &Paint)>>,
 ) {
-    // Query changed paints
-    changed_paint_query.for_each(|(entity, paint)| {
-        changed.changed_paints.entry(entity).or_insert_with(|| {
-            let mut parent_id: Option<Entity> = None;
-            let mut parent_dimension: Option<DimensionMixin> = None;
+    query.for_each(
+        |(entity, paint, maybe_image_paint, maybe_gradient_paint, mixin)| {
+            let changed_entity = changed_entities_res
+                .changed_entities
+                .entry(entity)
+                .or_insert_with(|| {
+                    // Try to get the parent entity id
+                    let mut parent_id: Option<Entity> = None;
+                    if let Ok(parent) = parent_query.get(entity) {
+                        parent_id = Some(parent.get());
+                    }
 
-            // Try to get the parent entity id and its dimension mixin
-            if let Ok(parent) = parent_query.get(entity) {
-                let parent_entity = parent.get();
-                parent_id = Some(parent_entity);
+                    return ChangedEntity {
+                        entity,
+                        entity_type: match paint.paint_type {
+                            PaintType::Solid => ChangedEntityType::SolidPaint,
+                            PaintType::Image => {
+                                if let Some(image_paint) = maybe_image_paint {
+                                    match image_paint.scale_mode {
+                                        ImagePaintScaleMode::Fill { .. } => {
+                                            ChangedEntityType::ImagePaint(
+                                                ChangedEntityImagePaintType::Fill,
+                                            )
+                                        }
 
-                if let Ok(dimension_mixin) =
-                    changed_dimension_query.get_component::<DimensionMixin>(parent_entity)
-                {
-                    parent_dimension = Some(dimension_mixin.clone());
-                }
-            }
+                                        ImagePaintScaleMode::Fit { .. } => {
+                                            ChangedEntityType::ImagePaint(
+                                                ChangedEntityImagePaintType::Fit,
+                                            )
+                                        }
 
-            return ChangedPaint {
-                paint: paint.clone(),
-                parent_id,
-                parent_dimension,
-            };
-        });
-    });
+                                        ImagePaintScaleMode::Crop { .. } => {
+                                            ChangedEntityType::ImagePaint(
+                                                ChangedEntityImagePaintType::Crop,
+                                            )
+                                        }
 
-    // Query changed parent dimensions
-    // TODO: Improve
-    changed_dimension_query.for_each(|(parent_entity, dimension_mixin)| {
-        if let Ok(children) = children_query.get_component::<Children>(parent_entity) {
-            for child in children.iter() {
-                if let Ok(paint) = paint_query.get_component::<Paint>(*child) {
-                    changed
-                        .changed_paints
-                        .entry(*child)
-                        .or_insert_with(|| ChangedPaint {
-                            paint: paint.clone(),
-                            parent_id: Some(parent_entity),
-                            parent_dimension: Some(dimension_mixin.clone()),
-                        });
-                }
-            }
-        }
-    });
+                                        ImagePaintScaleMode::Tile { .. } => {
+                                            ChangedEntityType::ImagePaint(
+                                                ChangedEntityImagePaintType::Tile,
+                                            )
+                                        }
+                                    }
+                                } else {
+                                    ChangedEntityType::Unknown
+                                }
+                            }
+                            PaintType::Gradient => {
+                                if let Some(gradient_paint) = maybe_gradient_paint {
+                                    match gradient_paint.variant {
+                                        GradientPaintVariant::Linear { .. } => {
+                                            ChangedEntityType::GradientPaint(
+                                                ChangedEntityGradientPaintType::Linear,
+                                            )
+                                        }
+                                        GradientPaintVariant::Radial { .. } => {
+                                            ChangedEntityType::GradientPaint(
+                                                ChangedEntityGradientPaintType::Linear,
+                                            )
+                                        }
+                                    }
+                                } else {
+                                    ChangedEntityType::Unknown
+                                }
+                            }
+                        },
+                        changes: Vec::new(),
+                        parent_id,
+                    };
+                });
+
+            changed_entity.changes.push(mixin.to_mixin_change());
+        },
+    );
 }

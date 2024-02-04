@@ -1,42 +1,48 @@
+import { mat3, vec3 } from '@dyn/dtif';
 import { shortId } from '@dyn/utils';
 import { JsCompositionHandle } from '@/rust/dyn_svg_composition_api';
 import type {
 	AnyInputEvent,
+	CompositionChange,
+	CompositionChangeEvent,
 	CoreInputEvent,
 	CursorChangeEvent,
 	CursorForFrontend,
 	DTIFComposition,
+	ElementChangeEvent,
 	Entity,
 	InteractionInputEvent,
 	InteractionModeChangeEvent,
 	InteractionModeForFrontend,
 	MixinChange,
+	NodeBundle,
 	OutputEvent,
-	Paint,
-	RectangleNodeBundle,
-	RenderUpdateEvent,
+	PaintBundle,
 	SelectionChangeEvent,
 	TrackableMixinType,
-	TrackUpdateEvent
+	TrackUpdateEvent,
+	ViewBox
 } from '@/rust/dyn_svg_composition_api/bindings';
 
 import type { TRustEnumKeyArray } from '../../wasm';
-import type { Renderer } from '../render';
-import { groupByType, mat3, vec3 } from '../utils';
+import type { Render } from '../render';
+import { groupByType } from '../utils';
 
 export class Composition {
 	public readonly id: string;
 	private readonly _compositionHandle: JsCompositionHandle;
 
-	private _renderer: Renderer[] = [];
+	private _renderer: Render[] = [];
 
 	private _width: number;
 	private _height: number;
+	private _viewBox: ViewBox;
 	private readonly _isCallbackBased: boolean;
 
 	private _eventQueue: AnyInputEvent[] = [];
 
 	// https://www.zhenghao.io/posts/object-vs-map
+	private _watchCompositionCallbacks = new Map<string, TWatchCompositionCallback>();
 	private readonly _watchEntityCallbacks = new Map<Entity, Map<string, TWatchEntityCallback>>();
 	private readonly _onSelectionChangeCallbacks = new Map<string, TOnSelectionChangeCallback>();
 	private readonly _onInteractionModeChangeCallbacks = new Map<
@@ -50,47 +56,19 @@ export class Composition {
 	private readonly debounceDelay: number = 100; // ms
 
 	constructor(config: TCompositionConfig) {
-		const {
-			width,
-			height,
-			dtif = {
-				version: '0.0.1',
-				name: 'Test',
-				width,
-				height,
-				rootNodeId: 0,
-				nodes: {
-					0: {
-						type: 'Frame',
-						children: [],
-						dimension: {
-							width,
-							height
-						},
-						relativeTransform: mat3(vec3(1, 0, 0), vec3(0, 1, 0), vec3(0, 0, 1)),
-						fill: {
-							paintIds: [10]
-						}
-					}
-				},
-				paints: {
-					10: {
-						type: 'Solid',
-						blendMode: 'Normal',
-						color: [0, 191, 255],
-						isVisible: true,
-						opacity: 1
-					}
-				}
-			},
-			isCallbackBased = true
-		} = config;
+		const { dtif, isCallbackBased = true } = config;
 		this.id = shortId();
 		this._compositionHandle = new JsCompositionHandle(dtif, (events: OutputEvent[]) => {
 			this.onWasmEvents(events);
 		});
-		this._width = width;
-		this._height = height;
+		this._width = dtif.width;
+		this._height = dtif.height;
+		this._viewBox = dtif.viewBox ?? {
+			width: dtif.width,
+			height: dtif.height,
+			minX: 0,
+			minY: 0
+		};
 		this._isCallbackBased = isCallbackBased;
 	}
 
@@ -106,7 +84,11 @@ export class Composition {
 		return this._height;
 	}
 
-	public get renderer(): Renderer[] {
+	public get viewBox(): Readonly<ViewBox> {
+		return this._viewBox;
+	}
+
+	public get renderer(): Render[] {
 		return this._renderer;
 	}
 
@@ -120,8 +102,11 @@ export class Composition {
 			const groupedEvent = groupedEvents[eventType];
 			if (groupedEvent != null) {
 				switch (eventType) {
-					case 'RenderUpdate':
-						this.handleRenderUpdates(groupedEvent as RenderUpdateEvent[]);
+					case 'CompositionChange':
+						this.handleCompositionUpdates(groupedEvent as CompositionChangeEvent[]);
+						break;
+					case 'ElementChange':
+						this.handleElementUpdates(groupedEvent as ElementChangeEvent[]);
 						break;
 					case 'TrackUpdate':
 						this.handleTrackUpdates(groupedEvent as TrackUpdateEvent[]);
@@ -135,8 +120,6 @@ export class Composition {
 					case 'CursorChange':
 						this.handleCursorChanges(groupedEvent as CursorChangeEvent[]);
 						break;
-					default:
-						console.warn(`Unknown event: ${eventType as string}`);
 				}
 			}
 		}
@@ -146,31 +129,70 @@ export class Composition {
 	// Renderer
 	// =========================================================================
 
-	public registerRenderer(renderer: Renderer): void {
-		renderer.setSize(this._width, this._height);
+	public registerRenderer(renderer: Render): void {
 		this._renderer.push(renderer);
 	}
 
-	private handleRenderUpdates(events: RenderUpdateEvent[]): void {
-		this._renderer.forEach((renderer) => {
-			renderer.render(events);
-		});
+	private handleElementUpdates(events: ElementChangeEvent[]): void {
+		if (events.length > 0) {
+			this._renderer.forEach((renderer) => {
+				renderer.applyElementChanges(events);
+			});
+		}
+	}
+
+	private handleCompositionUpdates(events: CompositionChangeEvent[]): void {
+		if (events.length > 0) {
+			const { change } = events[events.length - 1] as unknown as CompositionChangeEvent;
+
+			// Apply composition changes to each renderer
+			this._renderer.forEach((renderer) => {
+				renderer.applyCompositionChange(change);
+			});
+
+			this._viewBox = change.viewBox;
+			this._width = change.width;
+			this._height = change.height;
+
+			// Call the watch composition callbacks with the aggregated changes
+			this._watchCompositionCallbacks.forEach((callback) => {
+				callback(change);
+			});
+		}
 	}
 
 	// =========================================================================
-	// Tracking
+	// Watch Composition
+	// =========================================================================
+
+	public watchComposition(callback: TWatchCompositionCallback): () => void {
+		const callbackId = shortId();
+		this._watchCompositionCallbacks.set(callbackId, callback);
+		return () => {
+			this.unwatchComposition(callbackId);
+		};
+	}
+
+	private unwatchComposition(callbackId: string): void {
+		if (this._watchCompositionCallbacks.has(callbackId)) {
+			this._watchCompositionCallbacks.delete(callbackId);
+		}
+	}
+
+	// =========================================================================
+	// Watch Entity
 	// =========================================================================
 
 	public watchEntity(
 		entity: Entity,
-		toTrackMixins: TRustEnumKeyArray<TrackableMixinType>[],
+		toTrackMixinKeys: TRustEnumKeyArray<TrackableMixinType>[],
 		callback: TWatchEntityCallback,
 		initalValue = true
 	): (() => void) | false {
 		// Enable tracking of entity in composition
 		const intialChanges = this.trackEntity(
 			entity,
-			toTrackMixins.map((v) => ({ type: v })),
+			toTrackMixinKeys.map((key) => ({ type: key })),
 			initalValue
 		);
 
@@ -353,18 +375,14 @@ export class Composition {
 	}
 
 	// =========================================================================
-	// Paint
-	// =========================================================================
-
-	public registerPaint(paint: Paint): Entity {
-		return this._compositionHandle.spawnPaint(paint);
-	}
-
-	// =========================================================================
 	// Entity Creation
 	// =========================================================================
 
-	public createRectangle(
+	public spawnPaint(paint: PaintBundle): Entity {
+		return this._compositionHandle.spawnPaint(paint);
+	}
+
+	public spawnRectangle(
 		config: {
 			x: number;
 			y: number;
@@ -375,41 +393,42 @@ export class Composition {
 		parentId?: Entity
 	): Entity {
 		const { x, y, width, height, color = [0, 0, 0] } = config;
-		const paintId = this.registerPaint({
+		const paintId = this.spawnPaint({
 			type: 'Solid',
-			blendMode: 'Normal',
-			color,
-			isVisible: true,
-			opacity: 1
+			color
 		});
-		return this._compositionHandle.spawnRectangleNode(
-			{
-				compositionMixin: {
-					isVisible: true,
-					isLocked: false
-				},
-				dimension: {
-					width: Math.round(width),
-					height: Math.round(height)
-				},
-				relativeTransform: mat3(vec3(1, 0, 0), vec3(0, 1, 0), vec3(x, y, 1)),
-				blendMixin: {
-					blendMode: 'Normal',
-					opacity: 1,
-					isMask: false
-				},
-				rectangleCornerMixin: {
-					bottomLeftRadius: 20,
-					bottomRightRadius: 0,
-					topLeftRadius: 0,
-					topRightRadius: 0
-				},
-				fill: {
-					paintIds: [paintId]
-				}
-			} as RectangleNodeBundle,
-			parentId
-		);
+		const bundle: NodeBundle = {
+			type: 'Rectangle',
+			dimension: {
+				width,
+				height
+			},
+			relativeTransform: mat3(vec3(1, 0, 0), vec3(0, 1, 0), vec3(x, y, 1)),
+			rectangleCornerMixin: {
+				bottomLeftRadius: 20
+			},
+			fill: {
+				paintIds: [paintId]
+			}
+		};
+		return this._compositionHandle.spawnNodeBundle(bundle, parentId);
+	}
+
+	// =========================================================================
+	// Composition Interaction
+	// =========================================================================
+
+	public resize(width: number, height: number): void {
+		this.emitCoreEvents([{ type: 'CompositionResized', width, height }]);
+		this.update();
+		this._width = width;
+		this._height = height;
+	}
+
+	public updateViewBox(viewBox: ViewBox): void {
+		this.emitCoreEvents([{ type: 'CompositionViewBoxChanged', viewBox }]);
+		this.update();
+		this._viewBox = viewBox;
 	}
 
 	// =========================================================================
@@ -437,6 +456,8 @@ export class Composition {
 	public unmount(): void {
 		this.clear();
 		this._compositionHandle.free();
+		this._renderer = [];
+		this._eventQueue = [];
 	}
 
 	public toString(): string | null {
@@ -445,12 +466,11 @@ export class Composition {
 }
 
 export interface TCompositionConfig {
-	width: number;
-	height: number;
-	dtif?: DTIFComposition;
+	dtif: DTIFComposition;
 	isCallbackBased?: boolean;
 }
 
+type TWatchCompositionCallback = (change: CompositionChange) => void;
 type TWatchEntityCallback = (entity: Entity, changes: MixinChange[]) => void;
 type TOnSelectionChangeCallback = (selected: Entity[]) => void;
 type TOnInteractionModeChangeCallback = (interactionMode: InteractionModeForFrontend) => void;

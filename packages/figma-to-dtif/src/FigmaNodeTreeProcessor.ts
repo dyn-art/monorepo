@@ -1,5 +1,5 @@
 import { MD5 } from 'object-hash';
-import type { TFontMetadata } from '@dyn/dtif';
+import type { COMP } from '@dyn/dtif';
 import { ContinuousId, type TContinuousId } from '@dyn/utils';
 
 import { UnsupportedFigmaNodeException } from './exceptions';
@@ -10,6 +10,7 @@ import {
 	isFigmaFrameNode,
 	isFigmaGroupNode,
 	isFigmaInstanceNode,
+	isFigmaSceneNode,
 	isFigmaShapeNode,
 	isFigmaTextNode
 } from './utils';
@@ -47,7 +48,7 @@ export class FigmaNodeTreeProcessor {
 
 	// Recursive method to walk through each node
 	private walk(node: SceneNode, isRoot = false): TContinuousId {
-		const nodeId = isRoot ? ContinuousId.ZERO.toNumber() : ContinuousId.nextId();
+		const nodeId = ContinuousId.nextId();
 
 		if (isFigmaFrameNode(node) || isFigmaComponentNode(node) || isFigmaInstanceNode(node)) {
 			this._toTransformNodes.push({
@@ -55,7 +56,8 @@ export class FigmaNodeTreeProcessor {
 				id: nodeId,
 				node,
 				childrenIds: this.processChildren(node),
-				paintIds: this.processPaints(node)
+				paintIds: this.processPaints(node),
+				isRoot
 			});
 		} else if (isFigmaGroupNode(node)) {
 			this._toTransformNodes.push({
@@ -78,6 +80,12 @@ export class FigmaNodeTreeProcessor {
 				id: nodeId,
 				node,
 				paintIds: this.processPaints(node)
+			});
+		} else if (isFigmaSceneNode(node)) {
+			this._toTransformNodes.push({
+				type: 'Uncategorized',
+				id: nodeId,
+				node
 			});
 		} else {
 			throw new UnsupportedFigmaNodeException(node);
@@ -122,7 +130,7 @@ export class FigmaNodeTreeProcessor {
 	}
 
 	// Helper to extract font metadata from a node
-	private extractFontMetadata(segment: Omit<TTextNodeSegment, 'fontId'>): TFontMetadata {
+	private extractFontMetadata(segment: Omit<TTextNodeSegment, 'fontId'>): COMP.FontMetadata {
 		return {
 			family: segment.fontName.family,
 			name: segment.fontName.style,
@@ -154,7 +162,7 @@ export class FigmaNodeTreeProcessor {
 }
 
 interface TToTransformBaseNode {
-	type: 'Text' | 'Frame' | 'Group' | 'Shape';
+	type: 'Text' | 'Frame' | 'Group' | 'Shape' | 'Uncategorized';
 	id: TContinuousId;
 	node: SceneNode;
 }
@@ -183,6 +191,7 @@ export interface TToTransformFrameNode extends TToTransformBaseNode {
 	node: FrameNode | ComponentNode | InstanceNode;
 	childrenIds: TContinuousId[];
 	paintIds: TContinuousId[];
+	isRoot: boolean;
 }
 
 export interface TToTransformGroupNode extends TToTransformBaseNode {
@@ -197,11 +206,17 @@ export interface TToTransformShapeNode extends TToTransformBaseNode {
 	paintIds: TContinuousId[];
 }
 
+export interface TToTransformUncategorizedSceneNode extends TToTransformBaseNode {
+	type: 'Uncategorized';
+	node: SceneNode;
+}
+
 export type TToTransformNode =
 	| TToTransformTextNode
 	| TToTransformFrameNode
 	| TToTransformGroupNode
-	| TToTransformShapeNode;
+	| TToTransformShapeNode
+	| TToTransformUncategorizedSceneNode;
 
 export interface TToTransformPaint {
 	id: TContinuousId;
@@ -212,7 +227,7 @@ export interface TToTransformPaint {
 export interface TToTransformFont {
 	id: TContinuousId;
 	nodeIds: SceneNode['id'][];
-	fontMetadata: TFontMetadata;
+	fontMetadata: COMP.FontMetadata;
 }
 
 interface TToTransformHashmapItem {

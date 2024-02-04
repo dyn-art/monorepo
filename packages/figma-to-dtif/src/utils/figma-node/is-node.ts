@@ -1,58 +1,94 @@
 import type { TFigmaNodeWithChildren, TFigmaShapeNode } from '../../types';
 
-export function isFigmaFrameNode(node: any): node is FrameNode {
-	return node?.type === 'FRAME';
+// https://www.figma.com/plugin-docs/api/nodes/
+export const SCENE_NODE_TYPES: NodeType[] = [
+	'BOOLEAN_OPERATION',
+	'CODE_BLOCK',
+	'COMPONENT',
+	'COMPONENT_SET',
+	'CONNECTOR',
+	'ELLIPSE',
+	'EMBED',
+	'FRAME',
+	'GROUP',
+	'INSTANCE',
+	'LINE',
+	'LINK_UNFURL',
+	'MEDIA',
+	'POLYGON',
+	'RECTANGLE',
+	'SHAPE_WITH_TEXT',
+	'SLICE',
+	'STAMP',
+	'STAR',
+	'STICKY',
+	'TABLE',
+	'TEXT',
+	'VECTOR',
+	'WIDGET'
+];
+
+export function isFigmaSceneNode(node: unknown): node is SceneNode {
+	if (typeof node === 'object' && node !== null && 'type' in node && node.type != null) {
+		const typedNode = node as { type: NodeType };
+		return SCENE_NODE_TYPES.includes(typedNode.type);
+	}
+	return false;
 }
 
-export function isFigmaGroupNode(node: any): node is GroupNode {
-	return node?.type === 'GROUP';
+export function isFigmaFrameNode(node: unknown): node is FrameNode {
+	return isFigmaSceneNode(node) && node.type === 'FRAME';
 }
 
-export function isFigmaRectangleNode(node: any): node is RectangleNode {
-	return node?.type === 'RECTANGLE';
+export function isFigmaGroupNode(node: unknown): node is GroupNode {
+	return isFigmaSceneNode(node) && node.type === 'GROUP';
 }
 
-export function isFigmaLineNode(node: any): node is LineNode {
-	return node?.type === 'LINE';
+export function isFigmaRectangleNode(node: unknown): node is RectangleNode {
+	return isFigmaSceneNode(node) && node.type === 'RECTANGLE';
 }
 
-export function isFigmaEllipseNode(node: any): node is EllipseNode {
-	return node?.type === 'ELLIPSE';
+export function isFigmaLineNode(node: unknown): node is LineNode {
+	return isFigmaSceneNode(node) && node.type === 'LINE';
 }
 
-export function isFigmaPolygonNode(node: any): node is PolygonNode {
-	return node?.type === 'POLYGON';
+export function isFigmaEllipseNode(node: unknown): node is EllipseNode {
+	return isFigmaSceneNode(node) && node.type === 'ELLIPSE';
 }
 
-export function isFigmaStarNode(node: any): node is StarNode {
-	return node?.type === 'STAR';
+export function isFigmaPolygonNode(node: unknown): node is PolygonNode {
+	return isFigmaSceneNode(node) && node.type === 'POLYGON';
 }
 
-export function isFigmaVectorNode(node: any): node is VectorNode {
-	return node?.type === 'VECTOR';
+export function isFigmaStarNode(node: unknown): node is StarNode {
+	return isFigmaSceneNode(node) && node.type === 'STAR';
 }
 
-export function isFigmaTextNode(node: any): node is TextNode {
-	return node?.type === 'TEXT';
+export function isFigmaVectorNode(node: unknown): node is VectorNode {
+	return isFigmaSceneNode(node) && node.type === 'VECTOR';
 }
 
-export function isFigmaBooleanOperationNode(node: any): node is BooleanOperationNode {
-	return node?.type === 'BOOLEAN_OPERATION';
+export function isFigmaTextNode(node: unknown): node is TextNode {
+	return typeof node === 'object' && node != null && 'type' in node && node.type === 'TEXT';
 }
 
-export function isFigmaInstanceNode(node: any): node is InstanceNode {
-	return node?.type === 'INSTANCE';
+export function isFigmaBooleanOperationNode(node: unknown): node is BooleanOperationNode {
+	return isFigmaSceneNode(node) && node.type === 'BOOLEAN_OPERATION';
 }
 
-export function isFigmaComponentNode(node: any): node is ComponentNode {
-	return node?.type === 'COMPONENT';
+export function isFigmaInstanceNode(node: unknown): node is InstanceNode {
+	return isFigmaSceneNode(node) && node.type === 'INSTANCE';
 }
 
-export function isFigmaRemovedNode(node: any): node is RemovedNode {
-	return typeof node?.removed === 'boolean' && node.removed;
+export function isFigmaComponentNode(node: unknown): node is ComponentNode {
+	return isFigmaSceneNode(node) && node.type === 'COMPONENT';
 }
 
-export function isFigmaNodeWithChildren(node: any): node is TFigmaNodeWithChildren {
+export function isFigmaRemovedNode(node: unknown): node is RemovedNode {
+	return isFigmaSceneNode(node) && node.removed;
+}
+
+export function isFigmaNodeWithChildren(node: unknown): node is TFigmaNodeWithChildren {
 	return (
 		isFigmaFrameNode(node) ||
 		isFigmaComponentNode(node) ||
@@ -61,11 +97,12 @@ export function isFigmaNodeWithChildren(node: any): node is TFigmaNodeWithChildr
 	);
 }
 
-export function isFigmaShapeNode(node: any): node is TFigmaShapeNode {
+export function isFigmaShapeNode(node: unknown): node is TFigmaShapeNode {
 	return (
 		isFigmaRectangleNode(node) ||
 		isFigmaEllipseNode(node) ||
 		isFigmaPolygonNode(node) ||
-		isFigmaStarNode(node)
+		isFigmaStarNode(node) ||
+		isFigmaVectorNode(node)
 	);
 }

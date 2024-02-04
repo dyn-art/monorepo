@@ -1,19 +1,19 @@
-import type { TRectangleNodeBundle } from '@dyn/dtif';
+import type { COMP } from '@dyn/dtif';
 
-import { convertFigmaBlendModeToDTIF, convertFigmaTransformToMat3 } from '../../utils';
+import { mapFigmaBlendModeToDTIF, mapFigmaTransformToMat3 } from '../../utils';
 
 export function transformRectangleNode(
 	node: RectangleNode,
 	config: TTransformRectangleNodeConfig
-): { type: 'Rectangle' } & TRectangleNodeBundle {
+): { type: 'Rectangle' } & COMP.RectangleNodeBundle {
 	const { paintIds } = config;
 
 	return {
 		type: 'Rectangle',
 		node: {
-			name: node.name,
 			node_type: 'Rectangle'
 		},
+		name: node.name,
 		compositionMixin: {
 			isLocked: node.locked,
 			isVisible: node.visible
@@ -22,7 +22,7 @@ export function transformRectangleNode(
 			height: node.height,
 			width: node.width
 		},
-		relativeTransform: convertFigmaTransformToMat3(node.relativeTransform),
+		relativeTransform: mapFigmaTransformToMat3(node.relativeTransform),
 		rectangleCornerMixin: {
 			bottomLeftRadius: node.bottomLeftRadius,
 			bottomRightRadius: node.bottomRightRadius,
@@ -30,7 +30,7 @@ export function transformRectangleNode(
 			topRightRadius: node.topRightRadius
 		},
 		blendMixin: {
-			blendMode: convertFigmaBlendModeToDTIF(node.blendMode),
+			blendMode: mapFigmaBlendModeToDTIF(node.blendMode),
 			opacity: node.opacity,
 			isMask: node.isMask
 		},

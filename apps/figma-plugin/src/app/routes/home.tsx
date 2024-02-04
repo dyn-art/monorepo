@@ -49,7 +49,7 @@ const Home: React.FC = () => {
 						</SelectContent>
 					</Select>
 				}
-				rightContent={{ variant: 'user' }}
+				// rightContent={{ variant: 'user' }}
 			/>
 
 			<div className="flex h-full w-full flex-col overflow-hidden">

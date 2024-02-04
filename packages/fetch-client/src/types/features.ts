@@ -3,7 +3,6 @@ import type { TUnionToIntersection } from '@dyn/types/utility';
 import type { TApiFeature } from './api-client';
 import type { TOpenApiFeature } from './openapi-client';
 
-// TODO: Figure out how to apply GPaths to openapi without having to define it at TFeatures and the other helpers
 export type TFeatures<GPaths extends {} = {}> = {
 	base: { _: null }; // TODO: Placeholder Feature: Figure out how to make the TS infer work with [] (empty array -> no feature)
 	api: TApiFeature;

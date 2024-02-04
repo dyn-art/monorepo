@@ -1,13 +1,13 @@
-import { SVGRenderer, type TSVGRendererOptions } from '../render';
+import { SVGRender, type TSVGRendererOptions } from '../render';
 import { Composition, type TCompositionConfig } from './Composition';
 
-export function createSVGComposition(config: TSVGCompositionConfig) {
-	const { renderer: rendererOptions = {}, ...compositionConfig } = config;
+export function createSVGComposition(config: TSVGCompositionConfig): Composition {
+	const { render: renderOptions = {}, ...compositionConfig } = config;
 	const composition = new Composition(compositionConfig);
-	composition.registerRenderer(new SVGRenderer(composition, rendererOptions));
+	composition.registerRenderer(new SVGRender(composition, renderOptions));
 	return composition;
 }
 
 type TSVGCompositionConfig = {
-	renderer?: TSVGRendererOptions;
+	render?: TSVGRendererOptions;
 } & Omit<TCompositionConfig, 'renderer'>;

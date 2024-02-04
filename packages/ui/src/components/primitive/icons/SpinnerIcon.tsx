@@ -5,6 +5,7 @@ import type { TIconProps } from './types';
 export const SpinnerIcon = React.forwardRef<SVGSVGElement, TIconProps>((props, ref) => {
 	return (
 		<svg
+			fill="none"
 			ref={ref}
 			stroke="currentColor"
 			strokeLinecap="round"
