@@ -48,48 +48,15 @@ pub fn handle_rotating(
             // Determine rotation offset based on corner
             let rotation_offset_in_radians: f32 = match corner {
                 _ if corner == (HandleSide::Top as u8 | HandleSide::Left as u8) => {
-                    // Top-Left corner
-                    // let absolute_corner = apply_transform_to_point(
-                    //     absolute_transform_mixin.0,
-                    //     Vec2::new(0.0, 0.0),
-                    // );
-
                     (-135.0 as f32).to_radians()
-                    // + calculate_rotation_correction(
-                    //     dimension_mixin.width as f32,
-                    //     dimension_mixin.height as f32,
-                    //     absolute_pivot_point,
-                    //     absolute_corner,
-                    // )
                 }
                 _ if corner == (HandleSide::Top as u8 | HandleSide::Right as u8) => {
-                    // Top-Right corner
-                    // let absolute_corner = apply_transform_to_point(
-                    //     absolute_transform_mixin.0,
-                    //     Vec2::new(dimension_mixin.width as f32, 0.0),
-                    // );
-
                     (-45.0 as f32).to_radians()
                 }
                 _ if corner == (HandleSide::Bottom as u8 | HandleSide::Right as u8) => {
-                    // Bottom-Right corner
-                    // let absolute_corner = apply_transform_to_point(
-                    //     absolute_transform_mixin.0,
-                    //     Vec2::new(
-                    //         dimension_mixin.width as f32,
-                    //         dimension_mixin.height as f32,
-                    //     ),
-                    // );
-
                     (45.0 as f32).to_radians()
                 }
                 _ if corner == (HandleSide::Bottom as u8 | HandleSide::Left as u8) => {
-                    // Bottom-Left corner
-                    // let absolute_corner = apply_transform_to_point(
-                    //     absolute_transform_mixin.0,
-                    //     Vec2::new(0.0, dimension_mixin.height as f32),
-                    // );
-
                     (135.0 as f32).to_radians()
                 }
                 _ => 0.0,
@@ -109,42 +76,6 @@ pub fn handle_rotating(
         },
     );
 }
-
-// TODO Calculate offset for proper rotation if the node is not perfect square
-// fn calculate_rotation_correction(width: f32, height: f32, center: Vec2, p2: Vec2) -> f32 {
-//     let radius = width.max(height) / 2.0;
-//     let angle_for_square = std::f32::consts::PI / 4.0; // 45 degrees
-
-//     // Calculate P1's coordinates
-//     let p1 = Vec2 {
-//         x: center.x - radius * angle_for_square.cos(),
-//         y: center.y - radius * angle_for_square.sin(),
-//     };
-
-//     // Calculate vectors MP1 and MP2
-//     let mp1 = Vec2 {
-//         x: p1.x - center.x,
-//         y: p1.y - center.y,
-//     };
-//     let mp2 = Vec2 {
-//         x: p2.x - center.x,
-//         y: p2.y - center.y,
-//     };
-
-//     // Calculate the angle between MP1 and MP2
-//     let dot_product = mp1.x * mp2.x + mp1.y * mp2.y;
-//     let magnitudes =
-//         (mp1.x.powi(2) + mp1.y.powi(2)).sqrt() * (mp2.x.powi(2) + mp2.y.powi(2)).sqrt();
-
-//     let angle = (dot_product / magnitudes).acos();
-
-//     info!(
-//         "calculate_rotation_correction: \n width: {} \n height: {} \n center: {:?} \n p2: {:?} \n p1: {:?} \n angle: {}",
-//         width, height, center, p2, p1, angle
-//     );
-
-//     return angle;
-// }
 
 fn calculate_rotation(
     initial_angle_in_radians: f32,

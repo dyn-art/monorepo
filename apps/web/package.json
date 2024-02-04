@@ -6,6 +6,7 @@
 	"scripts": {
 		"start:dev": "next dev",
 		"build": "next build",
+		"build:vercel": "cd ../.. && pnpm run prebuild:vercel && turbo run build --filter=web",
 		"start": "next start",
 		"lint": "next lint"
 	},
