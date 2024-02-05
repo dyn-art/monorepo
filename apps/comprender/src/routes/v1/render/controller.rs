@@ -27,6 +27,19 @@ pub struct QueryParams {
     format: String,
 }
 
+pub async fn simplify_svg(body: String) -> Result<Response, AppError> {
+    let opts = Options::default();
+    let rtree = usvg::Tree::from_str(&body, &opts).unwrap();
+
+    Ok(Response::builder()
+        .status(StatusCode::OK)
+        .header(header::CONTENT_TYPE, "image/svg+xml")
+        .body(Body::from(
+            rtree.to_string(&XmlOptions::default()).into_bytes(),
+        ))
+        .unwrap())
+}
+
 #[utoipa::path(
     post,
     path = "/v1/render",

@@ -6,6 +6,7 @@ use bevy_ecs::{
 
 use crate::modules::node::components::mixins::{Anchor, PathMixin};
 
+// https://github.com/glenzli/paperjs-offset
 // https://stackoverflow.com/questions/13416693/svg-generate-outline-path/13445211#13445211
 // https://stackoverflow.com/questions/13643864/how-to-get-the-outline-of-a-stroke
 // https://github.com/fracalo/svg-contour/tree/master

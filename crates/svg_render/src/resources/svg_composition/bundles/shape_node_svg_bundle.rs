@@ -14,7 +14,9 @@ use crate::{
             svg_bundle::SVGBundle,
             svg_context::SVGContext,
             svg_element::{
-                attributes::{SVGAttribute, SVGDAttribute, SVGMeasurementUnit},
+                attributes::{
+                    SVGAttribute, SVGDAttribute, SVGMeasurementUnit, SVGPointerEventsVariants,
+                },
                 mapper::{
                     map_anchors_to_svg_path_string, map_blend_mode, map_mat3_to_svg_transform,
                 },
@@ -251,6 +253,9 @@ impl ShapeNodeSVGBundle {
         click_area_rect_element.set_attribute(SVGAttribute::Fill {
             fill: String::from("transparent"),
         });
+        click_area_rect_element.set_attribute(SVGAttribute::PointerEvents {
+            pointer_events: SVGPointerEventsVariants::All,
+        });
         root_element.append_child_in_bundle_context(entity, &mut click_area_rect_element);
 
         // Create fill elements
@@ -286,6 +291,9 @@ impl ShapeNodeSVGBundle {
                 String::from("fill-wrapper-g"),
                 false,
             ),
+        });
+        fill_clip_path_element.set_attribute(SVGAttribute::PointerEvents {
+            pointer_events: SVGPointerEventsVariants::None,
         });
         fill_wrapper_g_element.set_attribute(SVGAttribute::ClipPath {
             clip_path: fill_clip_path_element.get_id(),

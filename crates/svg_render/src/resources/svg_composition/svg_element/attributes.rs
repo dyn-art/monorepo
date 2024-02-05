@@ -79,6 +79,10 @@ pub enum SVGAttribute {
     StopColor {
         stop_color: String,
     },
+    #[serde(rename_all = "camelCase")]
+    PointerEvents {
+        pointer_events: SVGPointerEventsVariants,
+    },
 }
 
 impl SVGAttribute {
@@ -104,6 +108,7 @@ impl SVGAttribute {
             Self::Y2 { .. } => "y2",
             Self::Offset { .. } => "offset",
             Self::StopColor { .. } => "stop-color",
+            Self::PointerEvents { .. } => "pointer-events",
         }
     }
 
@@ -161,6 +166,10 @@ impl SVGAttribute {
             Self::Y2 { y2 } => y2.to_string(),
             Self::Offset { offset } => offset.to_string(),
             Self::StopColor { stop_color } => stop_color.clone(),
+            Self::PointerEvents { pointer_events } => match pointer_events {
+                SVGPointerEventsVariants::All => "all".to_string(),
+                SVGPointerEventsVariants::None => "none".to_string(),
+            },
         }
     }
 }
@@ -249,4 +258,11 @@ pub enum SVGHrefVariant {
     Url {
         url: String,
     },
+}
+
+#[derive(Debug, Serialize, Clone, Type)]
+#[serde(tag = "type")]
+pub enum SVGPointerEventsVariants {
+    None,
+    All,
 }
