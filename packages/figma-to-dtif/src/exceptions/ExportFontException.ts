@@ -9,9 +9,9 @@ export class ExportFontException extends NodeException {
 	constructor(fontMetadata: COMP.FontMetadata, nodeIds: SceneNode['id'][], throwable?: unknown) {
 		const errorData = throwable != null ? extractErrorData(throwable) : null;
 		super(
-			`Failed to export font  '${fontMetadata.family} ${fontMetadata.name} (${
-				fontMetadata.style
-			})'${errorData != null ? ` by error: ${errorData.message}` : '!'}`,
+			`Failed to export font  '${fontMetadata.family}  (${fontMetadata.style})'${
+				errorData != null ? ` by error: ${errorData.message}` : '!'
+			}`,
 			nodeIds
 		);
 		this.throwable = errorData?.error ?? undefined;
