@@ -6,10 +6,10 @@ use unicode_script::UnicodeScript;
 
 use self::usvg::{
     geom::IsValidLength,
-    text::Font,
+    text::{Font, LengthAdjust, TextFlow},
     text_to_paths::{
-        outline_cluster, resolve_font, shape_text, DatabaseExt, FontsCache, Glyph, OutlinedCluster,
-        ResolvedFont,
+        outline_cluster, resolve_font, script_supports_letter_spacing, shape_text, DatabaseExt,
+        FontsCache, Glyph, OutlinedCluster, ResolvedFont,
     },
 };
 
@@ -86,7 +86,7 @@ impl FontContext {
             // We are checking only the first code point, since it should be enough.
             // https://www.w3.org/TR/css-text-3/#cursive-tracking
             let script = cluster.codepoint.script();
-            if Self::script_supports_letter_spacing(script) {
+            if script_supports_letter_spacing(script) {
                 // A space after the last cluster should be ignored,
                 // since it affects the bbox and text alignment.
                 if i != num_clusters - 1 {
@@ -120,33 +120,65 @@ impl FontContext {
         }
     }
 
-    /// Checks that selected script supports letter spacing.
-    ///
-    /// [In the CSS spec](https://www.w3.org/TR/css-text-3/#cursive-tracking).
-    ///
-    /// The list itself is from: https://github.com/harfbuzz/harfbuzz/issues/64
-    fn script_supports_letter_spacing(script: unicode_script::Script) -> bool {
-        use unicode_script::Script;
+    pub fn apply_length_adjust(
+        clusters: &mut [OutlinedCluster],
+        length_adjust: LengthAdjust,
+        text_length: Option<f32>,
+        text_flow: TextFlow,
+    ) {
+        let is_horizontal = matches!(text_flow, TextFlow::Linear);
 
-        !matches!(
-            script,
-            Script::Arabic
-                | Script::Syriac
-                | Script::Nko
-                | Script::Manichaean
-                | Script::Psalter_Pahlavi
-                | Script::Mandaic
-                | Script::Mongolian
-                | Script::Phags_Pa
-                | Script::Devanagari
-                | Script::Bengali
-                | Script::Gurmukhi
-                | Script::Modi
-                | Script::Sharada
-                | Script::Syloti_Nagri
-                | Script::Tirhuta
-                | Script::Ogham
-        )
+        let target_width = match text_length {
+            Some(v) => v,
+            None => return,
+        };
+
+        let mut width = 0.0;
+        let mut cluster_indexes = Vec::new();
+        for (index, _) in clusters.iter().enumerate() {
+            cluster_indexes.push(index);
+        }
+        // Complex scripts can have mutli-codepoint clusters therefore we have to remove duplicates.
+        cluster_indexes.sort();
+        cluster_indexes.dedup();
+
+        for i in &cluster_indexes {
+            // Use the original cluster `width` and not `advance`.
+            // This method essentially discards any `word-spacing` and `letter-spacing`.
+            width += clusters[*i].width;
+        }
+
+        if cluster_indexes.is_empty() {
+            return;
+        }
+
+        if length_adjust == LengthAdjust::Spacing {
+            let factor = if cluster_indexes.len() > 1 {
+                (target_width - width) / (cluster_indexes.len() - 1) as f32
+            } else {
+                0.0
+            };
+
+            for i in cluster_indexes {
+                clusters[i].advance = clusters[i].width + factor;
+            }
+        } else {
+            let factor = target_width / width;
+            // Prevent multiplying by zero.
+            if factor < 0.001 {
+                return;
+            }
+
+            for i in cluster_indexes {
+                clusters[i].transform = clusters[i].transform.pre_scale(factor, 1.0);
+
+                // Technically just a hack to support the current text-on-path algorithm.
+                if !is_horizontal {
+                    clusters[i].advance *= factor;
+                    clusters[i].width *= factor;
+                }
+            }
+        }
     }
 
     /// Checks that the selected character is a word separator.

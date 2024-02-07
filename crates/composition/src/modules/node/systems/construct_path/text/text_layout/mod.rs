@@ -5,7 +5,10 @@ use crate::modules::{
     composition::resources::font::{
         usvg::{
             geom::BBox,
-            text::{Font, FontFamily, FontStretch, FontStyle, TextAnchor, TextFlow},
+            text::{
+                AlignmentBaseline, BaselineShift, DominantBaseline, Font, FontFamily, FontStretch,
+                FontStyle, LengthAdjust, TextAnchor, TextFlow,
+            },
             text_to_paths::{GlyphClusters, OutlinedCluster},
         },
         FontContext,
@@ -111,6 +114,10 @@ impl TokenChunk {
                 small_caps: false,
                 text_length: None,
                 word_spacing: 0.0,
+                alignment_baseline: AlignmentBaseline::default(),
+                baseline_shift: Vec::new(),
+                dominant_baseline: DominantBaseline::default(),
+                length_adjust: LengthAdjust::default(),
             });
         }
 
@@ -119,8 +126,6 @@ impl TokenChunk {
 
     pub fn to_paths(&mut self, cx: &mut FontContext) -> Vec<Path> {
         let mut bbox = BBox::default();
-        let mut stroke_bbox = BBox::default();
-        let mut char_offset = 0;
         let mut last_x = 0.0;
         let mut last_y = 0.0;
         // let mut new_paths = Vec::new();
@@ -130,7 +135,6 @@ impl TokenChunk {
             TextFlow::Path(_) => (0.0, 0.0),
         };
 
-        log::info!("[to_paths] Before outline: {:#?}", self.spans);
         self.outline(cx);
         log::info!("[to_paths] After outline: {:#?}", self.spans);
 
@@ -139,6 +143,11 @@ impl TokenChunk {
             for token in &mut span.tokens {
                 token.apply_letter_spacing(span.letter_spacing);
                 token.apply_word_spacing(span.word_spacing);
+                token.apply_length_adjust(
+                    span.length_adjust,
+                    span.text_length,
+                    self.text_flow.clone(),
+                );
             }
 
             let mut span_ts = text_ts;
@@ -199,12 +208,22 @@ pub struct TokenSpan {
     ///
     /// Supports both `kerning` and `font-kerning` properties.
     pub apply_kerning: bool,
+    /// A span dominant baseline.
+    pub dominant_baseline: DominantBaseline,
+    /// A span alignment baseline.
+    pub alignment_baseline: AlignmentBaseline,
+    /// A list of all baseline shift that should be applied to this span.
+    ///
+    /// Ordered from `text` element down to the actual `span` element.
+    pub baseline_shift: Vec<BaselineShift>,
     /// A letter spacing property.
     pub letter_spacing: f32,
     /// A word spacing property.
     pub word_spacing: f32,
     /// A text length property.
     pub text_length: Option<f32>,
+    /// A length adjust property.
+    pub length_adjust: LengthAdjust,
 }
 
 #[derive(Default, Debug, Clone)]
@@ -234,6 +253,17 @@ impl Token {
             if let Some(clusters) = &mut self.clusters {
                 FontContext::apply_word_spacing(clusters, word_spacing);
             }
+        }
+    }
+
+    pub fn apply_length_adjust(
+        &mut self,
+        length_adjust: LengthAdjust,
+        text_length: Option<f32>,
+        text_flow: TextFlow,
+    ) {
+        if let Some(clusters) = &mut self.clusters {
+            FontContext::apply_length_adjust(clusters, length_adjust, text_length, text_flow);
         }
     }
 }
