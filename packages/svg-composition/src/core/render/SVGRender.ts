@@ -397,6 +397,8 @@ export class SVGRender extends Render {
 				return ['offset', `${attribute.offset}`];
 			case 'StopColor':
 				return ['stop-color', attribute.stopColor];
+			case 'PointerEvents':
+				return ['pointer-events', attribute.pointerEvents.type === 'None' ? 'none' : 'all'];
 		}
 	}
 

@@ -192,7 +192,7 @@ paints: { [key in string]: PaintBundle };
  * Note: Planned to directly use `u64` as a key once the referenced serde issue is resolved.
  * https://github.com/serde-rs/serde/issues/1183
  */
-fonts?: { [key in string]: Font } | null; 
+fonts?: FontContent[]; 
 /**
  * Optional list of changes represented as core input events.
  * This field is optional and defaults to `None` if not provided.
@@ -299,19 +299,6 @@ export type FillMixin = {
 paintIds?: Entity[] }
 
 /**
- * Extends the `FontMetadata` structure with additional content for rendering.
- */
-export type Font = { 
-/**
- * The base font information.
- */
-metadata: FontMetadata; 
-/**
- * The actual content of the font.
- */
-content: FontContent }
-
-/**
  * Defines the content of a font.
  */
 export type FontContent = 
@@ -326,15 +313,7 @@ export type FontContent =
  */
 { type: "Url"; url: string }
 
-/**
- * Represents a font with specific characteristics.
- * Used for text rendering and styling.
- */
 export type FontMetadata = { 
-/**
- * The name of the font, often used for display purposes.
- */
-name: string; 
 /**
  * The font family to which this font belongs.
  */
@@ -349,17 +328,21 @@ style: FontStyle;
 weight: number }
 
 /**
- * Defines the style of a font, such as italic or normal.
+ * A font style property.
  */
 export type FontStyle = 
 /**
- * The standard, upright style of the font.
+ * A face that is neither italic not obliqued.
  */
 "Normal" | 
 /**
- * A style where the letters slant to the right.
+ * A form that is generally cursive in nature.
  */
-"Italic"
+"Italic" | 
+/**
+ * A typically-sloped version of the regular face.
+ */
+"Oblique"
 
 /**
  * Acts as a container used to define a layout hierarchy.
@@ -520,7 +503,7 @@ export type InteractionModeChangeEvent = { interactionMode: InteractionModeForFr
 export type InteractionModeForFrontend = { type: "None" } | { type: "Pressing" } | { type: "Translating" } | { type: "Resizing" } | { type: "Rotating" } | { type: "Dragging" }
 
 /**
- * Options for spacing between characters in a text segment.
+ * Options for spacing between characters in a text span.
  */
 export type LetterSpacing = 
 /**
@@ -734,7 +717,7 @@ export type RelativeTransformMixin = Mat3
  */
 export type Root = null
 
-export type SVGAttribute = { type: "Id"; id: ContinuousId } | { type: "Width"; width: number; unit: SVGMeasurementUnit } | { type: "Height"; height: number; unit: SVGMeasurementUnit } | { type: "Opacity"; opacity: number } | { type: "Transform"; transform: SVGTransformAttribute } | { type: "PatternTransform"; transform: SVGTransformAttribute } | { type: "D"; d: SVGDAttribute } | { type: "ClipPath"; clipPath: ContinuousId } | { type: "Fill"; fill: string } | { type: "ReferencedFill"; id: ContinuousId } | { type: "Name"; name: string } | { type: "PatternUnits"; patternUnits: SVGUnitsVariant } | { type: "GradientUnits"; gradientUnits: SVGUnitsVariant } | { type: "Href"; href: SVGHrefVariant } | { type: "PreserveAspectRatio"; preserveAspectRatio: string } | { type: "X1"; x1: number } | { type: "Y1"; y1: number } | { type: "X2"; x2: number } | { type: "Y2"; y2: number } | { type: "Offset"; offset: number } | { type: "StopColor"; stopColor: string }
+export type SVGAttribute = { type: "Id"; id: ContinuousId } | { type: "Width"; width: number; unit: SVGMeasurementUnit } | { type: "Height"; height: number; unit: SVGMeasurementUnit } | { type: "Opacity"; opacity: number } | { type: "Transform"; transform: SVGTransformAttribute } | { type: "PatternTransform"; transform: SVGTransformAttribute } | { type: "D"; d: SVGDAttribute } | { type: "ClipPath"; clipPath: ContinuousId } | { type: "Fill"; fill: string } | { type: "ReferencedFill"; id: ContinuousId } | { type: "Name"; name: string } | { type: "PatternUnits"; patternUnits: SVGUnitsVariant } | { type: "GradientUnits"; gradientUnits: SVGUnitsVariant } | { type: "Href"; href: SVGHrefVariant } | { type: "PreserveAspectRatio"; preserveAspectRatio: string } | { type: "X1"; x1: number } | { type: "Y1"; y1: number } | { type: "X2"; x2: number } | { type: "Y2"; y2: number } | { type: "Offset"; offset: number } | { type: "StopColor"; stopColor: string } | { type: "PointerEvents"; pointerEvents: SVGPointerEventsVariants }
 
 export type SVGBlendMode = { type: "Normal" } | { type: "Multiply" } | { type: "Screen" } | { type: "Overlay" } | { type: "Darken" } | { type: "Lighten" } | { type: "ColorDodge" } | { type: "ColorBurn" } | { type: "HardLight" } | { type: "SoftLight" } | { type: "Difference" } | { type: "Exclusion" } | { type: "Hue" } | { type: "Saturation" } | { type: "Color" } | { type: "Luminosity" }
 
@@ -755,6 +738,8 @@ export type SVGImagePaintScaleMode = "Fill" | "Fit" | { Crop: { transform: Mat3;
 export type SVGMeasurementUnit = { type: "Pixel" } | { type: "Percent" }
 
 export type SVGPathCommand = { type: "MoveTo"; x: number; y: number } | { type: "LineTo"; x: number; y: number } | { type: "CurveTo"; cx1: number; cy1: number; cx2: number; cy2: number; x: number; y: number } | { type: "ArcTo"; rx: number; ry: number; xAxisRotation: number; largeArcFlag: boolean; sweepFlag: boolean; x: number; y: number } | { type: "ClosePath" }
+
+export type SVGPointerEventsVariants = { type: "None" } | { type: "All" }
 
 export type SVGRenderOutputEvent = ({ type: "ElementChange" } & ElementChangeEvent)
 
@@ -833,7 +818,7 @@ export type TextNode = { _text_node?: null | null;
 /**
  * Sections of the text, each with its own style.
  */
-segments: TextSegment[]; 
+spans: TextSpan[]; 
 /**
  * Horizontal alignment of the text within its container.
  */
@@ -851,7 +836,7 @@ export type TextNodeBundle = ({ _text_node?: null | null;
 /**
  * Sections of the text, each with its own style.
  */
-segments: TextSegment[]; 
+spans: TextSpan[]; 
 /**
  * Horizontal alignment of the text within its container.
  */
@@ -873,30 +858,30 @@ linebreakBehavior?: BreakLineOn }) & ({
 name?: string | null }) & { node?: Node; compositionMixin?: NodeCompositionMixin; relativeTransform: RelativeTransformMixin; dimension: DimensionMixin; blendMixin?: BlendMixin; fill?: FillMixin }
 
 /**
- * A segment of text with a specific style.
+ * A span of text with a specific style.
  */
-export type TextSegment = { 
+export type TextSpan = { 
 /**
- * Text content of the segment.
+ * Text content of the span.
  */
-value: string; 
+text: string; 
 /**
- * Style properties applied to this segment.
+ * Font metadata to identify font
+ */
+font: FontMetadata; 
+/**
+ * Style properties applied to this span.
  */
 style: TextStyle }
 
 /**
- * Style properties for a text segment, defining its appearance.
+ * Style properties for a text span, defining its appearance.
  */
 export type TextStyle = { 
 /**
  * Height of rasterized glyphs in pixels, influenced by window scale.
  */
 fontSize: number; 
-/**
- * Primary font identifier.
- */
-fontId: number; 
 /**
  * Spacing between characters.
  */

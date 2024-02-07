@@ -1,7 +1,7 @@
 use bevy_app::{Plugin, PreUpdate};
 use bevy_ecs::world::World;
 
-use crate::dtif::{dtif_processor::DTIFProcessor, DTIFComposition};
+use crate::dtif::{dtif_processor::DTIFProcessor, DTIFComposition, FontContent};
 
 use self::{
     events::{
@@ -10,7 +10,7 @@ use self::{
     },
     resources::{
         composition::{CompositionRes, ViewBox},
-        font_cache::{font::FontContent, FontCacheRes},
+        font::FontRes,
     },
     systems::{
         composition::{handle_composition_resized, handle_composition_view_box_changed},
@@ -39,7 +39,7 @@ impl Plugin for CompositionPlugin {
         app.add_event::<EntityDeleted>();
 
         // Register resources
-        app.world.init_resource::<FontCacheRes>();
+        app.world.insert_non_send_resource(FontRes::default());
 
         // Register systems
         app.add_systems(
@@ -68,24 +68,22 @@ fn insert_dtif_into_world(world: &mut World, dtif: &DTIFComposition) {
     let root_node_eid = DTIFProcessor::entity_to_eid(&dtif.root_node_id);
     let mut dtif_processor = DTIFProcessor::new();
 
-    // Load fonts into cache
-    if let Some(fonts) = &dtif.fonts {
-        for (id, font) in fonts.clone().into_iter() {
-            if let Some(mut font_cache) = world.get_resource_mut::<FontCacheRes>() {
-                match font.content {
-                    FontContent::Binary { content } => {
-                        font_cache.insert(id.parse().unwrap(), font.metadata, content);
-                    }
-                    FontContent::Url { url } => {
-                        // TODO: Add URL resolve functionality once Bevy supports async plugin creation,
-                        // or somehow allow blocking in a Tokio environment work ("Cannot drop a runtime in a context where blocking is not allowed...")
-                        // https://github.com/bevyengine/bevy/discussions/3239
-                        #[cfg(feature = "resolve-url")]
-                        log::error!("URL resolve feature not implemented yet!");
+    // Load fonts into database
+    for content in &dtif.fonts {
+        if let Some(mut font_res) = world.get_non_send_resource_mut::<FontRes>() {
+            match content {
+                FontContent::Binary { content } => {
+                    font_res.context.add_font_source(content.clone());
+                }
+                FontContent::Url { url } => {
+                    // TODO: Add URL resolve functionality once Bevy supports async plugin creation,
+                    // or somehow allow blocking in a Tokio environment work ("Cannot drop a runtime in a context where blocking is not allowed...")
+                    // https://github.com/bevyengine/bevy/discussions/3239
+                    #[cfg(feature = "resolve-url")]
+                    log::error!("URL resolve feature not implemented yet!");
 
-                        #[cfg(not(feature = "resolve-url"))]
-                        log::warn!("URL font loading not supported in this build. Use 'resolve-url' feature to activate this functionality.");
-                    }
+                    #[cfg(not(feature = "resolve-url"))]
+                    log::warn!("URL font loading not supported in this build. Use 'resolve-url' feature to activate this functionality.");
                 }
             }
         }

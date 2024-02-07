@@ -40,7 +40,7 @@ export class Transformer {
 	private _fontsFailedToTransform: TToTransformFont[] = [];
 
 	// DTIF Fonts
-	public readonly fonts = new Map<number, COMP.Font>();
+	public readonly fonts: COMP.FontContent[] = [];
 
 	// Callbacks
 	private _onTransformStatusUpdate: TOnTransformStatusUpdate | null = null;
@@ -110,7 +110,7 @@ export class Transformer {
 			height: this._toTransformRootNode.height,
 			nodes: Object.fromEntries(this.nodes),
 			paints: Object.fromEntries(this.paints),
-			fonts: Object.fromEntries(this.fonts),
+			fonts: this.fonts,
 			rootNodeId: this._rootNodeId,
 			viewBox: {
 				minX: 0,
@@ -186,17 +186,13 @@ export class Transformer {
 		// Transform fonts
 		for (const toTransformFont of toTransformFonts) {
 			try {
-				const font = await transformFont(toTransformFont, config);
-				this.insertFont(toTransformFont.id, font);
+				const fontContent = await transformFont(toTransformFont, config);
+				this.fonts.push(fontContent);
 			} catch (error) {
 				// TODO: Error
 				this._fontsFailedToTransform.push(toTransformFont);
 			}
 		}
-	}
-
-	public insertFont(id: number, font: COMP.Font): void {
-		this.fonts.set(id, font);
 	}
 
 	private createExportContainerNode(name: string): FrameNode {

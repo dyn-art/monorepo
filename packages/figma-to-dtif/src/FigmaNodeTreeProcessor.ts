@@ -120,20 +120,23 @@ export class FigmaNodeTreeProcessor {
 			'letterSpacing',
 			'lineHeight'
 		]);
-		return segments.map((segment) => ({
-			...segment,
-			fontId: this.getOrGenerateId(this._toTransformFontsHashmap, this._toTransformFonts, {
-				nodeIds: [node.id],
-				fontMetadata: this.extractFontMetadata(segment)
-			})
-		}));
+		return segments.map((segment) => {
+			const fontMetadata = this.extractFontMetadata(segment);
+			return {
+				...segment,
+				fontMetadata,
+				fontId: this.getOrGenerateId(this._toTransformFontsHashmap, this._toTransformFonts, {
+					nodeIds: [node.id],
+					fontMetadata
+				})
+			};
+		});
 	}
 
 	// Helper to extract font metadata from a node
-	private extractFontMetadata(segment: Omit<TTextNodeSegment, 'fontId'>): COMP.FontMetadata {
+	private extractFontMetadata(segment: Omit<TTextNodeSegment, 'fontMetadata'>): COMP.FontMetadata {
 		return {
 			family: segment.fontName.family,
-			name: segment.fontName.style,
 			weight: segment.fontWeight,
 			style: segment.fontName.style.toLowerCase().includes('italic') ? 'Italic' : 'Normal'
 		};
@@ -184,7 +187,7 @@ export type TTextNodeSegment = Pick<
 	| 'characters'
 	| 'start'
 	| 'end'
-> & { fontId: number };
+> & { fontMetadata: COMP.FontMetadata };
 
 export interface TToTransformFrameNode extends TToTransformBaseNode {
 	type: 'Frame';

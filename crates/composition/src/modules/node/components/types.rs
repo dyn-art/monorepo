@@ -208,7 +208,7 @@ pub struct TextNode {
     _text_node: Option<()>,
 
     /// Sections of the text, each with its own style.
-    pub segments: Vec<TextSegment>,
+    pub spans: Vec<TextSpan>,
 
     /// Horizontal alignment of the text within its container.
     #[serde(default, rename = "horizontalTextAlignment")]
@@ -223,24 +223,45 @@ pub struct TextNode {
     pub linebreak_behavior: BreakLineOn,
 }
 
-/// A segment of text with a specific style.
+/// A span of text with a specific style.
 #[derive(Serialize, Deserialize, Clone, Debug, Type)]
-pub struct TextSegment {
-    /// Text content of the segment.
-    pub value: String,
-    /// Style properties applied to this segment.
+pub struct TextSpan {
+    /// Text content of the span.
+    pub text: String,
+    /// Font metadata to identify font
+    pub font: FontMetadata,
+    /// Style properties applied to this span.
     pub style: TextStyle,
 }
 
-/// Style properties for a text segment, defining its appearance.
-#[derive(Serialize, Deserialize, Clone, Copy, Debug, Type)]
+#[derive(Serialize, Deserialize, Clone, Debug, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct FontMetadata {
+    /// The font family to which this font belongs.
+    pub family: String,
+    /// The style of the font, such as italic or normal.
+    pub style: FontStyle,
+    /// The weight of the font, typically ranging from 100 (thin) to 900 (black).
+    pub weight: u16,
+}
+
+/// A font style property.
+#[derive(Serialize, Deserialize, Clone, Debug, Type)]
+pub enum FontStyle {
+    /// A face that is neither italic not obliqued.
+    Normal,
+    /// A form that is generally cursive in nature.
+    Italic,
+    /// A typically-sloped version of the regular face.
+    Oblique,
+}
+
+/// Style properties for a text span, defining its appearance.
+#[derive(Serialize, Deserialize, Clone, Debug, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct TextStyle {
     /// Height of rasterized glyphs in pixels, influenced by window scale.
     pub font_size: f32,
-
-    /// Primary font identifier.
-    pub font_id: u64,
 
     /// Spacing between characters.
     #[serde(default)]
@@ -277,7 +298,7 @@ pub enum VerticalTextAlignment {
     Bottom,
 }
 
-/// Options for spacing between characters in a text segment.
+/// Options for spacing between characters in a text span.
 #[derive(Serialize, Deserialize, Clone, Copy, Default, Debug, Type)]
 pub enum LetterSpacing {
     /// Automatic spacing based on font metrics.

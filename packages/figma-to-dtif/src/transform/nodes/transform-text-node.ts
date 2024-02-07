@@ -21,12 +21,12 @@ export function transformTextNode(
 			node_type: 'Text'
 		},
 		name: node.name,
-		segments: segments.map(
+		spans: segments.map(
 			(segment) =>
 				({
-					value: segment.characters,
+					text: segment.characters,
+					font: segment.fontMetadata,
 					style: {
-						fontId: segment.fontId,
 						fontSize: segment.fontSize,
 						letterSpacing:
 							segment.letterSpacing.unit === 'PIXELS'
@@ -40,7 +40,7 @@ export function transformTextNode(
 								? { Percent: segment.lineHeight.value }
 								: 'Auto'
 					}
-				}) as COMP.TextSegment
+				}) as COMP.TextSpan
 		),
 		horizontalTextAlignment: mapFigmaHorizontalTextAlignmentToDTIF(node.textAlignHorizontal),
 		verticalTextAlignment: mapFigmaVerticalTextAlignmentToDTIF(node.textAlignVertical),

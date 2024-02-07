@@ -9,7 +9,7 @@ export async function rustify(dtif: COMP.DTIFComposition): Promise<COMP.DTIFComp
 		rootNodeId: dtif.rootNodeId,
 		nodes: dtif.nodes,
 		paints: await resolvePaints(dtif.paints),
-		fonts: dtif.fonts != null ? await resolveFonts(dtif.fonts) : null,
+		fonts: dtif.fonts != null ? await resolveFonts(dtif.fonts) : [],
 		changes: dtif.changes,
 		viewBox: {
 			width: dtif.width,
@@ -41,12 +41,13 @@ async function resolvePaints(
 	return paints;
 }
 
-async function resolveFonts(fonts: Record<string, COMP.Font>): Promise<Record<string, COMP.Font>> {
+async function resolveFonts(fonts: COMP.FontContent[]): Promise<COMP.FontContent[]> {
 	// Check if content is a string (URL), then load the font, else use the existing number array
-	for (const font of Object.values(fonts)) {
-		if (font.content.type === 'Url') {
-			const content = await loadContent(font.content.url);
-			font.content = {
+	for (let i = 0; i < fonts.length; i++) {
+		const fontContent = fonts[i];
+		if (fontContent != null && fontContent.type === 'Url') {
+			const content = await loadContent(fontContent.url);
+			fonts[i] = {
 				type: 'Binary',
 				content
 			};

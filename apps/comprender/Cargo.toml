@@ -47,6 +47,7 @@ svg2pdf = "0.9.1"
 # CLI dependencies
 clap = { version = "4.4.16", features = ["derive"], optional = true }
 utoipa = { version = "4.2.0", features = ["axum_extras"] }
+futures = "0.3.30"
 
 [profile.release]
 opt-level = "s"

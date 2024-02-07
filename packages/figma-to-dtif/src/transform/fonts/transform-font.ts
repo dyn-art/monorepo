@@ -8,14 +8,14 @@ import { handleExport } from '../../utils';
 export async function transformFont(
 	toTransformFont: TToTransformFont,
 	config: TTransformFontConfig
-): Promise<COMP.Font> {
+): Promise<COMP.FontContent> {
 	const { fontMetadata, nodeIds } = toTransformFont;
 	const { export: exportConfig, resolveFontContent } = config;
 
 	// Resolve font
 	let fontContent;
 	try {
-		fontContent = await resolveFontContent(toTransformFont.fontMetadata);
+		fontContent = await resolveFontContent(fontMetadata);
 		if (fontContent == null) {
 			throw new ExportFontException(fontMetadata, nodeIds, 'No font found!');
 		}
@@ -25,21 +25,14 @@ export async function transformFont(
 
 	// Handle Url
 	if (fontContent.type === 'Url') {
-		return {
-			metadata: fontMetadata,
-			content: fontContent
-		};
+		return fontContent;
 	}
 
 	// Handle Binary
-	const content = await handleExport(fontContent.content, {
+	return handleExport(fontContent.content, {
 		export: exportConfig,
 		contentType: fontContent.contentType
 	});
-	return {
-		metadata: fontMetadata,
-		content
-	};
 }
 
 export interface TTransformFontConfig {

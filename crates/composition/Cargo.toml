@@ -37,3 +37,10 @@ specta = { version = "2.0.0-rc.7", features = [
 rustybuzz = "0.12.1"
 owned_ttf_parser = "0.20.0"
 reqwest = { version = "0.11.23", features = ["blocking"], optional = true }
+fontdb = "0.16.0"
+tiny-skia-path = "0.11.4"
+ttf-parser = "0.20.0"
+tinyvec = "1.6.0"
+unicode-bidi = "0.3.15"
+unicode-script = "0.5.5"
+strict-num = "0.2.0"

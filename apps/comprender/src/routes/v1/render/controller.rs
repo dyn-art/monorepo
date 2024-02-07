@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use axum::{
     body::Body,
     extract::Query,
@@ -9,10 +7,11 @@ use axum::{
 };
 use dyn_bevy_render_skeleton::RenderApp;
 use dyn_composition::{
-    composition::Composition, dtif::DTIFComposition,
-    modules::composition::resources::font_cache::font::FontContent,
+    composition::Composition,
+    dtif::{DTIFComposition, FontContent},
 };
 use dyn_svg_render::{resources::svg_composition::SVGCompositionRes, SVGRenderPlugin};
+use futures::future::try_join_all;
 use resvg::usvg::Options;
 use serde::Deserialize;
 use usvg::{TreeParsing, TreeWriting, XmlOptions};
@@ -58,7 +57,7 @@ pub async fn render_composition(
     let params = extract_query_params(maybe_query)?;
     let mut body = extract_json_body(maybe_body)?;
 
-    let _ = prepare_composition(&mut body).await;
+    let _ = resolve_font_contents(&mut body).await;
     let svg_string = generate_svg(body)?;
 
     // Determine response format from query parameter
@@ -119,26 +118,34 @@ pub async fn render_composition(
     }
 }
 
-async fn prepare_composition(composition: &mut DTIFComposition) -> Result<(), reqwest::Error> {
-    // Resolve font urls
-    if let Some(fonts) = &mut composition.fonts {
-        let mut url_contents: HashMap<String, Vec<u8>> = HashMap::new();
-
-        for (id, font) in fonts.iter() {
-            if let FontContent::Url { url } = &font.content {
-                let content = reqwest::get(url).await?.bytes().await?.to_vec();
-                url_contents.insert(id.clone(), content);
+async fn resolve_font_contents(composition: &mut DTIFComposition) -> Result<(), reqwest::Error> {
+    let fetches = composition
+        .fonts
+        .iter()
+        .enumerate()
+        .filter_map(|(index, font_content)| {
+            if let FontContent::Url { url } = font_content {
+                Some((index, url.clone()))
+            } else {
+                None
             }
-        }
+        })
+        .map(|(index, url)| async move {
+            let content = reqwest::get(&url).await?.bytes().await?.to_vec();
+            Ok((index, content))
+        });
 
-        for (id, content) in url_contents {
-            if let Some(font) = fonts.get_mut(&id) {
-                font.content = FontContent::Binary { content };
+    let results: Result<Vec<(usize, Vec<u8>)>, reqwest::Error> = try_join_all(fetches).await;
+
+    match results {
+        Ok(updates) => {
+            for (index, content) in updates {
+                composition.fonts[index] = FontContent::Binary { content };
             }
+            Ok(())
         }
+        Err(e) => Err(e),
     }
-
-    return Ok(());
 }
 
 fn generate_svg(body: DTIFComposition) -> Result<String, AppError> {

@@ -5,10 +5,7 @@ use serde::{Deserialize, Serialize};
 use specta::Type;
 
 use super::modules::{
-    composition::{
-        events::CoreInputEvent,
-        resources::{composition::ViewBox, font_cache::font::Font},
-    },
+    composition::{events::CoreInputEvent, resources::composition::ViewBox},
     node::components::bundles::{NodeBundle, PaintBundle},
 };
 
@@ -53,12 +50,24 @@ pub struct DTIFComposition {
     /// Note: Planned to directly use `u64` as a key once the referenced serde issue is resolved.
     ///       https://github.com/serde-rs/serde/issues/1183
     #[serde(default)]
-    pub fonts: Option<HashMap<String, Font>>,
+    pub fonts: Vec<FontContent>,
 
     /// Optional list of changes represented as core input events.
     /// This field is optional and defaults to `None` if not provided.
     #[serde(default)]
     pub changes: Option<Vec<CoreInputEvent>>,
+}
+
+/// Defines the content of a font.
+#[derive(Serialize, Deserialize, Eq, PartialEq, Hash, Clone, Debug, Type)]
+#[serde(tag = "type")]
+pub enum FontContent {
+    /// Font content stored as binary data.
+    Binary { content: Vec<u8> },
+    /// Font content referenced by a URL.
+    ///
+    /// This variant is only supported when the `resolve-url` feature is enabled.
+    Url { url: String },
 }
 
 fn default_dtif_version() -> String {

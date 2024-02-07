@@ -188,6 +188,11 @@ impl Default for BlendMixin {
 // Path Mixin
 // =============================================================================
 
+#[derive(Component, Clone, Debug)]
+pub struct PathMixinNew {
+    path: tiny_skia_path::Path,
+}
+
 /// Represents a path in a graphical composition, defined by a series of vertices.
 /// Each vertex is an anchor point, and the path is constructed by connecting these points.
 #[derive(Component, Serialize, Deserialize, Clone, Default, Debug, Type)]

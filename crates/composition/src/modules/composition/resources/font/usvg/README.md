@@ -1,0 +1,1 @@
+The code contained in the `usvg` module is copied from the [`usvg` project](https://github.com/RazrFalcon/resvg/blob/master/crates/usvg) and only barely edited.
