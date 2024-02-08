@@ -6,10 +6,11 @@ use unicode_script::UnicodeScript;
 
 use self::usvg::{
     geom::IsValidLength,
-    text::{Font, LengthAdjust, TextFlow},
+    text::{BaselineShift, Font, LengthAdjust, TextFlow, WritingMode},
     text_to_paths::{
-        outline_cluster, resolve_font, script_supports_letter_spacing, shape_text, DatabaseExt,
-        FontsCache, Glyph, OutlinedCluster, ResolvedFont,
+        apply_writing_mode, outline_cluster, resolve_baseline_shift, resolve_font,
+        script_supports_letter_spacing, shape_text, DatabaseExt, FontsCache, Glyph,
+        OutlinedCluster, ResolvedFont,
     },
 };
 
@@ -34,7 +35,7 @@ impl FontContext {
             .load_font_source(Source::Binary(Arc::new(content)));
     }
 
-    pub fn resolve_font(&mut self, font: &Font) -> Option<Rc<ResolvedFont>> {
+    pub fn resolve_font(&mut self, font: &Font) -> Option<&Rc<ResolvedFont>> {
         if !self.fonts_cache.contains_key(font) {
             if let Some(resolved_font) = resolve_font(font, &self.fontdb) {
                 self.fonts_cache
@@ -42,7 +43,7 @@ impl FontContext {
             }
         }
 
-        return self.fonts_cache.get(font).cloned();
+        return self.fonts_cache.get(font);
     }
 
     pub fn load_font(&self, id: ID) -> Option<ResolvedFont> {
@@ -75,6 +76,10 @@ impl FontContext {
         outline_cluster(glyphs, text, font_size, &self.fontdb)
     }
 
+    pub fn apply_writing_mode(clusters: &mut [OutlinedCluster], writing_mode: WritingMode) {
+        apply_writing_mode(writing_mode, clusters)
+    }
+
     /// Applies the `letter-spacing` property to a text chunk clusters.
     ///
     /// [In the CSS spec](https://www.w3.org/TR/css-text-3/#letter-spacing-property).
@@ -100,22 +105,6 @@ impl FontContext {
                     cluster.advance = 0.0;
                     cluster.path = None;
                 }
-            }
-        }
-    }
-
-    /// Applies the `word-spacing` property to a text chunk clusters.
-    ///
-    /// [In the CSS spec](https://www.w3.org/TR/css-text-3/#propdef-word-spacing).
-    pub fn apply_word_spacing(clusters: &mut [OutlinedCluster], word_spacing: f32) {
-        for cluster in clusters {
-            if Self::is_word_separator_char(cluster.codepoint) {
-                // Technically, word spacing 'should be applied half on each
-                // side of the character', but it doesn't affect us in any way,
-                // so we are ignoring this.
-                cluster.advance += word_spacing;
-
-                // After word spacing, `advance` can be negative.
             }
         }
     }
@@ -179,6 +168,14 @@ impl FontContext {
                 }
             }
         }
+    }
+
+    pub fn resolve_baseline_shift(
+        baselines: &[BaselineShift],
+        font: &ResolvedFont,
+        font_size: f32,
+    ) -> f32 {
+        resolve_baseline_shift(baselines, font, font_size)
     }
 
     /// Checks that the selected character is a word separator.

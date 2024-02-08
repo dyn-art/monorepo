@@ -181,6 +181,14 @@ pub enum TextFlow {
     Path(Rc<TextPath>),
 }
 
+/// A writing mode.
+#[allow(missing_docs)]
+#[derive(Clone, Copy, PartialEq, Debug)]
+pub enum WritingMode {
+    LeftToRight,
+    TopToBottom,
+}
+
 // =============================================================================
 // svgtypes/font
 // =============================================================================

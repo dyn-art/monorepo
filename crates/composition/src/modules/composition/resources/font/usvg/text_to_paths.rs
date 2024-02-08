@@ -137,56 +137,56 @@ pub struct ResolvedFont {
 
 impl ResolvedFont {
     #[inline]
-    fn scale(&self, font_size: f32) -> f32 {
+    pub fn scale(&self, font_size: f32) -> f32 {
         font_size / self.units_per_em.get() as f32
     }
 
     #[inline]
-    fn ascent(&self, font_size: f32) -> f32 {
+    pub fn ascent(&self, font_size: f32) -> f32 {
         self.ascent as f32 * self.scale(font_size)
     }
 
     #[inline]
-    fn descent(&self, font_size: f32) -> f32 {
+    pub fn descent(&self, font_size: f32) -> f32 {
         self.descent as f32 * self.scale(font_size)
     }
 
     #[inline]
-    fn height(&self, font_size: f32) -> f32 {
+    pub fn height(&self, font_size: f32) -> f32 {
         self.ascent(font_size) - self.descent(font_size)
     }
 
     #[inline]
-    fn x_height(&self, font_size: f32) -> f32 {
+    pub fn x_height(&self, font_size: f32) -> f32 {
         self.x_height.get() as f32 * self.scale(font_size)
     }
 
     #[inline]
-    fn underline_position(&self, font_size: f32) -> f32 {
+    pub fn underline_position(&self, font_size: f32) -> f32 {
         self.underline_position as f32 * self.scale(font_size)
     }
 
     #[inline]
-    fn underline_thickness(&self, font_size: f32) -> f32 {
+    pub fn underline_thickness(&self, font_size: f32) -> f32 {
         self.underline_thickness.get() as f32 * self.scale(font_size)
     }
 
     #[inline]
-    fn line_through_position(&self, font_size: f32) -> f32 {
+    pub fn line_through_position(&self, font_size: f32) -> f32 {
         self.line_through_position as f32 * self.scale(font_size)
     }
 
     #[inline]
-    fn subscript_offset(&self, font_size: f32) -> f32 {
+    pub fn subscript_offset(&self, font_size: f32) -> f32 {
         self.subscript_offset as f32 * self.scale(font_size)
     }
 
     #[inline]
-    fn superscript_offset(&self, font_size: f32) -> f32 {
+    pub fn superscript_offset(&self, font_size: f32) -> f32 {
         self.superscript_offset as f32 * self.scale(font_size)
     }
 
-    fn dominant_baseline_shift(&self, baseline: DominantBaseline, font_size: f32) -> f32 {
+    pub fn dominant_baseline_shift(&self, baseline: DominantBaseline, font_size: f32) -> f32 {
         let alignment = match baseline {
             DominantBaseline::Auto => AlignmentBaseline::Auto,
             DominantBaseline::UseScript => AlignmentBaseline::Auto, // unsupported
@@ -234,7 +234,7 @@ impl ResolvedFont {
     //
     // But that's not all! SVG 2 and CSS Inline Layout 3 did a baseline handling overhaul,
     // and it's far more complex now. Not sure if anyone actually supports it.
-    fn alignment_baseline_shift(&self, alignment: AlignmentBaseline, font_size: f32) -> f32 {
+    pub fn alignment_baseline_shift(&self, alignment: AlignmentBaseline, font_size: f32) -> f32 {
         match alignment {
             AlignmentBaseline::Auto => 0.0,
             AlignmentBaseline::Baseline => 0.0,
@@ -802,4 +802,57 @@ pub fn script_supports_letter_spacing(script: unicode_script::Script) -> bool {
             | Script::Tirhuta
             | Script::Ogham
     )
+}
+
+/// Rotates clusters according to
+/// [Unicode Vertical_Orientation Property](https://www.unicode.org/reports/tr50/tr50-19.html).
+pub fn apply_writing_mode(writing_mode: WritingMode, clusters: &mut [OutlinedCluster]) {
+    if writing_mode != WritingMode::TopToBottom {
+        return;
+    }
+
+    for cluster in clusters {
+        let orientation = unicode_vo::char_orientation(cluster.codepoint);
+        if orientation == unicode_vo::Orientation::Upright {
+            // Additional offset. Not sure why.
+            let dy = cluster.width - cluster.height();
+
+            // Rotate a cluster 90deg counter clockwise by the center.
+            let mut ts = Transform::default();
+            ts = ts.pre_translate(cluster.width / 2.0, 0.0);
+            ts = ts.pre_rotate(-90.0);
+            ts = ts.pre_translate(-cluster.width / 2.0, -dy);
+
+            if let Some(path) = cluster.path.take() {
+                cluster.path = path.transform(ts);
+            }
+
+            // Move "baseline" to the middle and make height equal to width.
+            cluster.ascent = cluster.width / 2.0;
+            cluster.descent = -cluster.width / 2.0;
+        } else {
+            // Could not find a spec that explains this,
+            // but this is how other applications are shifting the "rotated" characters
+            // in the top-to-bottom mode.
+            cluster.transform = cluster.transform.pre_translate(0.0, cluster.x_height / 2.0);
+        }
+    }
+}
+
+pub fn resolve_baseline_shift(
+    baselines: &[BaselineShift],
+    font: &ResolvedFont,
+    font_size: f32,
+) -> f32 {
+    let mut shift = 0.0;
+    for baseline in baselines.iter().rev() {
+        match baseline {
+            BaselineShift::Baseline => {}
+            BaselineShift::Subscript => shift -= font.subscript_offset(font_size),
+            BaselineShift::Superscript => shift += font.superscript_offset(font_size),
+            BaselineShift::Number(n) => shift += n,
+        }
+    }
+
+    shift
 }
