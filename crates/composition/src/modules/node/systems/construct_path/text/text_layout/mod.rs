@@ -6,7 +6,6 @@ use tinyvec::TinyVec;
 use crate::modules::{
     composition::resources::font::{
         usvg::{
-            geom::BBox,
             text::{
                 AlignmentBaseline, BaselineShift, DominantBaseline, Font, FontFamily, FontStretch,
                 FontStyle, LengthAdjust, TextAnchor, TextFlow, TextPath, WritingMode,
@@ -18,18 +17,18 @@ use crate::modules::{
     node::components::types::{TextNode, TextSpan},
 };
 
-pub struct TokenChunk {
+pub struct TokenStream {
+    /// A list of token style spans.
+    pub spans: Vec<TokenSpan>,
     /// A text anchor.
     pub anchor: TextAnchor,
-    /// A list of text chunk style spans.
-    pub spans: Vec<TokenSpan>,
     /// A text chunk flow.
     pub text_flow: TextFlow,
     /// A writing mode.
     pub writing_mode: WritingMode,
 }
 
-impl TokenChunk {
+impl TokenStream {
     pub fn from_text_node(text: &TextNode, cx: &mut FontContext) -> Self {
         let token_spans = Self::create_token_spans(text, cx);
 

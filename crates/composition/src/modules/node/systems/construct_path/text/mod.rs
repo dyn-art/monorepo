@@ -1,15 +1,18 @@
 use bevy_ecs::{
     entity::Entity,
     query::{Changed, Or},
-    system::{Commands, NonSend, NonSendMut, Query},
+    system::{Commands, NonSendMut, Query},
 };
 
 use crate::modules::{
     composition::resources::font::FontRes,
-    node::components::{mixins::DimensionMixin, types::TextNode},
+    node::components::{
+        mixins::{DimensionMixin, SkiaPathsMixin},
+        types::TextNode,
+    },
 };
 
-use self::text_layout::TokenChunk;
+use self::text_layout::TokenStream;
 
 mod text_layout;
 
@@ -25,18 +28,9 @@ pub fn construct_text_path(
     >,
 ) {
     for (entity, text, dimension) in query.iter() {
-        // let mut path = PathMixin {
-        //     vertices: Vec::new(),
-        // };
-        // let mut text_builder = TextBuilder::new(dimension.width as f32);
+        let mut token_chunk = TokenStream::from_text_node(text, &mut font_res.context);
+        let paths = token_chunk.to_paths(&mut font_res.context);
 
-        let mut token_chunk = TokenChunk::from_text_node(text, &mut font_res.context);
-        token_chunk.to_paths(&mut font_res.context);
-
-        // // Process text
-        // text_builder.process_text(text, &mut font_cache);
-        // path.vertices.extend(text_builder.into_vertices());
-
-        // commands.entity(entity).insert(path);
+        commands.entity(entity).insert(SkiaPathsMixin { paths });
     }
 }

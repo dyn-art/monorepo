@@ -886,6 +886,8 @@ dependencies = [
  "serde",
  "serde_with",
  "specta",
+ "strict-num 0.2.0",
+ "tiny-skia-path",
 ]
 
 [[package]]
@@ -2601,9 +2603,9 @@ dependencies = [
 
 [[package]]
 name = "tiny-skia"
-version = "0.11.3"
+version = "0.11.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b6a067b809476893fce6a254cf285850ff69c847e6cfbade6a20b655b6c7e80d"
+checksum = "83d13394d44dae3207b52a326c0c85a8bf87f1541f23b0d143811088497b09ab"
 dependencies = [
  "arrayref",
  "arrayvec",

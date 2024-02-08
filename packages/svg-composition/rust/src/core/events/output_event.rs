@@ -1,8 +1,10 @@
 use bevy_ecs::entity::Entity;
 use dyn_composition::modules::composition::resources::composition::ViewBox;
-use dyn_svg_render::{events::output_event::ElementChangeEvent, mixin_change::MixinChange};
+use dyn_svg_render::events::output_event::ElementChangeEvent;
 use serde::Serialize;
 use specta::Type;
+
+use crate::core::modules::track::mixin_change::MixinChange;
 
 #[derive(Debug, Serialize, Clone, Type)]
 #[serde(tag = "type")]

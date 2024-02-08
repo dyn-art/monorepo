@@ -19,6 +19,7 @@ use crate::{
                 },
                 mapper::{
                     map_anchors_to_svg_path_string, map_blend_mode, map_mat3_to_svg_transform,
+                    map_skia_path_to_svg_path_string,
                 },
                 styles::{SVGDisplayStyle, SVGStyle},
                 SVGElement, SVGTag,
@@ -106,6 +107,13 @@ impl SVGBundle for ShapeNodeSVGBundle {
                     self.fill_clipped_path.set_attributes(vec![SVGAttribute::D {
                         d: SVGDAttribute::String {
                             value: map_anchors_to_svg_path_string(&mixin.vertices),
+                        },
+                    }]);
+                }
+                MixinChange::SkiaPaths(mixin) => {
+                    self.fill_clipped_path.set_attributes(vec![SVGAttribute::D {
+                        d: SVGDAttribute::String {
+                            value: map_skia_path_to_svg_path_string(mixin.paths.get(0).unwrap()),
                         },
                     }]);
                 }

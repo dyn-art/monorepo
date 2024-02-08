@@ -5,11 +5,10 @@ use bevy_ecs::{
     system::{Query, Res, ResMut},
 };
 use dyn_composition::modules::node::components::mixins::{DimensionMixin, RelativeTransformMixin};
-use dyn_svg_render::mixin_change::ToMixinChange;
 
-use crate::core::modules::track::resources::{
-    changed_components::ChangedComponentsRes,
-    tracked_entities::{TrackableMixinType, TrackedEntitiesRes},
+use crate::core::modules::track::{
+    mixin_change::{MixinType, ToMixinChange},
+    resources::{changed_components::ChangedComponentsRes, tracked_entities::TrackedEntitiesRes},
 };
 
 pub fn extract_tracked_mixin_changes(
@@ -21,10 +20,10 @@ pub fn extract_tracked_mixin_changes(
     for (entity, component_types) in tracked_entities.tracked_entities.iter() {
         for component_type in component_types {
             match component_type {
-                TrackableMixinType::Dimension => {
+                MixinType::Dimension => {
                     handle_component_change(*entity, &query_dimension_mixin, &mut changed);
                 }
-                TrackableMixinType::RelativeTransform => {
+                MixinType::RelativeTransform => {
                     handle_component_change(*entity, &query_relative_transform, &mut changed);
                 }
             }

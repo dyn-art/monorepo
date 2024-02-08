@@ -13,6 +13,7 @@ use self::{
     },
 };
 
+pub mod mixin_change;
 pub mod resources;
 mod systems;
 

@@ -540,11 +540,11 @@ export type Locked = null
 
 export type Mat3 = [number, number, number, number, number, number, number, number, number]
 
-export type MixinChange = ({ type: "Dimension" } & DimensionMixin) | ({ type: "Blend" } & BlendMixin) | ({ type: "NodeComposition" } & NodeCompositionMixin) | ({ type: "Children" } & MixinChangeChildrenMixin) | ({ type: "RelativeTransform" } & MixinChangeRelativeTransformMixin) | ({ type: "Path" } & PathMixin) | ({ type: "PaintComposition" } & PaintCompositionMixin) | ({ type: "SolidPaint" } & SolidPaint) | ({ type: "ImagePaint" } & SVGImagePaint) | ({ type: "ImageContent" } & ImageContentMixin) | ({ type: "GradientPaint" } & SVGGradientPaint) | ({ type: "GradientStopsMixin" } & GradientStopsMixin)
-
-export type MixinChangeChildrenMixin = { children: ChildrenMixin }
+export type MixinChange = ({ type: "Dimension" } & DimensionMixin) | ({ type: "RelativeTransform" } & MixinChangeRelativeTransformMixin)
 
 export type MixinChangeRelativeTransformMixin = { relativeTransform: RelativeTransformMixin }
+
+export type MixinType = { type: "Dimension" } | { type: "RelativeTransform" }
 
 export type MouseButton = "Left" | "Middle" | "Right" | "Unkown"
 
@@ -892,8 +892,6 @@ letterSpacing?: LetterSpacing;
 lineHeight?: LineHeight }
 
 export type TrackUpdateEvent = { id: Entity; updates: MixinChange[] }
-
-export type TrackableMixinType = { type: "Dimension" } | { type: "RelativeTransform" }
 
 export type Vec2 = [number, number]
 

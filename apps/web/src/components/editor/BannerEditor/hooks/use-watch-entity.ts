@@ -44,7 +44,7 @@ function changesReducer<T extends TTrackableMixinKey[]>(
 type TCombinedMixin<T extends TTrackableMixinKey[]> = {
 	[K in T[number]]?: Extract<COMP.MixinChange, { type: K }>;
 };
-type TTrackableMixinKey = TRustEnumKeyArray<COMP.TrackableMixinType>;
+type TTrackableMixinKey = TRustEnumKeyArray<COMP.MixinType>;
 type TMiddleware<T> = (change: COMP.MixinChange) => T;
 
 // TODO: figure out how to solve this as tuple

@@ -8,7 +8,6 @@ use dyn_composition::dtif::DTIFComposition;
 use dyn_composition::modules::node::components::bundles::{NodeBundle, PaintBundle};
 use dyn_composition::modules::node::components::mixins::{DimensionMixin, RelativeTransformMixin};
 use dyn_svg_render::events::output_event::SVGRenderOutputEvent;
-use dyn_svg_render::mixin_change::{MixinChange, MixinChangeRelativeTransformMixin};
 use dyn_svg_render::resources::svg_composition::SVGCompositionRes;
 use dyn_svg_render::SVGRenderPlugin;
 use wasm_bindgen::prelude::wasm_bindgen;
@@ -16,9 +15,10 @@ use wasm_bindgen::JsValue;
 
 use crate::bindgen::utils::convert_optional_jsvalue;
 use crate::core::events::input_event::AnyInputEvent;
-use crate::core::modules::track::resources::tracked_entities::{
-    TrackableMixinType, TrackedEntitiesRes,
+use crate::core::modules::track::mixin_change::{
+    MixinChange, MixinChangeRelativeTransformMixin, MixinType,
 };
+use crate::core::modules::track::resources::tracked_entities::TrackedEntitiesRes;
 use crate::core::modules::track::TrackPlugin;
 
 use super::events::output_event::OutputEvent;
@@ -134,11 +134,11 @@ impl JsCompositionHandle {
             Ok(entity) => entity,
             Err(_) => return JsValue::FALSE,
         };
-        let to_track_mixins: Vec<TrackableMixinType> =
-            match serde_wasm_bindgen::from_value(to_track_mixins) {
-                Ok(to_track_mixins) => to_track_mixins,
-                Err(_) => return JsValue::FALSE,
-            };
+        let to_track_mixins: Vec<MixinType> = match serde_wasm_bindgen::from_value(to_track_mixins)
+        {
+            Ok(to_track_mixins) => to_track_mixins,
+            Err(_) => return JsValue::FALSE,
+        };
 
         let app = self.composition.get_app_mut();
 
@@ -147,12 +147,12 @@ impl JsCompositionHandle {
         if initial_value {
             for component_type in &to_track_mixins {
                 match component_type {
-                    TrackableMixinType::Dimension => {
+                    MixinType::Dimension => {
                         if let Some(mixin) = app.world.get::<DimensionMixin>(entity) {
                             changes.push(MixinChange::Dimension(mixin.clone()))
                         }
                     }
-                    TrackableMixinType::RelativeTransform => {
+                    MixinType::RelativeTransform => {
                         if let Some(mixin) = app.world.get::<RelativeTransformMixin>(entity) {
                             changes.push(MixinChange::RelativeTransform(
                                 MixinChangeRelativeTransformMixin {

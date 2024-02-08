@@ -15,11 +15,11 @@ import type {
 	InteractionModeChangeEvent,
 	InteractionModeForFrontend,
 	MixinChange,
+	MixinType,
 	NodeBundle,
 	OutputEvent,
 	PaintBundle,
 	SelectionChangeEvent,
-	TrackableMixinType,
 	TrackUpdateEvent,
 	ViewBox
 } from '@/rust/dyn_svg_composition_api/bindings';
@@ -185,7 +185,7 @@ export class Composition {
 
 	public watchEntity(
 		entity: Entity,
-		toTrackMixinKeys: TRustEnumKeyArray<TrackableMixinType>[],
+		toTrackMixinKeys: TRustEnumKeyArray<MixinType>[],
 		callback: TWatchEntityCallback,
 		initalValue = true
 	): (() => void) | false {
@@ -238,7 +238,7 @@ export class Composition {
 
 	private trackEntity(
 		entity: Entity,
-		toTrackMixins: TrackableMixinType[],
+		toTrackMixins: MixinType[],
 		intialValue = true
 	): MixinChange[] | boolean {
 		return this._compositionHandle.trackEntity(entity, toTrackMixins, intialValue);

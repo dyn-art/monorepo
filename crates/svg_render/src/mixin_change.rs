@@ -2,16 +2,14 @@ use dyn_composition::modules::node::components::{
     mixins::{
         BlendMixin, ChildrenMixin, DimensionMixin, GradientStopsMixin, ImageContentMixin,
         NodeCompositionMixin, PaintCompositionMixin, PathMixin, RelativeTransformMixin,
+        SkiaPathsMixin,
     },
     types::SolidPaint,
 };
-use serde::Serialize;
-use specta::Type;
 
 use crate::components::{SVGGradientPaint, SVGImagePaint};
 
-#[derive(Serialize, Clone, Debug, Type)]
-#[serde(tag = "type")]
+#[derive(Clone, Debug)]
 pub enum MixinChange {
     // Shared
     Dimension(DimensionMixin),
@@ -22,6 +20,7 @@ pub enum MixinChange {
     Children(MixinChangeChildrenMixin),
     RelativeTransform(MixinChangeRelativeTransformMixin),
     Path(PathMixin),
+    SkiaPaths(SkiaPathsMixin),
 
     // Paint
     PaintComposition(PaintCompositionMixin),
@@ -42,7 +41,7 @@ impl ToMixinChange for DimensionMixin {
     }
 }
 
-#[derive(Serialize, Clone, Debug, Type)]
+#[derive(Clone, Debug)]
 pub struct MixinChangeChildrenMixin {
     pub children: ChildrenMixin,
 }
@@ -55,8 +54,7 @@ impl ToMixinChange for ChildrenMixin {
     }
 }
 
-#[derive(Serialize, Clone, Debug, Type)]
-#[serde(rename_all = "camelCase")]
+#[derive(Clone, Debug)]
 pub struct MixinChangeRelativeTransformMixin {
     pub relative_transform: RelativeTransformMixin,
 }
@@ -84,6 +82,12 @@ impl ToMixinChange for BlendMixin {
 impl ToMixinChange for PathMixin {
     fn to_mixin_change(&self) -> MixinChange {
         MixinChange::Path(self.clone())
+    }
+}
+
+impl ToMixinChange for SkiaPathsMixin {
+    fn to_mixin_change(&self) -> MixinChange {
+        MixinChange::SkiaPaths(self.clone())
     }
 }
 

@@ -655,6 +655,8 @@ dependencies = [
  "serde",
  "serde_with",
  "specta",
+ "strict-num 0.2.0",
+ "tiny-skia-path",
 ]
 
 [[package]]

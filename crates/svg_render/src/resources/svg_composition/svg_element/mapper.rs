@@ -3,6 +3,9 @@ use dyn_composition::modules::node::components::mixins::BlendMode;
 use super::styles::SVGBlendMode;
 use dyn_composition::modules::node::components::mixins::{Anchor, AnchorCommand};
 use glam::{Mat3, Vec2};
+use std::fmt::Write;
+use strict_num::ApproxEqUlps;
+use tiny_skia_path::PathSegment;
 
 use super::attributes::{SVGPathCommand, SVGTransformAttribute};
 
@@ -20,6 +23,91 @@ pub fn map_mat3_to_svg_transform(transform: &Mat3) -> SVGTransformAttribute {
         tx: transform.z_axis.x,
         ty: transform.z_axis.y,
     }
+}
+
+static POW_VEC: &[f32] = &[
+    1.0,
+    10.0,
+    100.0,
+    1_000.0,
+    10_000.0,
+    100_000.0,
+    1_000_000.0,
+    10_000_000.0,
+    100_000_000.0,
+    1_000_000_000.0,
+    10_000_000_000.0,
+    100_000_000_000.0,
+    1_000_000_000_000.0,
+];
+
+/// Approximate zero equality comparisons.
+pub trait ApproxZeroUlps: ApproxEqUlps {
+    /// Checks if the number is approximately zero.
+    fn approx_zero_ulps(&self, ulps: <Self::Flt as strict_num::Ulps>::U) -> bool;
+}
+
+impl ApproxZeroUlps for f32 {
+    fn approx_zero_ulps(&self, ulps: i32) -> bool {
+        self.approx_eq_ulps(&0.0, ulps)
+    }
+}
+
+impl ApproxZeroUlps for f64 {
+    fn approx_zero_ulps(&self, ulps: i64) -> bool {
+        self.approx_eq_ulps(&0.0, ulps)
+    }
+}
+
+fn write_num(num: f32, buf: &mut String, precision: u8) {
+    if num.fract().approx_zero_ulps(4) {
+        write!(buf, "{} ", num as i32).unwrap();
+        return;
+    }
+
+    let v = (num * POW_VEC[precision as usize]).round() / POW_VEC[precision as usize];
+    write!(buf, "{} ", v).unwrap();
+}
+
+pub fn map_skia_path_to_svg_path_string(path: &tiny_skia_path::Path) -> String {
+    let coordinates_precision: u8 = 8;
+    let mut buf = String::new();
+
+    for seg in path.segments() {
+        match seg {
+            PathSegment::MoveTo(p) => {
+                write!(buf, "M {} ", p.x).unwrap();
+                write_num(p.x, &mut buf, coordinates_precision);
+                write_num(p.y, &mut buf, coordinates_precision);
+            }
+            PathSegment::LineTo(p) => {
+                write!(buf, "L {} ", p.x).unwrap();
+                write_num(p.x, &mut buf, coordinates_precision);
+                write_num(p.y, &mut buf, coordinates_precision);
+            }
+            PathSegment::QuadTo(p1, p) => {
+                write!(buf, "Q {} ", p1.x).unwrap();
+                write_num(p1.x, &mut buf, coordinates_precision);
+                write_num(p1.y, &mut buf, coordinates_precision);
+                write_num(p.x, &mut buf, coordinates_precision);
+                write_num(p.y, &mut buf, coordinates_precision);
+            }
+            PathSegment::CubicTo(p1, p2, p) => {
+                write!(buf, "C {} ", p1.x).unwrap();
+                write_num(p1.x, &mut buf, coordinates_precision);
+                write_num(p1.y, &mut buf, coordinates_precision);
+                write_num(p2.x, &mut buf, coordinates_precision);
+                write_num(p2.y, &mut buf, coordinates_precision);
+                write_num(p.x, &mut buf, coordinates_precision);
+                write_num(p.y, &mut buf, coordinates_precision);
+            }
+            PathSegment::Close => {
+                buf.push_str("Z");
+            }
+        }
+    }
+
+    buf
 }
 
 pub fn map_anchors_to_svg_path_string(vertices: &[Anchor]) -> String {
