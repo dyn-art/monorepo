@@ -6,7 +6,7 @@ use dyn_bevy_render_skeleton::{ExtractSchedule, Render, RenderApp, RenderSet};
 use dyn_composition::modules::node::components::{
     mixins::{
         BlendMixin, DimensionMixin, GradientStopsMixin, ImageContentMixin, NodeCompositionMixin,
-        PaintCompositionMixin, PathMixin, RelativeTransformMixin,
+        PaintCompositionMixin, PathMixin, RelativeTransformMixin, SkiaPathsMixin,
     },
     types::SolidPaint,
 };
@@ -63,6 +63,7 @@ impl Plugin for SVGRenderPlugin {
                     extract_node_mixin_generic::<NodeCompositionMixin>,
                     extract_node_mixin_generic::<BlendMixin>,
                     extract_node_mixin_generic::<PathMixin>,
+                    extract_node_mixin_generic::<SkiaPathsMixin>,
                     // Paint
                     extract_paint_mixin_generic::<DimensionMixin>,
                     extract_paint_mixin_generic::<BlendMixin>,

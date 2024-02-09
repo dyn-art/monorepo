@@ -1,6 +1,6 @@
 use std::rc::Rc;
 
-use tiny_skia_path::{NonZeroPositiveF32, Path, Transform};
+use tiny_skia_path::{Path, Transform};
 use tinyvec::TinyVec;
 
 use crate::modules::{
@@ -113,7 +113,7 @@ impl TokenStream {
                 tokens,
                 apply_kerning: false,
                 font,
-                font_size: NonZeroPositiveF32::new(style.font_size).unwrap(),
+                font_size: style.font_size,
                 letter_spacing: 0.0,
                 small_caps: false,
                 text_length: None,
@@ -139,7 +139,6 @@ impl TokenStream {
         };
 
         self.outline(cx);
-        log::info!("[to_paths] After outline: {:#?}", self.spans);
 
         // Preprocess
         for span in &mut self.spans {
@@ -208,7 +207,7 @@ impl TokenStream {
 
                 // Convert glyphs to clusters.
                 for (range, _) in GlyphClusters::new(&glyphs) {
-                    clusters.push(cx.outline_cluster(&glyphs[range], &text, span.font_size.get()));
+                    clusters.push(cx.outline_cluster(&glyphs[range], &text, span.font_size));
                 }
 
                 token.clusters = clusters;
@@ -256,17 +255,16 @@ impl TokenStream {
     // See `alignment_baseline_shift` method comment for more details.
     fn resolve_baseline(span: &TokenSpan, font: &ResolvedFont, writing_mode: WritingMode) -> f32 {
         let mut shift =
-            -FontContext::resolve_baseline_shift(&span.baseline_shift, font, span.font_size.get());
+            -FontContext::resolve_baseline_shift(&span.baseline_shift, font, span.font_size);
 
         // TODO: support vertical layout as well
         if writing_mode == WritingMode::LeftToRight {
             if span.alignment_baseline == AlignmentBaseline::Auto
                 || span.alignment_baseline == AlignmentBaseline::Baseline
             {
-                shift += font.dominant_baseline_shift(span.dominant_baseline, span.font_size.get());
+                shift += font.dominant_baseline_shift(span.dominant_baseline, span.font_size);
             } else {
-                shift +=
-                    font.alignment_baseline_shift(span.alignment_baseline, span.font_size.get());
+                shift += font.alignment_baseline_shift(span.alignment_baseline, span.font_size);
             }
         }
 
@@ -306,7 +304,7 @@ pub struct TokenSpan {
     /// A font.
     pub font: Font,
     /// A font size.
-    pub font_size: NonZeroPositiveF32,
+    pub font_size: f32,
     /// Indicates that small caps should be used.
     ///
     /// Set by `font-variant="small-caps"`

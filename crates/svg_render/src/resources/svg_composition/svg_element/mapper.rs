@@ -76,24 +76,24 @@ pub fn map_skia_path_to_svg_path_string(path: &tiny_skia_path::Path) -> String {
     for seg in path.segments() {
         match seg {
             PathSegment::MoveTo(p) => {
-                write!(buf, "M {} ", p.x).unwrap();
+                write!(buf, "M ").unwrap();
                 write_num(p.x, &mut buf, coordinates_precision);
                 write_num(p.y, &mut buf, coordinates_precision);
             }
             PathSegment::LineTo(p) => {
-                write!(buf, "L {} ", p.x).unwrap();
+                write!(buf, "L ").unwrap();
                 write_num(p.x, &mut buf, coordinates_precision);
                 write_num(p.y, &mut buf, coordinates_precision);
             }
             PathSegment::QuadTo(p1, p) => {
-                write!(buf, "Q {} ", p1.x).unwrap();
+                write!(buf, "Q ").unwrap();
                 write_num(p1.x, &mut buf, coordinates_precision);
                 write_num(p1.y, &mut buf, coordinates_precision);
                 write_num(p.x, &mut buf, coordinates_precision);
                 write_num(p.y, &mut buf, coordinates_precision);
             }
             PathSegment::CubicTo(p1, p2, p) => {
-                write!(buf, "C {} ", p1.x).unwrap();
+                write!(buf, "C ").unwrap();
                 write_num(p1.x, &mut buf, coordinates_precision);
                 write_num(p1.y, &mut buf, coordinates_precision);
                 write_num(p2.x, &mut buf, coordinates_precision);
