@@ -1,0 +1,13 @@
+[workspace]
+resolver = "2"
+members = ["crates/*", "apps/comprender", "packages/svg-composition/rust"]
+exclude = ["crates/_deprecated"]
+
+[workspace.package]
+edition = "2021"
+homepage = "https://s.dyn.art/github"
+repository = "https://github.com/dyndotart/monorepo"
+license = "AGPL-3.0-or-later"
+authors = ["@bennoinbeta"]
+
+[workspace.dependencies]

@@ -10,7 +10,7 @@ describe('hasFeatures function tests', () => {
 		const state = withUndo(createState(10, false));
 
 		// Act & Assert
-		expect(hasFeatures(state, ['set', 'undo'])).toBe(true);
+		expect(hasFeatures(state, ['base', 'undo'])).toBe(true);
 	});
 
 	it('should return false if the state is missing any of the requested features', () => {
@@ -18,7 +18,7 @@ describe('hasFeatures function tests', () => {
 		const state = createState(10, false);
 
 		// Act & Assert
-		expect(hasFeatures(state, ['set', 'undo'])).toBe(false);
+		expect(hasFeatures(state, ['base', 'undo'])).toBe(false);
 	});
 
 	it('should return true for a state with only the specified features', () => {
@@ -26,7 +26,7 @@ describe('hasFeatures function tests', () => {
 		const state = createState(10, false);
 
 		// Act & Assert
-		expect(hasFeatures(state, ['set'])).toBe(true);
+		expect(hasFeatures(state, ['base'])).toBe(true);
 	});
 
 	it('should return false if no features are present in the state', () => {
@@ -34,7 +34,7 @@ describe('hasFeatures function tests', () => {
 		const state = {}; // Mock a state with no features
 
 		// Act & Assert
-		expect(hasFeatures(state as any, ['set', 'undo'])).toBe(false);
+		expect(hasFeatures(state as any, ['base', 'undo'])).toBe(false);
 	});
 
 	it('should return true if checking for an empty feature set', () => {
