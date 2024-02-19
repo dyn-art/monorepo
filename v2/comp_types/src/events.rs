@@ -1,7 +1,6 @@
-use std::{any::Any, fmt::Debug};
+use std::fmt::Debug;
 
 use bevy_ecs::{entity::Entity, event::Event, world::World};
-use glam::Vec2;
 
 use crate::shared::{Size, Viewport};
 
@@ -9,7 +8,7 @@ pub trait InputEvent {
     fn send_into_ecs(self, world: &mut World);
 }
 
-#[derive(Debug, Default, Copy, Clone)]
+#[derive(Debug, Copy, Clone)]
 #[cfg_attr(
     feature = "serde_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type),
@@ -63,33 +62,33 @@ pub struct CompositionViewportChangedEvent {
     pub viewport: Viewport,
 }
 
-#[derive(Event, Debug, Default, Copy, Clone)]
+#[derive(Event, Debug, Copy, Clone)]
 #[cfg_attr(
     feature = "serde_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
-pub struct EntityMoved {
+pub struct EntityMovedEvent {
     pub entity: Entity,
     pub dx: f32,
     pub dy: f32,
 }
 
-#[derive(Event, Debug, Default, Copy, Clone)]
+#[derive(Event, Debug, Copy, Clone)]
 #[cfg_attr(
     feature = "serde_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
-pub struct EntitySetPosition {
+pub struct EntitySetPositionEvent {
     pub entity: Entity,
     pub x: f32,
     pub y: f32,
 }
 
-#[derive(Event, Debug, Default, Copy, Clone)]
+#[derive(Event, Debug, Copy, Clone)]
 #[cfg_attr(
     feature = "serde_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
-pub struct EntityDeleted {
+pub struct EntityDeletedEvent {
     pub entity: Entity,
 }

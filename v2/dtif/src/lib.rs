@@ -1,10 +1,6 @@
 use crate::node::Node;
-use dyn_comp_types::{
-    events::CompInputEvent,
-    shared::{Size, Viewport},
-};
+use dyn_comp_types::shared::{Size, Viewport};
 use events::DTIFInputEvent;
-use glam::Vec2;
 use std::collections::HashMap;
 
 pub mod dtif_injector;

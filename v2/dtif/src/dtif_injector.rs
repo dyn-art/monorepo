@@ -6,7 +6,7 @@ use dyn_comp_types::{
         world::{EntityWorldMut, World},
     },
     bevy_hierarchy::BuildWorldChildren,
-    events::{CompInputEvent, InputEvent},
+    events::InputEvent,
     mixins::Root,
 };
 
@@ -94,7 +94,7 @@ impl DTIFInjector {
         events
             .iter()
             .cloned()
-            .map(|event| event.to_comp_input_event(&self.sid_to_entity))
+            .map(|event| event.into_comp_input_event(&self.sid_to_entity))
             .for_each(|maybe_event| {
                 if let Some(event) = maybe_event {
                     event.send_into_ecs(world);
@@ -103,7 +103,7 @@ impl DTIFInjector {
     }
 
     /// Tries to find the actual spawned entity for an entity referenced in DTIF.
-    fn find_entity(&self, entity: &Entity) -> Option<Entity> {
+    fn find_entity(&self, entity: &Entity) -> Option<&Entity> {
         let sid = Self::entity_to_sid(entity);
         self.sid_to_entity.get(&sid)
     }

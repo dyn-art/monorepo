@@ -9,7 +9,9 @@ license = { workspace = true }
 authors = { workspace = true }
 
 [features]
-default = []
+default = ["serde_support"]
+serde_support = ["dep:serde", "dep:specta", "dyn-comp-types/serde_support"]
+output_events = []
 tracing = []
 
 [dependencies]
@@ -20,3 +22,11 @@ bevy_transform = "0.13.0"
 bevy_render = "0.13.0"
 glam = "0.25.0"
 smallvec = "1.13.1"
+
+# serde_support
+specta = { git = "https://github.com/oscartbeaumont/specta.git", rev = "5da3e56", features = [
+    "serde",
+    "glam",
+    "bevy_ecs",
+], optional = true }
+serde = { version = "1.0.195", features = ["derive"], optional = true }

@@ -10,8 +10,8 @@ authors = { workspace = true }
 
 [features]
 default = ["dtif"]
-tracing = []
 dtif = ["dep:dyn-dtif", "dyn-comp-types/serde_support"]
+tracing = []
 
 [dependencies]
 dyn-comp-types = { path = "../comp_types" }
@@ -21,3 +21,4 @@ bevy_ecs = "0.13.0"
 bevy_transform = "0.13.0"
 glam = "0.25.0"
 smallvec = "1.13.1"
+tiny-skia-path = "0.11.4"

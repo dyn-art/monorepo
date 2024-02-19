@@ -1,39 +1,8 @@
-use std::collections::HashMap;
-
 use bevy_ecs::prelude::*;
+use svg_element::SVGElement;
 
-trait SVGNode: Component + Clone {}
-
-#[derive(Component, Debug, Clone)]
-pub struct SVGElement {
-    // TODO: ContinuousId or based on intendLevel & childIndex?
-    id: u32,
-    tag: &'static str,
-    attributes: HashMap<&'static str, String>,
-    styles: HashMap<&'static str, String>,
-    /// How deeply the SVGElement is nested.
-    /// Acts like a stack index to determine which SVGElement should be rendered when.
-    indent_level: u16,
-    /// Position of the element in its parents child.
-    /// Also used to determine which SVGElement should be rendered when.
-    child_index: u16,
-
-    children: Vec<SVGElementChild>,
-}
-
-#[derive(Debug, Clone)]
-pub struct SVGElementChild {
-    pub id: u32, // SVGElement Id
-    pub identifier: SVGElementChildIdentifier,
-}
-
-#[derive(Debug, Clone)]
-pub enum SVGElementChildIdentifier {
-    /// Child element is root element of SVGNode.
-    InWorldContext(Entity),
-    /// Child element is child element of SVGNode.
-    InSVGNodeContext(Entity),
-}
+pub mod svg_element;
+pub mod svg_node;
 
 #[derive(Component, Debug, Clone)]
 pub struct FrameSVGNode {
