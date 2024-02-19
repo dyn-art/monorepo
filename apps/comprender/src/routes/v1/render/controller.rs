@@ -147,7 +147,7 @@ fn generate_svg(body: DTIFComposition) -> Result<String, AppError> {
     let app = composition.get_app_mut();
 
     // Register plugins
-    app.add_plugins(SVGRenderPlugin {});
+    // app.add_plugins(SVGRenderPlugin {});
 
     // Update app once
     app.update();

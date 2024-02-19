@@ -9,13 +9,15 @@ license = { workspace = true }
 authors = { workspace = true }
 
 [features]
-default = []
+default = ["dtif"]
 tracing = []
+dtif = ["dep:dyn-dtif", "dyn-comp-types/serde_support"]
 
 [dependencies]
+dyn-comp-types = { path = "../comp_types" }
+dyn-dtif = { path = "../dtif", optional = true }
 bevy_app = "0.13.0"
 bevy_ecs = "0.13.0"
 bevy_transform = "0.13.0"
 glam = "0.25.0"
 smallvec = "1.13.1"
-dyn-comp-types = { path = "../comp_types" }

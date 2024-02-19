@@ -1,32 +1,69 @@
-use bevy_ecs::entity::Entity;
+use std::{any::Any, fmt::Debug};
+
+use bevy_ecs::{entity::Entity, event::Event, world::World};
 use glam::Vec2;
 
-use crate::shared::Size;
+use crate::shared::{Size, Viewport};
 
 pub trait InputEvent {
-    fn send_to_ecs(self, world: &mut World);
+    fn send_into_ecs(self, world: &mut World);
 }
 
 #[derive(Debug, Default, Copy, Clone)]
 #[cfg_attr(
     feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type),
+    serde(tag = "type")
+)]
+pub enum CompInputEvent {
+    CompositionResized(CompositionResizedEvent),
+    CompositionViewportChanged(CompositionViewportChangedEvent),
+    EntityMoved(EntityMovedEvent),
+    EntitySetPosition(EntitySetPositionEvent),
+    EntityDeleted(EntityDeletedEvent),
+}
+
+impl InputEvent for CompInputEvent {
+    fn send_into_ecs(self, world: &mut World) {
+        match self {
+            CompInputEvent::CompositionResized(event) => {
+                world.send_event(event);
+            }
+            CompInputEvent::CompositionViewportChanged(event) => {
+                world.send_event(event);
+            }
+            CompInputEvent::EntityMoved(event) => {
+                world.send_event(event);
+            }
+            CompInputEvent::EntitySetPosition(event) => {
+                world.send_event(event);
+            }
+            CompInputEvent::EntityDeleted(event) => {
+                world.send_event(event);
+            }
+        }
+    }
+}
+
+#[derive(Event, Debug, Default, Copy, Clone)]
+#[cfg_attr(
+    feature = "serde_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
-pub struct CompositionResized {
+pub struct CompositionResizedEvent {
     pub size: Size,
 }
 
-#[derive(Debug, Default, Copy, Clone)]
+#[derive(Event, Debug, Default, Copy, Clone)]
 #[cfg_attr(
     feature = "serde_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
-pub struct CompositionViewportChanged {
-    pub physical_position: Vec2,
-    pub physical_size: Vec2,
+pub struct CompositionViewportChangedEvent {
+    pub viewport: Viewport,
 }
 
-#[derive(Debug, Default, Copy, Clone)]
+#[derive(Event, Debug, Default, Copy, Clone)]
 #[cfg_attr(
     feature = "serde_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
@@ -37,7 +74,7 @@ pub struct EntityMoved {
     pub dy: f32,
 }
 
-#[derive(Debug, Default, Copy, Clone)]
+#[derive(Event, Debug, Default, Copy, Clone)]
 #[cfg_attr(
     feature = "serde_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
@@ -48,7 +85,7 @@ pub struct EntitySetPosition {
     pub y: f32,
 }
 
-#[derive(Debug, Default, Copy, Clone)]
+#[derive(Event, Debug, Default, Copy, Clone)]
 #[cfg_attr(
     feature = "serde_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)

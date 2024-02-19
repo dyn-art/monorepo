@@ -6,9 +6,12 @@ use dyn_comp_types::{
         world::{EntityWorldMut, World},
     },
     bevy_hierarchy::BuildWorldChildren,
+    events::{CompInputEvent, InputEvent},
+    mixins::Root,
 };
 
 use crate::{
+    events::DTIFInputEvent,
     node::{FrameNode, GroupNode, Node, NodeImpl},
     DTIFComp,
 };
@@ -25,8 +28,19 @@ impl DTIFInjector {
         }
     }
 
+    pub fn drain_sid_to_entity(&mut self) -> HashMap<String, Entity> {
+        self.sid_to_entity.drain().collect()
+    }
+
     pub fn inject_from_root(&mut self, dtif: &DTIFComp, world: &mut World) -> Option<Entity> {
-        self.process_node(dtif.root_node_id.clone(), dtif, world)
+        let maybe_root_node_entity = self.process_node(dtif.root_node_id.clone(), dtif, world);
+
+        if let Some(root_node_entity) = maybe_root_node_entity {
+            world.entity_mut(root_node_entity).insert(Root);
+            self.inject_input_events(&dtif.events, world);
+        }
+
+        return maybe_root_node_entity;
     }
 
     fn process_node(
@@ -74,5 +88,29 @@ impl DTIFInjector {
                 world.entity_mut(parent_entity).push_children(&new_children);
             }
         }
+    }
+
+    fn inject_input_events(&self, events: &Vec<DTIFInputEvent>, world: &mut World) {
+        events
+            .iter()
+            .cloned()
+            .map(|event| event.to_comp_input_event(&self.sid_to_entity))
+            .for_each(|maybe_event| {
+                if let Some(event) = maybe_event {
+                    event.send_into_ecs(world);
+                }
+            });
+    }
+
+    /// Tries to find the actual spawned entity for an entity referenced in DTIF.
+    fn find_entity(&self, entity: &Entity) -> Option<Entity> {
+        let sid = Self::entity_to_sid(entity);
+        self.sid_to_entity.get(&sid)
+    }
+
+    /// Converts an `Entity` to an Id of type String (sid) used to reference elements in DTIF.
+    #[inline]
+    pub fn entity_to_sid(entity: &Entity) -> String {
+        entity.to_bits().to_string()
     }
 }

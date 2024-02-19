@@ -1,9 +1,14 @@
 use crate::node::Node;
-use dyn_comp_types::shared::Size;
+use dyn_comp_types::{
+    events::CompInputEvent,
+    shared::{Size, Viewport},
+};
+use events::DTIFInputEvent;
 use glam::Vec2;
 use std::collections::HashMap;
 
 pub mod dtif_injector;
+pub mod events;
 pub mod node;
 
 #[derive(Debug, Clone, serde::Serialize, specta::Type)]
@@ -27,13 +32,8 @@ pub struct DTIFComp {
     /// A list of font data.
     #[serde(default)]
     pub fonts: Vec<Content>,
-}
-
-#[derive(Debug, Default, Copy, Clone, serde::Serialize, specta::Type)]
-#[serde(rename_all = "camelCase")]
-pub struct Viewport {
-    pub physical_position: Vec2,
-    pub physical_size: Vec2,
+    #[serde(default)]
+    pub events: Vec<DTIFInputEvent>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, specta::Type)]

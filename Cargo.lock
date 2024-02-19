@@ -1671,6 +1671,7 @@ dependencies = [
  "bevy_ecs 0.13.0",
  "bevy_transform",
  "dyn-comp-types",
+ "dyn-dtif",
  "glam 0.25.0",
  "smallvec",
 ]
