@@ -1,0 +1,22 @@
+[package]
+name = "dyn-comp-svg-render"
+version = "0.0.1"
+description = ""
+edition = { workspace = true }
+homepage = { workspace = true }
+repository = { workspace = true }
+license = { workspace = true }
+authors = { workspace = true }
+
+[features]
+default = []
+tracing = []
+
+[dependencies]
+dyn-comp-types = { path = "../comp_types" }
+bevy_app = "0.13.0"
+bevy_ecs = "0.13.0"
+bevy_transform = "0.13.0"
+bevy_render = "0.13.0"
+glam = "0.25.0"
+smallvec = "1.13.1"

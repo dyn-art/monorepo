@@ -1,0 +1,30 @@
+[package]
+name = "dyn-comp-types"
+version = "0.0.1"
+description = ""
+edition = { workspace = true }
+homepage = { workspace = true }
+repository = { workspace = true }
+license = { workspace = true }
+authors = { workspace = true }
+
+[features]
+default = []
+serde_support = ["dep:serde", "dep:specta"]
+tracing = []
+
+[dependencies]
+bevy_ecs = "0.13.0"
+bevy_hierarchy = "0.13.0"
+bevy_transform = "0.13.0"
+glam = "0.25.0"
+smallvec = "1.13.1"
+tiny-skia-path = "0.11.4"
+
+specta = { git = "https://github.com/oscartbeaumont/specta.git", rev = "5da3e56e82addf972766a7be8af720a2f5d2ca17", features = [
+    "serde",
+    "glam",
+    "bevy_ecs",
+], optional = true }
+serde = { version = "1.0.195", features = ["derive"], optional = true }
+# serde_support
