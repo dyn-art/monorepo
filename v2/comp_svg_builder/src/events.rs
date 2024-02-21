@@ -6,7 +6,7 @@ use crate::svg::svg_element::element_changes::SVGElementChanges;
     derive(serde::Serialize, specta::Type),
     serde(tag = "type")
 )]
-pub enum SVGRenderOutputEvent {
+pub enum SVGBuilderOutputEvent {
     ElementChanges(SVGElementChangesEvent),
 }
 

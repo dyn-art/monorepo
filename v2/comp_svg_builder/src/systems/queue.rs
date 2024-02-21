@@ -3,16 +3,16 @@ use std::collections::HashMap;
 use bevy_ecs::{entity::Entity, system::ResMut};
 
 use crate::{
-    events::{SVGElementChangesEvent, SVGRenderOutputEvent},
+    events::{SVGBuilderOutputEvent, SVGElementChangesEvent},
     resources::{
         changed_svg_nodes::{ChangedSVGNode, ChangedSVGNodesRes},
-        svg_render_output_event_sender::SVGRenderOutputEventSenderRes,
+        output_event_sender::OutputEventSenderRes,
     },
 };
 
 pub fn queue_svg_node_changes(
     mut changed_svg_nodes_res: ResMut<ChangedSVGNodesRes>,
-    svg_render_output_event_sender_res: ResMut<SVGRenderOutputEventSenderRes>,
+    output_event_sender_res: ResMut<OutputEventSenderRes>,
 ) {
     let mut changes: Vec<ChangedSVGNode> = changed_svg_nodes_res.changes.drain(..).collect();
 
@@ -39,8 +39,8 @@ pub fn queue_svg_node_changes(
     // Iterating through sorted changes to send events
     for changed_svg_node in changes {
         for change in changed_svg_node.changes {
-            let event = SVGRenderOutputEvent::ElementChanges(SVGElementChangesEvent(change));
-            let _ = svg_render_output_event_sender_res.sender.send(event);
+            let event = SVGBuilderOutputEvent::ElementChanges(SVGElementChangesEvent(change));
+            let _ = output_event_sender_res.sender.send(event);
         }
     }
 }

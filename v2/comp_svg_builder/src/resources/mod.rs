@@ -1,3 +1,3 @@
 pub mod changed_svg_nodes;
+pub mod output_event_sender;
 pub mod svg_context;
-pub mod svg_render_output_event_sender;

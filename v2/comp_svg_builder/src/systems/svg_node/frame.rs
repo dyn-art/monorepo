@@ -39,9 +39,6 @@ pub struct FrameSVGNode {
     fill_clip_path: SVGElement,
     fill_clipped_path: SVGElement,
     fill_wrapper_g: SVGElement,
-
-    // Children
-    node_children: Vec<Entity>,
 }
 
 impl SVGNode for FrameSVGNode {
@@ -215,8 +212,6 @@ impl FrameSVGNode {
             fill_clip_path: fill_clip_path_element,
             fill_clipped_path: fill_clipped_path_element,
             fill_wrapper_g: fill_wrapper_g_element,
-
-            node_children: Vec::new(),
         }
     }
 

@@ -2,13 +2,12 @@ use std::{collections::HashMap, fmt::Display};
 
 use bevy_ecs::{component::Component, entity::Entity};
 
-use self::{
-    attributes::SVGAttribute,
-    element_changes::{
-        SVGAttributeUpdatedChange, SVGElementChange, SVGElementCreatedChange,
-        SVGElementDeletedChange, SVGStyleUpdatedChange,
-    },
-    styles::SVGStyle,
+use self::{attributes::SVGAttribute, styles::SVGStyle};
+
+#[cfg(feature = "output_events")]
+use self::element_changes::{
+    SVGAttributeUpdatedChange, SVGElementChange, SVGElementCreatedChange, SVGElementDeletedChange,
+    SVGStyleUpdatedChange,
 };
 
 pub mod attributes;
@@ -27,7 +26,7 @@ pub struct SVGElement {
     styles: HashMap<&'static str, SVGStyle>,
     /// Children of the SVG element in the SVG tree.
     children: Vec<SVGElementChild>,
-    /// Render change updates
+    /// Applied changes after last drain.
     #[cfg(feature = "output_events")]
     changes: Vec<SVGElementChange>,
     /// Whether the element was created in the current update cycle (before first update drain).

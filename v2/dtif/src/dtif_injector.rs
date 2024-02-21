@@ -102,12 +102,6 @@ impl DTIFInjector {
             });
     }
 
-    /// Tries to find the actual spawned entity for an entity referenced in DTIF.
-    fn find_entity(&self, entity: &Entity) -> Option<&Entity> {
-        let sid = Self::entity_to_sid(entity);
-        self.sid_to_entity.get(&sid)
-    }
-
     /// Converts an `Entity` to an Id of type String (sid) used to reference elements in DTIF.
     #[inline]
     pub fn entity_to_sid(entity: &Entity) -> String {

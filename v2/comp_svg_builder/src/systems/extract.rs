@@ -1,3 +1,5 @@
+#![cfg(feature = "output_events")]
+
 use bevy_ecs::{
     entity::Entity,
     query::{Changed, With},

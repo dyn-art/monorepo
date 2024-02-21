@@ -1,18 +1,9 @@
 use bevy_app::{App, Last, Plugin};
 use bevy_ecs::schedule::{IntoSystemConfigs, SystemSet};
-use bevy_render::{ExtractSchedule, Render, RenderApp};
-use events::SVGRenderOutputEvent;
-use resources::{
-    changed_svg_nodes::ChangedSVGNodesRes, svg_context::SVGContextRes,
-    svg_render_output_event_sender::SVGRenderOutputEventSenderRes,
-};
-use systems::{
-    extract::extract_svg_nodes_generic,
-    queue::queue_svg_node_changes,
-    svg_node::{
-        frame::{apply_frame_node_size_change, insert_frame_svg_node, FrameSVGNode},
-        shape::{apply_shape_node_size_change, insert_shape_svg_node, ShapeSVGNode},
-    },
+use resources::svg_context::SVGContextRes;
+use systems::svg_node::{
+    frame::{apply_frame_node_size_change, insert_frame_svg_node},
+    shape::{apply_shape_node_size_change, insert_shape_svg_node},
 };
 
 pub mod events;
@@ -20,35 +11,35 @@ pub mod resources;
 pub mod svg;
 pub mod systems;
 
-pub struct SVGRenderPlugin {
+pub struct SVGBuilderPlugin {
     #[cfg(feature = "output_events")]
-    pub output_event_sender: std::sync::mpsc::Sender<SVGRenderOutputEvent>,
+    pub output_event_sender: std::sync::mpsc::Sender<crate::events::SVGBuilderOutputEvent>,
 }
 
 #[derive(SystemSet, Debug, Hash, PartialEq, Eq, Clone)]
-pub enum SVGRenderSystem {
+pub enum SVGRBuilderSystem {
     /// After this lablel,  events got applied.
     Insert,
     /// After this label, the layout got applied to the compositions nodes.
     Apply,
 }
 
-impl Plugin for SVGRenderPlugin {
+impl Plugin for SVGBuilderPlugin {
     fn build(&self, app: &mut App) {
         // Register systems
         app.add_systems(
             Last,
             (
                 // Frame SVG Node
-                insert_frame_svg_node.in_set(SVGRenderSystem::Insert),
+                insert_frame_svg_node.in_set(SVGRBuilderSystem::Insert),
                 apply_frame_node_size_change
-                    .in_set(SVGRenderSystem::Apply)
-                    .after(SVGRenderSystem::Insert),
+                    .in_set(SVGRBuilderSystem::Apply)
+                    .after(SVGRBuilderSystem::Insert),
                 // Shape SVG Node
-                insert_shape_svg_node.in_set(SVGRenderSystem::Insert),
+                insert_shape_svg_node.in_set(SVGRBuilderSystem::Insert),
                 apply_shape_node_size_change
-                    .in_set(SVGRenderSystem::Apply)
-                    .after(SVGRenderSystem::Insert),
+                    .in_set(SVGRBuilderSystem::Apply)
+                    .after(SVGRBuilderSystem::Insert),
             ),
         );
 
@@ -60,7 +51,18 @@ impl Plugin for SVGRenderPlugin {
     }
 }
 
-fn build_render_app(app: &mut App, sender: std::sync::mpsc::Sender<SVGRenderOutputEvent>) {
+#[cfg(feature = "output_events")]
+fn build_render_app(app: &mut App, sender: std::sync::mpsc::Sender<events::SVGBuilderOutputEvent>) {
+    use crate::systems::extract::extract_svg_nodes_generic;
+    use bevy_render::{ExtractSchedule, Render, RenderApp};
+    use resources::{
+        changed_svg_nodes::ChangedSVGNodesRes, output_event_sender::OutputEventSenderRes,
+    };
+    use systems::{
+        queue::queue_svg_node_changes,
+        svg_node::{frame::FrameSVGNode, shape::ShapeSVGNode},
+    };
+
     let render_app = match app.get_sub_app_mut(RenderApp) {
         Ok(render_app) => render_app,
         Err(_) => return,
@@ -68,7 +70,7 @@ fn build_render_app(app: &mut App, sender: std::sync::mpsc::Sender<SVGRenderOutp
 
     // Register resources
     render_app.init_resource::<ChangedSVGNodesRes>();
-    render_app.insert_resource(SVGRenderOutputEventSenderRes { sender });
+    render_app.insert_resource(OutputEventSenderRes { sender });
 
     // Register systems
     render_app.add_systems(
