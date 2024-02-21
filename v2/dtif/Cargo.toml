@@ -14,10 +14,7 @@ tracing = []
 
 [dependencies]
 dyn-comp-types = { path = "../comp_types", features = ["serde_support"] }
-glam = "0.25.0"
-smallvec = "1.13.1"
-serde = { version = "1.0.195", features = ["derive"] }
-specta = { git = "https://github.com/oscartbeaumont/specta.git", rev = "5da3e56", features = [
-    "serde",
-    "glam",
-] }
+glam = { workspace = true }
+smallvec = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+specta = { workspace = true, features = ["serde", "glam"] }

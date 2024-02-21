@@ -853,7 +853,7 @@ dependencies = [
  "bevy_reflect_derive 0.13.0",
  "bevy_utils 0.13.0",
  "downcast-rs",
- "erased-serde 0.4.2",
+ "erased-serde 0.4.3",
  "glam 0.25.0",
  "serde",
  "smol_str",
@@ -1682,7 +1682,7 @@ name = "dyn-comp-interactive"
 version = "0.0.1"
 
 [[package]]
-name = "dyn-comp-svg-render"
+name = "dyn-comp-svg-builder"
 version = "0.0.1"
 dependencies = [
  "bevy_app 0.13.0",
@@ -1694,6 +1694,7 @@ dependencies = [
  "serde",
  "smallvec",
  "specta 2.0.0-rc.7 (git+https://github.com/oscartbeaumont/specta.git?rev=5da3e56)",
+ "tiny-skia-path",
 ]
 
 [[package]]
@@ -1868,9 +1869,9 @@ dependencies = [
 
 [[package]]
 name = "erased-serde"
-version = "0.4.2"
+version = "0.4.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "55d05712b2d8d88102bc9868020c9e5c7a1f5527c452b9b97450a1d006140ba7"
+checksum = "388979d208a049ffdfb22fa33b9c81942215b940910bccfe258caeb25d125cb3"
 dependencies = [
  "serde",
 ]

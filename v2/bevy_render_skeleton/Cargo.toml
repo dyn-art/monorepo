@@ -13,8 +13,8 @@ default = []
 tracing = []
 
 [dependencies]
-bevy_ecs = "0.13.0"
-bevy_app = "0.13.0"
-bevy_utils = "0.13.0"
-bevy_time = "0.13.0"
-glam = "0.25.0"
+bevy_ecs = { workspace = true }
+bevy_app = { workspace = true }
+bevy_utils = { workspace = true }
+bevy_time = { workspace = true }
+glam = { workspace = true }

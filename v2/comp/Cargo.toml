@@ -16,9 +16,9 @@ tracing = []
 [dependencies]
 dyn-comp-types = { path = "../comp_types" }
 dyn-dtif = { path = "../dtif", optional = true }
-bevy_app = "0.13.0"
-bevy_ecs = "0.13.0"
-bevy_transform = "0.13.0"
-glam = "0.25.0"
-smallvec = "1.13.1"
-tiny-skia-path = "0.11.4"
+bevy_app = { workspace = true }
+bevy_ecs = { workspace = true }
+bevy_transform = { workspace = true }
+glam = { workspace = true }
+smallvec = { workspace = true }
+tiny-skia-path = { workspace = true }

@@ -1,5 +1,5 @@
 [package]
-name = "dyn-comp-svg-render"
+name = "dyn-comp-svg-builder"
 version = "0.0.1"
 description = ""
 edition = { workspace = true }
@@ -9,24 +9,25 @@ license = { workspace = true }
 authors = { workspace = true }
 
 [features]
-default = ["serde_support"]
+default = ["serde_support", "output_events"]
 serde_support = ["dep:serde", "dep:specta", "dyn-comp-types/serde_support"]
 output_events = []
 tracing = []
 
 [dependencies]
 dyn-comp-types = { path = "../comp_types" }
-bevy_app = "0.13.0"
-bevy_ecs = "0.13.0"
-bevy_transform = "0.13.0"
-bevy_render = "0.13.0"
-glam = "0.25.0"
-smallvec = "1.13.1"
+bevy_app = { workspace = true }
+bevy_ecs = { workspace = true }
+bevy_transform = { workspace = true }
+bevy_render = { workspace = true }
+glam = { workspace = true }
+smallvec = { workspace = true }
+tiny-skia-path = { workspace = true }
 
 # serde_support
-specta = { git = "https://github.com/oscartbeaumont/specta.git", rev = "5da3e56", features = [
+specta = { workspace = true, features = [
     "serde",
     "glam",
     "bevy_ecs",
 ], optional = true }
-serde = { version = "1.0.195", features = ["derive"], optional = true }
+serde = { workspace = true, features = ["derive"], optional = true }

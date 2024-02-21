@@ -22,9 +22,9 @@ pub struct CompPlugin {
     pub dtif: dyn_dtif::DTIFComp,
 }
 
-#[derive(Debug, Hash, PartialEq, Eq, Clone, SystemSet)]
+#[derive(SystemSet, Debug, Hash, PartialEq, Eq, Clone)]
 pub enum CompSystem {
-    /// After this lable, input events got applied.
+    /// After this lablel, input events got applied.
     Input,
     /// After this label, the layout got applied to the compositions nodes.
     Layout,
@@ -41,7 +41,7 @@ impl Plugin for CompPlugin {
         // TODO
 
         // Register systems
-        app.add_systems(PostUpdate, (outline_rectangle.in_set(CompSystem::Outline)));
+        app.add_systems(Update, (outline_rectangle.in_set(CompSystem::Outline)));
 
         inject_dtif_into_ecs(&mut app.world, &self.dtif)
     }
