@@ -12,4 +12,4 @@ pub enum SVGRenderOutputEvent {
 
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde_support", derive(serde::Serialize, specta::Type))]
-pub struct SVGElementChangesEvent(SVGElementChanges);
+pub struct SVGElementChangesEvent(pub SVGElementChanges);

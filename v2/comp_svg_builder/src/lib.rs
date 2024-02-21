@@ -1,6 +1,6 @@
 use bevy_app::{App, Last, Plugin};
 use bevy_ecs::schedule::{IntoSystemConfigs, SystemSet};
-use bevy_render::{ExtractSchedule, RenderApp};
+use bevy_render::{ExtractSchedule, Render, RenderApp};
 use events::SVGRenderOutputEvent;
 use resources::{
     changed_svg_nodes::ChangedSVGNodesRes, svg_context::SVGContextRes,
@@ -8,7 +8,11 @@ use resources::{
 };
 use systems::{
     extract::extract_svg_nodes_generic,
-    svg_node::frame::{apply_frame_node_transform_change, create_frame_svg_node, FrameSVGNode},
+    queue::queue_svg_node_changes,
+    svg_node::{
+        frame::{apply_frame_node_size_change, insert_frame_svg_node, FrameSVGNode},
+        shape::{apply_shape_node_size_change, insert_shape_svg_node, ShapeSVGNode},
+    },
 };
 
 pub mod events;
@@ -22,9 +26,9 @@ pub struct SVGRenderPlugin {
 }
 
 #[derive(SystemSet, Debug, Hash, PartialEq, Eq, Clone)]
-pub enum SvgRenderSystem {
+pub enum SVGRenderSystem {
     /// After this lablel,  events got applied.
-    Create,
+    Insert,
     /// After this label, the layout got applied to the compositions nodes.
     Apply,
 }
@@ -35,10 +39,16 @@ impl Plugin for SVGRenderPlugin {
         app.add_systems(
             Last,
             (
-                create_frame_svg_node.in_set(SvgRenderSystem::Create),
-                apply_frame_node_transform_change
-                    .in_set(SvgRenderSystem::Apply)
-                    .after(SvgRenderSystem::Create),
+                // Frame SVG Node
+                insert_frame_svg_node.in_set(SVGRenderSystem::Insert),
+                apply_frame_node_size_change
+                    .in_set(SVGRenderSystem::Apply)
+                    .after(SVGRenderSystem::Insert),
+                // Shape SVG Node
+                insert_shape_svg_node.in_set(SVGRenderSystem::Insert),
+                apply_shape_node_size_change
+                    .in_set(SVGRenderSystem::Apply)
+                    .after(SVGRenderSystem::Insert),
             ),
         );
 
@@ -61,5 +71,12 @@ fn build_render_app(app: &mut App, sender: std::sync::mpsc::Sender<SVGRenderOutp
     render_app.insert_resource(SVGRenderOutputEventSenderRes { sender });
 
     // Register systems
-    render_app.add_systems(ExtractSchedule, (extract_svg_nodes_generic::<FrameSVGNode>));
+    render_app.add_systems(
+        ExtractSchedule,
+        (
+            extract_svg_nodes_generic::<FrameSVGNode>,
+            extract_svg_nodes_generic::<ShapeSVGNode>,
+        ),
+    );
+    render_app.add_systems(Render, queue_svg_node_changes);
 }

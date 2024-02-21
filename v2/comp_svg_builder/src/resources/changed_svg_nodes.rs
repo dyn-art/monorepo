@@ -12,4 +12,5 @@ pub struct ChangedSVGNode {
     pub parent_entity: Option<Entity>,
     pub entity: Entity,
     pub changes: Vec<SVGElementChanges>,
+    pub index: usize,
 }
