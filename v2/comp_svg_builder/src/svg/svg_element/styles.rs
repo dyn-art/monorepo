@@ -4,17 +4,17 @@
     derive(serde::Serialize, specta::Type),
     serde(tag = "type")
 )]
-pub enum SVGStyle {
+pub enum SvgStyle {
     Display {
-        display: SVGDisplayStyle,
+        display: SvgDisplayStyle,
     },
     #[cfg_attr(feature = "serde_support", serde(rename_all = "camelCase"))]
     BlendMode {
-        blend_mode: SVGBlendMode,
+        blend_mode: SvgBlendMode,
     },
 }
 
-impl SVGStyle {
+impl SvgStyle {
     pub fn key(&self) -> &'static str {
         match self {
             Self::Display { .. } => "display",
@@ -25,26 +25,26 @@ impl SVGStyle {
     pub fn into_svg_string(&self) -> String {
         match self {
             Self::Display { display } => match display {
-                SVGDisplayStyle::Block => String::from("block"),
-                SVGDisplayStyle::None => String::from("none"),
+                SvgDisplayStyle::Block => String::from("block"),
+                SvgDisplayStyle::None => String::from("none"),
             },
             Self::BlendMode { blend_mode } => match blend_mode {
-                SVGBlendMode::Normal => String::from("normal"),
-                SVGBlendMode::Multiply => String::from("multiply"),
-                SVGBlendMode::Screen => String::from("screen"),
-                SVGBlendMode::Overlay => String::from("overlay"),
-                SVGBlendMode::Darken => String::from("darken"),
-                SVGBlendMode::Lighten => String::from("lighten"),
-                SVGBlendMode::ColorDodge => String::from("color-dodge"),
-                SVGBlendMode::ColorBurn => String::from("color-burn"),
-                SVGBlendMode::HardLight => String::from("hard-light"),
-                SVGBlendMode::SoftLight => String::from("soft-light"),
-                SVGBlendMode::Difference => String::from("difference"),
-                SVGBlendMode::Exclusion => String::from("exclusion"),
-                SVGBlendMode::Hue => String::from("hue"),
-                SVGBlendMode::Saturation => String::from("saturation"),
-                SVGBlendMode::Color => String::from("color"),
-                SVGBlendMode::Luminosity => String::from("luminosity"),
+                SvgBlendMode::Normal => String::from("normal"),
+                SvgBlendMode::Multiply => String::from("multiply"),
+                SvgBlendMode::Screen => String::from("screen"),
+                SvgBlendMode::Overlay => String::from("overlay"),
+                SvgBlendMode::Darken => String::from("darken"),
+                SvgBlendMode::Lighten => String::from("lighten"),
+                SvgBlendMode::ColorDodge => String::from("color-dodge"),
+                SvgBlendMode::ColorBurn => String::from("color-burn"),
+                SvgBlendMode::HardLight => String::from("hard-light"),
+                SvgBlendMode::SoftLight => String::from("soft-light"),
+                SvgBlendMode::Difference => String::from("difference"),
+                SvgBlendMode::Exclusion => String::from("exclusion"),
+                SvgBlendMode::Hue => String::from("hue"),
+                SvgBlendMode::Saturation => String::from("saturation"),
+                SvgBlendMode::Color => String::from("color"),
+                SvgBlendMode::Luminosity => String::from("luminosity"),
             },
         }
     }
@@ -56,7 +56,7 @@ impl SVGStyle {
 
 #[derive(Debug, Default, Copy, Clone)]
 #[cfg_attr(feature = "serde_support", derive(serde::Serialize, specta::Type))]
-pub enum SVGDisplayStyle {
+pub enum SvgDisplayStyle {
     #[default]
     Block,
     None,
@@ -64,7 +64,7 @@ pub enum SVGDisplayStyle {
 
 #[derive(Debug, Default, Copy, Clone)]
 #[cfg_attr(feature = "serde_support", derive(serde::Serialize, specta::Type))]
-pub enum SVGBlendMode {
+pub enum SvgBlendMode {
     #[default]
     Normal,
     Multiply,

@@ -1,13 +1,4 @@
-use dyn_comp_types::{
-    bevy_transform::components::Transform,
-    bundles::{FrameCompNodeBundle, GroupCompNodeBundle, RectangleCompNodeBundle},
-    mixins::{
-        BlendModeMixin, CornerRadiiMixin, FillMixin, OpacityMixin, SizeMixin, StrokeMixin,
-        VisibilityMixin,
-    },
-    nodes::{CompNode, FrameCompNode, GroupCompNode, RectangleCompNode},
-    shared::{BlendMode, CornerRadii, Fill, Opacity, Size, Stroke, Visibility},
-};
+use dyn_comp_types::prelude::*;
 use glam::{Quat, Vec2, Vec3};
 use smallvec::SmallVec;
 
@@ -20,7 +11,7 @@ pub enum Node {
 }
 
 pub trait NodeImpl {
-    type Bundle: dyn_comp_types::bevy_ecs::bundle::Bundle;
+    type Bundle: bevy_ecs::bundle::Bundle;
     fn to_ecs_bundle(&self) -> Self::Bundle;
 }
 

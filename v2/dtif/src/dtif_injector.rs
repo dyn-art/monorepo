@@ -1,27 +1,19 @@
 use std::collections::HashMap;
 
-use dyn_comp_types::{
-    bevy_ecs::{
-        entity::Entity,
-        world::{EntityWorldMut, World},
-    },
-    bevy_hierarchy::BuildWorldChildren,
-    events::InputEvent,
-    mixins::Root,
-};
+use dyn_comp_types::prelude::*;
 
 use crate::{
-    events::DTIFInputEvent,
+    events::DtifInputEvent,
     node::{FrameNode, GroupNode, Node, NodeImpl},
-    DTIFComp,
+    DtifComp,
 };
 
-pub struct DTIFInjector {
+pub struct DtifInjector {
     /// Maps Ids of type String (sid) from the DTIF to actual spawned Bevy entities.
     sid_to_entity: HashMap<String, Entity>,
 }
 
-impl DTIFInjector {
+impl DtifInjector {
     pub fn new() -> Self {
         Self {
             sid_to_entity: HashMap::default(),
@@ -32,7 +24,7 @@ impl DTIFInjector {
         self.sid_to_entity.drain().collect()
     }
 
-    pub fn inject_from_root(&mut self, dtif: &DTIFComp, world: &mut World) -> Option<Entity> {
+    pub fn inject_from_root(&mut self, dtif: &DtifComp, world: &mut World) -> Option<Entity> {
         let maybe_root_node_entity = self.process_node(dtif.root_node_id.clone(), dtif, world);
 
         if let Some(root_node_entity) = maybe_root_node_entity {
@@ -46,7 +38,7 @@ impl DTIFInjector {
     fn process_node(
         &mut self,
         node_sid: String,
-        dtif: &DTIFComp,
+        dtif: &DtifComp,
         world: &mut World,
     ) -> Option<Entity> {
         dtif.nodes.get(&node_sid).map(|node| {
@@ -71,7 +63,7 @@ impl DTIFInjector {
         &mut self,
         parent_entity: Entity,
         node: &Node,
-        dtif: &DTIFComp,
+        dtif: &DtifComp,
         world: &mut World,
     ) {
         if let Node::Frame(FrameNode { children, .. }) | Node::Group(GroupNode { children, .. }) =
@@ -90,7 +82,7 @@ impl DTIFInjector {
         }
     }
 
-    fn inject_input_events(&self, events: &Vec<DTIFInputEvent>, world: &mut World) {
+    fn inject_input_events(&self, events: &Vec<DtifInputEvent>, world: &mut World) {
         events
             .iter()
             .cloned()

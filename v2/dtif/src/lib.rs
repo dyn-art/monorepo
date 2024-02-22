@@ -1,6 +1,6 @@
 use crate::node::Node;
-use dyn_comp_types::shared::{Size, Viewport};
-use events::DTIFInputEvent;
+use dyn_comp_types::prelude::*;
+use events::DtifInputEvent;
 use std::collections::HashMap;
 
 pub mod dtif_injector;
@@ -9,7 +9,7 @@ pub mod node;
 
 #[derive(Debug, Clone, serde::Serialize, specta::Type)]
 #[serde(rename_all = "camelCase")]
-pub struct DTIFComp {
+pub struct DtifComp {
     /// The version of the composition type declaration.
     pub version: String,
     /// The name of the composition.
@@ -29,7 +29,7 @@ pub struct DTIFComp {
     #[serde(default)]
     pub fonts: Vec<Content>,
     #[serde(default)]
-    pub events: Vec<DTIFInputEvent>,
+    pub events: Vec<DtifInputEvent>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, specta::Type)]

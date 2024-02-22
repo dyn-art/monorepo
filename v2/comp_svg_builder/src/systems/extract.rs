@@ -5,18 +5,16 @@ use bevy_ecs::{
     query::{Changed, With},
     system::{Query, ResMut},
 };
-use dyn_comp_types::{
-    bevy_hierarchy::{Children, Parent},
-    nodes::CompNode,
-};
+use bevy_hierarchy::{Children, Parent};
+use dyn_comp_types::nodes::CompNode;
 
 use crate::{
-    resources::changed_svg_nodes::{ChangedSVGNode, ChangedSVGNodesRes},
-    svg::svg_node::SVGNode,
+    resources::changed_svg_nodes::{ChangedSvgNode, ChangedSvgNodesRes},
+    svg::svg_node::SvgNode,
 };
 
-pub fn extract_svg_nodes_generic<C: SVGNode>(
-    mut changed_svg_nodes_res: ResMut<ChangedSVGNodesRes>,
+pub fn extract_svg_nodes_generic<C: SvgNode>(
+    mut changed_svg_nodes_res: ResMut<ChangedSvgNodesRes>,
     mut query: Query<(Entity, &mut C, Option<&Parent>), (With<CompNode>, Changed<C>)>,
     child_query: Query<&Children>,
 ) {
@@ -43,7 +41,7 @@ pub fn extract_svg_nodes_generic<C: SVGNode>(
                     (None, 0)
                 };
 
-            changed_svg_nodes_res.changes.push(ChangedSVGNode {
+            changed_svg_nodes_res.changes.push(ChangedSvgNode {
                 entity,
                 parent_entity,
                 changes: svg_node.drain_changes(),

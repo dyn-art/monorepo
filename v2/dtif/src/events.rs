@@ -1,45 +1,39 @@
 use std::collections::HashMap;
 
-use dyn_comp_types::{
-    bevy_ecs::entity::Entity,
-    events::CompInputEvent,
-    shared::{Size, Viewport},
-};
+use dyn_comp_types::prelude::*;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
 #[serde(tag = "type")]
-pub enum DTIFInputEvent {
-    CompositionResized(CompositionResizedEvent),
-    CompositionViewportChanged(CompositionViewportChangedEvent),
-    EntityMoved(EntityMovedEvent),
-    EntitySetPosition(EntitySetPositionEvent),
-    EntityDeleted(EntityDeletedEvent),
+pub enum DtifInputEvent {
+    CompositionResized(DtifCompositionResizedEvent),
+    CompositionViewportChanged(DtifCompositionViewportChangedEvent),
+    EntityMoved(DtifEntityMovedEvent),
+    EntitySetPosition(DtifEntitySetPositionEvent),
+    EntityDeleted(DtifEntityDeletedEvent),
 }
 
-impl DTIFInputEvent {
+impl DtifInputEvent {
     pub fn into_comp_input_event(
         self,
         sid_to_entity: &HashMap<String, Entity>,
     ) -> Option<CompInputEvent> {
-        use dyn_comp_types::events::*;
-
         match self {
-            DTIFInputEvent::CompositionResized(event) => Some(CompInputEvent::CompositionResized(
+            DtifInputEvent::CompositionResized(event) => Some(CompInputEvent::CompositionResized(
                 CompositionResizedEvent { size: event.size },
             )),
-            DTIFInputEvent::CompositionViewportChanged(event) => Some(
+            DtifInputEvent::CompositionViewportChanged(event) => Some(
                 CompInputEvent::CompositionViewportChanged(CompositionViewportChangedEvent {
                     viewport: event.viewport,
                 }),
             ),
-            DTIFInputEvent::EntityMoved(event) => sid_to_entity.get(&event.entity).map(|entity| {
+            DtifInputEvent::EntityMoved(event) => sid_to_entity.get(&event.entity).map(|entity| {
                 CompInputEvent::EntityMoved(EntityMovedEvent {
                     dx: event.dx,
                     dy: event.dy,
                     entity: *entity,
                 })
             }),
-            DTIFInputEvent::EntitySetPosition(event) => {
+            DtifInputEvent::EntitySetPosition(event) => {
                 sid_to_entity.get(&event.entity).map(|entity| {
                     CompInputEvent::EntitySetPosition(EntitySetPositionEvent {
                         x: event.x,
@@ -48,7 +42,7 @@ impl DTIFInputEvent {
                     })
                 })
             }
-            DTIFInputEvent::EntityDeleted(event) => {
+            DtifInputEvent::EntityDeleted(event) => {
                 sid_to_entity.get(&event.entity).map(|entity| {
                     CompInputEvent::EntityDeleted(EntityDeletedEvent { entity: *entity })
                 })
@@ -58,30 +52,30 @@ impl DTIFInputEvent {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
-pub struct CompositionResizedEvent {
+pub struct DtifCompositionResizedEvent {
     pub size: Size,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
-pub struct CompositionViewportChangedEvent {
+pub struct DtifCompositionViewportChangedEvent {
     pub viewport: Viewport,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
-pub struct EntityMovedEvent {
+pub struct DtifEntityMovedEvent {
     pub entity: String,
     pub dx: f32,
     pub dy: f32,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
-pub struct EntitySetPositionEvent {
+pub struct DtifEntitySetPositionEvent {
     pub entity: String,
     pub x: f32,
     pub y: f32,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
-pub struct EntityDeletedEvent {
+pub struct DtifEntityDeletedEvent {
     pub entity: String,
 }

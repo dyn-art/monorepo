@@ -1678,8 +1678,15 @@ dependencies = [
 ]
 
 [[package]]
-name = "dyn-comp-interactive"
+name = "dyn-comp-interaction"
 version = "0.0.1"
+dependencies = [
+ "bevy_app 0.13.0",
+ "bevy_ecs 0.13.0",
+ "bevy_transform",
+ "dyn-comp-types",
+ "glam 0.25.0",
+]
 
 [[package]]
 name = "dyn-comp-svg-builder"
@@ -1687,6 +1694,7 @@ version = "0.0.1"
 dependencies = [
  "bevy_app 0.13.0",
  "bevy_ecs 0.13.0",
+ "bevy_hierarchy 0.13.0",
  "bevy_render",
  "bevy_transform",
  "dyn-comp-types",
@@ -1715,6 +1723,9 @@ dependencies = [
 name = "dyn-dtif"
 version = "0.0.1"
 dependencies = [
+ "bevy_ecs 0.13.0",
+ "bevy_hierarchy 0.13.0",
+ "bevy_transform",
  "dyn-comp-types",
  "glam 0.25.0",
  "serde",

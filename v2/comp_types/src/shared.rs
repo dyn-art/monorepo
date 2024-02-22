@@ -51,7 +51,7 @@ pub struct Centimeter(pub f32);
 )]
 pub struct Millimeter(pub f32);
 
-// https://oreillymedia.github.io/Using_SVG/guide/units.html
+// https://oreillymedia.github.io/Using_Svg/guide/units.html
 #[derive(Debug, Copy, Clone)]
 #[cfg_attr(
     feature = "serde_support",

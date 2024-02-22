@@ -14,6 +14,9 @@ tracing = []
 
 [dependencies]
 dyn-comp-types = { path = "../comp_types", features = ["serde_support"] }
+bevy_ecs = { workspace = true }
+bevy_hierarchy = { workspace = true }
+bevy_transform = { workspace = true }
 glam = { workspace = true }
 smallvec = { workspace = true }
 serde = { workspace = true, features = ["derive"] }

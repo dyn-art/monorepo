@@ -1,31 +1,27 @@
 use bevy_app::prelude::*;
 use bevy_ecs::prelude::*;
+use dyn_comp_types::prelude::*;
 use resources::composition::CompositionRes;
 use systems::outline::rectangle::outline_rectangle;
 
 pub mod resources;
 pub mod systems;
 
-// Game Plan
-// Export as String
-// 1. Identify RootCompNode
-// 2. Get root SVGElement from SVGNode component which is attached to the RootCompNode entity
-// 3. Walk the tree, needs context to commands or world though I guess to query other entities
-
-// Determine Updates
-// 1. Query for changed SVGNodes
-// 2. Drain updates
-// 3. Decide where to put which updates based on SVGNodes root SVGElements indent level and child index
-
 pub struct CompPlugin {
     #[cfg(feature = "dtif")]
-    pub dtif: dyn_dtif::DTIFComp,
+    pub dtif: dyn_dtif::DtifComp,
+    #[cfg(not(feature = "dtif"))]
+    pub size: Size,
+    #[cfg(not(feature = "dtif"))]
+    pub viewport: Option<Viewport>,
+    #[cfg(not(feature = "dtif"))]
+    pub root_nodes: Vec<Entity>,
 }
 
 #[derive(SystemSet, Debug, Hash, PartialEq, Eq, Clone)]
-pub enum CompSystem {
+pub enum CompSystemSet {
     /// After this lablel, input events got applied.
-    Input,
+    InputEvents,
     /// After this label, the layout got applied to the compositions nodes.
     Layout,
     /// After this label, the composition nodes got outlined.
@@ -35,20 +31,45 @@ pub enum CompSystem {
 impl Plugin for CompPlugin {
     fn build(&self, app: &mut App) {
         // Register events
-        // TODO
+        app.add_event::<CompositionResizedEvent>();
+        app.add_event::<CompositionViewportChangedEvent>();
+        app.add_event::<EntityDeletedEvent>();
+        app.add_event::<EntityMovedEvent>();
+        app.add_event::<EntitySetPositionEvent>();
 
         // Register resources
+        #[cfg(not(feature = "dtif"))]
+        app.insert_resource(CompositionRes {
+            root_nodes: self.root_nodes.clone(),
+            viewport: self.viewport.unwrap_or_default(),
+            size: self.size,
+        });
         // TODO
+        // - Font Cache
+        // - Asset Cache
+
+        // Register system sets
+        app.configure_sets(
+            Update,
+            (
+                CompSystemSet::InputEvents,
+                CompSystemSet::Layout,
+                CompSystemSet::Outline,
+            )
+                .chain(),
+        );
 
         // Register systems
-        app.add_systems(Update, (outline_rectangle.in_set(CompSystem::Outline)));
+        app.add_systems(Update, outline_rectangle.in_set(CompSystemSet::Outline));
 
+        #[cfg(feature = "dtif")]
         inject_dtif_into_ecs(&mut app.world, &self.dtif)
     }
 }
 
-fn inject_dtif_into_ecs(world: &mut World, dtif: &dyn_dtif::DTIFComp) {
-    let mut dtif_injector = dyn_dtif::dtif_injector::DTIFInjector::new();
+#[cfg(feature = "dtif")]
+fn inject_dtif_into_ecs(world: &mut World, dtif: &dyn_dtif::DtifComp) {
+    let mut dtif_injector = dyn_dtif::dtif_injector::DtifInjector::new();
 
     // Load fonts into cache
     // TODO
@@ -60,9 +81,7 @@ fn inject_dtif_into_ecs(world: &mut World, dtif: &dyn_dtif::DTIFComp) {
     let maybe_root_node_entity = dtif_injector.inject_from_root(dtif, world);
     if let Some(root_node_entity) = maybe_root_node_entity {
         world.insert_resource(CompositionRes {
-            version: dtif.version.clone(),
-            name: dtif.name.clone(),
-            root_node: root_node_entity,
+            root_nodes: vec![root_node_entity],
             viewport: dtif.viewport,
             size: dtif.size,
         })

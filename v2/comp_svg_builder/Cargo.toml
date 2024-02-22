@@ -18,6 +18,7 @@ tracing = []
 dyn-comp-types = { path = "../comp_types" }
 bevy_app = { workspace = true }
 bevy_ecs = { workspace = true }
+bevy_hierarchy = { workspace = true }
 bevy_transform = { workspace = true }
 bevy_render = { workspace = true }
 glam = { workspace = true }

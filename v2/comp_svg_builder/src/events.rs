@@ -1,4 +1,4 @@
-use crate::svg::svg_element::element_changes::SVGElementChanges;
+use crate::svg::svg_element::element_changes::SvgElementChanges;
 
 #[derive(Debug, Clone)]
 #[cfg_attr(
@@ -6,10 +6,10 @@ use crate::svg::svg_element::element_changes::SVGElementChanges;
     derive(serde::Serialize, specta::Type),
     serde(tag = "type")
 )]
-pub enum SVGBuilderOutputEvent {
-    ElementChanges(SVGElementChangesEvent),
+pub enum SvgBuilderOutputEvent {
+    ElementChanges(SvgElementChangesEvent),
 }
 
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde_support", derive(serde::Serialize, specta::Type))]
-pub struct SVGElementChangesEvent(pub SVGElementChanges);
+pub struct SvgElementChangesEvent(pub SvgElementChanges);

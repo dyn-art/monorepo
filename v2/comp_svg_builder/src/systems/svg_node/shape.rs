@@ -14,40 +14,40 @@ use dyn_comp_types::{
 };
 
 use crate::{
-    resources::svg_context::SVGContextRes,
+    resources::svg_context::SvgContextRes,
     svg::{
         svg_element::{
-            attributes::{SVGAttribute, SVGMeasurementUnit},
-            SVGElement, SVGElementId,
+            attributes::{SvgAttribute, SvgMeasurementUnit},
+            SvgElement, SvgElementId,
         },
-        svg_node::SVGNode,
+        svg_node::SvgNode,
     },
 };
 
 #[derive(Component, Debug, Clone)]
-pub struct ShapeSVGNode {
-    root: SVGElement,
-    defs: SVGElement,
+pub struct ShapeSvgNode {
+    root: SvgElement,
+    defs: SvgElement,
 
     // Fill elements
-    fill_clip_path: SVGElement,
-    fill_clipped_path: SVGElement,
-    fill_wrapper_g: SVGElement,
+    fill_clip_path: SvgElement,
+    fill_clipped_path: SvgElement,
+    fill_wrapper_g: SvgElement,
 
     // Click area elements
-    click_area_rect: SVGElement,
+    click_area_rect: SvgElement,
 }
 
-impl SVGNode for ShapeSVGNode {
-    fn get_root_element(&self) -> &SVGElement {
+impl SvgNode for ShapeSvgNode {
+    fn get_root_element(&self) -> &SvgElement {
         &self.root
     }
 
-    fn get_root_element_mut(&mut self) -> &mut SVGElement {
+    fn get_root_element_mut(&mut self) -> &mut SvgElement {
         &mut self.root
     }
 
-    fn get_child_elements(&self) -> BTreeMap<SVGElementId, &SVGElement> {
+    fn get_child_elements(&self) -> BTreeMap<SvgElementId, &SvgElement> {
         let mut children = BTreeMap::new();
 
         children.insert(self.defs.get_id(), &self.defs);
@@ -59,7 +59,7 @@ impl SVGNode for ShapeSVGNode {
         return children;
     }
 
-    fn get_child_elements_mut(&mut self) -> BTreeMap<SVGElementId, &mut SVGElement> {
+    fn get_child_elements_mut(&mut self) -> BTreeMap<SvgElementId, &mut SvgElement> {
         let mut children = BTreeMap::new();
 
         children.insert(self.defs.get_id(), &mut self.defs);
@@ -72,17 +72,17 @@ impl SVGNode for ShapeSVGNode {
     }
 }
 
-impl ShapeSVGNode {
-    pub fn new(entity: Entity, cx: &mut SVGContextRes) -> Self {
+impl ShapeSvgNode {
+    pub fn new(entity: Entity, cx: &mut SvgContextRes) -> Self {
         let mut root_element = cx.create_bundle_root_element("group", entity);
         #[cfg(feature = "tracing")]
-        root_element.set_attribute(SVGAttribute::Name {
+        root_element.set_attribute(SvgAttribute::Name {
             name: Self::create_element_name(root_element.get_id(), String::from("root"), false),
         });
 
         let mut defs_element = cx.create_element("defs");
         #[cfg(feature = "tracing")]
-        defs_element.set_attribute(SVGAttribute::Name {
+        defs_element.set_attribute(SvgAttribute::Name {
             name: Self::create_element_name(defs_element.get_id(), String::from("defs"), false),
         });
         root_element.append_child_in_node_context(entity, &mut defs_element);
@@ -92,23 +92,23 @@ impl ShapeSVGNode {
         let mut click_area_rect_element = cx.create_element("rect");
         #[cfg(feature = "tracing")]
         click_area_rect_element.set_attributes(vec![
-            SVGAttribute::Name {
+            SvgAttribute::Name {
                 name: Self::create_element_name(
                     click_area_rect_element.get_id(),
                     String::from("click-area-rect"),
                     false,
                 ),
             },
-            SVGAttribute::Fill {
+            SvgAttribute::Fill {
                 fill: String::from("rgba(255, 204, 203, 0.5)"),
             },
         ]);
         #[cfg(not(feature = "tracing"))]
-        click_area_rect_element.set_attribute(SVGAttribute::Fill {
+        click_area_rect_element.set_attribute(SvgAttribute::Fill {
             fill: String::from("transparent"),
         });
-        // click_area_rect_element.set_attribute(SVGAttribute::PointerEvents {
-        //     pointer_events: SVGPointerEventsVariants::All,
+        // click_area_rect_element.set_attribute(SvgAttribute::PointerEvents {
+        //     pointer_events: SvgPointerEventsVariants::All,
         // });
         root_element.append_child_in_node_context(entity, &mut click_area_rect_element);
 
@@ -116,7 +116,7 @@ impl ShapeSVGNode {
 
         let mut fill_clip_path_element = cx.create_element("clip-path");
         #[cfg(feature = "tracing")]
-        fill_clip_path_element.set_attribute(SVGAttribute::Name {
+        fill_clip_path_element.set_attribute(SvgAttribute::Name {
             name: Self::create_element_name(
                 fill_clip_path_element.get_id(),
                 String::from("fill-clip-path"),
@@ -127,7 +127,7 @@ impl ShapeSVGNode {
 
         let mut fill_clipped_path_element = cx.create_element("path");
         #[cfg(feature = "tracing")]
-        fill_clipped_path_element.set_attribute(SVGAttribute::Name {
+        fill_clipped_path_element.set_attribute(SvgAttribute::Name {
             name: Self::create_element_name(
                 fill_clipped_path_element.get_id(),
                 String::from("fill-clipped-path"),
@@ -138,17 +138,17 @@ impl ShapeSVGNode {
 
         let mut fill_wrapper_g_element = cx.create_element("group");
         #[cfg(feature = "tracing")]
-        fill_wrapper_g_element.set_attribute(SVGAttribute::Name {
+        fill_wrapper_g_element.set_attribute(SvgAttribute::Name {
             name: Self::create_element_name(
                 fill_wrapper_g_element.get_id(),
                 String::from("fill-wrapper-g"),
                 false,
             ),
         });
-        // fill_clip_path_element.set_attribute(SVGAttribute::PointerEvents {
-        //     pointer_events: SVGPointerEventsVariants::None,
+        // fill_clip_path_element.set_attribute(SvgAttribute::PointerEvents {
+        //     pointer_events: SvgPointerEventsVariants::None,
         // });
-        fill_wrapper_g_element.set_attribute(SVGAttribute::ClipPath {
+        fill_wrapper_g_element.set_attribute(SvgAttribute::ClipPath {
             clip_path: fill_clip_path_element.get_id(),
         });
         root_element.append_child_in_node_context(entity, &mut fill_wrapper_g_element);
@@ -176,7 +176,7 @@ impl ShapeSVGNode {
 
 pub fn insert_shape_svg_node(
     mut commands: Commands,
-    mut svg_context_res: ResMut<SVGContextRes>,
+    mut svg_context_res: ResMut<SvgContextRes>,
     query: Query<
         Entity,
         (
@@ -188,41 +188,41 @@ pub fn insert_shape_svg_node(
                 With<EllipseCompNode>,
                 With<StarCompNode>,
             )>,
-            Without<ShapeSVGNode>,
+            Without<ShapeSvgNode>,
         ),
     >,
 ) {
     query.iter().for_each(|entity| {
         commands
             .entity(entity)
-            .insert(ShapeSVGNode::new(entity, &mut svg_context_res));
+            .insert(ShapeSvgNode::new(entity, &mut svg_context_res));
     });
 }
 
 pub fn apply_shape_node_size_change(
-    mut query: Query<(&SizeMixin, &mut ShapeSVGNode), (With<CompNode>, Changed<SizeMixin>)>,
+    mut query: Query<(&SizeMixin, &mut ShapeSvgNode), (With<CompNode>, Changed<SizeMixin>)>,
 ) {
     query.iter_mut().for_each(|(SizeMixin(size), mut node)| {
         let [width, height] = size.0.to_array();
 
         node.root.set_attributes(vec![
-            SVGAttribute::Width {
+            SvgAttribute::Width {
                 width,
-                unit: SVGMeasurementUnit::Pixel,
+                unit: SvgMeasurementUnit::Pixel,
             },
-            SVGAttribute::Height {
+            SvgAttribute::Height {
                 height,
-                unit: SVGMeasurementUnit::Pixel,
+                unit: SvgMeasurementUnit::Pixel,
             },
         ]);
         node.click_area_rect.set_attributes(vec![
-            SVGAttribute::Width {
+            SvgAttribute::Width {
                 width,
-                unit: SVGMeasurementUnit::Pixel,
+                unit: SvgMeasurementUnit::Pixel,
             },
-            SVGAttribute::Height {
+            SvgAttribute::Height {
                 height,
-                unit: SVGMeasurementUnit::Pixel,
+                unit: SvgMeasurementUnit::Pixel,
             },
         ]);
     });

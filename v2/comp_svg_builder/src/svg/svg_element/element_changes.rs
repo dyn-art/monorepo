@@ -1,12 +1,12 @@
 use bevy_ecs::prelude::Entity;
 
-use super::SVGElementId;
+use super::SvgElementId;
 
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde_support", derive(serde::Serialize, specta::Type))]
-pub struct SVGElementChanges {
-    pub id: SVGElementId,
-    pub changes: Vec<SVGElementChange>,
+pub struct SvgElementChanges {
+    pub id: SvgElementId,
+    pub changes: Vec<SvgElementChange>,
 }
 
 #[derive(Debug, Clone)]
@@ -15,81 +15,81 @@ pub struct SVGElementChanges {
     derive(serde::Serialize, specta::Type),
     serde(tag = "type")
 )]
-pub enum SVGElementChange {
-    ElementCreated(SVGElementCreatedChange),
-    ElementDeleted(SVGElementDeletedChange),
-    ElementAppended(SVGElementAppendedChange),
-    AttributeUpdated(SVGAttributeUpdatedChange),
-    AttributeRemoved(SVGAttributeRemovedChange),
-    StyleUpdated(SVGStyleUpdatedChange),
-    StyleRemoved(SVGStyleRemovedChange),
+pub enum SvgElementChange {
+    ElementCreated(SvgElementCreatedChange),
+    ElementDeleted(SvgElementDeletedChange),
+    ElementAppended(SvgElementAppendedChange),
+    AttributeUpdated(SvgAttributeUpdatedChange),
+    AttributeRemoved(SvgAttributeRemovedChange),
+    StyleUpdated(SvgStyleUpdatedChange),
+    StyleRemoved(SvgStyleRemovedChange),
 }
 
-/// Emitted when a new SVGElement is created.
+/// Emitted when a new SvgElement is created.
 #[derive(Debug, Clone)]
 #[cfg_attr(
     feature = "serde_support",
     derive(serde::Serialize, specta::Type),
     serde(rename_all = "camelCase")
 )]
-pub struct SVGElementCreatedChange {
+pub struct SvgElementCreatedChange {
     pub tag_name: &'static str,
     pub attributes: Vec<(&'static str, String)>,
     pub styles: Vec<(&'static str, String)>,
-    pub parent_id: Option<SVGElementId>,
+    pub parent_id: Option<SvgElementId>,
     pub entity: Option<Entity>,
 }
 
-/// Emitted when a new SVGElement is deleted.
+/// Emitted when a new SvgElement is deleted.
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde_support", derive(serde::Serialize, specta::Type))]
-pub struct SVGElementDeletedChange {}
+pub struct SvgElementDeletedChange {}
 
-/// Emitted when a SVGElement (child) is append to another SVGElement (parent).
+/// Emitted when a SvgElement (child) is append to another SvgElement (parent).
 #[derive(Debug, Clone)]
 #[cfg_attr(
     feature = "serde_support",
     derive(serde::Serialize, specta::Type),
     serde(rename_all = "camelCase")
 )]
-pub struct SVGElementAppendedChange {
-    pub parent_id: SVGElementId,
+pub struct SvgElementAppendedChange {
+    pub parent_id: SvgElementId,
 }
 
-/// Emitted when an attribute of an SVGElement is updated.
+/// Emitted when an attribute of an SvgElement is updated.
 #[derive(Debug, Clone)]
 #[cfg_attr(
     feature = "serde_support",
     derive(serde::Serialize, specta::Type),
     serde(rename_all = "camelCase")
 )]
-pub struct SVGAttributeUpdatedChange {
+pub struct SvgAttributeUpdatedChange {
     pub key: &'static str,
     pub new_value: String,
 }
 
-/// Emitted when an attribute of a SVGElement is removed.
+/// Emitted when an attribute of a SvgElement is removed.
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde_support", derive(serde::Serialize, specta::Type))]
-pub struct SVGAttributeRemovedChange {
+pub struct SvgAttributeRemovedChange {
     pub key: &'static str,
 }
 
-/// Emitted when a style property of a SVGElement is updated.
+/// Emitted when a style property of a SvgElement is updated.
 #[derive(Debug, Clone)]
 #[cfg_attr(
     feature = "serde_support",
     derive(serde::Serialize, specta::Type),
     serde(rename_all = "camelCase")
 )]
-pub struct SVGStyleUpdatedChange {
+pub struct SvgStyleUpdatedChange {
     pub key: &'static str,
     pub new_value: String,
 }
 
-/// Emitted when a style property of a SVGElement is removed.
+/// Emitted when a style property of a SvgElement is removed.
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde_support", derive(serde::Serialize, specta::Type))]
-pub struct SVGStyleRemovedChange {
+pub struct SvgStyleRemovedChange {
     pub key: &'static str,
 }

@@ -1,5 +1,5 @@
 [package]
-name = "dyn-comp-interactive"
+name = "dyn-comp-interaction"
 version = "0.0.1"
 description = ""
 edition = { workspace = true }
@@ -11,3 +11,10 @@ authors = { workspace = true }
 [features]
 default = []
 tracing = []
+
+[dependencies]
+dyn-comp-types = { path = "../comp_types" }
+bevy_app = { workspace = true }
+bevy_ecs = { workspace = true }
+bevy_transform = { workspace = true }
+glam = { workspace = true }

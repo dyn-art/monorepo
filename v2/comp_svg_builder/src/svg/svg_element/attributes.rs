@@ -1,4 +1,4 @@
-use super::SVGElementId;
+use super::SvgElementId;
 
 #[derive(Debug, Clone)]
 #[cfg_attr(
@@ -6,55 +6,55 @@ use super::SVGElementId;
     derive(serde::Serialize, specta::Type),
     serde(tag = "type")
 )]
-pub enum SVGAttribute {
+pub enum SvgAttribute {
     Id {
-        id: SVGElementId,
+        id: SvgElementId,
     },
     Name {
         name: String,
     },
     Width {
         width: f32,
-        unit: SVGMeasurementUnit,
+        unit: SvgMeasurementUnit,
     },
     Height {
         height: f32,
-        unit: SVGMeasurementUnit,
+        unit: SvgMeasurementUnit,
     },
     Opacity {
         opacity: f32,
     },
     Transform {
-        transform: SVGTransformAttribute,
+        transform: SvgTransformAttribute,
     },
     #[cfg_attr(feature = "serde_support", serde(rename_all = "camelCase"))]
     PatternTransform {
-        pattern_transform: SVGTransformAttribute,
+        pattern_transform: SvgTransformAttribute,
     },
     D {
         d: String,
     },
     #[cfg_attr(feature = "serde_support", serde(rename_all = "camelCase"))]
     ClipPath {
-        clip_path: SVGElementId,
+        clip_path: SvgElementId,
     },
     Fill {
         fill: String,
     },
     ReferencedFill {
-        id: SVGElementId,
+        id: SvgElementId,
     },
     #[cfg_attr(feature = "serde_support", serde(rename_all = "camelCase"))]
     PatternUnits {
-        pattern_units: SVGUnitsVariant,
+        pattern_units: SvgUnitsVariant,
     },
     #[cfg_attr(feature = "serde_support", serde(rename_all = "camelCase"))]
     GradientUnits {
-        gradient_units: SVGUnitsVariant,
+        gradient_units: SvgUnitsVariant,
     },
 }
 
-impl SVGAttribute {
+impl SvgAttribute {
     pub fn key(&self) -> &'static str {
         match self {
             Self::Id { .. } => "id",
@@ -76,22 +76,22 @@ impl SVGAttribute {
         match self {
             Self::Id { id } => id.to_string(),
             Self::Width { width, unit } => match unit {
-                SVGMeasurementUnit::Pixel => width.to_string(),
-                SVGMeasurementUnit::Percent => format!("{width}%"),
+                SvgMeasurementUnit::Pixel => width.to_string(),
+                SvgMeasurementUnit::Percent => format!("{width}%"),
             },
             Self::Height { height, unit } => match unit {
-                SVGMeasurementUnit::Pixel => height.to_string(),
-                SVGMeasurementUnit::Percent => format!("{height}%"),
+                SvgMeasurementUnit::Pixel => height.to_string(),
+                SvgMeasurementUnit::Percent => format!("{height}%"),
             },
             Self::Opacity { opacity } => opacity.to_string(),
             Self::Transform { transform }
             | Self::PatternTransform {
                 pattern_transform: transform,
             } => match transform {
-                SVGTransformAttribute::Matrix { a, b, c, d, tx, ty } => {
+                SvgTransformAttribute::Matrix { a, b, c, d, tx, ty } => {
                     format!("matrix({a}, {b}, {c}, {d}, {tx}, {ty})")
                 }
-                SVGTransformAttribute::Rotate { rotation } => {
+                SvgTransformAttribute::Rotate { rotation } => {
                     format!("rotate({rotation})")
                 }
             },
@@ -106,8 +106,8 @@ impl SVGAttribute {
             | Self::GradientUnits {
                 gradient_units: unit,
             } => match unit {
-                SVGUnitsVariant::ObjectBoundingBox => String::from("objectBoundingBox"),
-                SVGUnitsVariant::UserSpaceOnUse => String::from("userSpaceOnUse"),
+                SvgUnitsVariant::ObjectBoundingBox => String::from("objectBoundingBox"),
+                SvgUnitsVariant::UserSpaceOnUse => String::from("userSpaceOnUse"),
             },
         }
     }
@@ -123,7 +123,7 @@ impl SVGAttribute {
     derive(serde::Serialize, specta::Type),
     serde(tag = "type")
 )]
-pub enum SVGTransformAttribute {
+pub enum SvgTransformAttribute {
     Matrix {
         a: f32,
         b: f32,
@@ -139,7 +139,7 @@ pub enum SVGTransformAttribute {
 
 #[derive(Debug, Default, Copy, Clone)]
 #[cfg_attr(feature = "serde_support", derive(serde::Serialize, specta::Type))]
-pub enum SVGMeasurementUnit {
+pub enum SvgMeasurementUnit {
     #[default]
     Pixel,
     Percent,
@@ -147,7 +147,7 @@ pub enum SVGMeasurementUnit {
 
 #[derive(Debug, Default, Copy, Clone)]
 #[cfg_attr(feature = "serde_support", derive(serde::Serialize, specta::Type))]
-pub enum SVGUnitsVariant {
+pub enum SvgUnitsVariant {
     #[default]
     UserSpaceOnUse,
     ObjectBoundingBox,
