@@ -9,7 +9,7 @@ license = { workspace = true }
 authors = { workspace = true }
 
 [features]
-default = ["dtif"]
+default = []
 dtif = ["dep:dyn-dtif", "dyn-comp-types/serde_support"]
 tracing = []
 
