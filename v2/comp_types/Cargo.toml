@@ -27,4 +27,4 @@ specta = { workspace = true, features = [
     "glam",
     "bevy_ecs",
 ], optional = true }
-serde = { version = "1.0.195", features = ["derive"], optional = true }
+serde = { workspace = true, features = ["derive"], optional = true }

@@ -4,7 +4,17 @@ use crate::svg::svg_element::element_changes::SvgElementChanges;
 
 #[derive(Resource, Debug, Default)]
 pub struct ChangedSvgNodesRes {
-    pub changes: Vec<ChangedSvgNode>,
+    changes: Vec<ChangedSvgNode>,
+}
+
+impl ChangedSvgNodesRes {
+    pub fn drain(&mut self) -> Vec<ChangedSvgNode> {
+        self.changes.drain(..).collect()
+    }
+
+    pub fn push_change(&mut self, change: ChangedSvgNode) {
+        self.changes.push(change)
+    }
 }
 
 #[derive(Debug, Clone)]

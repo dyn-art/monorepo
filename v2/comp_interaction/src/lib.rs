@@ -1,9 +1,11 @@
 use bevy_app::prelude::*;
 use bevy_ecs::prelude::*;
 
-pub struct InteractionPlugin;
+pub mod events;
 
-impl Plugin for InteractionPlugin {
+pub struct CompInteractionPlugin;
+
+impl Plugin for CompInteractionPlugin {
     fn build(&self, app: &mut App) {
         // Register events
         // TODO

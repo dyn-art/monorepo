@@ -1310,9 +1310,9 @@ dependencies = [
 
 [[package]]
 name = "clap"
-version = "4.5.0"
+version = "4.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "80c21025abd42669a92efc996ef13cfb2c5c627858421ea58d5c3b331a6c134f"
+checksum = "c918d541ef2913577a0f9566e9ce27cb35b6df072075769e0b26cb5a554520da"
 dependencies = [
  "clap_builder",
  "clap_derive",
@@ -1320,9 +1320,9 @@ dependencies = [
 
 [[package]]
 name = "clap_builder"
-version = "4.5.0"
+version = "4.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "458bf1f341769dfcf849846f65dffdf9146daa56bcd2a47cb4e1de9915567c99"
+checksum = "9f3e7391dad68afb0c2ede1bf619f579a3dc9c2ec67f089baa397123a2f3d1eb"
 dependencies = [
  "anstream",
  "anstyle",
@@ -1686,6 +1686,8 @@ dependencies = [
  "bevy_transform",
  "dyn-comp-types",
  "glam 0.25.0",
+ "serde",
+ "specta 2.0.0-rc.7 (git+https://github.com/oscartbeaumont/specta.git?rev=5da3e56)",
 ]
 
 [[package]]
@@ -1731,6 +1733,28 @@ dependencies = [
  "serde",
  "smallvec",
  "specta 2.0.0-rc.7 (git+https://github.com/oscartbeaumont/specta.git?rev=5da3e56)",
+]
+
+[[package]]
+name = "dyn-svg-comp-api"
+version = "0.0.1"
+dependencies = [
+ "bevy_app 0.13.0",
+ "bevy_ecs 0.13.0",
+ "clap",
+ "console_error_panic_hook",
+ "dyn-comp",
+ "dyn-comp-interaction",
+ "dyn-comp-svg-builder",
+ "js-sys",
+ "log",
+ "once_cell",
+ "serde",
+ "serde-wasm-bindgen",
+ "serde_json",
+ "specta 2.0.0-rc.7 (git+https://github.com/oscartbeaumont/specta.git?rev=5da3e56)",
+ "wasm-bindgen",
+ "wasm-bindgen-test",
 ]
 
 [[package]]
@@ -3752,9 +3776,9 @@ dependencies = [
 
 [[package]]
 name = "serde_json"
-version = "1.0.113"
+version = "1.0.114"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "69801b70b1c3dac963ecb03a364ba0ceda9cf60c71cfe475e99864759c8b8a79"
+checksum = "c5f09b1bd632ef549eaa9f60a1f8de742bdbc698e6cee2095fc84dde5f549ae0"
 dependencies = [
  "itoa",
  "ryu",
@@ -3920,6 +3944,7 @@ version = "2.0.0-rc.7"
 source = "git+https://github.com/oscartbeaumont/specta.git?rev=5da3e56#5da3e56e82addf972766a7be8af720a2f5d2ca17"
 dependencies = [
  "bevy_ecs 0.13.0",
+ "ctor",
  "glam 0.25.0",
  "once_cell",
  "paste",

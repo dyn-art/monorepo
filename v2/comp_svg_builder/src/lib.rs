@@ -7,24 +7,24 @@ use systems::svg_node::{
 };
 
 pub mod events;
-pub mod resources;
+mod resources;
 pub mod svg;
-pub mod systems;
+mod systems;
 
-pub struct SvgBuilderPlugin {
+pub struct CompSvgBuilderPlugin {
     #[cfg(feature = "output_events")]
     pub output_event_sender: std::sync::mpsc::Sender<crate::events::SvgBuilderOutputEvent>,
 }
 
 #[derive(SystemSet, Debug, Hash, PartialEq, Eq, Clone)]
-pub enum SvgBuilderSystemSet {
+enum SvgBuilderSystemSet {
     /// After this lablel,  events got applied.
     Insert,
     /// After this label, the layout got applied to the compositions nodes.
     Apply,
 }
 
-impl Plugin for SvgBuilderPlugin {
+impl Plugin for CompSvgBuilderPlugin {
     fn build(&self, app: &mut App) {
         // Register resources
         app.init_resource::<SvgContextRes>();
@@ -54,7 +54,10 @@ impl Plugin for SvgBuilderPlugin {
 }
 
 #[cfg(feature = "output_events")]
-fn build_render_app(app: &mut App, sender: std::sync::mpsc::Sender<events::SvgBuilderOutputEvent>) {
+fn build_render_app(
+    app: &mut App,
+    output_event_sender: std::sync::mpsc::Sender<events::SvgBuilderOutputEvent>,
+) {
     use crate::systems::extract::extract_svg_nodes_generic;
     use bevy_render::{ExtractSchedule, Render, RenderApp};
     use resources::{
@@ -72,7 +75,7 @@ fn build_render_app(app: &mut App, sender: std::sync::mpsc::Sender<events::SvgBu
 
     // Register resources
     render_app.init_resource::<ChangedSvgNodesRes>();
-    render_app.insert_resource(OutputEventSenderRes { sender });
+    render_app.insert_resource(OutputEventSenderRes::new(output_event_sender));
 
     // Register systems
     render_app.add_systems(

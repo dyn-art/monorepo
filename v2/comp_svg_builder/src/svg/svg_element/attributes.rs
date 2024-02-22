@@ -3,7 +3,7 @@ use super::SvgElementId;
 #[derive(Debug, Clone)]
 #[cfg_attr(
     feature = "serde_support",
-    derive(serde::Serialize, specta::Type),
+    derive(serde::Serialize, serde::Deserialize, specta::Type),
     serde(tag = "type")
 )]
 pub enum SvgAttribute {
@@ -120,7 +120,7 @@ impl SvgAttribute {
 #[derive(Debug, Copy, Clone)]
 #[cfg_attr(
     feature = "serde_support",
-    derive(serde::Serialize, specta::Type),
+    derive(serde::Serialize, serde::Deserialize, specta::Type),
     serde(tag = "type")
 )]
 pub enum SvgTransformAttribute {
@@ -138,7 +138,10 @@ pub enum SvgTransformAttribute {
 }
 
 #[derive(Debug, Default, Copy, Clone)]
-#[cfg_attr(feature = "serde_support", derive(serde::Serialize, specta::Type))]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type)
+)]
 pub enum SvgMeasurementUnit {
     #[default]
     Pixel,
@@ -146,7 +149,10 @@ pub enum SvgMeasurementUnit {
 }
 
 #[derive(Debug, Default, Copy, Clone)]
-#[cfg_attr(feature = "serde_support", derive(serde::Serialize, specta::Type))]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type)
+)]
 pub enum SvgUnitsVariant {
     #[default]
     UserSpaceOnUse,

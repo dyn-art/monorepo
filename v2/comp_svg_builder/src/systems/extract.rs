@@ -41,7 +41,7 @@ pub fn extract_svg_nodes_generic<C: SvgNode>(
                     (None, 0)
                 };
 
-            changed_svg_nodes_res.changes.push(ChangedSvgNode {
+            changed_svg_nodes_res.push_change(ChangedSvgNode {
                 entity,
                 parent_entity,
                 changes: svg_node.drain_changes(),

@@ -9,7 +9,7 @@ license = { workspace = true }
 authors = { workspace = true }
 
 [features]
-default = ["serde_support", "output_events"]
+default = []
 serde_support = ["dep:serde", "dep:specta", "dyn-comp-types/serde_support"]
 output_events = []
 tracing = []

@@ -5,6 +5,7 @@ members = [
     "v2/*",
     "apps/comprender",
     "packages/svg-composition/rust",
+    "packages/svg-comp/rust",
 ]
 exclude = ["crates/_deprecated"]
 
@@ -28,6 +29,9 @@ bevy_utils = "0.13.0"
 # Bindgen
 specta = { git = "https://github.com/oscartbeaumont/specta.git", rev = "5da3e56" }
 serde = "1.0.195"
+
+# Logging
+log = "0.4.20"
 
 # Utilities
 glam = "0.25.0"

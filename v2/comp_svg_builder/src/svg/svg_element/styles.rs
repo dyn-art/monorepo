@@ -1,7 +1,7 @@
 #[derive(Debug, Clone)]
 #[cfg_attr(
     feature = "serde_support",
-    derive(serde::Serialize, specta::Type),
+    derive(serde::Serialize, serde::Deserialize, specta::Type),
     serde(tag = "type")
 )]
 pub enum SvgStyle {
@@ -55,7 +55,10 @@ impl SvgStyle {
 }
 
 #[derive(Debug, Default, Copy, Clone)]
-#[cfg_attr(feature = "serde_support", derive(serde::Serialize, specta::Type))]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type)
+)]
 pub enum SvgDisplayStyle {
     #[default]
     Block,
@@ -63,7 +66,10 @@ pub enum SvgDisplayStyle {
 }
 
 #[derive(Debug, Default, Copy, Clone)]
-#[cfg_attr(feature = "serde_support", derive(serde::Serialize, specta::Type))]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type)
+)]
 pub enum SvgBlendMode {
     #[default]
     Normal,

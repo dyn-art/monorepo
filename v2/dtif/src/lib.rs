@@ -7,7 +7,7 @@ pub mod dtif_injector;
 pub mod events;
 pub mod node;
 
-#[derive(Debug, Clone, serde::Serialize, specta::Type)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
 #[serde(rename_all = "camelCase")]
 pub struct DtifComp {
     /// The version of the composition type declaration.
@@ -32,7 +32,7 @@ pub struct DtifComp {
     pub events: Vec<DtifInputEvent>,
 }
 
-#[derive(Debug, Clone, serde::Serialize, specta::Type)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
 #[serde(tag = "type")]
 pub enum Content {
     /// Content stored as binary data.

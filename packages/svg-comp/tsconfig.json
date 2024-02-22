@@ -1,0 +1,14 @@
+{
+	"extends": "@dyn/config/shared-library.tsconfig.json",
+	"compilerOptions": {
+		"outDir": "./dist",
+		"rootDir": "./src",
+		"declarationDir": "./dist/types",
+		"baseUrl": ".",
+		"paths": {
+			"@/rust/*": ["./src/rust_modules/*"]
+		},
+		"lib": ["dom"]
+	},
+	"include": ["src"]
+}

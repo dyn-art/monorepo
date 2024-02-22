@@ -14,7 +14,7 @@ pub fn queue_svg_node_changes(
     mut changed_svg_nodes_res: ResMut<ChangedSvgNodesRes>,
     output_event_sender_res: ResMut<OutputEventSenderRes>,
 ) {
-    let mut changes: Vec<ChangedSvgNode> = changed_svg_nodes_res.changes.drain(..).collect();
+    let mut changes = changed_svg_nodes_res.drain();
 
     // Preparing a lookup map for parent positions
     let parent_positions: HashMap<Entity, usize> = changes
@@ -40,7 +40,7 @@ pub fn queue_svg_node_changes(
     for changed_svg_node in changes {
         for change in changed_svg_node.changes {
             let event = SvgBuilderOutputEvent::ElementChanges(SvgElementChangesEvent(change));
-            let _ = output_event_sender_res.sender.send(event);
+            output_event_sender_res.push_event(event);
         }
     }
 }

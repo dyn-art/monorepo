@@ -7,6 +7,12 @@ use systems::outline::rectangle::outline_rectangle;
 pub mod resources;
 pub mod systems;
 
+pub mod prelude {
+    pub use super::CompPlugin;
+    pub use dyn_comp_types::prelude::*;
+    pub use dyn_dtif::*;
+}
+
 pub struct CompPlugin {
     #[cfg(feature = "dtif")]
     pub dtif: dyn_dtif::DtifComp,
@@ -19,7 +25,7 @@ pub struct CompPlugin {
 }
 
 #[derive(SystemSet, Debug, Hash, PartialEq, Eq, Clone)]
-pub enum CompSystemSet {
+enum CompSystemSet {
     /// After this lablel, input events got applied.
     InputEvents,
     /// After this label, the layout got applied to the compositions nodes.

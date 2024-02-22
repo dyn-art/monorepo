@@ -2,7 +2,7 @@ use dyn_comp_types::prelude::*;
 use glam::{Quat, Vec2, Vec3};
 use smallvec::SmallVec;
 
-#[derive(Debug, Clone, serde::Serialize, specta::Type)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
 #[serde(tag = "type")]
 pub enum Node {
     Frame(FrameNode),
@@ -15,7 +15,7 @@ pub trait NodeImpl {
     fn to_ecs_bundle(&self) -> Self::Bundle;
 }
 
-#[derive(Debug, Clone, serde::Serialize, specta::Type)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
 #[serde(rename_all = "camelCase")]
 pub struct FrameNode {
     pub clip_content: bool,
@@ -56,7 +56,7 @@ impl NodeImpl for FrameNode {
     }
 }
 
-#[derive(Debug, Clone, serde::Serialize, specta::Type)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
 #[serde(rename_all = "camelCase")]
 pub struct GroupNode {
     pub translation: Vec2,
@@ -87,7 +87,7 @@ impl NodeImpl for GroupNode {
     }
 }
 
-#[derive(Debug, Clone, serde::Serialize, specta::Type)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
 #[serde(rename_all = "camelCase")]
 pub struct RectangleNode {
     pub translation: Vec2,
