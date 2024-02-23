@@ -1,13 +1,7 @@
 [workspace]
 resolver = "2"
-members = [
-    "crates/*",
-    "v2/*",
-    "apps/comprender",
-    "packages/svg-composition/rust",
-    "packages/svg-comp/rust",
-]
-exclude = ["crates/_deprecated"]
+members = ["v2/*", "apps/comprender", "packages/svg-comp/rust"]
+exclude = ["crates/_deprecated", "crates/*", "packages/svg-composition/rust"]
 
 [workspace.package]
 edition = "2021"

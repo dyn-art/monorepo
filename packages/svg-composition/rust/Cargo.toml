@@ -2,11 +2,10 @@
 name = "dyn_svg_composition_api"
 version = "0.0.1"
 description = "SVG Composition"
-edition = { workspace = true }
-homepage = { workspace = true }
-repository = { workspace = true }
-license = { workspace = true }
-authors = { workspace = true }
+edition = "2021"
+homepage = "https://s.dyn.art/github"
+repository = "https://github.com/dyndotart/monorepo"
+license = "AGPL-3.0-or-later"
 
 [lib]
 name = "dyn_svg_composition_api"
