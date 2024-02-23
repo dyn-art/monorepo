@@ -1252,6 +1252,7 @@ dependencies = [
  "dyn-comp-interaction",
  "dyn-comp-svg-builder",
  "dyn-comp-types",
+ "dyn-dtif",
  "js-sys",
  "log",
  "once_cell",

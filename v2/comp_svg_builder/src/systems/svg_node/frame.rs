@@ -1,16 +1,3 @@
-use std::collections::BTreeMap;
-
-use bevy_ecs::{
-    component::Component,
-    entity::Entity,
-    query::{Changed, With, Without},
-    system::{Commands, Query, ResMut},
-};
-use dyn_comp_types::{
-    mixins::SizeMixin,
-    nodes::{CompNode, FrameCompNode},
-};
-
 use crate::{
     resources::svg_context::SvgContextRes,
     svg::{
@@ -21,6 +8,17 @@ use crate::{
         svg_node::SvgNode,
     },
 };
+use bevy_ecs::{
+    component::Component,
+    entity::Entity,
+    query::{Changed, With, Without},
+    system::{Commands, Query, ResMut},
+};
+use dyn_comp_types::{
+    mixins::SizeMixin,
+    nodes::{CompNode, FrameCompNode},
+};
+use std::collections::BTreeMap;
 
 #[derive(Component, Debug, Clone)]
 pub struct FrameSvgNode {

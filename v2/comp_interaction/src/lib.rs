@@ -1,5 +1,4 @@
-use bevy_app::prelude::*;
-use bevy_ecs::prelude::*;
+use bevy_app::{App, Plugin};
 
 pub mod events;
 

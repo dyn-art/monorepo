@@ -1,8 +1,8 @@
-use wasm_bindgen::{prelude::wasm_bindgen, JsValue};
-
 mod js_bindings;
 mod logger;
 pub mod utils;
+
+use wasm_bindgen::{prelude::wasm_bindgen, JsValue};
 
 /// Initializes the Rust-JavaScript connection
 #[wasm_bindgen(start)]

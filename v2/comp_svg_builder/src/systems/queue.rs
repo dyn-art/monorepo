@@ -1,11 +1,9 @@
-use std::collections::HashMap;
-
-use bevy_ecs::{entity::Entity, system::ResMut};
-
 use crate::{
     events::{SvgBuilderOutputEvent, SvgElementChangesEvent},
     resources::{changed_svg_nodes::ChangedSvgNodesRes, output_event_sender::OutputEventSenderRes},
 };
+use bevy_ecs::{entity::Entity, system::ResMut};
+use std::collections::HashMap;
 
 pub fn queue_svg_node_changes(
     mut changed_svg_nodes_res: ResMut<ChangedSvgNodesRes>,

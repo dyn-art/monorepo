@@ -1,5 +1,5 @@
 use bevy_ecs::world::World;
-use dyn_comp_types::prelude::*;
+use dyn_comp_types::events::InputEvent;
 
 #[derive(Debug, Copy, Clone)]
 #[cfg_attr(

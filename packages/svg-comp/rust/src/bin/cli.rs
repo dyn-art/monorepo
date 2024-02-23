@@ -7,7 +7,15 @@ mod cli {
     };
 
     // Import types and modules to generate types from
-    use dyn_svg_comp_api::specta_prelude::*;
+    use dyn_svg_comp_api::*;
+
+    // TODO: Remove once specta can detect specta::Type on its own in the repo
+    #[derive(specta::Type)]
+    struct SpectaExport {
+        dtif_comp: dyn_dtif::DtifComp,
+        svg_comp_input_event: dyn_svg_comp_api::events::SvgCompInputEvent,
+        svg_comp_output_event: dyn_svg_comp_api::events::SvgCompOutputEvent,
+    }
 
     #[derive(Parser, Debug)]
     #[clap(name = "SVG Composition CLI")]

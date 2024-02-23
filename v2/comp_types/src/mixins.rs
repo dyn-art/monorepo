@@ -1,7 +1,6 @@
-use bevy_ecs::prelude::*;
-use smallvec::SmallVec;
-
 use crate::shared::{BlendMode, CornerRadii, Fill, Opacity, Size, Stroke, Visibility};
+use bevy_ecs::component::Component;
+use smallvec::SmallVec;
 
 /// Marks an entity as the root or top-level entity.
 #[derive(Component, Debug, Default, Copy, Clone)]

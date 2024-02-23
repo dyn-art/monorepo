@@ -27,10 +27,12 @@ tracing = [
     "dyn-comp/tracing",
     "dyn-comp-interaction/tracing",
     "dyn-comp-svg-builder/tracing",
+    "dyn-dtif/tracing",
 ]
 
 [dependencies]
 dyn-comp = { path = "../../../v2/comp", features = ["dtif"] }
+dyn-dtif = { path = "../../../v2/dtif" }
 dyn-comp-types = { path = "../../../v2/comp_types", features = [
     "serde_support",
 ] }

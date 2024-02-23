@@ -1,14 +1,15 @@
-use std::collections::HashMap;
-
-use bevy_ecs::prelude::*;
-use bevy_hierarchy::prelude::*;
-use dyn_comp_types::prelude::*;
-
 use crate::{
     events::DtifInputEvent,
     node::{FrameNode, GroupNode, Node, NodeImpl},
     DtifComp,
 };
+use bevy_ecs::{
+    entity::Entity,
+    world::{EntityWorldMut, World},
+};
+use bevy_hierarchy::BuildWorldChildren;
+use dyn_comp_types::{events::InputEvent, mixins::Root};
+use std::collections::HashMap;
 
 pub struct DtifInjector {
     /// Maps Ids of type String (sid) from the DTIF to actual spawned Bevy entities.

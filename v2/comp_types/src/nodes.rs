@@ -1,7 +1,6 @@
-use bevy_ecs::prelude::*;
-use smallvec::SmallVec;
-
 use crate::shared::{BreakLineOn, HorizontalTextAlignment, TextSpan, VerticalTextAlignment};
+use bevy_ecs::component::Component;
+use smallvec::SmallVec;
 
 #[derive(Component, Debug, Default, Copy, Clone)]
 pub struct CompNode;

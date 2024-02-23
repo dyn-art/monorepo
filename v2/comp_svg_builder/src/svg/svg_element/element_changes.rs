@@ -1,6 +1,5 @@
-use bevy_ecs::prelude::Entity;
-
 use super::SvgElementId;
+use bevy_ecs::prelude::Entity;
 
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde_support", derive(serde::Serialize, specta::Type))]
