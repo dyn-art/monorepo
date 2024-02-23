@@ -11,6 +11,12 @@ mod resources;
 pub mod svg;
 mod systems;
 
+pub mod prelude {
+    pub use super::events::*;
+    pub use super::svg::*;
+    pub use super::CompSvgBuilderPlugin;
+}
+
 pub struct CompSvgBuilderPlugin {
     #[cfg(feature = "output_events")]
     pub output_event_sender: std::sync::mpsc::Sender<crate::events::SvgBuilderOutputEvent>,
@@ -86,4 +92,24 @@ fn build_render_app(
         ),
     );
     render_app.add_systems(Render, queue_svg_node_changes);
+}
+
+#[cfg(test)]
+mod tests {
+    use specta::{
+        export,
+        ts::{BigIntExportBehavior, ExportConfig},
+    };
+
+    use super::*;
+
+    #[test]
+    fn specta_works() {
+        export::ts_with_cfg(
+            "./bindings.ts",
+            "".into(),
+            &ExportConfig::default().bigint(BigIntExportBehavior::Number),
+        )
+        .unwrap();
+    }
 }

@@ -1,6 +1,6 @@
-use dyn_comp::prelude::CompInputEvent;
 use dyn_comp_interaction::events::InteractionInputEvent;
 use dyn_comp_svg_builder::events::SvgElementChangesEvent;
+use dyn_comp_types::prelude::CompInputEvent;
 
 #[derive(Debug, Clone, serde::Serialize, specta::Type)]
 #[serde(tag = "type")]

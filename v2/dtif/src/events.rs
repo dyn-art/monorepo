@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 
+use bevy_ecs::prelude::*;
 use dyn_comp_types::prelude::*;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]

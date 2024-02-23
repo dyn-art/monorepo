@@ -12,4 +12,6 @@ pub enum SvgBuilderOutputEvent {
 
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde_support", derive(serde::Serialize, specta::Type))]
-pub struct SvgElementChangesEvent(pub SvgElementChanges);
+pub struct SvgElementChangesEvent {
+    pub changes: SvgElementChanges,
+}

@@ -4,13 +4,13 @@ use dyn_comp_types::prelude::*;
 use resources::composition::CompositionRes;
 use systems::outline::rectangle::outline_rectangle;
 
-pub mod resources;
-pub mod systems;
+mod resources;
+mod systems;
 
 pub mod prelude {
     pub use super::CompPlugin;
-    pub use dyn_comp_types::prelude::*;
-    pub use dyn_dtif::*;
+    #[cfg(feature = "dtif")]
+    pub use dyn_dtif::prelude::*;
 }
 
 pub struct CompPlugin {

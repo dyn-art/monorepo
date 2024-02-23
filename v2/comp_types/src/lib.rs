@@ -10,7 +10,24 @@ pub mod prelude {
     pub use crate::mixins::*;
     pub use crate::nodes::*;
     pub use crate::shared::*;
-    pub use bevy_ecs::prelude::*;
-    pub use bevy_hierarchy::prelude::*;
-    pub use bevy_transform::prelude::*;
+}
+
+#[cfg(test)]
+mod tests {
+    use specta::{
+        export,
+        ts::{BigIntExportBehavior, ExportConfig},
+    };
+
+    use super::*;
+
+    #[test]
+    fn specta_works() {
+        export::ts_with_cfg(
+            "./bindings.ts",
+            "".into(),
+            &ExportConfig::default().bigint(BigIntExportBehavior::Number),
+        )
+        .unwrap();
+    }
 }

@@ -7,6 +7,14 @@ pub mod dtif_injector;
 pub mod events;
 pub mod node;
 
+pub mod prelude {
+    pub use super::dtif_injector::*;
+    pub use super::events::*;
+    pub use super::node::*;
+    pub use super::Content;
+    pub use super::DtifComp;
+}
+
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
 #[serde(rename_all = "camelCase")]
 pub struct DtifComp {

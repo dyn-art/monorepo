@@ -1,5 +1,7 @@
 use std::collections::HashMap;
 
+use bevy_ecs::prelude::*;
+use bevy_hierarchy::prelude::*;
 use dyn_comp_types::prelude::*;
 
 use crate::{

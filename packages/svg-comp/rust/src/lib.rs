@@ -1,10 +1,10 @@
 use std::sync::mpsc::{channel, Receiver};
 
 use bevy_app::prelude::*;
-use bevy_ecs::prelude::*;
 use dyn_comp::prelude::*;
 use dyn_comp_interaction::CompInteractionPlugin;
 use dyn_comp_svg_builder::{events::SvgBuilderOutputEvent, CompSvgBuilderPlugin};
+use dyn_comp_types::events::InputEvent;
 use events::{SvgCompInputEvent, SvgCompOutputEvent};
 use wasm_bindgen::prelude::*;
 
@@ -13,6 +13,14 @@ use crate::resources::output_event_sender::OutputEventSenderRes;
 mod bindgen;
 pub mod events;
 mod resources;
+
+pub mod specta_prelude {
+    pub use super::events::*;
+    pub use super::SvgCompHandle;
+    pub use dyn_comp::prelude::*;
+    pub use dyn_comp_svg_builder::prelude::*;
+    pub use dyn_comp_types::prelude::*;
+}
 
 #[wasm_bindgen]
 pub struct SvgCompHandle {
@@ -88,5 +96,25 @@ impl SvgCompHandle {
         }
 
         return Ok(serde_wasm_bindgen::to_value(&output_events)?);
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use specta::{
+        export,
+        ts::{BigIntExportBehavior, ExportConfig},
+    };
+
+    use super::specta_prelude::*;
+
+    #[test]
+    fn specta_works() {
+        export::ts_with_cfg(
+            "./bindings.ts",
+            "".into(),
+            &ExportConfig::default().bigint(BigIntExportBehavior::Number),
+        )
+        .unwrap();
     }
 }

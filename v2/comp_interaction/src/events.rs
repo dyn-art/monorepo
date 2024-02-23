@@ -1,3 +1,4 @@
+use bevy_ecs::world::World;
 use dyn_comp_types::prelude::*;
 
 #[derive(Debug, Copy, Clone)]

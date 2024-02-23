@@ -488,6 +488,31 @@ importers:
         specifier: ^18.2.0
         version: 18.2.0
 
+  packages/svg-comp:
+    dependencies:
+      '@dyn/dtif':
+        specifier: workspace:*
+        version: link:../dtif
+      '@dyn/utils':
+        specifier: workspace:*
+        version: link:../utils
+    devDependencies:
+      '@dyn/config':
+        specifier: workspace:*
+        version: link:../config
+      '@dyn/types':
+        specifier: workspace:*
+        version: link:../types
+      '@rollup/plugin-wasm':
+        specifier: ^6.2.2
+        version: 6.2.2
+      '@types/node':
+        specifier: ^20.8.10
+        version: 20.8.10
+      '@types/react':
+        specifier: ^18.2.33
+        version: 18.2.34
+
   packages/svg-composition:
     dependencies:
       '@dyn/dtif':
@@ -2760,7 +2785,7 @@ packages:
       rollup:
         optional: true
     dependencies:
-      '@rollup/pluginutils': 5.0.5(rollup@4.2.0)
+      '@rollup/pluginutils': 5.1.0(rollup@4.2.0)
     dev: true
 
   /@rollup/pluginutils@5.0.5(rollup@4.2.0):
@@ -2776,6 +2801,7 @@ packages:
       estree-walker: 2.0.2
       picomatch: 2.3.1
       rollup: 4.2.0
+    dev: false
 
   /@rollup/pluginutils@5.1.0(rollup@4.2.0):
     resolution: {integrity: sha512-XTIWOPPcpvyKI6L1NHo0lFlCyznUEyPmPY1mc3KpPVDYulHSTvyeLNVW00QTLIAFNhR3kYnJTQHeGqU4M3n09g==}
@@ -2790,7 +2816,6 @@ packages:
       estree-walker: 2.0.2
       picomatch: 2.3.1
       rollup: 4.2.0
-    dev: false
 
   /@rollup/rollup-android-arm-eabi@4.2.0:
     resolution: {integrity: sha512-8PlggAxGxavr+pkCNeV1TM2wTb2o+cUWDg9M1cm9nR27Dsn287uZtSLYXoQqQcmq+sYfF7lHfd3sWJJinH9GmA==}

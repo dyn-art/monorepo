@@ -4,10 +4,7 @@ use bevy_ecs::{entity::Entity, system::ResMut};
 
 use crate::{
     events::{SvgBuilderOutputEvent, SvgElementChangesEvent},
-    resources::{
-        changed_svg_nodes::{ChangedSvgNode, ChangedSvgNodesRes},
-        output_event_sender::OutputEventSenderRes,
-    },
+    resources::{changed_svg_nodes::ChangedSvgNodesRes, output_event_sender::OutputEventSenderRes},
 };
 
 pub fn queue_svg_node_changes(
@@ -38,8 +35,8 @@ pub fn queue_svg_node_changes(
 
     // Iterating through sorted changes to send events
     for changed_svg_node in changes {
-        for change in changed_svg_node.changes {
-            let event = SvgBuilderOutputEvent::ElementChanges(SvgElementChangesEvent(change));
+        for changes in changed_svg_node.changes {
+            let event = SvgBuilderOutputEvent::ElementChanges(SvgElementChangesEvent { changes });
             output_event_sender_res.push_event(event);
         }
     }
