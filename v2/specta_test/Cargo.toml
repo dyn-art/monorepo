@@ -1,0 +1,39 @@
+[package]
+name = "specta-test"
+version = "0.0.1"
+description = ""
+edition = { workspace = true }
+homepage = { workspace = true }
+repository = { workspace = true }
+license = { workspace = true }
+authors = { workspace = true }
+
+[lib]
+name = "specta_test"
+path = "src/lib.rs"
+crate-type = ["cdylib", "rlib"]
+
+[[bin]]
+name = "cli"
+path = "src/bin/cli.rs"
+
+[features]
+default = []
+
+[dependencies]
+serde = { workspace = true, features = ["derive"] }
+specta = { workspace = true, features = [
+    "typescript",
+    "serde",
+    "glam",
+    "bevy_ecs",
+    "functions",
+    "export",
+] }
+
+[profile.release]
+opt-level = "s"
+lto = true
+
+[profile.dev.package."*"]
+opt-level = 3
