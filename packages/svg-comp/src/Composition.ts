@@ -1,8 +1,11 @@
 import { SvgCompHandle } from '@/rust/dyn-svg-comp-api';
 import type { CompInputEvent, SvgCompOutputEvent } from '@/rust/dyn-svg-comp-api/bindings';
 
+import type { Renderer } from './render';
+
 export class Composition {
 	private readonly _svgCompHandle: SvgCompHandle;
+	private _renderer: Renderer | null = null;
 
 	private _inputEventQueue: CompInputEvent[] = [];
 
@@ -40,6 +43,8 @@ export class Composition {
 	// =========================================================================
 
 	private handleElementChangesEvent(event: SvgCompOutputEvent): void {
-		// TODO
+		if (this._renderer != null) {
+			this._renderer.applyElementChanges(event.changes);
+		}
 	}
 }
