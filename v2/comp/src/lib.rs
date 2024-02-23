@@ -1,17 +1,14 @@
-use bevy_app::prelude::*;
-use bevy_ecs::prelude::*;
-use dyn_comp_types::prelude::*;
-use resources::composition::CompositionRes;
-use systems::outline::rectangle::outline_rectangle;
-
 mod resources;
 mod systems;
 
-pub mod prelude {
-    pub use super::CompPlugin;
-    #[cfg(feature = "dtif")]
-    pub use dyn_dtif::prelude::*;
-}
+use bevy_app::{App, Plugin, Update};
+use bevy_ecs::schedule::{IntoSystemConfigs, IntoSystemSetConfigs, SystemSet};
+use dyn_comp_types::events::{
+    CompositionResizedEvent, CompositionViewportChangedEvent, EntityDeletedEvent, EntityMovedEvent,
+    EntitySetPositionEvent,
+};
+use resources::composition::CompositionRes;
+use systems::outline::rectangle::outline_rectangle;
 
 pub struct CompPlugin {
     #[cfg(feature = "dtif")]
@@ -74,7 +71,7 @@ impl Plugin for CompPlugin {
 }
 
 #[cfg(feature = "dtif")]
-fn inject_dtif_into_ecs(world: &mut World, dtif: &dyn_dtif::DtifComp) {
+fn inject_dtif_into_ecs(world: &mut bevy_ecs::world::World, dtif: &dyn_dtif::DtifComp) {
     let mut dtif_injector = dyn_dtif::dtif_injector::DtifInjector::new();
 
     // Load fonts into cache

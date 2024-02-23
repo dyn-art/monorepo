@@ -1,18 +1,16 @@
-use std::{collections::HashMap, fmt::Display};
-
-use bevy_ecs::{component::Component, entity::Entity};
+pub mod attributes;
+pub mod element_changes;
+pub mod styles;
 
 use self::{attributes::SvgAttribute, styles::SvgStyle};
+use bevy_ecs::{component::Component, entity::Entity};
+use std::{collections::HashMap, fmt::Display};
 
 #[cfg(feature = "output_events")]
 use self::element_changes::{
     SvgAttributeUpdatedChange, SvgElementChange, SvgElementCreatedChange, SvgElementDeletedChange,
     SvgStyleUpdatedChange,
 };
-
-pub mod attributes;
-pub mod element_changes;
-pub mod styles;
 
 #[derive(Component, Debug, Clone)]
 pub struct SvgElement {

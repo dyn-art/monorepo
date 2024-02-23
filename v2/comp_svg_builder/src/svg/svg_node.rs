@@ -1,7 +1,6 @@
-use std::{collections::BTreeMap, fmt::Debug};
-
 use super::svg_element::{SvgElement, SvgElementId};
 use bevy_ecs::component::Component;
+use std::{collections::BTreeMap, fmt::Debug};
 
 #[cfg(feature = "output_events")]
 use super::svg_element::element_changes::SvgElementChanges;

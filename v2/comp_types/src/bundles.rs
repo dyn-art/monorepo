@@ -1,5 +1,5 @@
-use bevy_ecs::prelude::*;
-use bevy_transform::prelude::*;
+use bevy_ecs::bundle::Bundle;
+use bevy_transform::components::Transform;
 
 use crate::{
     mixins::{

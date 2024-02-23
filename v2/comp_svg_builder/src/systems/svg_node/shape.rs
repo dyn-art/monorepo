@@ -1,5 +1,13 @@
-use std::collections::BTreeMap;
-
+use crate::{
+    resources::svg_context::SvgContextRes,
+    svg::{
+        svg_element::{
+            attributes::{SvgAttribute, SvgMeasurementUnit},
+            SvgElement, SvgElementId,
+        },
+        svg_node::SvgNode,
+    },
+};
 use bevy_ecs::{
     component::Component,
     entity::Entity,
@@ -12,17 +20,7 @@ use dyn_comp_types::{
         CompNode, EllipseCompNode, PolygonCompNode, RectangleCompNode, StarCompNode, TextCompNode,
     },
 };
-
-use crate::{
-    resources::svg_context::SvgContextRes,
-    svg::{
-        svg_element::{
-            attributes::{SvgAttribute, SvgMeasurementUnit},
-            SvgElement, SvgElementId,
-        },
-        svg_node::SvgNode,
-    },
-};
+use std::collections::BTreeMap;
 
 #[derive(Component, Debug, Clone)]
 pub struct ShapeSvgNode {

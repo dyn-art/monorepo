@@ -1,5 +1,13 @@
-use bevy_transform::prelude::*;
-use dyn_comp_types::prelude::*;
+use bevy_transform::components::Transform;
+use dyn_comp_types::{
+    bundles::{FrameCompNodeBundle, GroupCompNodeBundle, RectangleCompNodeBundle},
+    mixins::{
+        BlendModeMixin, CornerRadiiMixin, FillMixin, OpacityMixin, SizeMixin, StrokeMixin,
+        VisibilityMixin,
+    },
+    nodes::{CompNode, FrameCompNode, GroupCompNode, RectangleCompNode},
+    shared::{BlendMode, CornerRadii, Fill, Opacity, Size, Stroke, Visibility},
+};
 use glam::{Quat, Vec2, Vec3};
 use smallvec::SmallVec;
 

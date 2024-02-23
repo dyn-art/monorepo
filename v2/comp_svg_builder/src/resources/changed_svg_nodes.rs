@@ -1,6 +1,5 @@
-use bevy_ecs::{entity::Entity, system::Resource};
-
 use crate::svg::svg_element::element_changes::SvgElementChanges;
+use bevy_ecs::{entity::Entity, system::Resource};
 
 #[derive(Resource, Debug, Default)]
 pub struct ChangedSvgNodesRes {

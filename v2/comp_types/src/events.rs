@@ -1,8 +1,6 @@
-use std::fmt::Debug;
-
-use bevy_ecs::{entity::Entity, event::Event, world::World};
-
 use crate::shared::{Size, Viewport};
+use bevy_ecs::{entity::Entity, event::Event, world::World};
+use std::fmt::Debug;
 
 pub trait InputEvent {
     fn send_into_ecs(self, world: &mut World);

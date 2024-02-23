@@ -1,6 +1,5 @@
-use bevy_ecs::{entity::Entity, system::Resource};
-
 use crate::svg::svg_element::{SvgElement, SvgElementId};
+use bevy_ecs::{entity::Entity, system::Resource};
 
 #[derive(Resource, Debug)]
 pub struct SvgContextRes {

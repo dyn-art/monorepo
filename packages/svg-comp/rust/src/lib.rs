@@ -1,26 +1,17 @@
-use std::sync::mpsc::{channel, Receiver};
-
-use bevy_app::prelude::*;
-use dyn_comp::prelude::*;
-use dyn_comp_interaction::CompInteractionPlugin;
-use dyn_comp_svg_builder::{events::SvgBuilderOutputEvent, CompSvgBuilderPlugin};
-use dyn_comp_types::events::InputEvent;
-use events::{SvgCompInputEvent, SvgCompOutputEvent};
-use wasm_bindgen::prelude::*;
-
-use crate::resources::output_event_sender::OutputEventSenderRes;
-
 mod bindgen;
 pub mod events;
 mod resources;
 
-pub mod specta_prelude {
-    pub use super::events::*;
-    pub use super::SvgCompHandle;
-    pub use dyn_comp::prelude::*;
-    pub use dyn_comp_svg_builder::prelude::*;
-    pub use dyn_comp_types::prelude::*;
-}
+use crate::resources::output_event_sender::OutputEventSenderRes;
+use bevy_app::App;
+use dyn_comp::CompPlugin;
+use dyn_comp_interaction::CompInteractionPlugin;
+use dyn_comp_svg_builder::{events::SvgBuilderOutputEvent, CompSvgBuilderPlugin};
+use dyn_comp_types::events::InputEvent;
+use dyn_dtif::DtifComp;
+use events::{SvgCompInputEvent, SvgCompOutputEvent};
+use std::sync::mpsc::{channel, Receiver};
+use wasm_bindgen::{prelude::wasm_bindgen, JsValue};
 
 #[wasm_bindgen]
 pub struct SvgCompHandle {
@@ -99,22 +90,20 @@ impl SvgCompHandle {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use specta::{
-        export,
-        ts::{BigIntExportBehavior, ExportConfig},
-    };
+// #[cfg(test)]
+// mod tests {
+//     use specta::{
+//         export,
+//         ts::{BigIntExportBehavior, ExportConfig},
+//     };
 
-    use super::specta_prelude::*;
-
-    #[test]
-    fn specta_works() {
-        export::ts_with_cfg(
-            "./bindings.ts",
-            "".into(),
-            &ExportConfig::default().bigint(BigIntExportBehavior::Number),
-        )
-        .unwrap();
-    }
-}
+//     #[test]
+//     fn specta_works() {
+//         export::ts_with_cfg(
+//             "./bindings.ts",
+//             "".into(),
+//             &ExportConfig::default().bigint(BigIntExportBehavior::Number),
+//         )
+//         .unwrap();
+//     }
+// }

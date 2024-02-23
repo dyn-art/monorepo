@@ -1,19 +1,11 @@
-use crate::node::Node;
-use dyn_comp_types::prelude::*;
-use events::DtifInputEvent;
-use std::collections::HashMap;
-
 pub mod dtif_injector;
 pub mod events;
 pub mod node;
 
-pub mod prelude {
-    pub use super::dtif_injector::*;
-    pub use super::events::*;
-    pub use super::node::*;
-    pub use super::Content;
-    pub use super::DtifComp;
-}
+use crate::node::Node;
+use dyn_comp_types::shared::{Size, Viewport};
+use events::DtifInputEvent;
+use std::collections::HashMap;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
 #[serde(rename_all = "camelCase")]

@@ -1,5 +1,9 @@
 #![cfg(feature = "output_events")]
 
+use crate::{
+    resources::changed_svg_nodes::{ChangedSvgNode, ChangedSvgNodesRes},
+    svg::svg_node::SvgNode,
+};
 use bevy_ecs::{
     entity::Entity,
     query::{Changed, With},
@@ -7,11 +11,6 @@ use bevy_ecs::{
 };
 use bevy_hierarchy::{Children, Parent};
 use dyn_comp_types::nodes::CompNode;
-
-use crate::{
-    resources::changed_svg_nodes::{ChangedSvgNode, ChangedSvgNodesRes},
-    svg::svg_node::SvgNode,
-};
 
 pub fn extract_svg_nodes_generic<C: SvgNode>(
     mut changed_svg_nodes_res: ResMut<ChangedSvgNodesRes>,

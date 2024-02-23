@@ -1,21 +1,15 @@
-use bevy_app::prelude::*;
-use bevy_ecs::prelude::*;
-use resources::svg_context::SvgContextRes;
-use systems::svg_node::{
-    frame::{apply_frame_node_size_change, insert_frame_svg_node},
-    shape::{apply_shape_node_size_change, insert_shape_svg_node},
-};
-
 pub mod events;
 mod resources;
 pub mod svg;
 mod systems;
 
-pub mod prelude {
-    pub use super::events::*;
-    pub use super::svg::*;
-    pub use super::CompSvgBuilderPlugin;
-}
+use bevy_app::{App, Last, Plugin};
+use bevy_ecs::schedule::{IntoSystemConfigs, IntoSystemSetConfigs, SystemSet};
+use resources::svg_context::SvgContextRes;
+use systems::svg_node::{
+    frame::{apply_frame_node_size_change, insert_frame_svg_node},
+    shape::{apply_shape_node_size_change, insert_shape_svg_node},
+};
 
 pub struct CompSvgBuilderPlugin {
     #[cfg(feature = "output_events")]
@@ -92,24 +86,4 @@ fn build_render_app(
         ),
     );
     render_app.add_systems(Render, queue_svg_node_changes);
-}
-
-#[cfg(test)]
-mod tests {
-    use specta::{
-        export,
-        ts::{BigIntExportBehavior, ExportConfig},
-    };
-
-    use super::*;
-
-    #[test]
-    fn specta_works() {
-        export::ts_with_cfg(
-            "./bindings.ts",
-            "".into(),
-            &ExportConfig::default().bigint(BigIntExportBehavior::Number),
-        )
-        .unwrap();
-    }
 }
