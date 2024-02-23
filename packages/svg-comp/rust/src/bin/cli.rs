@@ -1,7 +1,13 @@
 #[cfg(feature = "cli")]
 mod cli {
     use clap::Parser;
-    use specta::ts::{BigIntExportBehavior, ExportConfig};
+    use specta::{
+        export::ts_with_cfg,
+        ts::{BigIntExportBehavior, ExportConfig},
+    };
+
+    // Import types and modules to generate types from
+    use dyn_svg_comp_api::specta_prelude::*;
 
     #[derive(Parser, Debug)]
     #[clap(name = "SVG Composition CLI")]
@@ -23,12 +29,9 @@ mod cli {
     }
 
     fn generate_ts_types(output_path: &str) {
-        // Import types and modules to generate types from
-        use dyn_svg_comp_api::specta_prelude::*;
-
         println!("🚀 Generating TypeScript types at {}", output_path);
         let export_config = ExportConfig::default().bigint(BigIntExportBehavior::Number);
-        match specta::export::ts_with_cfg(output_path, "".into(), &export_config) {
+        match ts_with_cfg(output_path, "".into(), &export_config) {
             Ok(_) => println!(
                 "✅ Successfully generated TypeScript types at {}",
                 output_path
