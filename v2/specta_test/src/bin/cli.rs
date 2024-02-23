@@ -12,7 +12,7 @@ pub struct InCli {
 fn main() {
     let output_path = "./bindings.ts";
     let export_config = ExportConfig::default().bigint(BigIntExportBehavior::Number);
-    match ts_with_cfg(output_path, "".into(), &export_config) {
+    match ts_with_cfg(output_path,  &export_config) {
         Ok(_) => println!(
             "✅ Successfully generated TypeScript types at {}",
             output_path

@@ -6,6 +6,7 @@ exclude = [
     "crates/*",
     "packages/svg-composition/rust",
     "apps/comprender",
+    "v2/specta_test",
 ]
 
 [workspace.package]

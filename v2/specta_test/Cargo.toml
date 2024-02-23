@@ -2,11 +2,7 @@
 name = "specta-test"
 version = "0.0.1"
 description = ""
-edition = { workspace = true }
-homepage = { workspace = true }
-repository = { workspace = true }
-license = { workspace = true }
-authors = { workspace = true }
+edition = "2021"
 
 [lib]
 name = "specta_test"
@@ -21,13 +17,10 @@ path = "src/bin/cli.rs"
 default = []
 
 [dependencies]
-serde = { workspace = true, features = ["derive"] }
-specta = { workspace = true, features = [
+serde = { version = "1.0.195", features = ["derive"] }
+specta = { version = "2.0.0-rc.7", features = [
     "typescript",
     "serde",
-    "glam",
-    "bevy_ecs",
-    "functions",
     "export",
 ] }
 
