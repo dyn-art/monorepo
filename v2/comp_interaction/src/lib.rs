@@ -1,6 +1,7 @@
-use bevy_app::{App, Plugin};
-
 pub mod events;
+pub mod resources;
+
+use bevy_app::{App, Plugin};
 
 pub struct CompInteractionPlugin;
 

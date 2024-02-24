@@ -8,8 +8,9 @@ pub enum SvgCompOutputEvent {
     ElementChanges(SvgElementChangesEvent),
 }
 
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
+#[derive(Debug, Clone, serde::Deserialize, specta::Type)]
+#[serde(tag = "type")]
 pub enum SvgCompInputEvent {
-    Comp(CompInputEvent),
-    Interaction(InteractionInputEvent),
+    Comp { event: CompInputEvent },
+    Interaction { event: InteractionInputEvent },
 }
