@@ -1,5 +1,6 @@
 mod bindgen;
 pub mod events;
+mod logging;
 pub mod modules;
 
 use bevy_app::App;
@@ -92,6 +93,22 @@ impl SvgCompHandle {
         log::info!("[update] Output Events {:#?}", output_events);
 
         return Ok(serde_wasm_bindgen::to_value(&output_events)?);
+    }
+
+    #[wasm_bindgen(js_name = logEntityComponents)]
+    pub fn log_entity_components(&self, entity: JsValue) {
+        #[cfg(feature = "tracing")]
+        {
+            let entity: bevy_ecs::entity::Entity = match serde_wasm_bindgen::from_value(entity) {
+                Ok(entity) => entity,
+                Err(_) => return,
+            };
+
+            crate::logging::tracing::log_entity_components(&self.app.world, entity);
+        }
+
+        #[cfg(not(feature = "tracing"))]
+        log::warn!("Log entity components not supported in this build");
     }
 }
 

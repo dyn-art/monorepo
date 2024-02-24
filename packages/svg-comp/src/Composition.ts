@@ -2,6 +2,7 @@ import { shortId } from '@dyn/utils';
 import { SvgCompHandle } from '@/rust/dyn-svg-comp-api';
 import type {
 	CompDtif,
+	Entity,
 	SelectionChangeOutputEvent,
 	SvgCompInputEvent,
 	SvgCompOutputEvent,
@@ -77,7 +78,9 @@ export class Composition {
 			return;
 		}
 
-		callbacks.forEach((entry) => entry.callback(event));
+		callbacks.forEach((entry) => {
+			entry.callback(event);
+		});
 	}
 
 	private handleElementChangesOutputEvent(event: SvgElementChangesOutputEvent): void {
@@ -132,6 +135,10 @@ export class Composition {
 		for (const event of events) {
 			this.emitInputEvent(event, debounce);
 		}
+	}
+
+	public logEntityComponents(entity: Entity) {
+		this._svgCompHandle.logEntityComponents(entity);
 	}
 }
 
