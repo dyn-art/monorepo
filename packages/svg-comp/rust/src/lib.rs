@@ -111,21 +111,3 @@ impl SvgCompHandle {
         log::warn!("Log entity components not supported in this build");
     }
 }
-
-// #[cfg(test)]
-// mod tests {
-//     use specta::{
-//         export,
-//         ts::{BigIntExportBehavior, ExportConfig},
-//     };
-
-//     #[test]
-//     fn specta_works() {
-//         export::ts_with_cfg(
-//             "./bindings.ts",
-//             "".into(),
-//             &ExportConfig::default().bigint(BigIntExportBehavior::Number),
-//         )
-//         .unwrap();
-//     }
-// }
