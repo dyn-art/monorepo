@@ -24,15 +24,15 @@ console_log = ["dep:console_error_panic_hook", "dep:once_cell"]
 cli = ["dep:clap", "specta/export"]
 tracing = [
     "console_log",
-    "dyn-comp/tracing",
+    "dyn-comp-core/tracing",
     "dyn-comp-interaction/tracing",
     "dyn-comp-svg-builder/tracing",
-    "dyn-dtif/tracing",
+    "dyn-comp-dtif/tracing",
 ]
 
 [dependencies]
-dyn-comp = { path = "../../../v2/comp", features = ["dtif"] }
-dyn-dtif = { path = "../../../v2/dtif" }
+dyn-comp-core = { path = "../../../v2/comp_core", features = ["dtif"] }
+dyn-comp-dtif = { path = "../../../v2/comp_dtif" }
 dyn-comp-types = { path = "../../../v2/comp_types", features = [
     "serde_support",
 ] }

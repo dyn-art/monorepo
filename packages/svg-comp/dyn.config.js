@@ -4,9 +4,9 @@ const { wasm } = require('@rollup/plugin-wasm');
  * @type {import('@dyn/cli').TDynConfig}
  */
 module.exports = {
-	// rust: {
-	// 	typeDeclarationTargetPaths: ['../dtif/src/gen/bindings.ts']
-	// },
+	rust: {
+		typeDeclarationTargetPaths: ['../comp-dtif/src/_gen/bindings.ts']
+	},
 	library: {
 		rollupConfig: {
 			isBase: false,

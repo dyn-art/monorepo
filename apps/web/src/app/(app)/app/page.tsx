@@ -47,7 +47,7 @@ const DTIF: COMP.DTIFComposition = {
 			color: [0, 0, 0]
 		}
 	},
-	fonts: {},
+	fonts: [],
 	changes: [
 		// {
 		// 	type: 'EntityMoved',

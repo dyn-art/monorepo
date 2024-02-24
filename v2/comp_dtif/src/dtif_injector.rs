@@ -1,7 +1,7 @@
 use crate::{
     events::DtifInputEvent,
     node::{FrameNode, GroupNode, Node, NodeImpl},
-    DtifComp,
+    CompDtif,
 };
 use bevy_ecs::{
     entity::Entity,
@@ -27,7 +27,7 @@ impl DtifInjector {
         self.sid_to_entity.drain().collect()
     }
 
-    pub fn inject_from_root(&mut self, dtif: &DtifComp, world: &mut World) -> Option<Entity> {
+    pub fn inject_from_root(&mut self, dtif: &CompDtif, world: &mut World) -> Option<Entity> {
         let maybe_root_node_entity = self.process_node(dtif.root_node_id.clone(), dtif, world);
 
         if let Some(root_node_entity) = maybe_root_node_entity {
@@ -41,7 +41,7 @@ impl DtifInjector {
     fn process_node(
         &mut self,
         node_sid: String,
-        dtif: &DtifComp,
+        dtif: &CompDtif,
         world: &mut World,
     ) -> Option<Entity> {
         dtif.nodes.get(&node_sid).map(|node| {
@@ -66,7 +66,7 @@ impl DtifInjector {
         &mut self,
         parent_entity: Entity,
         node: &Node,
-        dtif: &DtifComp,
+        dtif: &CompDtif,
         world: &mut World,
     ) {
         if let Node::Frame(FrameNode { children, .. }) | Node::Group(GroupNode { children, .. }) =

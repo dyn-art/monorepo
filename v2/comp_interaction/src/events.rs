@@ -11,15 +11,15 @@ use crate::resources::comp_interaction::{MouseButton, XYWH};
     serde(tag = "type")
 )]
 pub enum InteractionInputEvent {
-    CursorDownOnEntity(CursorDownOnEntity),
-    CursorMovedOnComposition(CursorMovedOnComposition),
-    CursorEnteredComposition(CursorEnteredComposition),
-    CursorExitedComposition(CursorExitedComposition),
-    CursorDownOnComposition(CursorDownOnComposition),
-    CursorUpOnComposition(CursorUpOnComposition),
-    WheeledOnComposition(WheeledOnComposition),
-    CursorDownOnResizeHandle(CursorDownOnResizeHandle),
-    CursorDownOnRotateHandle(CursorDownOnRotateHandle),
+    CursorDownOnEntity(CursorDownOnEntityInputEvent),
+    CursorMovedOnComposition(CursorMovedOnCompInputEvent),
+    CursorEnteredComposition(CursorEnteredCompInputEvent),
+    CursorExitedComposition(CursorExitedCompInputEvent),
+    CursorDownOnComposition(CursorDownOnCompInputEvent),
+    CursorUpOnComposition(CursorUpOnCompInputEvent),
+    WheeledOnComposition(WheeledOnCompInputEvent),
+    CursorDownOnResizeHandle(CursorDownOnResizeHandleInputEvent),
+    CursorDownOnRotateHandle(CursorDownOnRotateHandleInputEvent),
 }
 
 impl InputEvent for InteractionInputEvent {
@@ -58,21 +58,21 @@ impl InputEvent for InteractionInputEvent {
 
 #[derive(Event, Debug, Copy, Clone)]
 #[cfg_attr(feature = "serde_support", derive(serde::Deserialize, specta::Type))]
-pub struct CursorMovedOnComposition {
+pub struct CursorMovedOnCompInputEvent {
     pub position: Vec2,
 }
 
 #[derive(Event, Debug, Copy, Clone)]
 #[cfg_attr(feature = "serde_support", derive(serde::Deserialize, specta::Type))]
-pub struct CursorEnteredComposition;
+pub struct CursorEnteredCompInputEvent;
 
 #[derive(Event, Debug, Copy, Clone)]
 #[cfg_attr(feature = "serde_support", derive(serde::Deserialize, specta::Type))]
-pub struct CursorExitedComposition;
+pub struct CursorExitedCompInputEvent;
 
 #[derive(Event, Debug, Copy, Clone)]
 #[cfg_attr(feature = "serde_support", derive(serde::Deserialize, specta::Type))]
-pub struct CursorDownOnEntity {
+pub struct CursorDownOnEntityInputEvent {
     pub entity: Entity,
     pub position: Vec2,
     pub button: MouseButton,
@@ -80,14 +80,14 @@ pub struct CursorDownOnEntity {
 
 #[derive(Event, Debug, Copy, Clone)]
 #[cfg_attr(feature = "serde_support", derive(serde::Deserialize, specta::Type))]
-pub struct CursorDownOnComposition {
+pub struct CursorDownOnCompInputEvent {
     pub position: Vec2,
     pub button: MouseButton,
 }
 
 #[derive(Event, Debug, Copy, Clone)]
 #[cfg_attr(feature = "serde_support", derive(serde::Deserialize, specta::Type))]
-pub struct CursorUpOnComposition {
+pub struct CursorUpOnCompInputEvent {
     pub position: Vec2,
     pub button: MouseButton,
 }
@@ -98,7 +98,7 @@ pub struct CursorUpOnComposition {
     derive(serde::Deserialize, specta::Type),
     serde(rename_all = "camelCase")
 )]
-pub struct WheeledOnComposition {
+pub struct WheeledOnCompInputEvent {
     pub position: Vec2,
     pub delta: Vec2,
     pub ctrl_key_pressed: bool,
@@ -111,7 +111,7 @@ pub struct WheeledOnComposition {
     derive(serde::Deserialize, specta::Type),
     serde(rename_all = "camelCase")
 )]
-pub struct CursorDownOnResizeHandle {
+pub struct CursorDownOnResizeHandleInputEvent {
     pub initial_bounds: XYWH,
     pub corner: u8,
     pub rotation_in_radians: f32,
@@ -123,7 +123,7 @@ pub struct CursorDownOnResizeHandle {
     derive(serde::Deserialize, specta::Type),
     serde(rename_all = "camelCase")
 )]
-pub struct CursorDownOnRotateHandle {
+pub struct CursorDownOnRotateHandleInputEvent {
     pub corner: u8,
     pub initial_rotation_in_radians: f32,
 }

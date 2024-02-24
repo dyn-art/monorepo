@@ -4,9 +4,9 @@ pub mod resources;
 use bevy_app::{App, Plugin, PreUpdate};
 use bevy_ecs::schedule::{IntoSystemSetConfigs, SystemSet};
 use events::{
-    CursorDownOnComposition, CursorDownOnEntity, CursorDownOnResizeHandle,
-    CursorDownOnRotateHandle, CursorEnteredComposition, CursorExitedComposition,
-    CursorMovedOnComposition, CursorUpOnComposition, WheeledOnComposition,
+    CursorDownOnCompInputEvent, CursorDownOnEntityInputEvent, CursorDownOnResizeHandleInputEvent,
+    CursorDownOnRotateHandleInputEvent, CursorEnteredCompInputEvent, CursorExitedCompInputEvent,
+    CursorMovedOnCompInputEvent, CursorUpOnCompInputEvent, WheeledOnCompInputEvent,
 };
 use resources::comp_interaction::CompInteractionRes;
 
@@ -39,15 +39,15 @@ enum CompInteractionSystemSet {
 impl Plugin for CompInteractionPlugin {
     fn build(&self, app: &mut App) {
         // Register events
-        app.add_event::<CursorMovedOnComposition>();
-        app.add_event::<CursorEnteredComposition>();
-        app.add_event::<CursorExitedComposition>();
-        app.add_event::<CursorDownOnEntity>();
-        app.add_event::<CursorDownOnComposition>();
-        app.add_event::<CursorUpOnComposition>();
-        app.add_event::<WheeledOnComposition>();
-        app.add_event::<CursorDownOnResizeHandle>();
-        app.add_event::<CursorDownOnRotateHandle>();
+        app.add_event::<CursorMovedOnCompInputEvent>();
+        app.add_event::<CursorEnteredCompInputEvent>();
+        app.add_event::<CursorExitedCompInputEvent>();
+        app.add_event::<CursorDownOnEntityInputEvent>();
+        app.add_event::<CursorDownOnCompInputEvent>();
+        app.add_event::<CursorUpOnCompInputEvent>();
+        app.add_event::<WheeledOnCompInputEvent>();
+        app.add_event::<CursorDownOnResizeHandleInputEvent>();
+        app.add_event::<CursorDownOnRotateHandleInputEvent>();
 
         // Register resources
         app.world.init_resource::<CompInteractionRes>();

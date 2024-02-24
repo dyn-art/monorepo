@@ -1,5 +1,5 @@
 [package]
-name = "dyn-comp"
+name = "dyn-comp-core"
 version = "0.0.1"
 description = ""
 edition = { workspace = true }
@@ -10,12 +10,12 @@ authors = { workspace = true }
 
 [features]
 default = []
-dtif = ["dep:dyn-dtif", "dyn-comp-types/serde_support"]
+dtif = ["dep:dyn-comp-dtif", "dyn-comp-types/serde_support"]
 tracing = []
 
 [dependencies]
 dyn-comp-types = { path = "../comp_types" }
-dyn-dtif = { path = "../dtif", optional = true }
+dyn-comp-dtif = { path = "../comp_dtif", optional = true }
 bevy_app = { workspace = true }
 bevy_ecs = { workspace = true }
 bevy_transform = { workspace = true }

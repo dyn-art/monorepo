@@ -171,15 +171,24 @@ importers:
 
   apps/web:
     dependencies:
+      '@dyn/comp-dtif':
+        specifier: workspace:*
+        version: link:../../packages/comp-dtif
       '@dyn/dtif':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../../packages/dtif
+      '@dyn/svg-comp':
+        specifier: workspace:*
+        version: link:../../packages/svg-comp
       '@dyn/svg-composition':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../../packages/svg-composition
       '@dyn/ui':
         specifier: workspace:*
         version: link:../../packages/ui
+      '@tanstack/react-query':
+        specifier: ^5.22.2
+        version: 5.22.2(react@18.2.0)
       clsx:
         specifier: ^2.0.0
         version: 2.0.0
@@ -306,6 +315,19 @@ importers:
       type-fest:
         specifier: ^4.6.0
         version: 4.6.0
+
+  packages/comp-dtif:
+    dependencies:
+      '@dyn/utils':
+        specifier: workspace:*
+        version: link:../utils
+    devDependencies:
+      '@dyn/config':
+        specifier: workspace:*
+        version: link:../config
+      '@types/node':
+        specifier: ^20.8.10
+        version: 20.8.10
 
   packages/config:
     dependencies:
@@ -490,9 +512,9 @@ importers:
 
   packages/svg-comp:
     dependencies:
-      '@dyn/dtif':
+      '@dyn/comp-dtif':
         specifier: workspace:*
-        version: link:../dtif
+        version: link:../comp-dtif
       '@dyn/utils':
         specifier: workspace:*
         version: link:../utils
@@ -2912,6 +2934,19 @@ packages:
     resolution: {integrity: sha512-E4KcWTpoLHqwPHLxidpOqQbcrZVgi0rsmmZXUle1jXmJfuIf/UWpczUJ7MZZ5tlxytgJXyp0w4PGkkeLiuIdZw==}
     dependencies:
       tslib: 2.6.2
+    dev: false
+
+  /@tanstack/query-core@5.22.2:
+    resolution: {integrity: sha512-z3PwKFUFACMUqe1eyesCIKg3Jv1mysSrYfrEW5ww5DCDUD4zlpTKBvUDaEjsfZzL3ULrFLDM9yVUxI/fega1Qg==}
+    dev: false
+
+  /@tanstack/react-query@5.22.2(react@18.2.0):
+    resolution: {integrity: sha512-TaxJDRzJ8/NWRT4lY2jguKCrNI6MRN+67dELzPjNUlvqzTxGANlMp68l7aC7hG8Bd1uHNxHl7ihv7MT50i/43A==}
+    peerDependencies:
+      react: ^18.0.0
+    dependencies:
+      '@tanstack/query-core': 5.22.2
+      react: 18.2.0
     dev: false
 
   /@testing-library/dom@8.20.1:

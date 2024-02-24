@@ -9,7 +9,7 @@ use std::collections::HashMap;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
 #[serde(rename_all = "camelCase")]
-pub struct DtifComp {
+pub struct CompDtif {
     /// The version of the composition type declaration.
     pub version: String,
     /// The name of the composition.

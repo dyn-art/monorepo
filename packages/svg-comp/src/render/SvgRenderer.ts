@@ -1,9 +1,5 @@
-import type {
-	MouseButton,
-	SvgElementChanges,
-	SvgElementId,
-	Vec2
-} from '@/rust/dyn-svg-comp-api/bindings';
+import { intoMouseButton } from '@dyn/comp-dtif';
+import type { SvgElementChanges, SvgElementId, Vec2 } from '@/rust/dyn-svg-comp-api/bindings';
 
 import type { Composition } from '../Composition';
 import { Renderer } from './Renderer';
@@ -21,7 +17,7 @@ export class SvgRenderer extends Renderer {
 	private _cursorInCompBounds = false;
 
 	constructor(composition: Composition, options: TsvgRendererOptions = {}) {
-		super(composition);
+		super(composition, true);
 		const { domElement = document.body } = options;
 		this._domElement = domElement;
 
@@ -69,7 +65,7 @@ export class SvgRenderer extends Renderer {
 					event: {
 						type: 'CursorDownOnComposition',
 						position: this.pointerEventToCompositionPoint(e),
-						button: toMouseButton(e.button)
+						button: intoMouseButton(e.button)
 					}
 				},
 				true
@@ -83,7 +79,7 @@ export class SvgRenderer extends Renderer {
 					event: {
 						type: 'CursorUpOnComposition',
 						position: this.pointerEventToCompositionPoint(e),
-						button: toMouseButton(e.button)
+						button: intoMouseButton(e.button)
 					}
 				},
 				true
@@ -159,7 +155,7 @@ export class SvgRenderer extends Renderer {
 									type: 'CursorDownOnEntity',
 									entity,
 									position: this.pointerEventToCompositionPoint(e),
-									button: toMouseButton(e.button)
+									button: intoMouseButton(e.button)
 								}
 							});
 						});
@@ -250,18 +246,4 @@ export class SvgRenderer extends Renderer {
 
 export interface TsvgRendererOptions {
 	domElement?: Element;
-}
-
-// TODO: Move into @dyn/dtif package
-export function toMouseButton(button: number): MouseButton {
-	switch (button) {
-		case 0:
-			return 'Left';
-		case 1:
-			return 'Middle';
-		case 2:
-			return 'Right';
-		default:
-			return 'Unkown';
-	}
 }

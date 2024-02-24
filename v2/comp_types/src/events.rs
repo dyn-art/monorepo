@@ -12,30 +12,30 @@ pub trait InputEvent {
     derive(serde::Serialize, serde::Deserialize, specta::Type),
     serde(tag = "type")
 )]
-pub enum CompInputEvent {
-    CompositionResized(CompositionResizedEvent),
-    CompositionViewportChanged(CompositionViewportChangedEvent),
-    EntityMoved(EntityMovedEvent),
-    EntitySetPosition(EntitySetPositionEvent),
-    EntityDeleted(EntityDeletedEvent),
+pub enum CompCoreInputEvent {
+    CompositionResized(CompositionResizedInputEvent),
+    CompositionViewportChanged(CompositionViewportChangedInputEvent),
+    EntityMoved(EntityMovedInputEvent),
+    EntitySetPosition(EntitySetPositionInputEvent),
+    EntityDeleted(EntityDeletedInputEvent),
 }
 
-impl InputEvent for CompInputEvent {
+impl InputEvent for CompCoreInputEvent {
     fn send_into_ecs(self, world: &mut World) {
         match self {
-            CompInputEvent::CompositionResized(event) => {
+            CompCoreInputEvent::CompositionResized(event) => {
                 world.send_event(event);
             }
-            CompInputEvent::CompositionViewportChanged(event) => {
+            CompCoreInputEvent::CompositionViewportChanged(event) => {
                 world.send_event(event);
             }
-            CompInputEvent::EntityMoved(event) => {
+            CompCoreInputEvent::EntityMoved(event) => {
                 world.send_event(event);
             }
-            CompInputEvent::EntitySetPosition(event) => {
+            CompCoreInputEvent::EntitySetPosition(event) => {
                 world.send_event(event);
             }
-            CompInputEvent::EntityDeleted(event) => {
+            CompCoreInputEvent::EntityDeleted(event) => {
                 world.send_event(event);
             }
         }
@@ -47,7 +47,7 @@ impl InputEvent for CompInputEvent {
     feature = "serde_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
-pub struct CompositionResizedEvent {
+pub struct CompositionResizedInputEvent {
     pub size: Size,
 }
 
@@ -56,7 +56,7 @@ pub struct CompositionResizedEvent {
     feature = "serde_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
-pub struct CompositionViewportChangedEvent {
+pub struct CompositionViewportChangedInputEvent {
     pub viewport: Viewport,
 }
 
@@ -65,7 +65,7 @@ pub struct CompositionViewportChangedEvent {
     feature = "serde_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
-pub struct EntityMovedEvent {
+pub struct EntityMovedInputEvent {
     pub entity: Entity,
     pub dx: f32,
     pub dy: f32,
@@ -76,7 +76,7 @@ pub struct EntityMovedEvent {
     feature = "serde_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
-pub struct EntitySetPositionEvent {
+pub struct EntitySetPositionInputEvent {
     pub entity: Entity,
     pub x: f32,
     pub y: f32,
@@ -87,6 +87,6 @@ pub struct EntitySetPositionEvent {
     feature = "serde_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
-pub struct EntityDeletedEvent {
+pub struct EntityDeletedInputEvent {
     pub entity: Entity,
 }

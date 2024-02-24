@@ -1169,17 +1169,31 @@ dependencies = [
 ]
 
 [[package]]
-name = "dyn-comp"
+name = "dyn-comp-core"
 version = "0.0.1"
 dependencies = [
  "bevy_app",
  "bevy_ecs",
  "bevy_transform",
+ "dyn-comp-dtif",
  "dyn-comp-types",
- "dyn-dtif",
  "glam",
  "smallvec",
  "tiny-skia-path",
+]
+
+[[package]]
+name = "dyn-comp-dtif"
+version = "0.0.1"
+dependencies = [
+ "bevy_ecs",
+ "bevy_hierarchy",
+ "bevy_transform",
+ "dyn-comp-types",
+ "glam",
+ "serde",
+ "smallvec",
+ "specta",
 ]
 
 [[package]]
@@ -1227,20 +1241,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "dyn-dtif"
-version = "0.0.1"
-dependencies = [
- "bevy_ecs",
- "bevy_hierarchy",
- "bevy_transform",
- "dyn-comp-types",
- "glam",
- "serde",
- "smallvec",
- "specta",
-]
-
-[[package]]
 name = "dyn-svg-comp-api"
 version = "0.0.1"
 dependencies = [
@@ -1248,11 +1248,11 @@ dependencies = [
  "bevy_ecs",
  "clap",
  "console_error_panic_hook",
- "dyn-comp",
+ "dyn-comp-core",
+ "dyn-comp-dtif",
  "dyn-comp-interaction",
  "dyn-comp-svg-builder",
  "dyn-comp-types",
- "dyn-dtif",
  "js-sys",
  "log",
  "once_cell",

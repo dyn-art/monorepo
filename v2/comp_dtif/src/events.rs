@@ -1,8 +1,8 @@
 use bevy_ecs::entity::Entity;
 use dyn_comp_types::{
     events::{
-        CompInputEvent, CompositionResizedEvent, CompositionViewportChangedEvent,
-        EntityDeletedEvent, EntityMovedEvent, EntitySetPositionEvent,
+        CompCoreInputEvent, CompositionResizedInputEvent, CompositionViewportChangedInputEvent,
+        EntityDeletedInputEvent, EntityMovedInputEvent, EntitySetPositionInputEvent,
     },
     shared::{Size, Viewport},
 };
@@ -22,18 +22,22 @@ impl DtifInputEvent {
     pub fn into_comp_input_event(
         self,
         sid_to_entity: &HashMap<String, Entity>,
-    ) -> Option<CompInputEvent> {
+    ) -> Option<CompCoreInputEvent> {
         match self {
-            DtifInputEvent::CompositionResized(event) => Some(CompInputEvent::CompositionResized(
-                CompositionResizedEvent { size: event.size },
-            )),
-            DtifInputEvent::CompositionViewportChanged(event) => Some(
-                CompInputEvent::CompositionViewportChanged(CompositionViewportChangedEvent {
-                    viewport: event.viewport,
-                }),
-            ),
+            DtifInputEvent::CompositionResized(event) => {
+                Some(CompCoreInputEvent::CompositionResized(
+                    CompositionResizedInputEvent { size: event.size },
+                ))
+            }
+            DtifInputEvent::CompositionViewportChanged(event) => {
+                Some(CompCoreInputEvent::CompositionViewportChanged(
+                    CompositionViewportChangedInputEvent {
+                        viewport: event.viewport,
+                    },
+                ))
+            }
             DtifInputEvent::EntityMoved(event) => sid_to_entity.get(&event.entity).map(|entity| {
-                CompInputEvent::EntityMoved(EntityMovedEvent {
+                CompCoreInputEvent::EntityMoved(EntityMovedInputEvent {
                     dx: event.dx,
                     dy: event.dy,
                     entity: *entity,
@@ -41,7 +45,7 @@ impl DtifInputEvent {
             }),
             DtifInputEvent::EntitySetPosition(event) => {
                 sid_to_entity.get(&event.entity).map(|entity| {
-                    CompInputEvent::EntitySetPosition(EntitySetPositionEvent {
+                    CompCoreInputEvent::EntitySetPosition(EntitySetPositionInputEvent {
                         x: event.x,
                         y: event.y,
                         entity: *entity,
@@ -50,7 +54,7 @@ impl DtifInputEvent {
             }
             DtifInputEvent::EntityDeleted(event) => {
                 sid_to_entity.get(&event.entity).map(|entity| {
-                    CompInputEvent::EntityDeleted(EntityDeletedEvent { entity: *entity })
+                    CompCoreInputEvent::EntityDeleted(EntityDeletedInputEvent { entity: *entity })
                 })
             }
         }

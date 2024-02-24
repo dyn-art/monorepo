@@ -4,15 +4,15 @@ mod systems;
 use bevy_app::{App, Plugin, Update};
 use bevy_ecs::schedule::{IntoSystemConfigs, IntoSystemSetConfigs, SystemSet};
 use dyn_comp_types::events::{
-    CompositionResizedEvent, CompositionViewportChangedEvent, EntityDeletedEvent, EntityMovedEvent,
-    EntitySetPositionEvent,
+    CompositionResizedInputEvent, CompositionViewportChangedInputEvent, EntityDeletedInputEvent,
+    EntityMovedInputEvent, EntitySetPositionInputEvent,
 };
 use resources::composition::CompositionRes;
 use systems::outline::rectangle::outline_rectangle;
 
-pub struct CompPlugin {
+pub struct CompCorePlugin {
     #[cfg(feature = "dtif")]
-    pub dtif: dyn_dtif::DtifComp,
+    pub dtif: dyn_comp_dtif::CompDtif,
     #[cfg(not(feature = "dtif"))]
     pub size: Size,
     #[cfg(not(feature = "dtif"))]
@@ -22,7 +22,7 @@ pub struct CompPlugin {
 }
 
 #[derive(SystemSet, Debug, Hash, PartialEq, Eq, Clone)]
-enum CompSystemSet {
+enum CompCoreSystemSet {
     /// After this label, the system has processed input events.
     InputEvents,
 
@@ -36,14 +36,14 @@ enum CompSystemSet {
     Outline,
 }
 
-impl Plugin for CompPlugin {
+impl Plugin for CompCorePlugin {
     fn build(&self, app: &mut App) {
         // Register events
-        app.add_event::<CompositionResizedEvent>();
-        app.add_event::<CompositionViewportChangedEvent>();
-        app.add_event::<EntityDeletedEvent>();
-        app.add_event::<EntityMovedEvent>();
-        app.add_event::<EntitySetPositionEvent>();
+        app.add_event::<CompositionResizedInputEvent>();
+        app.add_event::<CompositionViewportChangedInputEvent>();
+        app.add_event::<EntityDeletedInputEvent>();
+        app.add_event::<EntityMovedInputEvent>();
+        app.add_event::<EntitySetPositionInputEvent>();
 
         // Register resources
         #[cfg(not(feature = "dtif"))]
@@ -60,16 +60,16 @@ impl Plugin for CompPlugin {
         app.configure_sets(
             Update,
             (
-                CompSystemSet::InputEvents,
-                CompSystemSet::Layout,
-                CompSystemSet::Prepare,
-                CompSystemSet::Outline,
+                CompCoreSystemSet::InputEvents,
+                CompCoreSystemSet::Layout,
+                CompCoreSystemSet::Prepare,
+                CompCoreSystemSet::Outline,
             )
                 .chain(),
         );
 
         // Register systems
-        app.add_systems(Update, outline_rectangle.in_set(CompSystemSet::Outline));
+        app.add_systems(Update, outline_rectangle.in_set(CompCoreSystemSet::Outline));
 
         #[cfg(feature = "dtif")]
         inject_dtif_into_ecs(&mut app.world, &self.dtif)
@@ -77,8 +77,8 @@ impl Plugin for CompPlugin {
 }
 
 #[cfg(feature = "dtif")]
-fn inject_dtif_into_ecs(world: &mut bevy_ecs::world::World, dtif: &dyn_dtif::DtifComp) {
-    let mut dtif_injector = dyn_dtif::dtif_injector::DtifInjector::new();
+fn inject_dtif_into_ecs(world: &mut bevy_ecs::world::World, dtif: &dyn_comp_dtif::CompDtif) {
+    let mut dtif_injector = dyn_comp_dtif::dtif_injector::DtifInjector::new();
 
     // Load fonts into cache
     // TODO

@@ -3,11 +3,11 @@ pub mod events;
 pub mod modules;
 
 use bevy_app::App;
-use dyn_comp::CompPlugin;
+use dyn_comp_core::CompCorePlugin;
+use dyn_comp_dtif::CompDtif;
 use dyn_comp_interaction::CompInteractionPlugin;
 use dyn_comp_svg_builder::{events::SvgBuilderOutputEvent, CompSvgBuilderPlugin};
 use dyn_comp_types::events::InputEvent;
-use dyn_dtif::DtifComp;
 use events::{SvgCompInputEvent, SvgCompOutputEvent};
 use modules::watch::CompWatchPlugin;
 use std::sync::mpsc::{channel, Receiver};
@@ -23,7 +23,7 @@ pub struct SvgCompHandle {
 #[wasm_bindgen]
 impl SvgCompHandle {
     pub fn create(js_dtif: JsValue, interactive: bool) -> Result<SvgCompHandle, JsValue> {
-        let dtif: DtifComp = serde_wasm_bindgen::from_value(js_dtif)?;
+        let dtif: CompDtif = serde_wasm_bindgen::from_value(js_dtif)?;
         let mut app = App::new();
 
         let (svg_builder_output_event_sender, svg_builder_output_event_receiver) =
@@ -32,7 +32,7 @@ impl SvgCompHandle {
 
         // Register plugins
         app.add_plugins((
-            CompPlugin { dtif },
+            CompCorePlugin { dtif },
             CompWatchPlugin {
                 output_event_sender,
             },
