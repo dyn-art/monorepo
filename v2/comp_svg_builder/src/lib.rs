@@ -18,9 +18,7 @@ pub struct CompSvgBuilderPlugin {
 
 #[derive(SystemSet, Debug, Hash, PartialEq, Eq, Clone)]
 enum SvgBuilderSystemSet {
-    /// After this lablel,  events got applied.
     Insert,
-    /// After this label, the layout got applied to the compositions nodes.
     Apply,
 }
 

@@ -23,11 +23,16 @@ pub struct CompPlugin {
 
 #[derive(SystemSet, Debug, Hash, PartialEq, Eq, Clone)]
 enum CompSystemSet {
-    /// After this lablel, input events got applied.
+    /// After this label, the system has processed input events.
     InputEvents,
-    /// After this label, the layout got applied to the compositions nodes.
+
+    /// After this label, the system has applied layout calculations to the composition's nodes.
     Layout,
-    /// After this label, the composition nodes got outlined.
+
+    // After this label, the system has prepared the nodes for visual outlining.
+    Prepare,
+
+    /// After this label, the system has outlined the composition nodes.
     Outline,
 }
 
@@ -57,6 +62,7 @@ impl Plugin for CompPlugin {
             (
                 CompSystemSet::InputEvents,
                 CompSystemSet::Layout,
+                CompSystemSet::Prepare,
                 CompSystemSet::Outline,
             )
                 .chain(),

@@ -17,7 +17,13 @@ export class Composition {
 	// Getter & Setter
 	// =========================================================================
 
-	// TODO
+	public get renderer(): Renderer | null {
+		return this._renderer;
+	}
+
+	public set renderer(value: Renderer) {
+		this._renderer = value;
+	}
 
 	// =========================================================================
 	// Lifecycle

@@ -1,8 +1,7 @@
 mod bindgen;
 pub mod events;
-mod resources;
+pub mod modules;
 
-use crate::resources::output_event_sender::OutputEventSenderRes;
 use bevy_app::App;
 use dyn_comp::CompPlugin;
 use dyn_comp_interaction::CompInteractionPlugin;
@@ -10,6 +9,7 @@ use dyn_comp_svg_builder::{events::SvgBuilderOutputEvent, CompSvgBuilderPlugin};
 use dyn_comp_types::events::InputEvent;
 use dyn_dtif::DtifComp;
 use events::{SvgCompInputEvent, SvgCompOutputEvent};
+use modules::watch::CompWatchPlugin;
 use std::sync::mpsc::{channel, Receiver};
 use wasm_bindgen::{prelude::wasm_bindgen, JsValue};
 
@@ -33,6 +33,9 @@ impl SvgCompHandle {
         // Register plugins
         app.add_plugins((
             CompPlugin { dtif },
+            CompWatchPlugin {
+                output_event_sender,
+            },
             CompSvgBuilderPlugin {
                 output_event_sender: svg_builder_output_event_sender,
             },
@@ -40,10 +43,6 @@ impl SvgCompHandle {
         if interactive {
             app.add_plugins(CompInteractionPlugin);
         }
-
-        // Register resources
-        app.world
-            .insert_resource(OutputEventSenderRes::new(output_event_sender));
 
         return Ok(Self {
             app,
