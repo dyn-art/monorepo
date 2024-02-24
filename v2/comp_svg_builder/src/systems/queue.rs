@@ -11,6 +11,8 @@ pub fn queue_svg_node_changes(
 ) {
     let mut changes = changed_svg_nodes_res.drain();
 
+    log::info!("[queue_svg_node_changes] {:#?}", changes);
+
     // Preparing a lookup map for parent positions
     let parent_positions: HashMap<Entity, usize> = changes
         .iter()

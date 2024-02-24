@@ -72,6 +72,8 @@ impl SvgNode for ShapeSvgNode {
 
 impl ShapeSvgNode {
     pub fn new(entity: Entity, cx: &mut SvgContextRes) -> Self {
+        log::info!("[ShapeSvgNode::new] {:?}", entity);
+
         let mut root_element = cx.create_bundle_root_element("group", entity);
         #[cfg(feature = "tracing")]
         root_element.set_attribute(SvgAttribute::Name {

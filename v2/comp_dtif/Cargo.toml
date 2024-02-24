@@ -18,6 +18,7 @@ bevy_ecs = { workspace = true }
 bevy_hierarchy = { workspace = true }
 bevy_transform = { workspace = true }
 glam = { workspace = true }
+log = { workspace = true }
 smallvec = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
 specta = { workspace = true, features = ["serde", "glam"] }

@@ -57,7 +57,7 @@ fn build_render_app(
     output_event_sender: std::sync::mpsc::Sender<events::SvgBuilderOutputEvent>,
 ) {
     use crate::systems::extract::extract_svg_nodes_generic;
-    use bevy_render::{ExtractSchedule, Render, RenderApp};
+    use dyn_bevy_render_skeleton::{ExtractSchedule, Render, RenderApp, RenderPlugin};
     use resources::{
         changed_svg_nodes::ChangedSvgNodesRes, output_event_sender::OutputEventSenderRes,
     };
@@ -65,6 +65,9 @@ fn build_render_app(
         queue::queue_svg_node_changes,
         svg_node::{frame::FrameSvgNode, shape::ShapeSvgNode},
     };
+
+    // Register plugins
+    app.add_plugins(RenderPlugin);
 
     let render_app = match app.get_sub_app_mut(RenderApp) {
         Ok(render_app) => render_app,

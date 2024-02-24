@@ -11,16 +11,17 @@ authors = { workspace = true }
 [features]
 default = []
 serde_support = ["dep:serde", "dep:specta", "dyn-comp-types/serde_support"]
-output_events = []
+output_events = ["dep:dyn-bevy-render-skeleton"]
 tracing = []
 
 [dependencies]
 dyn-comp-types = { path = "../comp_types" }
+dyn-bevy-render-skeleton = { path = "../bevy_render_skeleton", optional = true }
 bevy_app = { workspace = true }
 bevy_ecs = { workspace = true }
 bevy_hierarchy = { workspace = true }
 bevy_transform = { workspace = true }
-bevy_render = { workspace = true }
+log = { workspace = true }
 glam = { workspace = true }
 smallvec = { workspace = true }
 tiny-skia-path = { workspace = true }
