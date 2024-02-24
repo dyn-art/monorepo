@@ -1,9 +1,9 @@
 #[cfg(feature = "console_log")]
-mod console {
+pub mod console {
     use log::{Level, Log, Metadata, Record};
     use once_cell::sync::OnceCell;
 
-    use super::js_bindings;
+    use crate::bindgen::js_bindings;
 
     // Using OnceCell for safe initialization
     static DEFAULT_LOGGER: OnceCell<ConsoleLogger> = OnceCell::new();

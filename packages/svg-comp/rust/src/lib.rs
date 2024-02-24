@@ -26,6 +26,8 @@ impl SvgCompHandle {
         let dtif: CompDtif = serde_wasm_bindgen::from_value(js_dtif)?;
         let mut app = App::new();
 
+        log::info!("[create] Dtif {:#?}", dtif);
+
         let (svg_builder_output_event_sender, svg_builder_output_event_receiver) =
             channel::<SvgBuilderOutputEvent>();
         let (output_event_sender, output_event_receiver) = channel::<SvgCompOutputEvent>();
@@ -54,6 +56,8 @@ impl SvgCompHandle {
     pub fn update(&mut self, js_input_events: JsValue) -> Result<JsValue, JsValue> {
         let maybe_input_events: Result<Vec<SvgCompInputEvent>, _> =
             serde_wasm_bindgen::from_value(js_input_events);
+
+        log::info!("[update] Input Events {:#?}", maybe_input_events);
 
         // Emit input events in ECS world
         if let Ok(input_events) = maybe_input_events {
@@ -84,6 +88,8 @@ impl SvgCompHandle {
                 }
             }
         }
+
+        log::info!("[update] Output Events {:#?}", output_events);
 
         return Ok(serde_wasm_bindgen::to_value(&output_events)?);
     }

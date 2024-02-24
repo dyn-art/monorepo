@@ -214,7 +214,7 @@ impl FrameSvgNode {
     }
 
     #[cfg(feature = "tracing")]
-    fn create_element_name(id: ContinuousId, category: String, is_definition: bool) -> String {
+    fn create_element_name(id: SvgElementId, category: String, is_definition: bool) -> String {
         let def_part = if is_definition { "_def" } else { "" };
         format!("frame_{}_{}{}", category, id, def_part)
     }

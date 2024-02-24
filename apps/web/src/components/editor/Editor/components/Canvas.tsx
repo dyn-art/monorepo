@@ -35,6 +35,7 @@ export const Canvas: React.FC<TCanvasProps> = (props) => {
 		newComposition.renderer = new SvgRenderer(newComposition, {
 			domElement: svgContainerRef.current as Element
 		});
+		newComposition.update();
 		setComposition(newComposition);
 		if (onLoadedComposition != null) {
 			onLoadedComposition(newComposition);
