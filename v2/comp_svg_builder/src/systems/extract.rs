@@ -20,6 +20,11 @@ pub fn extract_svg_nodes_generic<C: SvgNode>(
     query
         .iter_mut()
         .for_each(|(entity, mut svg_node, maybe_parent)| {
+            let changes = svg_node.drain_changes();
+            if changes.is_empty() {
+                return;
+            }
+
             // Try to get parent entity and the current entity's position in the parent's children array
             let (parent_entity, index) =
                 if let Some(parent_entity) = maybe_parent.map(|parent| parent.get()) {
@@ -45,7 +50,7 @@ pub fn extract_svg_nodes_generic<C: SvgNode>(
             changed_svg_nodes_res.push_change(ChangedSvgNode {
                 entity,
                 parent_entity,
-                changes: svg_node.drain_changes(),
+                changes,
                 index,
             });
         });

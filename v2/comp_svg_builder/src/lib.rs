@@ -16,10 +16,16 @@ pub struct CompSvgBuilderPlugin {
     pub output_event_sender: std::sync::mpsc::Sender<crate::events::SvgBuilderOutputEvent>,
 }
 
+// TODO: Plan to refactor into a sub-application for potential multithreading
+// Currently, the challenge lies in managing the spawning (when absent)
+// and modification of the SvgNode bundle component alongside its associated entity,
+// due to the deferred execution nature of entity spawn commands within the ECS schedule.
 #[derive(SystemSet, Debug, Hash, PartialEq, Eq, Clone)]
 enum SvgBuilderSystemSet {
     Insert,
     Apply,
+    Extract,
+    Queue,
 }
 
 impl Plugin for CompSvgBuilderPlugin {
@@ -30,7 +36,13 @@ impl Plugin for CompSvgBuilderPlugin {
         // Configure system set
         app.configure_sets(
             Last,
-            (SvgBuilderSystemSet::Insert, SvgBuilderSystemSet::Apply).chain(),
+            (
+                SvgBuilderSystemSet::Insert,
+                SvgBuilderSystemSet::Apply,
+                SvgBuilderSystemSet::Extract,
+                SvgBuilderSystemSet::Queue,
+            )
+                .chain(),
         );
 
         // Register systems
@@ -47,44 +59,29 @@ impl Plugin for CompSvgBuilderPlugin {
         );
 
         #[cfg(feature = "output_events")]
-        build_render_app(app, self.output_event_sender.clone());
+        {
+            use crate::resources::{
+                changed_svg_nodes::ChangedSvgNodesRes, output_event_sender::OutputEventSenderRes,
+            };
+            use crate::systems::{
+                extract::extract_svg_nodes_generic,
+                queue::queue_svg_node_changes,
+                svg_node::{frame::FrameSvgNode, shape::ShapeSvgNode},
+            };
+
+            // Register resources
+            app.init_resource::<ChangedSvgNodesRes>();
+            app.insert_resource(OutputEventSenderRes::new(self.output_event_sender.clone()));
+
+            // Register systems
+            app.add_systems(
+                Last,
+                (
+                    extract_svg_nodes_generic::<FrameSvgNode>.in_set(SvgBuilderSystemSet::Extract),
+                    extract_svg_nodes_generic::<ShapeSvgNode>.in_set(SvgBuilderSystemSet::Extract),
+                    queue_svg_node_changes.in_set(SvgBuilderSystemSet::Queue),
+                ),
+            );
+        }
     }
-}
-
-#[cfg(feature = "output_events")]
-fn build_render_app(
-    app: &mut App,
-    output_event_sender: std::sync::mpsc::Sender<events::SvgBuilderOutputEvent>,
-) {
-    use crate::systems::extract::extract_svg_nodes_generic;
-    use dyn_bevy_render_skeleton::{ExtractSchedule, Render, RenderApp, RenderPlugin};
-    use resources::{
-        changed_svg_nodes::ChangedSvgNodesRes, output_event_sender::OutputEventSenderRes,
-    };
-    use systems::{
-        queue::queue_svg_node_changes,
-        svg_node::{frame::FrameSvgNode, shape::ShapeSvgNode},
-    };
-
-    // Register plugins
-    app.add_plugins(RenderPlugin);
-
-    let render_app = match app.get_sub_app_mut(RenderApp) {
-        Ok(render_app) => render_app,
-        Err(_) => return,
-    };
-
-    // Register resources
-    render_app.init_resource::<ChangedSvgNodesRes>();
-    render_app.insert_resource(OutputEventSenderRes::new(output_event_sender));
-
-    // Register systems
-    render_app.add_systems(
-        ExtractSchedule,
-        (
-            extract_svg_nodes_generic::<FrameSvgNode>,
-            extract_svg_nodes_generic::<ShapeSvgNode>,
-        ),
-    );
-    render_app.add_systems(Render, queue_svg_node_changes);
 }

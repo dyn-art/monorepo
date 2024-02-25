@@ -325,20 +325,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "bevy_time"
-version = "0.13.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9738901b6b251d2c9250542af7002d6f671401fc3b74504682697c5ec822f210"
-dependencies = [
- "bevy_app",
- "bevy_ecs",
- "bevy_reflect",
- "bevy_utils",
- "crossbeam-channel",
- "thiserror",
-]
-
-[[package]]
 name = "bevy_transform"
 version = "0.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -466,15 +452,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "crossbeam-channel"
-version = "0.5.11"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "176dc175b78f56c0f321911d9c8eb2b77a78a4860b9c19db83835fea1a46649b"
-dependencies = [
- "crossbeam-utils",
-]
-
-[[package]]
 name = "crossbeam-utils"
 version = "0.8.19"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -495,17 +472,6 @@ name = "downcast-rs"
 version = "1.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9ea835d29036a4087793836fa931b08837ad5e957da9e23886b29586fb9b6650"
-
-[[package]]
-name = "dyn-bevy-render-skeleton"
-version = "0.0.1"
-dependencies = [
- "bevy_app",
- "bevy_ecs",
- "bevy_time",
- "bevy_utils",
- "glam",
-]
 
 [[package]]
 name = "dyn-comp-core"
@@ -557,7 +523,6 @@ dependencies = [
  "bevy_ecs",
  "bevy_hierarchy",
  "bevy_transform",
- "dyn-bevy-render-skeleton",
  "dyn-comp-types",
  "glam",
  "log",
