@@ -44,8 +44,6 @@ impl DtifInjector {
         dtif: &CompDtif,
         world: &mut World,
     ) -> Option<Entity> {
-        log::info!("[DtifInjector::process_node] {}", node_sid);
-
         dtif.nodes.get(&node_sid).map(|node| {
             let node_entity = self.spawn_node(node, world).id();
             self.sid_to_entity.insert(node_sid, node_entity);
@@ -79,8 +77,6 @@ impl DtifInjector {
                 .iter()
                 .filter_map(|child_sid| self.process_node(child_sid.clone(), dtif, world))
                 .collect();
-
-            log::info!("[DtifInjector::process_children] {:?}", new_children);
 
             // Establish Bevy parent-child relationships
             if !new_children.is_empty() {

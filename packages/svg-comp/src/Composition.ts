@@ -23,11 +23,6 @@ export class Composition {
 	constructor(config: TCompositionConfig) {
 		const { dtif, interactive = false } = config;
 		this._svgCompHandle = SvgCompHandle.create(dtif, interactive);
-
-		// Register output event callbacks
-		this.watchOutputEvent('ElementChanges', (value) => {
-			this.handleElementChangesOutputEvent(value);
-		});
 	}
 
 	// =========================================================================
@@ -83,12 +78,6 @@ export class Composition {
 		});
 	}
 
-	private handleElementChangesOutputEvent(event: SvgElementChangesOutputEvent): void {
-		if (this._renderer != null) {
-			this._renderer.applyElementChanges(event.changes);
-		}
-	}
-
 	public watchOutputEvent<GEventType extends keyof TOutputEventTypeMap>(
 		eventType: GEventType,
 		callback: TWatchedOutputEventCallback<GEventType>
@@ -96,11 +85,12 @@ export class Composition {
 		const id = shortId();
 		const entry: TWatchedOutputEventCallbackEntry<GEventType> = { id, callback };
 
-		if (Array.isArray(this._watchedOutputEventCallbackMap[eventType])) {
+		const callbacks = this._watchedOutputEventCallbackMap[eventType];
+		if (Array.isArray(callbacks)) {
+			callbacks.push(entry);
+		} else {
 			// @ts-expect-error -- Entry is of type GEventType
 			this._watchedOutputEventCallbackMap[eventType] = [entry];
-		} else {
-			this._watchedOutputEventCallbackMap[eventType]?.push(entry);
 		}
 
 		// Return an unregister function
@@ -137,8 +127,8 @@ export class Composition {
 		}
 	}
 
-	public logEntityComponents(entity: Entity) {
-		this._svgCompHandle.logEntityComponents(entity);
+	public logEntityComponentsRaw(entity: Entity) {
+		this._svgCompHandle.logEntityComponentsRaw(entity);
 	}
 }
 

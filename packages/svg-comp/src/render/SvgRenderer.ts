@@ -129,6 +129,8 @@ export class SvgRenderer extends Renderer {
 			return element;
 		};
 
+		console.log(`[applyElementChanges] ${elementChanges.id}`, elementChanges.changes);
+
 		for (const change of elementChanges.changes) {
 			switch (change.type) {
 				case 'ElementCreated': {

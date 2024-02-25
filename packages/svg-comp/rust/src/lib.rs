@@ -4,7 +4,6 @@ mod logging;
 pub mod modules;
 
 use bevy_app::App;
-use bevy_ecs::entity::Entity;
 use dyn_comp_core::CompCorePlugin;
 use dyn_comp_dtif::CompDtif;
 use dyn_comp_interaction::CompInteractionPlugin;
@@ -27,8 +26,6 @@ impl SvgCompHandle {
     pub fn create(js_dtif: JsValue, interactive: bool) -> Result<SvgCompHandle, JsValue> {
         let dtif: CompDtif = serde_wasm_bindgen::from_value(js_dtif)?;
         let mut app = App::new();
-
-        log::info!("[create] Dtif {:#?}", dtif);
 
         let (svg_builder_output_event_sender, svg_builder_output_event_receiver) =
             channel::<SvgBuilderOutputEvent>();
@@ -58,8 +55,6 @@ impl SvgCompHandle {
     pub fn update(&mut self, js_input_events: JsValue) -> Result<JsValue, JsValue> {
         let maybe_input_events: Result<Vec<SvgCompInputEvent>, _> =
             serde_wasm_bindgen::from_value(js_input_events);
-
-        log::info!("[update] Input Events {:#?}", maybe_input_events);
 
         // Emit input events in ECS world
         if let Ok(input_events) = maybe_input_events {
@@ -91,13 +86,11 @@ impl SvgCompHandle {
             }
         }
 
-        log::info!("[update] Output Events {:#?}", output_events);
-
         return Ok(serde_wasm_bindgen::to_value(&output_events)?);
     }
 
-    #[wasm_bindgen(js_name = logEntityComponents)]
-    pub fn log_entity_components(&self, js_entity: JsValue) {
+    #[wasm_bindgen(js_name = logEntityComponentsRaw)]
+    pub fn log_entity_components_raw(&self, js_entity: JsValue) {
         #[cfg(feature = "tracing")]
         {
             use crate::logging::tracing::log_entity_components;
@@ -107,13 +100,40 @@ impl SvgCompHandle {
                 Ok(raw) => raw,
                 Err(e) => {
                     log::warn!(
-                        "[log_entity_components] Failed to parse u32 from JsValue: {:?}",
+                        "[log_entity_components_raw] Failed to parse u32 from JsValue: {:?}",
                         e
                     );
                     return;
                 }
             };
             let entity: Entity = Entity::from_raw(entity_raw);
+
+            log_entity_components(&self.app.world, entity);
+        }
+
+        #[cfg(not(feature = "tracing"))]
+        log::warn!(
+            "[log_entity_components_raw] Log entity components not supported in this build! Build with feature 'tracing'."
+        );
+    }
+
+    #[wasm_bindgen(js_name = logEntityComponents)]
+    pub fn log_entity_components(&self, js_entity: JsValue) {
+        #[cfg(feature = "tracing")]
+        {
+            use crate::logging::tracing::log_entity_components;
+            use bevy_ecs::entity::Entity;
+
+            let entity: Entity = match serde_wasm_bindgen::from_value(js_entity) {
+                Ok(entity) => entity,
+                Err(e) => {
+                    log::warn!(
+                        "[log_entity_components] Failed to parse Entity from JsValue: {:?}",
+                        e
+                    );
+                    return;
+                }
+            };
 
             log_entity_components(&self.app.world, entity);
         }

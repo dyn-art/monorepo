@@ -9,6 +9,10 @@ export abstract class Renderer {
 	constructor(composition: Composition, isCallbackBased: boolean) {
 		this._comp = () => composition;
 		this._isCallbackBased = isCallbackBased;
+
+		composition.watchOutputEvent('ElementChanges', (event) => {
+			this.applyElementChanges(event.changes);
+		});
 	}
 
 	protected get composition(): Composition {
