@@ -10,10 +10,13 @@ pub mod tracing {
             .collect::<Vec<_>>();
 
         if component_names.is_empty() {
-            log::info!("Entity ({:?}) has no components.", entity);
+            log::info!(
+                "[log_entity_components] Entity ({:?}) has no components.",
+                entity
+            );
         } else {
             log::info!(
-                "Entity ({:?}) has the following components:\n - {}",
+                "[log_entity_components] Entity ({:?}) has the following components:\n - {}",
                 entity,
                 component_names.join("\n - ")
             );

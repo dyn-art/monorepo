@@ -4,6 +4,7 @@ mod logging;
 pub mod modules;
 
 use bevy_app::App;
+use bevy_ecs::entity::Entity;
 use dyn_comp_core::CompCorePlugin;
 use dyn_comp_dtif::CompDtif;
 use dyn_comp_interaction::CompInteractionPlugin;
@@ -96,18 +97,30 @@ impl SvgCompHandle {
     }
 
     #[wasm_bindgen(js_name = logEntityComponents)]
-    pub fn log_entity_components(&self, entity: JsValue) {
+    pub fn log_entity_components(&self, js_entity: JsValue) {
         #[cfg(feature = "tracing")]
         {
-            let entity: bevy_ecs::entity::Entity = match serde_wasm_bindgen::from_value(entity) {
-                Ok(entity) => entity,
-                Err(_) => return,
-            };
+            use crate::logging::tracing::log_entity_components;
+            use bevy_ecs::entity::Entity;
 
-            crate::logging::tracing::log_entity_components(&self.app.world, entity);
+            let entity_raw: u32 = match serde_wasm_bindgen::from_value(js_entity) {
+                Ok(raw) => raw,
+                Err(e) => {
+                    log::warn!(
+                        "[log_entity_components] Failed to parse u32 from JsValue: {:?}",
+                        e
+                    );
+                    return;
+                }
+            };
+            let entity: Entity = Entity::from_raw(entity_raw);
+
+            log_entity_components(&self.app.world, entity);
         }
 
         #[cfg(not(feature = "tracing"))]
-        log::warn!("Log entity components not supported in this build");
+        log::warn!(
+            "[log_entity_components] Log entity components not supported in this build! Build with feature 'tracing'."
+        );
     }
 }

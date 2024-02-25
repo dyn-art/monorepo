@@ -40,6 +40,8 @@ pub fn extract_svg_nodes_generic<C: SvgNode>(
                     (None, 0)
                 };
 
+            log::info!("[extract_svg_nodes_generic] {:?}", entity);
+
             changed_svg_nodes_res.push_change(ChangedSvgNode {
                 entity,
                 parent_entity,

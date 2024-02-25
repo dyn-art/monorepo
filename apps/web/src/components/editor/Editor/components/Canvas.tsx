@@ -16,6 +16,7 @@ export const Canvas: React.FC<TCanvasProps> = (props) => {
 	// Lifecycle
 	// =========================================================================
 
+	// https://www.youtube.com/watch?v=vxkbf5QMA2g
 	const { data: isWasmLoaded, isLoading: isWasmLoading } = useQuery({
 		queryKey: ['wasm'],
 		queryFn: async () => {
