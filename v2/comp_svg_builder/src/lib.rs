@@ -7,7 +7,9 @@ use bevy_app::{App, Last, Plugin};
 use bevy_ecs::schedule::{IntoSystemConfigs, IntoSystemSetConfigs, SystemSet};
 use resources::svg_context::SvgContextRes;
 use systems::svg_node::{
-    frame::{apply_frame_node_size_change, insert_frame_svg_node},
+    frame::{
+        apply_frame_node_children_change, apply_frame_node_size_change, insert_frame_svg_node,
+    },
     shape::{apply_shape_node_size_change, insert_shape_svg_node},
 };
 
@@ -52,6 +54,7 @@ impl Plugin for CompSvgBuilderPlugin {
                 // Frame Svg Node
                 insert_frame_svg_node.in_set(SvgBuilderSystemSet::Insert),
                 apply_frame_node_size_change.in_set(SvgBuilderSystemSet::Apply),
+                apply_frame_node_children_change.in_set(SvgBuilderSystemSet::Apply),
                 // Shape Svg Node
                 insert_shape_svg_node.in_set(SvgBuilderSystemSet::Insert),
                 apply_shape_node_size_change.in_set(SvgBuilderSystemSet::Apply),
@@ -63,11 +66,7 @@ impl Plugin for CompSvgBuilderPlugin {
             use crate::resources::{
                 changed_svg_nodes::ChangedSvgNodesRes, output_event_sender::OutputEventSenderRes,
             };
-            use crate::systems::{
-                extract::extract_svg_nodes_generic,
-                queue::queue_svg_node_changes,
-                svg_node::{frame::FrameSvgNode, shape::ShapeSvgNode},
-            };
+            use crate::systems::{extract::extract_svg_nodes, queue::queue_svg_node_changes};
 
             // Register resources
             app.init_resource::<ChangedSvgNodesRes>();
@@ -77,8 +76,7 @@ impl Plugin for CompSvgBuilderPlugin {
             app.add_systems(
                 Last,
                 (
-                    extract_svg_nodes_generic::<FrameSvgNode>.in_set(SvgBuilderSystemSet::Extract),
-                    extract_svg_nodes_generic::<ShapeSvgNode>.in_set(SvgBuilderSystemSet::Extract),
+                    extract_svg_nodes.in_set(SvgBuilderSystemSet::Extract),
                     queue_svg_node_changes.in_set(SvgBuilderSystemSet::Queue),
                 ),
             );

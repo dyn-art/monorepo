@@ -1,9 +1,6 @@
 #![cfg(feature = "output_events")]
 
-use crate::{
-    resources::changed_svg_nodes::{ChangedSvgNode, ChangedSvgNodesRes},
-    svg::svg_node::SvgNode,
-};
+use crate::resources::changed_svg_nodes::{ChangedSvgNode, ChangedSvgNodesRes};
 use bevy_ecs::{
     entity::Entity,
     query::{Changed, With},
@@ -12,15 +9,20 @@ use bevy_ecs::{
 use bevy_hierarchy::{Children, Parent};
 use dyn_comp_types::nodes::CompNode;
 
-pub fn extract_svg_nodes_generic<C: SvgNode>(
+use super::svg_node::SvgNodeVariant;
+
+pub fn extract_svg_nodes(
     mut changed_svg_nodes_res: ResMut<ChangedSvgNodesRes>,
-    mut query: Query<(Entity, &mut C, Option<&Parent>), (With<CompNode>, Changed<C>)>,
+    mut query: Query<
+        (Entity, &mut SvgNodeVariant, Option<&Parent>),
+        (With<CompNode>, Changed<SvgNodeVariant>),
+    >,
     child_query: Query<&Children>,
 ) {
     query
         .iter_mut()
         .for_each(|(entity, mut svg_node, maybe_parent)| {
-            let changes = svg_node.drain_changes();
+            let changes = svg_node.get_svg_node_mut().drain_changes();
             if changes.is_empty() {
                 return;
             }
@@ -44,13 +46,6 @@ pub fn extract_svg_nodes_generic<C: SvgNode>(
                 else {
                     (None, 0)
                 };
-
-            log::info!(
-                "[extract_svg_nodes_generic] {:?} ({:?}, {:?})",
-                entity,
-                parent_entity,
-                index
-            );
 
             changed_svg_nodes_res.push_change(ChangedSvgNode {
                 entity,

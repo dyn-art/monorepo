@@ -1,11 +1,10 @@
 use super::svg_element::{SvgElement, SvgElementId};
-use bevy_ecs::component::Component;
 use std::{collections::BTreeMap, fmt::Debug};
 
 #[cfg(feature = "output_events")]
 use super::svg_element::element_changes::SvgElementChanges;
 
-pub trait SvgNode: Debug + Component {
+pub trait SvgNode: Debug {
     /// Retrieves child SVG elements in a sorted order, starting from the top-level element and
     /// proceeding hierarchically to its children & siblings.
     ///

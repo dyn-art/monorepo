@@ -9,7 +9,6 @@ use crate::{
     },
 };
 use bevy_ecs::{
-    component::Component,
     entity::Entity,
     query::{Changed, Or, With, Without},
     system::{Commands, Query, ResMut},
@@ -22,7 +21,9 @@ use dyn_comp_types::{
 };
 use std::collections::BTreeMap;
 
-#[derive(Component, Debug, Clone)]
+use super::SvgNodeVariant;
+
+#[derive(Debug, Clone)]
 pub struct ShapeSvgNode {
     root: SvgElement,
     defs: SvgElement,
@@ -188,42 +189,67 @@ pub fn insert_shape_svg_node(
                 With<EllipseCompNode>,
                 With<StarCompNode>,
             )>,
-            Without<ShapeSvgNode>,
+            Without<SvgNodeVariant>,
         ),
     >,
 ) {
     query.iter().for_each(|entity| {
         commands
             .entity(entity)
-            .insert(ShapeSvgNode::new(entity, &mut svg_context_res));
+            .insert(SvgNodeVariant::Shape(ShapeSvgNode::new(
+                entity,
+                &mut svg_context_res,
+            )));
     });
 }
 
+// TODO: Combine systems into one and do one system where we apply the size change based on the SvgNodeVariant?
 pub fn apply_shape_node_size_change(
-    mut query: Query<(&SizeMixin, &mut ShapeSvgNode), (With<CompNode>, Changed<SizeMixin>)>,
+    mut query: Query<
+        (&SizeMixin, &mut SvgNodeVariant),
+        (
+            With<CompNode>,
+            Or<(
+                With<RectangleCompNode>,
+                With<TextCompNode>,
+                With<PolygonCompNode>,
+                With<EllipseCompNode>,
+                With<StarCompNode>,
+            )>,
+            Changed<SizeMixin>,
+        ),
+    >,
 ) {
-    query.iter_mut().for_each(|(SizeMixin(size), mut node)| {
-        let [width, height] = size.0.to_array();
+    query
+        .iter_mut()
+        .for_each(|(SizeMixin(size), mut node_variant)| {
+            let node = match node_variant.as_mut() {
+                SvgNodeVariant::Shape(node) => node,
+                _ => {
+                    return;
+                }
+            };
+            let [width, height] = size.0.to_array();
 
-        node.root.set_attributes(vec![
-            SvgAttribute::Width {
-                width,
-                unit: SvgMeasurementUnit::Pixel,
-            },
-            SvgAttribute::Height {
-                height,
-                unit: SvgMeasurementUnit::Pixel,
-            },
-        ]);
-        node.click_area_rect.set_attributes(vec![
-            SvgAttribute::Width {
-                width,
-                unit: SvgMeasurementUnit::Pixel,
-            },
-            SvgAttribute::Height {
-                height,
-                unit: SvgMeasurementUnit::Pixel,
-            },
-        ]);
-    });
+            node.root.set_attributes(vec![
+                SvgAttribute::Width {
+                    width,
+                    unit: SvgMeasurementUnit::Pixel,
+                },
+                SvgAttribute::Height {
+                    height,
+                    unit: SvgMeasurementUnit::Pixel,
+                },
+            ]);
+            node.click_area_rect.set_attributes(vec![
+                SvgAttribute::Width {
+                    width,
+                    unit: SvgMeasurementUnit::Pixel,
+                },
+                SvgAttribute::Height {
+                    height,
+                    unit: SvgMeasurementUnit::Pixel,
+                },
+            ]);
+        });
 }

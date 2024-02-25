@@ -56,8 +56,6 @@ pub fn queue_svg_node_changes(
         sorted_changes.push(change);
     }
 
-    log::info!("[queue_svg_node_changes] After sort: {:#?}", sorted_changes);
-
     // Process sorted changes to send events
     for changed_svg_node in sorted_changes {
         for changes in changed_svg_node.changes {
