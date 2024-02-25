@@ -1,40 +1,65 @@
 use crate::{
     events::{SvgBuilderOutputEvent, SvgElementChangesOutputEvent},
-    resources::{changed_svg_nodes::ChangedSvgNodesRes, output_event_sender::OutputEventSenderRes},
+    resources::{
+        changed_svg_nodes::{ChangedSvgNode, ChangedSvgNodesRes},
+        output_event_sender::OutputEventSenderRes,
+    },
 };
 use bevy_ecs::{entity::Entity, system::ResMut};
-use std::collections::HashMap;
+use std::collections::{HashMap, VecDeque};
 
 pub fn queue_svg_node_changes(
     mut changed_svg_nodes_res: ResMut<ChangedSvgNodesRes>,
     output_event_sender_res: ResMut<OutputEventSenderRes>,
 ) {
-    let mut changes = changed_svg_nodes_res.drain();
+    let changes = changed_svg_nodes_res.drain();
+    let changes_length = changes.len();
 
-    log::info!("[queue_svg_node_changes] {:#?}", changes);
+    // Mapping of parent id to children, still maintaining order
+    let mut parent_to_children: HashMap<Option<Entity>, Vec<ChangedSvgNode>> = HashMap::new();
 
-    // Preparing a lookup map for parent positions
-    let parent_positions: HashMap<Entity, usize> = changes
-        .iter()
-        .enumerate()
-        .map(|(index, node)| (node.entity, index))
+    // Separate changes into roots (None) and children grouped by parent
+    for change in changes {
+        match change.parent_entity {
+            Some(parent) => {
+                parent_to_children
+                    .entry(Some(parent))
+                    .or_default()
+                    .push(change);
+            }
+            None => {
+                parent_to_children.entry(None).or_default().push(change);
+            }
+        }
+    }
+
+    // Sort children within their parent grouping by their index
+    for children in parent_to_children.values_mut() {
+        children.sort_unstable_by_key(|change| change.index);
+    }
+
+    // Process root nodes in depth-first order, taking ownership of the data
+    let mut sorted_changes: Vec<ChangedSvgNode> = Vec::with_capacity(changes_length);
+    let mut stack: VecDeque<ChangedSvgNode> = parent_to_children
+        .remove(&None)
+        .unwrap_or_else(Vec::new)
+        .into_iter()
         .collect();
 
-    // Sorting changes with consideration for parent-child relationships and indices
-    changes.sort_by(|a, b| {
-        let pos_a = a
-            .parent_entity
-            .and_then(|parent| parent_positions.get(&parent))
-            .unwrap_or(&usize::MAX);
-        let pos_b = b
-            .parent_entity
-            .and_then(|parent| parent_positions.get(&parent))
-            .unwrap_or(&usize::MAX);
-        pos_a.cmp(&pos_b).then_with(|| a.index.cmp(&b.index))
-    });
+    while let Some(change) = stack.pop_back() {
+        if let Some(children) = parent_to_children.remove(&Some(change.entity)) {
+            for child in children.into_iter().rev() {
+                stack.push_back(child);
+            }
+        }
 
-    // Iterating through sorted changes to send events
-    for changed_svg_node in changes {
+        sorted_changes.push(change);
+    }
+
+    log::info!("[queue_svg_node_changes] After sort: {:#?}", sorted_changes);
+
+    // Process sorted changes to send events
+    for changed_svg_node in sorted_changes {
         for changes in changed_svg_node.changes {
             let event =
                 SvgBuilderOutputEvent::ElementChanges(SvgElementChangesOutputEvent { changes });

@@ -42,10 +42,6 @@ export const Canvas: React.FC<TCanvasProps> = (props) => {
 			onLoadedComposition(newComposition);
 		}
 
-		// TODO: REMOVE
-		newComposition.logEntityComponents(0);
-		newComposition.logEntityComponents(1);
-
 		return () => {
 			newComposition.unmount();
 		};
