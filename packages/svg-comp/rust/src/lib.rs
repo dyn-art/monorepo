@@ -93,7 +93,7 @@ impl SvgCompHandle {
     pub fn log_entity_components_raw(&self, js_entity: JsValue) {
         #[cfg(feature = "tracing")]
         {
-            use crate::logging::tracing::log_entity_components;
+            use crate::logging::log_entity_components;
             use bevy_ecs::entity::Entity;
 
             let entity_raw: u32 = match serde_wasm_bindgen::from_value(js_entity) {
@@ -121,7 +121,7 @@ impl SvgCompHandle {
     pub fn log_entity_components(&self, js_entity: JsValue) {
         #[cfg(feature = "tracing")]
         {
-            use crate::logging::tracing::log_entity_components;
+            use crate::logging::log_entity_components;
             use bevy_ecs::entity::Entity;
 
             let entity: Entity = match serde_wasm_bindgen::from_value(js_entity) {

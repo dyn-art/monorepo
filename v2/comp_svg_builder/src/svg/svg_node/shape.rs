@@ -1,40 +1,25 @@
 use crate::{
     resources::svg_context::SvgContextRes,
     svg::{
-        svg_element::{
-            attributes::{SvgAttribute, SvgMeasurementUnit},
-            SvgElement, SvgElementId,
-        },
+        svg_element::{attributes::SvgAttribute, SvgElement, SvgElementId},
         svg_node::SvgNode,
     },
 };
-use bevy_ecs::{
-    entity::Entity,
-    query::{Changed, Or, With, Without},
-    system::{Commands, Query, ResMut},
-};
-use dyn_comp_types::{
-    mixins::SizeMixin,
-    nodes::{
-        CompNode, EllipseCompNode, PolygonCompNode, RectangleCompNode, StarCompNode, TextCompNode,
-    },
-};
+use bevy_ecs::entity::Entity;
 use std::collections::BTreeMap;
-
-use super::SvgNodeVariant;
 
 #[derive(Debug, Clone)]
 pub struct ShapeSvgNode {
-    root: SvgElement,
-    defs: SvgElement,
+    pub root: SvgElement,
+    pub defs: SvgElement,
 
     // Fill elements
-    fill_clip_path: SvgElement,
-    fill_clipped_path: SvgElement,
-    fill_wrapper_g: SvgElement,
+    pub fill_clip_path: SvgElement,
+    pub fill_clipped_path: SvgElement,
+    pub fill_wrapper_g: SvgElement,
 
     // Click area elements
-    click_area_rect: SvgElement,
+    pub click_area_rect: SvgElement,
 }
 
 impl SvgNode for ShapeSvgNode {
@@ -173,83 +158,4 @@ impl ShapeSvgNode {
         let def_part = if is_definition { "_def" } else { "" };
         format!("shape_{}_{}{}", category, id, def_part)
     }
-}
-
-pub fn insert_shape_svg_node(
-    mut commands: Commands,
-    mut svg_context_res: ResMut<SvgContextRes>,
-    query: Query<
-        Entity,
-        (
-            With<CompNode>,
-            Or<(
-                With<RectangleCompNode>,
-                With<TextCompNode>,
-                With<PolygonCompNode>,
-                With<EllipseCompNode>,
-                With<StarCompNode>,
-            )>,
-            Without<SvgNodeVariant>,
-        ),
-    >,
-) {
-    query.iter().for_each(|entity| {
-        commands
-            .entity(entity)
-            .insert(SvgNodeVariant::Shape(ShapeSvgNode::new(
-                entity,
-                &mut svg_context_res,
-            )));
-    });
-}
-
-// TODO: Combine systems into one and do one system where we apply the size change based on the SvgNodeVariant?
-pub fn apply_shape_node_size_change(
-    mut query: Query<
-        (&SizeMixin, &mut SvgNodeVariant),
-        (
-            With<CompNode>,
-            Or<(
-                With<RectangleCompNode>,
-                With<TextCompNode>,
-                With<PolygonCompNode>,
-                With<EllipseCompNode>,
-                With<StarCompNode>,
-            )>,
-            Changed<SizeMixin>,
-        ),
-    >,
-) {
-    query
-        .iter_mut()
-        .for_each(|(SizeMixin(size), mut node_variant)| {
-            let node = match node_variant.as_mut() {
-                SvgNodeVariant::Shape(node) => node,
-                _ => {
-                    return;
-                }
-            };
-            let [width, height] = size.0.to_array();
-
-            node.root.set_attributes(vec![
-                SvgAttribute::Width {
-                    width,
-                    unit: SvgMeasurementUnit::Pixel,
-                },
-                SvgAttribute::Height {
-                    height,
-                    unit: SvgMeasurementUnit::Pixel,
-                },
-            ]);
-            node.click_area_rect.set_attributes(vec![
-                SvgAttribute::Width {
-                    width,
-                    unit: SvgMeasurementUnit::Pixel,
-                },
-                SvgAttribute::Height {
-                    height,
-                    unit: SvgMeasurementUnit::Pixel,
-                },
-            ]);
-        });
 }

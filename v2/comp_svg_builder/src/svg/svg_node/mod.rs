@@ -1,4 +1,9 @@
+pub mod frame;
+pub mod shape;
+
+use self::{frame::FrameSvgNode, shape::ShapeSvgNode};
 use super::svg_element::{SvgElement, SvgElementId};
+use bevy_ecs::component::Component;
 use std::{collections::BTreeMap, fmt::Debug};
 
 #[cfg(feature = "output_events")]
@@ -48,5 +53,29 @@ pub trait SvgNode: Debug {
         }
 
         return drained_changes;
+    }
+}
+
+// Explicit variants of the SvgNode trait
+// because Bevy doesn't support querying by trait components yet
+#[derive(Component, Debug, Clone)]
+pub enum SvgNodeVariant {
+    Frame(FrameSvgNode),
+    Shape(ShapeSvgNode),
+}
+
+impl SvgNodeVariant {
+    pub fn get_svg_node(&self) -> &dyn SvgNode {
+        match self {
+            SvgNodeVariant::Frame(node) => node,
+            SvgNodeVariant::Shape(node) => node,
+        }
+    }
+
+    pub fn get_svg_node_mut(&mut self) -> &mut dyn SvgNode {
+        match self {
+            SvgNodeVariant::Frame(node) => node,
+            SvgNodeVariant::Shape(node) => node,
+        }
     }
 }

@@ -1,47 +1,33 @@
 use crate::{
     resources::svg_context::SvgContextRes,
     svg::{
-        svg_element::{
-            attributes::{SvgAttribute, SvgMeasurementUnit},
-            SvgElement, SvgElementId,
-        },
+        svg_element::{attributes::SvgAttribute, SvgElement, SvgElementId},
         svg_node::SvgNode,
     },
 };
-use bevy_ecs::{
-    entity::Entity,
-    query::{Changed, With, Without},
-    system::{Commands, Query, ResMut},
-};
-use bevy_hierarchy::Children;
-use dyn_comp_types::{
-    mixins::SizeMixin,
-    nodes::{CompNode, FrameCompNode},
-};
-use std::collections::{BTreeMap, HashSet};
-
-use super::SvgNodeVariant;
+use bevy_ecs::entity::Entity;
+use std::collections::BTreeMap;
 
 #[derive(Debug, Clone)]
 pub struct FrameSvgNode {
-    root: SvgElement,
-    defs: SvgElement,
+    pub root: SvgElement,
+    pub defs: SvgElement,
 
     // Content elements
-    content_clip_path: SvgElement,
-    content_clipped_rect: SvgElement,
-    content_wrapper_g: SvgElement,
+    pub content_clip_path: SvgElement,
+    pub content_clipped_rect: SvgElement,
+    pub content_wrapper_g: SvgElement,
 
     // Children elements
-    children_wrapper_g: SvgElement,
+    pub children_wrapper_g: SvgElement,
 
     // Fill elements
-    fill_clip_path: SvgElement,
-    fill_clipped_path: SvgElement,
-    fill_wrapper_g: SvgElement,
+    pub fill_clip_path: SvgElement,
+    pub fill_clipped_path: SvgElement,
+    pub fill_wrapper_g: SvgElement,
 
     // Children
-    node_children: Vec<Entity>,
+    pub node_children: Vec<Entity>,
 }
 
 impl SvgNode for FrameSvgNode {
@@ -227,182 +213,4 @@ impl FrameSvgNode {
         let def_part = if is_definition { "_def" } else { "" };
         format!("frame_{}_{}{}", category, id, def_part)
     }
-}
-
-pub fn insert_frame_svg_node(
-    mut commands: Commands,
-    mut svg_context_res: ResMut<SvgContextRes>,
-    query: Query<Entity, (With<CompNode>, With<FrameCompNode>, Without<SvgNodeVariant>)>,
-) {
-    query.iter().for_each(|entity| {
-        commands
-            .entity(entity)
-            .insert(SvgNodeVariant::Frame(FrameSvgNode::new(
-                entity,
-                &mut svg_context_res,
-            )));
-    });
-}
-
-struct NodeModification {
-    parent_entity: Entity,
-    added_entities: Vec<Entity>,
-    removed_entities: Vec<Entity>,
-}
-
-pub fn apply_frame_node_children_change(
-    query: Query<
-        (Entity, &Children, &mut SvgNodeVariant),
-        (With<CompNode>, With<FrameCompNode>, Changed<Children>),
-    >,
-    // mut node_query: Query<&mut SvgNodeVariant>, // TODO: Put into separate system and store NodeModifications in Resource
-) {
-    let mut modifications = Vec::new();
-
-    // Identify modifications
-    for (entity, children, node_variant) in query.iter() {
-        if let SvgNodeVariant::Frame(node) = node_variant {
-            let current_node_children_set: HashSet<_> =
-                node.node_children.iter().cloned().collect();
-            let new_node_children_set: HashSet<_> = children.iter().cloned().collect();
-
-            let removed_node_entities: Vec<_> = current_node_children_set
-                .difference(&new_node_children_set)
-                .cloned()
-                .collect();
-
-            let added_node_entities: Vec<_> = new_node_children_set
-                .difference(&current_node_children_set)
-                .cloned()
-                .collect();
-
-            modifications.push(NodeModification {
-                parent_entity: entity,
-                added_entities: added_node_entities,
-                removed_entities: removed_node_entities,
-            });
-        }
-    }
-
-    // TODO: Put into separate system due to conflicting queries
-    // Apply modifications
-    // for modification in modifications {
-    //     // Process removed entities
-    //     for entity in modification.removed_entities {
-    //         if let Ok(mut to_remove_node) = node_query.get_mut(entity) {
-    //             // TODO
-    //         }
-    //     }
-
-    //     // Process added entities
-    //     for entity in modification.added_entities {
-    //         if let Ok(mut added_node) = node_query.get_mut(entity) {
-    //             // TODO
-    //         }
-    //     }
-    // }
-}
-
-// pub fn apply_frame_node_children_change(
-//     mut commands: Commands,
-//     mut query: Query<
-//         (&Children, &mut SvgNodeVariant),
-//         (With<CompNode>, With<FrameCompNode>, Changed<Children>),
-//     >,
-//     mut node_query: Query<&mut SvgNodeVariant>,
-// ) {
-//     query.iter_mut().for_each(|(children, mut node_variant)| {
-//         let node = match node_variant.as_mut() {
-//             SvgNodeVariant::Frame(node) => node,
-//             _ => {
-//                 return;
-//             }
-//         };
-
-//         // Identify added and removed node elements
-//         let current_node_children_set: HashSet<_> = node.node_children.iter().cloned().collect();
-//         let new_node_children_set: HashSet<_> = children.iter().cloned().collect();
-//         let removed_node_entities: Vec<_> = node
-//             .node_children
-//             .iter()
-//             .filter(|&e| !new_node_children_set.contains(e))
-//             .cloned()
-//             .collect();
-//         let added_node_enntities: Vec<_> = children
-//             .iter()
-//             .filter(|&e| !current_node_children_set.contains(e))
-//             .cloned()
-//             .collect();
-
-//         // Process removed entities
-//         for entity in removed_node_entities {
-//             if let Ok(to_remove_node) = node_query.get(entity) {
-//                 node.children_wrapper_g
-//                     .remove_child(to_remove_node.get_svg_node().get_root_element().get_id());
-//                 commands.entity(entity).despawn();
-//             }
-//         }
-
-//         // Process added entities
-//         for entity in added_node_enntities {
-//             if let Ok(mut added_node) = node_query.get_mut(entity) {
-//                 node.children_wrapper_g.append_child_in_world_context(
-//                     entity,
-//                     added_node.get_svg_node_mut().get_root_element_mut(),
-//                 );
-//             }
-//         }
-
-//         // Reorder entities
-//         // TODO
-
-//         node.node_children = children.iter().cloned().collect();
-//     });
-// }
-
-pub fn apply_frame_node_size_change(
-    mut query: Query<(&SizeMixin, &mut SvgNodeVariant), (With<CompNode>, Changed<SizeMixin>)>,
-) {
-    query
-        .iter_mut()
-        .for_each(|(SizeMixin(size), mut node_variant)| {
-            let node = match node_variant.as_mut() {
-                SvgNodeVariant::Frame(node) => node,
-                _ => {
-                    return;
-                }
-            };
-            let [width, height] = size.0.to_array();
-
-            node.root.set_attributes(vec![
-                SvgAttribute::Width {
-                    width,
-                    unit: SvgMeasurementUnit::Pixel,
-                },
-                SvgAttribute::Height {
-                    height,
-                    unit: SvgMeasurementUnit::Pixel,
-                },
-            ]);
-            node.fill_clipped_path.set_attributes(vec![
-                SvgAttribute::Width {
-                    width,
-                    unit: SvgMeasurementUnit::Pixel,
-                },
-                SvgAttribute::Height {
-                    height,
-                    unit: SvgMeasurementUnit::Pixel,
-                },
-            ]);
-            node.content_clipped_rect.set_attributes(vec![
-                SvgAttribute::Width {
-                    width,
-                    unit: SvgMeasurementUnit::Pixel,
-                },
-                SvgAttribute::Height {
-                    height,
-                    unit: SvgMeasurementUnit::Pixel,
-                },
-            ]);
-        });
 }

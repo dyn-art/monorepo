@@ -1,3 +1,5 @@
+#![cfg(feature = "output_events")]
+
 use crate::{
     events::{SvgBuilderOutputEvent, SvgElementChangesOutputEvent},
     resources::{

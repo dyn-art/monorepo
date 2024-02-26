@@ -22,7 +22,7 @@ pub fn wasm_memory() -> JsValue {
 
 #[cfg(feature = "console_log")]
 fn setup_console_logger() {
-    if let Err(e) = log::set_logger(logger::console::default_logger()) {
+    if let Err(e) = log::set_logger(logger::default_logger()) {
         eprintln!("Failed to setup Javascript logger: {}", e);
         return;
     }
