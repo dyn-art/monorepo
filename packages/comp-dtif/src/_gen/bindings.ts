@@ -218,11 +218,13 @@ export type SvgBlendMode = "Normal" | "Multiply" | "Screen" | "Overlay" | "Darke
 
 export type SvgBuilderOutputEvent = 
 /**
- * Output when "output_svg_element_changes" active.
+ * Represents incremental changes to an SVG element.
+ * Emitted when the "output_svg_element_changes" feature is enabled.
  */
 ({ type: "SvgElementChanges" } & SvgElementChangesOutputEvent) | 
 /**
- * Output when "output_svg_string" feature active.
+ * Contains the complete SVG as a string.
+ * Emitted when the "output_svg_string" feature is enabled.
  */
 ({ type: "SvgString" } & SvgStringOutputEvent)
 
