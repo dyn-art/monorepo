@@ -1,4 +1,4 @@
-#![cfg(feature = "output_events")]
+#![cfg(feature = "output_svg_element_changes")]
 
 use crate::{
     events::{SvgBuilderOutputEvent, SvgElementChangesOutputEvent},
@@ -62,7 +62,7 @@ pub fn queue_svg_node_changes(
     for changed_svg_node in sorted_changes {
         for changes in changed_svg_node.changes {
             let event =
-                SvgBuilderOutputEvent::ElementChanges(SvgElementChangesOutputEvent { changes });
+                SvgBuilderOutputEvent::SvgElementChanges(SvgElementChangesOutputEvent { changes });
             output_event_sender_res.push_event(event);
         }
     }

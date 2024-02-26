@@ -1,4 +1,4 @@
-mod resources;
+pub mod resources;
 mod systems;
 
 use bevy_app::{App, Plugin, Update};

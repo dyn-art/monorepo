@@ -4,10 +4,12 @@ pub mod element_changes;
 pub mod styles;
 
 use self::{attributes::SvgAttribute, styles::SvgStyle};
-use bevy_ecs::{component::Component, entity::Entity};
+use super::svg_node::{SvgNode, SvgNodeVariant};
+use bevy_ecs::{component::Component, entity::Entity, query::Without, system::Query};
+use dyn_comp_types::mixins::Root;
 use std::{collections::HashMap, fmt::Display};
 
-#[cfg(feature = "output_events")]
+#[cfg(feature = "output_svg_element_changes")]
 use self::element_changes::{
     SvgAttributeUpdatedChange, SvgElementChange, SvgElementCreatedChange, SvgElementDeletedChange,
     SvgStyleUpdatedChange,
@@ -26,10 +28,10 @@ pub struct SvgElement {
     /// Children of the SvgElement in the Svg tree.
     children: Vec<SvgElementChild>,
     /// Applied changes after last drain.
-    #[cfg(feature = "output_events")]
+    #[cfg(feature = "output_svg_element_changes")]
     changes: Vec<SvgElementChange>,
     /// Whether the element was created in the current update cycle (before first update drain).
-    #[cfg(feature = "output_events")]
+    #[cfg(feature = "output_svg_element_changes")]
     was_created_in_current_update_cycle: bool,
 }
 
@@ -46,9 +48,9 @@ impl SvgElement {
             attributes: inital_attributes,
             styles: inital_styles,
             children: Vec::new(),
-            #[cfg(feature = "output_events")]
+            #[cfg(feature = "output_svg_element_changes")]
             changes: Vec::new(),
-            #[cfg(feature = "output_events")]
+            #[cfg(feature = "output_svg_element_changes")]
             was_created_in_current_update_cycle: true,
         };
     }
@@ -66,11 +68,11 @@ impl SvgElement {
     // =========================================================================
 
     pub fn set_attribute(&mut self, attribute: SvgAttribute) {
-        #[cfg(feature = "output_events")]
+        #[cfg(feature = "output_svg_element_changes")]
         self.register_change(SvgElementChange::AttributeUpdated(
             SvgAttributeUpdatedChange {
                 key: attribute.key(),
-                new_value: attribute.into_svg_string(),
+                new_value: attribute.to_svg_string(),
             },
         ));
 
@@ -92,10 +94,10 @@ impl SvgElement {
     // =========================================================================
 
     pub fn set_style(&mut self, style: SvgStyle) {
-        #[cfg(feature = "output_events")]
+        #[cfg(feature = "output_svg_element_changes")]
         self.register_change(SvgElementChange::StyleUpdated(SvgStyleUpdatedChange {
             key: style.key(),
-            new_value: style.into_svg_string(),
+            new_value: style.to_svg_string(),
         }));
 
         self.styles.insert(style.key(), style);
@@ -142,11 +144,11 @@ impl SvgElement {
             id: child_element.get_id(),
             identifier,
         });
-        #[cfg(feature = "output_events")]
+        #[cfg(feature = "output_svg_element_changes")]
         child_element.append_to_parent(self.id);
     }
 
-    #[cfg(feature = "output_events")]
+    #[cfg(feature = "output_svg_element_changes")]
     pub fn append_to_parent(&mut self, parent_id: SvgElementId) {
         self.register_change(SvgElementChange::ElementAppended(
             self::element_changes::SvgElementAppendedChange { parent_id },
@@ -165,7 +167,7 @@ impl SvgElement {
     // Other
     // =========================================================================
 
-    #[cfg(feature = "output_events")]
+    #[cfg(feature = "output_svg_element_changes")]
     pub fn init(&mut self, entity: Option<Entity>) {
         self.register_change(SvgElementChange::ElementCreated(SvgElementCreatedChange {
             parent_id: None,
@@ -173,18 +175,14 @@ impl SvgElement {
             attributes: self
                 .attributes
                 .values()
-                .map(|value| value.into_tuple())
+                .map(|value| value.to_tuple())
                 .collect(),
-            styles: self
-                .styles
-                .values()
-                .map(|value| value.into_tuple())
-                .collect(),
+            styles: self.styles.values().map(|value| value.to_tuple()).collect(),
             entity,
         }));
     }
 
-    #[cfg(feature = "output_events")]
+    #[cfg(feature = "output_svg_element_changes")]
     fn register_change(&mut self, element_change: SvgElementChange) {
         if self.was_created_in_current_update_cycle {
             if let Some(update) = self.changes.first_mut() {
@@ -223,15 +221,67 @@ impl SvgElement {
     /// Destroys this SvgElement.
     /// This method only handles the destruction of the element itself.
     /// It is the responsibility of the caller to ensure that any references to this element are properly managed.
-    #[cfg(feature = "output_events")]
+    #[cfg(feature = "output_svg_element_changes")]
     pub fn destroy(&mut self) {
         self.register_change(SvgElementChange::ElementDeleted(SvgElementDeletedChange {}));
     }
 
-    #[cfg(feature = "output_events")]
+    #[cfg(feature = "output_svg_element_changes")]
     pub fn drain_changes(&mut self) -> Vec<SvgElementChange> {
         self.was_created_in_current_update_cycle = false;
         self.changes.drain(..).collect()
+    }
+
+    pub fn to_string(
+        &self,
+        node: &dyn SvgNode,
+        node_query: &Query<&SvgNodeVariant, Without<Root>>,
+    ) -> String {
+        let mut result = String::new();
+
+        // Open SVG tag
+        {
+            result.push_str(&format!("<{}", self.tag));
+
+            // Append attributes
+            for (key, value) in &self.attributes {
+                result.push_str(&format!(" {}=\"{}\"", key, value.to_svg_string()));
+            }
+
+            // Append styles as a single 'style' attribute
+            if !self.styles.is_empty() {
+                let style_string: String = self
+                    .styles
+                    .iter()
+                    .map(|(key, value)| format!("{}: {}", key, value.to_svg_string()))
+                    .collect::<Vec<String>>()
+                    .join("; ");
+                result.push_str(&format!(" style=\"{}\"", style_string));
+            }
+
+            result.push('>');
+        }
+
+        // Append children
+        for child in &self.children {
+            match child.identifier {
+                SvgElementChildIdentifier::InSvgNodeContext(_) => {
+                    if let Some(child_element) = node.get_child_elements().get(&child.id) {
+                        result.push_str(&child_element.to_string(node, node_query));
+                    }
+                }
+                SvgElementChildIdentifier::InWorldContext(entity) => {
+                    if let Ok(node) = node_query.get(entity) {
+                        result.push_str(&node.to_string(node_query));
+                    }
+                }
+            }
+        }
+
+        // Close SVG tag
+        result.push_str(&format!("</{}>", self.tag));
+
+        return result;
     }
 }
 

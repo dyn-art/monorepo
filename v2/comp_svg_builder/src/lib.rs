@@ -17,7 +17,7 @@ use systems::{
 };
 
 pub struct CompSvgBuilderPlugin {
-    #[cfg(feature = "output_events")]
+    #[cfg(any(feature = "output_svg_element_changes", feature = "output_svg_string"))]
     pub output_event_sender: std::sync::mpsc::Sender<crate::events::SvgBuilderOutputEvent>,
 }
 
@@ -66,7 +66,12 @@ impl Plugin for CompSvgBuilderPlugin {
             ),
         );
 
-        #[cfg(feature = "output_events")]
+        #[cfg(feature = "output_svg_string")]
+        {
+            // TODO
+        }
+
+        #[cfg(feature = "output_svg_element_changes")]
         {
             use crate::resources::{
                 changed_svg_nodes::ChangedSvgNodesRes, output_event_sender::OutputEventSenderRes,

@@ -67,7 +67,7 @@ pub enum MeasurementUnit {
 }
 
 impl MeasurementUnit {
-    pub fn into_pixel(&self, parent_pixels: f32) -> Pixel {
+    pub fn to_pixel(&self, parent_pixels: f32) -> Pixel {
         match self {
             Self::Percent { percent } => Pixel(parent_pixels * percent.get()),
             Self::Pixels { pixels } => *pixels,

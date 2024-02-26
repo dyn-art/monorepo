@@ -1,4 +1,4 @@
-#![cfg(feature = "output_events")]
+#![cfg(feature = "output_svg_element_changes")]
 
 use crate::{
     resources::changed_svg_nodes::{ChangedSvgNode, ChangedSvgNodesRes},

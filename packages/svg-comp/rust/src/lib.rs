@@ -4,11 +4,18 @@ mod logging;
 pub mod modules;
 
 use bevy_app::App;
-use dyn_comp_core::CompCorePlugin;
+use bevy_ecs::{
+    query::{With, Without},
+    system::{Query, SystemState},
+    world::World,
+};
+use dyn_comp_core::{resources::composition::CompositionRes, CompCorePlugin};
 use dyn_comp_dtif::CompDtif;
 use dyn_comp_interaction::CompInteractionPlugin;
-use dyn_comp_svg_builder::{events::SvgBuilderOutputEvent, CompSvgBuilderPlugin};
-use dyn_comp_types::events::InputEvent;
+use dyn_comp_svg_builder::{
+    events::SvgBuilderOutputEvent, svg::svg_node::SvgNodeVariant, CompSvgBuilderPlugin,
+};
+use dyn_comp_types::{events::InputEvent, mixins::Root};
 use events::{SvgCompInputEvent, SvgCompOutputEvent};
 use modules::watch::CompWatchPlugin;
 use std::sync::mpsc::{channel, Receiver};
@@ -80,13 +87,42 @@ impl SvgCompHandle {
         }
         while let Ok(event) = self.svg_builder_output_event_receiver.try_recv() {
             match event {
-                SvgBuilderOutputEvent::ElementChanges(event) => {
-                    output_events.push(SvgCompOutputEvent::ElementChanges(event))
+                SvgBuilderOutputEvent::SvgElementChanges(event) => {
+                    output_events.push(SvgCompOutputEvent::SvgElementChanges(event))
                 }
+                _ => {}
             }
         }
 
         return Ok(serde_wasm_bindgen::to_value(&output_events)?);
+    }
+
+    #[wasm_bindgen(js_name = toString)]
+    pub fn to_string(&mut self) -> Option<String> {
+        let mut result = String::new();
+        let comp_res = self.app.world.get_resource::<CompositionRes>()?;
+
+        // Open SVG tag
+        result.push_str(&format!(
+            "<svg width=\"{}\" height=\"{}\" xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\">",
+            comp_res.size.0.x, comp_res.size.0.y
+        ));
+
+        let mut system_state: SystemState<(
+            Query<&SvgNodeVariant, With<Root>>,
+            Query<&SvgNodeVariant, Without<Root>>,
+        )> = SystemState::new(&mut self.app.world);
+        let (root_node_query, node_query) = system_state.get(&mut self.app.world);
+
+        // Construct SVG string starting from root nodes
+        root_node_query
+            .iter()
+            .for_each(|node_variant| result.push_str(&node_variant.to_string(&node_query)));
+
+        // Close the SVG tag
+        result.push_str("</svg>");
+
+        return Some(result);
     }
 
     #[wasm_bindgen(js_name = logEntityComponentsRaw)]

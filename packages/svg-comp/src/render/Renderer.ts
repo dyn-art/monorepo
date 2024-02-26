@@ -10,7 +10,7 @@ export abstract class Renderer {
 		this._comp = () => composition;
 		this._isCallbackBased = isCallbackBased;
 
-		composition.watchOutputEvent('ElementChanges', (event) => {
+		composition.watchOutputEvent('SvgElementChanges', (event) => {
 			this.applyElementChanges(event.changes);
 		});
 	}

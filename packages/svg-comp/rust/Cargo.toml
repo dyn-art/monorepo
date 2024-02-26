@@ -41,7 +41,7 @@ dyn-comp-interaction = { path = "../../../v2/comp_interaction", features = [
 ] }
 dyn-comp-svg-builder = { path = "../../../v2/comp_svg_builder", features = [
     "serde_support",
-    "output_events",
+    "output_svg_element_changes",
 ] }
 bevy_app = { workspace = true }
 bevy_ecs = { workspace = true }

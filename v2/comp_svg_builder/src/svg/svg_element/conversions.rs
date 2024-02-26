@@ -16,6 +16,7 @@ impl From<&Transform> for SvgTransformAttribute {
 
         // Create the SVG transformation matrix
         // This matrix combines rotation and scale, then applies translation
+        // https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/transform
         SvgTransformAttribute::Matrix {
             a: cos_a * sx,  // cos(theta) * scale_x
             b: sin_a * sx,  // sin(theta) * scale_x

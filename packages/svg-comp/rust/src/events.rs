@@ -7,7 +7,7 @@ use crate::modules::watch::events::{SelectionChangeOutputEvent, WatchedEntityCha
 #[derive(Debug, Clone, serde::Serialize, specta::Type)]
 #[serde(tag = "type")]
 pub enum SvgCompOutputEvent {
-    ElementChanges(SvgElementChangesOutputEvent),
+    SvgElementChanges(SvgElementChangesOutputEvent),
     WatchedEntityChanges(WatchedEntityChangesOutputEvent),
     SelectionChange(SelectionChangeOutputEvent),
 }

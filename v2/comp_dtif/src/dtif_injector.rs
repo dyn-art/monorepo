@@ -89,7 +89,7 @@ impl DtifInjector {
         events
             .iter()
             .cloned()
-            .map(|event| event.into_comp_input_event(&self.sid_to_entity))
+            .map(|event| event.to_comp_input_event(&self.sid_to_entity))
             .for_each(|maybe_event| {
                 if let Some(event) = maybe_event {
                     event.send_into_ecs(world);

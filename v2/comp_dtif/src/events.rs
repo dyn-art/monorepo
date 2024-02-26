@@ -19,7 +19,7 @@ pub enum DtifInputEvent {
 }
 
 impl DtifInputEvent {
-    pub fn into_comp_input_event(
+    pub fn to_comp_input_event(
         self,
         sid_to_entity: &HashMap<String, Entity>,
     ) -> Option<CompCoreInputEvent> {

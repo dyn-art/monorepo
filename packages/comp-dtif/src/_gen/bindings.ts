@@ -216,11 +216,19 @@ export type SvgAttributeUpdatedChange = { key: string; newValue: string }
 
 export type SvgBlendMode = "Normal" | "Multiply" | "Screen" | "Overlay" | "Darken" | "Lighten" | "ColorDodge" | "ColorBurn" | "HardLight" | "SoftLight" | "Difference" | "Exclusion" | "Hue" | "Saturation" | "Color" | "Luminosity"
 
-export type SvgBuilderOutputEvent = ({ type: "ElementChanges" } & SvgElementChangesOutputEvent)
+export type SvgBuilderOutputEvent = 
+/**
+ * Output when "output_svg_element_changes" active.
+ */
+({ type: "SvgElementChanges" } & SvgElementChangesOutputEvent) | 
+/**
+ * Output when "output_svg_string" feature active.
+ */
+({ type: "SvgString" } & SvgStringOutputEvent)
 
 export type SvgCompInputEvent = { type: "Comp"; event: CompCoreInputEvent } | { type: "Interaction"; event: InteractionInputEvent }
 
-export type SvgCompOutputEvent = ({ type: "ElementChanges" } & SvgElementChangesOutputEvent) | ({ type: "WatchedEntityChanges" } & WatchedEntityChangesOutputEvent) | ({ type: "SelectionChange" } & SelectionChangeOutputEvent)
+export type SvgCompOutputEvent = ({ type: "SvgElementChanges" } & SvgElementChangesOutputEvent) | ({ type: "WatchedEntityChanges" } & WatchedEntityChangesOutputEvent) | ({ type: "SelectionChange" } & SelectionChangeOutputEvent)
 
 export type SvgDisplayStyle = "Block" | "None"
 
@@ -248,6 +256,8 @@ export type SvgElementDeletedChange = Record<string, never>
 export type SvgElementId = number
 
 export type SvgMeasurementUnit = "Pixel" | "Percent"
+
+export type SvgStringOutputEvent = { value: string }
 
 export type SvgStyle = { type: "Display"; display: SvgDisplayStyle } | { type: "BlendMode"; blendMode: SvgBlendMode }
 

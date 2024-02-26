@@ -3,7 +3,7 @@ use crate::{
         DelayedNodeModificationsRes, SvgNodeChildrenModification,
     },
     svg::{
-        svg_element::attributes::{SvgAttribute, SvgMeasurementUnit, SvgTransformAttribute},
+        svg_element::attributes::{SvgAttribute, SvgMeasurementUnit},
         svg_node::SvgNodeVariant,
     },
 };

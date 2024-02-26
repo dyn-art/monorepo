@@ -3,6 +3,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
 import type { Composition } from '@dyn/svg-comp';
+import { Button } from '@dyn/ui';
 
 import { Canvas, type TCanvasProps } from './components';
 
@@ -17,6 +18,13 @@ export const Editor: React.FC<TEditorProps> = (props) => {
 			<div className="flex flex-col items-center justify-center">
 				<Canvas dtif={dtif} height={height} onLoadedComposition={setComposition} width={width} />
 			</div>
+			<Button
+				onClick={() => {
+					console.log(composition?.toString());
+				}}
+			>
+				To String
+			</Button>
 		</QueryClientProvider>
 	);
 };

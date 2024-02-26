@@ -127,8 +127,17 @@ export class Composition {
 		}
 	}
 
-	public logEntityComponentsRaw(entity: Entity) {
+	// =========================================================================
+	// Other
+	// =========================================================================
+
+	public logEntityComponentsRaw(entity: Entity): void {
 		this._svgCompHandle.logEntityComponentsRaw(entity);
+	}
+
+	public toString(): string | null {
+		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition, @typescript-eslint/no-base-to-string -- Whatever
+		return this._svgCompHandle.toString() ?? null;
 	}
 }
 
@@ -138,7 +147,7 @@ export interface TCompositionConfig {
 }
 
 interface TOutputEventTypeMap {
-	ElementChanges: SvgElementChangesOutputEvent;
+	SvgElementChanges: SvgElementChangesOutputEvent;
 	WatchedEntityChanges: WatchedEntityChangesOutputEvent;
 	SelectionChange: SelectionChangeOutputEvent;
 }

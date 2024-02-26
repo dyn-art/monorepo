@@ -3,10 +3,11 @@ pub mod shape;
 
 use self::{frame::FrameSvgNode, shape::ShapeSvgNode};
 use super::svg_element::{SvgElement, SvgElementId};
-use bevy_ecs::component::Component;
+use bevy_ecs::{component::Component, query::Without, system::Query};
+use dyn_comp_types::mixins::Root;
 use std::{collections::BTreeMap, fmt::Debug};
 
-#[cfg(feature = "output_events")]
+#[cfg(feature = "output_svg_element_changes")]
 use super::svg_element::element_changes::SvgElementChanges;
 
 pub trait SvgNode: Debug {
@@ -27,7 +28,7 @@ pub trait SvgNode: Debug {
     /// Returns a mutable reference to the root `SvgElement`.
     fn get_root_element_mut(&mut self) -> &mut SvgElement;
 
-    #[cfg(feature = "output_events")]
+    #[cfg(feature = "output_svg_element_changes")]
     fn drain_changes(&mut self) -> Vec<SvgElementChanges> {
         let mut drained_changes: Vec<SvgElementChanges> = Vec::new();
 
@@ -76,6 +77,13 @@ impl SvgNodeVariant {
         match self {
             SvgNodeVariant::Frame(node) => node,
             SvgNodeVariant::Shape(node) => node,
+        }
+    }
+
+    pub fn to_string(&self, node_query: &Query<&SvgNodeVariant, Without<Root>>) -> String {
+        match self {
+            SvgNodeVariant::Frame(node) => node.get_root_element().to_string(node, node_query),
+            SvgNodeVariant::Shape(node) => node.get_root_element().to_string(node, node_query),
         }
     }
 }

@@ -22,7 +22,7 @@ impl SvgStyle {
         }
     }
 
-    pub fn into_svg_string(&self) -> String {
+    pub fn to_svg_string(&self) -> String {
         match self {
             Self::Display { display } => match display {
                 SvgDisplayStyle::Block => String::from("block"),
@@ -49,8 +49,8 @@ impl SvgStyle {
         }
     }
 
-    pub fn into_tuple(&self) -> (&'static str, String) {
-        (self.key(), self.into_svg_string())
+    pub fn to_tuple(&self) -> (&'static str, String) {
+        (self.key(), self.to_svg_string())
     }
 }
 

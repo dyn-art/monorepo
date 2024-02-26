@@ -11,7 +11,8 @@ authors = { workspace = true }
 [features]
 default = []
 serde_support = ["dep:serde", "dep:specta", "dyn-comp-types/serde_support"]
-output_events = []
+output_svg_element_changes = []
+output_svg_string = []
 tracing = []
 
 [dependencies]
