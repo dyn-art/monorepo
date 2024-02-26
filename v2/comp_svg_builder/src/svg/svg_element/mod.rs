@@ -20,7 +20,7 @@ pub struct SvgElement {
     /// Unique identifier of the SvgElement
     id: SvgElementId,
     /// The type of SvgElement (e.g., circle, rect).
-    tag: &'static str,
+    tag: SvgTag,
     /// The attributes of the SvgElement.
     attributes: HashMap<&'static str, SvgAttribute>,
     /// The style properties of the SvgElement.
@@ -36,7 +36,7 @@ pub struct SvgElement {
 }
 
 impl SvgElement {
-    pub fn new(tag: &'static str, id: SvgElementId) -> Self {
+    pub fn new(tag: SvgTag, id: SvgElementId) -> Self {
         let id_attribute = SvgAttribute::Id { id };
         let inital_attributes: HashMap<&'static str, SvgAttribute> =
             HashMap::from([(id_attribute.key(), id_attribute)]);
@@ -57,10 +57,6 @@ impl SvgElement {
 
     pub fn get_id(&self) -> SvgElementId {
         self.id
-    }
-
-    pub fn get_tag(&self) -> &'static str {
-        &self.tag
     }
 
     // =========================================================================
@@ -171,7 +167,7 @@ impl SvgElement {
     pub fn init_element_created(&mut self, entity: Option<Entity>) {
         self.register_change(SvgElementChange::ElementCreated(SvgElementCreatedChange {
             parent_id: None,
-            tag_name: self.tag,
+            tag_name: self.tag.as_str(),
             attributes: self
                 .attributes
                 .values()
@@ -245,7 +241,7 @@ impl SvgElement {
 
         // Open SVG tag
         {
-            result.push_str(&format!("<{}", self.tag));
+            result.push_str(&format!("<{}", self.tag.as_str()));
 
             // Append attributes
             for (key, value) in &self.attributes {
@@ -283,7 +279,7 @@ impl SvgElement {
         }
 
         // Close SVG tag
-        result.push_str(&format!("</{}>", self.tag));
+        result.push_str(&format!("</{}>", self.tag.as_str()));
 
         return result;
     }
@@ -309,6 +305,49 @@ impl SvgElementId {
 impl Display for SvgElementId {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.0)
+    }
+}
+
+#[derive(Debug, Copy, Clone)]
+pub enum SvgTag {
+    Circle,
+    Rect,
+    Path,
+    Line,
+    Ellipse,
+    Polygon,
+    Polyline,
+    Text,
+    Group,
+    Defs,
+    ClipPath,
+    Pattern,
+    Image,
+    LinearGradient,
+    RadialGradient,
+    Stop,
+}
+
+impl SvgTag {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            SvgTag::Circle => "circle",
+            SvgTag::Rect => "rect",
+            SvgTag::Path => "path",
+            SvgTag::Line => "line",
+            SvgTag::Ellipse => "ellipse",
+            SvgTag::Polygon => "polygon",
+            SvgTag::Polyline => "polyline",
+            SvgTag::Text => "text",
+            SvgTag::Group => "g",
+            SvgTag::Defs => "defs",
+            SvgTag::ClipPath => "clipPath",
+            SvgTag::Pattern => "pattern",
+            SvgTag::Image => "image",
+            SvgTag::LinearGradient => "linearGradient",
+            SvgTag::RadialGradient => "radialGradient",
+            SvgTag::Stop => "stop",
+        }
     }
 }
 
