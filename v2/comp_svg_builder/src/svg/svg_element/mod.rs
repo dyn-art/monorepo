@@ -164,11 +164,11 @@ impl SvgElement {
     }
 
     // =========================================================================
-    // Other
+    // Changes
     // =========================================================================
 
     #[cfg(feature = "output_svg_element_changes")]
-    pub fn init(&mut self, entity: Option<Entity>) {
+    pub fn init_element_created(&mut self, entity: Option<Entity>) {
         self.register_change(SvgElementChange::ElementCreated(SvgElementCreatedChange {
             parent_id: None,
             tag_name: self.tag,
@@ -218,18 +218,22 @@ impl SvgElement {
         self.changes.push(element_change);
     }
 
+    // =========================================================================
+    // Other
+    // =========================================================================
+
+    #[cfg(feature = "output_svg_element_changes")]
+    pub fn drain_changes(&mut self) -> Vec<SvgElementChange> {
+        self.was_created_in_current_update_cycle = false;
+        self.changes.drain(..).collect()
+    }
+
     /// Destroys this SvgElement.
     /// This method only handles the destruction of the element itself.
     /// It is the responsibility of the caller to ensure that any references to this element are properly managed.
     #[cfg(feature = "output_svg_element_changes")]
     pub fn destroy(&mut self) {
         self.register_change(SvgElementChange::ElementDeleted(SvgElementDeletedChange {}));
-    }
-
-    #[cfg(feature = "output_svg_element_changes")]
-    pub fn drain_changes(&mut self) -> Vec<SvgElementChange> {
-        self.was_created_in_current_update_cycle = false;
-        self.changes.drain(..).collect()
     }
 
     pub fn to_string(
