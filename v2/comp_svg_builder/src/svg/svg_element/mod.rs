@@ -1,4 +1,5 @@
 pub mod attributes;
+pub mod conversions;
 pub mod element_changes;
 pub mod styles;
 
@@ -206,7 +207,7 @@ impl SvgElement {
                             element_created_event.parent_id = Some(event.parent_id);
                             return;
                         }
-                        SvgElementChange::ElementDeleted(event) => {
+                        SvgElementChange::ElementDeleted(_) => {
                             self.changes.clear();
                             return;
                         }

@@ -9,7 +9,10 @@ use resources::{
     delayed_node_modifications::DelayedNodeModificationsRes, svg_context::SvgContextRes,
 };
 use systems::{
-    apply::{apply_children_changes, apply_size_mixin_changes, collect_children_changes},
+    apply::{
+        apply_children_changes, apply_size_mixin_changes, apply_transform_changes,
+        collect_children_changes,
+    },
     insert::{insert_frame_svg_node, insert_shape_svg_node},
 };
 
@@ -59,6 +62,7 @@ impl Plugin for CompSvgBuilderPlugin {
                 collect_children_changes.in_set(SvgBuilderSystemSet::Collect),
                 apply_children_changes.in_set(SvgBuilderSystemSet::Apply),
                 apply_size_mixin_changes.in_set(SvgBuilderSystemSet::Apply),
+                apply_transform_changes.in_set(SvgBuilderSystemSet::Apply),
             ),
         );
 

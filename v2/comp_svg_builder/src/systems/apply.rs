@@ -3,7 +3,7 @@ use crate::{
         DelayedNodeModificationsRes, SvgNodeChildrenModification,
     },
     svg::{
-        svg_element::attributes::{SvgAttribute, SvgMeasurementUnit},
+        svg_element::attributes::{SvgAttribute, SvgMeasurementUnit, SvgTransformAttribute},
         svg_node::SvgNodeVariant,
     },
 };
@@ -13,75 +13,9 @@ use bevy_ecs::{
     system::{Commands, Query, ResMut},
 };
 use bevy_hierarchy::Children;
+use bevy_transform::components::Transform;
 use dyn_comp_types::{mixins::SizeMixin, nodes::CompNode};
 use std::collections::HashSet;
-
-pub fn apply_size_mixin_changes(
-    mut query: Query<(&SizeMixin, &mut SvgNodeVariant), (With<CompNode>, Changed<SizeMixin>)>,
-) {
-    query
-        .iter_mut()
-        .for_each(|(SizeMixin(size), mut node_variant)| {
-            let [width, height] = size.0.to_array();
-
-            match node_variant.as_mut() {
-                SvgNodeVariant::Frame(node) => {
-                    node.root.set_attributes(vec![
-                        SvgAttribute::Width {
-                            width,
-                            unit: SvgMeasurementUnit::Pixel,
-                        },
-                        SvgAttribute::Height {
-                            height,
-                            unit: SvgMeasurementUnit::Pixel,
-                        },
-                    ]);
-                    node.fill_clipped_path.set_attributes(vec![
-                        SvgAttribute::Width {
-                            width,
-                            unit: SvgMeasurementUnit::Pixel,
-                        },
-                        SvgAttribute::Height {
-                            height,
-                            unit: SvgMeasurementUnit::Pixel,
-                        },
-                    ]);
-                    node.content_clipped_rect.set_attributes(vec![
-                        SvgAttribute::Width {
-                            width,
-                            unit: SvgMeasurementUnit::Pixel,
-                        },
-                        SvgAttribute::Height {
-                            height,
-                            unit: SvgMeasurementUnit::Pixel,
-                        },
-                    ]);
-                }
-                SvgNodeVariant::Shape(node) => {
-                    node.root.set_attributes(vec![
-                        SvgAttribute::Width {
-                            width,
-                            unit: SvgMeasurementUnit::Pixel,
-                        },
-                        SvgAttribute::Height {
-                            height,
-                            unit: SvgMeasurementUnit::Pixel,
-                        },
-                    ]);
-                    node.click_area_rect.set_attributes(vec![
-                        SvgAttribute::Width {
-                            width,
-                            unit: SvgMeasurementUnit::Pixel,
-                        },
-                        SvgAttribute::Height {
-                            height,
-                            unit: SvgMeasurementUnit::Pixel,
-                        },
-                    ]);
-                }
-            }
-        });
-}
 
 pub fn collect_children_changes(
     mut delayed_node_modification_res: ResMut<DelayedNodeModificationsRes>,
@@ -157,4 +91,86 @@ pub fn apply_children_changes(
             }
         }
     }
+}
+
+pub fn apply_size_mixin_changes(
+    mut query: Query<(&SizeMixin, &mut SvgNodeVariant), (With<CompNode>, Changed<SizeMixin>)>,
+) {
+    query
+        .iter_mut()
+        .for_each(|(SizeMixin(size), mut node_variant)| {
+            let [width, height] = size.0.to_array();
+
+            match node_variant.as_mut() {
+                SvgNodeVariant::Frame(node) => {
+                    node.root.set_attributes(vec![
+                        SvgAttribute::Width {
+                            width,
+                            unit: SvgMeasurementUnit::Pixel,
+                        },
+                        SvgAttribute::Height {
+                            height,
+                            unit: SvgMeasurementUnit::Pixel,
+                        },
+                    ]);
+                    node.fill_clipped_path.set_attributes(vec![
+                        SvgAttribute::Width {
+                            width,
+                            unit: SvgMeasurementUnit::Pixel,
+                        },
+                        SvgAttribute::Height {
+                            height,
+                            unit: SvgMeasurementUnit::Pixel,
+                        },
+                    ]);
+                    node.content_clipped_rect.set_attributes(vec![
+                        SvgAttribute::Width {
+                            width,
+                            unit: SvgMeasurementUnit::Pixel,
+                        },
+                        SvgAttribute::Height {
+                            height,
+                            unit: SvgMeasurementUnit::Pixel,
+                        },
+                    ]);
+                }
+                SvgNodeVariant::Shape(node) => {
+                    node.root.set_attributes(vec![
+                        SvgAttribute::Width {
+                            width,
+                            unit: SvgMeasurementUnit::Pixel,
+                        },
+                        SvgAttribute::Height {
+                            height,
+                            unit: SvgMeasurementUnit::Pixel,
+                        },
+                    ]);
+                    node.click_area_rect.set_attributes(vec![
+                        SvgAttribute::Width {
+                            width,
+                            unit: SvgMeasurementUnit::Pixel,
+                        },
+                        SvgAttribute::Height {
+                            height,
+                            unit: SvgMeasurementUnit::Pixel,
+                        },
+                    ]);
+                }
+            }
+        });
+}
+
+pub fn apply_transform_changes(
+    mut query: Query<(&Transform, &mut SvgNodeVariant), (With<CompNode>, Changed<Transform>)>,
+) {
+    query.iter_mut().for_each(|(transform, mut node_variant)| {
+        let element = match node_variant.as_mut() {
+            SvgNodeVariant::Frame(node) => &mut node.root,
+            SvgNodeVariant::Shape(node) => &mut node.root,
+        };
+
+        element.set_attribute(SvgAttribute::Transform {
+            transform: transform.into(),
+        });
+    });
 }
