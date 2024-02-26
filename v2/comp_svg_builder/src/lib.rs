@@ -10,8 +10,9 @@ use resources::{
 };
 use systems::{
     apply::{
-        apply_children_changes, apply_size_mixin_changes, apply_transform_changes,
-        collect_children_changes,
+        apply_blend_mode_mixin_changes, apply_children_changes, apply_fill_mixin_changes,
+        apply_opacity_mixin_changes, apply_size_mixin_changes, apply_transform_changes,
+        apply_visibility_mixin_changes, collect_children_changes,
     },
     insert::{insert_frame_svg_node, insert_shape_svg_node},
 };
@@ -61,8 +62,12 @@ impl Plugin for CompSvgBuilderPlugin {
                 insert_shape_svg_node.in_set(SvgBuilderSystemSet::Insert),
                 collect_children_changes.in_set(SvgBuilderSystemSet::Collect),
                 apply_children_changes.in_set(SvgBuilderSystemSet::Apply),
+                apply_visibility_mixin_changes.in_set(SvgBuilderSystemSet::Apply),
                 apply_size_mixin_changes.in_set(SvgBuilderSystemSet::Apply),
                 apply_transform_changes.in_set(SvgBuilderSystemSet::Apply),
+                apply_opacity_mixin_changes.in_set(SvgBuilderSystemSet::Apply),
+                apply_blend_mode_mixin_changes.in_set(SvgBuilderSystemSet::Apply),
+                apply_fill_mixin_changes.in_set(SvgBuilderSystemSet::Apply),
             ),
         );
 

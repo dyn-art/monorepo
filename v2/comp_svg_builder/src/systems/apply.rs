@@ -3,7 +3,10 @@ use crate::{
         DelayedNodeModificationsRes, SvgNodeChildrenModification,
     },
     svg::{
-        svg_element::attributes::{SvgAttribute, SvgMeasurementUnit},
+        svg_element::{
+            attributes::{SvgAttribute, SvgMeasurementUnit},
+            styles::{SvgDisplayStyle, SvgStyle},
+        },
         svg_node::SvgNodeVariant,
     },
 };
@@ -14,7 +17,11 @@ use bevy_ecs::{
 };
 use bevy_hierarchy::Children;
 use bevy_transform::components::Transform;
-use dyn_comp_types::{mixins::SizeMixin, nodes::CompNode};
+use dyn_comp_types::{
+    mixins::{BlendModeMixin, FillMixin, OpacityMixin, SizeMixin, VisibilityMixin},
+    nodes::CompNode,
+    shared::Visibility,
+};
 use std::collections::HashSet;
 
 pub fn collect_children_changes(
@@ -91,6 +98,28 @@ pub fn apply_children_changes(
             }
         }
     }
+}
+
+pub fn apply_visibility_mixin_changes(
+    mut query: Query<
+        (&VisibilityMixin, &mut SvgNodeVariant),
+        (With<CompNode>, Changed<VisibilityMixin>),
+    >,
+) {
+    query
+        .iter_mut()
+        .for_each(|(VisibilityMixin(visibility), mut node_variant)| {
+            let element = match node_variant.as_mut() {
+                SvgNodeVariant::Frame(node) => &mut node.root,
+                SvgNodeVariant::Shape(node) => &mut node.root,
+            };
+
+            let display = match visibility {
+                Visibility::Visible => SvgDisplayStyle::Block,
+                Visibility::Hidden => SvgDisplayStyle::None,
+            };
+            element.set_style(SvgStyle::Display { display });
+        });
 }
 
 pub fn apply_size_mixin_changes(
@@ -172,5 +201,55 @@ pub fn apply_transform_changes(
         element.set_attribute(SvgAttribute::Transform {
             transform: transform.into(),
         });
+    });
+}
+
+pub fn apply_opacity_mixin_changes(
+    mut query: Query<(&OpacityMixin, &mut SvgNodeVariant), (With<CompNode>, Changed<OpacityMixin>)>,
+) {
+    query
+        .iter_mut()
+        .for_each(|(OpacityMixin(opacity), mut node_variant)| {
+            let element = match node_variant.as_mut() {
+                SvgNodeVariant::Frame(node) => &mut node.root,
+                SvgNodeVariant::Shape(node) => &mut node.root,
+            };
+
+            element.set_attribute(SvgAttribute::Opacity {
+                opacity: opacity.0.get(),
+            });
+        });
+}
+
+pub fn apply_blend_mode_mixin_changes(
+    mut query: Query<
+        (&BlendModeMixin, &mut SvgNodeVariant),
+        (With<CompNode>, Changed<BlendModeMixin>),
+    >,
+) {
+    query
+        .iter_mut()
+        .for_each(|(BlendModeMixin(blend_mode), mut node_variant)| {
+            let element = match node_variant.as_mut() {
+                SvgNodeVariant::Frame(node) => &mut node.root,
+                SvgNodeVariant::Shape(node) => &mut node.root,
+            };
+
+            element.set_style(SvgStyle::BlendMode {
+                blend_mode: blend_mode.into(),
+            });
+        });
+}
+
+pub fn apply_fill_mixin_changes(
+    mut query: Query<(&FillMixin, &mut SvgNodeVariant), (With<CompNode>, Changed<FillMixin>)>,
+) {
+    query.iter_mut().for_each(|(fill_mixin, mut node_variant)| {
+        let fill_wrapper_element = match node_variant.as_mut() {
+            SvgNodeVariant::Frame(node) => &mut node.fill_wrapper_g,
+            SvgNodeVariant::Shape(node) => &mut node.fill_wrapper_g,
+        };
+
+        // TODO
     });
 }

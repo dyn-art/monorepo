@@ -1,6 +1,3 @@
-use bevy_ecs::bundle::Bundle;
-use bevy_transform::components::Transform;
-
 use crate::{
     mixins::{
         BlendModeMixin, CornerRadiiMixin, FillMixin, OpacityMixin, SizeMixin, StrokeMixin,
@@ -11,6 +8,8 @@ use crate::{
         RectangleCompNode, StarCompNode, TextCompNode,
     },
 };
+use bevy_ecs::bundle::Bundle;
+use bevy_transform::components::Transform;
 
 #[derive(Bundle, Debug)]
 pub struct FrameCompNodeBundle {

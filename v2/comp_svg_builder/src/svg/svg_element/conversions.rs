@@ -1,5 +1,6 @@
-use super::attributes::SvgTransformAttribute;
+use super::{attributes::SvgTransformAttribute, styles::SvgBlendMode};
 use bevy_transform::components::Transform;
+use dyn_comp_types::shared::BlendMode;
 use glam::EulerRot;
 
 impl From<&Transform> for SvgTransformAttribute {
@@ -24,6 +25,29 @@ impl From<&Transform> for SvgTransformAttribute {
             d: cos_a * sy,  // cos(theta) * scale_y
             tx,             // Translation on the x-axis
             ty,             // Translation on the y-axis
+        }
+    }
+}
+
+impl From<&BlendMode> for SvgBlendMode {
+    fn from(blend_mode: &BlendMode) -> Self {
+        match blend_mode {
+            BlendMode::Normal => SvgBlendMode::Normal,
+            BlendMode::Multiply => SvgBlendMode::Multiply,
+            BlendMode::Screen => SvgBlendMode::Screen,
+            BlendMode::Overlay => SvgBlendMode::Overlay,
+            BlendMode::Darken => SvgBlendMode::Darken,
+            BlendMode::Lighten => SvgBlendMode::Lighten,
+            BlendMode::ColorDodge => SvgBlendMode::ColorDodge,
+            BlendMode::ColorBurn => SvgBlendMode::ColorBurn,
+            BlendMode::HardLight => SvgBlendMode::HardLight,
+            BlendMode::SoftLight => SvgBlendMode::SoftLight,
+            BlendMode::Difference => SvgBlendMode::Difference,
+            BlendMode::Exclusion => SvgBlendMode::Exclusion,
+            BlendMode::Hue => SvgBlendMode::Hue,
+            BlendMode::Saturation => SvgBlendMode::Saturation,
+            BlendMode::Color => SvgBlendMode::Color,
+            BlendMode::Luminosity => SvgBlendMode::Luminosity,
         }
     }
 }
