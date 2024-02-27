@@ -6,7 +6,7 @@ mod systems;
 use bevy_app::{App, Last, Plugin};
 use bevy_ecs::schedule::{IntoSystemConfigs, IntoSystemSetConfigs, SystemSet};
 use resources::{
-    delayed_node_modifications::DelayedNodeModificationsRes, svg_context::SvgContextRes,
+    delayed_svg_bundle_modifications::DelayedSvgBundleModificationsRes, svg_context::SvgContextRes,
 };
 use systems::{
     apply::{
@@ -14,7 +14,7 @@ use systems::{
         apply_opacity_mixin_changes, apply_size_mixin_changes, apply_transform_changes,
         apply_visibility_mixin_changes, collect_children_changes,
     },
-    insert::{insert_frame_svg_node, insert_shape_svg_node},
+    insert::{insert_frame_svg_bundle, insert_shape_svg_bundle},
 };
 
 pub struct CompSvgBuilderPlugin {
@@ -24,7 +24,7 @@ pub struct CompSvgBuilderPlugin {
 
 // TODO: Plan to refactor into a sub-application for potential multithreading
 // Currently, the challenge lies in managing the spawning (when absent)
-// and modification of the SvgNode bundle component alongside its associated entity,
+// and modification of the SvgBundle component alongside its associated entity,
 // due to the deferred execution nature of entity spawn commands within the ECS schedule.
 #[derive(SystemSet, Debug, Hash, PartialEq, Eq, Clone)]
 enum SvgBuilderSystemSet {
@@ -39,7 +39,7 @@ impl Plugin for CompSvgBuilderPlugin {
     fn build(&self, app: &mut App) {
         // Register resources
         app.init_resource::<SvgContextRes>();
-        app.init_resource::<DelayedNodeModificationsRes>();
+        app.init_resource::<DelayedSvgBundleModificationsRes>();
 
         // Configure system set
         app.configure_sets(
@@ -58,8 +58,8 @@ impl Plugin for CompSvgBuilderPlugin {
         app.add_systems(
             Last,
             (
-                insert_frame_svg_node.in_set(SvgBuilderSystemSet::Insert),
-                insert_shape_svg_node.in_set(SvgBuilderSystemSet::Insert),
+                insert_frame_svg_bundle.in_set(SvgBuilderSystemSet::Insert),
+                insert_shape_svg_bundle.in_set(SvgBuilderSystemSet::Insert),
                 collect_children_changes.in_set(SvgBuilderSystemSet::Collect),
                 apply_children_changes.in_set(SvgBuilderSystemSet::Apply),
                 apply_visibility_mixin_changes.in_set(SvgBuilderSystemSet::Apply),
@@ -79,20 +79,21 @@ impl Plugin for CompSvgBuilderPlugin {
         #[cfg(feature = "output_svg_element_changes")]
         {
             use crate::resources::{
-                changed_svg_nodes::ChangedSvgNodesRes, output_event_sender::OutputEventSenderRes,
+                changed_svg_bundles::ChangedSvgBundlesRes,
+                output_event_sender::OutputEventSenderRes,
             };
-            use crate::systems::{extract::extract_svg_nodes, queue::queue_svg_node_changes};
+            use crate::systems::{extract::extract_svg_bundles, queue::queue_svg_bundle_changes};
 
             // Register resources
-            app.init_resource::<ChangedSvgNodesRes>();
+            app.init_resource::<ChangedSvgBundlesRes>();
             app.insert_resource(OutputEventSenderRes::new(self.output_event_sender.clone()));
 
             // Register systems
             app.add_systems(
                 Last,
                 (
-                    extract_svg_nodes.in_set(SvgBuilderSystemSet::Extract),
-                    queue_svg_node_changes.in_set(SvgBuilderSystemSet::Queue),
+                    extract_svg_bundles.in_set(SvgBuilderSystemSet::Extract),
+                    queue_svg_bundle_changes.in_set(SvgBuilderSystemSet::Queue),
                 ),
             );
         }

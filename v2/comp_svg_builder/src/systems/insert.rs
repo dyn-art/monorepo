@@ -1,6 +1,8 @@
 use crate::{
     resources::svg_context::SvgContextRes,
-    svg::svg_node::{frame::FrameSvgNode, shape::ShapeSvgNode, SvgNodeVariant},
+    svg::svg_bundle::{
+        frame_node::FrameNodeSvgBundle, shape_node::ShapeNodeSvgBundle, SvgBundleVariant,
+    },
 };
 use bevy_ecs::{
     entity::Entity,
@@ -12,22 +14,29 @@ use dyn_comp_types::nodes::{
     TextCompNode,
 };
 
-pub fn insert_frame_svg_node(
+pub fn insert_frame_svg_bundle(
     mut commands: Commands,
     mut svg_context_res: ResMut<SvgContextRes>,
-    query: Query<Entity, (With<CompNode>, With<FrameCompNode>, Without<SvgNodeVariant>)>,
+    query: Query<
+        Entity,
+        (
+            With<CompNode>,
+            With<FrameCompNode>,
+            Without<SvgBundleVariant>,
+        ),
+    >,
 ) {
     query.iter().for_each(|entity| {
         commands
             .entity(entity)
-            .insert(SvgNodeVariant::Frame(FrameSvgNode::new(
+            .insert(SvgBundleVariant::Frame(FrameNodeSvgBundle::new(
                 entity,
                 &mut svg_context_res,
             )));
     });
 }
 
-pub fn insert_shape_svg_node(
+pub fn insert_shape_svg_bundle(
     mut commands: Commands,
     mut svg_context_res: ResMut<SvgContextRes>,
     query: Query<
@@ -41,14 +50,14 @@ pub fn insert_shape_svg_node(
                 With<EllipseCompNode>,
                 With<StarCompNode>,
             )>,
-            Without<SvgNodeVariant>,
+            Without<SvgBundleVariant>,
         ),
     >,
 ) {
     query.iter().for_each(|entity| {
         commands
             .entity(entity)
-            .insert(SvgNodeVariant::Shape(ShapeSvgNode::new(
+            .insert(SvgBundleVariant::Shape(ShapeNodeSvgBundle::new(
                 entity,
                 &mut svg_context_res,
             )));

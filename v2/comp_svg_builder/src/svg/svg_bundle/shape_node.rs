@@ -1,15 +1,15 @@
 use crate::{
     resources::svg_context::SvgContextRes,
     svg::{
+        svg_bundle::SvgBundle,
         svg_element::{attributes::SvgAttribute, SvgElement, SvgElementId, SvgTag},
-        svg_node::SvgNode,
     },
 };
 use bevy_ecs::entity::Entity;
 use std::collections::BTreeMap;
 
 #[derive(Debug, Clone)]
-pub struct ShapeSvgNode {
+pub struct ShapeNodeSvgBundle {
     pub root: SvgElement,
     pub defs: SvgElement,
 
@@ -22,7 +22,7 @@ pub struct ShapeSvgNode {
     pub click_area_rect: SvgElement,
 }
 
-impl SvgNode for ShapeSvgNode {
+impl SvgBundle for ShapeNodeSvgBundle {
     fn get_root_element(&self) -> &SvgElement {
         &self.root
     }
@@ -56,9 +56,9 @@ impl SvgNode for ShapeSvgNode {
     }
 }
 
-impl ShapeSvgNode {
+impl ShapeNodeSvgBundle {
     pub fn new(entity: Entity, cx: &mut SvgContextRes) -> Self {
-        log::info!("[ShapeSvgNode::new] {:?}", entity);
+        log::info!("[ShapeSvgBundle::new] {:?}", entity);
 
         let mut root_element = cx.create_bundle_root_element(SvgTag::Group, entity);
         #[cfg(feature = "tracing")]

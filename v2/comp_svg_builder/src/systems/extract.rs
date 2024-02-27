@@ -1,8 +1,8 @@
 #![cfg(feature = "output_svg_element_changes")]
 
 use crate::{
-    resources::changed_svg_nodes::{ChangedSvgNode, ChangedSvgNodesRes},
-    svg::svg_node::SvgNodeVariant,
+    resources::changed_svg_bundles::{ChangedSvgBundle, ChangedSvgBundlesRes},
+    svg::svg_bundle::SvgBundleVariant,
 };
 use bevy_ecs::{
     entity::Entity,
@@ -12,18 +12,18 @@ use bevy_ecs::{
 use bevy_hierarchy::{Children, Parent};
 use dyn_comp_types::nodes::CompNode;
 
-pub fn extract_svg_nodes(
-    mut changed_svg_nodes_res: ResMut<ChangedSvgNodesRes>,
+pub fn extract_svg_bundles(
+    mut changed_svg_bundles_res: ResMut<ChangedSvgBundlesRes>,
     mut query: Query<
-        (Entity, &mut SvgNodeVariant, Option<&Parent>),
-        (With<CompNode>, Changed<SvgNodeVariant>),
+        (Entity, &mut SvgBundleVariant, Option<&Parent>),
+        (With<CompNode>, Changed<SvgBundleVariant>),
     >,
     child_query: Query<&Children>,
 ) {
     query
         .iter_mut()
-        .for_each(|(entity, mut svg_node, maybe_parent)| {
-            let changes = svg_node.get_svg_node_mut().drain_changes();
+        .for_each(|(entity, mut svg_bundle, maybe_parent)| {
+            let changes = svg_bundle.get_svg_bundle_mut().drain_changes();
             if changes.is_empty() {
                 return;
             }
@@ -48,10 +48,10 @@ pub fn extract_svg_nodes(
                     (None, 0)
                 };
 
-            changed_svg_nodes_res.push_change(ChangedSvgNode {
+            changed_svg_bundles_res.push_change(ChangedSvgBundle {
                 entity,
                 parent_entity,
-                changes,
+                elements_changes: changes,
                 index,
             });
         });

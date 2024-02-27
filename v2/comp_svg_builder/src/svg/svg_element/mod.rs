@@ -4,7 +4,7 @@ pub mod element_changes;
 pub mod styles;
 
 use self::{attributes::SvgAttribute, styles::SvgStyle};
-use super::svg_node::{SvgNode, SvgNodeVariant};
+use super::svg_bundle::{SvgBundle, SvgBundleVariant};
 use bevy_ecs::{component::Component, entity::Entity, query::Without, system::Query};
 use dyn_comp_types::mixins::Root;
 use std::{collections::HashMap, fmt::Display};
@@ -127,7 +127,7 @@ impl SvgElement {
     pub fn append_child_in_node_context(&mut self, entity: Entity, child_element: &mut SvgElement) {
         self.append_child_element(
             child_element,
-            SvgElementChildIdentifier::InSvgNodeContext(entity),
+            SvgElementChildIdentifier::InSvgBundleContext(entity),
         );
     }
 
@@ -234,8 +234,8 @@ impl SvgElement {
 
     pub fn to_string(
         &self,
-        node: &dyn SvgNode,
-        node_query: &Query<&SvgNodeVariant, Without<Root>>,
+        bundle: &dyn SvgBundle,
+        bundle_query: &Query<&SvgBundleVariant, Without<Root>>,
     ) -> String {
         let mut result = String::new();
 
@@ -265,14 +265,14 @@ impl SvgElement {
         // Append children
         for child in &self.children {
             match child.identifier {
-                SvgElementChildIdentifier::InSvgNodeContext(_) => {
-                    if let Some(child_element) = node.get_child_elements().get(&child.id) {
-                        result.push_str(&child_element.to_string(node, node_query));
+                SvgElementChildIdentifier::InSvgBundleContext(_) => {
+                    if let Some(child_element) = bundle.get_child_elements().get(&child.id) {
+                        result.push_str(&child_element.to_string(bundle, bundle_query));
                     }
                 }
                 SvgElementChildIdentifier::InWorldContext(entity) => {
-                    if let Ok(node) = node_query.get(entity) {
-                        result.push_str(&node.to_string(node_query));
+                    if let Ok(bundle) = bundle_query.get(entity) {
+                        result.push_str(&bundle.to_string(bundle_query));
                     }
                 }
             }
@@ -359,8 +359,8 @@ pub struct SvgElementChild {
 
 #[derive(Debug, Copy, Clone)]
 pub enum SvgElementChildIdentifier {
-    /// Child element is root element of SvgNode.
+    /// Child element is root element of SvgBundle.
     InWorldContext(Entity),
-    /// Child element is child element of SvgNode.
-    InSvgNodeContext(Entity),
+    /// Child element is child element of SvgBundle.
+    InSvgBundleContext(Entity),
 }

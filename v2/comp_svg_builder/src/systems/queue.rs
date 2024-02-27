@@ -3,22 +3,22 @@
 use crate::{
     events::{SvgBuilderOutputEvent, SvgElementChangesOutputEvent},
     resources::{
-        changed_svg_nodes::{ChangedSvgNode, ChangedSvgNodesRes},
+        changed_svg_bundles::{ChangedSvgBundle, ChangedSvgBundlesRes},
         output_event_sender::OutputEventSenderRes,
     },
 };
 use bevy_ecs::{entity::Entity, system::ResMut};
 use std::collections::{HashMap, VecDeque};
 
-pub fn queue_svg_node_changes(
-    mut changed_svg_nodes_res: ResMut<ChangedSvgNodesRes>,
+pub fn queue_svg_bundle_changes(
+    mut changed_svg_bundles_res: ResMut<ChangedSvgBundlesRes>,
     output_event_sender_res: ResMut<OutputEventSenderRes>,
 ) {
-    let changes = changed_svg_nodes_res.drain();
+    let changes = changed_svg_bundles_res.drain();
     let changes_length = changes.len();
 
     // Mapping of parent id to children, still maintaining order
-    let mut parent_to_children: HashMap<Option<Entity>, Vec<ChangedSvgNode>> = HashMap::new();
+    let mut parent_to_children: HashMap<Option<Entity>, Vec<ChangedSvgBundle>> = HashMap::new();
 
     // Separate changes into roots (None) and children grouped by parent
     for change in changes {
@@ -41,8 +41,8 @@ pub fn queue_svg_node_changes(
     }
 
     // Process root nodes in depth-first order, taking ownership of the data
-    let mut sorted_changes: Vec<ChangedSvgNode> = Vec::with_capacity(changes_length);
-    let mut stack: VecDeque<ChangedSvgNode> = parent_to_children
+    let mut sorted_changes: Vec<ChangedSvgBundle> = Vec::with_capacity(changes_length);
+    let mut stack: VecDeque<ChangedSvgBundle> = parent_to_children
         .remove(&None)
         .unwrap_or_else(Vec::new)
         .into_iter()
@@ -59,8 +59,8 @@ pub fn queue_svg_node_changes(
     }
 
     // Process sorted changes to send events
-    for changed_svg_node in sorted_changes {
-        for changes in changed_svg_node.changes {
+    for changed_svg_bundle in sorted_changes {
+        for changes in changed_svg_bundle.elements_changes {
             let event =
                 SvgBuilderOutputEvent::SvgElementChanges(SvgElementChangesOutputEvent { changes });
             output_event_sender_res.push_event(event);

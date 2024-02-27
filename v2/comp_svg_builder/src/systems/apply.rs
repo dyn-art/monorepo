@@ -1,13 +1,13 @@
 use crate::{
-    resources::delayed_node_modifications::{
-        DelayedNodeModificationsRes, SvgNodeChildrenModification,
+    resources::delayed_svg_bundle_modifications::{
+        DelayedSvgBundleModificationsRes, SvgBundleChildrenModification,
     },
     svg::{
+        svg_bundle::SvgBundleVariant,
         svg_element::{
             attributes::{SvgAttribute, SvgMeasurementUnit},
             styles::{SvgDisplayStyle, SvgStyle},
         },
-        svg_node::SvgNodeVariant,
     },
 };
 use bevy_ecs::{
@@ -15,7 +15,7 @@ use bevy_ecs::{
     query::{Changed, With},
     system::{Commands, Query, ResMut},
 };
-use bevy_hierarchy::Children;
+use bevy_hierarchy::{BuildChildren, Children};
 use bevy_transform::components::Transform;
 use dyn_comp_types::{
     mixins::{BlendModeMixin, FillMixin, OpacityMixin, SizeMixin, VisibilityMixin},
@@ -25,12 +25,12 @@ use dyn_comp_types::{
 use std::collections::HashSet;
 
 pub fn collect_children_changes(
-    mut delayed_node_modification_res: ResMut<DelayedNodeModificationsRes>,
-    query: Query<(Entity, &Children, &mut SvgNodeVariant), (With<CompNode>, Changed<Children>)>,
+    mut delayed_node_modification_res: ResMut<DelayedSvgBundleModificationsRes>,
+    query: Query<(Entity, &Children, &mut SvgBundleVariant), (With<CompNode>, Changed<Children>)>,
 ) {
-    for (entity, children, node_variant) in query.iter() {
-        let maybe_node_children = match &node_variant {
-            SvgNodeVariant::Frame(node) => Some(&node.node_children),
+    for (entity, children, bundle_variant) in query.iter() {
+        let maybe_node_children = match &bundle_variant {
+            SvgBundleVariant::Frame(bundle) => Some(&bundle.node_children),
             _ => None,
         };
         if let Some(node_children) = maybe_node_children {
@@ -48,7 +48,7 @@ pub fn collect_children_changes(
                 .collect();
 
             delayed_node_modification_res.children_modifications.push(
-                SvgNodeChildrenModification {
+                SvgBundleChildrenModification {
                     parent_entity: entity,
                     added_entities: added_node_entities,
                     removed_entities: removed_node_entities,
@@ -60,10 +60,10 @@ pub fn collect_children_changes(
 
 pub fn apply_children_changes(
     mut commands: Commands,
-    mut delayed_node_modification_res: ResMut<DelayedNodeModificationsRes>,
-    mut node_query: Query<&mut SvgNodeVariant>,
+    mut delayed_svg_bundle_modifications_res: ResMut<DelayedSvgBundleModificationsRes>,
+    mut bundle_query: Query<&mut SvgBundleVariant>,
 ) {
-    let modifications = delayed_node_modification_res
+    let modifications = delayed_svg_bundle_modifications_res
         .children_modifications
         .drain(..)
         .collect::<Vec<_>>();
@@ -71,13 +71,18 @@ pub fn apply_children_changes(
     for modification in modifications {
         // Process removed entities
         for entity in modification.removed_entities {
-            let [mut node, child_node] = node_query.many_mut([modification.parent_entity, entity]);
-            match node.as_mut() {
-                SvgNodeVariant::Frame(frame_node) => {
+            let [mut bundle, child_bundle] =
+                bundle_query.many_mut([modification.parent_entity, entity]);
+            match bundle.as_mut() {
+                SvgBundleVariant::Frame(frame_node) => {
                     frame_node
                         .children_wrapper_g
-                        .remove_child(child_node.get_svg_node().get_root_element().get_id());
+                        .remove_child(child_bundle.get_svg_bundle().get_root_element().get_id());
+                    // https://bevy-cheatbook.github.io/fundamentals/hierarchy.html#despawning-child-entities
                     commands.entity(entity).despawn();
+                    commands
+                        .entity(modification.parent_entity)
+                        .remove_children(&[entity]);
                 }
                 _ => {}
             }
@@ -85,13 +90,13 @@ pub fn apply_children_changes(
 
         // Process added entities
         for entity in modification.added_entities {
-            let [mut node, mut child_node] =
-                node_query.many_mut([modification.parent_entity, entity]);
-            match node.as_mut() {
-                SvgNodeVariant::Frame(frame_node) => {
+            let [mut bundle, mut child_bundle] =
+                bundle_query.many_mut([modification.parent_entity, entity]);
+            match bundle.as_mut() {
+                SvgBundleVariant::Frame(frame_node) => {
                     frame_node.children_wrapper_g.append_child_in_world_context(
                         entity,
-                        child_node.get_svg_node_mut().get_root_element_mut(),
+                        child_bundle.get_svg_bundle_mut().get_root_element_mut(),
                     );
                 }
                 _ => {}
@@ -102,16 +107,16 @@ pub fn apply_children_changes(
 
 pub fn apply_visibility_mixin_changes(
     mut query: Query<
-        (&VisibilityMixin, &mut SvgNodeVariant),
+        (&VisibilityMixin, &mut SvgBundleVariant),
         (With<CompNode>, Changed<VisibilityMixin>),
     >,
 ) {
     query
         .iter_mut()
-        .for_each(|(VisibilityMixin(visibility), mut node_variant)| {
-            let element = match node_variant.as_mut() {
-                SvgNodeVariant::Frame(node) => &mut node.root,
-                SvgNodeVariant::Shape(node) => &mut node.root,
+        .for_each(|(VisibilityMixin(visibility), mut bundle_variant)| {
+            let element = match bundle_variant.as_mut() {
+                SvgBundleVariant::Frame(bundle) => &mut bundle.root,
+                SvgBundleVariant::Shape(bundle) => &mut bundle.root,
             };
 
             let display = match visibility {
@@ -123,16 +128,16 @@ pub fn apply_visibility_mixin_changes(
 }
 
 pub fn apply_size_mixin_changes(
-    mut query: Query<(&SizeMixin, &mut SvgNodeVariant), (With<CompNode>, Changed<SizeMixin>)>,
+    mut query: Query<(&SizeMixin, &mut SvgBundleVariant), (With<CompNode>, Changed<SizeMixin>)>,
 ) {
     query
         .iter_mut()
-        .for_each(|(SizeMixin(size), mut node_variant)| {
+        .for_each(|(SizeMixin(size), mut bundle_variant)| {
             let [width, height] = size.0.to_array();
 
-            match node_variant.as_mut() {
-                SvgNodeVariant::Frame(node) => {
-                    node.root.set_attributes(vec![
+            match bundle_variant.as_mut() {
+                SvgBundleVariant::Frame(bundle) => {
+                    bundle.root.set_attributes(vec![
                         SvgAttribute::Width {
                             width,
                             unit: SvgMeasurementUnit::Pixel,
@@ -142,7 +147,7 @@ pub fn apply_size_mixin_changes(
                             unit: SvgMeasurementUnit::Pixel,
                         },
                     ]);
-                    node.fill_clipped_path.set_attributes(vec![
+                    bundle.fill_clipped_path.set_attributes(vec![
                         SvgAttribute::Width {
                             width,
                             unit: SvgMeasurementUnit::Pixel,
@@ -152,7 +157,7 @@ pub fn apply_size_mixin_changes(
                             unit: SvgMeasurementUnit::Pixel,
                         },
                     ]);
-                    node.content_clipped_rect.set_attributes(vec![
+                    bundle.content_clipped_rect.set_attributes(vec![
                         SvgAttribute::Width {
                             width,
                             unit: SvgMeasurementUnit::Pixel,
@@ -163,8 +168,8 @@ pub fn apply_size_mixin_changes(
                         },
                     ]);
                 }
-                SvgNodeVariant::Shape(node) => {
-                    node.root.set_attributes(vec![
+                SvgBundleVariant::Shape(bundle) => {
+                    bundle.root.set_attributes(vec![
                         SvgAttribute::Width {
                             width,
                             unit: SvgMeasurementUnit::Pixel,
@@ -174,7 +179,7 @@ pub fn apply_size_mixin_changes(
                             unit: SvgMeasurementUnit::Pixel,
                         },
                     ]);
-                    node.click_area_rect.set_attributes(vec![
+                    bundle.click_area_rect.set_attributes(vec![
                         SvgAttribute::Width {
                             width,
                             unit: SvgMeasurementUnit::Pixel,
@@ -190,29 +195,34 @@ pub fn apply_size_mixin_changes(
 }
 
 pub fn apply_transform_changes(
-    mut query: Query<(&Transform, &mut SvgNodeVariant), (With<CompNode>, Changed<Transform>)>,
-) {
-    query.iter_mut().for_each(|(transform, mut node_variant)| {
-        let element = match node_variant.as_mut() {
-            SvgNodeVariant::Frame(node) => &mut node.root,
-            SvgNodeVariant::Shape(node) => &mut node.root,
-        };
-
-        element.set_attribute(SvgAttribute::Transform {
-            transform: transform.into(),
-        });
-    });
-}
-
-pub fn apply_opacity_mixin_changes(
-    mut query: Query<(&OpacityMixin, &mut SvgNodeVariant), (With<CompNode>, Changed<OpacityMixin>)>,
+    mut query: Query<(&Transform, &mut SvgBundleVariant), (With<CompNode>, Changed<Transform>)>,
 ) {
     query
         .iter_mut()
-        .for_each(|(OpacityMixin(opacity), mut node_variant)| {
-            let element = match node_variant.as_mut() {
-                SvgNodeVariant::Frame(node) => &mut node.root,
-                SvgNodeVariant::Shape(node) => &mut node.root,
+        .for_each(|(transform, mut bundle_variant)| {
+            let element = match bundle_variant.as_mut() {
+                SvgBundleVariant::Frame(bundle) => &mut bundle.root,
+                SvgBundleVariant::Shape(bundle) => &mut bundle.root,
+            };
+
+            element.set_attribute(SvgAttribute::Transform {
+                transform: transform.into(),
+            });
+        });
+}
+
+pub fn apply_opacity_mixin_changes(
+    mut query: Query<
+        (&OpacityMixin, &mut SvgBundleVariant),
+        (With<CompNode>, Changed<OpacityMixin>),
+    >,
+) {
+    query
+        .iter_mut()
+        .for_each(|(OpacityMixin(opacity), mut bundle_variant)| {
+            let element = match bundle_variant.as_mut() {
+                SvgBundleVariant::Frame(bundle) => &mut bundle.root,
+                SvgBundleVariant::Shape(bundle) => &mut bundle.root,
             };
 
             element.set_attribute(SvgAttribute::Opacity {
@@ -223,16 +233,16 @@ pub fn apply_opacity_mixin_changes(
 
 pub fn apply_blend_mode_mixin_changes(
     mut query: Query<
-        (&BlendModeMixin, &mut SvgNodeVariant),
+        (&BlendModeMixin, &mut SvgBundleVariant),
         (With<CompNode>, Changed<BlendModeMixin>),
     >,
 ) {
     query
         .iter_mut()
-        .for_each(|(BlendModeMixin(blend_mode), mut node_variant)| {
-            let element = match node_variant.as_mut() {
-                SvgNodeVariant::Frame(node) => &mut node.root,
-                SvgNodeVariant::Shape(node) => &mut node.root,
+        .for_each(|(BlendModeMixin(blend_mode), mut bundle_variant)| {
+            let element = match bundle_variant.as_mut() {
+                SvgBundleVariant::Frame(bundle) => &mut bundle.root,
+                SvgBundleVariant::Shape(bundle) => &mut bundle.root,
             };
 
             element.set_style(SvgStyle::BlendMode {
@@ -242,14 +252,16 @@ pub fn apply_blend_mode_mixin_changes(
 }
 
 pub fn apply_fill_mixin_changes(
-    mut query: Query<(&FillMixin, &mut SvgNodeVariant), (With<CompNode>, Changed<FillMixin>)>,
+    mut query: Query<(&FillMixin, &mut SvgBundleVariant), (With<CompNode>, Changed<FillMixin>)>,
 ) {
-    query.iter_mut().for_each(|(fill_mixin, mut node_variant)| {
-        let fill_wrapper_element = match node_variant.as_mut() {
-            SvgNodeVariant::Frame(node) => &mut node.fill_wrapper_g,
-            SvgNodeVariant::Shape(node) => &mut node.fill_wrapper_g,
-        };
+    query
+        .iter_mut()
+        .for_each(|(FillMixin(fills), mut bundle_variant)| {
+            let fill_wrapper_element = match bundle_variant.as_mut() {
+                SvgBundleVariant::Frame(bundle) => &mut bundle.fill_wrapper_g,
+                SvgBundleVariant::Shape(bundle) => &mut bundle.fill_wrapper_g,
+            };
 
-        // TODO
-    });
+            // TODO
+        });
 }

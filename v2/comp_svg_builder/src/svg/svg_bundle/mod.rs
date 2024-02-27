@@ -1,7 +1,8 @@
-pub mod frame;
-pub mod shape;
+pub mod frame_node;
+pub mod shape_node;
+pub mod solid_paint;
 
-use self::{frame::FrameSvgNode, shape::ShapeSvgNode};
+use self::{frame_node::FrameNodeSvgBundle, shape_node::ShapeNodeSvgBundle};
 use super::svg_element::{SvgElement, SvgElementId};
 use bevy_ecs::{component::Component, query::Without, system::Query};
 use dyn_comp_types::mixins::Root;
@@ -10,7 +11,7 @@ use std::{collections::BTreeMap, fmt::Debug};
 #[cfg(feature = "output_svg_element_changes")]
 use super::svg_element::element_changes::SvgElementChanges;
 
-pub trait SvgNode: Debug {
+pub trait SvgBundle: Debug {
     /// Retrieves child SVG elements in a sorted order, starting from the top-level element and
     /// proceeding hierarchically to its children & siblings.
     ///
@@ -57,33 +58,37 @@ pub trait SvgNode: Debug {
     }
 }
 
-// Explicit variants of the SvgNode trait
+// Explicit variants of the SvgBundle trait
 // because Bevy doesn't support querying by trait components yet
 #[derive(Component, Debug, Clone)]
-pub enum SvgNodeVariant {
-    Frame(FrameSvgNode),
-    Shape(ShapeSvgNode),
+pub enum SvgBundleVariant {
+    Frame(FrameNodeSvgBundle),
+    Shape(ShapeNodeSvgBundle),
 }
 
-impl SvgNodeVariant {
-    pub fn get_svg_node(&self) -> &dyn SvgNode {
+impl SvgBundleVariant {
+    pub fn get_svg_bundle(&self) -> &dyn SvgBundle {
         match self {
-            SvgNodeVariant::Frame(node) => node,
-            SvgNodeVariant::Shape(node) => node,
+            SvgBundleVariant::Frame(bundle) => bundle,
+            SvgBundleVariant::Shape(bundle) => bundle,
         }
     }
 
-    pub fn get_svg_node_mut(&mut self) -> &mut dyn SvgNode {
+    pub fn get_svg_bundle_mut(&mut self) -> &mut dyn SvgBundle {
         match self {
-            SvgNodeVariant::Frame(node) => node,
-            SvgNodeVariant::Shape(node) => node,
+            SvgBundleVariant::Frame(bundle) => bundle,
+            SvgBundleVariant::Shape(bundle) => bundle,
         }
     }
 
-    pub fn to_string(&self, node_query: &Query<&SvgNodeVariant, Without<Root>>) -> String {
+    pub fn to_string(&self, bundle_query: &Query<&SvgBundleVariant, Without<Root>>) -> String {
         match self {
-            SvgNodeVariant::Frame(node) => node.get_root_element().to_string(node, node_query),
-            SvgNodeVariant::Shape(node) => node.get_root_element().to_string(node, node_query),
+            SvgBundleVariant::Frame(bundle) => {
+                bundle.get_root_element().to_string(bundle, bundle_query)
+            }
+            SvgBundleVariant::Shape(bundle) => {
+                bundle.get_root_element().to_string(bundle, bundle_query)
+            }
         }
     }
 }
