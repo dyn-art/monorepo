@@ -1,15 +1,20 @@
+use crate::{
+    common::{DtifFill, DtifStroke},
+    ToEcsBundleImpl,
+};
+use bevy_ecs::entity::Entity;
 use bevy_transform::components::Transform;
 use dyn_comp_types::{
     bundles::{FrameCompNodeBundle, GroupCompNodeBundle, RectangleCompNodeBundle},
+    common::{BlendMode, CornerRadii, Opacity, Size, Visibility},
     mixins::{
         BlendModeMixin, CornerRadiiMixin, FillMixin, OpacityMixin, SizeMixin, StrokeMixin,
         VisibilityMixin,
     },
     nodes::{CompNode, FrameCompNode, GroupCompNode, RectangleCompNode},
-    shared::{BlendMode, CornerRadii, Fill, Opacity, Size, Stroke, Visibility},
 };
 use glam::{Quat, Vec2, Vec3};
-use smallvec::SmallVec;
+use std::collections::HashMap;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
 #[serde(tag = "type")]
@@ -17,11 +22,6 @@ pub enum Node {
     Frame(FrameNode),
     Group(GroupNode),
     Rectangle(RectangleNode),
-}
-
-pub trait NodeImpl {
-    type Bundle: bevy_ecs::bundle::Bundle;
-    fn to_ecs_bundle(&self) -> Self::Bundle;
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
@@ -33,17 +33,17 @@ pub struct FrameNode {
     pub size: Size,
     pub corner_radii: CornerRadii,
     pub visibility: Visibility,
-    pub fill: Vec<Fill>,
+    pub fill: Vec<DtifFill>,
     pub blend_mode: BlendMode,
     pub opacity: Opacity,
-    pub stroke: Vec<Stroke>,
+    pub stroke: Vec<DtifStroke>,
     pub children: Vec<String>,
 }
 
-impl NodeImpl for FrameNode {
+impl ToEcsBundleImpl for FrameNode {
     type Bundle = FrameCompNodeBundle;
 
-    fn to_ecs_bundle(&self) -> Self::Bundle {
+    fn to_ecs_bundle(&self, sid_to_entity: &HashMap<String, Entity>) -> Self::Bundle {
         FrameCompNodeBundle {
             node: CompNode::default(),
             frame: FrameCompNode {
@@ -57,10 +57,20 @@ impl NodeImpl for FrameNode {
             size: SizeMixin(self.size),
             corner_radii: CornerRadiiMixin(self.corner_radii),
             visibility: VisibilityMixin(self.visibility),
-            fill: FillMixin(SmallVec::from_vec(self.fill.clone())),
             blend_mode: BlendModeMixin(self.blend_mode),
             opacity: OpacityMixin(self.opacity),
-            stroke: StrokeMixin(SmallVec::from_vec(self.stroke.clone())),
+            fill: FillMixin(
+                self.fill
+                    .iter()
+                    .filter_map(|fill| fill.to_fill(sid_to_entity))
+                    .collect(),
+            ),
+            stroke: StrokeMixin(
+                self.stroke
+                    .iter()
+                    .filter_map(|stroke| stroke.to_storke(sid_to_entity))
+                    .collect(),
+            ),
         }
     }
 }
@@ -77,10 +87,10 @@ pub struct GroupNode {
     pub children: Vec<String>,
 }
 
-impl NodeImpl for GroupNode {
+impl ToEcsBundleImpl for GroupNode {
     type Bundle = GroupCompNodeBundle;
 
-    fn to_ecs_bundle(&self) -> Self::Bundle {
+    fn to_ecs_bundle(&self, sid_to_entity: &HashMap<String, Entity>) -> Self::Bundle {
         GroupCompNodeBundle {
             node: CompNode::default(),
             group: GroupCompNode,
@@ -104,16 +114,16 @@ pub struct RectangleNode {
     pub size: Size,
     pub corner_radii: CornerRadii,
     pub visibility: Visibility,
-    pub fill: Vec<Fill>,
+    pub fill: Vec<DtifFill>,
     pub blend_mode: BlendMode,
     pub opacity: Opacity,
-    pub stroke: Vec<Stroke>,
+    pub stroke: Vec<DtifStroke>,
 }
 
-impl NodeImpl for RectangleNode {
+impl ToEcsBundleImpl for RectangleNode {
     type Bundle = RectangleCompNodeBundle;
 
-    fn to_ecs_bundle(&self) -> Self::Bundle {
+    fn to_ecs_bundle(&self, sid_to_entity: &HashMap<String, Entity>) -> Self::Bundle {
         RectangleCompNodeBundle {
             node: CompNode::default(),
             rectangle: RectangleCompNode::default(),
@@ -125,10 +135,20 @@ impl NodeImpl for RectangleNode {
             size: SizeMixin(self.size),
             corner_radii: CornerRadiiMixin(self.corner_radii),
             visibility: VisibilityMixin(self.visibility),
-            fill: FillMixin(SmallVec::from_vec(self.fill.clone())),
             blend_mode: BlendModeMixin(self.blend_mode),
             opacity: OpacityMixin(self.opacity),
-            stroke: StrokeMixin(SmallVec::from_vec(self.stroke.clone())),
+            fill: FillMixin(
+                self.fill
+                    .iter()
+                    .filter_map(|fill| fill.to_fill(sid_to_entity))
+                    .collect(),
+            ),
+            stroke: StrokeMixin(
+                self.stroke
+                    .iter()
+                    .filter_map(|stroke| stroke.to_storke(sid_to_entity))
+                    .collect(),
+            ),
         }
     }
 }

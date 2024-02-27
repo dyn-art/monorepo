@@ -1,10 +1,10 @@
 use bevy_ecs::entity::Entity;
 use dyn_comp_types::{
+    common::{Size, Viewport},
     events::{
         CompCoreInputEvent, CompositionResizedInputEvent, CompositionViewportChangedInputEvent,
         EntityDeletedInputEvent, EntityMovedInputEvent, EntitySetPositionInputEvent,
     },
-    shared::{Size, Viewport},
 };
 use std::collections::HashMap;
 

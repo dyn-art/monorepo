@@ -1,12 +1,21 @@
+pub mod assets;
+pub mod common;
 pub mod dtif_injector;
 pub mod events;
-pub mod node;
+pub mod nodes;
+pub mod paints;
 
-use crate::node::Node;
-use dyn_comp_types::shared::{Size, Viewport};
+use crate::nodes::Node;
+use assets::Asset;
+use bevy_ecs::entity::Entity;
+use dyn_comp_types::common::{Size, Viewport};
 use events::DtifInputEvent;
+use paints::Paint;
 use std::collections::HashMap;
 
+/// DTIF (Design Tree Interchange Format) utilizes a flat structure for easy readability
+/// and efficient access & manipulation of design elements (Nodes, Paints, ..).
+/// https://softwareengineering.stackexchange.com/questions/350623/flat-or-nested-json-for-hierarchal-data
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
 #[serde(rename_all = "camelCase")]
 pub struct CompDtif {
@@ -23,20 +32,18 @@ pub struct CompDtif {
     pub root_node_id: String,
     /// A mapping of node identifiers to their corresponding nodes within the composition.
     pub nodes: HashMap<String, Node>,
-    /// A mapping of image identifiers to their corresponding images within the composition.
-    pub images: HashMap<String, Content>,
-    /// A list of font data.
+    /// A mapping of paint identifiers to their corresponding paints within the composition.
     #[serde(default)]
-    pub fonts: Vec<Content>,
+    pub paints: HashMap<String, Paint>,
+    /// A mapping of asset identifiers to their corresponding assets within the composition.
+    #[serde(default)]
+    pub assets: HashMap<String, Asset>,
+    // A list of input events.
     #[serde(default)]
     pub events: Vec<DtifInputEvent>,
 }
 
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
-#[serde(tag = "type")]
-pub enum Content {
-    /// Content stored as binary data.
-    Binary { content: Vec<u8> },
-    /// Content referenced by a URL.
-    Url { url: String },
+pub trait ToEcsBundleImpl {
+    type Bundle: bevy_ecs::bundle::Bundle;
+    fn to_ecs_bundle(&self, sid_to_entity: &HashMap<String, Entity>) -> Self::Bundle;
 }

@@ -1,6 +1,6 @@
 use super::{attributes::SvgTransformAttribute, styles::SvgBlendMode};
 use bevy_transform::components::Transform;
-use dyn_comp_types::shared::BlendMode;
+use dyn_comp_types::common::BlendMode;
 use glam::EulerRot;
 
 impl From<&Transform> for SvgTransformAttribute {

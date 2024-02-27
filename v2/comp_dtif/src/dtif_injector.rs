@@ -1,7 +1,8 @@
 use crate::{
     events::DtifInputEvent,
-    node::{FrameNode, GroupNode, Node, NodeImpl},
-    CompDtif,
+    nodes::{FrameNode, GroupNode, Node},
+    paints::Paint,
+    CompDtif, ToEcsBundleImpl,
 };
 use bevy_ecs::{
     entity::Entity,
@@ -28,6 +29,10 @@ impl DtifInjector {
     }
 
     pub fn inject_from_root(&mut self, dtif: &CompDtif, world: &mut World) -> Option<Entity> {
+        // Process paints (before nodes as nodes can reference paint sid's)
+        self.process_paints(dtif, world);
+
+        // Process nodes starting from the root
         let maybe_root_node_entity = self.process_node(dtif.root_node_id.clone(), dtif, world);
 
         if let Some(root_node_entity) = maybe_root_node_entity {
@@ -48,7 +53,7 @@ impl DtifInjector {
             let node_entity = self.spawn_node(node, world).id();
             self.sid_to_entity.insert(node_sid, node_entity);
 
-            self.process_children(node_entity, node, dtif, world);
+            self.process_node_children(node_entity, node, dtif, world);
 
             return node_entity;
         })
@@ -56,13 +61,13 @@ impl DtifInjector {
 
     fn spawn_node<'a>(&self, node: &Node, world: &'a mut World) -> EntityWorldMut<'a> {
         match node {
-            Node::Frame(frame) => world.spawn(frame.to_ecs_bundle()),
-            Node::Group(group) => world.spawn(group.to_ecs_bundle()),
-            Node::Rectangle(rectangle) => world.spawn(rectangle.to_ecs_bundle()),
+            Node::Frame(node) => world.spawn(node.to_ecs_bundle(&self.sid_to_entity)),
+            Node::Group(node) => world.spawn(node.to_ecs_bundle(&self.sid_to_entity)),
+            Node::Rectangle(node) => world.spawn(node.to_ecs_bundle(&self.sid_to_entity)),
         }
     }
 
-    fn process_children(
+    fn process_node_children(
         &mut self,
         parent_entity: Entity,
         node: &Node,
@@ -82,6 +87,19 @@ impl DtifInjector {
             if !new_children.is_empty() {
                 world.entity_mut(parent_entity).push_children(&new_children);
             }
+        }
+    }
+
+    fn process_paints(&mut self, dtif: &CompDtif, world: &mut World) {
+        dtif.paints.iter().for_each(|(id, paint)| {
+            let paint_entity = self.spawn_paint(&paint, world).id();
+            self.sid_to_entity.insert(id.clone(), paint_entity);
+        });
+    }
+
+    fn spawn_paint<'a>(&self, paint: &Paint, world: &'a mut World) -> EntityWorldMut<'a> {
+        match paint {
+            Paint::Solid(paint) => world.spawn(paint.to_ecs_bundle(&self.sid_to_entity)),
         }
     }
 

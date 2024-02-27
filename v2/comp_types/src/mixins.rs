@@ -1,4 +1,4 @@
-use crate::shared::{BlendMode, CornerRadii, Fill, Opacity, Size, Stroke, Visibility};
+use crate::common::{BlendMode, CornerRadii, Fill, Opacity, Size, Stroke, Visibility};
 use bevy_ecs::component::Component;
 use smallvec::SmallVec;
 
@@ -30,10 +30,10 @@ pub struct OpacityMixin(pub Opacity);
 #[derive(Component, Debug, Clone)]
 pub struct PathMixin(pub tiny_skia_path::Path);
 
-/// Configures stroke properties for drawing paths, including fill styles and width.
-#[derive(Component, Debug, Default, Clone)]
-pub struct StrokeMixin(pub SmallVec<[Stroke; 2]>);
-
 /// Defines fill styles for drawing operations.
 #[derive(Component, Debug, Default, Clone)]
 pub struct FillMixin(pub SmallVec<[Fill; 2]>);
+
+/// Configures stroke properties for drawing paths, including fill styles and width.
+#[derive(Component, Debug, Default, Clone)]
+pub struct StrokeMixin(pub SmallVec<[Stroke; 2]>);

@@ -7,6 +7,7 @@ use crate::{
         CompNode, EllipseCompNode, FrameCompNode, GroupCompNode, PolygonCompNode,
         RectangleCompNode, StarCompNode, TextCompNode,
     },
+    paints::{CompPaint, SolidCompPaint},
 };
 use bevy_ecs::bundle::Bundle;
 use bevy_transform::components::Transform;
@@ -19,9 +20,9 @@ pub struct FrameCompNodeBundle {
     pub size: SizeMixin,
     pub corner_radii: CornerRadiiMixin,
     pub visibility: VisibilityMixin,
-    pub fill: FillMixin,
     pub blend_mode: BlendModeMixin,
     pub opacity: OpacityMixin,
+    pub fill: FillMixin,
     pub stroke: StrokeMixin,
 }
 
@@ -43,9 +44,9 @@ pub struct RectangleCompNodeBundle {
     pub size: SizeMixin,
     pub corner_radii: CornerRadiiMixin,
     pub visibility: VisibilityMixin,
-    pub fill: FillMixin,
     pub blend_mode: BlendModeMixin,
     pub opacity: OpacityMixin,
+    pub fill: FillMixin,
     pub stroke: StrokeMixin,
 }
 
@@ -56,9 +57,9 @@ pub struct EllipseCompNodeBundle {
     pub transform: Transform,
     pub size: SizeMixin,
     pub visibility: VisibilityMixin,
-    pub fill: FillMixin,
     pub blend_mode: BlendModeMixin,
     pub opacity: OpacityMixin,
+    pub fill: FillMixin,
     pub stroke: StrokeMixin,
 }
 
@@ -69,9 +70,9 @@ pub struct StarCompNodeBundle {
     pub transform: Transform,
     pub size: SizeMixin,
     pub visibility: VisibilityMixin,
-    pub fill: FillMixin,
     pub blend_mode: BlendModeMixin,
     pub opacity: OpacityMixin,
+    pub fill: FillMixin,
     pub stroke: StrokeMixin,
 }
 
@@ -82,9 +83,9 @@ pub struct PolygonCompNodeBundle {
     pub transform: Transform,
     pub size: SizeMixin,
     pub visibility: VisibilityMixin,
-    pub fill: FillMixin,
     pub blend_mode: BlendModeMixin,
     pub opacity: OpacityMixin,
+    pub fill: FillMixin,
     pub stroke: StrokeMixin,
 }
 
@@ -95,8 +96,14 @@ pub struct TextCompNodeBundle {
     pub transform: Transform,
     pub size: SizeMixin,
     pub visibility: VisibilityMixin,
-    pub fill: FillMixin,
     pub blend_mode: BlendModeMixin,
     pub opacity: OpacityMixin,
+    pub fill: FillMixin,
     pub stroke: StrokeMixin,
+}
+
+#[derive(Bundle, Debug, Default)]
+pub struct SolidPaintBundle {
+    pub paint: CompPaint,
+    pub solid: SolidCompPaint,
 }

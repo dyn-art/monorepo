@@ -30,14 +30,7 @@ const DEFAULT_DTIF: COMP.CompDtif = {
 				{
 					blendMode: 'Normal',
 					opacity: 1,
-					paint: {
-						type: 'Solid',
-						color: {
-							red: 229,
-							green: 229,
-							blue: 229
-						}
-					}
+					paintId: 'p1'
 				}
 			],
 			opacity: 1,
@@ -56,14 +49,7 @@ const DEFAULT_DTIF: COMP.CompDtif = {
 				{
 					blendMode: 'Normal',
 					opacity: 1,
-					paint: {
-						type: 'Solid',
-						color: {
-							red: 229,
-							green: 229,
-							blue: 229
-						}
-					}
+					paintId: 'p2'
 				}
 			],
 			opacity: 1,
@@ -73,8 +59,24 @@ const DEFAULT_DTIF: COMP.CompDtif = {
 			visibility: 'Visible'
 		}
 	},
-	images: {},
-	fonts: [],
+	paints: {
+		p1: {
+			type: 'Solid',
+			color: {
+				red: 229,
+				green: 229,
+				blue: 229
+			}
+		},
+		p2: {
+			type: 'Solid',
+			color: {
+				red: 0,
+				green: 128,
+				blue: 0
+			}
+		}
+	},
 	events: [
 		// {
 		// 	type: 'EntityMoved',

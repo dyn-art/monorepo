@@ -23,6 +23,9 @@ pub struct ShapeNodeSvgBundle {
 
     // Click area elements
     pub click_area_rect: SvgElement,
+
+    // Children
+    pub paint_children: Vec<Entity>,
 }
 
 impl SvgBundle for ShapeNodeSvgBundle {
@@ -154,6 +157,8 @@ impl ShapeNodeSvgBundle {
             fill_clip_path: fill_clip_path_element,
             fill_clipped_path: fill_clipped_path_element,
             fill_wrapper_g: fill_wrapper_g_element,
+
+            paint_children: Vec::new(),
         }
     }
 

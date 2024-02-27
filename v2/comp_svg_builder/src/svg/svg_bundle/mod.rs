@@ -94,8 +94,7 @@ impl NodeSvgBundleVariant {
     }
 }
 
-// TODO
-#[derive(Debug, Clone)]
+#[derive(Component, Debug, Clone)]
 pub enum PaintSvgBundleVariant {
     Solid(SolidPaintSvgBundle),
 }

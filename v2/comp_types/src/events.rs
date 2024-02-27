@@ -1,4 +1,4 @@
-use crate::shared::{Size, Viewport};
+use crate::common::{Size, Viewport};
 use bevy_ecs::{entity::Entity, event::Event, world::World};
 use std::fmt::Debug;
 

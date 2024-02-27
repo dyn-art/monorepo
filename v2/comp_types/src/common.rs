@@ -1,8 +1,5 @@
+use bevy_ecs::entity::Entity;
 use glam::{Vec2, Vec4};
-
-// =============================================================================
-// Base
-// =============================================================================
 
 #[derive(Debug, Default, Copy, Clone)]
 #[cfg_attr(
@@ -191,11 +188,7 @@ pub struct Viewport {
     pub physical_size: Vec2,
 }
 
-// =============================================================================
-// Fill
-// =============================================================================
-
-#[derive(Debug, Default, Copy, Clone)]
+#[derive(Debug, Copy, Clone)]
 #[cfg_attr(
     feature = "serde_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
@@ -205,58 +198,17 @@ pub struct Stroke {
     pub width: f32,
 }
 
-/// Describes a fill style, including paint type, blend mode, and opacity.
-#[derive(Debug, Default, Copy, Clone)]
+#[derive(Debug, Copy, Clone)]
 #[cfg_attr(
     feature = "serde_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type),
     serde(rename_all = "camelCase")
 )]
 pub struct Fill {
-    pub paint: Paint,
+    pub paint: Entity,
     pub blend_mode: BlendMode,
     pub opacity: Opacity,
 }
-
-/// Represents a paint style.
-#[derive(Debug, Copy, Clone)]
-#[cfg_attr(
-    feature = "serde_support",
-    derive(serde::Serialize, serde::Deserialize, specta::Type),
-    serde(tag = "type")
-)]
-pub enum Paint {
-    Solid(SolidPaint),
-    Image,    // TODO
-    Gradient, // TODO
-}
-
-impl Default for Paint {
-    fn default() -> Self {
-        Self::Solid(SolidPaint::default())
-    }
-}
-
-#[derive(Debug, Copy, Clone)]
-#[cfg_attr(
-    feature = "serde_support",
-    derive(serde::Serialize, serde::Deserialize, specta::Type)
-)]
-pub struct SolidPaint {
-    color: Color,
-}
-
-impl Default for SolidPaint {
-    fn default() -> Self {
-        Self {
-            color: Color::black(),
-        }
-    }
-}
-
-// =============================================================================
-// Text
-// =============================================================================
 
 /// A styled text segment.
 #[derive(Debug, Clone)]

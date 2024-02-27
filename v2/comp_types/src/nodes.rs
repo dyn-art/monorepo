@@ -1,4 +1,4 @@
-use crate::shared::{BreakLineOn, HorizontalTextAlignment, TextSpan, VerticalTextAlignment};
+use crate::common::{BreakLineOn, HorizontalTextAlignment, TextSpan, VerticalTextAlignment};
 use bevy_ecs::component::Component;
 use smallvec::SmallVec;
 

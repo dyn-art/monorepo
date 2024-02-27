@@ -28,6 +28,7 @@ pub struct FrameNodeSvgBundle {
 
     // Children
     pub node_children: Vec<Entity>,
+    pub paint_children: Vec<Entity>,
 }
 
 impl SvgBundle for FrameNodeSvgBundle {
@@ -207,6 +208,7 @@ impl FrameNodeSvgBundle {
             fill_wrapper_g: fill_wrapper_g_element,
 
             node_children: Vec::new(),
+            paint_children: Vec::new(),
         }
     }
 

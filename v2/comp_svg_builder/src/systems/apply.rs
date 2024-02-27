@@ -3,7 +3,7 @@ use crate::{
         DelayedSvgBundleModificationsRes, SvgBundleChildrenModification,
     },
     svg::{
-        svg_bundle::NodeSvgBundleVariant,
+        svg_bundle::{NodeSvgBundleVariant, PaintSvgBundleVariant},
         svg_element::{
             attributes::{SvgAttribute, SvgMeasurementUnit},
             styles::{SvgDisplayStyle, SvgStyle},
@@ -18,13 +18,14 @@ use bevy_ecs::{
 use bevy_hierarchy::{BuildChildren, Children};
 use bevy_transform::components::Transform;
 use dyn_comp_types::{
+    common::Visibility,
     mixins::{BlendModeMixin, FillMixin, OpacityMixin, SizeMixin, VisibilityMixin},
     nodes::CompNode,
-    shared::Visibility,
+    paints::{CompPaint, SolidCompPaint},
 };
 use std::collections::HashSet;
 
-pub fn collect_children_changes(
+pub fn collect_node_children_changes(
     mut delayed_node_modification_res: ResMut<DelayedSvgBundleModificationsRes>,
     query: Query<
         (Entity, &Children, &mut NodeSvgBundleVariant),
@@ -61,7 +62,7 @@ pub fn collect_children_changes(
     }
 }
 
-pub fn apply_children_changes(
+pub fn apply_node_children_changes(
     mut commands: Commands,
     mut delayed_svg_bundle_modifications_res: ResMut<DelayedSvgBundleModificationsRes>,
     mut bundle_query: Query<&mut NodeSvgBundleVariant>,
@@ -104,6 +105,51 @@ pub fn apply_children_changes(
                 }
                 _ => {}
             }
+        }
+    }
+}
+
+// TODO: Collect or instant apply?
+pub fn collect_paint_children_changes(
+    mut delayed_node_modification_res: ResMut<DelayedSvgBundleModificationsRes>,
+    query: Query<
+        (Entity, &FillMixin, &mut NodeSvgBundleVariant),
+        (With<CompNode>, Changed<FillMixin>),
+    >,
+    solid_paint_query: Query<
+        (&SolidCompPaint, &mut PaintSvgBundleVariant),
+        (With<CompPaint>, Changed<SolidCompPaint>),
+    >,
+) {
+    for (entity, FillMixin(fills), bundle_variant) in query.iter() {
+        let maybe_paint_children = match &bundle_variant {
+            NodeSvgBundleVariant::Frame(bundle) => Some(&bundle.paint_children),
+            NodeSvgBundleVariant::Shape(bundle) => Some(&bundle.paint_children),
+            _ => None,
+        };
+        if let Some(paint_children) = maybe_paint_children {
+            // TODO
+
+            // let current_node_children_set: HashSet<_> = paint_children.iter().cloned().collect();
+            // let new_node_children_set: HashSet<_> = children.iter().cloned().collect();
+
+            // let removed_node_entities: Vec<_> = current_node_children_set
+            //     .difference(&new_node_children_set)
+            //     .cloned()
+            //     .collect();
+
+            // let added_node_entities: Vec<_> = new_node_children_set
+            //     .difference(&current_node_children_set)
+            //     .cloned()
+            //     .collect();
+
+            // delayed_node_modification_res.children_modifications.push(
+            //     SvgBundleChildrenModification {
+            //         parent_entity: entity,
+            //         added_entities: added_node_entities,
+            //         removed_entities: removed_node_entities,
+            //     },
+            // );
         }
     }
 }
@@ -251,20 +297,5 @@ pub fn apply_blend_mode_mixin_changes(
             element.set_style(SvgStyle::BlendMode {
                 blend_mode: blend_mode.into(),
             });
-        });
-}
-
-pub fn apply_fill_mixin_changes(
-    mut query: Query<(&FillMixin, &mut NodeSvgBundleVariant), (With<CompNode>, Changed<FillMixin>)>,
-) {
-    query
-        .iter_mut()
-        .for_each(|(FillMixin(fills), mut bundle_variant)| {
-            let fill_wrapper_element = match bundle_variant.as_mut() {
-                NodeSvgBundleVariant::Frame(bundle) => &mut bundle.fill_wrapper_g,
-                NodeSvgBundleVariant::Shape(bundle) => &mut bundle.fill_wrapper_g,
-            };
-
-            // TODO
         });
 }
