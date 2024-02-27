@@ -2,7 +2,10 @@ use crate::{
     resources::svg_context::SvgContextRes,
     svg::{
         svg_bundle::SvgBundle,
-        svg_element::{attributes::SvgAttribute, SvgElement, SvgElementId, SvgTag},
+        svg_element::{
+            attributes::{SvgAttribute, SvgPointerEventsVariants},
+            SvgElement, SvgElementId, SvgTag,
+        },
     },
 };
 use bevy_ecs::entity::Entity;
@@ -58,7 +61,7 @@ impl SvgBundle for ShapeNodeSvgBundle {
 
 impl ShapeNodeSvgBundle {
     pub fn new(entity: Entity, cx: &mut SvgContextRes) -> Self {
-        log::info!("[ShapeSvgBundle::new] {:?}", entity);
+        log::info!("[ShapeNodeSvgBundle::new] {:?}", entity);
 
         let mut root_element = cx.create_bundle_root_element(SvgTag::Group, entity);
         #[cfg(feature = "tracing")]
@@ -71,7 +74,7 @@ impl ShapeNodeSvgBundle {
         defs_element.set_attribute(SvgAttribute::Name {
             name: Self::create_element_name(defs_element.get_id(), "defs", false),
         });
-        root_element.append_child_in_node_context(entity, &mut defs_element);
+        root_element.append_child_in_bundle_context(entity, &mut defs_element);
 
         // Create click area elements
 
@@ -93,10 +96,10 @@ impl ShapeNodeSvgBundle {
         click_area_rect_element.set_attribute(SvgAttribute::Fill {
             fill: String::from("transparent"),
         });
-        // click_area_rect_element.set_attribute(SvgAttribute::PointerEvents {
-        //     pointer_events: SvgPointerEventsVariants::All,
-        // });
-        root_element.append_child_in_node_context(entity, &mut click_area_rect_element);
+        click_area_rect_element.set_attribute(SvgAttribute::PointerEvents {
+            pointer_events: SvgPointerEventsVariants::All,
+        });
+        root_element.append_child_in_bundle_context(entity, &mut click_area_rect_element);
 
         // Create fill elements
 
@@ -109,7 +112,7 @@ impl ShapeNodeSvgBundle {
                 true,
             ),
         });
-        defs_element.append_child_in_node_context(entity, &mut fill_clip_path_element);
+        defs_element.append_child_in_bundle_context(entity, &mut fill_clip_path_element);
 
         let mut fill_clipped_path_element = cx.create_element(SvgTag::Path);
         #[cfg(feature = "tracing")]
@@ -120,7 +123,8 @@ impl ShapeNodeSvgBundle {
                 false,
             ),
         });
-        fill_clip_path_element.append_child_in_node_context(entity, &mut fill_clipped_path_element);
+        fill_clip_path_element
+            .append_child_in_bundle_context(entity, &mut fill_clipped_path_element);
 
         let mut fill_wrapper_g_element = cx.create_element(SvgTag::Group);
         #[cfg(feature = "tracing")]
@@ -137,7 +141,7 @@ impl ShapeNodeSvgBundle {
         fill_wrapper_g_element.set_attribute(SvgAttribute::ClipPath {
             clip_path: fill_clip_path_element.get_id(),
         });
-        root_element.append_child_in_node_context(entity, &mut fill_wrapper_g_element);
+        root_element.append_child_in_bundle_context(entity, &mut fill_wrapper_g_element);
 
         Self {
             root: root_element,
@@ -156,6 +160,6 @@ impl ShapeNodeSvgBundle {
     #[cfg(feature = "tracing")]
     fn create_element_name(id: SvgElementId, category: &str, is_definition: bool) -> String {
         let def_part = if is_definition { "_def" } else { "" };
-        format!("shape_{}_{}{}", category, id, def_part)
+        format!("shape-node_{}_{}{}", category, id, def_part)
     }
 }

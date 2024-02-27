@@ -13,7 +13,7 @@ use dyn_comp_core::{resources::composition::CompositionRes, CompCorePlugin};
 use dyn_comp_dtif::CompDtif;
 use dyn_comp_interaction::CompInteractionPlugin;
 use dyn_comp_svg_builder::{
-    events::SvgBuilderOutputEvent, svg::svg_bundle::SvgBundleVariant, CompSvgBuilderPlugin,
+    events::SvgBuilderOutputEvent, svg::svg_bundle::NodeSvgBundleVariant, CompSvgBuilderPlugin,
 };
 use dyn_comp_types::{events::InputEvent, mixins::Root};
 use events::{SvgCompInputEvent, SvgCompOutputEvent};
@@ -109,8 +109,8 @@ impl SvgCompHandle {
         ));
 
         let mut system_state: SystemState<(
-            Query<&SvgBundleVariant, With<Root>>,
-            Query<&SvgBundleVariant, Without<Root>>,
+            Query<&NodeSvgBundleVariant, With<Root>>,
+            Query<&NodeSvgBundleVariant, Without<Root>>,
         )> = SystemState::new(&mut self.app.world);
         let (root_node_query, node_query) = system_state.get(&mut self.app.world);
 

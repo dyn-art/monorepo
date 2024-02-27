@@ -2,7 +2,7 @@
 
 use crate::{
     resources::changed_svg_bundles::{ChangedSvgBundle, ChangedSvgBundlesRes},
-    svg::svg_bundle::SvgBundleVariant,
+    svg::svg_bundle::NodeSvgBundleVariant,
 };
 use bevy_ecs::{
     entity::Entity,
@@ -15,8 +15,8 @@ use dyn_comp_types::nodes::CompNode;
 pub fn extract_svg_bundles(
     mut changed_svg_bundles_res: ResMut<ChangedSvgBundlesRes>,
     mut query: Query<
-        (Entity, &mut SvgBundleVariant, Option<&Parent>),
-        (With<CompNode>, Changed<SvgBundleVariant>),
+        (Entity, &mut NodeSvgBundleVariant, Option<&Parent>),
+        (With<CompNode>, Changed<NodeSvgBundleVariant>),
     >,
     child_query: Query<&Children>,
 ) {

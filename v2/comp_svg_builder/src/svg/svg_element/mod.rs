@@ -4,7 +4,7 @@ pub mod element_changes;
 pub mod styles;
 
 use self::{attributes::SvgAttribute, styles::SvgStyle};
-use super::svg_bundle::{SvgBundle, SvgBundleVariant};
+use super::svg_bundle::{NodeSvgBundleVariant, SvgBundle};
 use bevy_ecs::{component::Component, entity::Entity, query::Without, system::Query};
 use dyn_comp_types::mixins::Root;
 use std::{collections::HashMap, fmt::Display};
@@ -124,7 +124,11 @@ impl SvgElement {
         )
     }
 
-    pub fn append_child_in_node_context(&mut self, entity: Entity, child_element: &mut SvgElement) {
+    pub fn append_child_in_bundle_context(
+        &mut self,
+        entity: Entity,
+        child_element: &mut SvgElement,
+    ) {
         self.append_child_element(
             child_element,
             SvgElementChildIdentifier::InSvgBundleContext(entity),
@@ -235,7 +239,7 @@ impl SvgElement {
     pub fn to_string(
         &self,
         bundle: &dyn SvgBundle,
-        bundle_query: &Query<&SvgBundleVariant, Without<Root>>,
+        maybe_bundle_query: Option<&Query<&NodeSvgBundleVariant, Without<Root>>>,
     ) -> String {
         let mut result = String::new();
 
@@ -267,12 +271,14 @@ impl SvgElement {
             match child.identifier {
                 SvgElementChildIdentifier::InSvgBundleContext(_) => {
                     if let Some(child_element) = bundle.get_child_elements().get(&child.id) {
-                        result.push_str(&child_element.to_string(bundle, bundle_query));
+                        result.push_str(&child_element.to_string(bundle, maybe_bundle_query));
                     }
                 }
                 SvgElementChildIdentifier::InWorldContext(entity) => {
-                    if let Ok(bundle) = bundle_query.get(entity) {
-                        result.push_str(&bundle.to_string(bundle_query));
+                    if let Some(bundle_query) = maybe_bundle_query {
+                        if let Ok(bundle) = bundle_query.get(entity) {
+                            result.push_str(&bundle.to_string(bundle_query));
+                        }
                     }
                 }
             }

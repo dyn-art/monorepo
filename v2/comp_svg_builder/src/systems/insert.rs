@@ -1,7 +1,7 @@
 use crate::{
     resources::svg_context::SvgContextRes,
     svg::svg_bundle::{
-        frame_node::FrameNodeSvgBundle, shape_node::ShapeNodeSvgBundle, SvgBundleVariant,
+        frame_node::FrameNodeSvgBundle, shape_node::ShapeNodeSvgBundle, NodeSvgBundleVariant,
     },
 };
 use bevy_ecs::{
@@ -22,14 +22,14 @@ pub fn insert_frame_svg_bundle(
         (
             With<CompNode>,
             With<FrameCompNode>,
-            Without<SvgBundleVariant>,
+            Without<NodeSvgBundleVariant>,
         ),
     >,
 ) {
     query.iter().for_each(|entity| {
         commands
             .entity(entity)
-            .insert(SvgBundleVariant::Frame(FrameNodeSvgBundle::new(
+            .insert(NodeSvgBundleVariant::Frame(FrameNodeSvgBundle::new(
                 entity,
                 &mut svg_context_res,
             )));
@@ -50,14 +50,14 @@ pub fn insert_shape_svg_bundle(
                 With<EllipseCompNode>,
                 With<StarCompNode>,
             )>,
-            Without<SvgBundleVariant>,
+            Without<NodeSvgBundleVariant>,
         ),
     >,
 ) {
     query.iter().for_each(|entity| {
         commands
             .entity(entity)
-            .insert(SvgBundleVariant::Shape(ShapeNodeSvgBundle::new(
+            .insert(NodeSvgBundleVariant::Shape(ShapeNodeSvgBundle::new(
                 entity,
                 &mut svg_context_res,
             )));

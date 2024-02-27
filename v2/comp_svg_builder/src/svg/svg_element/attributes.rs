@@ -52,6 +52,36 @@ pub enum SvgAttribute {
     GradientUnits {
         gradient_units: SvgUnitsVariant,
     },
+    Href {
+        href: SvgHrefVariant,
+    },
+    #[cfg_attr(feature = "serde_support", serde(rename_all = "camelCase"))]
+    PreserveAspectRatio {
+        preserve_aspect_ratio: String,
+    },
+    X1 {
+        x1: f32,
+    },
+    Y1 {
+        y1: f32,
+    },
+    X2 {
+        x2: f32,
+    },
+    Y2 {
+        y2: f32,
+    },
+    Offset {
+        offset: f32,
+    },
+    #[cfg_attr(feature = "serde_support", serde(rename_all = "camelCase"))]
+    StopColor {
+        stop_color: String,
+    },
+    #[cfg_attr(feature = "serde_support", serde(rename_all = "camelCase"))]
+    PointerEvents {
+        pointer_events: SvgPointerEventsVariants,
+    },
 }
 
 impl SvgAttribute {
@@ -69,6 +99,15 @@ impl SvgAttribute {
             Self::Name { .. } => "name",
             Self::PatternUnits { .. } => "patternUnits",
             Self::GradientUnits { .. } => "gradientUnits",
+            Self::Href { .. } => "href",
+            Self::PreserveAspectRatio { .. } => "preserveAspectRatio",
+            Self::X1 { .. } => "x1",
+            Self::Y1 { .. } => "y1",
+            Self::X2 { .. } => "x2",
+            Self::Y2 { .. } => "y2",
+            Self::Offset { .. } => "offset",
+            Self::StopColor { .. } => "stop-color",
+            Self::PointerEvents { .. } => "pointer-events",
         }
     }
 
@@ -108,6 +147,27 @@ impl SvgAttribute {
             } => match unit {
                 SvgUnitsVariant::ObjectBoundingBox => String::from("objectBoundingBox"),
                 SvgUnitsVariant::UserSpaceOnUse => String::from("userSpaceOnUse"),
+            },
+            Self::Href { href } => match href {
+                // SvgHrefVariant::Base64 {
+                //     content,
+                //     content_type,
+                // } => format!("data:{};base64,{}", content_type.mime_type(), content),
+                SvgHrefVariant::Base64 { .. } => String::from("todo"),
+                SvgHrefVariant::Url { url } => url.clone(),
+            },
+            Self::PreserveAspectRatio {
+                preserve_aspect_ratio,
+            } => preserve_aspect_ratio.clone(),
+            Self::X1 { x1 } => x1.to_string(),
+            Self::Y1 { y1 } => y1.to_string(),
+            Self::X2 { x2 } => x2.to_string(),
+            Self::Y2 { y2 } => y2.to_string(),
+            Self::Offset { offset } => offset.to_string(),
+            Self::StopColor { stop_color } => stop_color.clone(),
+            Self::PointerEvents { pointer_events } => match pointer_events {
+                SvgPointerEventsVariants::All => "all".to_string(),
+                SvgPointerEventsVariants::None => "none".to_string(),
             },
         }
     }
@@ -157,4 +217,31 @@ pub enum SvgUnitsVariant {
     #[default]
     UserSpaceOnUse,
     ObjectBoundingBox,
+}
+
+#[derive(Debug, Clone)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type)
+)]
+pub enum SvgHrefVariant {
+    #[serde(rename_all = "camelCase")]
+    Base64 {
+        content: String,
+        // content_type: ContentType, // TODO: Add ContentType struct in comp_types
+    },
+    Url {
+        url: String,
+    },
+}
+
+#[derive(Debug, Default, Copy, Clone)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type)
+)]
+pub enum SvgPointerEventsVariants {
+    #[default]
+    None,
+    All,
 }
