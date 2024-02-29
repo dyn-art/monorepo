@@ -11,12 +11,10 @@ use resources::{
 use systems::{
     apply::{
         apply_blend_mode_mixin_changes, apply_node_children_changes, apply_opacity_mixin_changes,
-        apply_size_mixin_changes, apply_transform_changes, apply_visibility_mixin_changes,
-        collect_node_children_changes, collect_paint_children_changes,
+        apply_size_mixin_changes, apply_solid_paint_changes, apply_transform_changes,
+        apply_visibility_mixin_changes, collect_node_children_changes,
     },
-    insert::{
-        insert_frame_node_svg_bundle, insert_shape_node_svg_bundle, insert_solid_paint_svg_bundle,
-    },
+    insert::{insert_fills, insert_frame_node_svg_bundle, insert_shape_node_svg_bundle},
 };
 
 pub struct CompSvgBuilderPlugin {
@@ -62,15 +60,15 @@ impl Plugin for CompSvgBuilderPlugin {
             (
                 insert_frame_node_svg_bundle.in_set(SvgBuilderSystemSet::Insert),
                 insert_shape_node_svg_bundle.in_set(SvgBuilderSystemSet::Insert),
-                insert_solid_paint_svg_bundle.in_set(SvgBuilderSystemSet::Insert),
+                insert_fills.in_set(SvgBuilderSystemSet::Apply),
                 collect_node_children_changes.in_set(SvgBuilderSystemSet::Collect),
-                collect_paint_children_changes.in_set(SvgBuilderSystemSet::Collect),
                 apply_node_children_changes.in_set(SvgBuilderSystemSet::Apply),
                 apply_visibility_mixin_changes.in_set(SvgBuilderSystemSet::Apply),
                 apply_size_mixin_changes.in_set(SvgBuilderSystemSet::Apply),
                 apply_transform_changes.in_set(SvgBuilderSystemSet::Apply),
                 apply_opacity_mixin_changes.in_set(SvgBuilderSystemSet::Apply),
                 apply_blend_mode_mixin_changes.in_set(SvgBuilderSystemSet::Apply),
+                apply_solid_paint_changes.in_set(SvgBuilderSystemSet::Apply),
             ),
         );
 

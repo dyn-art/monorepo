@@ -10,12 +10,14 @@ use crate::{
 use super::SvgBundle;
 
 #[derive(Debug, Clone)]
-pub struct SolidPaintSvgBundle {
-    root: SvgElement,
-    paint_rect: SvgElement,
+pub struct SolidFillSvgBundle {
+    pub paint_entity: Entity,
+
+    pub root: SvgElement,
+    pub paint_rect: SvgElement,
 }
 
-impl SvgBundle for SolidPaintSvgBundle {
+impl SvgBundle for SolidFillSvgBundle {
     fn get_root_element(&self) -> &SvgElement {
         &self.root
     }
@@ -41,7 +43,7 @@ impl SvgBundle for SolidPaintSvgBundle {
     }
 }
 
-impl SolidPaintSvgBundle {
+impl SolidFillSvgBundle {
     pub fn new(entity: Entity, cx: &mut SvgContextRes) -> Self {
         log::info!("[SolidPaintSvgBundle::new] {:?}", entity);
 
@@ -59,6 +61,8 @@ impl SolidPaintSvgBundle {
         root_element.append_child_in_bundle_context(entity, &mut paint_rect_element);
 
         Self {
+            paint_entity: entity,
+
             root: root_element,
             paint_rect: paint_rect_element,
         }

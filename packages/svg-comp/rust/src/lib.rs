@@ -13,7 +13,9 @@ use dyn_comp_core::{resources::composition::CompositionRes, CompCorePlugin};
 use dyn_comp_dtif::CompDtif;
 use dyn_comp_interaction::CompInteractionPlugin;
 use dyn_comp_svg_builder::{
-    events::SvgBuilderOutputEvent, svg::svg_bundle::NodeSvgBundleVariant, CompSvgBuilderPlugin,
+    events::SvgBuilderOutputEvent,
+    svg::svg_bundle::{NodeSvgBundle, NodeSvgBundleMixin},
+    CompSvgBuilderPlugin,
 };
 use dyn_comp_types::{events::InputEvent, mixins::Root};
 use events::{SvgCompInputEvent, SvgCompOutputEvent};
@@ -109,15 +111,15 @@ impl SvgCompHandle {
         ));
 
         let mut system_state: SystemState<(
-            Query<&NodeSvgBundleVariant, With<Root>>,
-            Query<&NodeSvgBundleVariant, Without<Root>>,
+            Query<&NodeSvgBundleMixin, With<Root>>,
+            Query<&NodeSvgBundleMixin, Without<Root>>,
         )> = SystemState::new(&mut self.app.world);
         let (root_node_query, node_query) = system_state.get(&mut self.app.world);
 
         // Construct SVG string starting from root nodes
         root_node_query
             .iter()
-            .for_each(|node_variant| result.push_str(&node_variant.to_string(&node_query)));
+            .for_each(|bundle| result.push_str(&bundle.0.to_string(&node_query)));
 
         // Close the SVG tag
         result.push_str("</svg>");

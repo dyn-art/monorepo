@@ -4,10 +4,13 @@ pub mod element_changes;
 pub mod styles;
 
 use self::{attributes::SvgAttribute, styles::SvgStyle};
-use super::svg_bundle::{NodeSvgBundleVariant, SvgBundle};
+use super::svg_bundle::{NodeSvgBundle, NodeSvgBundleMixin, SvgBundle};
 use bevy_ecs::{component::Component, entity::Entity, query::Without, system::Query};
 use dyn_comp_types::mixins::Root;
-use std::{collections::HashMap, fmt::Display};
+use std::{
+    collections::{HashMap, HashSet},
+    fmt::Display,
+};
 
 #[cfg(feature = "output_svg_element_changes")]
 use self::element_changes::{
@@ -159,6 +162,11 @@ impl SvgElement {
         self.children.retain(|child| child.id != id);
     }
 
+    pub fn remove_children(&mut self, ids: &[SvgElementId]) {
+        let ids_set = ids.iter().collect::<HashSet<_>>();
+        self.children.retain(|child| !ids_set.contains(&child.id));
+    }
+
     pub fn clear_children(&mut self) {
         self.children.clear()
     }
@@ -239,7 +247,7 @@ impl SvgElement {
     pub fn to_string(
         &self,
         bundle: &dyn SvgBundle,
-        maybe_bundle_query: Option<&Query<&NodeSvgBundleVariant, Without<Root>>>,
+        maybe_bundle_query: Option<&Query<&NodeSvgBundleMixin, Without<Root>>>,
     ) -> String {
         let mut result = String::new();
 
@@ -276,7 +284,7 @@ impl SvgElement {
                 }
                 SvgElementChildIdentifier::InWorldContext(entity) => {
                     if let Some(bundle_query) = maybe_bundle_query {
-                        if let Ok(bundle) = bundle_query.get(entity) {
+                        if let Ok(NodeSvgBundleMixin(bundle)) = bundle_query.get(entity) {
                             result.push_str(&bundle.to_string(bundle_query));
                         }
                     }
@@ -291,7 +299,7 @@ impl SvgElement {
     }
 }
 
-#[derive(Debug, Default, PartialEq, Eq, PartialOrd, Ord, Copy, Clone)]
+#[derive(Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash, Copy, Clone)]
 #[cfg_attr(
     feature = "serde_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)

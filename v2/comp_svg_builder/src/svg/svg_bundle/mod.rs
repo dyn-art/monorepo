@@ -1,13 +1,12 @@
 pub mod frame_node;
 pub mod shape_node;
-pub mod solid_paint;
+pub mod solid_fill;
 
 use self::{
-    frame_node::FrameNodeSvgBundle, shape_node::ShapeNodeSvgBundle,
-    solid_paint::SolidPaintSvgBundle,
+    frame_node::FrameNodeSvgBundle, shape_node::ShapeNodeSvgBundle, solid_fill::SolidFillSvgBundle,
 };
 use super::svg_element::{SvgElement, SvgElementId};
-use bevy_ecs::{component::Component, query::Without, system::Query};
+use bevy_ecs::{component::Component, entity::Entity, query::Without, system::Query};
 use dyn_comp_types::mixins::Root;
 use std::{collections::BTreeMap, fmt::Debug};
 
@@ -61,62 +60,67 @@ pub trait SvgBundle: Debug {
     }
 }
 
-#[derive(Component, Debug, Clone)]
-pub enum NodeSvgBundleVariant {
+#[derive(Debug, Clone)]
+pub enum NodeSvgBundle {
     Frame(FrameNodeSvgBundle),
     Shape(ShapeNodeSvgBundle),
 }
 
-impl NodeSvgBundleVariant {
+impl NodeSvgBundle {
     pub fn get_svg_bundle(&self) -> &dyn SvgBundle {
         match self {
-            NodeSvgBundleVariant::Frame(bundle) => bundle,
-            NodeSvgBundleVariant::Shape(bundle) => bundle,
+            NodeSvgBundle::Frame(bundle) => bundle,
+            NodeSvgBundle::Shape(bundle) => bundle,
         }
     }
 
     pub fn get_svg_bundle_mut(&mut self) -> &mut dyn SvgBundle {
         match self {
-            NodeSvgBundleVariant::Frame(bundle) => bundle,
-            NodeSvgBundleVariant::Shape(bundle) => bundle,
+            NodeSvgBundle::Frame(bundle) => bundle,
+            NodeSvgBundle::Shape(bundle) => bundle,
         }
     }
 
-    pub fn to_string(&self, bundle_query: &Query<&NodeSvgBundleVariant, Without<Root>>) -> String {
+    pub fn to_string(&self, bundle_query: &Query<&NodeSvgBundleMixin, Without<Root>>) -> String {
         match self {
-            NodeSvgBundleVariant::Frame(bundle) => bundle
+            NodeSvgBundle::Frame(bundle) => bundle
                 .get_root_element()
                 .to_string(bundle, Some(bundle_query)),
-            NodeSvgBundleVariant::Shape(bundle) => {
-                bundle.get_root_element().to_string(bundle, None)
-            }
+            NodeSvgBundle::Shape(bundle) => bundle.get_root_element().to_string(bundle, None),
         }
     }
 }
 
 #[derive(Component, Debug, Clone)]
-pub enum PaintSvgBundleVariant {
-    Solid(SolidPaintSvgBundle),
+pub struct NodeSvgBundleMixin(pub NodeSvgBundle);
+
+#[derive(Debug, Clone)]
+pub enum FillSvgBundle {
+    Solid(SolidFillSvgBundle),
 }
 
-impl PaintSvgBundleVariant {
+impl FillSvgBundle {
+    pub fn get_paint_entity(&self) -> &Entity {
+        match self {
+            FillSvgBundle::Solid(bundle) => &bundle.paint_entity,
+        }
+    }
+
     pub fn get_svg_bundle(&self) -> &dyn SvgBundle {
         match self {
-            PaintSvgBundleVariant::Solid(bundle) => bundle,
+            FillSvgBundle::Solid(bundle) => bundle,
         }
     }
 
     pub fn get_svg_bundle_mut(&mut self) -> &mut dyn SvgBundle {
         match self {
-            PaintSvgBundleVariant::Solid(bundle) => bundle,
+            FillSvgBundle::Solid(bundle) => bundle,
         }
     }
 
     pub fn to_string(&self) -> String {
         match self {
-            PaintSvgBundleVariant::Solid(bundle) => {
-                bundle.get_root_element().to_string(bundle, None)
-            }
+            FillSvgBundle::Solid(bundle) => bundle.get_root_element().to_string(bundle, None),
         }
     }
 }

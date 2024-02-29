@@ -1,3 +1,4 @@
+use super::FillSvgBundle;
 use crate::{
     resources::svg_context::SvgContextRes,
     svg::{
@@ -9,6 +10,7 @@ use crate::{
     },
 };
 use bevy_ecs::entity::Entity;
+use smallvec::SmallVec;
 use std::collections::BTreeMap;
 
 #[derive(Debug, Clone)]
@@ -20,12 +22,10 @@ pub struct ShapeNodeSvgBundle {
     pub fill_clip_path: SvgElement,
     pub fill_clipped_path: SvgElement,
     pub fill_wrapper_g: SvgElement,
+    pub fills: SmallVec<[FillSvgBundle; 2]>,
 
     // Click area elements
     pub click_area_rect: SvgElement,
-
-    // Children
-    pub paint_children: Vec<Entity>,
 }
 
 impl SvgBundle for ShapeNodeSvgBundle {
@@ -45,6 +45,10 @@ impl SvgBundle for ShapeNodeSvgBundle {
         children.insert(self.fill_clip_path.get_id(), &self.fill_clip_path);
         children.insert(self.fill_clipped_path.get_id(), &self.fill_clipped_path);
         children.insert(self.fill_wrapper_g.get_id(), &self.fill_wrapper_g);
+        self.fills.iter().for_each(|fill| {
+            let root_element = fill.get_svg_bundle().get_root_element();
+            children.insert(root_element.get_id(), root_element);
+        });
 
         return children;
     }
@@ -57,6 +61,10 @@ impl SvgBundle for ShapeNodeSvgBundle {
         children.insert(self.fill_clip_path.get_id(), &mut self.fill_clip_path);
         children.insert(self.fill_clipped_path.get_id(), &mut self.fill_clipped_path);
         children.insert(self.fill_wrapper_g.get_id(), &mut self.fill_wrapper_g);
+        self.fills.iter_mut().for_each(|fill| {
+            let root_element = fill.get_svg_bundle_mut().get_root_element_mut();
+            children.insert(root_element.get_id(), root_element);
+        });
 
         return children;
     }
@@ -158,7 +166,7 @@ impl ShapeNodeSvgBundle {
             fill_clipped_path: fill_clipped_path_element,
             fill_wrapper_g: fill_wrapper_g_element,
 
-            paint_children: Vec::new(),
+            fills: SmallVec::new(),
         }
     }
 

@@ -1,5 +1,5 @@
 use crate::common::{BlendMode, CornerRadii, Fill, Opacity, Size, Stroke, Visibility};
-use bevy_ecs::component::Component;
+use bevy_ecs::{component::Component, entity::Entity};
 use smallvec::SmallVec;
 
 /// Marks an entity as the root or top-level entity.
@@ -37,3 +37,6 @@ pub struct FillMixin(pub SmallVec<[Fill; 2]>);
 /// Configures stroke properties for drawing paths, including fill styles and width.
 #[derive(Component, Debug, Default, Clone)]
 pub struct StrokeMixin(pub SmallVec<[Stroke; 2]>);
+
+#[derive(Component, Debug, Default, Clone)]
+pub struct PaintAppliedOn(pub SmallVec<[Entity; 2]>);
