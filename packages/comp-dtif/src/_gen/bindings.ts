@@ -244,7 +244,7 @@ export type SvgDisplayStyle = "Block" | "None"
  */
 export type SvgElementAppendedChange = { parentId: SvgElementId }
 
-export type SvgElementChange = ({ type: "ElementCreated" } & SvgElementCreatedChange) | ({ type: "ElementDeleted" }) | ({ type: "ElementAppended" } & SvgElementAppendedChange) | ({ type: "AttributeUpdated" } & SvgAttributeUpdatedChange) | ({ type: "AttributeRemoved" } & SvgAttributeRemovedChange) | ({ type: "StyleUpdated" } & SvgStyleUpdatedChange) | ({ type: "StyleRemoved" } & SvgStyleRemovedChange)
+export type SvgElementChange = ({ type: "ElementCreated" } & SvgElementCreatedChange) | ({ type: "ElementDeleted" }) | ({ type: "ElementAppended" } & SvgElementAppendedChange) | ({ type: "AttributeUpdated" } & SvgAttributeUpdatedChange) | ({ type: "AttributeRemoved" } & SvgAttributeRemovedChange) | ({ type: "StyleUpdated" } & SvgStyleUpdatedChange) | ({ type: "StyleRemoved" } & SvgStyleRemovedChange) | ({ type: "ElementReordered" } & SvgElementReorderedChange)
 
 export type SvgElementChanges = { id: SvgElementId; changes: SvgElementChange[] }
 
@@ -261,6 +261,11 @@ export type SvgElementCreatedChange = { tagName: string; attributes: ([string, s
 export type SvgElementDeletedChange = Record<string, never>
 
 export type SvgElementId = number
+
+/**
+ * Emitted when an SvgElement is reordered within its parent.
+ */
+export type SvgElementReorderedChange = { elementId: SvgElementId; newParentId: SvgElementId; insertBeforeId: SvgElementId | null }
 
 export type SvgHrefVariant = { Base64: { content: string } } | { Url: { url: string } }
 

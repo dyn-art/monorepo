@@ -22,6 +22,7 @@ pub enum SvgElementChange {
     AttributeRemoved(SvgAttributeRemovedChange),
     StyleUpdated(SvgStyleUpdatedChange),
     StyleRemoved(SvgStyleRemovedChange),
+    ElementReordered(SvgElementReorderedChange),
 }
 
 /// Emitted when a new SvgElement is created.
@@ -91,4 +92,17 @@ pub struct SvgStyleUpdatedChange {
 #[cfg_attr(feature = "serde_support", derive(serde::Serialize, specta::Type))]
 pub struct SvgStyleRemovedChange {
     pub key: &'static str,
+}
+
+/// Emitted when an SvgElement is reordered within its parent.
+#[derive(Debug, Clone)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, specta::Type),
+    serde(rename_all = "camelCase")
+)]
+pub struct SvgElementReorderedChange {
+    pub element_id: SvgElementId,
+    pub new_parent_id: SvgElementId,
+    pub insert_before_id: Option<SvgElementId>, // None means append at the end
 }

@@ -4,7 +4,7 @@ pub mod element_changes;
 pub mod styles;
 
 use self::{attributes::SvgAttribute, styles::SvgStyle};
-use super::svg_bundle::{NodeSvgBundle, NodeSvgBundleMixin, SvgBundle};
+use super::svg_bundle::{NodeSvgBundleMixin, SvgBundle};
 use bevy_ecs::{component::Component, entity::Entity, query::Without, system::Query};
 use dyn_comp_types::mixins::Root;
 use std::{
@@ -191,7 +191,7 @@ impl SvgElement {
     }
 
     #[cfg(feature = "output_svg_element_changes")]
-    fn register_change(&mut self, element_change: SvgElementChange) {
+    pub fn register_change(&mut self, element_change: SvgElementChange) {
         if self.was_created_in_current_update_cycle {
             if let Some(update) = self.changes.first_mut() {
                 match update {

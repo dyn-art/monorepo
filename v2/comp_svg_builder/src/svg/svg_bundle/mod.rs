@@ -8,6 +8,7 @@ use self::{
 use super::svg_element::{SvgElement, SvgElementId};
 use bevy_ecs::{component::Component, entity::Entity, query::Without, system::Query};
 use dyn_comp_types::mixins::Root;
+use smallvec::SmallVec;
 use std::{collections::BTreeMap, fmt::Debug};
 
 #[cfg(feature = "output_svg_element_changes")]
@@ -78,6 +79,22 @@ impl NodeSvgBundle {
         match self {
             NodeSvgBundle::Frame(bundle) => bundle,
             NodeSvgBundle::Shape(bundle) => bundle,
+        }
+    }
+
+    pub fn get_fill_wrapper_element_mut(&mut self) -> Option<&mut SvgElement> {
+        match self {
+            NodeSvgBundle::Frame(bundle) => Some(&mut bundle.fill_wrapper_g),
+            NodeSvgBundle::Shape(bundle) => Some(&mut bundle.fill_wrapper_g),
+            _ => None,
+        }
+    }
+
+    pub fn get_fills_mut(&mut self) -> Option<&mut SmallVec<[FillSvgBundle; 2]>> {
+        match self {
+            NodeSvgBundle::Frame(bundle) => Some(&mut bundle.fills),
+            NodeSvgBundle::Shape(bundle) => Some(&mut bundle.fills),
+            _ => None,
         }
     }
 

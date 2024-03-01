@@ -221,6 +221,27 @@ export class SvgRenderer extends Renderer {
 					}
 					break;
 				}
+				case 'ElementReordered': {
+					const elementToReorder = this._svgElementMap.get(change.elementId);
+					const newParentElement = this._svgElementMap.get(change.newParentId);
+					if (elementToReorder != null && newParentElement != null) {
+						if (change.insertBeforeId != null) {
+							const insertBeforeElement = this._svgElementMap.get(change.insertBeforeId);
+							if (insertBeforeElement != null) {
+								newParentElement.insertBefore(elementToReorder, insertBeforeElement);
+							}
+							// If insertBeforeId is not found, append at the end as fallback
+							else {
+								newParentElement.appendChild(elementToReorder);
+							}
+						}
+						// If insertBeforeId is null, append at the end
+						else {
+							newParentElement.appendChild(elementToReorder);
+						}
+					}
+					break;
+				}
 			}
 		}
 	}

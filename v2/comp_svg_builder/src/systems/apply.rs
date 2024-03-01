@@ -11,7 +11,6 @@ use crate::{
     },
 };
 use bevy_ecs::{
-    bundle,
     entity::Entity,
     query::{Changed, With},
     system::{Query, ResMut},
@@ -24,7 +23,7 @@ use dyn_comp_types::{
     nodes::CompNode,
     paints::{CompPaint, SolidCompPaint},
 };
-use std::{collections::HashSet, fmt::format};
+use std::collections::HashSet;
 
 pub fn collect_node_children_changes(
     mut delayed_node_modification_res: ResMut<DelayedSvgBundleModificationsRes>,

@@ -50,6 +50,11 @@ const DEFAULT_DTIF: COMP.CompDtif = {
 					blendMode: 'Normal',
 					opacity: 1,
 					paintId: 'p2'
+				},
+				{
+					blendMode: 'Normal',
+					opacity: 1,
+					paintId: 'p1'
 				}
 			],
 			opacity: 1,
