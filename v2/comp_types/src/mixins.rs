@@ -38,5 +38,6 @@ pub struct FillMixin(pub SmallVec<[Fill; 2]>);
 #[derive(Component, Debug, Default, Clone)]
 pub struct StrokeMixin(pub SmallVec<[Stroke; 2]>);
 
+/// Holds references to the parent entities of this entity in the paint context.
 #[derive(Component, Debug, Default, Clone)]
-pub struct PaintAppliedOn(pub SmallVec<[Entity; 2]>);
+pub struct PaintParentMixin(pub SmallVec<[Entity; 2]>);

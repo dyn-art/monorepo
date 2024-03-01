@@ -1,8 +1,5 @@
 use crate::{
-    mixins::{
-        BlendModeMixin, CornerRadiiMixin, FillMixin, OpacityMixin, SizeMixin, StrokeMixin,
-        VisibilityMixin,
-    },
+    mixins::{BlendModeMixin, CornerRadiiMixin, OpacityMixin, SizeMixin, VisibilityMixin},
     nodes::{
         CompNode, EllipseCompNode, FrameCompNode, GroupCompNode, PolygonCompNode,
         RectangleCompNode, StarCompNode, TextCompNode,
@@ -22,8 +19,9 @@ pub struct FrameCompNodeBundle {
     pub visibility: VisibilityMixin,
     pub blend_mode: BlendModeMixin,
     pub opacity: OpacityMixin,
-    pub fill: FillMixin,
-    pub stroke: StrokeMixin,
+    // https://github.com/Nilirad/bevy_prototype_lyon/issues/207
+    // pub fill: FillMixin,
+    // pub stroke: StrokeMixin,
 }
 
 #[derive(Bundle, Debug)]
@@ -46,8 +44,9 @@ pub struct RectangleCompNodeBundle {
     pub visibility: VisibilityMixin,
     pub blend_mode: BlendModeMixin,
     pub opacity: OpacityMixin,
-    pub fill: FillMixin,
-    pub stroke: StrokeMixin,
+    // https://github.com/Nilirad/bevy_prototype_lyon/issues/207
+    // pub fill: FillMixin,
+    // pub stroke: StrokeMixin,
 }
 
 #[derive(Bundle, Debug, Default)]
@@ -59,8 +58,9 @@ pub struct EllipseCompNodeBundle {
     pub visibility: VisibilityMixin,
     pub blend_mode: BlendModeMixin,
     pub opacity: OpacityMixin,
-    pub fill: FillMixin,
-    pub stroke: StrokeMixin,
+    // https://github.com/Nilirad/bevy_prototype_lyon/issues/207
+    // pub fill: FillMixin,
+    // pub stroke: StrokeMixin,
 }
 
 #[derive(Bundle, Debug, Default)]
@@ -72,8 +72,9 @@ pub struct StarCompNodeBundle {
     pub visibility: VisibilityMixin,
     pub blend_mode: BlendModeMixin,
     pub opacity: OpacityMixin,
-    pub fill: FillMixin,
-    pub stroke: StrokeMixin,
+    // https://github.com/Nilirad/bevy_prototype_lyon/issues/207
+    // pub fill: FillMixin,
+    // pub stroke: StrokeMixin,
 }
 
 #[derive(Bundle, Debug, Default)]
@@ -85,8 +86,9 @@ pub struct PolygonCompNodeBundle {
     pub visibility: VisibilityMixin,
     pub blend_mode: BlendModeMixin,
     pub opacity: OpacityMixin,
-    pub fill: FillMixin,
-    pub stroke: StrokeMixin,
+    // https://github.com/Nilirad/bevy_prototype_lyon/issues/207
+    // pub fill: FillMixin,
+    // pub stroke: StrokeMixin,
 }
 
 #[derive(Bundle, Debug, Default)]
@@ -98,8 +100,9 @@ pub struct TextCompNodeBundle {
     pub visibility: VisibilityMixin,
     pub blend_mode: BlendModeMixin,
     pub opacity: OpacityMixin,
-    pub fill: FillMixin,
-    pub stroke: StrokeMixin,
+    // https://github.com/Nilirad/bevy_prototype_lyon/issues/207
+    // pub fill: FillMixin,
+    // pub stroke: StrokeMixin,
 }
 
 #[derive(Bundle, Debug, Default)]

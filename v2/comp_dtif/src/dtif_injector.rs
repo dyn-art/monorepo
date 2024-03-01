@@ -9,7 +9,11 @@ use bevy_ecs::{
     world::{EntityWorldMut, World},
 };
 use bevy_hierarchy::BuildWorldChildren;
-use dyn_comp_types::{events::InputEvent, mixins::Root};
+use dyn_comp_types::{
+    events::InputEvent,
+    mixins::{FillMixin, PaintParentMixin, Root},
+};
+use smallvec::{smallvec, SmallVec};
 use std::collections::HashMap;
 
 pub struct DtifInjector {
@@ -53,6 +57,7 @@ impl DtifInjector {
             let node_entity = self.spawn_node(node, world).id();
             self.sid_to_entity.insert(node_sid, node_entity);
 
+            self.process_node_fills(node_entity, node, world);
             self.process_node_children(node_entity, node, dtif, world);
 
             return node_entity;
@@ -61,15 +66,15 @@ impl DtifInjector {
 
     fn spawn_node<'a>(&self, node: &Node, world: &'a mut World) -> EntityWorldMut<'a> {
         match node {
-            Node::Frame(node) => world.spawn(node.to_ecs_bundle(&self.sid_to_entity)),
-            Node::Group(node) => world.spawn(node.to_ecs_bundle(&self.sid_to_entity)),
-            Node::Rectangle(node) => world.spawn(node.to_ecs_bundle(&self.sid_to_entity)),
+            Node::Frame(node) => world.spawn(node.to_ecs_bundle()),
+            Node::Group(node) => world.spawn(node.to_ecs_bundle()),
+            Node::Rectangle(node) => world.spawn(node.to_ecs_bundle()),
         }
     }
 
     fn process_node_children(
         &mut self,
-        parent_entity: Entity,
+        node_entity: Entity,
         node: &Node,
         dtif: &CompDtif,
         world: &mut World,
@@ -85,7 +90,38 @@ impl DtifInjector {
 
             // Establish Bevy parent-child relationships
             if !new_children.is_empty() {
-                world.entity_mut(parent_entity).push_children(&new_children);
+                world.entity_mut(node_entity).push_children(&new_children);
+            }
+        }
+    }
+
+    fn process_node_fills(&mut self, node_entity: Entity, node: &Node, world: &mut World) {
+        let dtif_fills = match node {
+            Node::Frame(node) => &node.fill,
+            Node::Rectangle(node) => &node.fill,
+            _ => return,
+        };
+        let fills = dtif_fills
+            .iter()
+            .filter_map(|dtif_fill| {
+                let fill = dtif_fill.to_fill(&self.sid_to_entity)?;
+                let mut paint_entity_world = world.get_entity_mut(fill.paint)?;
+
+                if let Some(mut paint_parent_mixin) =
+                    paint_entity_world.get_mut::<PaintParentMixin>()
+                {
+                    paint_parent_mixin.0.push(node_entity);
+                } else {
+                    paint_entity_world.insert(PaintParentMixin(smallvec![node_entity]));
+                }
+
+                Some(fill)
+            })
+            .collect::<SmallVec<_>>();
+
+        if !fills.is_empty() {
+            if let Some(mut node_entity_world) = world.get_entity_mut(node_entity) {
+                node_entity_world.insert(FillMixin(fills));
             }
         }
     }
@@ -99,7 +135,7 @@ impl DtifInjector {
 
     fn spawn_paint<'a>(&self, paint: &Paint, world: &'a mut World) -> EntityWorldMut<'a> {
         match paint {
-            Paint::Solid(paint) => world.spawn(paint.to_ecs_bundle(&self.sid_to_entity)),
+            Paint::Solid(paint) => world.spawn(paint.to_ecs_bundle()),
         }
     }
 

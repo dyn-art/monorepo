@@ -29,6 +29,7 @@ pub struct CompSvgBuilderPlugin {
 #[derive(SystemSet, Debug, Hash, PartialEq, Eq, Clone)]
 enum SvgBuilderSystemSet {
     Insert,
+    PostInsert,
     Collect,
     Apply,
     Extract,
@@ -46,6 +47,7 @@ impl Plugin for CompSvgBuilderPlugin {
             Last,
             (
                 SvgBuilderSystemSet::Insert,
+                SvgBuilderSystemSet::PostInsert,
                 SvgBuilderSystemSet::Collect,
                 SvgBuilderSystemSet::Apply,
                 SvgBuilderSystemSet::Extract,
@@ -60,7 +62,7 @@ impl Plugin for CompSvgBuilderPlugin {
             (
                 insert_frame_node_svg_bundle.in_set(SvgBuilderSystemSet::Insert),
                 insert_shape_node_svg_bundle.in_set(SvgBuilderSystemSet::Insert),
-                insert_fills.in_set(SvgBuilderSystemSet::Apply),
+                insert_fills.in_set(SvgBuilderSystemSet::PostInsert),
                 collect_node_children_changes.in_set(SvgBuilderSystemSet::Collect),
                 apply_node_children_changes.in_set(SvgBuilderSystemSet::Apply),
                 apply_visibility_mixin_changes.in_set(SvgBuilderSystemSet::Apply),

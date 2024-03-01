@@ -26,20 +26,22 @@ impl SvgBundle for SolidFillSvgBundle {
         &mut self.root
     }
 
-    fn get_child_elements(&self) -> BTreeMap<SvgElementId, &SvgElement> {
-        let mut children = BTreeMap::new();
+    fn get_elements(&self) -> BTreeMap<SvgElementId, &SvgElement> {
+        let mut elements = BTreeMap::new();
 
-        children.insert(self.paint_rect.get_id(), &self.paint_rect);
+        elements.insert(self.root.get_id(), &self.root);
+        elements.insert(self.paint_rect.get_id(), &self.paint_rect);
 
-        return children;
+        return elements;
     }
 
-    fn get_child_elements_mut(&mut self) -> BTreeMap<SvgElementId, &mut SvgElement> {
-        let mut children = BTreeMap::new();
+    fn get_elements_mut(&mut self) -> BTreeMap<SvgElementId, &mut SvgElement> {
+        let mut elements = BTreeMap::new();
 
-        children.insert(self.paint_rect.get_id(), &mut self.paint_rect);
+        elements.insert(self.root.get_id(), &mut self.root);
+        elements.insert(self.paint_rect.get_id(), &mut self.paint_rect);
 
-        return children;
+        return elements;
     }
 }
 

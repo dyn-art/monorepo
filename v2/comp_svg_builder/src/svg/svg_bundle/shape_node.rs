@@ -37,36 +37,42 @@ impl SvgBundle for ShapeNodeSvgBundle {
         &mut self.root
     }
 
-    fn get_child_elements(&self) -> BTreeMap<SvgElementId, &SvgElement> {
-        let mut children = BTreeMap::new();
+    fn get_elements(&self) -> BTreeMap<SvgElementId, &SvgElement> {
+        let mut elements = BTreeMap::new();
 
-        children.insert(self.defs.get_id(), &self.defs);
-        children.insert(self.click_area_rect.get_id(), &self.click_area_rect);
-        children.insert(self.fill_clip_path.get_id(), &self.fill_clip_path);
-        children.insert(self.fill_clipped_path.get_id(), &self.fill_clipped_path);
-        children.insert(self.fill_wrapper_g.get_id(), &self.fill_wrapper_g);
+        elements.insert(self.root.get_id(), &self.root);
+        elements.insert(self.defs.get_id(), &self.defs);
+        elements.insert(self.click_area_rect.get_id(), &self.click_area_rect);
+        elements.insert(self.fill_clip_path.get_id(), &self.fill_clip_path);
+        elements.insert(self.fill_clipped_path.get_id(), &self.fill_clipped_path);
+        elements.insert(self.fill_wrapper_g.get_id(), &self.fill_wrapper_g);
         self.fills.iter().for_each(|fill| {
-            let root_element = fill.get_svg_bundle().get_root_element();
-            children.insert(root_element.get_id(), root_element);
+            let elements_map = fill.get_svg_bundle().get_elements();
+            for (_, element) in elements_map {
+                elements.insert(element.get_id(), element);
+            }
         });
 
-        return children;
+        return elements;
     }
 
-    fn get_child_elements_mut(&mut self) -> BTreeMap<SvgElementId, &mut SvgElement> {
-        let mut children = BTreeMap::new();
+    fn get_elements_mut(&mut self) -> BTreeMap<SvgElementId, &mut SvgElement> {
+        let mut elements = BTreeMap::new();
 
-        children.insert(self.defs.get_id(), &mut self.defs);
-        children.insert(self.click_area_rect.get_id(), &mut self.click_area_rect);
-        children.insert(self.fill_clip_path.get_id(), &mut self.fill_clip_path);
-        children.insert(self.fill_clipped_path.get_id(), &mut self.fill_clipped_path);
-        children.insert(self.fill_wrapper_g.get_id(), &mut self.fill_wrapper_g);
+        elements.insert(self.root.get_id(), &mut self.root);
+        elements.insert(self.defs.get_id(), &mut self.defs);
+        elements.insert(self.click_area_rect.get_id(), &mut self.click_area_rect);
+        elements.insert(self.fill_clip_path.get_id(), &mut self.fill_clip_path);
+        elements.insert(self.fill_clipped_path.get_id(), &mut self.fill_clipped_path);
+        elements.insert(self.fill_wrapper_g.get_id(), &mut self.fill_wrapper_g);
         self.fills.iter_mut().for_each(|fill| {
-            let root_element = fill.get_svg_bundle_mut().get_root_element_mut();
-            children.insert(root_element.get_id(), root_element);
+            let elements_map = fill.get_svg_bundle_mut().get_elements_mut();
+            for (_, element) in elements_map {
+                elements.insert(element.get_id(), element);
+            }
         });
 
-        return children;
+        return elements;
     }
 }
 

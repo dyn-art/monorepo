@@ -2,19 +2,14 @@ use crate::{
     common::{DtifFill, DtifStroke},
     ToEcsBundleImpl,
 };
-use bevy_ecs::entity::Entity;
 use bevy_transform::components::Transform;
 use dyn_comp_types::{
     bundles::{FrameCompNodeBundle, GroupCompNodeBundle, RectangleCompNodeBundle},
     common::{BlendMode, CornerRadii, Opacity, Size, Visibility},
-    mixins::{
-        BlendModeMixin, CornerRadiiMixin, FillMixin, OpacityMixin, SizeMixin, StrokeMixin,
-        VisibilityMixin,
-    },
+    mixins::{BlendModeMixin, CornerRadiiMixin, OpacityMixin, SizeMixin, VisibilityMixin},
     nodes::{CompNode, FrameCompNode, GroupCompNode, RectangleCompNode},
 };
 use glam::{Quat, Vec2, Vec3};
-use std::collections::HashMap;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
 #[serde(tag = "type")]
@@ -43,7 +38,7 @@ pub struct FrameNode {
 impl ToEcsBundleImpl for FrameNode {
     type Bundle = FrameCompNodeBundle;
 
-    fn to_ecs_bundle(&self, sid_to_entity: &HashMap<String, Entity>) -> Self::Bundle {
+    fn to_ecs_bundle(&self) -> Self::Bundle {
         FrameCompNodeBundle {
             node: CompNode::default(),
             frame: FrameCompNode {
@@ -59,18 +54,6 @@ impl ToEcsBundleImpl for FrameNode {
             visibility: VisibilityMixin(self.visibility),
             blend_mode: BlendModeMixin(self.blend_mode),
             opacity: OpacityMixin(self.opacity),
-            fill: FillMixin(
-                self.fill
-                    .iter()
-                    .filter_map(|fill| fill.to_fill(sid_to_entity))
-                    .collect(),
-            ),
-            stroke: StrokeMixin(
-                self.stroke
-                    .iter()
-                    .filter_map(|stroke| stroke.to_storke(sid_to_entity))
-                    .collect(),
-            ),
         }
     }
 }
@@ -90,7 +73,7 @@ pub struct GroupNode {
 impl ToEcsBundleImpl for GroupNode {
     type Bundle = GroupCompNodeBundle;
 
-    fn to_ecs_bundle(&self, sid_to_entity: &HashMap<String, Entity>) -> Self::Bundle {
+    fn to_ecs_bundle(&self) -> Self::Bundle {
         GroupCompNodeBundle {
             node: CompNode::default(),
             group: GroupCompNode,
@@ -123,7 +106,7 @@ pub struct RectangleNode {
 impl ToEcsBundleImpl for RectangleNode {
     type Bundle = RectangleCompNodeBundle;
 
-    fn to_ecs_bundle(&self, sid_to_entity: &HashMap<String, Entity>) -> Self::Bundle {
+    fn to_ecs_bundle(&self) -> Self::Bundle {
         RectangleCompNodeBundle {
             node: CompNode::default(),
             rectangle: RectangleCompNode::default(),
@@ -137,18 +120,6 @@ impl ToEcsBundleImpl for RectangleNode {
             visibility: VisibilityMixin(self.visibility),
             blend_mode: BlendModeMixin(self.blend_mode),
             opacity: OpacityMixin(self.opacity),
-            fill: FillMixin(
-                self.fill
-                    .iter()
-                    .filter_map(|fill| fill.to_fill(sid_to_entity))
-                    .collect(),
-            ),
-            stroke: StrokeMixin(
-                self.stroke
-                    .iter()
-                    .filter_map(|stroke| stroke.to_storke(sid_to_entity))
-                    .collect(),
-            ),
         }
     }
 }

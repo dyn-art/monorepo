@@ -278,7 +278,7 @@ impl SvgElement {
         for child in &self.children {
             match child.identifier {
                 SvgElementChildIdentifier::InSvgBundleContext(_) => {
-                    if let Some(child_element) = bundle.get_child_elements().get(&child.id) {
+                    if let Some(child_element) = bundle.get_elements().get(&child.id) {
                         result.push_str(&child_element.to_string(bundle, maybe_bundle_query));
                     }
                 }

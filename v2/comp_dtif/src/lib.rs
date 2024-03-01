@@ -45,5 +45,5 @@ pub struct CompDtif {
 
 pub trait ToEcsBundleImpl {
     type Bundle: bevy_ecs::bundle::Bundle;
-    fn to_ecs_bundle(&self, sid_to_entity: &HashMap<String, Entity>) -> Self::Bundle;
+    fn to_ecs_bundle(&self) -> Self::Bundle;
 }

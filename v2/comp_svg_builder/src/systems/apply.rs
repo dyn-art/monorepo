@@ -19,7 +19,7 @@ use bevy_hierarchy::Children;
 use bevy_transform::components::Transform;
 use dyn_comp_types::{
     common::Visibility,
-    mixins::{BlendModeMixin, OpacityMixin, PaintAppliedOn, SizeMixin, VisibilityMixin},
+    mixins::{BlendModeMixin, OpacityMixin, PaintParentMixin, SizeMixin, VisibilityMixin},
     nodes::CompNode,
     paints::{CompPaint, SolidCompPaint},
 };
@@ -245,12 +245,15 @@ pub fn apply_blend_mode_mixin_changes(
 }
 
 pub fn apply_solid_paint_changes(
-    query: Query<(&SolidCompPaint, &PaintAppliedOn), (With<CompPaint>, Changed<SolidCompPaint>)>,
+    query: Query<
+        (Entity, &SolidCompPaint, &PaintParentMixin),
+        (With<CompPaint>, Changed<SolidCompPaint>),
+    >,
     mut node_bundle_query: Query<&mut NodeSvgBundleMixin>,
 ) {
-    for (solid_paint, PaintAppliedOn(entites)) in query.iter() {
-        for entity in entites {
-            if let Ok(mut bundle_mixin) = node_bundle_query.get_mut(*entity) {
+    for (paint_entity, solid_paint, PaintParentMixin(node_entities)) in query.iter() {
+        for node_entity in node_entities {
+            if let Ok(mut bundle_mixin) = node_bundle_query.get_mut(*node_entity) {
                 let NodeSvgBundleMixin(bundle) = bundle_mixin.as_mut();
                 let bundle_fills = match bundle {
                     NodeSvgBundle::Frame(bundle) => &mut bundle.fills,
@@ -260,7 +263,7 @@ pub fn apply_solid_paint_changes(
 
                 if let Some(fill) = bundle_fills
                     .iter_mut()
-                    .find(|fill| fill.get_paint_entity() == entity)
+                    .find(|fill| *fill.get_paint_entity() == paint_entity)
                 {
                     match fill {
                         FillSvgBundle::Solid(fill) => {
