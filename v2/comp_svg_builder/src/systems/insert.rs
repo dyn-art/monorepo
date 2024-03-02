@@ -83,35 +83,29 @@ pub fn insert_fills(
             None => return,
         };
 
-        // Identify removed and newly added fills
+        // Identify removed and newly added fills (paint entities)
         let current_fill_entities_set = bundle_fills
             .iter()
             .map(|fill| *fill.get_paint_entity())
             .collect::<HashSet<_>>();
         let new_fill_entities_set = fills.iter().map(|fill| fill.paint).collect::<HashSet<_>>();
+        let removed_fill_entities = current_fill_entities_set
+            .difference(&new_fill_entities_set)
+            .cloned()
+            .collect::<Vec<_>>();
+        let added_fill_entities = new_fill_entities_set
+            .difference(&current_fill_entities_set)
+            .cloned()
+            .collect::<Vec<_>>();
 
-        process_removed_fills(&current_fill_entities_set, &new_fill_entities_set, bundle);
-        process_added_fills(
-            &current_fill_entities_set,
-            &new_fill_entities_set,
-            bundle,
-            &mut svg_context_res,
-        );
+        process_removed_fills(removed_fill_entities, bundle);
+        process_added_fills(added_fill_entities, bundle, &mut svg_context_res);
         reorder_fills(fills, bundle);
     }
 }
 
-fn process_removed_fills(
-    current_fill_entities_set: &HashSet<Entity>,
-    new_fill_entities_set: &HashSet<Entity>,
-    bundle: &mut NodeSvgBundle,
-) -> Option<()> {
-    let removed_fill_entities = current_fill_entities_set
-        .difference(new_fill_entities_set)
-        .cloned()
-        .collect::<Vec<_>>();
-
-    for entity in removed_fill_entities {
+fn process_removed_fills(removed_entities: Vec<Entity>, bundle: &mut NodeSvgBundle) -> Option<()> {
+    for entity in removed_entities {
         let to_remove_ids = bundle
             .get_fills_mut()?
             .iter()
@@ -132,17 +126,11 @@ fn process_removed_fills(
 }
 
 fn process_added_fills(
-    current_fill_entities_set: &HashSet<Entity>,
-    new_fill_entities_set: &HashSet<Entity>,
+    added_entities: Vec<Entity>,
     bundle: &mut NodeSvgBundle,
     svg_context_res: &mut ResMut<SvgContextRes>,
 ) -> Option<()> {
-    let added_fill_entities = new_fill_entities_set
-        .difference(current_fill_entities_set)
-        .cloned()
-        .collect::<Vec<_>>();
-
-    for entity in added_fill_entities {
+    for entity in added_entities {
         let mut fill_bundle = SolidFillSvgBundle::new(entity, svg_context_res);
         bundle
             .get_fill_wrapper_element_mut()?

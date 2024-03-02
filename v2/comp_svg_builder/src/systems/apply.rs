@@ -69,40 +69,60 @@ pub fn apply_node_children_changes(
     {
         let mut node_query = queries.p1();
         for modification in modifications {
-            // Process removed entities
-            for entity in modification.removed_entities {
-                let [mut bundle_mixin, child_bundle_mixin] =
-                    node_query.many_mut([modification.parent_entity, entity]);
-                let NodeSvgBundleMixin(bundle) = bundle_mixin.as_mut();
-                let NodeSvgBundleMixin(child_bundle) = child_bundle_mixin.as_ref();
-                match bundle {
-                    NodeSvgBundle::Frame(frame_node) => {
-                        frame_node.children_wrapper_g.remove_child(
-                            child_bundle.get_svg_bundle().get_root_element().get_id(),
-                        );
-                    }
-                    _ => {}
-                }
-            }
-
-            // Process added entities
-            for entity in modification.added_entities {
-                let [mut bundle_mixin, mut child_bundle_mixin] =
-                    node_query.many_mut([modification.parent_entity, entity]);
-                let NodeSvgBundleMixin(bundle) = bundle_mixin.as_mut();
-                let NodeSvgBundleMixin(child_bundle) = child_bundle_mixin.as_mut();
-                match bundle {
-                    NodeSvgBundle::Frame(frame_node) => {
-                        frame_node.children_wrapper_g.append_child_in_world_context(
-                            entity,
-                            child_bundle.get_svg_bundle_mut().get_root_element_mut(),
-                        );
-                    }
-                    _ => {}
-                }
-            }
+            process_removed_nodes(
+                modification.removed_entities,
+                modification.parent_entity,
+                &mut node_query,
+            );
+            process_added_nodes(
+                modification.added_entities,
+                modification.parent_entity,
+                &mut node_query,
+            );
 
             // TODO: Reorder
+        }
+    }
+}
+
+fn process_removed_nodes(
+    removed_entities: Vec<Entity>,
+    parent_entity: Entity,
+    node_query: &mut Query<&mut NodeSvgBundleMixin>,
+) {
+    for entity in removed_entities {
+        let [mut bundle_mixin, child_bundle_mixin] = node_query.many_mut([parent_entity, entity]);
+        let NodeSvgBundleMixin(bundle) = bundle_mixin.as_mut();
+        let NodeSvgBundleMixin(child_bundle) = child_bundle_mixin.as_ref();
+        match bundle {
+            NodeSvgBundle::Frame(frame_node) => {
+                frame_node
+                    .children_wrapper_g
+                    .remove_child(child_bundle.get_svg_bundle().get_root_element().get_id());
+            }
+            _ => {}
+        }
+    }
+}
+
+fn process_added_nodes(
+    added_entities: Vec<Entity>,
+    parent_entity: Entity,
+    node_query: &mut Query<&mut NodeSvgBundleMixin>,
+) {
+    for entity in added_entities {
+        let [mut bundle_mixin, mut child_bundle_mixin] =
+            node_query.many_mut([parent_entity, entity]);
+        let NodeSvgBundleMixin(bundle) = bundle_mixin.as_mut();
+        let NodeSvgBundleMixin(child_bundle) = child_bundle_mixin.as_mut();
+        match bundle {
+            NodeSvgBundle::Frame(bundle) => {
+                bundle.children_wrapper_g.append_child_in_world_context(
+                    entity,
+                    child_bundle.get_svg_bundle_mut().get_root_element_mut(),
+                );
+            }
+            _ => {}
         }
     }
 }
