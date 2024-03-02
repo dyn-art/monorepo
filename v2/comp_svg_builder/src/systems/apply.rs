@@ -1,19 +1,14 @@
-use crate::{
-    resources::delayed_svg_bundle_modifications::{
-        DelayedSvgBundleModificationsRes, SvgBundleChildrenModification,
-    },
-    svg::{
-        svg_bundle::{FillSvgBundle, NodeSvgBundle, NodeSvgBundleMixin},
-        svg_element::{
-            attributes::{SvgAttribute, SvgMeasurementUnit},
-            styles::{SvgDisplayStyle, SvgStyle},
-        },
+use crate::svg::{
+    svg_bundle::{FillSvgBundle, NodeSvgBundle, NodeSvgBundleMixin},
+    svg_element::{
+        attributes::{SvgAttribute, SvgMeasurementUnit},
+        styles::{SvgDisplayStyle, SvgStyle},
     },
 };
 use bevy_ecs::{
     entity::Entity,
     query::{Changed, With},
-    system::{Query, ResMut},
+    system::{ParamSet, Query},
 };
 use bevy_hierarchy::Children;
 use bevy_transform::components::Transform;
@@ -25,82 +20,90 @@ use dyn_comp_types::{
 };
 use std::collections::HashSet;
 
-pub fn collect_node_children_changes(
-    mut delayed_node_modification_res: ResMut<DelayedSvgBundleModificationsRes>,
-    query: Query<(Entity, &Children, &mut NodeSvgBundleMixin), (With<CompNode>, Changed<Children>)>,
+#[derive(Debug, Clone)]
+pub struct SvgBundleChildrenModification {
+    pub parent_entity: Entity,
+    pub added_entities: Vec<Entity>,
+    pub removed_entities: Vec<Entity>,
+}
+
+pub fn apply_node_children_changes(
+    // https://bevyengine.org/learn/errors/
+    mut queries: ParamSet<(
+        Query<(Entity, &Children, &mut NodeSvgBundleMixin), (With<CompNode>, Changed<Children>)>,
+        Query<&mut NodeSvgBundleMixin>,
+    )>,
 ) {
-    for (entity, children, NodeSvgBundleMixin(bundle)) in query.iter() {
-        let node_children = match &bundle {
-            NodeSvgBundle::Frame(bundle) => &bundle.node_children,
-            _ => return,
-        };
+    let mut modifications: Vec<SvgBundleChildrenModification> = Vec::new();
 
-        // Identify removed and newly added node entities
-        let current_node_children_set = node_children.iter().copied().collect::<HashSet<_>>();
-        let new_node_children_set = children.iter().copied().collect::<HashSet<_>>();
-        let removed_node_entities: Vec<_> = current_node_children_set
-            .difference(&new_node_children_set)
-            .cloned()
-            .collect();
-        let added_node_entities: Vec<_> = new_node_children_set
-            .difference(&current_node_children_set)
-            .cloned()
-            .collect();
+    // Query modifications
+    {
+        let children_query = queries.p0();
+        for (entity, children, NodeSvgBundleMixin(bundle)) in children_query.iter() {
+            let node_children = match &bundle {
+                NodeSvgBundle::Frame(bundle) => &bundle.node_children,
+                _ => return,
+            };
 
-        delayed_node_modification_res
-            .children_modifications
-            .push(SvgBundleChildrenModification {
+            // Identify removed and newly added node entities
+            let current_node_children_set = node_children.iter().copied().collect::<HashSet<_>>();
+            let new_node_children_set = children.iter().copied().collect::<HashSet<_>>();
+            let removed_node_entities: Vec<_> = current_node_children_set
+                .difference(&new_node_children_set)
+                .cloned()
+                .collect();
+            let added_node_entities: Vec<_> = new_node_children_set
+                .difference(&current_node_children_set)
+                .cloned()
+                .collect();
+
+            modifications.push(SvgBundleChildrenModification {
                 parent_entity: entity,
                 added_entities: added_node_entities,
                 removed_entities: removed_node_entities,
             });
+        }
     }
-}
 
-pub fn apply_node_children_changes(
-    mut delayed_svg_bundle_modifications_res: ResMut<DelayedSvgBundleModificationsRes>,
-    mut bundle_query: Query<&mut NodeSvgBundleMixin>,
-) {
-    let modifications = delayed_svg_bundle_modifications_res
-        .children_modifications
-        .drain(..)
-        .collect::<Vec<_>>();
-
-    for modification in modifications {
-        // Process removed entities
-        for entity in modification.removed_entities {
-            let [mut bundle_mixin, child_bundle_mixin] =
-                bundle_query.many_mut([modification.parent_entity, entity]);
-            let NodeSvgBundleMixin(bundle) = bundle_mixin.as_mut();
-            let NodeSvgBundleMixin(child_bundle) = child_bundle_mixin.as_ref();
-            match bundle {
-                NodeSvgBundle::Frame(frame_node) => {
-                    frame_node
-                        .children_wrapper_g
-                        .remove_child(child_bundle.get_svg_bundle().get_root_element().get_id());
+    // Apply modifications
+    {
+        let mut node_query = queries.p1();
+        for modification in modifications {
+            // Process removed entities
+            for entity in modification.removed_entities {
+                let [mut bundle_mixin, child_bundle_mixin] =
+                    node_query.many_mut([modification.parent_entity, entity]);
+                let NodeSvgBundleMixin(bundle) = bundle_mixin.as_mut();
+                let NodeSvgBundleMixin(child_bundle) = child_bundle_mixin.as_ref();
+                match bundle {
+                    NodeSvgBundle::Frame(frame_node) => {
+                        frame_node.children_wrapper_g.remove_child(
+                            child_bundle.get_svg_bundle().get_root_element().get_id(),
+                        );
+                    }
+                    _ => {}
                 }
-                _ => {}
             }
-        }
 
-        // Process added entities
-        for entity in modification.added_entities {
-            let [mut bundle_mixin, mut child_bundle_mixin] =
-                bundle_query.many_mut([modification.parent_entity, entity]);
-            let NodeSvgBundleMixin(bundle) = bundle_mixin.as_mut();
-            let NodeSvgBundleMixin(child_bundle) = child_bundle_mixin.as_mut();
-            match bundle {
-                NodeSvgBundle::Frame(frame_node) => {
-                    frame_node.children_wrapper_g.append_child_in_world_context(
-                        entity,
-                        child_bundle.get_svg_bundle_mut().get_root_element_mut(),
-                    );
+            // Process added entities
+            for entity in modification.added_entities {
+                let [mut bundle_mixin, mut child_bundle_mixin] =
+                    node_query.many_mut([modification.parent_entity, entity]);
+                let NodeSvgBundleMixin(bundle) = bundle_mixin.as_mut();
+                let NodeSvgBundleMixin(child_bundle) = child_bundle_mixin.as_mut();
+                match bundle {
+                    NodeSvgBundle::Frame(frame_node) => {
+                        frame_node.children_wrapper_g.append_child_in_world_context(
+                            entity,
+                            child_bundle.get_svg_bundle_mut().get_root_element_mut(),
+                        );
+                    }
+                    _ => {}
                 }
-                _ => {}
             }
-        }
 
-        // TODO: Reorder
+            // TODO: Reorder
+        }
     }
 }
 

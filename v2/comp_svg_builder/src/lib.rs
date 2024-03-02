@@ -5,14 +5,12 @@ mod systems;
 
 use bevy_app::{App, Last, Plugin};
 use bevy_ecs::schedule::{IntoSystemConfigs, IntoSystemSetConfigs, SystemSet};
-use resources::{
-    delayed_svg_bundle_modifications::DelayedSvgBundleModificationsRes, svg_context::SvgContextRes,
-};
+use resources::svg_context::SvgContextRes;
 use systems::{
     apply::{
         apply_blend_mode_mixin_changes, apply_node_children_changes, apply_opacity_mixin_changes,
         apply_size_mixin_changes, apply_solid_paint_changes, apply_transform_changes,
-        apply_visibility_mixin_changes, collect_node_children_changes,
+        apply_visibility_mixin_changes,
     },
     insert::{insert_fills, insert_frame_node_svg_bundle, insert_shape_node_svg_bundle},
 };
@@ -30,7 +28,6 @@ pub struct CompSvgBuilderPlugin {
 enum SvgBuilderSystemSet {
     Insert,
     PostInsert,
-    Collect,
     Apply,
     Extract,
     Queue,
@@ -40,7 +37,6 @@ impl Plugin for CompSvgBuilderPlugin {
     fn build(&self, app: &mut App) {
         // Register resources
         app.init_resource::<SvgContextRes>();
-        app.init_resource::<DelayedSvgBundleModificationsRes>();
 
         // Configure system set
         app.configure_sets(
@@ -48,7 +44,6 @@ impl Plugin for CompSvgBuilderPlugin {
             (
                 SvgBuilderSystemSet::Insert,
                 SvgBuilderSystemSet::PostInsert,
-                SvgBuilderSystemSet::Collect,
                 SvgBuilderSystemSet::Apply,
                 SvgBuilderSystemSet::Extract,
                 SvgBuilderSystemSet::Queue,
@@ -63,7 +58,6 @@ impl Plugin for CompSvgBuilderPlugin {
                 insert_frame_node_svg_bundle.in_set(SvgBuilderSystemSet::Insert),
                 insert_shape_node_svg_bundle.in_set(SvgBuilderSystemSet::Insert),
                 insert_fills.in_set(SvgBuilderSystemSet::PostInsert),
-                collect_node_children_changes.in_set(SvgBuilderSystemSet::Collect),
                 apply_node_children_changes.in_set(SvgBuilderSystemSet::Apply),
                 apply_visibility_mixin_changes.in_set(SvgBuilderSystemSet::Apply),
                 apply_size_mixin_changes.in_set(SvgBuilderSystemSet::Apply),
