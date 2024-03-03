@@ -12,6 +12,8 @@ use std::collections::BTreeMap;
 
 #[derive(Debug, Clone)]
 pub struct FrameNodeSvgBundle {
+    pub entity: Entity,
+
     pub root: SvgElement,
     pub defs: SvgElement,
 
@@ -30,7 +32,7 @@ pub struct FrameNodeSvgBundle {
     pub fills: SmallVec<[FillSvgBundle; 2]>,
 
     // Children
-    pub node_children: Vec<Entity>,
+    pub node_children: SmallVec<[Entity; 2]>,
 }
 
 impl SvgBundle for FrameNodeSvgBundle {
@@ -207,6 +209,8 @@ impl FrameNodeSvgBundle {
             .append_child_in_bundle_context(entity, &mut children_wrapper_g_element);
 
         Self {
+            entity,
+
             root: root_element,
             defs: defs_element,
 
@@ -223,7 +227,7 @@ impl FrameNodeSvgBundle {
             fill_clipped_path: fill_clipped_path_element,
             fill_wrapper_g: fill_wrapper_g_element,
 
-            node_children: Vec::new(),
+            node_children: SmallVec::new(),
             fills: SmallVec::new(),
         }
     }

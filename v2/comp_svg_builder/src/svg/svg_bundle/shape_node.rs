@@ -15,6 +15,8 @@ use std::collections::BTreeMap;
 
 #[derive(Debug, Clone)]
 pub struct ShapeNodeSvgBundle {
+    pub entity: Entity,
+
     pub root: SvgElement,
     pub defs: SvgElement,
 
@@ -161,6 +163,8 @@ impl ShapeNodeSvgBundle {
         root_element.append_child_in_bundle_context(entity, &mut fill_wrapper_g_element);
 
         Self {
+            entity,
+
             root: root_element,
             defs: defs_element,
 

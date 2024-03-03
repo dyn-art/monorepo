@@ -57,6 +57,13 @@ pub enum NodeSvgBundle {
 }
 
 impl NodeSvgBundle {
+    pub fn get_entity(&self) -> &Entity {
+        match self {
+            NodeSvgBundle::Frame(bundle) => &bundle.entity,
+            NodeSvgBundle::Shape(bundle) => &bundle.entity,
+        }
+    }
+
     pub fn get_svg_bundle(&self) -> &dyn SvgBundle {
         match self {
             NodeSvgBundle::Frame(bundle) => bundle,
@@ -83,6 +90,20 @@ impl NodeSvgBundle {
         match self {
             NodeSvgBundle::Frame(bundle) => Some(&mut bundle.fills),
             NodeSvgBundle::Shape(bundle) => Some(&mut bundle.fills),
+            _ => None,
+        }
+    }
+
+    pub fn get_node_children_mut(&mut self) -> Option<&mut SmallVec<[Entity; 2]>> {
+        match self {
+            NodeSvgBundle::Frame(bundle) => Some(&mut bundle.node_children),
+            _ => None,
+        }
+    }
+
+    pub fn get_node_children(&self) -> Option<&SmallVec<[Entity; 2]>> {
+        match self {
+            NodeSvgBundle::Frame(bundle) => Some(&bundle.node_children),
             _ => None,
         }
     }
