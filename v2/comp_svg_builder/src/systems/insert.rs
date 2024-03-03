@@ -5,7 +5,10 @@ use crate::{
             frame_node::FrameNodeSvgBundle, shape_node::ShapeNodeSvgBundle,
             solid_fill::SolidFillSvgBundle, FillSvgBundle, NodeSvgBundle, NodeSvgBundleMixin,
         },
-        svg_element::SvgElementId,
+        svg_element::{
+            element_changes::{SvgElementChange, SvgElementReorderedChange},
+            SvgElementId,
+        },
     },
 };
 use bevy_ecs::{
@@ -83,13 +86,13 @@ pub fn insert_fills(
     for (FillMixin(fills), mut bundle_mixin) in query.iter_mut() {
         let NodeSvgBundleMixin(bundle) = bundle_mixin.as_mut();
 
-        remove_absent_fills(bundle, fills);
-        add_or_update_fills(bundle, fills, &paint_query, &mut svg_context_res);
-        reorder_fills(bundle, fills);
+        remove_absent_node_fills(bundle, fills);
+        add_or_update_node_fills(bundle, fills, &paint_query, &mut svg_context_res);
+        reorder_node_fills(bundle, fills);
     }
 }
 
-fn remove_absent_fills(node_bundle: &mut NodeSvgBundle, fills: &[Fill]) {
+fn remove_absent_node_fills(node_bundle: &mut NodeSvgBundle, fills: &[Fill]) {
     let mut to_remove_element_ids: SmallVec<[SvgElementId; 2]> = SmallVec::new();
 
     // Identify to remove element ids
@@ -114,7 +117,7 @@ fn remove_absent_fills(node_bundle: &mut NodeSvgBundle, fills: &[Fill]) {
     fill_wrapper_element.remove_children(&to_remove_element_ids);
 }
 
-fn add_or_update_fills(
+fn add_or_update_node_fills(
     node_bundle: &mut NodeSvgBundle,
     fills: &[Fill],
     paint_query: &Query<&CompPaint>,
@@ -165,17 +168,69 @@ fn add_or_update_fills(
     bundle_fills.extend(to_add_fill_bundles);
 }
 
-fn reorder_fills(node_bundle: &mut NodeSvgBundle, fills: &[Fill]) {
+fn reorder_node_fills(node_bundle: &mut NodeSvgBundle, fills: &[Fill]) {
     let bundle_fills = match node_bundle.get_fills_mut() {
         Some(bundle_fills) => bundle_fills,
         None => return,
     };
+
+    // Track the original positions of the fills
+    #[cfg(feature = "output_svg_element_changes")]
+    let original_positions = bundle_fills
+        .iter()
+        .map(|fill| fill.get_svg_bundle().get_root_element().get_id())
+        .collect::<Vec<_>>();
+
+    // Sort bundle fills
     bundle_fills.sort_by_key(|bundle_fill| {
         fills
             .iter()
             .position(|fill| *bundle_fill.get_paint_entity() == fill.paint)
             .unwrap_or(usize::MAX)
     });
+
+    #[cfg(feature = "output_svg_element_changes")]
+    {
+        // Determine the new positions after sorting
+        let new_positions = bundle_fills
+            .iter()
+            .map(|fill| fill.get_svg_bundle().get_root_element().get_id())
+            .collect::<Vec<_>>();
+
+        // Emit SvgElementReorderedChange events for fills that have been moved
+        for (new_index, &element_id) in new_positions.iter().enumerate() {
+            let original_index = original_positions
+                .iter()
+                .position(|&e| e == element_id)
+                .unwrap_or(new_index);
+
+            // If the fill has been moved
+            if original_index != new_index {
+                let fill_wrapper_element = match node_bundle.get_fill_wrapper_element_mut() {
+                    Some(fill_wrapper_element) => fill_wrapper_element,
+                    None => return,
+                };
+                let new_parent_id = fill_wrapper_element.get_id();
+
+                // Determine insert_before_id based on the next sibling in the new order
+                let insert_before_id = if new_index + 1 < new_positions.len() {
+                    // There is a next sibling, get its ID
+                    Some(new_positions[new_index + 1])
+                } else {
+                    // No next sibling, append at the end
+                    None
+                };
+
+                fill_wrapper_element.register_change(SvgElementChange::ElementReordered(
+                    SvgElementReorderedChange {
+                        element_id,
+                        new_parent_id,
+                        insert_before_id,
+                    },
+                ));
+            }
+        }
+    }
 }
 
 fn create_fill_bundle(

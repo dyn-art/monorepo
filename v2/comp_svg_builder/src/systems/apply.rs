@@ -21,12 +21,12 @@ use dyn_comp_types::{
     paints::{CompPaint, SolidCompPaint},
 };
 use smallvec::SmallVec;
-use std::collections::{HashMap, HashSet};
+use std::collections::HashSet;
 
 #[derive(Debug, Clone)]
 pub struct SvgBundleChildrenModification {
     pub parent_entity: Entity,
-    pub entities: SmallVec<[Entity; 2]>,
+    pub new_entities_order: SmallVec<[Entity; 2]>,
     pub added_entities: SmallVec<[Entity; 2]>,
     pub removed_entities: SmallVec<[Entity; 2]>,
 }
@@ -65,7 +65,7 @@ pub fn apply_node_children_changes(
                 parent_entity: entity,
                 added_entities: added_node_entities,
                 removed_entities: removed_node_entities,
-                entities: node_children.iter().copied().collect(),
+                new_entities_order: node_children.iter().copied().collect(),
             });
         }
     }
@@ -74,26 +74,26 @@ pub fn apply_node_children_changes(
     {
         let mut node_query = queries.p1();
         for modification in modifications {
-            process_removed_nodes(
+            process_removed_node_children(
                 modification.parent_entity,
                 &modification.removed_entities,
                 &mut node_query,
             );
-            process_added_nodes(
+            process_added_node_children(
                 modification.parent_entity,
                 &modification.added_entities,
                 &mut node_query,
             );
-            reorder_nodes(
+            reorder_node_children(
                 modification.parent_entity,
-                &modification.entities,
+                &modification.new_entities_order,
                 &mut node_query,
             );
         }
     }
 }
 
-fn process_removed_nodes(
+fn process_removed_node_children(
     parent_entity: Entity,
     removed_entities: &[Entity],
     node_query: &mut Query<&mut NodeSvgBundleMixin>,
@@ -113,7 +113,7 @@ fn process_removed_nodes(
     }
 }
 
-fn process_added_nodes(
+fn process_added_node_children(
     parent_entity: Entity,
     added_entities: &[Entity],
     node_query: &mut Query<&mut NodeSvgBundleMixin>,
@@ -135,25 +135,23 @@ fn process_added_nodes(
     }
 }
 
-fn reorder_nodes(
+fn reorder_node_children(
     parent_entity: Entity,
-    entities: &[Entity],
+    new_entities_order: &[Entity],
     node_query: &mut Query<&mut NodeSvgBundleMixin>,
-) -> Option<()> {
-    let order_map = entities
-        .iter()
-        .enumerate()
-        .map(|(index, entity)| (*entity, index))
-        .collect::<HashMap<Entity, usize>>();
-
+) {
+    // Track the original positions of the node children
     #[cfg(feature = "output_svg_element_changes")]
-    let bundle_children = {
-        let NodeSvgBundleMixin(bundle) = match node_query.get(parent_entity) {
+    let original_positions = {
+        let NodeSvgBundleMixin(node_bundle) = match node_query.get(parent_entity) {
             Ok(bundle_mixin) => bundle_mixin,
-            Err(_) => return Some(()),
+            Err(_) => return,
         };
-        let entities_with_element_id: SmallVec<[(Entity, SvgElementId); 2]> = bundle
-            .get_node_children()?
+        let bundle_children = match node_bundle.get_node_children() {
+            Some(bundle_children) => bundle_children,
+            None => return,
+        };
+        bundle_children
             .iter()
             .filter_map(|entity| match node_query.get(*entity) {
                 Ok(NodeSvgBundleMixin(bundle)) => {
@@ -161,31 +159,31 @@ fn reorder_nodes(
                 }
                 Err(_) => None,
             })
-            .collect();
-        entities_with_element_id
+            .collect::<SmallVec<[(Entity, SvgElementId); 2]>>()
     };
 
     let mut bundle_mixin = match node_query.get_mut(parent_entity) {
         Ok(bundle_mixin) => bundle_mixin,
-        Err(_) => return Some(()),
+        Err(_) => return,
     };
-    let NodeSvgBundleMixin(bundle) = bundle_mixin.as_mut();
-    let bundle_children_mut = bundle.get_node_children_mut()?;
+    let NodeSvgBundleMixin(node_bundle) = bundle_mixin.as_mut();
+    let bundle_children = match node_bundle.get_node_children_mut() {
+        Some(bundle_children) => bundle_children,
+        None => return,
+    };
 
-    // Track the original positions of the node children
-    #[cfg(feature = "output_svg_element_changes")]
-    let original_positions = bundle_children
-        .iter()
-        .map(|(_, id)| *id)
-        .collect::<Vec<_>>();
-
-    // Sort `bundle_children` based on the order defined in `order_map`
-    bundle_children_mut.sort_by_key(|entity| *order_map.get(entity).unwrap_or(&usize::MAX));
+    // Sort bundle children
+    bundle_children.sort_by_key(|bundle_child| {
+        new_entities_order
+            .iter()
+            .position(|entity| *bundle_child == *entity)
+            .unwrap_or(usize::MAX)
+    });
 
     #[cfg(feature = "output_svg_element_changes")]
     {
         // Determine the new positions after sorting
-        let new_positions = bundle_children
+        let new_positions = original_positions
             .iter()
             .map(|(_, id)| *id)
             .collect::<Vec<_>>();
@@ -194,12 +192,17 @@ fn reorder_nodes(
         for (new_index, &element_id) in new_positions.iter().enumerate() {
             let original_index = original_positions
                 .iter()
-                .position(|&e| e == element_id)
+                .position(|(_, e)| *e == element_id)
                 .unwrap_or(new_index);
 
-            // If the fill has been moved
+            // If the node has been moved
             if original_index != new_index {
-                let new_parent_id = bundle.get_fill_wrapper_element_mut()?.get_id();
+                let children_wrapper_element = match node_bundle.get_children_wrapper_element_mut()
+                {
+                    Some(children_wrapper_element) => children_wrapper_element,
+                    None => return,
+                };
+                let new_parent_id = children_wrapper_element.get_id();
 
                 // Determine insert_before_id based on the next sibling in the new order
                 let insert_before_id = if new_index + 1 < new_positions.len() {
@@ -210,18 +213,16 @@ fn reorder_nodes(
                     None
                 };
 
-                bundle.get_fill_wrapper_element_mut()?.register_change(
-                    SvgElementChange::ElementReordered(SvgElementReorderedChange {
+                children_wrapper_element.register_change(SvgElementChange::ElementReordered(
+                    SvgElementReorderedChange {
                         element_id,
                         new_parent_id,
                         insert_before_id,
-                    }),
-                );
+                    },
+                ));
             }
         }
     }
-
-    Some(())
 }
 
 pub fn apply_visibility_mixin_changes(
