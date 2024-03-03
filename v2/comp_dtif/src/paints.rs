@@ -2,7 +2,7 @@ use crate::ToEcsBundleImpl;
 use dyn_comp_types::{
     bundles::SolidPaintBundle,
     common::Color,
-    paints::{CompPaint, SolidCompPaint},
+    paints::{CompPaint, CompPaintVariant, SolidCompPaint},
 };
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
@@ -22,7 +22,9 @@ impl ToEcsBundleImpl for SolidPaint {
 
     fn to_ecs_bundle(&self) -> Self::Bundle {
         SolidPaintBundle {
-            paint: CompPaint::default(),
+            paint: CompPaint {
+                variant: CompPaintVariant::Solid,
+            },
             solid: SolidCompPaint { color: self.color },
         }
     }

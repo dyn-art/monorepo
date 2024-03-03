@@ -34,7 +34,7 @@ pub struct GroupCompNodeBundle {
     pub opacity: OpacityMixin,
 }
 
-#[derive(Bundle, Debug, Default)]
+#[derive(Bundle, Debug)]
 pub struct RectangleCompNodeBundle {
     pub node: CompNode,
     pub rectangle: RectangleCompNode,
@@ -49,7 +49,7 @@ pub struct RectangleCompNodeBundle {
     // pub stroke: StrokeMixin,
 }
 
-#[derive(Bundle, Debug, Default)]
+#[derive(Bundle, Debug)]
 pub struct EllipseCompNodeBundle {
     pub node: CompNode,
     pub ellipse: EllipseCompNode,
@@ -63,7 +63,7 @@ pub struct EllipseCompNodeBundle {
     // pub stroke: StrokeMixin,
 }
 
-#[derive(Bundle, Debug, Default)]
+#[derive(Bundle, Debug)]
 pub struct StarCompNodeBundle {
     pub node: CompNode,
     pub star: StarCompNode,
@@ -77,7 +77,7 @@ pub struct StarCompNodeBundle {
     // pub stroke: StrokeMixin,
 }
 
-#[derive(Bundle, Debug, Default)]
+#[derive(Bundle, Debug)]
 pub struct PolygonCompNodeBundle {
     pub node: CompNode,
     pub polygon: PolygonCompNode,
@@ -91,7 +91,7 @@ pub struct PolygonCompNodeBundle {
     // pub stroke: StrokeMixin,
 }
 
-#[derive(Bundle, Debug, Default)]
+#[derive(Bundle, Debug)]
 pub struct TextCompNodeBundle {
     pub node: CompNode,
     pub text: TextCompNode,
@@ -105,7 +105,7 @@ pub struct TextCompNodeBundle {
     // pub stroke: StrokeMixin,
 }
 
-#[derive(Bundle, Debug, Default)]
+#[derive(Bundle, Debug)]
 pub struct SolidPaintBundle {
     pub paint: CompPaint,
     pub solid: SolidCompPaint,

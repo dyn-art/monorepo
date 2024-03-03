@@ -7,7 +7,7 @@ use dyn_comp_types::{
     bundles::{FrameCompNodeBundle, GroupCompNodeBundle, RectangleCompNodeBundle},
     common::{BlendMode, CornerRadii, Opacity, Size, Visibility},
     mixins::{BlendModeMixin, CornerRadiiMixin, OpacityMixin, SizeMixin, VisibilityMixin},
-    nodes::{CompNode, FrameCompNode, GroupCompNode, RectangleCompNode},
+    nodes::{CompNode, CompNodeVariant, FrameCompNode, GroupCompNode, RectangleCompNode},
 };
 use glam::{Quat, Vec2, Vec3};
 
@@ -40,7 +40,9 @@ impl ToEcsBundleImpl for FrameNode {
 
     fn to_ecs_bundle(&self) -> Self::Bundle {
         FrameCompNodeBundle {
-            node: CompNode::default(),
+            node: CompNode {
+                variant: CompNodeVariant::Frame,
+            },
             frame: FrameCompNode {
                 clip_content: self.clip_content,
             },
@@ -75,7 +77,9 @@ impl ToEcsBundleImpl for GroupNode {
 
     fn to_ecs_bundle(&self) -> Self::Bundle {
         GroupCompNodeBundle {
-            node: CompNode::default(),
+            node: CompNode {
+                variant: CompNodeVariant::Group,
+            },
             group: GroupCompNode,
             transform: Transform {
                 translation: Vec3::new(self.translation.x, self.translation.y, 0.0),
@@ -108,7 +112,9 @@ impl ToEcsBundleImpl for RectangleNode {
 
     fn to_ecs_bundle(&self) -> Self::Bundle {
         RectangleCompNodeBundle {
-            node: CompNode::default(),
+            node: CompNode {
+                variant: CompNodeVariant::Rectangle,
+            },
             rectangle: RectangleCompNode::default(),
             transform: Transform {
                 translation: Vec3::new(self.translation.x, self.translation.y, 0.0),

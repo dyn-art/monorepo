@@ -251,6 +251,8 @@ pub fn apply_size_mixin_changes(
     for (SizeMixin(size), mut bundle_mixin) in query.iter_mut() {
         let NodeSvgBundleMixin(bundle) = bundle_mixin.as_mut();
         let [width, height] = size.0.to_array();
+
+        // Apply dimension change to node
         match bundle {
             NodeSvgBundle::Frame(bundle) => {
                 bundle.root.set_attributes(vec![
@@ -305,6 +307,28 @@ pub fn apply_size_mixin_changes(
                         unit: SvgMeasurementUnit::Pixel,
                     },
                 ]);
+            }
+        }
+
+        // Apply dimension change to fills
+        let fills = match bundle.get_fills_mut() {
+            Some(fills) => fills,
+            None => return,
+        };
+        for fill in fills {
+            match fill {
+                FillSvgBundle::Solid(fill) => {
+                    fill.paint_rect.set_attributes(vec![
+                        SvgAttribute::Width {
+                            width,
+                            unit: SvgMeasurementUnit::Pixel,
+                        },
+                        SvgAttribute::Height {
+                            height,
+                            unit: SvgMeasurementUnit::Pixel,
+                        },
+                    ]);
+                }
             }
         }
     }

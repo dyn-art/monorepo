@@ -2,8 +2,22 @@ use crate::common::{BreakLineOn, HorizontalTextAlignment, TextSpan, VerticalText
 use bevy_ecs::component::Component;
 use smallvec::SmallVec;
 
-#[derive(Component, Debug, Default, Copy, Clone)]
-pub struct CompNode;
+#[derive(Component, Debug, Copy, Clone)]
+pub struct CompNode {
+    pub variant: CompNodeVariant,
+}
+
+#[derive(Debug, Copy, Clone)]
+pub enum CompNodeVariant {
+    Group,
+    Rectangle,
+    Frame,
+    Text,
+    Vector,
+    Polygon,
+    Ellipse,
+    Star,
+}
 
 /// Defines a layout container, similar to an HTML `<div>`, for hierarchical organization.
 #[derive(Component, Debug, Default, Copy, Clone)]

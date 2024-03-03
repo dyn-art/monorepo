@@ -68,12 +68,20 @@ impl SvgElement {
 
     pub fn set_attribute(&mut self, attribute: SvgAttribute) {
         #[cfg(feature = "output_svg_element_changes")]
-        self.register_change(SvgElementChange::AttributeUpdated(
-            SvgAttributeUpdatedChange {
-                key: attribute.key(),
-                new_value: attribute.to_svg_string(),
-            },
-        ));
+        {
+            if let Some(current_attribute) = self.get_attribute(attribute.key()) {
+                if *current_attribute == attribute {
+                    return;
+                }
+            }
+
+            self.register_change(SvgElementChange::AttributeUpdated(
+                SvgAttributeUpdatedChange {
+                    key: attribute.key(),
+                    new_value: attribute.to_svg_string(),
+                },
+            ));
+        }
 
         self.attributes.insert(attribute.key(), attribute);
     }
@@ -94,10 +102,18 @@ impl SvgElement {
 
     pub fn set_style(&mut self, style: SvgStyle) {
         #[cfg(feature = "output_svg_element_changes")]
-        self.register_change(SvgElementChange::StyleUpdated(SvgStyleUpdatedChange {
-            key: style.key(),
-            new_value: style.to_svg_string(),
-        }));
+        {
+            if let Some(current_style) = self.get_style(style.key()) {
+                if *current_style == style {
+                    return;
+                }
+            }
+
+            self.register_change(SvgElementChange::StyleUpdated(SvgStyleUpdatedChange {
+                key: style.key(),
+                new_value: style.to_svg_string(),
+            }));
+        }
 
         self.styles.insert(style.key(), style);
     }
