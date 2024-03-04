@@ -51,6 +51,12 @@ paints?: { [key in string]: Paint };
  */
 assets?: { [key in string]: Asset }; events?: DtifInputEvent[] }
 
+export type ComponentChange = { type: "Size"; size: Size } | { type: "Transform" }
+
+export type CompositionChange = { rootNodes: Entity[]; viewport: Viewport; size: Size }
+
+export type CompositionChangeOutputEvent = { change: CompositionChange }
+
 export type CompositionResizedInputEvent = { size: Size }
 
 export type CompositionViewportChangedInputEvent = { viewport: Viewport }
@@ -235,7 +241,7 @@ export type SvgBuilderOutputEvent =
 
 export type SvgCompInputEvent = { type: "Comp"; event: CompCoreInputEvent } | { type: "Interaction"; event: InteractionInputEvent }
 
-export type SvgCompOutputEvent = ({ type: "SvgElementChanges" } & SvgElementChangesOutputEvent) | ({ type: "WatchedEntityChanges" } & WatchedEntityChangesOutputEvent) | ({ type: "SelectionChange" } & SelectionChangeOutputEvent)
+export type SvgCompOutputEvent = ({ type: "SvgElementChanges" } & SvgElementChangesOutputEvent) | ({ type: "CompositionChange" } & CompositionChangeOutputEvent) | ({ type: "WatchedEntityChanges" } & WatchedEntityChangesOutputEvent) | ({ type: "SelectionChange" } & SelectionChangeOutputEvent)
 
 export type SvgDisplayStyle = "Block" | "None"
 
@@ -335,9 +341,9 @@ export type Viewport = { physicalPosition: Vec2; physicalSize: Vec2 }
 
 export type Visibility = "Visible" | "Hidden"
 
-export type WatchableMixinVariant = "Dimension" | "Transform"
+export type WatchableComponentVariant = "Size" | "Transform"
 
-export type WatchedEntityChangesOutputEvent = { entity: Entity; changes: null[] }
+export type WatchedEntityChangesOutputEvent = { entity: Entity; changes: ComponentChange[] }
 
 export type WheeledOnCompInputEvent = { position: Vec2; delta: Vec2; ctrlKeyPressed: boolean; metaKeyPressed: boolean }
 

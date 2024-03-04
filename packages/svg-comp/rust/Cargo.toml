@@ -45,6 +45,7 @@ dyn-comp-svg-builder = { path = "../../../v2/comp_svg_builder", features = [
 ] }
 bevy_app = { workspace = true }
 bevy_ecs = { workspace = true }
+bevy_transform = { workspace = true }
 log = { workspace = true }
 wasm-bindgen = "0.2.91"
 js-sys = "0.3.68"

@@ -16,15 +16,19 @@ export const Editor: React.FC<TEditorProps> = (props) => {
 	return (
 		<QueryClientProvider client={queryClient}>
 			<div className="flex flex-col items-center justify-center">
-				<Canvas dtif={dtif} height={height} onLoadedComposition={setComposition} width={width} />
+				<div style={{ width: width + 4, height: height + 4 }}>
+					<Canvas dtif={dtif} height={height} onLoadedComposition={setComposition} width={width} />
+				</div>
+				<div className="flex w-full flex-row items-center justify-between ">
+					<Button
+						onClick={() => {
+							console.log(composition?.toString());
+						}}
+					>
+						To String
+					</Button>
+				</div>
 			</div>
-			<Button
-				onClick={() => {
-					console.log(composition?.toString());
-				}}
-			>
-				To String
-			</Button>
 		</QueryClientProvider>
 	);
 };

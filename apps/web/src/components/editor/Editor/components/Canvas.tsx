@@ -55,11 +55,7 @@ export const Canvas: React.FC<TCanvasProps> = (props) => {
 		return <Skeleton className="h-full w-full" />;
 	}
 
-	return (
-		<div {...other} className={cn('bg-gray-100', other.className)}>
-			<div ref={svgContainerRef} />
-		</div>
-	);
+	return <div {...other} className={cn('bg-gray-100', other.className)} ref={svgContainerRef} />;
 };
 
 export type TCanvasProps = {

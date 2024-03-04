@@ -70,7 +70,7 @@ pub fn apply_node_children_changes(
         }
     }
 
-    // Apply modifications
+    // Apply modifications (Deferred apply of node modifications to avoid query conflicts)
     {
         let mut node_query = queries.p1();
         for modification in modifications {

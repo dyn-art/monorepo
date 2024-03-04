@@ -1,5 +1,10 @@
 import { intoMouseButton } from '@dyn/comp-dtif';
-import type { SvgElementChanges, SvgElementId, Vec2 } from '@/rust/dyn-svg-comp-api/bindings';
+import type {
+	CompositionChange,
+	SvgElementChanges,
+	SvgElementId,
+	Vec2
+} from '@/rust/dyn-svg-comp-api/bindings';
 
 import type { Composition } from '../Composition';
 import { Renderer } from './Renderer';
@@ -129,8 +134,6 @@ export class SvgRenderer extends Renderer {
 			return element;
 		};
 
-		console.log(`[applyElementChanges] ${elementChanges.id}`, elementChanges.changes);
-
 		for (const change of elementChanges.changes) {
 			switch (change.type) {
 				case 'ElementCreated': {
@@ -244,6 +247,15 @@ export class SvgRenderer extends Renderer {
 				}
 			}
 		}
+	}
+
+	public applyCompositionChange(change: CompositionChange): void {
+		this._svgElement.setAttribute('width', `${change.size[0]}px`);
+		this._svgElement.setAttribute('height', `${change.size[1]}px`);
+		this._svgElement.setAttribute(
+			'viewBox',
+			`${change.viewport.physicalPosition[0]} ${change.viewport.physicalPosition[1]} ${change.viewport.physicalSize[1]} ${change.viewport.physicalSize[1]}`
+		);
 	}
 
 	public clear(): void {

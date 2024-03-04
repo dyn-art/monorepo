@@ -2,6 +2,7 @@ import { shortId } from '@dyn/utils';
 import { SvgCompHandle } from '@/rust/dyn-svg-comp-api';
 import type {
 	CompDtif,
+	CompositionChangeOutputEvent,
 	Entity,
 	SelectionChangeOutputEvent,
 	SvgCompInputEvent,
@@ -136,7 +137,6 @@ export class Composition {
 	}
 
 	public toString(): string | null {
-		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition, @typescript-eslint/no-base-to-string -- Whatever
 		return this._svgCompHandle.toString() ?? null;
 	}
 }
@@ -150,6 +150,7 @@ interface TOutputEventTypeMap {
 	SvgElementChanges: SvgElementChangesOutputEvent;
 	WatchedEntityChanges: WatchedEntityChangesOutputEvent;
 	SelectionChange: SelectionChangeOutputEvent;
+	CompositionChange: CompositionChangeOutputEvent;
 }
 
 type TWatchedOutputEventCallback<GEventType extends keyof TOutputEventTypeMap> = (

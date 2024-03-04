@@ -5,7 +5,7 @@ import { Editor } from '@/components';
 const Page: React.FC = () => {
 	return (
 		<div>
-			Hello World <Editor dtif={DEFAULT_DTIF} height={100} width={100} />{' '}
+			<Editor dtif={DEFAULT_DTIF} height={HEIGHT} width={WIDTH} />
 		</div>
 	);
 };

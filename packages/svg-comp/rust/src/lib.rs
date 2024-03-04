@@ -3,20 +3,29 @@ pub mod events;
 mod logging;
 pub mod modules;
 
+use crate::modules::watch::{
+    component_change::{ComponentChange, ToComponentChange},
+    resources::watched_entities::WatchableComponentVariant,
+};
 use bevy_app::App;
 use bevy_ecs::{
+    entity::{self, Entity},
     query::{With, Without},
     system::{Query, SystemState},
 };
+use bevy_transform::components::Transform;
 use dyn_comp_core::{resources::composition::CompositionRes, CompCorePlugin};
 use dyn_comp_dtif::CompDtif;
 use dyn_comp_interaction::CompInteractionPlugin;
 use dyn_comp_svg_builder::{
     events::SvgBuilderOutputEvent, svg::svg_bundle::NodeSvgBundleMixin, CompSvgBuilderPlugin,
 };
-use dyn_comp_types::{events::InputEvent, mixins::Root};
+use dyn_comp_types::{
+    events::InputEvent,
+    mixins::{Root, SizeMixin},
+};
 use events::{SvgCompInputEvent, SvgCompOutputEvent};
-use modules::watch::CompWatchPlugin;
+use modules::watch::{resources::watched_entities::WatchedEntitiesRes, CompWatchPlugin};
 use std::sync::mpsc::{channel, Receiver};
 use wasm_bindgen::{prelude::wasm_bindgen, JsValue};
 
@@ -94,6 +103,64 @@ impl SvgCompHandle {
         }
 
         return Ok(serde_wasm_bindgen::to_value(&output_events)?);
+    }
+
+    #[wasm_bindgen(js_name = watchEntity)]
+    pub fn watch_entity(
+        &mut self,
+        js_entity: JsValue,
+        js_to_watch_components: JsValue,
+        initial_value: bool,
+    ) -> Result<JsValue, JsValue> {
+        let entity: Entity = serde_wasm_bindgen::from_value(js_entity)?;
+        let to_watch_components: Vec<WatchableComponentVariant> =
+            serde_wasm_bindgen::from_value(js_to_watch_components)?;
+
+        // Collect intial values
+        let mut changes: Vec<ComponentChange> = Vec::with_capacity(to_watch_components.len());
+        if initial_value {
+            for component_variant in &to_watch_components {
+                match component_variant {
+                    WatchableComponentVariant::Size => {
+                        if let Some(component) = self.app.world.get::<SizeMixin>(entity) {
+                            changes.push(component.to_component_change())
+                        }
+                    }
+                    WatchableComponentVariant::Transform => {
+                        if let Some(component) = self.app.world.get::<Transform>(entity) {
+                            changes.push(component.to_component_change())
+                        }
+                    }
+                }
+            }
+        }
+
+        // Update watched entities ressource
+        match self.app.world.get_resource_mut::<WatchedEntitiesRes>() {
+            Some(mut watched_entities_res) => {
+                watched_entities_res.watch_entity(entity, to_watch_components);
+            }
+            None => {
+                return Err(JsValue::from_str(
+                    "Failed to watch Entity because required resource couldn't be accessed!",
+                ));
+            }
+        }
+
+        return if initial_value {
+            Ok(serde_wasm_bindgen::to_value(&changes)?)
+        } else {
+            Ok(JsValue::TRUE)
+        };
+    }
+
+    #[wasm_bindgen(js_name = unregisterEntity)]
+    pub fn unregister_entity(&mut self, js_entity: JsValue) -> Result<bool, JsValue> {
+        let entity: Entity = serde_wasm_bindgen::from_value(js_entity)?;
+        return match self.app.world.get_resource_mut::<WatchedEntitiesRes>() {
+            Some(mut watched_entities_res) => Ok(watched_entities_res.unregister_entity(entity)),
+            None => Ok(false),
+        };
     }
 
     #[wasm_bindgen(js_name = toString)]

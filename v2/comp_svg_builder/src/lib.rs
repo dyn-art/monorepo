@@ -25,7 +25,7 @@ pub struct CompSvgBuilderPlugin {
 // and modification of the SvgBundle component alongside its associated entity,
 // due to the deferred execution nature of entity spawn commands within the ECS schedule.
 #[derive(SystemSet, Debug, Hash, PartialEq, Eq, Clone)]
-enum SvgBuilderSystemSet {
+enum CompSvgBuilderSystemSet {
     Insert,
     PostInsert,
     Apply,
@@ -42,11 +42,11 @@ impl Plugin for CompSvgBuilderPlugin {
         app.configure_sets(
             Last,
             (
-                SvgBuilderSystemSet::Insert,
-                SvgBuilderSystemSet::PostInsert,
-                SvgBuilderSystemSet::Apply,
-                SvgBuilderSystemSet::Extract,
-                SvgBuilderSystemSet::Queue,
+                CompSvgBuilderSystemSet::Insert,
+                CompSvgBuilderSystemSet::PostInsert,
+                CompSvgBuilderSystemSet::Apply,
+                CompSvgBuilderSystemSet::Extract,
+                CompSvgBuilderSystemSet::Queue,
             )
                 .chain(),
         );
@@ -55,16 +55,16 @@ impl Plugin for CompSvgBuilderPlugin {
         app.add_systems(
             Last,
             (
-                insert_frame_node_svg_bundle.in_set(SvgBuilderSystemSet::Insert),
-                insert_shape_node_svg_bundle.in_set(SvgBuilderSystemSet::Insert),
-                insert_fills.in_set(SvgBuilderSystemSet::PostInsert),
-                apply_node_children_changes.in_set(SvgBuilderSystemSet::Apply),
-                apply_visibility_mixin_changes.in_set(SvgBuilderSystemSet::Apply),
-                apply_size_mixin_changes.in_set(SvgBuilderSystemSet::Apply),
-                apply_transform_changes.in_set(SvgBuilderSystemSet::Apply),
-                apply_opacity_mixin_changes.in_set(SvgBuilderSystemSet::Apply),
-                apply_blend_mode_mixin_changes.in_set(SvgBuilderSystemSet::Apply),
-                apply_solid_paint_changes.in_set(SvgBuilderSystemSet::Apply),
+                insert_frame_node_svg_bundle.in_set(CompSvgBuilderSystemSet::Insert),
+                insert_shape_node_svg_bundle.in_set(CompSvgBuilderSystemSet::Insert),
+                insert_fills.in_set(CompSvgBuilderSystemSet::PostInsert),
+                apply_node_children_changes.in_set(CompSvgBuilderSystemSet::Apply),
+                apply_visibility_mixin_changes.in_set(CompSvgBuilderSystemSet::Apply),
+                apply_size_mixin_changes.in_set(CompSvgBuilderSystemSet::Apply),
+                apply_transform_changes.in_set(CompSvgBuilderSystemSet::Apply),
+                apply_opacity_mixin_changes.in_set(CompSvgBuilderSystemSet::Apply),
+                apply_blend_mode_mixin_changes.in_set(CompSvgBuilderSystemSet::Apply),
+                apply_solid_paint_changes.in_set(CompSvgBuilderSystemSet::Apply),
             ),
         );
 
@@ -89,8 +89,8 @@ impl Plugin for CompSvgBuilderPlugin {
             app.add_systems(
                 Last,
                 (
-                    extract_svg_bundles.in_set(SvgBuilderSystemSet::Extract),
-                    queue_svg_bundle_changes.in_set(SvgBuilderSystemSet::Queue),
+                    extract_svg_bundles.in_set(CompSvgBuilderSystemSet::Extract),
+                    queue_svg_bundle_changes.in_set(CompSvgBuilderSystemSet::Queue),
                 ),
             );
         }
