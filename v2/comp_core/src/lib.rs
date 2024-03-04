@@ -78,6 +78,9 @@ impl Plugin for CompCorePlugin {
 
 #[cfg(feature = "dtif")]
 fn inject_dtif_into_ecs(world: &mut bevy_ecs::world::World, dtif: &dyn_comp_dtif::CompDtif) {
+    use dyn_comp_types::common::Viewport;
+    use glam::Vec2;
+
     let mut dtif_injector = dyn_comp_dtif::dtif_injector::DtifInjector::new();
 
     // Load fonts into cache
@@ -91,7 +94,10 @@ fn inject_dtif_into_ecs(world: &mut bevy_ecs::world::World, dtif: &dyn_comp_dtif
     if let Some(root_node_entity) = maybe_root_node_entity {
         world.insert_resource(CompositionRes {
             root_nodes: vec![root_node_entity],
-            viewport: dtif.viewport,
+            viewport: dtif.viewport.unwrap_or(Viewport {
+                physical_position: Vec2::default(),
+                physical_size: Vec2::new(dtif.size.0.x, dtif.size.0.y),
+            }),
             size: dtif.size,
         })
     }

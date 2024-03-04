@@ -254,7 +254,7 @@ export class SvgRenderer extends Renderer {
 		this._svgElement.setAttribute('height', `${change.size[1]}px`);
 		this._svgElement.setAttribute(
 			'viewBox',
-			`${change.viewport.physicalPosition[0]} ${change.viewport.physicalPosition[1]} ${change.viewport.physicalSize[1]} ${change.viewport.physicalSize[1]}`
+			`${change.viewport.physicalPosition[0]} ${change.viewport.physicalPosition[1]} ${change.viewport.physicalSize[0]} ${change.viewport.physicalSize[1]}`
 		);
 	}
 

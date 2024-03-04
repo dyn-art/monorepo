@@ -15,8 +15,6 @@ export default Page;
 const WIDTH = 1500;
 const HEIGHT = 500;
 const DEFAULT_DTIF: COMP.CompDtif = {
-	version: '0.0.1',
-	name: 'Test',
 	size: [WIDTH, HEIGHT],
 	rootNodeId: 'n1',
 	nodes: {

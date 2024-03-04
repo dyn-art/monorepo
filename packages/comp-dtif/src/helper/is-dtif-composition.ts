@@ -6,7 +6,6 @@ export function isDTIFComposition(value: unknown): value is COMP.CompDtif {
 	}
 	const obj = value as Partial<COMP.CompDtif>;
 	return (
-		typeof obj.name === 'string' &&
 		Array.isArray(obj.size) &&
 		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- Necessary here as we don't know how long the size array might be
 		obj.size.length === 2 &&

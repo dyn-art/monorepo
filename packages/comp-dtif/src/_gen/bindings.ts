@@ -21,11 +21,7 @@ export type CompDtif = {
 /**
  * The version of the composition type declaration.
  */
-version: string; 
-/**
- * The name of the composition.
- */
-name: string; 
+version?: string | null; 
 /**
  * The size of the composition in pixels.
  */
@@ -33,7 +29,7 @@ size: Size;
 /**
  * The viewport defines the area on the render target to which the camera renders its image.
  */
-viewport?: Viewport; 
+viewport?: Viewport | null; 
 /**
  * The identifier of the root node in the composition.
  */

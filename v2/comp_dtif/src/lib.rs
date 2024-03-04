@@ -7,7 +7,6 @@ pub mod paints;
 
 use crate::nodes::Node;
 use assets::Asset;
-use bevy_ecs::entity::Entity;
 use dyn_comp_types::common::{Size, Viewport};
 use events::DtifInputEvent;
 use paints::Paint;
@@ -20,14 +19,13 @@ use std::collections::HashMap;
 #[serde(rename_all = "camelCase")]
 pub struct CompDtif {
     /// The version of the composition type declaration.
-    pub version: String,
-    /// The name of the composition.
-    pub name: String,
+    #[serde(default)]
+    pub version: Option<String>,
     /// The size of the composition in pixels.
     pub size: Size,
     /// The viewport defines the area on the render target to which the camera renders its image.
     #[serde(default)]
-    pub viewport: Viewport,
+    pub viewport: Option<Viewport>,
     /// The identifier of the root node in the composition.
     pub root_node_id: String,
     /// A mapping of node identifiers to their corresponding nodes within the composition.

@@ -10,21 +10,34 @@ impl From<&Transform> for SvgTransformAttribute {
         let cos_a = angle.cos();
         let sin_a = angle.sin();
 
-        let sx = transform.scale.x;
-        let sy = transform.scale.y;
+        // Extract scale and ensure default scale is 1,1 if scale is 0,0 indicating no scaling applied
+        let sx = if transform.scale.x == 0.0 {
+            1.0
+        } else {
+            transform.scale.x
+        };
+        let sy = if transform.scale.y == 0.0 {
+            1.0
+        } else {
+            transform.scale.y
+        };
+
         let tx = transform.translation.x;
         let ty = transform.translation.y;
 
         // Create the SVG transformation matrix
         // This matrix combines rotation and scale, then applies translation
         // https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/transform
+        // | a c e |
+        // | b d f |
+        // | 0 0 1 |
         SvgTransformAttribute::Matrix {
-            a: cos_a * sx,  // cos(theta) * scale_x
-            b: sin_a * sx,  // sin(theta) * scale_x
-            c: -sin_a * sy, // -sin(theta) * scale_y (negated to match SVG's coordinate system)
-            d: cos_a * sy,  // cos(theta) * scale_y
-            tx,             // Translation on the x-axis
-            ty,             // Translation on the y-axis
+            a: cos_a * sx,
+            b: sin_a * sy,
+            c: -sin_a * sx,
+            d: cos_a * sy,
+            tx,
+            ty,
         }
     }
 }
