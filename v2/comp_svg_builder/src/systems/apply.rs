@@ -16,7 +16,9 @@ use bevy_hierarchy::Children;
 use bevy_transform::components::Transform;
 use dyn_comp_types::{
     common::Visibility,
-    mixins::{BlendModeMixin, OpacityMixin, PaintParentMixin, SizeMixin, VisibilityMixin},
+    mixins::{
+        BlendModeMixin, OpacityMixin, PaintParentMixin, PathMixin, SizeMixin, VisibilityMixin,
+    },
     nodes::CompNode,
     paints::{CompPaint, SolidCompPaint},
 };
@@ -44,7 +46,7 @@ pub fn apply_node_children_changes(
     {
         let children_query = queries.p0();
         for (entity, children, NodeSvgBundleMixin(bundle)) in children_query.iter() {
-            let node_children = match bundle.get_node_children() {
+            let node_children = match bundle.get_child_nodes() {
                 Some(node_children) => node_children,
                 None => return,
             };
@@ -147,7 +149,7 @@ fn reorder_node_children(
             Ok(bundle_mixin) => bundle_mixin,
             Err(_) => return,
         };
-        let bundle_children = match node_bundle.get_node_children() {
+        let bundle_children = match node_bundle.get_child_nodes() {
             Some(bundle_children) => bundle_children,
             None => return,
         };
@@ -167,7 +169,7 @@ fn reorder_node_children(
         Err(_) => return,
     };
     let NodeSvgBundleMixin(node_bundle) = bundle_mixin.as_mut();
-    let bundle_children = match node_bundle.get_node_children_mut() {
+    let bundle_children = match node_bundle.get_child_nodes_mut() {
         Some(bundle_children) => bundle_children,
         None => return,
     };
@@ -234,8 +236,8 @@ pub fn apply_visibility_mixin_changes(
     for (VisibilityMixin(visibility), mut bundle_mixin) in query.iter_mut() {
         let NodeSvgBundleMixin(bundle) = bundle_mixin.as_mut();
         let element = match bundle {
-            NodeSvgBundle::Frame(bundle) => &mut bundle.root,
-            NodeSvgBundle::Shape(bundle) => &mut bundle.root,
+            NodeSvgBundle::Frame(bundle) => &mut bundle.root_g,
+            NodeSvgBundle::Shape(bundle) => &mut bundle.root_g,
         };
 
         let display = match visibility {
@@ -256,7 +258,7 @@ pub fn apply_size_mixin_changes(
         // Apply dimension change to node
         match bundle {
             NodeSvgBundle::Frame(bundle) => {
-                bundle.root.set_attributes(vec![
+                bundle.root_g.set_attributes(vec![
                     SvgAttribute::Width {
                         width,
                         unit: SvgMeasurementUnit::Pixel,
@@ -266,17 +268,7 @@ pub fn apply_size_mixin_changes(
                         unit: SvgMeasurementUnit::Pixel,
                     },
                 ]);
-                bundle.fill_clipped_path.set_attributes(vec![
-                    SvgAttribute::Width {
-                        width,
-                        unit: SvgMeasurementUnit::Pixel,
-                    },
-                    SvgAttribute::Height {
-                        height,
-                        unit: SvgMeasurementUnit::Pixel,
-                    },
-                ]);
-                bundle.content_clipped_rect.set_attributes(vec![
+                bundle.click_area_rect.set_attributes(vec![
                     SvgAttribute::Width {
                         width,
                         unit: SvgMeasurementUnit::Pixel,
@@ -288,7 +280,7 @@ pub fn apply_size_mixin_changes(
                 ]);
             }
             NodeSvgBundle::Shape(bundle) => {
-                bundle.root.set_attributes(vec![
+                bundle.root_g.set_attributes(vec![
                     SvgAttribute::Width {
                         width,
                         unit: SvgMeasurementUnit::Pixel,
@@ -310,28 +302,6 @@ pub fn apply_size_mixin_changes(
                 ]);
             }
         }
-
-        // Apply dimension change to fills
-        let fills = match bundle.get_fills_mut() {
-            Some(fills) => fills,
-            None => return,
-        };
-        for fill in fills {
-            match fill {
-                FillSvgBundle::Solid(fill) => {
-                    fill.paint_rect.set_attributes(vec![
-                        SvgAttribute::Width {
-                            width,
-                            unit: SvgMeasurementUnit::Pixel,
-                        },
-                        SvgAttribute::Height {
-                            height,
-                            unit: SvgMeasurementUnit::Pixel,
-                        },
-                    ]);
-                }
-            }
-        }
     }
 }
 
@@ -341,8 +311,8 @@ pub fn apply_transform_changes(
     for (transform, mut bundle_mixin) in query.iter_mut() {
         let NodeSvgBundleMixin(bundle) = bundle_mixin.as_mut();
         let element = match bundle {
-            NodeSvgBundle::Frame(bundle) => &mut bundle.root,
-            NodeSvgBundle::Shape(bundle) => &mut bundle.root,
+            NodeSvgBundle::Frame(bundle) => &mut bundle.root_g,
+            NodeSvgBundle::Shape(bundle) => &mut bundle.root_g,
         };
 
         element.set_attribute(SvgAttribute::Transform {
@@ -360,8 +330,8 @@ pub fn apply_opacity_mixin_changes(
     for (OpacityMixin(opacity), mut bundle_mixin) in query.iter_mut() {
         let NodeSvgBundleMixin(bundle) = bundle_mixin.as_mut();
         let element = match bundle {
-            NodeSvgBundle::Frame(bundle) => &mut bundle.root,
-            NodeSvgBundle::Shape(bundle) => &mut bundle.root,
+            NodeSvgBundle::Frame(bundle) => &mut bundle.root_g,
+            NodeSvgBundle::Shape(bundle) => &mut bundle.root_g,
         };
 
         element.set_attribute(SvgAttribute::Opacity {
@@ -379,13 +349,51 @@ pub fn apply_blend_mode_mixin_changes(
     for (BlendModeMixin(blend_mode), mut bundle_mixin) in query.iter_mut() {
         let NodeSvgBundleMixin(bundle) = bundle_mixin.as_mut();
         let element = match bundle {
-            NodeSvgBundle::Frame(bundle) => &mut bundle.root,
-            NodeSvgBundle::Shape(bundle) => &mut bundle.root,
+            NodeSvgBundle::Frame(bundle) => &mut bundle.root_g,
+            NodeSvgBundle::Shape(bundle) => &mut bundle.root_g,
         };
 
         element.set_style(SvgStyle::BlendMode {
             blend_mode: blend_mode.into(),
         });
+    }
+}
+
+pub fn apply_path_mixin_changes(
+    mut query: Query<(&PathMixin, &mut NodeSvgBundleMixin), (With<CompNode>, Changed<PathMixin>)>,
+) {
+    for (PathMixin(path), mut bundle_mixin) in query.iter_mut() {
+        let NodeSvgBundleMixin(bundle) = bundle_mixin.as_mut();
+
+        match bundle {
+            NodeSvgBundle::Frame(frame_bundle) => {
+                for fill_bundle in &mut frame_bundle.fill_bundles {
+                    match fill_bundle {
+                        FillSvgBundle::Solid(solid_bundle) => {
+                            solid_bundle.shape_path.set_attribute(SvgAttribute::D {
+                                d: String::from("todo"),
+                            })
+                        }
+                    }
+                }
+                frame_bundle
+                    .children_clipped_path
+                    .set_attribute(SvgAttribute::D {
+                        d: String::from("todo"),
+                    })
+            }
+            NodeSvgBundle::Shape(shape_bundle) => {
+                for fill_bundle in &mut shape_bundle.fill_bundles {
+                    match fill_bundle {
+                        FillSvgBundle::Solid(solid_bundle) => {
+                            solid_bundle.shape_path.set_attribute(SvgAttribute::D {
+                                d: String::from("todo"),
+                            })
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -400,19 +408,19 @@ pub fn apply_solid_paint_changes(
         for node_entity in node_entities {
             if let Ok(mut bundle_mixin) = node_bundle_query.get_mut(*node_entity) {
                 let NodeSvgBundleMixin(bundle) = bundle_mixin.as_mut();
-                let bundle_fills = match bundle {
-                    NodeSvgBundle::Frame(bundle) => &mut bundle.fills,
-                    NodeSvgBundle::Shape(bundle) => &mut bundle.fills,
+                let fill_bundles = match bundle {
+                    NodeSvgBundle::Frame(bundle) => &mut bundle.fill_bundles,
+                    NodeSvgBundle::Shape(bundle) => &mut bundle.fill_bundles,
                     _ => return,
                 };
 
-                if let Some(fill) = bundle_fills
+                if let Some(fill_bundle) = fill_bundles
                     .iter_mut()
                     .find(|fill| *fill.get_paint_entity() == paint_entity)
                 {
-                    match fill {
-                        FillSvgBundle::Solid(fill) => {
-                            fill.paint_rect.set_attribute(SvgAttribute::Fill {
+                    match fill_bundle {
+                        FillSvgBundle::Solid(solid_bundle) => {
+                            solid_bundle.shape_path.set_attribute(SvgAttribute::Fill {
                                 fill: format!(
                                     "rgb({}, {}, {})",
                                     solid_paint.color.red,

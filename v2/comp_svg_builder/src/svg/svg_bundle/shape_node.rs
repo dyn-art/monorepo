@@ -15,45 +15,41 @@ use std::collections::BTreeMap;
 
 #[derive(Debug, Clone)]
 pub struct ShapeNodeSvgBundle {
-    pub entity: Entity,
+    pub node_entity: Entity,
 
-    pub root: SvgElement,
-    pub defs: SvgElement,
-
-    // Fill elements
-    pub fill_clip_path: SvgElement,
-    pub fill_clipped_path: SvgElement,
-    pub fill_wrapper_g: SvgElement,
-    pub fills: SmallVec<[FillSvgBundle; 2]>,
-
-    // Click area elements
-    pub click_area_rect: SvgElement,
+    pub root_g: SvgElement,
+    /**/ pub defs: SvgElement,
+    /**/ pub click_area_rect: SvgElement,
+    /**/ pub fills_wrapper_g: SvgElement,
+    /**//**/ pub fill_bundles: SmallVec<[FillSvgBundle; 2]>,
+    /**/ pub strokes_wrapper_g: SvgElement,
+    /**//**/ pub stroke_bundles: SmallVec<[(); 2]>, // TODO
 }
 
 impl SvgBundle for ShapeNodeSvgBundle {
     fn get_root_element(&self) -> &SvgElement {
-        &self.root
+        &self.root_g
     }
 
     fn get_root_element_mut(&mut self) -> &mut SvgElement {
-        &mut self.root
+        &mut self.root_g
     }
 
     fn get_elements(&self) -> BTreeMap<SvgElementId, &SvgElement> {
         let mut elements = BTreeMap::new();
 
-        elements.insert(self.root.get_id(), &self.root);
+        elements.insert(self.root_g.get_id(), &self.root_g);
         elements.insert(self.defs.get_id(), &self.defs);
         elements.insert(self.click_area_rect.get_id(), &self.click_area_rect);
-        elements.insert(self.fill_clip_path.get_id(), &self.fill_clip_path);
-        elements.insert(self.fill_clipped_path.get_id(), &self.fill_clipped_path);
-        elements.insert(self.fill_wrapper_g.get_id(), &self.fill_wrapper_g);
-        self.fills.iter().for_each(|fill| {
+        elements.insert(self.fills_wrapper_g.get_id(), &self.fills_wrapper_g);
+        self.fill_bundles.iter().for_each(|fill| {
             let elements_map = fill.get_svg_bundle().get_elements();
             for (_, element) in elements_map {
                 elements.insert(element.get_id(), element);
             }
         });
+        elements.insert(self.strokes_wrapper_g.get_id(), &self.strokes_wrapper_g);
+        // TODO: stroke_bundles
 
         return elements;
     }
@@ -61,18 +57,18 @@ impl SvgBundle for ShapeNodeSvgBundle {
     fn get_elements_mut(&mut self) -> BTreeMap<SvgElementId, &mut SvgElement> {
         let mut elements = BTreeMap::new();
 
-        elements.insert(self.root.get_id(), &mut self.root);
+        elements.insert(self.root_g.get_id(), &mut self.root_g);
         elements.insert(self.defs.get_id(), &mut self.defs);
         elements.insert(self.click_area_rect.get_id(), &mut self.click_area_rect);
-        elements.insert(self.fill_clip_path.get_id(), &mut self.fill_clip_path);
-        elements.insert(self.fill_clipped_path.get_id(), &mut self.fill_clipped_path);
-        elements.insert(self.fill_wrapper_g.get_id(), &mut self.fill_wrapper_g);
-        self.fills.iter_mut().for_each(|fill| {
+        elements.insert(self.fills_wrapper_g.get_id(), &mut self.fills_wrapper_g);
+        self.fill_bundles.iter_mut().for_each(|fill| {
             let elements_map = fill.get_svg_bundle_mut().get_elements_mut();
             for (_, element) in elements_map {
                 elements.insert(element.get_id(), element);
             }
         });
+        elements.insert(self.strokes_wrapper_g.get_id(), &mut self.strokes_wrapper_g);
+        // TODO: stroke_bundles
 
         return elements;
     }
@@ -82,20 +78,18 @@ impl ShapeNodeSvgBundle {
     pub fn new(entity: Entity, cx: &mut SvgContextRes) -> Self {
         log::info!("[ShapeNodeSvgBundle::new] {:?}", entity);
 
-        let mut root_element = cx.create_bundle_root_element(SvgTag::Group, entity);
+        let mut root_g_element = cx.create_bundle_root_element(SvgTag::Group, entity);
         #[cfg(feature = "tracing")]
-        root_element.set_attribute(SvgAttribute::Name {
-            name: Self::create_element_name(root_element.get_id(), "root", false),
+        root_g_element.set_attribute(SvgAttribute::Name {
+            name: Self::create_element_name(root_g_element.get_id(), "root"),
         });
 
         let mut defs_element = cx.create_element(SvgTag::Defs);
         #[cfg(feature = "tracing")]
         defs_element.set_attribute(SvgAttribute::Name {
-            name: Self::create_element_name(defs_element.get_id(), "defs", false),
+            name: Self::create_element_name(defs_element.get_id(), "defs"),
         });
-        root_element.append_child_in_bundle_context(entity, &mut defs_element);
-
-        // Create click area elements
+        root_g_element.append_child_in_bundle_context(entity, &mut defs_element);
 
         let mut click_area_rect_element = cx.create_element(SvgTag::Rect);
         #[cfg(feature = "tracing")]
@@ -104,7 +98,6 @@ impl ShapeNodeSvgBundle {
                 name: Self::create_element_name(
                     click_area_rect_element.get_id(),
                     "click-area-rect",
-                    false,
                 ),
             },
             SvgAttribute::Fill {
@@ -118,71 +111,37 @@ impl ShapeNodeSvgBundle {
         click_area_rect_element.set_attribute(SvgAttribute::PointerEvents {
             pointer_events: SvgPointerEventsVariants::All,
         });
-        root_element.append_child_in_bundle_context(entity, &mut click_area_rect_element);
+        root_g_element.append_child_in_bundle_context(entity, &mut click_area_rect_element);
 
-        // Create fill elements
-
-        let mut fill_clip_path_element = cx.create_element(SvgTag::ClipPath);
+        let mut fills_wrapper_g_element = cx.create_element(SvgTag::Group);
         #[cfg(feature = "tracing")]
-        fill_clip_path_element.set_attribute(SvgAttribute::Name {
-            name: Self::create_element_name(
-                fill_clip_path_element.get_id(),
-                "fill-clip-path",
-                true,
-            ),
+        fills_wrapper_g_element.set_attribute(SvgAttribute::Name {
+            name: Self::create_element_name(fills_wrapper_g_element.get_id(), "fills"),
         });
-        defs_element.append_child_in_bundle_context(entity, &mut fill_clip_path_element);
+        root_g_element.append_child_in_bundle_context(entity, &mut fills_wrapper_g_element);
 
-        let mut fill_clipped_path_element = cx.create_element(SvgTag::Path);
+        let mut strokes_wrapper_g_element = cx.create_element(SvgTag::Group);
         #[cfg(feature = "tracing")]
-        fill_clipped_path_element.set_attribute(SvgAttribute::Name {
-            name: Self::create_element_name(
-                fill_clipped_path_element.get_id(),
-                "fill-clipped-path",
-                false,
-            ),
+        strokes_wrapper_g_element.set_attribute(SvgAttribute::Name {
+            name: Self::create_element_name(strokes_wrapper_g_element.get_id(), "strokes"),
         });
-        fill_clip_path_element
-            .append_child_in_bundle_context(entity, &mut fill_clipped_path_element);
-
-        let mut fill_wrapper_g_element = cx.create_element(SvgTag::Group);
-        #[cfg(feature = "tracing")]
-        fill_wrapper_g_element.set_attribute(SvgAttribute::Name {
-            name: Self::create_element_name(
-                fill_wrapper_g_element.get_id(),
-                "fill-wrapper-g",
-                false,
-            ),
-        });
-        // fill_clip_path_element.set_attribute(SvgAttribute::PointerEvents {
-        //     pointer_events: SvgPointerEventsVariants::None,
-        // });
-        fill_wrapper_g_element.set_attribute(SvgAttribute::ClipPath {
-            clip_path: fill_clip_path_element.get_id(),
-        });
-        root_element.append_child_in_bundle_context(entity, &mut fill_wrapper_g_element);
+        root_g_element.append_child_in_bundle_context(entity, &mut strokes_wrapper_g_element);
 
         Self {
-            entity,
+            node_entity: entity,
 
-            root: root_element,
+            root_g: root_g_element,
             defs: defs_element,
-
-            // Click area elements
             click_area_rect: click_area_rect_element,
-
-            // Fill elements
-            fill_clip_path: fill_clip_path_element,
-            fill_clipped_path: fill_clipped_path_element,
-            fill_wrapper_g: fill_wrapper_g_element,
-
-            fills: SmallVec::new(),
+            fills_wrapper_g: fills_wrapper_g_element,
+            fill_bundles: SmallVec::new(),
+            strokes_wrapper_g: strokes_wrapper_g_element,
+            stroke_bundles: SmallVec::new(),
         }
     }
 
     #[cfg(feature = "tracing")]
-    fn create_element_name(id: SvgElementId, category: &str, is_definition: bool) -> String {
-        let def_part = if is_definition { "_def" } else { "" };
-        format!("shape-node_{}_{}{}", category, id, def_part)
+    fn create_element_name(id: SvgElementId, category: &str) -> String {
+        format!("shape-node_{}_{}", category, id)
     }
 }

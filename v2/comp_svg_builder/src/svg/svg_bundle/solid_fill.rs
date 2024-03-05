@@ -1,36 +1,35 @@
-use std::collections::BTreeMap;
-
-use bevy_ecs::entity::Entity;
-
+use super::SvgBundle;
 use crate::{
     resources::svg_context::SvgContextRes,
     svg::svg_element::{attributes::SvgAttribute, SvgElement, SvgElementId, SvgTag},
 };
-
-use super::SvgBundle;
+use bevy_ecs::entity::Entity;
+use std::collections::BTreeMap;
 
 #[derive(Debug, Clone)]
 pub struct SolidFillSvgBundle {
     pub paint_entity: Entity,
 
-    pub root: SvgElement,
-    pub paint_rect: SvgElement,
+    pub root_g: SvgElement,
+    /**/ pub defs: SvgElement,
+    /**/ pub shape_path: SvgElement,
 }
 
 impl SvgBundle for SolidFillSvgBundle {
     fn get_root_element(&self) -> &SvgElement {
-        &self.root
+        &self.root_g
     }
 
     fn get_root_element_mut(&mut self) -> &mut SvgElement {
-        &mut self.root
+        &mut self.root_g
     }
 
     fn get_elements(&self) -> BTreeMap<SvgElementId, &SvgElement> {
         let mut elements = BTreeMap::new();
 
-        elements.insert(self.root.get_id(), &self.root);
-        elements.insert(self.paint_rect.get_id(), &self.paint_rect);
+        elements.insert(self.root_g.get_id(), &self.root_g);
+        elements.insert(self.defs.get_id(), &self.defs);
+        elements.insert(self.shape_path.get_id(), &self.shape_path);
 
         return elements;
     }
@@ -38,8 +37,9 @@ impl SvgBundle for SolidFillSvgBundle {
     fn get_elements_mut(&mut self) -> BTreeMap<SvgElementId, &mut SvgElement> {
         let mut elements = BTreeMap::new();
 
-        elements.insert(self.root.get_id(), &mut self.root);
-        elements.insert(self.paint_rect.get_id(), &mut self.paint_rect);
+        elements.insert(self.root_g.get_id(), &mut self.root_g);
+        elements.insert(self.defs.get_id(), &mut self.defs);
+        elements.insert(self.shape_path.get_id(), &mut self.shape_path);
 
         return elements;
     }
@@ -49,30 +49,37 @@ impl SolidFillSvgBundle {
     pub fn new(entity: Entity, cx: &mut SvgContextRes) -> Self {
         log::info!("[SolidPaintSvgBundle::new] {:?}", entity);
 
-        let mut root_element = cx.create_bundle_root_element(SvgTag::Group, entity);
+        let mut root_g_element = cx.create_bundle_root_element(SvgTag::Group, entity);
         #[cfg(feature = "tracing")]
-        root_element.set_attribute(SvgAttribute::Name {
-            name: Self::create_element_name(root_element.get_id(), "root", false),
+        root_g_element.set_attribute(SvgAttribute::Name {
+            name: Self::create_element_name(root_g_element.get_id(), "root"),
         });
 
-        let mut paint_rect_element = cx.create_element(SvgTag::Rect);
+        let mut defs_element = cx.create_element(SvgTag::Defs);
         #[cfg(feature = "tracing")]
-        paint_rect_element.set_attribute(SvgAttribute::Name {
-            name: Self::create_element_name(paint_rect_element.get_id(), "paint-rect", false),
+        defs_element.set_attribute(SvgAttribute::Name {
+            name: Self::create_element_name(defs_element.get_id(), "defs"),
         });
-        root_element.append_child_in_bundle_context(entity, &mut paint_rect_element);
+        root_g_element.append_child_in_bundle_context(entity, &mut defs_element);
+
+        let mut shape_path_element = cx.create_element(SvgTag::Path);
+        #[cfg(feature = "tracing")]
+        shape_path_element.set_attribute(SvgAttribute::Name {
+            name: Self::create_element_name(shape_path_element.get_id(), "shape-path"),
+        });
+        root_g_element.append_child_in_bundle_context(entity, &mut shape_path_element);
 
         Self {
             paint_entity: entity,
 
-            root: root_element,
-            paint_rect: paint_rect_element,
+            root_g: root_g_element,
+            defs: defs_element,
+            shape_path: shape_path_element,
         }
     }
 
     #[cfg(feature = "tracing")]
-    fn create_element_name(id: SvgElementId, category: &str, is_definition: bool) -> String {
-        let def_part = if is_definition { "_def" } else { "" };
-        format!("solid-paint_{}_{}{}", category, id, def_part)
+    fn create_element_name(id: SvgElementId, category: &str) -> String {
+        format!("solid-paint_{}_{}", category, id)
     }
 }

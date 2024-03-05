@@ -9,8 +9,8 @@ use resources::svg_context::SvgContextRes;
 use systems::{
     apply::{
         apply_blend_mode_mixin_changes, apply_node_children_changes, apply_opacity_mixin_changes,
-        apply_size_mixin_changes, apply_solid_paint_changes, apply_transform_changes,
-        apply_visibility_mixin_changes,
+        apply_path_mixin_changes, apply_size_mixin_changes, apply_solid_paint_changes,
+        apply_transform_changes, apply_visibility_mixin_changes,
     },
     insert::{insert_fills, insert_frame_node_svg_bundle, insert_shape_node_svg_bundle},
 };
@@ -64,6 +64,7 @@ impl Plugin for CompSvgBuilderPlugin {
                 apply_transform_changes.in_set(CompSvgBuilderSystemSet::Apply),
                 apply_opacity_mixin_changes.in_set(CompSvgBuilderSystemSet::Apply),
                 apply_blend_mode_mixin_changes.in_set(CompSvgBuilderSystemSet::Apply),
+                apply_path_mixin_changes.in_set(CompSvgBuilderSystemSet::Apply),
                 apply_solid_paint_changes.in_set(CompSvgBuilderSystemSet::Apply),
             ),
         );

@@ -57,10 +57,10 @@ pub enum NodeSvgBundle {
 }
 
 impl NodeSvgBundle {
-    pub fn get_entity(&self) -> &Entity {
+    pub fn get_node_entity(&self) -> &Entity {
         match self {
-            NodeSvgBundle::Frame(bundle) => &bundle.entity,
-            NodeSvgBundle::Shape(bundle) => &bundle.entity,
+            NodeSvgBundle::Frame(bundle) => &bundle.node_entity,
+            NodeSvgBundle::Shape(bundle) => &bundle.node_entity,
         }
     }
 
@@ -78,25 +78,32 @@ impl NodeSvgBundle {
         }
     }
 
-    pub fn get_fill_wrapper_element_mut(&mut self) -> Option<&mut SvgElement> {
+    pub fn get_fills_wrapper_element_mut(&mut self) -> Option<&mut SvgElement> {
         match self {
-            NodeSvgBundle::Frame(bundle) => Some(&mut bundle.fill_wrapper_g),
-            NodeSvgBundle::Shape(bundle) => Some(&mut bundle.fill_wrapper_g),
+            NodeSvgBundle::Frame(bundle) => Some(&mut bundle.fills_wrapper_g),
+            NodeSvgBundle::Shape(bundle) => Some(&mut bundle.fills_wrapper_g),
             _ => None,
         }
     }
 
-    pub fn get_fills_mut(&mut self) -> Option<&mut SmallVec<[FillSvgBundle; 2]>> {
+    pub fn get_fill_bundles_mut(&mut self) -> Option<&mut SmallVec<[FillSvgBundle; 2]>> {
         match self {
-            NodeSvgBundle::Frame(bundle) => Some(&mut bundle.fills),
-            NodeSvgBundle::Shape(bundle) => Some(&mut bundle.fills),
+            NodeSvgBundle::Frame(bundle) => Some(&mut bundle.fill_bundles),
+            NodeSvgBundle::Shape(bundle) => Some(&mut bundle.fill_bundles),
             _ => None,
         }
     }
 
-    pub fn get_node_children_mut(&mut self) -> Option<&mut SmallVec<[Entity; 2]>> {
+    pub fn get_child_nodes_mut(&mut self) -> Option<&mut SmallVec<[Entity; 2]>> {
         match self {
-            NodeSvgBundle::Frame(bundle) => Some(&mut bundle.node_children),
+            NodeSvgBundle::Frame(bundle) => Some(&mut bundle.child_nodes),
+            _ => None,
+        }
+    }
+
+    pub fn get_child_nodes(&self) -> Option<&SmallVec<[Entity; 2]>> {
+        match self {
+            NodeSvgBundle::Frame(bundle) => Some(&bundle.child_nodes),
             _ => None,
         }
     }
@@ -104,13 +111,6 @@ impl NodeSvgBundle {
     pub fn get_children_wrapper_element_mut(&mut self) -> Option<&mut SvgElement> {
         match self {
             NodeSvgBundle::Frame(bundle) => Some(&mut bundle.children_wrapper_g),
-            _ => None,
-        }
-    }
-
-    pub fn get_node_children(&self) -> Option<&SmallVec<[Entity; 2]>> {
-        match self {
-            NodeSvgBundle::Frame(bundle) => Some(&bundle.node_children),
             _ => None,
         }
     }

@@ -96,7 +96,7 @@ fn remove_absent_node_fills(node_bundle: &mut NodeSvgBundle, fills: &[Fill]) {
     let mut to_remove_element_ids: SmallVec<[SvgElementId; 2]> = SmallVec::new();
 
     // Identify to remove element ids
-    let bundle_fills = match node_bundle.get_fills_mut() {
+    let bundle_fills = match node_bundle.get_fill_bundles_mut() {
         Some(bundle_fills) => bundle_fills,
         None => return,
     };
@@ -110,7 +110,7 @@ fn remove_absent_node_fills(node_bundle: &mut NodeSvgBundle, fills: &[Fill]) {
     });
 
     // Remove elements from node bundle based on element ids
-    let fill_wrapper_element = match node_bundle.get_fill_wrapper_element_mut() {
+    let fill_wrapper_element = match node_bundle.get_fills_wrapper_element_mut() {
         Some(fill_wrapper_element) => fill_wrapper_element,
         None => return,
     };
@@ -126,7 +126,7 @@ fn add_or_update_node_fills(
     let mut to_add_fill_bundles: SmallVec<[FillSvgBundle; 2]> = SmallVec::new();
 
     // Update existing fills and identify newly added fills
-    let bundle_fills = match node_bundle.get_fills_mut() {
+    let bundle_fills = match node_bundle.get_fill_bundles_mut() {
         Some(bundle_fills) => bundle_fills,
         None => return,
     };
@@ -151,7 +151,7 @@ fn add_or_update_node_fills(
     }
 
     // Append fills to node bundle
-    let fill_wrapper_element = match node_bundle.get_fill_wrapper_element_mut() {
+    let fill_wrapper_element = match node_bundle.get_fills_wrapper_element_mut() {
         Some(fill_wrapper_element) => fill_wrapper_element,
         None => return,
     };
@@ -161,7 +161,7 @@ fn add_or_update_node_fills(
             fill_bundle.get_svg_bundle_mut().get_root_element_mut(),
         );
     }
-    let bundle_fills = match node_bundle.get_fills_mut() {
+    let bundle_fills = match node_bundle.get_fill_bundles_mut() {
         Some(bundle_fills) => bundle_fills,
         None => return,
     };
@@ -169,7 +169,7 @@ fn add_or_update_node_fills(
 }
 
 fn reorder_node_fills(node_bundle: &mut NodeSvgBundle, fills: &[Fill]) {
-    let bundle_fills = match node_bundle.get_fills_mut() {
+    let bundle_fills = match node_bundle.get_fill_bundles_mut() {
         Some(bundle_fills) => bundle_fills,
         None => return,
     };
@@ -206,7 +206,7 @@ fn reorder_node_fills(node_bundle: &mut NodeSvgBundle, fills: &[Fill]) {
 
             // If the fill has been moved
             if original_index != new_index {
-                let fill_wrapper_element = match node_bundle.get_fill_wrapper_element_mut() {
+                let fill_wrapper_element = match node_bundle.get_fills_wrapper_element_mut() {
                     Some(fill_wrapper_element) => fill_wrapper_element,
                     None => return,
                 };
