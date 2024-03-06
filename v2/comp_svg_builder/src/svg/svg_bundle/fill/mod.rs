@@ -1,10 +1,8 @@
 pub mod solid;
 
-use bevy_ecs::entity::Entity;
-
 use self::solid::SolidFillSvgBundle;
-
 use super::SvgBundle;
+use bevy_ecs::entity::Entity;
 
 #[derive(Debug, Clone)]
 pub enum FillSvgBundle {

@@ -12,7 +12,9 @@ use systems::{
         apply_path_mixin_changes, apply_size_mixin_changes, apply_solid_paint_changes,
         apply_transform_changes, apply_visibility_mixin_changes,
     },
-    insert::{insert_fills, insert_frame_node_svg_bundle, insert_shape_node_svg_bundle},
+    insert::{
+        insert_fills, insert_frame_node_svg_bundle, insert_shape_node_svg_bundle, insert_strokes,
+    },
 };
 
 pub struct CompSvgBuilderPlugin {
@@ -58,6 +60,7 @@ impl Plugin for CompSvgBuilderPlugin {
                 insert_frame_node_svg_bundle.in_set(CompSvgBuilderSystemSet::Insert),
                 insert_shape_node_svg_bundle.in_set(CompSvgBuilderSystemSet::Insert),
                 insert_fills.in_set(CompSvgBuilderSystemSet::PostInsert),
+                insert_strokes.in_set(CompSvgBuilderSystemSet::PostInsert),
                 apply_node_children_changes.in_set(CompSvgBuilderSystemSet::Apply),
                 apply_visibility_mixin_changes.in_set(CompSvgBuilderSystemSet::Apply),
                 apply_size_mixin_changes.in_set(CompSvgBuilderSystemSet::Apply),

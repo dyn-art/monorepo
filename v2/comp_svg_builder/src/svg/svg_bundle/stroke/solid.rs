@@ -2,7 +2,10 @@ use crate::{
     resources::svg_context::SvgContextRes,
     svg::{
         svg_bundle::SvgBundle,
-        svg_element::{SvgElement, SvgElementId, SvgTag},
+        svg_element::{
+            styles::{SvgFillStyle, SvgStyle},
+            SvgElement, SvgElementId, SvgTag,
+        },
     },
 };
 use bevy_ecs::entity::Entity;
@@ -57,6 +60,9 @@ impl SolidStrokeSvgBundle {
         root_g_element.append_child_in_bundle_context(entity, &mut defs_element);
 
         let mut shape_path_element = cx.create_element(SvgTag::Path);
+        shape_path_element.set_style(SvgStyle::Fill {
+            fill: SvgFillStyle::None,
+        });
         root_g_element.append_child_in_bundle_context(entity, &mut shape_path_element);
 
         #[cfg(feature = "tracing")]

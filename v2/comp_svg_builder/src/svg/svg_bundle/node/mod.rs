@@ -1,15 +1,12 @@
 pub mod frame;
 pub mod shape;
 
+use self::{frame::FrameNodeSvgBundle, shape::ShapeNodeSvgBundle};
+use super::{fill::FillSvgBundle, stroke::StrokeSvgBundle, SvgBundle};
+use crate::svg::svg_element::SvgElement;
 use bevy_ecs::{component::Component, entity::Entity, query::Without, system::Query};
 use dyn_comp_types::mixins::Root;
 use smallvec::SmallVec;
-
-use crate::svg::svg_element::SvgElement;
-
-use self::{frame::FrameNodeSvgBundle, shape::ShapeNodeSvgBundle};
-
-use super::{fill::FillSvgBundle, SvgBundle};
 
 #[derive(Debug, Clone)]
 pub enum NodeSvgBundle {
@@ -39,10 +36,10 @@ impl NodeSvgBundle {
         }
     }
 
-    pub fn get_fills_wrapper_element_mut(&mut self) -> Option<&mut SvgElement> {
+    pub fn get_fill_wrapper_element_mut(&mut self) -> Option<&mut SvgElement> {
         match self {
-            NodeSvgBundle::Frame(bundle) => Some(&mut bundle.fills_wrapper_g),
-            NodeSvgBundle::Shape(bundle) => Some(&mut bundle.fills_wrapper_g),
+            NodeSvgBundle::Frame(bundle) => Some(&mut bundle.fill_wrapper_g),
+            NodeSvgBundle::Shape(bundle) => Some(&mut bundle.fill_wrapper_g),
             _ => None,
         }
     }
@@ -51,6 +48,22 @@ impl NodeSvgBundle {
         match self {
             NodeSvgBundle::Frame(bundle) => Some(&mut bundle.fill_bundles),
             NodeSvgBundle::Shape(bundle) => Some(&mut bundle.fill_bundles),
+            _ => None,
+        }
+    }
+
+    pub fn get_stroke_wrapper_element_mut(&mut self) -> Option<&mut SvgElement> {
+        match self {
+            NodeSvgBundle::Frame(bundle) => Some(&mut bundle.stroke_wrapper_g),
+            NodeSvgBundle::Shape(bundle) => Some(&mut bundle.stroke_wrapper_g),
+            _ => None,
+        }
+    }
+
+    pub fn get_stroke_bundles_mut(&mut self) -> Option<&mut SmallVec<[StrokeSvgBundle; 2]>> {
+        match self {
+            NodeSvgBundle::Frame(bundle) => Some(&mut bundle.stroke_bundles),
+            NodeSvgBundle::Shape(bundle) => Some(&mut bundle.stroke_bundles),
             _ => None,
         }
     }

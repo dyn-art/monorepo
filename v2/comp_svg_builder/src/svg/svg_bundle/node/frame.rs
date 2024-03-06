@@ -2,7 +2,7 @@ use super::FillSvgBundle;
 use crate::{
     resources::svg_context::SvgContextRes,
     svg::{
-        svg_bundle::SvgBundle,
+        svg_bundle::{stroke::StrokeSvgBundle, SvgBundle},
         svg_element::{
             attributes::SvgAttribute,
             styles::{SvgPointerEventsStyle, SvgStyle},
@@ -23,10 +23,10 @@ pub struct FrameNodeSvgBundle {
     /**//**/ pub children_clip_path: SvgElement,
     /**//**//**/ pub children_clipped_path: SvgElement,
     /**/ pub click_area_rect: SvgElement,
-    /**/ pub fills_wrapper_g: SvgElement,
+    /**/ pub fill_wrapper_g: SvgElement,
     /**//**/ pub fill_bundles: SmallVec<[FillSvgBundle; 2]>,
-    /**/ pub strokes_wrapper_g: SvgElement,
-    /**//**/ pub stroke_bundles: SmallVec<[(); 2]>, // TODO
+    /**/ pub stroke_wrapper_g: SvgElement,
+    /**//**/ pub stroke_bundles: SmallVec<[StrokeSvgBundle; 2]>,
     /**/ pub children_wrapper_g: SvgElement,
     /**//**/ pub child_nodes: SmallVec<[Entity; 2]>,
 }
@@ -51,15 +51,20 @@ impl SvgBundle for FrameNodeSvgBundle {
             &self.children_clipped_path,
         );
         elements.insert(self.click_area_rect.get_id(), &self.click_area_rect);
-        elements.insert(self.fills_wrapper_g.get_id(), &self.fills_wrapper_g);
+        elements.insert(self.fill_wrapper_g.get_id(), &self.fill_wrapper_g);
         self.fill_bundles.iter().for_each(|fill| {
             let elements_map = fill.get_svg_bundle().get_elements();
             for (_, element) in elements_map {
                 elements.insert(element.get_id(), element);
             }
         });
-        elements.insert(self.strokes_wrapper_g.get_id(), &self.strokes_wrapper_g);
-        // TODO: stroke_bundles
+        elements.insert(self.stroke_wrapper_g.get_id(), &self.stroke_wrapper_g);
+        self.stroke_bundles.iter().for_each(|stroke| {
+            let elements_map = stroke.get_svg_bundle().get_elements();
+            for (_, element) in elements_map {
+                elements.insert(element.get_id(), element);
+            }
+        });
         elements.insert(self.children_wrapper_g.get_id(), &self.children_wrapper_g);
 
         return elements;
@@ -79,15 +84,20 @@ impl SvgBundle for FrameNodeSvgBundle {
             &mut self.children_clipped_path,
         );
         elements.insert(self.click_area_rect.get_id(), &mut self.click_area_rect);
-        elements.insert(self.fills_wrapper_g.get_id(), &mut self.fills_wrapper_g);
+        elements.insert(self.fill_wrapper_g.get_id(), &mut self.fill_wrapper_g);
         self.fill_bundles.iter_mut().for_each(|fill| {
             let elements_map = fill.get_svg_bundle_mut().get_elements_mut();
             for (_, element) in elements_map {
                 elements.insert(element.get_id(), element);
             }
         });
-        elements.insert(self.strokes_wrapper_g.get_id(), &mut self.strokes_wrapper_g);
-        // TODO: stroke_bundles
+        elements.insert(self.stroke_wrapper_g.get_id(), &mut self.stroke_wrapper_g);
+        self.stroke_bundles.iter_mut().for_each(|stroke| {
+            let elements_map = stroke.get_svg_bundle_mut().get_elements_mut();
+            for (_, element) in elements_map {
+                elements.insert(element.get_id(), element);
+            }
+        });
         elements.insert(
             self.children_wrapper_g.get_id(),
             &mut self.children_wrapper_g,
@@ -186,9 +196,9 @@ impl FrameNodeSvgBundle {
             children_clip_path: children_clip_path_element,
             children_clipped_path: children_clipped_path_element,
             click_area_rect: click_area_rect_element,
-            fills_wrapper_g: fills_wrapper_g_element,
+            fill_wrapper_g: fills_wrapper_g_element,
             fill_bundles: SmallVec::new(),
-            strokes_wrapper_g: strokes_wrapper_g_element,
+            stroke_wrapper_g: strokes_wrapper_g_element,
             stroke_bundles: SmallVec::new(),
             children_wrapper_g: children_wrapper_g_element,
             child_nodes: SmallVec::new(),

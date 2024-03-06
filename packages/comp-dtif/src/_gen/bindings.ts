@@ -271,7 +271,7 @@ export type SvgElementReorderedChange = { elementId: SvgElementId; newParentId: 
 
 export type SvgFillAttribute = { RGB: { red: number; green: number; blue: number } } | { RGBA: { red: number; green: number; blue: number; alpha: number } } | { Reference: { id: SvgElementId } }
 
-export type SvgFillStyle = { RGB: { red: number; green: number; blue: number } } | { RGBA: { red: number; green: number; blue: number; alpha: number } }
+export type SvgFillStyle = { RGB: { red: number; green: number; blue: number } } | { RGBA: { red: number; green: number; blue: number; alpha: number } } | "None"
 
 export type SvgHrefAttribute = { Base64: { content: string } } | { Url: { url: string } }
 
@@ -283,7 +283,9 @@ export type SvgPointerEventsStyle = "None" | "All"
 
 export type SvgStringOutputEvent = { value: string }
 
-export type SvgStyle = { type: "Display"; display: SvgDisplayStyle } | { type: "BlendMode"; blendMode: SvgBlendModeStyle } | { type: "Opacity"; opacity: number } | { type: "Fill"; fill: SvgFillStyle } | { type: "PointerEvents"; pointerEvents: SvgPointerEventsStyle }
+export type SvgStrokeStyle = { RGB: { red: number; green: number; blue: number } } | { RGBA: { red: number; green: number; blue: number; alpha: number } } | "None"
+
+export type SvgStyle = { type: "Display"; display: SvgDisplayStyle } | { type: "BlendMode"; blendMode: SvgBlendModeStyle } | { type: "Opacity"; opacity: number } | { type: "Fill"; fill: SvgFillStyle } | { type: "Stroke"; stroke: SvgStrokeStyle } | { type: "StrokeWidth"; strokeWidth: number } | { type: "StrokeOpacity"; strokeOpacity: number } | { type: "PointerEvents"; pointerEvents: SvgPointerEventsStyle }
 
 /**
  * Emitted when a style property of a SvgElement is removed.

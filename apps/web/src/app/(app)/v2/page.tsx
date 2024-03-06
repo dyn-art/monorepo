@@ -57,7 +57,16 @@ const DEFAULT_DTIF: COMP.CompDtif = {
 			],
 			opacity: 1,
 			size: [100, 100],
-			stroke: [],
+			stroke: [
+				{
+					fill: {
+						blendMode: 'Normal',
+						opacity: 0.5,
+						paintId: 'p3'
+					},
+					width: 5
+				}
+			],
 			translation: [WIDTH / 2, HEIGHT / 2],
 			visibility: 'Visible'
 		}
@@ -77,6 +86,14 @@ const DEFAULT_DTIF: COMP.CompDtif = {
 				red: 0,
 				green: 128,
 				blue: 0
+			}
+		},
+		p3: {
+			type: 'Solid',
+			color: {
+				red: 250,
+				green: 128,
+				blue: 114
 			}
 		}
 	},

@@ -18,6 +18,17 @@ pub enum SvgStyle {
     Fill {
         fill: SvgFillStyle,
     },
+    Stroke {
+        stroke: SvgStrokeStyle,
+    },
+    #[cfg_attr(feature = "serde_support", serde(rename_all = "camelCase"))]
+    StrokeWidth {
+        stroke_width: f32,
+    },
+    #[cfg_attr(feature = "serde_support", serde(rename_all = "camelCase"))]
+    StrokeOpacity {
+        stroke_opacity: f32,
+    },
     #[cfg_attr(feature = "serde_support", serde(rename_all = "camelCase"))]
     PointerEvents {
         pointer_events: SvgPointerEventsStyle,
@@ -31,6 +42,9 @@ impl SvgStyle {
             Self::BlendMode { .. } => "mix-blend-mode",
             Self::Opacity { .. } => "opacity",
             Self::Fill { .. } => "fill",
+            Self::Stroke { .. } => "stroke",
+            Self::StrokeWidth { .. } => "stroke-width",
+            Self::StrokeOpacity { .. } => "stroke-opactiy",
             Self::PointerEvents { .. } => "pointer-events",
         }
     }
@@ -71,7 +85,24 @@ impl SvgStyle {
                 } => {
                     format!("rgb({red}, {green}, {blue}, {alpha})")
                 }
+                SvgFillStyle::None => String::from("none"),
             },
+            Self::Stroke { stroke } => match stroke {
+                SvgStrokeStyle::RGB { red, green, blue } => {
+                    format!("rgb({red}, {green}, {blue})")
+                }
+                SvgStrokeStyle::RGBA {
+                    red,
+                    green,
+                    blue,
+                    alpha,
+                } => {
+                    format!("rgb({red}, {green}, {blue}, {alpha})")
+                }
+                SvgStrokeStyle::None => String::from("none"),
+            },
+            Self::StrokeWidth { stroke_width } => stroke_width.to_string(),
+            Self::StrokeOpacity { stroke_opacity } => stroke_opacity.to_string(),
             Self::Opacity { opacity } => opacity.to_string(),
             Self::PointerEvents { pointer_events } => match pointer_events {
                 SvgPointerEventsStyle::All => "all".to_string(),
@@ -138,6 +169,27 @@ pub enum SvgFillStyle {
         blue: u8,
         alpha: f32,
     },
+    None,
+}
+
+#[derive(Debug, PartialEq, Copy, Clone)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type)
+)]
+pub enum SvgStrokeStyle {
+    RGB {
+        red: u8,
+        green: u8,
+        blue: u8,
+    },
+    RGBA {
+        red: u8,
+        green: u8,
+        blue: u8,
+        alpha: f32,
+    },
+    None,
 }
 
 #[derive(Debug, Default, PartialEq, Copy, Clone)]

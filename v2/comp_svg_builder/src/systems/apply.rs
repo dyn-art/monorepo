@@ -2,11 +2,12 @@ use crate::svg::{
     svg_bundle::{
         fill::FillSvgBundle,
         node::{NodeSvgBundle, NodeSvgBundleMixin},
+        stroke::StrokeSvgBundle,
     },
     svg_element::{
         attributes::{SvgAttribute, SvgMeasurementUnit},
         element_changes::{SvgElementChange, SvgElementReorderedChange},
-        styles::{SvgDisplayStyle, SvgFillStyle, SvgStyle},
+        styles::{SvgDisplayStyle, SvgFillStyle, SvgStrokeStyle, SvgStyle},
         SvgElementId,
     },
 };
@@ -377,6 +378,13 @@ pub fn apply_path_mixin_changes(
                             .set_attribute(SvgAttribute::D { d: path.into() }),
                     }
                 }
+                for stroke_bundle in &mut frame_bundle.stroke_bundles {
+                    match stroke_bundle {
+                        StrokeSvgBundle::Solid(solid_bundle) => solid_bundle
+                            .shape_path
+                            .set_attribute(SvgAttribute::D { d: path.into() }),
+                    }
+                }
                 frame_bundle
                     .children_clipped_path
                     .set_attribute(SvgAttribute::D { d: path.into() })
@@ -385,6 +393,13 @@ pub fn apply_path_mixin_changes(
                 for fill_bundle in &mut shape_bundle.fill_bundles {
                     match fill_bundle {
                         FillSvgBundle::Solid(solid_bundle) => solid_bundle
+                            .shape_path
+                            .set_attribute(SvgAttribute::D { d: path.into() }),
+                    }
+                }
+                for stroke_bundle in &mut shape_bundle.stroke_bundles {
+                    match stroke_bundle {
+                        StrokeSvgBundle::Solid(solid_bundle) => solid_bundle
                             .shape_path
                             .set_attribute(SvgAttribute::D { d: path.into() }),
                     }
@@ -405,12 +420,11 @@ pub fn apply_solid_paint_changes(
         for node_entity in node_entities {
             if let Ok(mut bundle_mixin) = node_bundle_query.get_mut(*node_entity) {
                 let NodeSvgBundleMixin(bundle) = bundle_mixin.as_mut();
-                let fill_bundles = match bundle {
-                    NodeSvgBundle::Frame(bundle) => &mut bundle.fill_bundles,
-                    NodeSvgBundle::Shape(bundle) => &mut bundle.fill_bundles,
-                    _ => return,
-                };
 
+                // Update fills
+                let Some(fill_bundles) = bundle.get_fill_bundles_mut() else {
+                    return;
+                };
                 if let Some(fill_bundle) = fill_bundles
                     .iter_mut()
                     .find(|fill| *fill.get_paint_entity() == paint_entity)
@@ -419,6 +433,27 @@ pub fn apply_solid_paint_changes(
                         FillSvgBundle::Solid(solid_bundle) => {
                             solid_bundle.shape_path.set_style(SvgStyle::Fill {
                                 fill: SvgFillStyle::RGB {
+                                    red: solid_paint.color.red,
+                                    green: solid_paint.color.green,
+                                    blue: solid_paint.color.blue,
+                                },
+                            })
+                        }
+                    }
+                }
+
+                // Update strokes
+                let Some(stroke_bundles) = bundle.get_stroke_bundles_mut() else {
+                    return;
+                };
+                if let Some(stroke_bundle) = stroke_bundles
+                    .iter_mut()
+                    .find(|fill| *fill.get_paint_entity() == paint_entity)
+                {
+                    match stroke_bundle {
+                        StrokeSvgBundle::Solid(solid_bundle) => {
+                            solid_bundle.shape_path.set_style(SvgStyle::Stroke {
+                                stroke: SvgStrokeStyle::RGB {
                                     red: solid_paint.color.red,
                                     green: solid_paint.color.green,
                                     blue: solid_paint.color.blue,
