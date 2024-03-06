@@ -1,7 +1,13 @@
-use super::{attributes::SvgTransformAttribute, styles::SvgBlendMode};
+use std::fmt::{Error, Write};
+
+use super::{
+    attributes::{SvgPathAttribute, SvgTransformAttribute},
+    styles::SvgBlendModeStyle,
+};
 use bevy_transform::components::Transform;
 use dyn_comp_types::common::BlendMode;
 use glam::EulerRot;
+use tiny_skia_path::{Path, PathSegment};
 
 impl From<&Transform> for SvgTransformAttribute {
     fn from(transform: &Transform) -> Self {
@@ -42,25 +48,53 @@ impl From<&Transform> for SvgTransformAttribute {
     }
 }
 
-impl From<&BlendMode> for SvgBlendMode {
+impl From<&BlendMode> for SvgBlendModeStyle {
     fn from(blend_mode: &BlendMode) -> Self {
         match blend_mode {
-            BlendMode::Normal => SvgBlendMode::Normal,
-            BlendMode::Multiply => SvgBlendMode::Multiply,
-            BlendMode::Screen => SvgBlendMode::Screen,
-            BlendMode::Overlay => SvgBlendMode::Overlay,
-            BlendMode::Darken => SvgBlendMode::Darken,
-            BlendMode::Lighten => SvgBlendMode::Lighten,
-            BlendMode::ColorDodge => SvgBlendMode::ColorDodge,
-            BlendMode::ColorBurn => SvgBlendMode::ColorBurn,
-            BlendMode::HardLight => SvgBlendMode::HardLight,
-            BlendMode::SoftLight => SvgBlendMode::SoftLight,
-            BlendMode::Difference => SvgBlendMode::Difference,
-            BlendMode::Exclusion => SvgBlendMode::Exclusion,
-            BlendMode::Hue => SvgBlendMode::Hue,
-            BlendMode::Saturation => SvgBlendMode::Saturation,
-            BlendMode::Color => SvgBlendMode::Color,
-            BlendMode::Luminosity => SvgBlendMode::Luminosity,
+            BlendMode::Normal => SvgBlendModeStyle::Normal,
+            BlendMode::Multiply => SvgBlendModeStyle::Multiply,
+            BlendMode::Screen => SvgBlendModeStyle::Screen,
+            BlendMode::Overlay => SvgBlendModeStyle::Overlay,
+            BlendMode::Darken => SvgBlendModeStyle::Darken,
+            BlendMode::Lighten => SvgBlendModeStyle::Lighten,
+            BlendMode::ColorDodge => SvgBlendModeStyle::ColorDodge,
+            BlendMode::ColorBurn => SvgBlendModeStyle::ColorBurn,
+            BlendMode::HardLight => SvgBlendModeStyle::HardLight,
+            BlendMode::SoftLight => SvgBlendModeStyle::SoftLight,
+            BlendMode::Difference => SvgBlendModeStyle::Difference,
+            BlendMode::Exclusion => SvgBlendModeStyle::Exclusion,
+            BlendMode::Hue => SvgBlendModeStyle::Hue,
+            BlendMode::Saturation => SvgBlendModeStyle::Saturation,
+            BlendMode::Color => SvgBlendModeStyle::Color,
+            BlendMode::Luminosity => SvgBlendModeStyle::Luminosity,
         }
     }
+}
+
+impl From<&Path> for SvgPathAttribute {
+    fn from(path: &Path) -> Self {
+        SvgPathAttribute(path_to_string(path).unwrap_or_default())
+    }
+}
+
+fn path_to_string(path: &Path) -> Result<String, Error> {
+    let mut s = String::new();
+    for segment in path.segments() {
+        match segment {
+            PathSegment::MoveTo(p) => s.write_fmt(format_args!("M {} {} ", p.x, p.y))?,
+            PathSegment::LineTo(p) => s.write_fmt(format_args!("L {} {} ", p.x, p.y))?,
+            PathSegment::QuadTo(p0, p1) => {
+                s.write_fmt(format_args!("Q {} {} {} {} ", p0.x, p0.y, p1.x, p1.y))?
+            }
+            PathSegment::CubicTo(p0, p1, p2) => s.write_fmt(format_args!(
+                "C {} {} {} {} {} {} ",
+                p0.x, p0.y, p1.x, p1.y, p2.x, p2.y
+            ))?,
+            PathSegment::Close => s.write_fmt(format_args!("Z "))?,
+        }
+    }
+
+    s.pop(); // ' '
+
+    return Ok(s);
 }

@@ -103,6 +103,7 @@ impl DtifInjector {
         };
         let fills = dtif_fills
             .iter()
+            .rev()
             .filter_map(|dtif_fill| {
                 let fill = dtif_fill.to_fill(&self.sid_to_entity)?;
                 let mut paint_entity_world = world.get_entity_mut(fill.paint)?;

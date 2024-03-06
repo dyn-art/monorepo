@@ -1,7 +1,7 @@
 use bevy_ecs::entity::Entity;
 use glam::{Vec2, Vec4};
 
-#[derive(Debug, Default, Copy, Clone)]
+#[derive(Debug, Default, PartialEq, Copy, Clone)]
 #[cfg_attr(
     feature = "serde_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
@@ -20,28 +20,28 @@ impl Percent {
     }
 }
 
-#[derive(Debug, Default, Copy, Clone)]
+#[derive(Debug, Default, PartialEq, Copy, Clone)]
 #[cfg_attr(
     feature = "serde_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
 pub struct Pixel(pub f32);
 
-#[derive(Debug, Default, Copy, Clone)]
+#[derive(Debug, Default, PartialEq, Copy, Clone)]
 #[cfg_attr(
     feature = "serde_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
 pub struct Inch(pub f32);
 
-#[derive(Debug, Default, Copy, Clone)]
+#[derive(Debug, Default, PartialEq, Copy, Clone)]
 #[cfg_attr(
     feature = "serde_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
 pub struct Centimeter(pub f32);
 
-#[derive(Debug, Default, Copy, Clone)]
+#[derive(Debug, Default, PartialEq, Copy, Clone)]
 #[cfg_attr(
     feature = "serde_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
@@ -49,7 +49,7 @@ pub struct Centimeter(pub f32);
 pub struct Millimeter(pub f32);
 
 // https://oreillymedia.github.io/Using_Svg/guide/units.html
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, PartialEq, Copy, Clone)]
 #[cfg_attr(
     feature = "serde_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type),

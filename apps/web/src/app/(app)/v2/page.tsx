@@ -27,7 +27,7 @@ const DEFAULT_DTIF: COMP.CompDtif = {
 			fill: [
 				{
 					blendMode: 'Normal',
-					opacity: 1,
+					opacity: 1.0,
 					paintId: 'p1'
 				}
 			],
@@ -42,16 +42,16 @@ const DEFAULT_DTIF: COMP.CompDtif = {
 			type: 'Rectangle',
 			angleInRadians: 0,
 			blendMode: 'Normal',
-			cornerRadii: [0, 0, 0, 0],
+			cornerRadii: [0, 20, 0, 0],
 			fill: [
 				{
 					blendMode: 'Normal',
-					opacity: 1,
+					opacity: 0.5,
 					paintId: 'p2'
 				},
 				{
 					blendMode: 'Normal',
-					opacity: 1,
+					opacity: 1.0,
 					paintId: 'p1'
 				}
 			],

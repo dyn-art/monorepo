@@ -30,6 +30,7 @@ export class SvgRenderer extends Renderer {
 		this._svgElement = document.createElementNS(NS, 'svg');
 		this._svgElement.setAttribute('version', VERSION);
 		this._svgElement.style.setProperty('overflow', 'hidden');
+		this._svgElement.style.setProperty('pointer-events', 'none');
 		this._domElement.appendChild(this._svgElement);
 
 		// Register SVG root callbacks

@@ -209,7 +209,7 @@ export type SpectaExport = { comp_dtif: CompDtif; svg_comp_input_event: SvgCompI
 
 export type Stroke = { fill: Fill; width: number }
 
-export type SvgAttribute = { type: "Id"; id: SvgElementId } | { type: "Name"; name: string } | { type: "Width"; width: number; unit: SvgMeasurementUnit } | { type: "Height"; height: number; unit: SvgMeasurementUnit } | { type: "Opacity"; opacity: number } | { type: "Transform"; transform: SvgTransformAttribute } | { type: "PatternTransform"; patternTransform: SvgTransformAttribute } | { type: "D"; d: string } | { type: "ClipPath"; clipPath: SvgElementId } | { type: "Fill"; fill: string } | { type: "ReferencedFill"; id: SvgElementId } | { type: "PatternUnits"; patternUnits: SvgUnitsVariant } | { type: "GradientUnits"; gradientUnits: SvgUnitsVariant } | { type: "Href"; href: SvgHrefVariant } | { type: "PreserveAspectRatio"; preserveAspectRatio: string } | { type: "X1"; x1: number } | { type: "Y1"; y1: number } | { type: "X2"; x2: number } | { type: "Y2"; y2: number } | { type: "Offset"; offset: number } | { type: "StopColor"; stopColor: string } | { type: "PointerEvents"; pointerEvents: SvgPointerEventsVariants }
+export type SvgAttribute = { type: "Id"; id: SvgElementId } | { type: "Class"; class: string } | { type: "Width"; width: number; unit: SvgMeasurementUnit } | { type: "Height"; height: number; unit: SvgMeasurementUnit } | { type: "Transform"; transform: SvgTransformAttribute } | { type: "PatternTransform"; patternTransform: SvgTransformAttribute } | { type: "D"; d: SvgPathAttribute } | { type: "ClipPath"; clipPath: SvgElementId } | { type: "Fill"; fill: SvgFillAttribute } | { type: "PatternUnits"; patternUnits: SvgUnits } | { type: "GradientUnits"; gradientUnits: SvgUnits } | { type: "Href"; href: SvgHrefAttribute } | { type: "PreserveAspectRatio"; preserveAspectRatio: string } | { type: "X1"; x1: number } | { type: "Y1"; y1: number } | { type: "X2"; x2: number } | { type: "Y2"; y2: number } | { type: "Offset"; offset: number } | { type: "StopColor"; stopColor: string }
 
 /**
  * Emitted when an attribute of a SvgElement is removed.
@@ -221,7 +221,7 @@ export type SvgAttributeRemovedChange = { key: string }
  */
 export type SvgAttributeUpdatedChange = { key: string; newValue: string }
 
-export type SvgBlendMode = "Normal" | "Multiply" | "Screen" | "Overlay" | "Darken" | "Lighten" | "ColorDodge" | "ColorBurn" | "HardLight" | "SoftLight" | "Difference" | "Exclusion" | "Hue" | "Saturation" | "Color" | "Luminosity"
+export type SvgBlendModeStyle = "Normal" | "Multiply" | "Screen" | "Overlay" | "Darken" | "Lighten" | "ColorDodge" | "ColorBurn" | "HardLight" | "SoftLight" | "Difference" | "Exclusion" | "Hue" | "Saturation" | "Color" | "Luminosity"
 
 export type SvgBuilderOutputEvent = 
 /**
@@ -269,15 +269,21 @@ export type SvgElementId = number
  */
 export type SvgElementReorderedChange = { elementId: SvgElementId; newParentId: SvgElementId; insertBeforeId: SvgElementId | null }
 
-export type SvgHrefVariant = { Base64: { content: string } } | { Url: { url: string } }
+export type SvgFillAttribute = { RGB: { red: number; green: number; blue: number } } | { RGBA: { red: number; green: number; blue: number; alpha: number } } | { Reference: { id: SvgElementId } }
+
+export type SvgFillStyle = { RGB: { red: number; green: number; blue: number } } | { RGBA: { red: number; green: number; blue: number; alpha: number } }
+
+export type SvgHrefAttribute = { Base64: { content: string } } | { Url: { url: string } }
 
 export type SvgMeasurementUnit = "Pixel" | "Percent"
 
-export type SvgPointerEventsVariants = "None" | "All"
+export type SvgPathAttribute = string
+
+export type SvgPointerEventsStyle = "None" | "All"
 
 export type SvgStringOutputEvent = { value: string }
 
-export type SvgStyle = { type: "Display"; display: SvgDisplayStyle } | { type: "BlendMode"; blendMode: SvgBlendMode }
+export type SvgStyle = { type: "Display"; display: SvgDisplayStyle } | { type: "BlendMode"; blendMode: SvgBlendModeStyle } | { type: "Opacity"; opacity: number } | { type: "Fill"; fill: SvgFillStyle } | { type: "PointerEvents"; pointerEvents: SvgPointerEventsStyle }
 
 /**
  * Emitted when a style property of a SvgElement is removed.
@@ -291,7 +297,7 @@ export type SvgStyleUpdatedChange = { key: string; newValue: string }
 
 export type SvgTransformAttribute = { type: "Matrix"; a: number; b: number; c: number; d: number; tx: number; ty: number } | { type: "Rotate"; rotation: number }
 
-export type SvgUnitsVariant = "UserSpaceOnUse" | "ObjectBoundingBox"
+export type SvgUnits = "UserSpaceOnUse" | "ObjectBoundingBox"
 
 /**
  * A styled text segment.

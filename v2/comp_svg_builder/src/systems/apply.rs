@@ -3,7 +3,7 @@ use crate::svg::{
     svg_element::{
         attributes::{SvgAttribute, SvgMeasurementUnit},
         element_changes::{SvgElementChange, SvgElementReorderedChange},
-        styles::{SvgDisplayStyle, SvgStyle},
+        styles::{SvgDisplayStyle, SvgFillStyle, SvgStyle},
         SvgElementId,
     },
 };
@@ -334,7 +334,7 @@ pub fn apply_opacity_mixin_changes(
             NodeSvgBundle::Shape(bundle) => &mut bundle.root_g,
         };
 
-        element.set_attribute(SvgAttribute::Opacity {
+        element.set_style(SvgStyle::Opacity {
             opacity: opacity.0.get(),
         });
     }
@@ -369,27 +369,21 @@ pub fn apply_path_mixin_changes(
             NodeSvgBundle::Frame(frame_bundle) => {
                 for fill_bundle in &mut frame_bundle.fill_bundles {
                     match fill_bundle {
-                        FillSvgBundle::Solid(solid_bundle) => {
-                            solid_bundle.shape_path.set_attribute(SvgAttribute::D {
-                                d: String::from("todo"),
-                            })
-                        }
+                        FillSvgBundle::Solid(solid_bundle) => solid_bundle
+                            .shape_path
+                            .set_attribute(SvgAttribute::D { d: path.into() }),
                     }
                 }
                 frame_bundle
                     .children_clipped_path
-                    .set_attribute(SvgAttribute::D {
-                        d: String::from("todo"),
-                    })
+                    .set_attribute(SvgAttribute::D { d: path.into() })
             }
             NodeSvgBundle::Shape(shape_bundle) => {
                 for fill_bundle in &mut shape_bundle.fill_bundles {
                     match fill_bundle {
-                        FillSvgBundle::Solid(solid_bundle) => {
-                            solid_bundle.shape_path.set_attribute(SvgAttribute::D {
-                                d: String::from("todo"),
-                            })
-                        }
+                        FillSvgBundle::Solid(solid_bundle) => solid_bundle
+                            .shape_path
+                            .set_attribute(SvgAttribute::D { d: path.into() }),
                     }
                 }
             }
@@ -420,13 +414,12 @@ pub fn apply_solid_paint_changes(
                 {
                     match fill_bundle {
                         FillSvgBundle::Solid(solid_bundle) => {
-                            solid_bundle.shape_path.set_attribute(SvgAttribute::Fill {
-                                fill: format!(
-                                    "rgb({}, {}, {})",
-                                    solid_paint.color.red,
-                                    solid_paint.color.green,
-                                    solid_paint.color.blue
-                                ),
+                            solid_bundle.shape_path.set_style(SvgStyle::Fill {
+                                fill: SvgFillStyle::RGB {
+                                    red: solid_paint.color.red,
+                                    green: solid_paint.color.green,
+                                    blue: solid_paint.color.blue,
+                                },
                             })
                         }
                     }

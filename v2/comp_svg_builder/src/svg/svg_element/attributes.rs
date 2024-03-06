@@ -10,8 +10,8 @@ pub enum SvgAttribute {
     Id {
         id: SvgElementId,
     },
-    Name {
-        name: String,
+    Class {
+        class: String,
     },
     Width {
         width: f32,
@@ -21,9 +21,6 @@ pub enum SvgAttribute {
         height: f32,
         unit: SvgMeasurementUnit,
     },
-    Opacity {
-        opacity: f32,
-    },
     Transform {
         transform: SvgTransformAttribute,
     },
@@ -32,28 +29,25 @@ pub enum SvgAttribute {
         pattern_transform: SvgTransformAttribute,
     },
     D {
-        d: String,
+        d: SvgPathAttribute,
     },
     #[cfg_attr(feature = "serde_support", serde(rename_all = "camelCase"))]
     ClipPath {
         clip_path: SvgElementId,
     },
     Fill {
-        fill: String,
-    },
-    ReferencedFill {
-        id: SvgElementId,
+        fill: SvgFillAttribute,
     },
     #[cfg_attr(feature = "serde_support", serde(rename_all = "camelCase"))]
     PatternUnits {
-        pattern_units: SvgUnitsVariant,
+        pattern_units: SvgUnits,
     },
     #[cfg_attr(feature = "serde_support", serde(rename_all = "camelCase"))]
     GradientUnits {
-        gradient_units: SvgUnitsVariant,
+        gradient_units: SvgUnits,
     },
     Href {
-        href: SvgHrefVariant,
+        href: SvgHrefAttribute,
     },
     #[cfg_attr(feature = "serde_support", serde(rename_all = "camelCase"))]
     PreserveAspectRatio {
@@ -78,25 +72,20 @@ pub enum SvgAttribute {
     StopColor {
         stop_color: String,
     },
-    #[cfg_attr(feature = "serde_support", serde(rename_all = "camelCase"))]
-    PointerEvents {
-        pointer_events: SvgPointerEventsVariants,
-    },
 }
 
 impl SvgAttribute {
     pub fn key(&self) -> &'static str {
         match self {
             Self::Id { .. } => "id",
+            Self::Class { .. } => "class",
             Self::Width { .. } => "width",
             Self::Height { .. } => "height",
-            Self::Opacity { .. } => "opacity",
             Self::Transform { .. } => "transform",
             Self::PatternTransform { .. } => "patternTransform",
             Self::D { .. } => "d",
             Self::ClipPath { .. } => "clip-path",
-            Self::Fill { .. } | Self::ReferencedFill { .. } => "fill",
-            Self::Name { .. } => "name",
+            Self::Fill { .. } => "fill",
             Self::PatternUnits { .. } => "patternUnits",
             Self::GradientUnits { .. } => "gradientUnits",
             Self::Href { .. } => "href",
@@ -107,13 +96,13 @@ impl SvgAttribute {
             Self::Y2 { .. } => "y2",
             Self::Offset { .. } => "offset",
             Self::StopColor { .. } => "stop-color",
-            Self::PointerEvents { .. } => "pointer-events",
         }
     }
 
     pub fn to_svg_string(&self) -> String {
         match self {
             Self::Id { id } => id.to_string(),
+            Self::Class { class } => class.clone(),
             Self::Width { width, unit } => match unit {
                 SvgMeasurementUnit::Pixel => width.to_string(),
                 SvgMeasurementUnit::Percent => format!("{width}%"),
@@ -122,7 +111,6 @@ impl SvgAttribute {
                 SvgMeasurementUnit::Pixel => height.to_string(),
                 SvgMeasurementUnit::Percent => format!("{height}%"),
             },
-            Self::Opacity { opacity } => opacity.to_string(),
             Self::Transform { transform }
             | Self::PatternTransform {
                 pattern_transform: transform,
@@ -134,27 +122,38 @@ impl SvgAttribute {
                     format!("rotate({rotation})")
                 }
             },
-            Self::D { d } => d.clone(),
+            Self::D { d } => d.0.clone(),
             Self::ClipPath { clip_path } => format!("url(#{clip_path})"),
-            Self::Fill { fill } => fill.clone(),
-            Self::ReferencedFill { id } => format!("url(#{id})"),
-            Self::Name { name } => name.clone(),
+            Self::Fill { fill } => match fill {
+                SvgFillAttribute::Reference { id } => format!("url(#{id})"),
+                SvgFillAttribute::RGB { red, green, blue } => {
+                    format!("rgb({red}, {green}, {blue})")
+                }
+                SvgFillAttribute::RGBA {
+                    red,
+                    green,
+                    blue,
+                    alpha,
+                } => {
+                    format!("rgb({red}, {green}, {blue}, {alpha})")
+                }
+            },
             Self::PatternUnits {
                 pattern_units: unit,
             }
             | Self::GradientUnits {
                 gradient_units: unit,
             } => match unit {
-                SvgUnitsVariant::ObjectBoundingBox => String::from("objectBoundingBox"),
-                SvgUnitsVariant::UserSpaceOnUse => String::from("userSpaceOnUse"),
+                SvgUnits::ObjectBoundingBox => String::from("objectBoundingBox"),
+                SvgUnits::UserSpaceOnUse => String::from("userSpaceOnUse"),
             },
             Self::Href { href } => match href {
                 // SvgHrefVariant::Base64 {
                 //     content,
                 //     content_type,
                 // } => format!("data:{};base64,{}", content_type.mime_type(), content),
-                SvgHrefVariant::Base64 { .. } => String::from("todo"),
-                SvgHrefVariant::Url { url } => url.clone(),
+                SvgHrefAttribute::Base64 { .. } => String::from("todo"),
+                SvgHrefAttribute::Url { url } => url.clone(),
             },
             Self::PreserveAspectRatio {
                 preserve_aspect_ratio,
@@ -165,10 +164,6 @@ impl SvgAttribute {
             Self::Y2 { y2 } => y2.to_string(),
             Self::Offset { offset } => offset.to_string(),
             Self::StopColor { stop_color } => stop_color.clone(),
-            Self::PointerEvents { pointer_events } => match pointer_events {
-                SvgPointerEventsVariants::All => "all".to_string(),
-                SvgPointerEventsVariants::None => "none".to_string(),
-            },
         }
     }
 
@@ -213,7 +208,7 @@ pub enum SvgMeasurementUnit {
     feature = "serde_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
-pub enum SvgUnitsVariant {
+pub enum SvgUnits {
     #[default]
     UserSpaceOnUse,
     ObjectBoundingBox,
@@ -224,7 +219,7 @@ pub enum SvgUnitsVariant {
     feature = "serde_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
-pub enum SvgHrefVariant {
+pub enum SvgHrefAttribute {
     #[serde(rename_all = "camelCase")]
     Base64 {
         content: String,
@@ -235,13 +230,31 @@ pub enum SvgHrefVariant {
     },
 }
 
-#[derive(Debug, Default, PartialEq, Copy, Clone)]
+#[derive(Debug, Default, PartialEq, Clone)]
 #[cfg_attr(
     feature = "serde_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
-pub enum SvgPointerEventsVariants {
-    #[default]
-    None,
-    All,
+pub struct SvgPathAttribute(pub String);
+
+#[derive(Debug, PartialEq, Copy, Clone)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type)
+)]
+pub enum SvgFillAttribute {
+    RGB {
+        red: u8,
+        green: u8,
+        blue: u8,
+    },
+    RGBA {
+        red: u8,
+        green: u8,
+        blue: u8,
+        alpha: f32,
+    },
+    Reference {
+        id: SvgElementId,
+    },
 }

@@ -10,7 +10,17 @@ pub enum SvgStyle {
     },
     #[cfg_attr(feature = "serde_support", serde(rename_all = "camelCase"))]
     BlendMode {
-        blend_mode: SvgBlendMode,
+        blend_mode: SvgBlendModeStyle,
+    },
+    Opacity {
+        opacity: f32,
+    },
+    Fill {
+        fill: SvgFillStyle,
+    },
+    #[cfg_attr(feature = "serde_support", serde(rename_all = "camelCase"))]
+    PointerEvents {
+        pointer_events: SvgPointerEventsStyle,
     },
 }
 
@@ -19,6 +29,9 @@ impl SvgStyle {
         match self {
             Self::Display { .. } => "display",
             Self::BlendMode { .. } => "mix-blend-mode",
+            Self::Opacity { .. } => "opacity",
+            Self::Fill { .. } => "fill",
+            Self::PointerEvents { .. } => "pointer-events",
         }
     }
 
@@ -29,22 +42,40 @@ impl SvgStyle {
                 SvgDisplayStyle::None => String::from("none"),
             },
             Self::BlendMode { blend_mode } => match blend_mode {
-                SvgBlendMode::Normal => String::from("normal"),
-                SvgBlendMode::Multiply => String::from("multiply"),
-                SvgBlendMode::Screen => String::from("screen"),
-                SvgBlendMode::Overlay => String::from("overlay"),
-                SvgBlendMode::Darken => String::from("darken"),
-                SvgBlendMode::Lighten => String::from("lighten"),
-                SvgBlendMode::ColorDodge => String::from("color-dodge"),
-                SvgBlendMode::ColorBurn => String::from("color-burn"),
-                SvgBlendMode::HardLight => String::from("hard-light"),
-                SvgBlendMode::SoftLight => String::from("soft-light"),
-                SvgBlendMode::Difference => String::from("difference"),
-                SvgBlendMode::Exclusion => String::from("exclusion"),
-                SvgBlendMode::Hue => String::from("hue"),
-                SvgBlendMode::Saturation => String::from("saturation"),
-                SvgBlendMode::Color => String::from("color"),
-                SvgBlendMode::Luminosity => String::from("luminosity"),
+                SvgBlendModeStyle::Normal => String::from("normal"),
+                SvgBlendModeStyle::Multiply => String::from("multiply"),
+                SvgBlendModeStyle::Screen => String::from("screen"),
+                SvgBlendModeStyle::Overlay => String::from("overlay"),
+                SvgBlendModeStyle::Darken => String::from("darken"),
+                SvgBlendModeStyle::Lighten => String::from("lighten"),
+                SvgBlendModeStyle::ColorDodge => String::from("color-dodge"),
+                SvgBlendModeStyle::ColorBurn => String::from("color-burn"),
+                SvgBlendModeStyle::HardLight => String::from("hard-light"),
+                SvgBlendModeStyle::SoftLight => String::from("soft-light"),
+                SvgBlendModeStyle::Difference => String::from("difference"),
+                SvgBlendModeStyle::Exclusion => String::from("exclusion"),
+                SvgBlendModeStyle::Hue => String::from("hue"),
+                SvgBlendModeStyle::Saturation => String::from("saturation"),
+                SvgBlendModeStyle::Color => String::from("color"),
+                SvgBlendModeStyle::Luminosity => String::from("luminosity"),
+            },
+            Self::Fill { fill } => match fill {
+                SvgFillStyle::RGB { red, green, blue } => {
+                    format!("rgb({red}, {green}, {blue})")
+                }
+                SvgFillStyle::RGBA {
+                    red,
+                    green,
+                    blue,
+                    alpha,
+                } => {
+                    format!("rgb({red}, {green}, {blue}, {alpha})")
+                }
+            },
+            Self::Opacity { opacity } => opacity.to_string(),
+            Self::PointerEvents { pointer_events } => match pointer_events {
+                SvgPointerEventsStyle::All => "all".to_string(),
+                SvgPointerEventsStyle::None => "none".to_string(),
             },
         }
     }
@@ -70,7 +101,7 @@ pub enum SvgDisplayStyle {
     feature = "serde_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
-pub enum SvgBlendMode {
+pub enum SvgBlendModeStyle {
     #[default]
     Normal,
     Multiply,
@@ -88,4 +119,34 @@ pub enum SvgBlendMode {
     Saturation,
     Color,
     Luminosity,
+}
+
+#[derive(Debug, PartialEq, Copy, Clone)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type)
+)]
+pub enum SvgFillStyle {
+    RGB {
+        red: u8,
+        green: u8,
+        blue: u8,
+    },
+    RGBA {
+        red: u8,
+        green: u8,
+        blue: u8,
+        alpha: f32,
+    },
+}
+
+#[derive(Debug, Default, PartialEq, Copy, Clone)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type)
+)]
+pub enum SvgPointerEventsStyle {
+    #[default]
+    None,
+    All,
 }

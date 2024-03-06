@@ -7,6 +7,7 @@ use crate::{
         },
         svg_element::{
             element_changes::{SvgElementChange, SvgElementReorderedChange},
+            styles::SvgStyle,
             SvgElementId,
         },
     },
@@ -96,15 +97,15 @@ fn remove_absent_node_fills(node_bundle: &mut NodeSvgBundle, fills: &[Fill]) {
     let mut to_remove_element_ids: SmallVec<[SvgElementId; 2]> = SmallVec::new();
 
     // Identify to remove element ids
-    let bundle_fills = match node_bundle.get_fill_bundles_mut() {
-        Some(bundle_fills) => bundle_fills,
+    let fill_bundles = match node_bundle.get_fill_bundles_mut() {
+        Some(fill_bundles) => fill_bundles,
         None => return,
     };
     let fill_entities: HashSet<Entity> = fills.iter().map(|fill| fill.paint).collect();
-    bundle_fills.retain(|bundle_fill| {
-        let retain = fill_entities.contains(bundle_fill.get_paint_entity());
+    fill_bundles.retain(|fill_bundle| {
+        let retain = fill_entities.contains(fill_bundle.get_paint_entity());
         if !retain {
-            to_remove_element_ids.push(bundle_fill.get_svg_bundle().get_root_element().get_id());
+            to_remove_element_ids.push(fill_bundle.get_svg_bundle().get_root_element().get_id());
         }
         return retain;
     });
@@ -126,24 +127,40 @@ fn add_or_update_node_fills(
     let mut to_add_fill_bundles: SmallVec<[FillSvgBundle; 2]> = SmallVec::new();
 
     // Update existing fills and identify newly added fills
-    let bundle_fills = match node_bundle.get_fill_bundles_mut() {
-        Some(bundle_fills) => bundle_fills,
+    let fill_bundles = match node_bundle.get_fill_bundles_mut() {
+        Some(fill_bundles) => fill_bundles,
         None => return,
     };
     for fill in fills.iter() {
-        match bundle_fills
+        match fill_bundles
             .iter_mut()
-            .find(|bundle_fill| *bundle_fill.get_paint_entity() == fill.paint)
+            .find(|fill_bundle| *fill_bundle.get_paint_entity() == fill.paint)
         {
             // If found, update the existing fill bundle as necessary
-            Some(bundle_fill) => {
-                // TODO: Apply updates
+            Some(fill_bundle) => {
+                let root_element = fill_bundle.get_svg_bundle_mut().get_root_element_mut();
+                root_element.set_styles(vec![
+                    SvgStyle::BlendMode {
+                        blend_mode: (&fill.blend_mode).into(),
+                    },
+                    SvgStyle::Opacity {
+                        opacity: fill.opacity.0.get(),
+                    },
+                ]);
             }
             // If not found, create a new fill bundle
             None => {
                 if let Ok(paint) = paint_query.get(fill.paint) {
-                    let fill_bundle = create_fill_bundle(paint, fill, svg_context_res);
-                    // TODO: Apply initial updates
+                    let mut fill_bundle = create_fill_bundle(paint, fill, svg_context_res);
+                    let root_element = fill_bundle.get_svg_bundle_mut().get_root_element_mut();
+                    root_element.set_styles(vec![
+                        SvgStyle::BlendMode {
+                            blend_mode: (&fill.blend_mode).into(),
+                        },
+                        SvgStyle::Opacity {
+                            opacity: fill.opacity.0.get(),
+                        },
+                    ]);
                     to_add_fill_bundles.push(fill_bundle);
                 }
             }
@@ -161,38 +178,38 @@ fn add_or_update_node_fills(
             fill_bundle.get_svg_bundle_mut().get_root_element_mut(),
         );
     }
-    let bundle_fills = match node_bundle.get_fill_bundles_mut() {
-        Some(bundle_fills) => bundle_fills,
+    let fill_bundles = match node_bundle.get_fill_bundles_mut() {
+        Some(fill_bundles) => fill_bundles,
         None => return,
     };
-    bundle_fills.extend(to_add_fill_bundles);
+    fill_bundles.extend(to_add_fill_bundles);
 }
 
 fn reorder_node_fills(node_bundle: &mut NodeSvgBundle, fills: &[Fill]) {
-    let bundle_fills = match node_bundle.get_fill_bundles_mut() {
-        Some(bundle_fills) => bundle_fills,
+    let fill_bundles = match node_bundle.get_fill_bundles_mut() {
+        Some(fill_bundles) => fill_bundles,
         None => return,
     };
 
     // Track the original positions of the fills
     #[cfg(feature = "output_svg_element_changes")]
-    let original_positions = bundle_fills
+    let original_positions = fill_bundles
         .iter()
         .map(|fill| fill.get_svg_bundle().get_root_element().get_id())
         .collect::<Vec<_>>();
 
     // Sort bundle fills
-    bundle_fills.sort_by_key(|bundle_fill| {
+    fill_bundles.sort_by_key(|fill_bundle| {
         fills
             .iter()
-            .position(|fill| *bundle_fill.get_paint_entity() == fill.paint)
+            .position(|fill| *fill_bundle.get_paint_entity() == fill.paint)
             .unwrap_or(usize::MAX)
     });
 
     #[cfg(feature = "output_svg_element_changes")]
     {
         // Determine the new positions after sorting
-        let new_positions = bundle_fills
+        let new_positions = fill_bundles
             .iter()
             .map(|fill| fill.get_svg_bundle().get_root_element().get_id())
             .collect::<Vec<_>>();
@@ -251,13 +268,13 @@ fn create_fill_bundle(
 // ) {
 //     for (FillMixin(fills), mut bundle_mixin) in query.iter_mut() {
 //         let NodeSvgBundleMixin(bundle) = bundle_mixin.as_mut();
-//         let bundle_fills = match bundle.get_fills_mut() {
-//             Some(bundle_fills) => bundle_fills,
+//         let fill_bundles = match bundle.get_fills_mut() {
+//             Some(fill_bundles) => fill_bundles,
 //             None => return,
 //         };
 
 //         // Identify removed and newly added fills (paint entities)
-//         let current_fill_entities_set = bundle_fills
+//         let current_fill_entities_set = fill_bundles
 //             .iter()
 //             .map(|fill| *fill.get_paint_entity())
 //             .collect::<HashSet<_>>();
@@ -322,17 +339,17 @@ fn create_fill_bundle(
 //         .enumerate()
 //         .map(|(index, fill)| (fill.paint, index))
 //         .collect::<HashMap<Entity, usize>>();
-//     let bundle_fills = bundle.get_fills_mut()?;
+//     let fill_bundles = bundle.get_fills_mut()?;
 
 //     // Track the original positions of the fills
 //     #[cfg(feature = "output_svg_element_changes")]
-//     let original_positions = bundle_fills
+//     let original_positions = fill_bundles
 //         .iter()
 //         .map(|fill| fill.get_svg_bundle().get_root_element().get_id())
 //         .collect::<Vec<_>>();
 
-//     // Sort `bundle_fills` based on the order defined in `order_map`
-//     bundle_fills.sort_by_key(|fill| {
+//     // Sort `fill_bundles` based on the order defined in `order_map`
+//     fill_bundles.sort_by_key(|fill| {
 //         *order_map
 //             .get(&fill.get_paint_entity())
 //             .unwrap_or(&usize::MAX)
@@ -341,7 +358,7 @@ fn create_fill_bundle(
 //     #[cfg(feature = "output_svg_element_changes")]
 //     {
 //         // Determine the new positions after sorting
-//         let new_positions = bundle_fills
+//         let new_positions = fill_bundles
 //             .iter()
 //             .map(|fill| fill.get_svg_bundle().get_root_element().get_id())
 //             .collect::<Vec<_>>();

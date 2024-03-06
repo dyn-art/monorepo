@@ -1,7 +1,7 @@
 use super::SvgBundle;
 use crate::{
     resources::svg_context::SvgContextRes,
-    svg::svg_element::{attributes::SvgAttribute, SvgElement, SvgElementId, SvgTag},
+    svg::svg_element::{SvgElement, SvgElementId, SvgTag},
 };
 use bevy_ecs::entity::Entity;
 use std::collections::BTreeMap;
@@ -50,24 +50,27 @@ impl SolidFillSvgBundle {
         log::info!("[SolidPaintSvgBundle::new] {:?}", entity);
 
         let mut root_g_element = cx.create_bundle_root_element(SvgTag::Group, entity);
-        #[cfg(feature = "tracing")]
-        root_g_element.set_attribute(SvgAttribute::Name {
-            name: Self::create_element_name(root_g_element.get_id(), "root"),
-        });
 
         let mut defs_element = cx.create_element(SvgTag::Defs);
-        #[cfg(feature = "tracing")]
-        defs_element.set_attribute(SvgAttribute::Name {
-            name: Self::create_element_name(defs_element.get_id(), "defs"),
-        });
         root_g_element.append_child_in_bundle_context(entity, &mut defs_element);
 
         let mut shape_path_element = cx.create_element(SvgTag::Path);
-        #[cfg(feature = "tracing")]
-        shape_path_element.set_attribute(SvgAttribute::Name {
-            name: Self::create_element_name(shape_path_element.get_id(), "shape-path"),
-        });
         root_g_element.append_child_in_bundle_context(entity, &mut shape_path_element);
+
+        #[cfg(feature = "tracing")]
+        {
+            use crate::svg::svg_element::attributes::SvgAttribute;
+
+            root_g_element.set_attribute(SvgAttribute::Class {
+                class: Self::create_element_name(root_g_element.get_id(), "root"),
+            });
+            defs_element.set_attribute(SvgAttribute::Class {
+                class: Self::create_element_name(defs_element.get_id(), "defs"),
+            });
+            shape_path_element.set_attribute(SvgAttribute::Class {
+                class: Self::create_element_name(shape_path_element.get_id(), "shape-path"),
+            });
+        }
 
         Self {
             paint_entity: entity,
