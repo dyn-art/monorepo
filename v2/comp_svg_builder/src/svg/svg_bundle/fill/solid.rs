@@ -83,6 +83,6 @@ impl SolidFillSvgBundle {
 
     #[cfg(feature = "tracing")]
     fn create_element_name(id: SvgElementId, category: &str) -> String {
-        format!("solid-paint_{}_{}", category, id)
+        format!("solid-fill_{}_{}", category, id)
     }
 }

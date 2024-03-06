@@ -1,5 +1,8 @@
 use crate::svg::{
-    svg_bundle::{FillSvgBundle, NodeSvgBundle, NodeSvgBundleMixin},
+    svg_bundle::{
+        fill::FillSvgBundle,
+        node::{NodeSvgBundle, NodeSvgBundleMixin},
+    },
     svg_element::{
         attributes::{SvgAttribute, SvgMeasurementUnit},
         element_changes::{SvgElementChange, SvgElementReorderedChange},

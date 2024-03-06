@@ -9,7 +9,7 @@ use crate::modules::watch::{
 };
 use bevy_app::App;
 use bevy_ecs::{
-    entity::{self, Entity},
+    entity::Entity,
     query::{With, Without},
     system::{Query, SystemState},
 };
@@ -18,7 +18,7 @@ use dyn_comp_core::{resources::composition::CompositionRes, CompCorePlugin};
 use dyn_comp_dtif::CompDtif;
 use dyn_comp_interaction::CompInteractionPlugin;
 use dyn_comp_svg_builder::{
-    events::SvgBuilderOutputEvent, svg::svg_bundle::NodeSvgBundleMixin, CompSvgBuilderPlugin,
+    events::SvgBuilderOutputEvent, svg::svg_bundle::node::NodeSvgBundleMixin, CompSvgBuilderPlugin,
 };
 use dyn_comp_types::{
     events::InputEvent,

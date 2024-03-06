@@ -2,7 +2,7 @@
 
 use crate::{
     resources::changed_svg_bundles::{ChangedSvgBundle, ChangedSvgBundlesRes},
-    svg::svg_bundle::NodeSvgBundleMixin,
+    svg::svg_bundle::node::NodeSvgBundleMixin,
 };
 use bevy_ecs::{
     entity::Entity,
