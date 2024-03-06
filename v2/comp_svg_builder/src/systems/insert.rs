@@ -177,8 +177,7 @@ fn add_or_update_node_fills(
         None => return,
     };
     for fill_bundle in &mut to_add_fill_bundles {
-        fill_wrapper_element.append_child_in_world_context(
-            *fill_bundle.get_paint_entity(),
+        fill_wrapper_element.append_child_in_bundle_context(
             fill_bundle.get_svg_bundle_mut().get_root_element_mut(),
         );
     }
@@ -376,8 +375,7 @@ fn add_or_update_node_strokes(
         None => return,
     };
     for stroke_bundle in &mut to_add_stroke_bundles {
-        stroke_wrapper_element.append_child_in_world_context(
-            *stroke_bundle.get_paint_entity(),
+        stroke_wrapper_element.append_child_in_bundle_context(
             stroke_bundle.get_svg_bundle_mut().get_root_element_mut(),
         );
     }

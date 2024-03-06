@@ -143,15 +143,8 @@ impl SvgElement {
         )
     }
 
-    pub fn append_child_in_bundle_context(
-        &mut self,
-        entity: Entity,
-        child_element: &mut SvgElement,
-    ) {
-        self.append_child_element(
-            child_element,
-            SvgElementChildIdentifier::InSvgBundleContext(entity),
-        );
+    pub fn append_child_in_bundle_context(&mut self, child_element: &mut SvgElement) {
+        self.append_child_element(child_element, SvgElementChildIdentifier::InSvgBundleContext);
     }
 
     fn append_child_element(
@@ -291,10 +284,11 @@ impl SvgElement {
         }
 
         // Append children
+        let bundle_elements = bundle.get_elements();
         for child in &self.children {
             match child.identifier {
-                SvgElementChildIdentifier::InSvgBundleContext(_) => {
-                    if let Some(child_element) = bundle.get_elements().get(&child.id) {
+                SvgElementChildIdentifier::InSvgBundleContext => {
+                    if let Some(child_element) = bundle_elements.get(&child.id) {
                         result.push_str(&child_element.to_string(bundle, maybe_bundle_query));
                     }
                 }
@@ -392,5 +386,5 @@ pub enum SvgElementChildIdentifier {
     /// Child element is root element of SvgBundle.
     InWorldContext(Entity),
     /// Child element is child element of SvgBundle.
-    InSvgBundleContext(Entity),
+    InSvgBundleContext,
 }

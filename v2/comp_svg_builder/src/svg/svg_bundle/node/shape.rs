@@ -90,19 +90,19 @@ impl ShapeNodeSvgBundle {
         let mut root_g_element = cx.create_bundle_root_element(SvgTag::Group, entity);
 
         let mut defs_element = cx.create_element(SvgTag::Defs);
-        root_g_element.append_child_in_bundle_context(entity, &mut defs_element);
+        root_g_element.append_child_in_bundle_context(&mut defs_element);
 
         let mut click_area_rect_element = cx.create_element(SvgTag::Rect);
         click_area_rect_element.set_style(SvgStyle::PointerEvents {
             pointer_events: SvgPointerEventsStyle::All,
         });
-        root_g_element.append_child_in_bundle_context(entity, &mut click_area_rect_element);
+        root_g_element.append_child_in_bundle_context(&mut click_area_rect_element);
 
         let mut fills_wrapper_g_element = cx.create_element(SvgTag::Group);
-        root_g_element.append_child_in_bundle_context(entity, &mut fills_wrapper_g_element);
+        root_g_element.append_child_in_bundle_context(&mut fills_wrapper_g_element);
 
         let mut strokes_wrapper_g_element = cx.create_element(SvgTag::Group);
-        root_g_element.append_child_in_bundle_context(entity, &mut strokes_wrapper_g_element);
+        root_g_element.append_child_in_bundle_context(&mut strokes_wrapper_g_element);
 
         #[cfg(feature = "tracing")]
         {

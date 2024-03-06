@@ -57,13 +57,13 @@ impl SolidStrokeSvgBundle {
         let mut root_g_element = cx.create_bundle_root_element(SvgTag::Group, entity);
 
         let mut defs_element = cx.create_element(SvgTag::Defs);
-        root_g_element.append_child_in_bundle_context(entity, &mut defs_element);
+        root_g_element.append_child_in_bundle_context(&mut defs_element);
 
         let mut shape_path_element = cx.create_element(SvgTag::Path);
         shape_path_element.set_style(SvgStyle::Fill {
             fill: SvgFillStyle::None,
         });
-        root_g_element.append_child_in_bundle_context(entity, &mut shape_path_element);
+        root_g_element.append_child_in_bundle_context(&mut shape_path_element);
 
         #[cfg(feature = "tracing")]
         {
