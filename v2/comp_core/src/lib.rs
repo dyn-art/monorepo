@@ -3,6 +3,7 @@ mod systems;
 
 use bevy_app::{App, Plugin, Update};
 use bevy_ecs::schedule::{IntoSystemConfigs, IntoSystemSetConfigs, SystemSet};
+use dyn_comp_asset::CompAssetPlugin;
 use dyn_comp_types::events::{
     CompositionResizedInputEvent, CompositionViewportChangedInputEvent, EntityDeletedInputEvent,
     EntityMovedInputEvent, EntitySetPositionInputEvent,
@@ -38,6 +39,9 @@ enum CompCoreSystemSet {
 
 impl Plugin for CompCorePlugin {
     fn build(&self, app: &mut App) {
+        // Register plugins
+        app.add_plugins(CompAssetPlugin);
+
         // Register events
         app.add_event::<CompositionResizedInputEvent>();
         app.add_event::<CompositionViewportChangedInputEvent>();
@@ -52,9 +56,6 @@ impl Plugin for CompCorePlugin {
             viewport: self.viewport.unwrap_or_default(),
             size: self.size,
         });
-        // TODO
-        // - Font Cache
-        // - Asset Cache
 
         // Register system sets
         app.configure_sets(
@@ -78,16 +79,16 @@ impl Plugin for CompCorePlugin {
 
 #[cfg(feature = "dtif")]
 fn inject_dtif_into_ecs(world: &mut bevy_ecs::world::World, dtif: &dyn_comp_dtif::CompDtif) {
+    use dyn_comp_asset::resources::AssetDatabaseRes;
     use dyn_comp_types::common::Viewport;
     use glam::Vec2;
 
     let mut dtif_injector = dyn_comp_dtif::dtif_injector::DtifInjector::new();
 
-    // Load fonts into cache
-    // TODO
-
-    // Load images into cache
-    // TODO
+    // Load assets
+    if let Some(mut asset_db) = world.get_resource_mut::<AssetDatabaseRes>() {
+        dtif_injector.load_assets(dtif, asset_db.as_mut());
+    }
 
     // Spawn nodes recursively
     let maybe_root_node_entity = dtif_injector.inject_from_root(dtif, world);

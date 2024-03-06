@@ -1,3 +1,4 @@
+pub mod gradient;
 pub mod solid;
 
 use self::solid::SolidFillSvgBundle;

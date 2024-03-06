@@ -110,3 +110,13 @@ pub struct SolidPaintBundle {
     pub paint: CompPaint,
     pub solid: SolidCompPaint,
 }
+
+#[derive(Bundle, Debug)]
+pub struct ImagePaintBundle {
+    // TODO
+}
+
+#[derive(Bundle, Debug)]
+pub struct GradientPaintBundle {
+    // TODO
+}

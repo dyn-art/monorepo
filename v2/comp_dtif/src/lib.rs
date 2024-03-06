@@ -1,4 +1,3 @@
-pub mod assets;
 pub mod common;
 pub mod dtif_injector;
 pub mod events;
@@ -6,7 +5,7 @@ pub mod nodes;
 pub mod paints;
 
 use crate::nodes::Node;
-use assets::Asset;
+use dyn_comp_asset::asset::Asset;
 use dyn_comp_types::common::{Size, Viewport};
 use events::DtifInputEvent;
 use paints::Paint;

@@ -1,5 +1,6 @@
 use crate::common::{BlendMode, CornerRadii, Fill, Opacity, Size, Stroke, Visibility};
 use bevy_ecs::{component::Component, entity::Entity};
+use dyn_comp_asset::asset_id::AnyAssetId;
 use smallvec::SmallVec;
 
 /// Marks an entity as the root or top-level entity.
@@ -41,3 +42,6 @@ pub struct StrokeMixin(pub SmallVec<[Stroke; 2]>);
 /// Holds references to the parent entities of this entity in the paint context.
 #[derive(Component, Debug, Default, Clone)]
 pub struct PaintParentMixin(pub SmallVec<[Entity; 2]>);
+
+#[derive(Component, Debug, Default, Clone)]
+pub struct ImageContentMixin(pub AnyAssetId);

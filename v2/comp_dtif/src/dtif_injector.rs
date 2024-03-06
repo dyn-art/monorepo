@@ -9,6 +9,7 @@ use bevy_ecs::{
     world::{EntityWorldMut, World},
 };
 use bevy_hierarchy::BuildWorldChildren;
+use dyn_comp_asset::{asset_id::AssetId, resources::AssetDatabaseRes};
 use dyn_comp_types::{
     events::InputEvent,
     mixins::{FillMixin, PaintParentMixin, Root, StrokeMixin},
@@ -19,17 +20,28 @@ use std::collections::HashMap;
 pub struct DtifInjector {
     /// Maps Ids of type String (sid) from the DTIF to actual spawned Bevy entities.
     sid_to_entity: HashMap<String, Entity>,
+    /// Maps Ids of type String (sid) from the DTIF to actual asset id.
+    sid_to_asset_id: HashMap<String, AssetId>,
 }
 
 impl DtifInjector {
     pub fn new() -> Self {
         Self {
             sid_to_entity: HashMap::default(),
+            sid_to_asset_id: HashMap::default(),
         }
     }
 
     pub fn drain_sid_to_entity(&mut self) -> HashMap<String, Entity> {
         self.sid_to_entity.drain().collect()
+    }
+
+    pub fn load_assets(&mut self, dtif: &CompDtif, asset_db: &mut AssetDatabaseRes) {
+        for (sid, asset) in &dtif.assets {
+            if let Some(asset_id) = asset_db.insert_asset(asset.clone()) {
+                self.sid_to_asset_id.insert(sid.clone(), asset_id);
+            }
+        }
     }
 
     pub fn inject_from_root(&mut self, dtif: &CompDtif, world: &mut World) -> Option<Entity> {
