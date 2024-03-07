@@ -1,3 +1,5 @@
+use imagesize::ImageType;
+
 #[derive(Debug, Clone)]
 #[cfg_attr(
     feature = "serde_support",
@@ -28,13 +30,21 @@ pub enum AssetContent {
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
 pub enum AssetContentType {
-    // Image
-    JPEG,
-    PNG,
-    SVG,
-    // Font
-    TTF,
-    // Other
     #[default]
     Unknown,
+    // Image
+    Jpeg,
+    Png,
+    // Vector
+    Svg,
+    // Font
+    Ttf,
+}
+
+#[derive(Debug, Clone)]
+pub struct ImageAsset {
+    pub content: Vec<u8>,
+    pub width: usize,
+    pub height: usize,
+    pub image_type: ImageType,
 }

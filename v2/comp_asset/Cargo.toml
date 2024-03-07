@@ -19,6 +19,7 @@ bevy_ecs = { workspace = true }
 fontdb = "0.16.0"
 slotmap = "1.0.7"
 tinyvec = { workspace = true }
+imagesize = "0.12"
 
 # serde_support
 specta = { workspace = true, features = ["serde"], optional = true }

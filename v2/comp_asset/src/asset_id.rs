@@ -4,7 +4,7 @@ use tinyvec::TinyVec;
 #[derive(Clone, Eq, Hash, Ord, PartialEq, PartialOrd, Debug)]
 pub enum AssetId {
     Font(FontId),
-    Any(AnyAssetId),
+    Image(ImageId),
 }
 
 #[derive(Clone, Eq, Hash, Ord, PartialEq, PartialOrd, Debug, Default)]
@@ -16,7 +16,7 @@ pub struct FontId(pub TinyVec<[ID; 8]>);
 /// is actually from the same db instance. This is up to the caller.
 ///
 /// ID overflow will cause a panic, but it's highly unlikely that someone would
-/// load more than 4 billion font faces.
+/// load more than 4 billion assets.
 ///
 /// Because the internal representation of ID is private, The `Display` trait
 /// implementation for this type only promise that unequal IDs will be displayed
@@ -25,14 +25,14 @@ pub struct FontId(pub TinyVec<[ID; 8]>);
 ///
 /// [`KeyData`]: https://docs.rs/slotmap/latest/slotmap/struct.KeyData.html
 #[derive(Clone, Copy, Eq, Hash, Ord, PartialEq, PartialOrd, Debug, Default)]
-pub struct AnyAssetId(pub(crate) InnerAnyAssetId);
+pub struct ImageId(pub(crate) InnerImageId);
 
 slotmap::new_key_type! {
     /// Internal ID type.
-    pub(crate) struct InnerAnyAssetId;
+    pub(crate) struct InnerImageId;
 }
 
-impl core::fmt::Display for AnyAssetId {
+impl core::fmt::Display for ImageId {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", (self.0).0.as_ffi())
     }

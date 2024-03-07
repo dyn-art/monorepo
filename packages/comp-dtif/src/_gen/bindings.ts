@@ -12,7 +12,7 @@ export type AssetContent =
  */
 { type: "Url"; url: string }
 
-export type AssetContentType = "JPEG" | "PNG" | "SVG" | "TTF" | "Unknown"
+export type AssetContentType = "Unknown" | "Jpeg" | "Png" | "Svg" | "Ttf"
 
 export type BlendMode = "Normal" | "Multiply" | "Screen" | "Overlay" | "Darken" | "Lighten" | "ColorDodge" | "ColorBurn" | "HardLight" | "SoftLight" | "Difference" | "Exclusion" | "Hue" | "Saturation" | "Color" | "Luminosity"
 
@@ -87,6 +87,8 @@ export type CursorMovedOnCompInputEvent = { position: Vec2 }
 
 export type CursorUpOnCompInputEvent = { position: Vec2; button: MouseButton }
 
+export type Degree = number
+
 export type DtifCompositionResizedEvent = { size: Size }
 
 export type DtifCompositionViewportChangedEvent = { viewport: Viewport }
@@ -141,13 +143,33 @@ export type FontStyle =
  */
 "Oblique"
 
-export type FrameNode = { clipContent: boolean; translation: Vec2; angleInRadians: number; size: Size; cornerRadii: CornerRadii; visibility: Visibility; fill: DtifFill[]; blendMode: BlendMode; opacity: Opacity; stroke: DtifStroke[]; children: string[] }
+export type FrameNode = { clipContent?: boolean; translation: Vec2; angle?: Degree; size: Size; cornerRadii?: CornerRadii; visibility?: Visibility; fill: DtifFill[]; blendMode?: BlendMode; opacity?: Opacity; stroke?: DtifStroke[]; children?: string[] }
 
-export type GroupNode = { translation: Vec2; angleInRadians: number; size: Size; visibility: Visibility; blendMode: BlendMode; opacity: Opacity; children: string[] }
+export type GroupNode = { translation: Vec2; angle?: Degree; size: Size; visibility?: Visibility; blendMode?: BlendMode; opacity?: Opacity; children?: string[] }
 
 export type HandleSide = "Top" | "Bottom" | "Left" | "Right"
 
 export type HorizontalTextAlignment = "Left" | "Center" | "Right" | "Justified"
+
+export type ImagePaint = { assetId: string; scaleMode?: ImageScaleMode; blendMode?: BlendMode; opacity?: Opacity }
+
+export type ImageScaleMode = 
+/**
+ * Fills the area completely with the image.
+ */
+{ type: "Fill" } | 
+/**
+ * Fits the image within the area while maintaining its aspect ratio.
+ */
+{ type: "Fit" } | 
+/**
+ * Crops the image to fill the area.
+ */
+{ type: "Crop"; transform?: Mat3 } | 
+/**
+ * Tiles the image within the area.
+ */
+{ type: "Tile"; rotation?: number; scalingFactor: number }
 
 export type Inch = number
 
@@ -183,6 +205,8 @@ export type LetterSpacing = "Auto" | { Fixed: MeasurementUnit }
 
 export type LineHeight = "Auto" | { Fixed: MeasurementUnit }
 
+export type Mat3 = [number, number, number, number, number, number, number, number, number]
+
 export type MeasurementUnit = { type: "Pixels"; pixels: Pixel } | { type: "Percent"; percent: Percent } | { type: "Inch"; inch: Inch } | { type: "Centimeter"; centimeter: Centimeter } | { type: "Millimeter"; millimeter: Millimeter }
 
 export type Millimeter = number
@@ -199,13 +223,13 @@ export type Percent = number
 
 export type Pixel = number
 
-export type RectangleNode = { translation: Vec2; angleInRadians: number; size: Size; cornerRadii: CornerRadii; visibility: Visibility; fill: DtifFill[]; blendMode: BlendMode; opacity: Opacity; stroke: DtifStroke[] }
+export type RectangleNode = { translation: Vec2; angle?: Degree; size: Size; cornerRadii?: CornerRadii; visibility?: Visibility; fill: DtifFill[]; blendMode?: BlendMode; opacity?: Opacity; stroke?: DtifStroke[] }
 
 export type SelectionChangeOutputEvent = { selected: Entity[] }
 
 export type Size = Vec2
 
-export type SolidPaint = { color: Color }
+export type SolidPaint = { color: Color; blendMode?: BlendMode; opacity?: Opacity }
 
 export type SpectaExport = { comp_dtif: CompDtif; svg_comp_input_event: SvgCompInputEvent; svg_comp_output_event: SvgCompOutputEvent }
 

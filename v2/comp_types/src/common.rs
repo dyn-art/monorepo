@@ -1,5 +1,29 @@
 use bevy_ecs::entity::Entity;
-use glam::{Vec2, Vec4};
+use glam::{Mat3, Vec2, Vec4};
+
+#[derive(Debug, Default, PartialEq, Copy, Clone)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type)
+)]
+pub struct Degree(f32);
+
+impl Degree {
+    #[inline]
+    pub fn new(value: f32) -> Self {
+        Self(value.clamp(0.0, 360.0))
+    }
+
+    #[inline]
+    pub fn get(&self) -> f32 {
+        self.0
+    }
+
+    #[inline]
+    pub fn to_radians(&self) -> f32 {
+        self.0.to_radians()
+    }
+}
 
 #[derive(Debug, Default, PartialEq, Copy, Clone)]
 #[cfg_attr(
@@ -133,12 +157,18 @@ pub enum Visibility {
     Hidden,
 }
 
-#[derive(Debug, Default, Copy, Clone)]
+#[derive(Debug, Copy, Clone)]
 #[cfg_attr(
     feature = "serde_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
 pub struct Opacity(pub Percent);
+
+impl Default for Opacity {
+    fn default() -> Self {
+        Self(Percent(1.0))
+    }
+}
 
 #[derive(Debug, Copy, Clone)]
 #[cfg_attr(
@@ -329,4 +359,33 @@ pub enum BreakLineOn {
     WordBoundary,
     AnyCharacter,
     NoWrap,
+}
+
+#[derive(Debug, Default, Copy, Clone)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type),
+    serde(tag = "type")
+)]
+pub enum ImageScaleMode {
+    /// Fills the area completely with the image.
+    #[default]
+    Fill,
+
+    /// Fits the image within the area while maintaining its aspect ratio.
+    Fit,
+
+    /// Crops the image to fill the area.
+    Crop {
+        #[cfg_attr(feature = "serde_support", serde(default))]
+        transform: Mat3,
+    },
+
+    /// Tiles the image within the area.
+    #[serde(rename_all = "camelCase")]
+    Tile {
+        #[cfg_attr(feature = "serde_support", serde(default))]
+        rotation: f32,
+        scaling_factor: f32,
+    },
 }

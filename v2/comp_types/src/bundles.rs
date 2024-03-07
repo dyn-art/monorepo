@@ -1,10 +1,12 @@
 use crate::{
-    mixins::{BlendModeMixin, CornerRadiiMixin, OpacityMixin, SizeMixin, VisibilityMixin},
+    mixins::{
+        BlendModeMixin, CornerRadiiMixin, ImageAssetMixin, OpacityMixin, SizeMixin, VisibilityMixin,
+    },
     nodes::{
         CompNode, EllipseCompNode, FrameCompNode, GroupCompNode, PolygonCompNode,
         RectangleCompNode, StarCompNode, TextCompNode,
     },
-    paints::{CompPaint, SolidCompPaint},
+    paints::{CompPaint, ImageCompPaint, SolidCompPaint},
 };
 use bevy_ecs::bundle::Bundle;
 use bevy_transform::components::Transform;
@@ -109,11 +111,17 @@ pub struct TextCompNodeBundle {
 pub struct SolidPaintBundle {
     pub paint: CompPaint,
     pub solid: SolidCompPaint,
+    pub blend_mode: BlendModeMixin,
+    pub opacity: OpacityMixin,
 }
 
 #[derive(Bundle, Debug)]
 pub struct ImagePaintBundle {
-    // TODO
+    pub paint: CompPaint,
+    pub image: ImageCompPaint,
+    pub asset: ImageAssetMixin,
+    pub blend_mode: BlendModeMixin,
+    pub opacity: OpacityMixin,
 }
 
 #[derive(Bundle, Debug)]
