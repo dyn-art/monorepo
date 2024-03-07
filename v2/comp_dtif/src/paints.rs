@@ -11,6 +11,7 @@ use dyn_comp_common::{
 #[serde(tag = "type")]
 pub enum Paint {
     Solid(SolidPaint),
+    Image(ImagePaint),
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]

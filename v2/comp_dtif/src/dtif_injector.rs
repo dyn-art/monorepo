@@ -186,6 +186,7 @@ impl DtifInjector {
     fn spawn_paint<'a>(&self, paint: &Paint, world: &'a mut World) -> EntityWorldMut<'a> {
         match paint {
             Paint::Solid(paint) => world.spawn(paint.to_ecs_bundle(&self)),
+            Paint::Image(paint) => world.spawn(paint.to_ecs_bundle(&self)),
         }
     }
 
