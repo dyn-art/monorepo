@@ -6,7 +6,7 @@ pub mod styles;
 use self::{attributes::SvgAttribute, styles::SvgStyle};
 use super::svg_bundle::{node::NodeSvgBundleMixin, SvgBundle};
 use bevy_ecs::{component::Component, entity::Entity, query::Without, system::Query};
-use dyn_comp_types::mixins::Root;
+use dyn_comp_common::mixins::Root;
 use std::{
     collections::{HashMap, HashSet},
     fmt::Display,

@@ -10,7 +10,7 @@ use bevy_ecs::{
     system::{Query, ResMut},
 };
 use bevy_hierarchy::{Children, Parent};
-use dyn_comp_types::nodes::CompNode;
+use dyn_comp_common::nodes::CompNode;
 
 pub fn extract_svg_bundles(
     mut changed_svg_bundles_res: ResMut<ChangedSvgBundlesRes>,

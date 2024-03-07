@@ -488,6 +488,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "dyn-comp-common"
+version = "0.0.1"
+dependencies = [
+ "bevy_ecs",
+ "bevy_hierarchy",
+ "bevy_transform",
+ "dyn-comp-asset",
+ "glam",
+ "serde",
+ "smallvec",
+ "specta",
+ "tiny-skia-path",
+]
+
+[[package]]
 name = "dyn-comp-core"
 version = "0.0.1"
 dependencies = [
@@ -495,8 +510,8 @@ dependencies = [
  "bevy_ecs",
  "bevy_transform",
  "dyn-comp-asset",
+ "dyn-comp-common",
  "dyn-comp-dtif",
- "dyn-comp-types",
  "glam",
  "smallvec",
  "tiny-skia-path",
@@ -510,7 +525,7 @@ dependencies = [
  "bevy_hierarchy",
  "bevy_transform",
  "dyn-comp-asset",
- "dyn-comp-types",
+ "dyn-comp-common",
  "glam",
  "log",
  "serde",
@@ -525,7 +540,7 @@ dependencies = [
  "bevy_app",
  "bevy_ecs",
  "bevy_transform",
- "dyn-comp-types",
+ "dyn-comp-common",
  "glam",
  "serde",
  "specta",
@@ -539,24 +554,9 @@ dependencies = [
  "bevy_ecs",
  "bevy_hierarchy",
  "bevy_transform",
- "dyn-comp-types",
+ "dyn-comp-common",
  "glam",
  "log",
- "serde",
- "smallvec",
- "specta",
- "tiny-skia-path",
-]
-
-[[package]]
-name = "dyn-comp-types"
-version = "0.0.1"
-dependencies = [
- "bevy_ecs",
- "bevy_hierarchy",
- "bevy_transform",
- "dyn-comp-asset",
- "glam",
  "serde",
  "smallvec",
  "specta",
@@ -572,11 +572,11 @@ dependencies = [
  "bevy_transform",
  "clap",
  "console_error_panic_hook",
+ "dyn-comp-common",
  "dyn-comp-core",
  "dyn-comp-dtif",
  "dyn-comp-interaction",
  "dyn-comp-svg-builder",
- "dyn-comp-types",
  "js-sys",
  "log",
  "once_cell",

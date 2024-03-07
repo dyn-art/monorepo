@@ -21,7 +21,7 @@ use bevy_ecs::{
     query::{Changed, Or, With, Without},
     system::{Commands, Query, ResMut},
 };
-use dyn_comp_types::{
+use dyn_comp_common::{
     common::{Fill, Stroke},
     mixins::{FillMixin, StrokeMixin},
     nodes::{

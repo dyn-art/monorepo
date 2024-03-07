@@ -5,8 +5,9 @@ pub mod nodes;
 pub mod paints;
 
 use crate::nodes::Node;
+use dtif_injector::DtifInjector;
 use dyn_comp_asset::asset::Asset;
-use dyn_comp_types::common::{Size, Viewport};
+use dyn_comp_common::common::{Size, Viewport};
 use events::DtifInputEvent;
 use paints::Paint;
 use std::collections::HashMap;
@@ -42,5 +43,5 @@ pub struct CompDtif {
 
 pub trait ToEcsBundleImpl {
     type Bundle: bevy_ecs::bundle::Bundle;
-    fn to_ecs_bundle(&self) -> Self::Bundle;
+    fn to_ecs_bundle(&self, dtif_injector: &DtifInjector) -> Self::Bundle;
 }

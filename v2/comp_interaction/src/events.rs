@@ -1,5 +1,5 @@
 use bevy_ecs::{entity::Entity, event::Event, world::World};
-use dyn_comp_types::events::InputEvent;
+use dyn_comp_common::events::InputEvent;
 use glam::Vec2;
 
 use crate::resources::comp_interaction::{MouseButton, XYWH};

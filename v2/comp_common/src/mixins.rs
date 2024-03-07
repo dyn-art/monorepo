@@ -44,4 +44,4 @@ pub struct StrokeMixin(pub SmallVec<[Stroke; 2]>);
 pub struct PaintParentMixin(pub SmallVec<[Entity; 2]>);
 
 #[derive(Component, Debug, Default, Clone)]
-pub struct ImageAssetMixin(pub ImageId);
+pub struct ImageAssetMixin(pub Option<ImageId>);

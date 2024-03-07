@@ -18,7 +18,7 @@ use bevy_ecs::{
 };
 use bevy_hierarchy::Children;
 use bevy_transform::components::Transform;
-use dyn_comp_types::{
+use dyn_comp_common::{
     common::Visibility,
     mixins::{
         BlendModeMixin, OpacityMixin, PaintParentMixin, PathMixin, SizeMixin, VisibilityMixin,

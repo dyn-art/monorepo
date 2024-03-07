@@ -1,5 +1,6 @@
-use crate::ToEcsBundleImpl;
-use dyn_comp_types::{
+use crate::{dtif_injector::DtifInjector, ToEcsBundleImpl};
+use dyn_comp_asset::asset_id::AssetId;
+use dyn_comp_common::{
     bundles::{ImagePaintBundle, SolidPaintBundle},
     common::{BlendMode, Color, ImageScaleMode, Opacity},
     mixins::{BlendModeMixin, ImageAssetMixin, OpacityMixin},
@@ -25,7 +26,7 @@ pub struct SolidPaint {
 impl ToEcsBundleImpl for SolidPaint {
     type Bundle = SolidPaintBundle;
 
-    fn to_ecs_bundle(&self) -> Self::Bundle {
+    fn to_ecs_bundle(&self, _: &DtifInjector) -> Self::Bundle {
         SolidPaintBundle {
             paint: CompPaint {
                 variant: CompPaintVariant::Solid,
@@ -52,7 +53,7 @@ pub struct ImagePaint {
 impl ToEcsBundleImpl for ImagePaint {
     type Bundle = ImagePaintBundle;
 
-    fn to_ecs_bundle(&self) -> Self::Bundle {
+    fn to_ecs_bundle(&self, dtif_injector: &DtifInjector) -> Self::Bundle {
         ImagePaintBundle {
             paint: CompPaint {
                 variant: CompPaintVariant::Image,
@@ -60,7 +61,16 @@ impl ToEcsBundleImpl for ImagePaint {
             image: ImageCompPaint {
                 scale_mode: self.scale_mode,
             },
-            asset: ImageAssetMixin(todo!()),
+            asset: ImageAssetMixin(
+                if let Some(asset_id) = dtif_injector.get_sid_to_asset_id().get(&self.asset_id) {
+                    match asset_id {
+                        AssetId::Image(image_id) => Some(*image_id),
+                        _ => None,
+                    }
+                } else {
+                    None
+                },
+            ),
             blend_mode: BlendModeMixin(self.blend_mode),
             opacity: OpacityMixin(self.opacity),
         }

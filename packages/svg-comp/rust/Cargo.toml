@@ -33,7 +33,7 @@ tracing = [
 [dependencies]
 dyn-comp-core = { path = "../../../v2/comp_core", features = ["dtif"] }
 dyn-comp-dtif = { path = "../../../v2/comp_dtif" }
-dyn-comp-types = { path = "../../../v2/comp_types", features = [
+dyn-comp-common = { path = "../../../v2/comp_common", features = [
     "serde_support",
 ] }
 dyn-comp-interaction = { path = "../../../v2/comp_interaction", features = [

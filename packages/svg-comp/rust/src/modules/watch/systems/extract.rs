@@ -10,7 +10,7 @@ use bevy_ecs::{
     system::{Query, Res, ResMut},
 };
 use bevy_transform::components::Transform;
-use dyn_comp_types::mixins::SizeMixin;
+use dyn_comp_common::mixins::SizeMixin;
 
 pub fn extract_changed_components(
     watched_entities_res: Res<WatchedEntitiesRes>,

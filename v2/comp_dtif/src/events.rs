@@ -1,5 +1,5 @@
 use bevy_ecs::entity::Entity;
-use dyn_comp_types::{
+use dyn_comp_common::{
     common::{Size, Viewport},
     events::{
         CompCoreInputEvent, CompositionResizedInputEvent, CompositionViewportChangedInputEvent,

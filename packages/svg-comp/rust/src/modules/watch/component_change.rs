@@ -1,5 +1,5 @@
 use bevy_transform::components::Transform;
-use dyn_comp_types::{common::Size, mixins::SizeMixin};
+use dyn_comp_common::{common::Size, mixins::SizeMixin};
 
 #[derive(Debug, Clone, serde::Serialize, specta::Type)]
 #[serde(tag = "type")]

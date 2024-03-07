@@ -14,7 +14,7 @@ tracing = []
 
 [dependencies]
 dyn-comp-asset = { path = "../comp_asset", features = ["serde_support"] }
-dyn-comp-types = { path = "../comp_types", features = ["serde_support"] }
+dyn-comp-common = { path = "../comp_common", features = ["serde_support"] }
 bevy_ecs = { workspace = true }
 bevy_hierarchy = { workspace = true }
 bevy_transform = { workspace = true }

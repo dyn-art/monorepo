@@ -1,6 +1,5 @@
-use bevy_ecs::entity::Entity;
-use dyn_comp_types::common::{BlendMode, Fill, Opacity, Stroke};
-use std::collections::HashMap;
+use crate::dtif_injector::DtifInjector;
+use dyn_comp_common::common::{BlendMode, Fill, Opacity, Stroke};
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
 pub struct DtifStroke {
@@ -9,8 +8,8 @@ pub struct DtifStroke {
 }
 
 impl DtifStroke {
-    pub fn to_storke(&self, sid_to_entity: &HashMap<String, Entity>) -> Option<Stroke> {
-        self.fill.to_fill(sid_to_entity).map(|fill| Stroke {
+    pub fn to_storke(&self, dtif_injector: &DtifInjector) -> Option<Stroke> {
+        self.fill.to_fill(dtif_injector).map(|fill| Stroke {
             width: self.width,
             fill,
         })
@@ -26,11 +25,14 @@ pub struct DtifFill {
 }
 
 impl DtifFill {
-    pub fn to_fill(&self, sid_to_entity: &HashMap<String, Entity>) -> Option<Fill> {
-        sid_to_entity.get(&self.paint_id).map(|entity| Fill {
-            paint: *entity,
-            blend_mode: self.blend_mode,
-            opacity: self.opacity,
-        })
+    pub fn to_fill(&self, dtif_injector: &DtifInjector) -> Option<Fill> {
+        dtif_injector
+            .get_sid_to_entity()
+            .get(&self.paint_id)
+            .map(|entity| Fill {
+                paint: *entity,
+                blend_mode: self.blend_mode,
+                opacity: self.opacity,
+            })
     }
 }

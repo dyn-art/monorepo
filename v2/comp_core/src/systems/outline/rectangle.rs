@@ -3,7 +3,7 @@ use bevy_ecs::{
     query::{Changed, Or},
     system::{Commands, Query},
 };
-use dyn_comp_types::mixins::{CornerRadiiMixin, PathMixin, SizeMixin};
+use dyn_comp_common::mixins::{CornerRadiiMixin, PathMixin, SizeMixin};
 
 pub fn outline_rectangle(
     mut commands: Commands,

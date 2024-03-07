@@ -5,7 +5,7 @@ use self::{frame::FrameNodeSvgBundle, shape::ShapeNodeSvgBundle};
 use super::{fill::FillSvgBundle, stroke::StrokeSvgBundle, SvgBundle};
 use crate::svg::svg_element::SvgElement;
 use bevy_ecs::{component::Component, entity::Entity, query::Without, system::Query};
-use dyn_comp_types::mixins::Root;
+use dyn_comp_common::mixins::Root;
 use smallvec::SmallVec;
 
 #[derive(Debug, Clone)]

@@ -14,15 +14,15 @@ use bevy_ecs::{
     system::{Query, SystemState},
 };
 use bevy_transform::components::Transform;
+use dyn_comp_common::{
+    events::InputEvent,
+    mixins::{Root, SizeMixin},
+};
 use dyn_comp_core::{resources::composition::CompositionRes, CompCorePlugin};
 use dyn_comp_dtif::CompDtif;
 use dyn_comp_interaction::CompInteractionPlugin;
 use dyn_comp_svg_builder::{
     events::SvgBuilderOutputEvent, svg::svg_bundle::node::NodeSvgBundleMixin, CompSvgBuilderPlugin,
-};
-use dyn_comp_types::{
-    events::InputEvent,
-    mixins::{Root, SizeMixin},
 };
 use events::{SvgCompInputEvent, SvgCompOutputEvent};
 use modules::watch::{resources::watched_entities::WatchedEntitiesRes, CompWatchPlugin};

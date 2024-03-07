@@ -10,7 +10,7 @@ use bevy_ecs::{
 };
 use bevy_hierarchy::BuildWorldChildren;
 use dyn_comp_asset::{asset_id::AssetId, resources::AssetDatabaseRes};
-use dyn_comp_types::{
+use dyn_comp_common::{
     events::InputEvent,
     mixins::{FillMixin, PaintParentMixin, Root, StrokeMixin},
 };
@@ -32,8 +32,12 @@ impl DtifInjector {
         }
     }
 
-    pub fn drain_sid_to_entity(&mut self) -> HashMap<String, Entity> {
-        self.sid_to_entity.drain().collect()
+    pub fn get_sid_to_entity(&self) -> &HashMap<String, Entity> {
+        &self.sid_to_entity
+    }
+
+    pub fn get_sid_to_asset_id(&self) -> &HashMap<String, AssetId> {
+        &self.sid_to_asset_id
     }
 
     pub fn load_assets(&mut self, dtif: &CompDtif, asset_db: &mut AssetDatabaseRes) {
@@ -79,9 +83,9 @@ impl DtifInjector {
 
     fn spawn_node<'a>(&self, node: &Node, world: &'a mut World) -> EntityWorldMut<'a> {
         match node {
-            Node::Frame(node) => world.spawn(node.to_ecs_bundle()),
-            Node::Group(node) => world.spawn(node.to_ecs_bundle()),
-            Node::Rectangle(node) => world.spawn(node.to_ecs_bundle()),
+            Node::Frame(node) => world.spawn(node.to_ecs_bundle(&self)),
+            Node::Group(node) => world.spawn(node.to_ecs_bundle(&self)),
+            Node::Rectangle(node) => world.spawn(node.to_ecs_bundle(&self)),
         }
     }
 
@@ -118,7 +122,7 @@ impl DtifInjector {
             .iter()
             .rev()
             .filter_map(|dtif_fill| {
-                let fill = dtif_fill.to_fill(&self.sid_to_entity)?;
+                let fill = dtif_fill.to_fill(&self)?;
                 let mut paint_entity_world = world.get_entity_mut(fill.paint)?;
 
                 if let Some(mut paint_parent_mixin) =
@@ -150,7 +154,7 @@ impl DtifInjector {
             .iter()
             .rev()
             .filter_map(|dtif_stroke| {
-                let stroke = dtif_stroke.to_storke(&self.sid_to_entity)?;
+                let stroke = dtif_stroke.to_storke(&self)?;
                 let mut paint_entity_world = world.get_entity_mut(stroke.fill.paint)?;
 
                 if let Some(mut paint_parent_mixin) =
@@ -181,7 +185,7 @@ impl DtifInjector {
 
     fn spawn_paint<'a>(&self, paint: &Paint, world: &'a mut World) -> EntityWorldMut<'a> {
         match paint {
-            Paint::Solid(paint) => world.spawn(paint.to_ecs_bundle()),
+            Paint::Solid(paint) => world.spawn(paint.to_ecs_bundle(&self)),
         }
     }
 

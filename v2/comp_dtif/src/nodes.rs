@@ -1,9 +1,10 @@
 use crate::{
     common::{DtifFill, DtifStroke},
+    dtif_injector::DtifInjector,
     ToEcsBundleImpl,
 };
 use bevy_transform::components::Transform;
-use dyn_comp_types::{
+use dyn_comp_common::{
     bundles::{FrameCompNodeBundle, GroupCompNodeBundle, RectangleCompNodeBundle},
     common::{BlendMode, CornerRadii, Degree, Opacity, Size, Visibility},
     mixins::{BlendModeMixin, CornerRadiiMixin, OpacityMixin, SizeMixin, VisibilityMixin},
@@ -51,7 +52,7 @@ fn default_as_false() -> bool {
 impl ToEcsBundleImpl for FrameNode {
     type Bundle = FrameCompNodeBundle;
 
-    fn to_ecs_bundle(&self) -> Self::Bundle {
+    fn to_ecs_bundle(&self, _: &DtifInjector) -> Self::Bundle {
         FrameCompNodeBundle {
             node: CompNode {
                 variant: CompNodeVariant::Frame,
@@ -93,7 +94,7 @@ pub struct GroupNode {
 impl ToEcsBundleImpl for GroupNode {
     type Bundle = GroupCompNodeBundle;
 
-    fn to_ecs_bundle(&self) -> Self::Bundle {
+    fn to_ecs_bundle(&self, _: &DtifInjector) -> Self::Bundle {
         GroupCompNodeBundle {
             node: CompNode {
                 variant: CompNodeVariant::Group,
@@ -134,7 +135,7 @@ pub struct RectangleNode {
 impl ToEcsBundleImpl for RectangleNode {
     type Bundle = RectangleCompNodeBundle;
 
-    fn to_ecs_bundle(&self) -> Self::Bundle {
+    fn to_ecs_bundle(&self, _: &DtifInjector) -> Self::Bundle {
         RectangleCompNodeBundle {
             node: CompNode {
                 variant: CompNodeVariant::Rectangle,

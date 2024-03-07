@@ -1,5 +1,5 @@
 [package]
-name = "dyn-comp-types"
+name = "dyn-comp-common"
 version = "0.0.1"
 description = ""
 edition = { workspace = true }

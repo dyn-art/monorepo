@@ -1,5 +1,5 @@
 use bevy_ecs::{entity::Entity, system::Resource};
-use dyn_comp_types::common::{Size, Viewport};
+use dyn_comp_common::common::{Size, Viewport};
 
 #[derive(Resource, Debug)]
 pub struct CompositionRes {

@@ -1,6 +1,6 @@
 use super::component_change::ComponentChange;
 use bevy_ecs::entity::Entity;
-use dyn_comp_types::common::{Size, Viewport};
+use dyn_comp_common::common::{Size, Viewport};
 
 #[derive(Debug, Clone, serde::Serialize, specta::Type)]
 pub struct WatchedEntityChangesOutputEvent {

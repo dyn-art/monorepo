@@ -5,7 +5,7 @@ use super::{
     styles::SvgBlendModeStyle,
 };
 use bevy_transform::components::Transform;
-use dyn_comp_types::common::BlendMode;
+use dyn_comp_common::common::BlendMode;
 use glam::EulerRot;
 use tiny_skia_path::{Path, PathSegment};
 

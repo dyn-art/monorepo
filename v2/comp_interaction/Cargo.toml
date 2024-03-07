@@ -10,11 +10,11 @@ authors = { workspace = true }
 
 [features]
 default = []
-serde_support = ["dep:serde", "dep:specta", "dyn-comp-types/serde_support"]
+serde_support = ["dep:serde", "dep:specta", "dyn-comp-common/serde_support"]
 tracing = []
 
 [dependencies]
-dyn-comp-types = { path = "../comp_types" }
+dyn-comp-common = { path = "../comp_common" }
 bevy_app = { workspace = true }
 bevy_ecs = { workspace = true }
 bevy_transform = { workspace = true }
