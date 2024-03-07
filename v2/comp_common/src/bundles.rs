@@ -6,7 +6,7 @@ use crate::{
         CompNode, EllipseCompNode, FrameCompNode, GroupCompNode, PolygonCompNode,
         RectangleCompNode, StarCompNode, TextCompNode,
     },
-    paints::{CompPaint, ImageCompPaint, SolidCompPaint},
+    paints::{CompPaint, GradientCompPaint, ImageCompPaint, SolidCompPaint},
 };
 use bevy_ecs::bundle::Bundle;
 use bevy_transform::components::Transform;
@@ -24,6 +24,7 @@ pub struct FrameCompNodeBundle {
     // https://github.com/Nilirad/bevy_prototype_lyon/issues/207
     // pub fill: FillMixin,
     // pub stroke: StrokeMixin,
+    // pub children: Children,
 }
 
 #[derive(Bundle, Debug)]
@@ -34,6 +35,8 @@ pub struct GroupCompNodeBundle {
     pub visibility: VisibilityMixin,
     pub blend_mode: BlendModeMixin,
     pub opacity: OpacityMixin,
+    // https://github.com/Nilirad/bevy_prototype_lyon/issues/207
+    // pub children: Children,
 }
 
 #[derive(Bundle, Debug)]
@@ -126,5 +129,8 @@ pub struct ImagePaintBundle {
 
 #[derive(Bundle, Debug)]
 pub struct GradientPaintBundle {
-    // TODO
+    pub paint: CompPaint,
+    pub gradient: GradientCompPaint,
+    pub blend_mode: BlendModeMixin,
+    pub opacity: OpacityMixin,
 }

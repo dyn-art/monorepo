@@ -389,3 +389,34 @@ pub enum ImageScaleMode {
         scaling_factor: f32,
     },
 }
+
+#[derive(Debug, Copy, Clone)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type),
+    serde(tag = "type")
+)]
+pub enum GradientVariant {
+    Linear {
+        #[serde(default)]
+        transform: Mat3,
+    },
+    Radial {
+        #[serde(default)]
+        transform: Mat3,
+    },
+}
+
+#[derive(Debug, Default, Copy, Clone)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type),
+    serde(tag = "type")
+)]
+pub struct GradientColorStop {
+    /// The position of the color stop in the gradient, ranging from 0.0 to 1.0.
+    pub position: Percent,
+
+    /// The color of the stop.
+    pub color: Color,
+}

@@ -145,6 +145,20 @@ export type FontStyle =
 
 export type FrameNode = { clipContent?: boolean; translation: Vec2; angle?: Degree; size: Size; cornerRadii?: CornerRadii; visibility?: Visibility; fill: DtifFill[]; blendMode?: BlendMode; opacity?: Opacity; stroke?: DtifStroke[]; children?: string[] }
 
+export type GradientColorStop = { 
+/**
+ * The position of the color stop in the gradient, ranging from 0.0 to 1.0.
+ */
+position: Percent; 
+/**
+ * The color of the stop.
+ */
+color: Color; type: "GradientColorStop" }
+
+export type GradientPaint = { variant: GradientVariant; stops: GradientColorStop[]; blendMode?: BlendMode; opacity?: Opacity }
+
+export type GradientVariant = { type: "Linear"; transform?: Mat3 } | { type: "Radial"; transform?: Mat3 }
+
 export type GroupNode = { translation: Vec2; angle?: Degree; size: Size; visibility?: Visibility; blendMode?: BlendMode; opacity?: Opacity; children?: string[] }
 
 export type HandleSide = "Top" | "Bottom" | "Left" | "Right"
@@ -217,7 +231,7 @@ export type Node = ({ type: "Frame" } & FrameNode) | ({ type: "Group" } & GroupN
 
 export type Opacity = Percent
 
-export type Paint = ({ type: "Solid" } & SolidPaint)
+export type Paint = ({ type: "Solid" } & SolidPaint) | ({ type: "Image" } & ImagePaint) | ({ type: "Gradient" } & GradientPaint)
 
 export type Percent = number
 

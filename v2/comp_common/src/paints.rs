@@ -1,6 +1,7 @@
 use bevy_ecs::component::Component;
+use smallvec::SmallVec;
 
-use crate::common::{Color, ImageScaleMode};
+use crate::common::{Color, GradientColorStop, GradientVariant, ImageScaleMode};
 
 #[derive(Component, Debug, Copy, Clone)]
 pub struct CompPaint {
@@ -11,6 +12,7 @@ pub struct CompPaint {
 pub enum CompPaintVariant {
     Solid,
     Image,
+    Gradient,
 }
 
 #[derive(Component, Debug, Default, Copy, Clone)]
@@ -21,4 +23,10 @@ pub struct SolidCompPaint {
 #[derive(Component, Debug, Default, Copy, Clone)]
 pub struct ImageCompPaint {
     pub scale_mode: ImageScaleMode,
+}
+
+#[derive(Component, Debug, Clone)]
+pub struct GradientCompPaint {
+    pub variant: GradientVariant,
+    pub stops: SmallVec<[GradientColorStop; 4]>,
 }

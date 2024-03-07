@@ -187,6 +187,7 @@ impl DtifInjector {
         match paint {
             Paint::Solid(paint) => world.spawn(paint.to_ecs_bundle(&self)),
             Paint::Image(paint) => world.spawn(paint.to_ecs_bundle(&self)),
+            Paint::Gradient(paint) => world.spawn(paint.to_ecs_bundle(&self)),
         }
     }
 

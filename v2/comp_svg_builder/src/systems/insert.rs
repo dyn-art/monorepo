@@ -262,7 +262,7 @@ fn create_fill_bundle(
         CompPaintVariant::Solid => {
             FillSvgBundle::Solid(SolidFillSvgBundle::new(fill.paint, &mut svg_context_res))
         }
-        CompPaintVariant::Image => panic!("Not supported yet!"),
+        _ => panic!("Not supported yet!"),
     }
 }
 
@@ -462,6 +462,6 @@ fn create_stroke_bundle(
             stroke.fill.paint,
             &mut svg_context_res,
         )),
-        CompPaintVariant::Image => panic!("Not supported yet"),
+        _ => panic!("Not supported yet"),
     }
 }

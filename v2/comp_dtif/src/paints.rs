@@ -1,10 +1,10 @@
 use crate::{dtif_injector::DtifInjector, ToEcsBundleImpl};
 use dyn_comp_asset::asset_id::AssetId;
 use dyn_comp_common::{
-    bundles::{ImagePaintBundle, SolidPaintBundle},
-    common::{BlendMode, Color, ImageScaleMode, Opacity},
+    bundles::{GradientPaintBundle, ImagePaintBundle, SolidPaintBundle},
+    common::{BlendMode, Color, GradientColorStop, GradientVariant, ImageScaleMode, Opacity},
     mixins::{BlendModeMixin, ImageAssetMixin, OpacityMixin},
-    paints::{CompPaint, CompPaintVariant, ImageCompPaint, SolidCompPaint},
+    paints::{CompPaint, CompPaintVariant, GradientCompPaint, ImageCompPaint, SolidCompPaint},
 };
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
@@ -12,6 +12,7 @@ use dyn_comp_common::{
 pub enum Paint {
     Solid(SolidPaint),
     Image(ImagePaint),
+    Gradient(GradientPaint),
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
@@ -72,6 +73,35 @@ impl ToEcsBundleImpl for ImagePaint {
                     None
                 },
             ),
+            blend_mode: BlendModeMixin(self.blend_mode),
+            opacity: OpacityMixin(self.opacity),
+        }
+    }
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
+#[serde(rename_all = "camelCase")]
+pub struct GradientPaint {
+    pub variant: GradientVariant,
+    pub stops: Vec<GradientColorStop>,
+    #[serde(default)]
+    pub blend_mode: BlendMode,
+    #[serde(default)]
+    pub opacity: Opacity,
+}
+
+impl ToEcsBundleImpl for GradientPaint {
+    type Bundle = GradientPaintBundle;
+
+    fn to_ecs_bundle(&self, _: &DtifInjector) -> Self::Bundle {
+        GradientPaintBundle {
+            paint: CompPaint {
+                variant: CompPaintVariant::Gradient,
+            },
+            gradient: GradientCompPaint {
+                variant: self.variant,
+                stops: self.stops.iter().copied().collect(),
+            },
             blend_mode: BlendModeMixin(self.blend_mode),
             opacity: OpacityMixin(self.opacity),
         }
