@@ -7,7 +7,6 @@ use crate::{
                 frame::FrameNodeSvgBundle, shape::ShapeNodeSvgBundle, NodeSvgBundle,
                 NodeSvgBundleMixin,
             },
-            stroke::{solid::SolidStrokeSvgBundle, StrokeSvgBundle},
         },
         svg_element::{
             element_changes::{SvgElementChange, SvgElementReorderedChange},
@@ -22,8 +21,8 @@ use bevy_ecs::{
     system::{Commands, Query, ResMut},
 };
 use dyn_comp_common::{
-    common::{Fill, Stroke},
-    mixins::{FillMixin, StrokeMixin},
+    common::Fill,
+    mixins::{FillsMixin, StrokeFillsMixin},
     nodes::{
         CompNode, EllipseCompNode, FrameCompNode, PolygonCompNode, RectangleCompNode, StarCompNode,
         TextCompNode,
@@ -85,10 +84,10 @@ pub fn insert_shape_node_svg_bundle(
 // but thats good enough for now
 pub fn insert_fills(
     mut svg_context_res: ResMut<SvgContextRes>,
-    mut query: Query<(&FillMixin, &mut NodeSvgBundleMixin), (With<CompNode>, Changed<FillMixin>)>,
+    mut query: Query<(&FillsMixin, &mut NodeSvgBundleMixin), (With<CompNode>, Changed<FillsMixin>)>,
     paint_query: Query<&CompPaint>,
 ) {
-    for (FillMixin(fills), mut bundle_mixin) in query.iter_mut() {
+    for (FillsMixin(fills), mut bundle_mixin) in query.iter_mut() {
         let NodeSvgBundleMixin(bundle) = bundle_mixin.as_mut();
 
         remove_absent_node_fills(bundle, fills);
@@ -269,167 +268,158 @@ fn create_fill_bundle(
 // TODO: Based on `insert_fills` maybe its possible to combine to not have so many code duplications
 // TODO: Right now the system doesn't work with nodes referencing the same paint multiple times
 // but thats good enough for now
-pub fn insert_strokes(
+pub fn insert_stroke_fills(
     mut svg_context_res: ResMut<SvgContextRes>,
     mut query: Query<
-        (&StrokeMixin, &mut NodeSvgBundleMixin),
-        (With<CompNode>, Changed<StrokeMixin>),
+        (&StrokeFillsMixin, &mut NodeSvgBundleMixin),
+        (With<CompNode>, Changed<StrokeFillsMixin>),
     >,
     paint_query: Query<&CompPaint>,
 ) {
-    for (StrokeMixin(strokes), mut bundle_mixin) in query.iter_mut() {
+    for (StrokeFillsMixin(stroke_fills), mut bundle_mixin) in query.iter_mut() {
         let NodeSvgBundleMixin(bundle) = bundle_mixin.as_mut();
 
-        remove_absent_node_strokes(bundle, strokes);
-        add_or_update_node_strokes(bundle, strokes, &paint_query, &mut svg_context_res);
-        reorder_node_strokes(bundle, strokes);
+        remove_absent_node_stroke_fills(bundle, stroke_fills);
+        add_or_update_node_stroke_fills(bundle, stroke_fills, &paint_query, &mut svg_context_res);
+        reorder_node_stroke_fills(bundle, stroke_fills);
     }
 }
 
-fn remove_absent_node_strokes(node_bundle: &mut NodeSvgBundle, strokes: &[Stroke]) {
+fn remove_absent_node_stroke_fills(node_bundle: &mut NodeSvgBundle, fills: &[Fill]) {
     let mut to_remove_element_ids: SmallVec<[SvgElementId; 2]> = SmallVec::new();
 
     // Identify to remove element ids
-    let stroke_bundles = match node_bundle.get_stroke_bundles_mut() {
-        Some(stroke_bundles) => stroke_bundles,
+    let stroke_fill_bundles = match node_bundle.get_stroke_fill_bundles_mut() {
+        Some(stroke_fill_bundles) => stroke_fill_bundles,
         None => return,
     };
-    let stroke_entities: HashSet<Entity> = strokes.iter().map(|stroke| stroke.fill.paint).collect();
-    stroke_bundles.retain(|stroke_bundle| {
-        let retain = stroke_entities.contains(stroke_bundle.get_paint_entity());
+    let fill_entities: HashSet<Entity> = fills.iter().map(|fill| fill.paint).collect();
+    stroke_fill_bundles.retain(|fill_bundle| {
+        let retain = fill_entities.contains(fill_bundle.get_paint_entity());
         if !retain {
-            to_remove_element_ids.push(stroke_bundle.get_svg_bundle().get_root_element().get_id());
+            to_remove_element_ids.push(fill_bundle.get_svg_bundle().get_root_element().get_id());
         }
         return retain;
     });
 
     // Remove elements from node bundle based on element ids
-    let stroke_wrapper_element = match node_bundle.get_stroke_wrapper_element_mut() {
-        Some(stroke_wrapper_element) => stroke_wrapper_element,
+    let stroke_fill_wrapper_element = match node_bundle.get_stroke_fill_wrapper_element_mut() {
+        Some(stroke_fill_wrapper_element) => stroke_fill_wrapper_element,
         None => return,
     };
-    stroke_wrapper_element.remove_children(&to_remove_element_ids);
+    stroke_fill_wrapper_element.remove_children(&to_remove_element_ids);
 }
 
-fn add_or_update_node_strokes(
+fn add_or_update_node_stroke_fills(
     node_bundle: &mut NodeSvgBundle,
-    strokes: &[Stroke],
+    stroke_fills: &[Fill],
     paint_query: &Query<&CompPaint>,
     svg_context_res: &mut ResMut<SvgContextRes>,
 ) {
-    let mut to_add_stroke_bundles: SmallVec<[StrokeSvgBundle; 2]> = SmallVec::new();
+    let mut to_add_fill_bundles: SmallVec<[FillSvgBundle; 2]> = SmallVec::new();
 
-    // Update existing fstrokes and identify newly added strokes
-    let stroke_bundles = match node_bundle.get_stroke_bundles_mut() {
-        Some(stroke_bundles) => stroke_bundles,
+    // Update existing fills and identify newly added fills
+    let stroke_fill_bundles = match node_bundle.get_stroke_fill_bundles_mut() {
+        Some(stroke_fill_bundles) => stroke_fill_bundles,
         None => return,
     };
-    for stroke in strokes.iter() {
-        match stroke_bundles
+    for fill in stroke_fills.iter() {
+        match stroke_fill_bundles
             .iter_mut()
-            .find(|stroke_bundle| *stroke_bundle.get_paint_entity() == stroke.fill.paint)
+            .find(|fill_bundle| *fill_bundle.get_paint_entity() == fill.paint)
         {
-            // If found, update the existing stroke bundle as necessary
-            Some(stroke_bundle) => match stroke_bundle {
-                StrokeSvgBundle::Solid(solid_bundle) => {
-                    solid_bundle.root_g.set_style(SvgStyle::BlendMode {
-                        blend_mode: (&stroke.fill.blend_mode).into(),
-                    });
-                    solid_bundle.shape_path.set_styles(vec![
-                        SvgStyle::StrokeOpacity {
-                            stroke_opacity: stroke.fill.opacity.0.get(),
+            // If found, update the existing fill bundle as necessary
+            Some(fill_bundle) => {
+                let root_element = fill_bundle.get_svg_bundle_mut().get_root_element_mut();
+                root_element.set_styles(vec![
+                    SvgStyle::BlendMode {
+                        blend_mode: (&fill.blend_mode).into(),
+                    },
+                    SvgStyle::Opacity {
+                        opacity: fill.opacity.0.get(),
+                    },
+                ]);
+            }
+            // If not found, create a new fill bundle
+            None => {
+                if let Ok(paint) = paint_query.get(fill.paint) {
+                    let mut fill_bundle = create_fill_bundle(paint, fill, svg_context_res);
+                    let root_element = fill_bundle.get_svg_bundle_mut().get_root_element_mut();
+                    root_element.set_styles(vec![
+                        SvgStyle::BlendMode {
+                            blend_mode: (&fill.blend_mode).into(),
                         },
-                        SvgStyle::StrokeWidth {
-                            stroke_width: stroke.width,
+                        SvgStyle::Opacity {
+                            opacity: fill.opacity.0.get(),
                         },
                     ]);
-                }
-            },
-            // If not found, create a new stroke bundle
-            None => {
-                if let Ok(paint) = paint_query.get(stroke.fill.paint) {
-                    let mut stroke_bundle = create_stroke_bundle(paint, stroke, svg_context_res);
-                    match &mut stroke_bundle {
-                        StrokeSvgBundle::Solid(solid_bundle) => {
-                            solid_bundle.root_g.set_style(SvgStyle::BlendMode {
-                                blend_mode: (&stroke.fill.blend_mode).into(),
-                            });
-                            solid_bundle.shape_path.set_styles(vec![
-                                SvgStyle::StrokeOpacity {
-                                    stroke_opacity: stroke.fill.opacity.0.get(),
-                                },
-                                SvgStyle::StrokeWidth {
-                                    stroke_width: stroke.width,
-                                },
-                            ]);
-                        }
-                    };
-                    to_add_stroke_bundles.push(stroke_bundle);
+                    to_add_fill_bundles.push(fill_bundle);
                 }
             }
         }
     }
 
-    // Append strokes to node bundle
-    let stroke_wrapper_element = match node_bundle.get_stroke_wrapper_element_mut() {
-        Some(stroke_wrapper_element) => stroke_wrapper_element,
+    // Append fills to node bundle
+    let stroke_fill_wrapper_element = match node_bundle.get_stroke_fill_wrapper_element_mut() {
+        Some(stroke_fill_wrapper_element) => stroke_fill_wrapper_element,
         None => return,
     };
-    for stroke_bundle in &mut to_add_stroke_bundles {
-        stroke_wrapper_element.append_child_in_bundle_context(
-            stroke_bundle.get_svg_bundle_mut().get_root_element_mut(),
+    for fill_bundle in &mut to_add_fill_bundles {
+        stroke_fill_wrapper_element.append_child_in_bundle_context(
+            fill_bundle.get_svg_bundle_mut().get_root_element_mut(),
         );
     }
-    let stroke_bundles = match node_bundle.get_stroke_bundles_mut() {
-        Some(stroke_bundles) => stroke_bundles,
+    let stroke_fill_bundles = match node_bundle.get_stroke_fill_bundles_mut() {
+        Some(fill_bundles) => fill_bundles,
         None => return,
     };
-    stroke_bundles.extend(to_add_stroke_bundles);
+    stroke_fill_bundles.extend(to_add_fill_bundles);
 }
 
-fn reorder_node_strokes(node_bundle: &mut NodeSvgBundle, strokes: &[Stroke]) {
-    let stroke_bundles = match node_bundle.get_stroke_bundles_mut() {
-        Some(stroke_bundles) => stroke_bundles,
+fn reorder_node_stroke_fills(node_bundle: &mut NodeSvgBundle, stroke_fills: &[Fill]) {
+    let stroke_fill_bundles = match node_bundle.get_stroke_fill_bundles_mut() {
+        Some(stroke_fill_bundles) => stroke_fill_bundles,
         None => return,
     };
 
-    // Track the original positions of the strokes
+    // Track the original positions of the fills
     #[cfg(feature = "output_svg_element_changes")]
-    let original_positions = stroke_bundles
+    let original_positions = stroke_fill_bundles
         .iter()
-        .map(|stroke| stroke.get_svg_bundle().get_root_element().get_id())
+        .map(|fill| fill.get_svg_bundle().get_root_element().get_id())
         .collect::<Vec<_>>();
 
-    // Sort bundle strokes
-    stroke_bundles.sort_by_key(|stroke_bundle| {
-        strokes
+    // Sort bundle fills
+    stroke_fill_bundles.sort_by_key(|fill_bundle| {
+        stroke_fills
             .iter()
-            .position(|stroke| *stroke_bundle.get_paint_entity() == stroke.fill.paint)
+            .position(|fill| *fill_bundle.get_paint_entity() == fill.paint)
             .unwrap_or(usize::MAX)
     });
 
     #[cfg(feature = "output_svg_element_changes")]
     {
         // Determine the new positions after sorting
-        let new_positions = stroke_bundles
+        let new_positions = stroke_fill_bundles
             .iter()
-            .map(|stroke| stroke.get_svg_bundle().get_root_element().get_id())
+            .map(|fill| fill.get_svg_bundle().get_root_element().get_id())
             .collect::<Vec<_>>();
 
-        // Emit SvgElementReorderedChange events for strokes that have been moved
+        // Emit SvgElementReorderedChange events for fills that have been moved
         for (new_index, &element_id) in new_positions.iter().enumerate() {
             let original_index = original_positions
                 .iter()
                 .position(|&e| e == element_id)
                 .unwrap_or(new_index);
 
-            // If the stroke has been moved
+            // If the fill has been moved
             if original_index != new_index {
-                let stroke_wrapper_element = match node_bundle.get_stroke_wrapper_element_mut() {
-                    Some(stroke_wrapper_element) => stroke_wrapper_element,
-                    None => return,
-                };
-                let new_parent_id = stroke_wrapper_element.get_id();
+                let stroke_fill_wrapper_element =
+                    match node_bundle.get_stroke_fill_wrapper_element_mut() {
+                        Some(stroke_fill_wrapper_element) => stroke_fill_wrapper_element,
+                        None => return,
+                    };
+                let new_parent_id = stroke_fill_wrapper_element.get_id();
 
                 // Determine insert_before_id based on the next sibling in the new order
                 let insert_before_id = if new_index + 1 < new_positions.len() {
@@ -440,7 +430,7 @@ fn reorder_node_strokes(node_bundle: &mut NodeSvgBundle, strokes: &[Stroke]) {
                     None
                 };
 
-                stroke_wrapper_element.register_change(SvgElementChange::ElementReordered(
+                stroke_fill_wrapper_element.register_change(SvgElementChange::ElementReordered(
                     SvgElementReorderedChange {
                         element_id,
                         new_parent_id,
@@ -449,19 +439,5 @@ fn reorder_node_strokes(node_bundle: &mut NodeSvgBundle, strokes: &[Stroke]) {
                 ));
             }
         }
-    }
-}
-
-fn create_stroke_bundle(
-    paint: &CompPaint,
-    stroke: &Stroke,
-    mut svg_context_res: &mut ResMut<SvgContextRes>,
-) -> StrokeSvgBundle {
-    match paint.variant {
-        CompPaintVariant::Solid => StrokeSvgBundle::Solid(SolidStrokeSvgBundle::new(
-            stroke.fill.paint,
-            &mut svg_context_res,
-        )),
-        _ => panic!("Not supported yet"),
     }
 }

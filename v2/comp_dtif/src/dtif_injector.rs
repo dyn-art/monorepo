@@ -1,4 +1,5 @@
 use crate::{
+    common::DtifFill,
     events::DtifInputEvent,
     nodes::{FrameNode, GroupNode, Node},
     paints::Paint,
@@ -11,11 +12,12 @@ use bevy_ecs::{
 use bevy_hierarchy::BuildWorldChildren;
 use dyn_comp_asset::{asset_id::AssetId, resources::AssetDatabaseRes};
 use dyn_comp_common::{
+    common::Fill,
     events::InputEvent,
-    mixins::{FillMixin, PaintParentMixin, Root, StrokeMixin},
+    mixins::{FillsMixin, PaintParentMixin, Root, StrokeFillsMixin, StrokeMixin},
 };
-use smallvec::{smallvec, SmallVec};
-use std::collections::HashMap;
+use smallvec::SmallVec;
+use std::collections::{HashMap, HashSet};
 
 pub struct DtifInjector {
     /// Maps Ids of type String (sid) from the DTIF to actual spawned Bevy entities.
@@ -74,7 +76,7 @@ impl DtifInjector {
             self.sid_to_entity.insert(node_sid, node_entity);
 
             self.process_node_fills(node_entity, node, world);
-            self.process_node_strokes(node_entity, node, world);
+            self.process_node_stroke(node_entity, node, world);
             self.process_node_children(node_entity, node, dtif, world);
 
             return node_entity;
@@ -114,11 +116,48 @@ impl DtifInjector {
 
     fn process_node_fills(&mut self, node_entity: Entity, node: &Node, world: &mut World) {
         let dtif_fills = match node {
-            Node::Frame(node) => &node.fill,
-            Node::Rectangle(node) => &node.fill,
+            Node::Frame(node) => &node.fills,
+            Node::Rectangle(node) => &node.fills,
             _ => return,
         };
-        let fills = dtif_fills
+
+        let fills = self.process_fills(node_entity, dtif_fills, world);
+        if !fills.is_empty() {
+            if let Some(mut node_entity_world) = world.get_entity_mut(node_entity) {
+                node_entity_world.insert(FillsMixin(fills));
+            }
+        }
+    }
+
+    fn process_node_stroke(&mut self, node_entity: Entity, node: &Node, world: &mut World) {
+        let dtif_stroke = match node {
+            Node::Frame(node) => match &node.stroke {
+                Some(stroke) => stroke,
+                _ => return,
+            },
+            Node::Rectangle(node) => match &node.stroke {
+                Some(stroke) => stroke,
+                _ => return,
+            },
+            _ => return,
+        };
+
+        let stroke_fills = self.process_fills(node_entity, &dtif_stroke.fills, world);
+        if let Some(mut node_entity_world) = world.get_entity_mut(node_entity) {
+            node_entity_world.insert(StrokeMixin(dtif_stroke.to_skia_stroke_without_fills()));
+            if !stroke_fills.is_empty() {
+                node_entity_world.insert(StrokeFillsMixin(stroke_fills));
+            }
+        }
+    }
+
+    fn process_fills(
+        &self,
+        entity: Entity,
+        dtif_fills: &Vec<DtifFill>,
+        world: &mut World,
+    ) -> SmallVec<[Fill; 2]> {
+        dtif_fills
             .iter()
             .rev()
             .filter_map(|dtif_fill| {
@@ -128,52 +167,16 @@ impl DtifInjector {
                 if let Some(mut paint_parent_mixin) =
                     paint_entity_world.get_mut::<PaintParentMixin>()
                 {
-                    paint_parent_mixin.0.push(node_entity);
+                    paint_parent_mixin.0.insert(entity);
                 } else {
-                    paint_entity_world.insert(PaintParentMixin(smallvec![node_entity]));
+                    let mut hashset = HashSet::new();
+                    hashset.insert(entity);
+                    paint_entity_world.insert(PaintParentMixin(hashset));
                 }
 
                 Some(fill)
             })
-            .collect::<SmallVec<_>>();
-
-        if !fills.is_empty() {
-            if let Some(mut node_entity_world) = world.get_entity_mut(node_entity) {
-                node_entity_world.insert(FillMixin(fills));
-            }
-        }
-    }
-
-    fn process_node_strokes(&mut self, node_entity: Entity, node: &Node, world: &mut World) {
-        let dtif_strokes = match node {
-            Node::Frame(node) => &node.stroke,
-            Node::Rectangle(node) => &node.stroke,
-            _ => return,
-        };
-        let strokes = dtif_strokes
-            .iter()
-            .rev()
-            .filter_map(|dtif_stroke| {
-                let stroke = dtif_stroke.to_storke(&self)?;
-                let mut paint_entity_world = world.get_entity_mut(stroke.fill.paint)?;
-
-                if let Some(mut paint_parent_mixin) =
-                    paint_entity_world.get_mut::<PaintParentMixin>()
-                {
-                    paint_parent_mixin.0.push(node_entity);
-                } else {
-                    paint_entity_world.insert(PaintParentMixin(smallvec![node_entity]));
-                }
-
-                Some(stroke)
-            })
-            .collect::<SmallVec<_>>();
-
-        if !strokes.is_empty() {
-            if let Some(mut node_entity_world) = world.get_entity_mut(node_entity) {
-                node_entity_world.insert(StrokeMixin(strokes));
-            }
-        }
+            .collect::<SmallVec<_>>()
     }
 
     fn process_paints(&mut self, dtif: &CompDtif, world: &mut World) {

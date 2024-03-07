@@ -1,6 +1,5 @@
 pub mod fill;
 pub mod node;
-pub mod stroke;
 
 use std::{collections::BTreeMap, fmt::Debug};
 

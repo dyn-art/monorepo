@@ -18,6 +18,7 @@ dyn-comp-common = { path = "../comp_common", features = ["serde_support"] }
 bevy_ecs = { workspace = true }
 bevy_hierarchy = { workspace = true }
 bevy_transform = { workspace = true }
+tiny-skia-path = { workspace = true }
 glam = { workspace = true }
 log = { workspace = true }
 smallvec = { workspace = true }

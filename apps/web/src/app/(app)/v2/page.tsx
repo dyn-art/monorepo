@@ -20,11 +20,10 @@ const DEFAULT_DTIF: COMP.CompDtif = {
 	nodes: {
 		n1: {
 			type: 'Frame',
-			angleInRadians: 0,
 			blendMode: 'Normal',
 			clipContent: false,
 			cornerRadii: [0, 0, 0, 0],
-			fill: [
+			fills: [
 				{
 					blendMode: 'Normal',
 					opacity: 1.0,
@@ -33,17 +32,15 @@ const DEFAULT_DTIF: COMP.CompDtif = {
 			],
 			opacity: 1,
 			size: [WIDTH, HEIGHT],
-			stroke: [],
 			translation: [0, 0],
 			visibility: 'Visible',
 			children: ['n2']
 		},
 		n2: {
 			type: 'Rectangle',
-			angleInRadians: 0,
 			blendMode: 'Normal',
 			cornerRadii: [0, 20, 0, 0],
-			fill: [
+			fills: [
 				{
 					blendMode: 'Normal',
 					opacity: 0.5,
@@ -57,16 +54,16 @@ const DEFAULT_DTIF: COMP.CompDtif = {
 			],
 			opacity: 1,
 			size: [100, 100],
-			stroke: [
-				{
-					fill: {
+			stroke: {
+				width: 5,
+				fills: [
+					{
 						blendMode: 'Normal',
-						opacity: 0.5,
+						opacity: 1,
 						paintId: 'p3'
-					},
-					width: 5
-				}
-			],
+					}
+				]
+			},
 			translation: [WIDTH / 2, HEIGHT / 2],
 			visibility: 'Visible'
 		}

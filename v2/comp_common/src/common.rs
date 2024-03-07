@@ -1,5 +1,6 @@
 use bevy_ecs::entity::Entity;
 use glam::{Mat3, Vec2, Vec4};
+use smallvec::SmallVec;
 
 #[derive(Debug, Default, PartialEq, Copy, Clone)]
 #[cfg_attr(
@@ -216,16 +217,6 @@ impl Color {
 pub struct Viewport {
     pub physical_position: Vec2,
     pub physical_size: Vec2,
-}
-
-#[derive(Debug, Copy, Clone)]
-#[cfg_attr(
-    feature = "serde_support",
-    derive(serde::Serialize, serde::Deserialize, specta::Type)
-)]
-pub struct Stroke {
-    pub fill: Fill,
-    pub width: f32,
 }
 
 #[derive(Debug, Copy, Clone)]

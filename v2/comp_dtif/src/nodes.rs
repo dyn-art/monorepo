@@ -33,13 +33,13 @@ pub struct FrameNode {
     pub corner_radii: CornerRadii,
     #[serde(default)]
     pub visibility: Visibility,
-    pub fill: Vec<DtifFill>,
+    pub fills: Vec<DtifFill>,
     #[serde(default)]
     pub blend_mode: BlendMode,
     #[serde(default)]
     pub opacity: Opacity,
     #[serde(default)]
-    pub stroke: Vec<DtifStroke>,
+    pub stroke: Option<DtifStroke>,
     #[serde(default)]
     pub children: Vec<String>,
 }
@@ -123,13 +123,13 @@ pub struct RectangleNode {
     pub corner_radii: CornerRadii,
     #[serde(default)]
     pub visibility: Visibility,
-    pub fill: Vec<DtifFill>,
+    pub fills: Vec<DtifFill>,
     #[serde(default)]
     pub blend_mode: BlendMode,
     #[serde(default)]
     pub opacity: Opacity,
     #[serde(default)]
-    pub stroke: Vec<DtifStroke>,
+    pub stroke: Option<DtifStroke>,
 }
 
 impl ToEcsBundleImpl for RectangleNode {

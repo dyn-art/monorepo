@@ -10,10 +10,11 @@ use systems::{
     apply::{
         apply_blend_mode_mixin_changes, apply_node_children_changes, apply_opacity_mixin_changes,
         apply_path_mixin_changes, apply_size_mixin_changes, apply_solid_paint_changes,
-        apply_transform_changes, apply_visibility_mixin_changes,
+        apply_stroke_path_mixin_changes, apply_transform_changes, apply_visibility_mixin_changes,
     },
     insert::{
-        insert_fills, insert_frame_node_svg_bundle, insert_shape_node_svg_bundle, insert_strokes,
+        insert_fills, insert_frame_node_svg_bundle, insert_shape_node_svg_bundle,
+        insert_stroke_fills,
     },
 };
 
@@ -60,7 +61,7 @@ impl Plugin for CompSvgBuilderPlugin {
                 insert_frame_node_svg_bundle.in_set(CompSvgBuilderSystemSet::Insert),
                 insert_shape_node_svg_bundle.in_set(CompSvgBuilderSystemSet::Insert),
                 insert_fills.in_set(CompSvgBuilderSystemSet::PostInsert),
-                insert_strokes.in_set(CompSvgBuilderSystemSet::PostInsert),
+                insert_stroke_fills.in_set(CompSvgBuilderSystemSet::PostInsert),
                 apply_node_children_changes.in_set(CompSvgBuilderSystemSet::Apply),
                 apply_visibility_mixin_changes.in_set(CompSvgBuilderSystemSet::Apply),
                 apply_size_mixin_changes.in_set(CompSvgBuilderSystemSet::Apply),
@@ -68,6 +69,7 @@ impl Plugin for CompSvgBuilderPlugin {
                 apply_opacity_mixin_changes.in_set(CompSvgBuilderSystemSet::Apply),
                 apply_blend_mode_mixin_changes.in_set(CompSvgBuilderSystemSet::Apply),
                 apply_path_mixin_changes.in_set(CompSvgBuilderSystemSet::Apply),
+                apply_stroke_path_mixin_changes.in_set(CompSvgBuilderSystemSet::Apply),
                 apply_solid_paint_changes.in_set(CompSvgBuilderSystemSet::Apply),
             ),
         );

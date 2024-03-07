@@ -2,12 +2,11 @@ use crate::svg::{
     svg_bundle::{
         fill::FillSvgBundle,
         node::{NodeSvgBundle, NodeSvgBundleMixin},
-        stroke::StrokeSvgBundle,
     },
     svg_element::{
         attributes::{SvgAttribute, SvgMeasurementUnit},
         element_changes::{SvgElementChange, SvgElementReorderedChange},
-        styles::{SvgDisplayStyle, SvgFillStyle, SvgStrokeStyle, SvgStyle},
+        styles::{SvgDisplayStyle, SvgFillStyle, SvgStyle},
         SvgElementId,
     },
 };
@@ -21,7 +20,8 @@ use bevy_transform::components::Transform;
 use dyn_comp_common::{
     common::Visibility,
     mixins::{
-        BlendModeMixin, OpacityMixin, PaintParentMixin, PathMixin, SizeMixin, VisibilityMixin,
+        BlendModeMixin, OpacityMixin, PaintParentMixin, PathMixin, SizeMixin, StrokePathMixin,
+        VisibilityMixin,
     },
     nodes::CompNode,
     paints::{CompPaint, SolidCompPaint},
@@ -371,16 +371,9 @@ pub fn apply_path_mixin_changes(
 
         match bundle {
             NodeSvgBundle::Frame(frame_bundle) => {
-                for fill_bundle in &mut frame_bundle.fill_bundles {
+                for fill_bundle in frame_bundle.fill_bundles.iter_mut() {
                     match fill_bundle {
                         FillSvgBundle::Solid(solid_bundle) => solid_bundle
-                            .shape_path
-                            .set_attribute(SvgAttribute::D { d: path.into() }),
-                    }
-                }
-                for stroke_bundle in &mut frame_bundle.stroke_bundles {
-                    match stroke_bundle {
-                        StrokeSvgBundle::Solid(solid_bundle) => solid_bundle
                             .shape_path
                             .set_attribute(SvgAttribute::D { d: path.into() }),
                     }
@@ -390,18 +383,47 @@ pub fn apply_path_mixin_changes(
                     .set_attribute(SvgAttribute::D { d: path.into() })
             }
             NodeSvgBundle::Shape(shape_bundle) => {
-                for fill_bundle in &mut shape_bundle.fill_bundles {
+                for fill_bundle in shape_bundle.fill_bundles.iter_mut() {
                     match fill_bundle {
                         FillSvgBundle::Solid(solid_bundle) => solid_bundle
                             .shape_path
                             .set_attribute(SvgAttribute::D { d: path.into() }),
                     }
                 }
-                for stroke_bundle in &mut shape_bundle.stroke_bundles {
-                    match stroke_bundle {
-                        StrokeSvgBundle::Solid(solid_bundle) => solid_bundle
-                            .shape_path
-                            .set_attribute(SvgAttribute::D { d: path.into() }),
+            }
+        }
+    }
+}
+
+pub fn apply_stroke_path_mixin_changes(
+    mut query: Query<
+        (&StrokePathMixin, &mut NodeSvgBundleMixin),
+        (With<CompNode>, Changed<StrokePathMixin>),
+    >,
+) {
+    for (StrokePathMixin(stroke_path), mut bundle_mixin) in query.iter_mut() {
+        let NodeSvgBundleMixin(bundle) = bundle_mixin.as_mut();
+
+        match bundle {
+            NodeSvgBundle::Frame(frame_bundle) => {
+                for fill_bundle in frame_bundle.stroke_fill_bundles.iter_mut() {
+                    match fill_bundle {
+                        FillSvgBundle::Solid(solid_bundle) => {
+                            solid_bundle.shape_path.set_attribute(SvgAttribute::D {
+                                d: stroke_path.into(),
+                            })
+                        }
+                    }
+                }
+            }
+            NodeSvgBundle::Shape(shape_bundle) => {
+                for fill_bundle in shape_bundle.stroke_fill_bundles.iter_mut() {
+                    match fill_bundle {
+                        FillSvgBundle::Solid(solid_bundle) => {
+                            solid_bundle.shape_path.set_attribute(SvgAttribute::D {
+                                d: stroke_path.into(),
+                            })
+                        }
                     }
                 }
             }
@@ -422,43 +444,22 @@ pub fn apply_solid_paint_changes(
                 let NodeSvgBundleMixin(bundle) = bundle_mixin.as_mut();
 
                 // Update fills
-                let Some(fill_bundles) = bundle.get_fill_bundles_mut() else {
-                    return;
+                let combined_fill_bundles_iter = match bundle.get_combined_fill_bundles_iter_mut() {
+                    Some(combined_fills_iter) => combined_fills_iter,
+                    None => return,
                 };
-                if let Some(fill_bundle) = fill_bundles
-                    .iter_mut()
-                    .find(|fill| *fill.get_paint_entity() == paint_entity)
-                {
-                    match fill_bundle {
-                        FillSvgBundle::Solid(solid_bundle) => {
-                            solid_bundle.shape_path.set_style(SvgStyle::Fill {
-                                fill: SvgFillStyle::RGB {
-                                    red: solid_paint.color.red,
-                                    green: solid_paint.color.green,
-                                    blue: solid_paint.color.blue,
-                                },
-                            })
-                        }
-                    }
-                }
-
-                // Update strokes
-                let Some(stroke_bundles) = bundle.get_stroke_bundles_mut() else {
-                    return;
-                };
-                if let Some(stroke_bundle) = stroke_bundles
-                    .iter_mut()
-                    .find(|fill| *fill.get_paint_entity() == paint_entity)
-                {
-                    match stroke_bundle {
-                        StrokeSvgBundle::Solid(solid_bundle) => {
-                            solid_bundle.shape_path.set_style(SvgStyle::Stroke {
-                                stroke: SvgStrokeStyle::RGB {
-                                    red: solid_paint.color.red,
-                                    green: solid_paint.color.green,
-                                    blue: solid_paint.color.blue,
-                                },
-                            })
+                for fill_bundle in combined_fill_bundles_iter {
+                    if *fill_bundle.get_paint_entity() == paint_entity {
+                        match fill_bundle {
+                            FillSvgBundle::Solid(solid_bundle) => {
+                                solid_bundle.shape_path.set_style(SvgStyle::Fill {
+                                    fill: SvgFillStyle::RGB {
+                                        red: solid_paint.color.red,
+                                        green: solid_paint.color.green,
+                                        blue: solid_paint.color.blue,
+                                    },
+                                })
+                            }
                         }
                     }
                 }

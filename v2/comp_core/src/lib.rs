@@ -9,7 +9,7 @@ use dyn_comp_common::events::{
     EntityMovedInputEvent, EntitySetPositionInputEvent,
 };
 use resources::composition::CompositionRes;
-use systems::outline::rectangle::outline_rectangle;
+use systems::{outline::rectangle::outline_rectangle, stroke::stroke_path};
 
 pub struct CompCorePlugin {
     #[cfg(feature = "dtif")]
@@ -35,6 +35,9 @@ enum CompCoreSystemSet {
 
     /// After this label, the system has outlined the composition nodes.
     Outline,
+
+    /// After this label, the system has stroked the composition nodes.
+    Stroke,
 }
 
 impl Plugin for CompCorePlugin {
@@ -65,12 +68,19 @@ impl Plugin for CompCorePlugin {
                 CompCoreSystemSet::Layout,
                 CompCoreSystemSet::Prepare,
                 CompCoreSystemSet::Outline,
+                CompCoreSystemSet::Stroke,
             )
                 .chain(),
         );
 
         // Register systems
-        app.add_systems(Update, outline_rectangle.in_set(CompCoreSystemSet::Outline));
+        app.add_systems(
+            Update,
+            (
+                outline_rectangle.in_set(CompCoreSystemSet::Outline),
+                stroke_path.in_set(CompCoreSystemSet::Stroke),
+            ),
+        );
 
         #[cfg(feature = "dtif")]
         inject_dtif_into_ecs(&mut app.world, &self.dtif)

@@ -2,7 +2,7 @@ use super::FillSvgBundle;
 use crate::{
     resources::svg_context::SvgContextRes,
     svg::{
-        svg_bundle::{stroke::StrokeSvgBundle, SvgBundle},
+        svg_bundle::SvgBundle,
         svg_element::{
             styles::{SvgPointerEventsStyle, SvgStyle},
             SvgElement, SvgElementId, SvgTag,
@@ -23,7 +23,7 @@ pub struct ShapeNodeSvgBundle {
     /**/ pub fill_wrapper_g: SvgElement,
     /**//**/ pub fill_bundles: SmallVec<[FillSvgBundle; 2]>,
     /**/ pub stroke_wrapper_g: SvgElement,
-    /**//**/ pub stroke_bundles: SmallVec<[StrokeSvgBundle; 2]>,
+    /**//**/ pub stroke_fill_bundles: SmallVec<[FillSvgBundle; 2]>,
 }
 
 impl SvgBundle for ShapeNodeSvgBundle {
@@ -49,7 +49,7 @@ impl SvgBundle for ShapeNodeSvgBundle {
             }
         });
         elements.insert(self.stroke_wrapper_g.get_id(), &self.stroke_wrapper_g);
-        self.stroke_bundles.iter().for_each(|stroke| {
+        self.stroke_fill_bundles.iter().for_each(|stroke| {
             let elements_map = stroke.get_svg_bundle().get_elements();
             for (_, element) in elements_map {
                 elements.insert(element.get_id(), element);
@@ -73,7 +73,7 @@ impl SvgBundle for ShapeNodeSvgBundle {
             }
         });
         elements.insert(self.stroke_wrapper_g.get_id(), &mut self.stroke_wrapper_g);
-        self.stroke_bundles.iter_mut().for_each(|stroke| {
+        self.stroke_fill_bundles.iter_mut().for_each(|stroke| {
             let elements_map = stroke.get_svg_bundle_mut().get_elements_mut();
             for (_, element) in elements_map {
                 elements.insert(element.get_id(), element);
@@ -146,7 +146,7 @@ impl ShapeNodeSvgBundle {
             fill_wrapper_g: fills_wrapper_g_element,
             fill_bundles: SmallVec::new(),
             stroke_wrapper_g: strokes_wrapper_g_element,
-            stroke_bundles: SmallVec::new(),
+            stroke_fill_bundles: SmallVec::new(),
         }
     }
 
