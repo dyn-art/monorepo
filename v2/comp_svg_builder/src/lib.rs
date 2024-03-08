@@ -57,7 +57,9 @@ impl Plugin for CompSvgBuilderPlugin {
             Last,
             (
                 insert_node_svg_bundle.in_set(CompSvgBuilderSystemSet::Insert),
-                insert_style_svg_bundle.in_set(CompSvgBuilderSystemSet::Insert),
+                insert_style_svg_bundle
+                    .in_set(CompSvgBuilderSystemSet::Insert)
+                    .after(insert_node_svg_bundle),
                 apply_node_children_changes.in_set(CompSvgBuilderSystemSet::Apply),
                 apply_node_styles_changes.in_set(CompSvgBuilderSystemSet::Apply),
                 apply_visibility_mixin_changes.in_set(CompSvgBuilderSystemSet::Apply),
