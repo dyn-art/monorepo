@@ -9,7 +9,10 @@ use dyn_comp_common::events::{
     EntityMovedInputEvent, EntitySetPositionInputEvent,
 };
 use resources::composition::CompositionRes;
-use systems::{outline::rectangle::outline_rectangle, stroke::stroke_path};
+use systems::{
+    outline::rectangle::outline_rectangle,
+    stroke::{stroke_path_on_path_change, stroke_path_on_stroke_change},
+};
 
 pub struct CompCorePlugin {
     #[cfg(feature = "dtif")]
@@ -78,7 +81,8 @@ impl Plugin for CompCorePlugin {
             Update,
             (
                 outline_rectangle.in_set(CompCoreSystemSet::Outline),
-                stroke_path.in_set(CompCoreSystemSet::Stroke),
+                stroke_path_on_stroke_change.in_set(CompCoreSystemSet::Stroke),
+                stroke_path_on_path_change.in_set(CompCoreSystemSet::Stroke),
             ),
         );
 

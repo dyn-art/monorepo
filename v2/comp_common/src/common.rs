@@ -1,6 +1,4 @@
-use bevy_ecs::entity::Entity;
 use glam::{Mat3, Vec2, Vec4};
-use smallvec::SmallVec;
 
 #[derive(Debug, Default, PartialEq, Copy, Clone)]
 #[cfg_attr(
@@ -217,18 +215,6 @@ impl Color {
 pub struct Viewport {
     pub physical_position: Vec2,
     pub physical_size: Vec2,
-}
-
-#[derive(Debug, Copy, Clone)]
-#[cfg_attr(
-    feature = "serde_support",
-    derive(serde::Serialize, serde::Deserialize, specta::Type),
-    serde(rename_all = "camelCase")
-)]
-pub struct Fill {
-    pub paint: Entity,
-    pub blend_mode: BlendMode,
-    pub opacity: Opacity,
 }
 
 /// A styled text segment.

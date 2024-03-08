@@ -8,14 +8,12 @@ use bevy_ecs::schedule::{IntoSystemConfigs, IntoSystemSetConfigs, SystemSet};
 use resources::svg_context::SvgContextRes;
 use systems::{
     apply::{
-        apply_blend_mode_mixin_changes, apply_node_children_changes, apply_opacity_mixin_changes,
-        apply_path_mixin_changes, apply_size_mixin_changes, apply_solid_paint_changes,
-        apply_stroke_path_mixin_changes, apply_transform_changes, apply_visibility_mixin_changes,
+        apply_blend_mode_mixin_changes, apply_node_children_changes, apply_node_styles_changes,
+        apply_opacity_mixin_changes, apply_path_mixin_changes, apply_size_mixin_changes,
+        apply_solid_paint_changes, apply_stroke_path_mixin_changes, apply_transform_changes,
+        apply_visibility_mixin_changes,
     },
-    insert::{
-        insert_fills, insert_frame_node_svg_bundle, insert_shape_node_svg_bundle,
-        insert_stroke_fills,
-    },
+    insert::{insert_node_svg_bundle, insert_style_svg_bundle},
 };
 
 pub struct CompSvgBuilderPlugin {
@@ -58,11 +56,10 @@ impl Plugin for CompSvgBuilderPlugin {
         app.add_systems(
             Last,
             (
-                insert_frame_node_svg_bundle.in_set(CompSvgBuilderSystemSet::Insert),
-                insert_shape_node_svg_bundle.in_set(CompSvgBuilderSystemSet::Insert),
-                insert_fills.in_set(CompSvgBuilderSystemSet::PostInsert),
-                insert_stroke_fills.in_set(CompSvgBuilderSystemSet::PostInsert),
+                insert_node_svg_bundle.in_set(CompSvgBuilderSystemSet::Insert),
+                insert_style_svg_bundle.in_set(CompSvgBuilderSystemSet::Insert),
                 apply_node_children_changes.in_set(CompSvgBuilderSystemSet::Apply),
+                apply_node_styles_changes.in_set(CompSvgBuilderSystemSet::Apply),
                 apply_visibility_mixin_changes.in_set(CompSvgBuilderSystemSet::Apply),
                 apply_size_mixin_changes.in_set(CompSvgBuilderSystemSet::Apply),
                 apply_transform_changes.in_set(CompSvgBuilderSystemSet::Apply),

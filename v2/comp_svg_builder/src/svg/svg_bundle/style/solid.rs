@@ -7,7 +7,7 @@ use bevy_ecs::entity::Entity;
 use std::collections::BTreeMap;
 
 #[derive(Debug, Clone)]
-pub struct SolidFillSvgBundle {
+pub struct SolidStyleSvgBundle {
     pub paint_entity: Entity,
 
     pub root_g: SvgElement,
@@ -15,7 +15,7 @@ pub struct SolidFillSvgBundle {
     /**/ pub shape_path: SvgElement,
 }
 
-impl SvgBundle for SolidFillSvgBundle {
+impl SvgBundle for SolidStyleSvgBundle {
     fn get_root_element(&self) -> &SvgElement {
         &self.root_g
     }
@@ -45,7 +45,7 @@ impl SvgBundle for SolidFillSvgBundle {
     }
 }
 
-impl SolidFillSvgBundle {
+impl SolidStyleSvgBundle {
     pub fn new(entity: Entity, cx: &mut SvgContextRes) -> Self {
         log::info!("[SolidPaintSvgBundle::new] {:?}", entity);
 

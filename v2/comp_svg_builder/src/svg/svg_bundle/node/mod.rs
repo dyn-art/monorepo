@@ -2,7 +2,7 @@ pub mod frame;
 pub mod shape;
 
 use self::{frame::FrameNodeSvgBundle, shape::ShapeNodeSvgBundle};
-use super::{fill::FillSvgBundle, SvgBundle};
+use super::SvgBundle;
 use crate::svg::svg_element::SvgElement;
 use bevy_ecs::{component::Component, entity::Entity, query::Without, system::Query};
 use dyn_comp_common::mixins::Root;
@@ -36,59 +36,26 @@ impl NodeSvgBundle {
         }
     }
 
-    pub fn get_fill_wrapper_element_mut(&mut self) -> Option<&mut SvgElement> {
+    pub fn get_styles_wrapper_element_mut(&mut self) -> Option<&mut SvgElement> {
         match self {
-            NodeSvgBundle::Frame(bundle) => Some(&mut bundle.fill_wrapper_g),
-            NodeSvgBundle::Shape(bundle) => Some(&mut bundle.fill_wrapper_g),
+            NodeSvgBundle::Frame(bundle) => Some(&mut bundle.styles_wrapper_g),
+            NodeSvgBundle::Shape(bundle) => Some(&mut bundle.styles_wrapper_g),
             _ => None,
         }
     }
 
-    pub fn get_fill_bundles_mut(&mut self) -> Option<&mut SmallVec<[FillSvgBundle; 2]>> {
+    pub fn get_styles_mut(&mut self) -> Option<&mut SmallVec<[Entity; 2]>> {
         match self {
-            NodeSvgBundle::Frame(bundle) => Some(&mut bundle.fill_bundles),
-            NodeSvgBundle::Shape(bundle) => Some(&mut bundle.fill_bundles),
+            NodeSvgBundle::Frame(bundle) => Some(&mut bundle.styles),
+            NodeSvgBundle::Shape(bundle) => Some(&mut bundle.styles),
             _ => None,
         }
     }
 
-    pub fn get_stroke_fill_wrapper_element_mut(&mut self) -> Option<&mut SvgElement> {
+    pub fn get_styles(&self) -> Option<&SmallVec<[Entity; 2]>> {
         match self {
-            NodeSvgBundle::Frame(bundle) => Some(&mut bundle.stroke_wrapper_g),
-            NodeSvgBundle::Shape(bundle) => Some(&mut bundle.stroke_wrapper_g),
-            _ => None,
-        }
-    }
-
-    pub fn get_stroke_fill_bundles_mut(&mut self) -> Option<&mut SmallVec<[FillSvgBundle; 2]>> {
-        match self {
-            NodeSvgBundle::Frame(bundle) => Some(&mut bundle.stroke_fill_bundles),
-            NodeSvgBundle::Shape(bundle) => Some(&mut bundle.stroke_fill_bundles),
-            _ => None,
-        }
-    }
-
-    pub fn get_combined_fill_bundles_iter_mut(
-        &mut self,
-    ) -> Option<
-        std::iter::Chain<
-            std::slice::IterMut<'_, FillSvgBundle>,
-            std::slice::IterMut<'_, FillSvgBundle>,
-        >,
-    > {
-        match self {
-            NodeSvgBundle::Frame(bundle) => Some(
-                bundle
-                    .fill_bundles
-                    .iter_mut()
-                    .chain(bundle.stroke_fill_bundles.iter_mut()),
-            ),
-            NodeSvgBundle::Shape(bundle) => Some(
-                bundle
-                    .fill_bundles
-                    .iter_mut()
-                    .chain(bundle.stroke_fill_bundles.iter_mut()),
-            ),
+            NodeSvgBundle::Frame(bundle) => Some(&bundle.styles),
+            NodeSvgBundle::Shape(bundle) => Some(&bundle.styles),
             _ => None,
         }
     }

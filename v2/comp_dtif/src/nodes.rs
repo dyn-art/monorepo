@@ -1,8 +1,4 @@
-use crate::{
-    common::{DtifFill, DtifStroke},
-    dtif_injector::DtifInjector,
-    ToEcsBundleImpl,
-};
+use crate::{dtif_injector::DtifInjector, styles::Style, ToEcsBundleImpl};
 use bevy_transform::components::Transform;
 use dyn_comp_common::{
     bundles::{FrameCompNodeBundle, GroupCompNodeBundle, RectangleCompNodeBundle},
@@ -33,13 +29,12 @@ pub struct FrameNode {
     pub corner_radii: CornerRadii,
     #[serde(default)]
     pub visibility: Visibility,
-    pub fills: Vec<DtifFill>,
     #[serde(default)]
     pub blend_mode: BlendMode,
     #[serde(default)]
     pub opacity: Opacity,
     #[serde(default)]
-    pub stroke: Option<DtifStroke>,
+    pub styles: Vec<Style>,
     #[serde(default)]
     pub children: Vec<String>,
 }
@@ -53,7 +48,7 @@ impl ToEcsBundleImpl for FrameNode {
     type Bundle = FrameCompNodeBundle;
 
     fn to_ecs_bundle(&self, _: &DtifInjector) -> Self::Bundle {
-        FrameCompNodeBundle {
+        Self::Bundle {
             node: CompNode {
                 variant: CompNodeVariant::Frame,
             },
@@ -95,7 +90,7 @@ impl ToEcsBundleImpl for GroupNode {
     type Bundle = GroupCompNodeBundle;
 
     fn to_ecs_bundle(&self, _: &DtifInjector) -> Self::Bundle {
-        GroupCompNodeBundle {
+        Self::Bundle {
             node: CompNode {
                 variant: CompNodeVariant::Group,
             },
@@ -123,20 +118,19 @@ pub struct RectangleNode {
     pub corner_radii: CornerRadii,
     #[serde(default)]
     pub visibility: Visibility,
-    pub fills: Vec<DtifFill>,
     #[serde(default)]
     pub blend_mode: BlendMode,
     #[serde(default)]
     pub opacity: Opacity,
     #[serde(default)]
-    pub stroke: Option<DtifStroke>,
+    pub styles: Vec<Style>,
 }
 
 impl ToEcsBundleImpl for RectangleNode {
     type Bundle = RectangleCompNodeBundle;
 
     fn to_ecs_bundle(&self, _: &DtifInjector) -> Self::Bundle {
-        RectangleCompNodeBundle {
+        Self::Bundle {
             node: CompNode {
                 variant: CompNodeVariant::Rectangle,
             },
