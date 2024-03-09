@@ -15,7 +15,7 @@ pub enum StyleSvgBundle {
 impl StyleSvgBundle {
     pub fn get_paint_entity(&self) -> &Entity {
         match self {
-            StyleSvgBundle::Solid(bundle) => &bundle.paint_entity,
+            StyleSvgBundle::Solid(bundle) => &bundle.entity,
         }
     }
 

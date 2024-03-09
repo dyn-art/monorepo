@@ -12,7 +12,11 @@ use bevy_ecs::{
 use bevy_hierarchy::{Children, Parent};
 use dyn_comp_common::nodes::CompNode;
 
-pub fn extract_svg_bundles(
+// TODO: As of right now we don't drain changes from styles
+// so either we create a combined Node & styles svg bundle which should actually work since we can check for CompNode or CompStyle
+// and also exclude it if necessary.. so that not conflicts are created..
+
+pub fn extract_svg_node_bundles(
     mut changed_svg_bundles_res: ResMut<ChangedSvgBundlesRes>,
     mut query: Query<
         (Entity, &mut NodeSvgBundleMixin, Option<&Parent>),
@@ -20,9 +24,9 @@ pub fn extract_svg_bundles(
     >,
     child_query: Query<&Children>,
 ) {
-    for (entity, mut bundle_mixin, maybe_parent) in query.iter_mut() {
-        let NodeSvgBundleMixin(bundle) = bundle_mixin.as_mut();
-        let changes = bundle.get_svg_bundle_mut().drain_changes();
+    for (entity, mut node_bundle_mixin, maybe_parent) in query.iter_mut() {
+        let NodeSvgBundleMixin(node_bundle) = node_bundle_mixin.as_mut();
+        let changes = node_bundle.get_svg_bundle_mut().drain_changes();
         if changes.is_empty() {
             return;
         }

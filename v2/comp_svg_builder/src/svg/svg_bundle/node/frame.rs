@@ -15,7 +15,7 @@ use std::collections::BTreeMap;
 
 #[derive(Debug, Clone)]
 pub struct FrameNodeSvgBundle {
-    pub node_entity: Entity,
+    pub entity: Entity,
 
     pub root_g: SvgElement,
     /**/ pub defs: SvgElement,
@@ -29,6 +29,10 @@ pub struct FrameNodeSvgBundle {
 }
 
 impl SvgBundle for FrameNodeSvgBundle {
+    fn get_entity(&self) -> &Entity {
+        &self.entity
+    }
+
     fn get_root_element(&self) -> &SvgElement {
         &self.root_g
     }
@@ -37,44 +41,29 @@ impl SvgBundle for FrameNodeSvgBundle {
         &mut self.root_g
     }
 
-    fn get_elements(&self) -> BTreeMap<SvgElementId, &SvgElement> {
-        let mut elements = BTreeMap::new();
-
-        elements.insert(self.root_g.get_id(), &self.root_g);
-        elements.insert(self.defs.get_id(), &self.defs);
-        elements.insert(self.children_clip_path.get_id(), &self.children_clip_path);
-        elements.insert(
-            self.children_clipped_path.get_id(),
-            &self.children_clipped_path,
-        );
-        elements.insert(self.click_area_rect.get_id(), &self.click_area_rect);
-        elements.insert(self.styles_wrapper_g.get_id(), &self.styles_wrapper_g);
-        elements.insert(self.children_wrapper_g.get_id(), &self.children_wrapper_g);
-
-        return elements;
+    fn elements_iter<'a>(&'a self) -> Box<dyn Iterator<Item = &'a SvgElement> + 'a> {
+        Box::new(
+            std::iter::once(&self.root_g).chain(
+                std::iter::once(&self.defs)
+                    .chain(std::iter::once(&self.children_clip_path))
+                    .chain(std::iter::once(&self.children_clipped_path))
+                    .chain(std::iter::once(&self.click_area_rect))
+                    .chain(std::iter::once(&self.styles_wrapper_g))
+                    .chain(std::iter::once(&self.children_wrapper_g)),
+            ),
+        )
     }
 
-    fn get_elements_mut(&mut self) -> BTreeMap<SvgElementId, &mut SvgElement> {
-        let mut elements = BTreeMap::new();
-
-        elements.insert(self.root_g.get_id(), &mut self.root_g);
-        elements.insert(self.defs.get_id(), &mut self.defs);
-        elements.insert(
-            self.children_clip_path.get_id(),
-            &mut self.children_clip_path,
-        );
-        elements.insert(
-            self.children_clipped_path.get_id(),
-            &mut self.children_clipped_path,
-        );
-        elements.insert(self.click_area_rect.get_id(), &mut self.click_area_rect);
-        elements.insert(self.styles_wrapper_g.get_id(), &mut self.styles_wrapper_g);
-        elements.insert(
-            self.children_wrapper_g.get_id(),
-            &mut self.children_wrapper_g,
-        );
-
-        return elements;
+    fn elements_iter_mut<'a>(&'a mut self) -> Box<dyn Iterator<Item = &'a mut SvgElement> + 'a> {
+        Box::new(
+            std::iter::once(&mut self.root_g)
+                .chain(std::iter::once(&mut self.defs))
+                .chain(std::iter::once(&mut self.children_clip_path))
+                .chain(std::iter::once(&mut self.children_clipped_path))
+                .chain(std::iter::once(&mut self.click_area_rect))
+                .chain(std::iter::once(&mut self.styles_wrapper_g))
+                .chain(std::iter::once(&mut self.children_wrapper_g)),
+        )
     }
 }
 
@@ -154,7 +143,7 @@ impl FrameNodeSvgBundle {
         }
 
         Self {
-            node_entity: entity,
+            entity,
 
             root_g: root_g_element,
             defs: defs_element,

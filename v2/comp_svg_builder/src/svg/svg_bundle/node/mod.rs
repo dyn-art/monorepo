@@ -17,8 +17,8 @@ pub enum NodeSvgBundle {
 impl NodeSvgBundle {
     pub fn get_node_entity(&self) -> &Entity {
         match self {
-            NodeSvgBundle::Frame(bundle) => &bundle.node_entity,
-            NodeSvgBundle::Shape(bundle) => &bundle.node_entity,
+            NodeSvgBundle::Frame(bundle) => &bundle.entity,
+            NodeSvgBundle::Shape(bundle) => &bundle.entity,
         }
     }
 

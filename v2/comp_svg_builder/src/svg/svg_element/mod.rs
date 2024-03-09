@@ -284,7 +284,7 @@ impl SvgElement {
         }
 
         // Append children
-        let bundle_elements = bundle.get_elements();
+        let bundle_elements = bundle.get_elements_map();
         for child in &self.children {
             match child.identifier {
                 SvgElementChildIdentifier::InSvgBundleContext => {

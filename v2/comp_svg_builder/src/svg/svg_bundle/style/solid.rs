@@ -1,14 +1,13 @@
 use super::SvgBundle;
 use crate::{
     resources::svg_context::SvgContextRes,
-    svg::svg_element::{SvgElement, SvgElementId, SvgTag},
+    svg::svg_element::{SvgElement, SvgTag},
 };
 use bevy_ecs::entity::Entity;
-use std::collections::BTreeMap;
 
 #[derive(Debug, Clone)]
 pub struct SolidStyleSvgBundle {
-    pub paint_entity: Entity,
+    pub entity: Entity,
 
     pub root_g: SvgElement,
     /**/ pub defs: SvgElement,
@@ -16,6 +15,10 @@ pub struct SolidStyleSvgBundle {
 }
 
 impl SvgBundle for SolidStyleSvgBundle {
+    fn get_entity(&self) -> &Entity {
+        &self.entity
+    }
+
     fn get_root_element(&self) -> &SvgElement {
         &self.root_g
     }
@@ -24,24 +27,20 @@ impl SvgBundle for SolidStyleSvgBundle {
         &mut self.root_g
     }
 
-    fn get_elements(&self) -> BTreeMap<SvgElementId, &SvgElement> {
-        let mut elements = BTreeMap::new();
-
-        elements.insert(self.root_g.get_id(), &self.root_g);
-        elements.insert(self.defs.get_id(), &self.defs);
-        elements.insert(self.shape_path.get_id(), &self.shape_path);
-
-        return elements;
+    fn elements_iter<'a>(&'a self) -> Box<dyn Iterator<Item = &'a SvgElement> + 'a> {
+        Box::new(
+            std::iter::once(&self.root_g)
+                .chain(std::iter::once(&self.defs))
+                .chain(std::iter::once(&self.shape_path)),
+        )
     }
 
-    fn get_elements_mut(&mut self) -> BTreeMap<SvgElementId, &mut SvgElement> {
-        let mut elements = BTreeMap::new();
-
-        elements.insert(self.root_g.get_id(), &mut self.root_g);
-        elements.insert(self.defs.get_id(), &mut self.defs);
-        elements.insert(self.shape_path.get_id(), &mut self.shape_path);
-
-        return elements;
+    fn elements_iter_mut<'a>(&'a mut self) -> Box<dyn Iterator<Item = &'a mut SvgElement> + 'a> {
+        Box::new(
+            std::iter::once(&mut self.root_g)
+                .chain(std::iter::once(&mut self.defs))
+                .chain(std::iter::once(&mut self.shape_path)),
+        )
     }
 }
 
@@ -73,7 +72,7 @@ impl SolidStyleSvgBundle {
         }
 
         Self {
-            paint_entity: entity,
+            entity,
 
             root_g: root_g_element,
             defs: defs_element,
