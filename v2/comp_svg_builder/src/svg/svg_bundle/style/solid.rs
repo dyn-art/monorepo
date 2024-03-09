@@ -1,7 +1,7 @@
 use super::SvgBundle;
 use crate::{
     resources::svg_context::SvgContextRes,
-    svg::svg_element::{SvgElement, SvgTag},
+    svg::svg_element::{SvgElement, SvgElementId, SvgTag},
 };
 use bevy_ecs::entity::Entity;
 
@@ -80,7 +80,7 @@ impl SolidStyleSvgBundle {
         }
     }
 
-    #[cfg(feature = "tracing")]
+    #[inline]
     fn create_element_name(id: SvgElementId, category: &str) -> String {
         format!("solid-fill_{}_{}", category, id)
     }

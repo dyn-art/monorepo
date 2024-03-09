@@ -10,7 +10,6 @@ use crate::{
 };
 use bevy_ecs::entity::Entity;
 use smallvec::SmallVec;
-use std::collections::BTreeMap;
 
 #[derive(Debug, Clone)]
 pub struct ShapeNodeSvgBundle {
@@ -115,7 +114,7 @@ impl ShapeNodeSvgBundle {
         }
     }
 
-    #[cfg(feature = "tracing")]
+    #[inline]
     fn create_element_name(id: SvgElementId, category: &str) -> String {
         format!("shape-node_{}_{}", category, id)
     }
