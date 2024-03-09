@@ -1,13 +1,14 @@
 use crate::{
     mixins::{
-        BlendModeMixin, CornerRadiiMixin, ImageAssetMixin, OpacityMixin, SizeMixin, StrokeMixin,
-        VisibilityMixin,
+        BlendModeMixin, CornerRadiiMixin, ImageAssetMixin, OpacityMixin, PaintChildMixin,
+        SizeMixin, VisibilityMixin,
     },
     nodes::{
         CompNode, EllipseCompNode, FrameCompNode, GroupCompNode, PolygonCompNode,
         RectangleCompNode, StarCompNode, TextCompNode,
     },
     paints::{CompPaint, GradientCompPaint, ImageCompPaint, SolidCompPaint},
+    styles::{CompStyle, FillCompStyle, StrokeCompStyle},
 };
 use bevy_ecs::bundle::Bundle;
 use bevy_transform::components::Transform;
@@ -23,9 +24,8 @@ pub struct FrameCompNodeBundle {
     pub blend_mode: BlendModeMixin,
     pub opacity: OpacityMixin,
     // https://github.com/Nilirad/bevy_prototype_lyon/issues/207
-    // pub fills: FillsMixin,
-    // pub stroke: StrokeMixin,
-    // pub stroke_fills: StrokeFillsMixin,
+    // pub styles: StylesMixin,
+    // pub children: Children,
 }
 
 #[derive(Bundle, Debug)]
@@ -51,9 +51,7 @@ pub struct RectangleCompNodeBundle {
     pub blend_mode: BlendModeMixin,
     pub opacity: OpacityMixin,
     // https://github.com/Nilirad/bevy_prototype_lyon/issues/207
-    // pub fills: FillsMixin,
-    // pub stroke: StrokeMixin,
-    // pub stroke_fills: StrokeFillsMixin,
+    // pub styles: StylesMixin,
 }
 
 #[derive(Bundle, Debug)]
@@ -66,9 +64,7 @@ pub struct EllipseCompNodeBundle {
     pub blend_mode: BlendModeMixin,
     pub opacity: OpacityMixin,
     // https://github.com/Nilirad/bevy_prototype_lyon/issues/207
-    // pub fills: FillsMixin,
-    // pub stroke: StrokeMixin,
-    // pub stroke_fills: StrokeFillsMixin,
+    // pub styles: StylesMixin,
 }
 
 #[derive(Bundle, Debug)]
@@ -81,9 +77,7 @@ pub struct StarCompNodeBundle {
     pub blend_mode: BlendModeMixin,
     pub opacity: OpacityMixin,
     // https://github.com/Nilirad/bevy_prototype_lyon/issues/207
-    // pub fills: FillsMixin,
-    // pub stroke: StrokeMixin,
-    // pub stroke_fills: StrokeFillsMixin,
+    // pub styles: StylesMixin,
 }
 
 #[derive(Bundle, Debug)]
@@ -96,9 +90,7 @@ pub struct PolygonCompNodeBundle {
     pub blend_mode: BlendModeMixin,
     pub opacity: OpacityMixin,
     // https://github.com/Nilirad/bevy_prototype_lyon/issues/207
-    // pub fills: FillsMixin,
-    // pub stroke: StrokeMixin,
-    // pub stroke_fills: StrokeFillsMixin,
+    // pub styles: StylesMixin,
 }
 
 #[derive(Bundle, Debug)]
@@ -111,9 +103,7 @@ pub struct TextCompNodeBundle {
     pub blend_mode: BlendModeMixin,
     pub opacity: OpacityMixin,
     // https://github.com/Nilirad/bevy_prototype_lyon/issues/207
-    // pub fills: FillsMixin,
-    // pub stroke: StrokeMixin,
-    // pub stroke_fills: StrokeFillsMixin,
+    // pub styles: StylesMixin,
 }
 
 #[derive(Bundle, Debug)]
@@ -122,6 +112,8 @@ pub struct SolidPaintBundle {
     pub solid: SolidCompPaint,
     pub blend_mode: BlendModeMixin,
     pub opacity: OpacityMixin,
+    // https://github.com/Nilirad/bevy_prototype_lyon/issues/207
+    // pub parent: PaintParentMixin,
 }
 
 #[derive(Bundle, Debug)]
@@ -131,6 +123,8 @@ pub struct ImagePaintBundle {
     pub asset: ImageAssetMixin,
     pub blend_mode: BlendModeMixin,
     pub opacity: OpacityMixin,
+    // https://github.com/Nilirad/bevy_prototype_lyon/issues/207
+    // pub parent: PaintParentMixin,
 }
 
 #[derive(Bundle, Debug)]
@@ -139,4 +133,31 @@ pub struct GradientPaintBundle {
     pub gradient: GradientCompPaint,
     pub blend_mode: BlendModeMixin,
     pub opacity: OpacityMixin,
+    // https://github.com/Nilirad/bevy_prototype_lyon/issues/207
+    // pub parent: PaintParentMixin,
+}
+
+#[derive(Bundle, Debug)]
+pub struct FillStyleBundle {
+    pub style: CompStyle,
+    pub fill: FillCompStyle,
+    pub paint: PaintChildMixin,
+    pub visibility: VisibilityMixin,
+    pub blend_mode: BlendModeMixin,
+    pub opacity: OpacityMixin,
+    // https://github.com/Nilirad/bevy_prototype_lyon/issues/207
+    // pub parent: StyleParentMixin,
+}
+
+#[derive(Bundle, Debug)]
+pub struct StrokeStyleBundle {
+    pub style: CompStyle,
+    pub stroke: StrokeCompStyle,
+    pub paint: PaintChildMixin,
+    pub visibility: VisibilityMixin,
+    pub blend_mode: BlendModeMixin,
+    pub opacity: OpacityMixin,
+    // https://github.com/Nilirad/bevy_prototype_lyon/issues/207
+    // pub stroke_path: StrokePathMixin,
+    // pub parent: StyleParentMixin,
 }

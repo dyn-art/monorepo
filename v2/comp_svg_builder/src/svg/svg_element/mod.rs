@@ -4,7 +4,7 @@ pub mod element_changes;
 pub mod styles;
 
 use self::{attributes::SvgAttribute, styles::SvgStyle};
-use super::svg_bundle::{node::NodeSvgBundleMixin, SvgBundle};
+use super::svg_bundle::{SvgBundle, SvgBundleVariant};
 use bevy_ecs::{component::Component, entity::Entity, query::Without, system::Query};
 use dyn_comp_common::mixins::Root;
 use std::{
@@ -256,7 +256,7 @@ impl SvgElement {
     pub fn to_string(
         &self,
         bundle: &dyn SvgBundle,
-        maybe_bundle_query: Option<&Query<&NodeSvgBundleMixin, Without<Root>>>,
+        maybe_bundle_variant_query: Option<&Query<&SvgBundleVariant, Without<Root>>>,
     ) -> String {
         let mut result = String::new();
 
@@ -284,18 +284,19 @@ impl SvgElement {
         }
 
         // Append children
-        let bundle_elements = bundle.get_elements();
+        let bundle_elements = bundle.get_elements_map();
         for child in &self.children {
             match child.identifier {
                 SvgElementChildIdentifier::InSvgBundleContext => {
                     if let Some(child_element) = bundle_elements.get(&child.id) {
-                        result.push_str(&child_element.to_string(bundle, maybe_bundle_query));
+                        result
+                            .push_str(&child_element.to_string(bundle, maybe_bundle_variant_query));
                     }
                 }
                 SvgElementChildIdentifier::InWorldContext(entity) => {
-                    if let Some(bundle_query) = maybe_bundle_query {
-                        if let Ok(NodeSvgBundleMixin(bundle)) = bundle_query.get(entity) {
-                            result.push_str(&bundle.to_string(bundle_query));
+                    if let Some(bundle_variant_query) = maybe_bundle_variant_query {
+                        if let Ok(bundle_variant) = bundle_variant_query.get(entity) {
+                            result.push_str(&bundle_variant.to_string(bundle_variant_query));
                         }
                     }
                 }

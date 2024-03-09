@@ -23,8 +23,9 @@ const DEFAULT_DTIF: COMP.CompDtif = {
 			blendMode: 'Normal',
 			clipContent: false,
 			cornerRadii: [0, 0, 0, 0],
-			fills: [
+			styles: [
 				{
+					type: 'Fill',
 					blendMode: 'Normal',
 					opacity: 1.0,
 					paintId: 'p1'
@@ -40,30 +41,36 @@ const DEFAULT_DTIF: COMP.CompDtif = {
 			type: 'Rectangle',
 			blendMode: 'Normal',
 			cornerRadii: [0, 20, 0, 0],
-			fills: [
+			styles: [
 				{
+					type: 'Stroke',
+					width: 5,
+					blendMode: 'Normal',
+					opacity: 1,
+					paintId: 'p3'
+				},
+				{
+					type: 'Fill',
 					blendMode: 'Normal',
 					opacity: 0.5,
 					paintId: 'p2'
 				},
 				{
+					type: 'Fill',
 					blendMode: 'Normal',
 					opacity: 1.0,
 					paintId: 'p1'
+				},
+				{
+					type: 'Stroke',
+					width: 20,
+					blendMode: 'Normal',
+					opacity: 1,
+					paintId: 'p2'
 				}
 			],
 			opacity: 1,
 			size: [100, 100],
-			stroke: {
-				width: 5,
-				fills: [
-					{
-						blendMode: 'Normal',
-						opacity: 1,
-						paintId: 'p3'
-					}
-				]
-			},
 			translation: [WIDTH / 2, HEIGHT / 2],
 			visibility: 'Visible'
 		}

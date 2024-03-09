@@ -172,6 +172,10 @@ export class SvgRenderer extends Renderer {
 						const parentElement = this._svgElementMap.get(change.parentId);
 						if (parentElement != null) {
 							parentElement.appendChild(newElement);
+						} else {
+							console.error(
+								`Failed to query parent element (${change.parentId}) to append element (${elementChanges.id}) to!`
+							);
 						}
 					} else {
 						this._svgElement.appendChild(newElement);
@@ -186,6 +190,8 @@ export class SvgRenderer extends Renderer {
 					if (elementToDelete?.parentNode != null) {
 						elementToDelete.parentNode.removeChild(elementToDelete);
 						this._svgElementMap.delete(elementChanges.id);
+					} else {
+						console.error(`Failed to query to remove element (${elementChanges.id})!`);
 					}
 					break;
 				}
@@ -194,6 +200,10 @@ export class SvgRenderer extends Renderer {
 					const parentElement = this._svgElementMap.get(elementChanges.id);
 					if (parentElement != null && toAppendElement != null) {
 						parentElement.appendChild(toAppendElement);
+					} else {
+						console.error(
+							`Failed to query parent element (${change.parentId}) to append element (${elementChanges.id}) to!`
+						);
 					}
 					break;
 				}
@@ -201,6 +211,10 @@ export class SvgRenderer extends Renderer {
 					const elementToUpdate = getElement();
 					if (elementToUpdate != null) {
 						elementToUpdate.setAttribute(change.key, change.newValue);
+					} else {
+						console.error(
+							`Failed to query element (${elementChanges.id}) to add attribute (${change.key}) to!`
+						);
 					}
 					break;
 				}
@@ -208,6 +222,10 @@ export class SvgRenderer extends Renderer {
 					const elementToUpdate = getElement();
 					if (elementToUpdate != null) {
 						elementToUpdate.removeAttribute(change.key);
+					} else {
+						console.error(
+							`Failed to query element (${elementChanges.id}) to remove attribute (${change.key}) from!`
+						);
 					}
 					break;
 				}
@@ -215,6 +233,10 @@ export class SvgRenderer extends Renderer {
 					const elementToUpdate = getElement();
 					if (elementToUpdate != null) {
 						elementToUpdate.style.setProperty(change.key, change.newValue);
+					} else {
+						console.error(
+							`Failed to query element (${elementChanges.id}) to add style (${change.key}) to!`
+						);
 					}
 					break;
 				}
@@ -222,6 +244,10 @@ export class SvgRenderer extends Renderer {
 					const elementToUpdate = getElement();
 					if (elementToUpdate != null) {
 						elementToUpdate.style.removeProperty(change.key);
+					} else {
+						console.error(
+							`Failed to query element (${elementChanges.id}) to remove style (${change.key}) from!`
+						);
 					}
 					break;
 				}
@@ -243,6 +269,8 @@ export class SvgRenderer extends Renderer {
 						else {
 							newParentElement.appendChild(elementToReorder);
 						}
+					} else {
+						console.error(`Failed to query element (${elementChanges.id}) to reorder!`);
 					}
 					break;
 				}

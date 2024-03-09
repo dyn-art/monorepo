@@ -1,22 +1,59 @@
+use std::collections::HashSet;
+
 use bevy_ecs::{
     entity::Entity,
-    query::{Changed, Or},
+    query::Changed,
     system::{Commands, Query},
 };
-use dyn_comp_common::mixins::{PathMixin, StrokeMixin, StrokePathMixin};
+use dyn_comp_common::{
+    mixins::{PathMixin, StrokePathMixin, StyleChildrenMixin, StyleParentMixin},
+    styles::StrokeCompStyle,
+};
 use tiny_skia_path::PathStroker;
 
-pub fn stroke_path(
+pub fn stroke_path_system(
     mut commands: Commands,
-    query: Query<
-        (Entity, &StrokeMixin, &PathMixin),
-        Or<(Changed<StrokeMixin>, Changed<PathMixin>)>,
+    stroke_query: Query<
+        (Entity, &StrokeCompStyle, Option<&StyleParentMixin>),
+        Changed<StrokeCompStyle>,
     >,
+    path_query: Query<(Entity, &PathMixin, Option<&StyleChildrenMixin>), Changed<PathMixin>>,
+    stroke_style_query: Query<&StrokeCompStyle>,
 ) {
-    for (entity, StrokeMixin(stroke), PathMixin(path)) in query.iter() {
-        let mut stroker = PathStroker::new();
-        if let Some(stroke_path) = stroker.stroke(path, stroke, 1.0) {
-            commands.entity(entity).insert(StrokePathMixin(stroke_path));
+    let mut processed_entities: HashSet<Entity> = HashSet::new();
+
+    // Handle stroke style changes
+    for (entity, stroke_style, maybe_style_parent_mixin) in stroke_query.iter() {
+        if let Some(StyleParentMixin(parent_entity)) = maybe_style_parent_mixin {
+            if let Ok((_, PathMixin(path), _)) = path_query.get(*parent_entity) {
+                stroke_path(&mut commands, entity, path, stroke_style);
+            }
         }
+    }
+
+    // Handle path changes
+    for (entity, PathMixin(path), maybe_style_children_mixin) in path_query.iter() {
+        if let Some(StyleChildrenMixin(style_entities)) = maybe_style_children_mixin {
+            for style_entity in style_entities.iter() {
+                if let Ok(stroke_style) = stroke_style_query.get(*style_entity) {
+                    // Check if entity has not been processed before
+                    if processed_entities.insert(*style_entity) {
+                        stroke_path(&mut commands, *style_entity, path, stroke_style);
+                    }
+                }
+            }
+        }
+    }
+}
+
+fn stroke_path(
+    commands: &mut Commands,
+    entity: Entity,
+    path: &tiny_skia_path::Path,
+    stroke_style: &StrokeCompStyle,
+) {
+    let mut stroker = PathStroker::new();
+    if let Some(stroke_path) = stroker.stroke(path, &stroke_style.stroke, 1.0) {
+        commands.entity(entity).insert(StrokePathMixin(stroke_path));
     }
 }

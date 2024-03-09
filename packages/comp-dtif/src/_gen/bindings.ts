@@ -99,11 +99,7 @@ export type DtifEntityMovedEvent = { entity: string; dx: number; dy: number }
 
 export type DtifEntitySetPositionEvent = { entity: string; x: number; y: number }
 
-export type DtifFill = { paintId: string; blendMode: BlendMode; opacity: Opacity }
-
 export type DtifInputEvent = ({ type: "CompositionResized" } & DtifCompositionResizedEvent) | ({ type: "CompositionViewportChanged" } & DtifCompositionViewportChangedEvent) | ({ type: "EntityMoved" } & DtifEntityMovedEvent) | ({ type: "EntitySetPosition" } & DtifEntitySetPositionEvent) | ({ type: "EntityDeleted" } & DtifEntityDeletedEvent)
-
-export type DtifStroke = { fills: DtifFill[]; width: number }
 
 export type Entity = number
 
@@ -113,7 +109,7 @@ export type EntityMovedInputEvent = { entity: Entity; dx: number; dy: number }
 
 export type EntitySetPositionInputEvent = { entity: Entity; x: number; y: number }
 
-export type Fill = { paint: Entity; blendMode: BlendMode; opacity: Opacity }
+export type FillStyle = { paintId: string; visibility?: Visibility; blendMode?: BlendMode; opacity?: Opacity }
 
 export type FontMetadata = { 
 /**
@@ -143,7 +139,7 @@ export type FontStyle =
  */
 "Oblique"
 
-export type FrameNode = { clipContent?: boolean; translation: Vec2; angle?: Degree; size: Size; cornerRadii?: CornerRadii; visibility?: Visibility; fills: DtifFill[]; blendMode?: BlendMode; opacity?: Opacity; stroke?: DtifStroke | null; children?: string[] }
+export type FrameNode = { clipContent?: boolean; translation: Vec2; angle?: Degree; size: Size; cornerRadii?: CornerRadii; visibility?: Visibility; blendMode?: BlendMode; opacity?: Opacity; styles?: Style[]; children?: string[] }
 
 export type GradientColorStop = { 
 /**
@@ -237,7 +233,7 @@ export type Percent = number
 
 export type Pixel = number
 
-export type RectangleNode = { translation: Vec2; angle?: Degree; size: Size; cornerRadii?: CornerRadii; visibility?: Visibility; fills: DtifFill[]; blendMode?: BlendMode; opacity?: Opacity; stroke?: DtifStroke | null }
+export type RectangleNode = { translation: Vec2; angle?: Degree; size: Size; cornerRadii?: CornerRadii; visibility?: Visibility; blendMode?: BlendMode; opacity?: Opacity; styles?: Style[] }
 
 export type SelectionChangeOutputEvent = { selected: Entity[] }
 
@@ -246,6 +242,10 @@ export type Size = Vec2
 export type SolidPaint = { color: Color; blendMode?: BlendMode; opacity?: Opacity }
 
 export type SpectaExport = { comp_dtif: CompDtif; svg_comp_input_event: SvgCompInputEvent; svg_comp_output_event: SvgCompOutputEvent }
+
+export type StrokeStyle = { width: number; paintId: string; visibility?: Visibility; blendMode?: BlendMode; opacity?: Opacity }
+
+export type Style = ({ type: "Fill" } & FillStyle) | ({ type: "Stroke" } & StrokeStyle)
 
 export type SvgAttribute = { type: "Id"; id: SvgElementId } | { type: "Class"; class: string } | { type: "Width"; width: number; unit: SvgMeasurementUnit } | { type: "Height"; height: number; unit: SvgMeasurementUnit } | { type: "Transform"; transform: SvgTransformAttribute } | { type: "PatternTransform"; patternTransform: SvgTransformAttribute } | { type: "D"; d: SvgPathAttribute } | { type: "ClipPath"; clipPath: SvgElementId } | { type: "Fill"; fill: SvgFillAttribute } | { type: "PatternUnits"; patternUnits: SvgUnits } | { type: "GradientUnits"; gradientUnits: SvgUnits } | { type: "Href"; href: SvgHrefAttribute } | { type: "PreserveAspectRatio"; preserveAspectRatio: string } | { type: "X1"; x1: number } | { type: "Y1"; y1: number } | { type: "X2"; x2: number } | { type: "Y2"; y2: number } | { type: "Offset"; offset: number } | { type: "StopColor"; stopColor: string }
 

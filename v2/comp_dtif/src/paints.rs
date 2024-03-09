@@ -29,7 +29,7 @@ impl ToEcsBundleImpl for SolidPaint {
     type Bundle = SolidPaintBundle;
 
     fn to_ecs_bundle(&self, _: &DtifInjector) -> Self::Bundle {
-        SolidPaintBundle {
+        Self::Bundle {
             paint: CompPaint {
                 variant: CompPaintVariant::Solid,
             },
@@ -56,7 +56,7 @@ impl ToEcsBundleImpl for ImagePaint {
     type Bundle = ImagePaintBundle;
 
     fn to_ecs_bundle(&self, dtif_injector: &DtifInjector) -> Self::Bundle {
-        ImagePaintBundle {
+        Self::Bundle {
             paint: CompPaint {
                 variant: CompPaintVariant::Image,
             },
@@ -94,7 +94,7 @@ impl ToEcsBundleImpl for GradientPaint {
     type Bundle = GradientPaintBundle;
 
     fn to_ecs_bundle(&self, _: &DtifInjector) -> Self::Bundle {
-        GradientPaintBundle {
+        Self::Bundle {
             paint: CompPaint {
                 variant: CompPaintVariant::Gradient,
             },
