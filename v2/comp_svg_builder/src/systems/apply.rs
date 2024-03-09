@@ -118,6 +118,8 @@ fn process_removed_node_children(
                     .get_id(),
             );
         }
+
+        // Note: child_node_entities are synced in "reorder_node_children()"
     }
 
     return Ok(());
@@ -142,6 +144,8 @@ fn process_added_node_children(
                     .get_root_element_mut(),
             );
         }
+
+        // Note: child_node_entities are synced in "reorder_node_children()"
     }
 
     return Ok(());
@@ -180,13 +184,9 @@ fn reorder_node_children(
         .get_child_node_entities_mut()
         .ok_or(NoneErr::new("Failed to retrieve node children!"))?;
 
-    // Sort bundle children
-    child_node_entities.sort_by_key(|bundle_child| {
-        new_entities_order
-            .iter()
-            .position(|entity| *bundle_child == *entity)
-            .unwrap_or(usize::MAX)
-    });
+    // Apply new order
+    child_node_entities.clear();
+    child_node_entities.extend(new_entities_order.iter().copied());
 
     #[cfg(feature = "output_svg_element_changes")]
     {
@@ -293,7 +293,7 @@ fn process_removed_node_styles(
     >,
 ) -> Result<(), Box<dyn Error>> {
     for entity in removed_entities {
-        let mut style_bundle_variant = style_bundle_variant_query.get_mut(*entity)?;
+        let style_bundle_variant = style_bundle_variant_query.get_mut(*entity)?;
 
         if let Some(styles_wrapper_element) = node_bundle_variant.get_styles_wrapper_element_mut() {
             styles_wrapper_element.remove_child(
@@ -303,6 +303,8 @@ fn process_removed_node_styles(
                     .get_id(),
             );
         }
+
+        // Note: style_entities are synced in "reorder_node_styles()"
     }
 
     return Ok(());
@@ -327,6 +329,8 @@ fn process_added_node_styles(
                     .get_root_element_mut(),
             );
         }
+
+        // Note: style_entities are synced in "reorder_node_styles()"
     }
 
     return Ok(());
@@ -366,13 +370,9 @@ fn reorder_node_styles(
         .get_style_entities_mut()
         .ok_or(NoneErr::new("Failed to retrieve node styles!"))?;
 
-    // Sort bundle children
-    style_entities.sort_by_key(|bundle_child| {
-        new_entities_order
-            .iter()
-            .position(|entity| *bundle_child == *entity)
-            .unwrap_or(usize::MAX)
-    });
+    // Apply new order
+    style_entities.clear();
+    style_entities.extend(new_entities_order.iter().copied());
 
     #[cfg(feature = "output_svg_element_changes")]
     {
@@ -504,11 +504,11 @@ pub fn apply_blend_mode_mixin_changes(
 pub fn apply_path_mixin_changes(
     mut query: Query<
         (&PathMixin, &mut SvgBundleVariant),
-        (With<CompNode>, Without<CompPaint>, Changed<PathMixin>),
+        (With<CompNode>, Without<CompStyle>, Changed<PathMixin>),
     >,
     mut style_bundle_query: Query<
         &mut SvgBundleVariant,
-        (With<CompPaint>, Without<CompNode>, With<FillCompStyle>),
+        (With<CompStyle>, Without<CompNode>, With<FillCompStyle>),
     >,
 ) {
     for (PathMixin(path), mut node_bundle_variant) in query.iter_mut() {
@@ -525,7 +525,7 @@ pub fn apply_path_mixin_changes(
             for style_entity in style_entities {
                 if let Ok(mut style_bundle_variant) = style_bundle_query.get_mut(*style_entity) {
                     match style_bundle_variant.as_mut() {
-                        SvgBundleVariant::Solid(solid_bundle) => solid_bundle
+                        SvgBundleVariant::Solid(bundle) => bundle
                             .shape_path
                             .set_attribute(SvgAttribute::D { d: path.into() }),
                         _ => {}

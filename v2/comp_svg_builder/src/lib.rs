@@ -28,7 +28,7 @@ pub struct CompSvgBuilderPlugin {
 #[derive(SystemSet, Debug, Hash, PartialEq, Eq, Clone)]
 enum CompSvgBuilderSystemSet {
     Insert,
-    PostInsert,
+    PreApply,
     Apply,
     Extract,
     Queue,
@@ -44,7 +44,7 @@ impl Plugin for CompSvgBuilderPlugin {
             Last,
             (
                 CompSvgBuilderSystemSet::Insert,
-                CompSvgBuilderSystemSet::PostInsert,
+                CompSvgBuilderSystemSet::PreApply,
                 CompSvgBuilderSystemSet::Apply,
                 CompSvgBuilderSystemSet::Extract,
                 CompSvgBuilderSystemSet::Queue,
@@ -60,8 +60,10 @@ impl Plugin for CompSvgBuilderPlugin {
                 insert_style_svg_bundle
                     .in_set(CompSvgBuilderSystemSet::Insert)
                     .after(insert_node_svg_bundle),
-                apply_node_children_changes.in_set(CompSvgBuilderSystemSet::Apply),
-                apply_node_styles_changes.in_set(CompSvgBuilderSystemSet::Apply),
+                apply_node_children_changes.in_set(CompSvgBuilderSystemSet::PreApply),
+                apply_node_styles_changes
+                    .in_set(CompSvgBuilderSystemSet::PreApply)
+                    .after(apply_node_children_changes),
                 apply_visibility_mixin_changes.in_set(CompSvgBuilderSystemSet::Apply),
                 apply_size_mixin_changes.in_set(CompSvgBuilderSystemSet::Apply),
                 apply_transform_changes.in_set(CompSvgBuilderSystemSet::Apply),
