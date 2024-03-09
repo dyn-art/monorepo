@@ -7,6 +7,7 @@ use self::{
 };
 use bevy_ecs::{component::Component, entity::Entity, query::Without, system::Query};
 use dyn_comp_common::mixins::Root;
+use smallvec::SmallVec;
 use std::{collections::HashMap, fmt::Debug};
 
 #[cfg(feature = "output_svg_element_changes")]
@@ -70,18 +71,126 @@ pub enum SvgBundleVariant {
 }
 
 impl SvgBundleVariant {
-    // TODO
+    pub fn get_svg_bundle(&self) -> &dyn SvgBundle {
+        match self {
+            SvgBundleVariant::Frame(bundle) => bundle,
+            SvgBundleVariant::Shape(bundle) => bundle,
+            SvgBundleVariant::Solid(bundle) => bundle,
+        }
+    }
 
-    pub fn to_string(&self, bundle_query: &Query<&SvgBundleVariant, Without<Root>>) -> String {
-        // match self {
-        //     SvgBundleVariant::Frame(bundle) => bundle
-        //         .get_root_element()
-        //         .to_string(bundle, Some(bundle_query)),
-        //     SvgBundleVariant::Shape(bundle) => bundle
-        //         .get_root_element()
-        //         .to_string(bundle, Some(bundle_query)),
-        //     SvgBundleVariant::Solid(bundle) => bundle.get_root_element().to_string(bundle, None),
-        // }
-        String::from("hello")
+    pub fn get_svg_bundle_mut(&mut self) -> &mut dyn SvgBundle {
+        match self {
+            SvgBundleVariant::Frame(bundle) => bundle,
+            SvgBundleVariant::Shape(bundle) => bundle,
+            SvgBundleVariant::Solid(bundle) => bundle,
+        }
+    }
+
+    pub fn get_style_entities(&self) -> Option<&SmallVec<[Entity; 2]>> {
+        match self {
+            SvgBundleVariant::Frame(bundle) => Some(&bundle.style_entities),
+            SvgBundleVariant::Shape(bundle) => Some(&bundle.style_entities),
+            _ => None,
+        }
+    }
+
+    pub fn get_style_entities_mut(&mut self) -> Option<&mut SmallVec<[Entity; 2]>> {
+        match self {
+            SvgBundleVariant::Frame(bundle) => Some(&mut bundle.style_entities),
+            SvgBundleVariant::Shape(bundle) => Some(&mut bundle.style_entities),
+            _ => None,
+        }
+    }
+
+    pub fn get_child_node_entities(&self) -> Option<&SmallVec<[Entity; 2]>> {
+        match self {
+            SvgBundleVariant::Frame(bundle) => Some(&bundle.child_node_entities),
+            _ => None,
+        }
+    }
+
+    pub fn get_child_node_entities_mut(&mut self) -> Option<&mut SmallVec<[Entity; 2]>> {
+        match self {
+            SvgBundleVariant::Frame(bundle) => Some(&mut bundle.child_node_entities),
+            _ => None,
+        }
+    }
+
+    pub fn get_root_element(&self) -> &SvgElement {
+        match self {
+            SvgBundleVariant::Frame(bundle) => &bundle.root_g,
+            SvgBundleVariant::Shape(bundle) => &bundle.root_g,
+            SvgBundleVariant::Solid(bundle) => &bundle.root_g,
+        }
+    }
+
+    pub fn get_root_element_mut(&mut self) -> &mut SvgElement {
+        match self {
+            SvgBundleVariant::Frame(bundle) => &mut bundle.root_g,
+            SvgBundleVariant::Shape(bundle) => &mut bundle.root_g,
+            SvgBundleVariant::Solid(bundle) => &mut bundle.root_g,
+        }
+    }
+
+    pub fn get_click_area_element(&self) -> Option<&SvgElement> {
+        match self {
+            SvgBundleVariant::Frame(bundle) => Some(&bundle.click_area_rect),
+            SvgBundleVariant::Shape(bundle) => Some(&bundle.click_area_rect),
+            _ => None,
+        }
+    }
+
+    pub fn get_click_area_element_mut(&mut self) -> Option<&mut SvgElement> {
+        match self {
+            SvgBundleVariant::Frame(bundle) => Some(&mut bundle.click_area_rect),
+            SvgBundleVariant::Shape(bundle) => Some(&mut bundle.click_area_rect),
+            _ => None,
+        }
+    }
+
+    pub fn get_children_wrapper_element(&self) -> Option<&SvgElement> {
+        match self {
+            SvgBundleVariant::Frame(bundle) => Some(&bundle.children_wrapper_g),
+            _ => None,
+        }
+    }
+
+    pub fn get_children_wrapper_element_mut(&mut self) -> Option<&mut SvgElement> {
+        match self {
+            SvgBundleVariant::Frame(bundle) => Some(&mut bundle.children_wrapper_g),
+            _ => None,
+        }
+    }
+
+    pub fn get_styles_wrapper_element(&self) -> Option<&SvgElement> {
+        match self {
+            SvgBundleVariant::Frame(bundle) => Some(&bundle.styles_wrapper_g),
+            SvgBundleVariant::Shape(bundle) => Some(&bundle.styles_wrapper_g),
+            _ => None,
+        }
+    }
+
+    pub fn get_styles_wrapper_element_mut(&mut self) -> Option<&mut SvgElement> {
+        match self {
+            SvgBundleVariant::Frame(bundle) => Some(&mut bundle.styles_wrapper_g),
+            SvgBundleVariant::Shape(bundle) => Some(&mut bundle.styles_wrapper_g),
+            _ => None,
+        }
+    }
+
+    pub fn to_string(
+        &self,
+        bundle_variant_query: &Query<&SvgBundleVariant, Without<Root>>,
+    ) -> String {
+        match self {
+            SvgBundleVariant::Frame(bundle) => bundle
+                .get_root_element()
+                .to_string(bundle, Some(bundle_variant_query)),
+            SvgBundleVariant::Shape(bundle) => bundle
+                .get_root_element()
+                .to_string(bundle, Some(bundle_variant_query)),
+            SvgBundleVariant::Solid(bundle) => bundle.get_root_element().to_string(bundle, None),
+        }
     }
 }

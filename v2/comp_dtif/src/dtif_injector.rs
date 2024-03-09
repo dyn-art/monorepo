@@ -9,7 +9,7 @@ use bevy_hierarchy::BuildWorldChildren;
 use dyn_comp_asset::{asset_id::AssetId, resources::AssetDatabaseRes};
 use dyn_comp_common::{
     events::InputEvent,
-    mixins::{PaintMixin, PaintParentMixin, Root, StyleParentMixin, StylesMixin},
+    mixins::{PaintChildMixin, PaintParentMixin, Root, StyleChildrenMixin, StyleParentMixin},
 };
 use smallvec::{smallvec, SmallVec};
 use std::collections::HashMap;
@@ -127,7 +127,7 @@ impl DtifInjector {
         if !style_entities.is_empty() {
             world
                 .entity_mut(node_entity)
-                .insert(StylesMixin(style_entities));
+                .insert(StyleChildrenMixin(style_entities));
         }
     }
 
@@ -140,7 +140,7 @@ impl DtifInjector {
         // Spawn style
         let mut style_entity_world_mut = self.spawn_style(style, world);
         style_entity_world_mut.insert(StyleParentMixin(node_entity));
-        let paint_entity = style_entity_world_mut.get::<PaintMixin>()?.0?;
+        let paint_entity = style_entity_world_mut.get::<PaintChildMixin>()?.0?;
         let style_entity = style_entity_world_mut.id();
 
         // Reference style entity in paint

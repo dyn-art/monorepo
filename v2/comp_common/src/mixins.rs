@@ -36,15 +36,14 @@ pub struct PathMixin(pub tiny_skia_path::Path);
 pub struct StrokePathMixin(pub tiny_skia_path::Path);
 
 #[derive(Component, Debug, Default, Clone)]
-pub struct StylesMixin(pub SmallVec<[Entity; 2]>);
+pub struct StyleChildrenMixin(pub SmallVec<[Entity; 2]>);
 
 #[derive(Component, Debug, Clone)]
 pub struct StyleParentMixin(pub Entity);
 
 #[derive(Component, Debug, Clone)]
-pub struct PaintMixin(pub Option<Entity>);
+pub struct PaintChildMixin(pub Option<Entity>);
 
-/// Holds references to the parent entities of this entity in the paint context.
 #[derive(Component, Debug, Default, Clone)]
 pub struct PaintParentMixin(pub SmallVec<[Entity; 2]>);
 

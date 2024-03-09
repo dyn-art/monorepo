@@ -4,7 +4,7 @@ use bevy_ecs::{
     system::{Commands, Query},
 };
 use dyn_comp_common::{
-    mixins::{PathMixin, StrokePathMixin, StyleParentMixin, StylesMixin},
+    mixins::{PathMixin, StrokePathMixin, StyleChildrenMixin, StyleParentMixin},
     styles::StrokeCompStyle,
 };
 use tiny_skia_path::PathStroker;
@@ -29,10 +29,10 @@ pub fn stroke_path_on_stroke_change(
 
 pub fn stroke_path_on_path_change(
     mut commands: Commands,
-    query: Query<(&StylesMixin, &PathMixin), Changed<PathMixin>>,
+    query: Query<(&StyleChildrenMixin, &PathMixin), Changed<PathMixin>>,
     stroke_style_query: Query<&StrokeCompStyle>,
 ) {
-    for (StylesMixin(style_entities), PathMixin(path)) in query.iter() {
+    for (StyleChildrenMixin(style_entities), PathMixin(path)) in query.iter() {
         for style_entity in style_entities.iter() {
             if let Ok(stroke_style) = stroke_style_query.get(*style_entity) {
                 let mut stroker = PathStroker::new();

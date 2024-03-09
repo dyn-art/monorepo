@@ -1,7 +1,7 @@
 use crate::{
     mixins::{
-        BlendModeMixin, CornerRadiiMixin, ImageAssetMixin, OpacityMixin, PaintMixin, SizeMixin,
-        VisibilityMixin,
+        BlendModeMixin, CornerRadiiMixin, ImageAssetMixin, OpacityMixin, PaintChildMixin,
+        SizeMixin, VisibilityMixin,
     },
     nodes::{
         CompNode, EllipseCompNode, FrameCompNode, GroupCompNode, PolygonCompNode,
@@ -141,7 +141,7 @@ pub struct GradientPaintBundle {
 pub struct FillStyleBundle {
     pub style: CompStyle,
     pub fill: FillCompStyle,
-    pub paint: PaintMixin,
+    pub paint: PaintChildMixin,
     pub visibility: VisibilityMixin,
     pub blend_mode: BlendModeMixin,
     pub opacity: OpacityMixin,
@@ -153,7 +153,7 @@ pub struct FillStyleBundle {
 pub struct StrokeStyleBundle {
     pub style: CompStyle,
     pub stroke: StrokeCompStyle,
-    pub paint: PaintMixin,
+    pub paint: PaintChildMixin,
     pub visibility: VisibilityMixin,
     pub blend_mode: BlendModeMixin,
     pub opacity: OpacityMixin,

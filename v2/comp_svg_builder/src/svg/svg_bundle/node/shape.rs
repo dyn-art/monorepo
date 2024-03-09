@@ -19,7 +19,7 @@ pub struct ShapeNodeSvgBundle {
     /**/ pub defs: SvgElement,
     /**/ pub click_area_rect: SvgElement,
     /**/ pub styles_wrapper_g: SvgElement,
-    /**//**/ pub styles: SmallVec<[Entity; 2]>,
+    /**//**/ pub style_entities: SmallVec<[Entity; 2]>,
 }
 
 impl SvgBundle for ShapeNodeSvgBundle {
@@ -110,7 +110,7 @@ impl ShapeNodeSvgBundle {
             defs: defs_element,
             click_area_rect: click_area_rect_element,
             styles_wrapper_g: styles_wrapper_g_element,
-            styles: SmallVec::new(),
+            style_entities: SmallVec::new(),
         }
     }
 

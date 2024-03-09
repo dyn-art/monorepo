@@ -1,8 +1,5 @@
 use crate::svg::{
-    svg_bundle::{
-        node::{NodeSvgBundle, NodeSvgBundleMixin},
-        style::{StyleSvgBundle, StyleSvgBundleMixin},
-    },
+    svg_bundle::SvgBundleVariant,
     svg_element::{
         attributes::{SvgAttribute, SvgMeasurementUnit},
         element_changes::{SvgElementChange, SvgElementReorderedChange},
@@ -12,7 +9,7 @@ use crate::svg::{
 };
 use bevy_ecs::{
     entity::Entity,
-    query::{Changed, With},
+    query::{Changed, With, Without},
     system::{ParamSet, Query},
 };
 use bevy_hierarchy::Children;
@@ -22,11 +19,11 @@ use dyn_comp_common::{
     error::NoneErr,
     mixins::{
         BlendModeMixin, OpacityMixin, PaintParentMixin, PathMixin, SizeMixin, StrokePathMixin,
-        StylesMixin, VisibilityMixin,
+        StyleChildrenMixin, VisibilityMixin,
     },
     nodes::CompNode,
     paints::{CompPaint, SolidCompPaint},
-    styles::{FillCompStyle, StrokeCompStyle},
+    styles::{CompStyle, FillCompStyle, StrokeCompStyle},
 };
 use smallvec::SmallVec;
 use std::{collections::HashSet, error::Error};
@@ -42,8 +39,8 @@ pub struct SvgBundleChildrenChange {
 pub fn apply_node_children_changes(
     // https://bevyengine.org/learn/errors/
     mut queries: ParamSet<(
-        Query<(Entity, &Children, &mut NodeSvgBundleMixin), (With<CompNode>, Changed<Children>)>,
-        Query<&mut NodeSvgBundleMixin>,
+        Query<(Entity, &Children, &mut SvgBundleVariant), (With<CompNode>, Changed<Children>)>,
+        Query<&mut SvgBundleVariant, With<CompNode>>,
     )>,
 ) {
     let mut changes: SmallVec<[SvgBundleChildrenChange; 2]> = SmallVec::new();
@@ -51,54 +48,51 @@ pub fn apply_node_children_changes(
     // Query changes
     {
         let children_query = queries.p0();
-        for (entity, children, NodeSvgBundleMixin(bundle)) in children_query.iter() {
-            let node_children = match bundle.get_child_nodes() {
-                Some(node_children) => node_children,
-                None => return,
-            };
+        for (parent_entity, children, node_bundle_variant) in children_query.iter() {
+            if let Some(child_node_entities) = node_bundle_variant.get_child_node_entities() {
+                // Identify removed and newly added node entities
+                let current_entities_set: HashSet<Entity> =
+                    child_node_entities.iter().copied().collect();
+                let new_entities_set: HashSet<Entity> = children.iter().copied().collect();
+                let removed_entities: SmallVec<[Entity; 2]> = current_entities_set
+                    .difference(&new_entities_set)
+                    .copied()
+                    .collect();
+                let added_entities: SmallVec<[Entity; 2]> = new_entities_set
+                    .difference(&current_entities_set)
+                    .copied()
+                    .collect();
 
-            // Identify removed and newly added node entities
-            let current_node_children_set: HashSet<Entity> =
-                node_children.iter().copied().collect();
-            let new_node_children_set: HashSet<Entity> = children.iter().copied().collect();
-            let removed_node_children: SmallVec<[Entity; 2]> = current_node_children_set
-                .difference(&new_node_children_set)
-                .copied()
-                .collect();
-            let added_node_children: SmallVec<[Entity; 2]> = new_node_children_set
-                .difference(&current_node_children_set)
-                .copied()
-                .collect();
-
-            changes.push(SvgBundleChildrenChange {
-                parent_entity: entity,
-                added_entities: added_node_children,
-                removed_entities: removed_node_children,
-                new_entities_order: children.iter().copied().collect(),
-            });
+                changes.push(SvgBundleChildrenChange {
+                    parent_entity,
+                    added_entities,
+                    removed_entities,
+                    new_entities_order: children.iter().copied().collect(),
+                });
+            }
         }
     }
 
     // Apply detected changes (Deferred to avoid query conflicts)
     {
-        let mut node_bundle_query = queries.p1();
+        let mut node_bundle_variant_query = queries.p1();
         for change in changes {
             process_removed_node_children(
                 change.parent_entity,
                 &change.removed_entities,
-                &mut node_bundle_query,
+                &mut node_bundle_variant_query,
             )
             .unwrap();
             process_added_node_children(
                 change.parent_entity,
                 &change.added_entities,
-                &mut node_bundle_query,
+                &mut node_bundle_variant_query,
             )
             .unwrap();
             reorder_node_children(
                 change.parent_entity,
                 &change.new_entities_order,
-                &mut node_bundle_query,
+                &mut node_bundle_variant_query,
             )
             .unwrap();
         }
@@ -108,17 +102,21 @@ pub fn apply_node_children_changes(
 fn process_removed_node_children(
     parent_entity: Entity,
     removed_entities: &[Entity],
-    node_bundle_query: &mut Query<&mut NodeSvgBundleMixin>,
+    node_bundle_variant_query: &mut Query<&mut SvgBundleVariant, With<CompNode>>,
 ) -> Result<(), Box<dyn Error>> {
     for entity in removed_entities {
-        let [mut node_bundle_mixin, child_bundle_mixin] =
-            node_bundle_query.get_many_mut([parent_entity, *entity])?;
-        let NodeSvgBundleMixin(node_bundle) = node_bundle_mixin.as_mut();
-        let NodeSvgBundleMixin(child_bundle) = child_bundle_mixin.as_ref();
+        let [mut node_bundle_variant, child_node_bundle_variant] =
+            node_bundle_variant_query.get_many_mut([parent_entity, *entity])?;
 
-        if let Some(children_wrapper_element) = node_bundle.get_children_wrapper_element_mut() {
-            children_wrapper_element
-                .remove_child(child_bundle.get_svg_bundle().get_root_element().get_id());
+        if let Some(children_wrapper_element) =
+            node_bundle_variant.get_children_wrapper_element_mut()
+        {
+            children_wrapper_element.remove_child(
+                child_node_bundle_variant
+                    .get_svg_bundle()
+                    .get_root_element()
+                    .get_id(),
+            );
         }
     }
 
@@ -128,18 +126,20 @@ fn process_removed_node_children(
 fn process_added_node_children(
     parent_entity: Entity,
     added_entities: &[Entity],
-    node_bundle_query: &mut Query<&mut NodeSvgBundleMixin>,
+    node_bundle_variant_query: &mut Query<&mut SvgBundleVariant, With<CompNode>>,
 ) -> Result<(), Box<dyn Error>> {
     for entity in added_entities {
-        let [mut node_bundle_mixin, mut child_bundle_mixin] =
-            node_bundle_query.get_many_mut([parent_entity, *entity])?;
-        let NodeSvgBundleMixin(node_bundle) = node_bundle_mixin.as_mut();
-        let NodeSvgBundleMixin(child_bundle) = child_bundle_mixin.as_mut();
+        let [mut node_bundle_variant, mut child_node_bundle_variant] =
+            node_bundle_variant_query.get_many_mut([parent_entity, *entity])?;
 
-        if let Some(children_wrapper_element) = node_bundle.get_children_wrapper_element_mut() {
+        if let Some(children_wrapper_element) =
+            node_bundle_variant.get_children_wrapper_element_mut()
+        {
             children_wrapper_element.append_child_in_world_context(
                 *entity,
-                child_bundle.get_svg_bundle_mut().get_root_element_mut(),
+                child_node_bundle_variant
+                    .get_svg_bundle_mut()
+                    .get_root_element_mut(),
             );
         }
     }
@@ -150,32 +150,38 @@ fn process_added_node_children(
 fn reorder_node_children(
     parent_entity: Entity,
     new_entities_order: &[Entity],
-    node_bundle_query: &mut Query<&mut NodeSvgBundleMixin>,
+    node_bundle_variant_query: &mut Query<&mut SvgBundleVariant, With<CompNode>>,
 ) -> Result<(), Box<dyn Error>> {
     // Track the original positions of the node children
     #[cfg(feature = "output_svg_element_changes")]
     let original_positions: SmallVec<[(Entity, SvgElementId); 2]> = {
-        let NodeSvgBundleMixin(node_bundle) = node_bundle_query.get(parent_entity)?;
-        let node_children = node_bundle
-            .get_child_nodes()
+        let child_node_entities = node_bundle_variant_query
+            .get(parent_entity)?
+            .get_child_node_entities()
             .ok_or(NoneErr::new("Failed to retrieve node children!"))?;
-        node_children
+        child_node_entities
             .iter()
             .filter_map(|entity| {
-                let NodeSvgBundleMixin(bundle) = node_bundle_query.get(*entity).ok()?;
-                Some((*entity, bundle.get_svg_bundle().get_root_element().get_id()))
+                Some((
+                    *entity,
+                    node_bundle_variant_query
+                        .get(*entity)
+                        .ok()?
+                        .get_svg_bundle()
+                        .get_root_element()
+                        .get_id(),
+                ))
             })
             .collect()
     };
 
-    let mut bundle_mixin = node_bundle_query.get_mut(parent_entity)?;
-    let NodeSvgBundleMixin(node_bundle) = bundle_mixin.as_mut();
-    let node_children = node_bundle
-        .get_child_nodes_mut()
+    let mut node_bundle_variant = node_bundle_variant_query.get_mut(parent_entity)?;
+    let child_node_entities = node_bundle_variant
+        .get_child_node_entities_mut()
         .ok_or(NoneErr::new("Failed to retrieve node children!"))?;
 
     // Sort bundle children
-    node_children.sort_by_key(|bundle_child| {
+    child_node_entities.sort_by_key(|bundle_child| {
         new_entities_order
             .iter()
             .position(|entity| *bundle_child == *entity)
@@ -199,7 +205,7 @@ fn reorder_node_children(
 
             // If the child has been moved
             if original_index != new_index {
-                let children_wrapper_element = node_bundle
+                let children_wrapper_element = node_bundle_variant
                     .get_children_wrapper_element_mut()
                     .ok_or(NoneErr::new("Failed to retrieve children wrapper element!"))?;
                 let new_parent_id = children_wrapper_element.get_id();
@@ -229,55 +235,73 @@ fn reorder_node_children(
 
 pub fn apply_node_styles_changes(
     mut query: Query<
-        (&StylesMixin, &mut NodeSvgBundleMixin),
-        (With<CompNode>, Changed<StylesMixin>),
+        (&StyleChildrenMixin, &mut SvgBundleVariant),
+        (
+            With<CompNode>,
+            Without<CompStyle>,
+            Changed<StyleChildrenMixin>,
+        ),
     >,
-    mut style_bundle_query: Query<&mut StyleSvgBundleMixin>,
+    mut style_bundle_variant_query: Query<
+        &mut SvgBundleVariant,
+        (With<CompStyle>, Without<CompNode>),
+    >,
 ) {
-    for (StylesMixin(styles), mut node_bundle_mixin) in query.iter_mut() {
-        let NodeSvgBundleMixin(node_bundle) = node_bundle_mixin.as_mut();
-        let node_styles = match node_bundle.get_styles() {
-            Some(node_styles) => node_styles,
-            None => return,
-        };
+    for (StyleChildrenMixin(styles), mut node_bundle_variant) in query.iter_mut() {
+        if let Some(style_entities) = node_bundle_variant.get_style_entities() {
+            // Identify removed and newly added style entities
+            let current_entities_set: HashSet<Entity> = style_entities.iter().copied().collect();
+            let new_entities_set: HashSet<Entity> = styles.iter().copied().collect();
+            let mut removed_entities: SmallVec<[Entity; 2]> = current_entities_set
+                .difference(&new_entities_set)
+                .copied()
+                .collect();
+            let mut added_entities: SmallVec<[Entity; 2]> = new_entities_set
+                .difference(&current_entities_set)
+                .copied()
+                .collect();
 
-        // Identify removed and newly added style entities
-        let current_node_styles_set: HashSet<Entity> = node_styles.iter().copied().collect();
-        let new_node_styles_set: HashSet<Entity> = styles.iter().copied().collect();
-        let mut removed_node_styles: SmallVec<[Entity; 2]> = current_node_styles_set
-            .difference(&new_node_styles_set)
-            .copied()
-            .collect();
-        let mut added_node_styles: SmallVec<[Entity; 2]> = new_node_styles_set
-            .difference(&current_node_styles_set)
-            .copied()
-            .collect();
-
-        // Apply detected changes
-        process_removed_node_styles(
-            node_bundle,
-            &mut removed_node_styles,
-            &mut style_bundle_query,
-        )
-        .unwrap();
-        process_added_node_styles(node_bundle, &mut added_node_styles, &mut style_bundle_query)
+            // Apply detected changes
+            process_removed_node_styles(
+                node_bundle_variant.as_mut(),
+                &mut removed_entities,
+                &mut style_bundle_variant_query,
+            )
             .unwrap();
-        reorder_node_styles(node_bundle, &styles, &mut style_bundle_query).unwrap();
+            process_added_node_styles(
+                node_bundle_variant.as_mut(),
+                &mut added_entities,
+                &mut style_bundle_variant_query,
+            )
+            .unwrap();
+            reorder_node_styles(
+                node_bundle_variant.as_mut(),
+                &styles,
+                &mut style_bundle_variant_query,
+            )
+            .unwrap();
+        }
     }
 }
 
 fn process_removed_node_styles(
-    node_bundle: &mut NodeSvgBundle,
+    node_bundle_variant: &mut SvgBundleVariant,
     removed_entities: &[Entity],
-    style_bundle_query: &mut Query<&mut StyleSvgBundleMixin>,
+    style_bundle_variant_query: &mut Query<
+        &mut SvgBundleVariant,
+        (With<CompStyle>, Without<CompNode>),
+    >,
 ) -> Result<(), Box<dyn Error>> {
     for entity in removed_entities {
-        let mut style_bundle_mixin = style_bundle_query.get_mut(*entity)?;
-        let StyleSvgBundleMixin(style_bundle) = style_bundle_mixin.as_mut();
+        let mut style_bundle_variant = style_bundle_variant_query.get_mut(*entity)?;
 
-        if let Some(styles_wrapper_element) = node_bundle.get_styles_wrapper_element_mut() {
-            styles_wrapper_element
-                .remove_child(style_bundle.get_svg_bundle().get_root_element().get_id());
+        if let Some(styles_wrapper_element) = node_bundle_variant.get_styles_wrapper_element_mut() {
+            styles_wrapper_element.remove_child(
+                style_bundle_variant
+                    .get_svg_bundle()
+                    .get_root_element()
+                    .get_id(),
+            );
         }
     }
 
@@ -285,18 +309,22 @@ fn process_removed_node_styles(
 }
 
 fn process_added_node_styles(
-    node_bundle: &mut NodeSvgBundle,
+    node_bundle_variant: &mut SvgBundleVariant,
     added_entities: &[Entity],
-    style_bundle_query: &mut Query<&mut StyleSvgBundleMixin>,
+    style_bundle_variant_query: &mut Query<
+        &mut SvgBundleVariant,
+        (With<CompStyle>, Without<CompNode>),
+    >,
 ) -> Result<(), Box<dyn Error>> {
     for entity in added_entities {
-        let mut style_bundle_mixin = style_bundle_query.get_mut(*entity)?;
-        let StyleSvgBundleMixin(style_bundle) = style_bundle_mixin.as_mut();
+        let mut style_bundle_variant = style_bundle_variant_query.get_mut(*entity)?;
 
-        if let Some(styles_wrapper_element) = node_bundle.get_styles_wrapper_element_mut() {
+        if let Some(styles_wrapper_element) = node_bundle_variant.get_styles_wrapper_element_mut() {
             styles_wrapper_element.append_child_in_world_context(
                 *entity,
-                style_bundle.get_svg_bundle_mut().get_root_element_mut(),
+                style_bundle_variant
+                    .get_svg_bundle_mut()
+                    .get_root_element_mut(),
             );
         }
     }
@@ -305,31 +333,41 @@ fn process_added_node_styles(
 }
 
 fn reorder_node_styles(
-    node_bundle: &mut NodeSvgBundle,
+    node_bundle_variant: &mut SvgBundleVariant,
     new_entities_order: &[Entity],
-    style_bundle_query: &mut Query<&mut StyleSvgBundleMixin>,
+    style_bundle_variant_query: &mut Query<
+        &mut SvgBundleVariant,
+        (With<CompStyle>, Without<CompNode>),
+    >,
 ) -> Result<(), Box<dyn Error>> {
     // Track the original positions of the node styles
     #[cfg(feature = "output_svg_element_changes")]
     let original_positions: SmallVec<[(Entity, SvgElementId); 2]> = {
-        let node_styles = node_bundle
-            .get_styles()
+        let style_entities = node_bundle_variant
+            .get_style_entities()
             .ok_or(NoneErr::new("Failed to retrieve node styles!"))?;
-        node_styles
+        style_entities
             .iter()
             .filter_map(|entity| {
-                let StyleSvgBundleMixin(bundle) = style_bundle_query.get(*entity).ok()?;
-                Some((*entity, bundle.get_svg_bundle().get_root_element().get_id()))
+                Some((
+                    *entity,
+                    style_bundle_variant_query
+                        .get(*entity)
+                        .ok()?
+                        .get_svg_bundle()
+                        .get_root_element()
+                        .get_id(),
+                ))
             })
             .collect()
     };
 
-    let node_styles = node_bundle
-        .get_styles_mut()
+    let style_entities = node_bundle_variant
+        .get_style_entities_mut()
         .ok_or(NoneErr::new("Failed to retrieve node styles!"))?;
 
     // Sort bundle children
-    node_styles.sort_by_key(|bundle_child| {
+    style_entities.sort_by_key(|bundle_child| {
         new_entities_order
             .iter()
             .position(|entity| *bundle_child == *entity)
@@ -353,9 +391,10 @@ fn reorder_node_styles(
 
             // If the style has been moved
             if original_index != new_index {
-                let styles_wrapper_element = node_bundle
-                    .get_styles_wrapper_element_mut()
-                    .ok_or(NoneErr::new("Failed to retrieve styles wrapper element!"))?;
+                let styles_wrapper_element =
+                    node_bundle_variant
+                        .get_styles_wrapper_element_mut()
+                        .ok_or(NoneErr::new("Failed to retrieve styles wrapper element!"))?;
                 let new_parent_id = styles_wrapper_element.get_id();
 
                 // Determine insert_before_id based on the next sibling in the new order
@@ -382,161 +421,114 @@ fn reorder_node_styles(
 }
 
 pub fn apply_visibility_mixin_changes(
-    mut query: Query<
-        (&VisibilityMixin, &mut NodeSvgBundleMixin),
-        (With<CompNode>, Changed<VisibilityMixin>),
-    >,
+    mut query: Query<(&VisibilityMixin, &mut SvgBundleVariant), Changed<VisibilityMixin>>,
 ) {
-    for (VisibilityMixin(visibility), mut node_bundle_mixin) in query.iter_mut() {
-        let NodeSvgBundleMixin(node_bundle) = node_bundle_mixin.as_mut();
-        let element = match node_bundle {
-            NodeSvgBundle::Frame(bundle) => &mut bundle.root_g,
-            NodeSvgBundle::Shape(bundle) => &mut bundle.root_g,
-        };
-
+    for (VisibilityMixin(visibility), mut bundle_variant) in query.iter_mut() {
         let display = match visibility {
             Visibility::Visible => SvgDisplayStyle::Block,
             Visibility::Hidden => SvgDisplayStyle::None,
         };
-        element.set_style(SvgStyle::Display { display });
+        bundle_variant
+            .get_root_element_mut()
+            .set_style(SvgStyle::Display { display });
     }
 }
 
 pub fn apply_size_mixin_changes(
-    mut query: Query<(&SizeMixin, &mut NodeSvgBundleMixin), (With<CompNode>, Changed<SizeMixin>)>,
+    mut query: Query<(&SizeMixin, &mut SvgBundleVariant), Changed<SizeMixin>>,
 ) {
-    for (SizeMixin(size), mut node_bundle_mixin) in query.iter_mut() {
-        let NodeSvgBundleMixin(node_bundle) = node_bundle_mixin.as_mut();
+    for (SizeMixin(size), mut bundle_variant) in query.iter_mut() {
         let [width, height] = size.0.to_array();
 
-        // Apply dimension change to node
-        match node_bundle {
-            NodeSvgBundle::Frame(bundle) => {
-                bundle.root_g.set_attributes(vec![
-                    SvgAttribute::Width {
-                        width,
-                        unit: SvgMeasurementUnit::Pixel,
-                    },
-                    SvgAttribute::Height {
-                        height,
-                        unit: SvgMeasurementUnit::Pixel,
-                    },
-                ]);
-                bundle.click_area_rect.set_attributes(vec![
-                    SvgAttribute::Width {
-                        width,
-                        unit: SvgMeasurementUnit::Pixel,
-                    },
-                    SvgAttribute::Height {
-                        height,
-                        unit: SvgMeasurementUnit::Pixel,
-                    },
-                ]);
-            }
-            NodeSvgBundle::Shape(bundle) => {
-                bundle.root_g.set_attributes(vec![
-                    SvgAttribute::Width {
-                        width,
-                        unit: SvgMeasurementUnit::Pixel,
-                    },
-                    SvgAttribute::Height {
-                        height,
-                        unit: SvgMeasurementUnit::Pixel,
-                    },
-                ]);
-                bundle.click_area_rect.set_attributes(vec![
-                    SvgAttribute::Width {
-                        width,
-                        unit: SvgMeasurementUnit::Pixel,
-                    },
-                    SvgAttribute::Height {
-                        height,
-                        unit: SvgMeasurementUnit::Pixel,
-                    },
-                ]);
-            }
+        bundle_variant.get_root_element_mut().set_attributes(vec![
+            SvgAttribute::Width {
+                width,
+                unit: SvgMeasurementUnit::Pixel,
+            },
+            SvgAttribute::Height {
+                height,
+                unit: SvgMeasurementUnit::Pixel,
+            },
+        ]);
+        if let Some(click_area_element) = bundle_variant.get_click_area_element_mut() {
+            click_area_element.set_attributes(vec![
+                SvgAttribute::Width {
+                    width,
+                    unit: SvgMeasurementUnit::Pixel,
+                },
+                SvgAttribute::Height {
+                    height,
+                    unit: SvgMeasurementUnit::Pixel,
+                },
+            ]);
         }
     }
 }
 
 pub fn apply_transform_changes(
-    mut query: Query<(&Transform, &mut NodeSvgBundleMixin), (With<CompNode>, Changed<Transform>)>,
+    mut query: Query<(&Transform, &mut SvgBundleVariant), Changed<Transform>>,
 ) {
-    for (transform, mut node_bundle_mixin) in query.iter_mut() {
-        let NodeSvgBundleMixin(node_bundle) = node_bundle_mixin.as_mut();
-        let element = match node_bundle {
-            NodeSvgBundle::Frame(bundle) => &mut bundle.root_g,
-            NodeSvgBundle::Shape(bundle) => &mut bundle.root_g,
-        };
-
-        element.set_attribute(SvgAttribute::Transform {
-            transform: transform.into(),
-        });
+    for (transform, mut bundle_variant) in query.iter_mut() {
+        bundle_variant
+            .get_root_element_mut()
+            .set_attribute(SvgAttribute::Transform {
+                transform: transform.into(),
+            });
     }
 }
 
 pub fn apply_opacity_mixin_changes(
-    mut query: Query<
-        (&OpacityMixin, &mut NodeSvgBundleMixin),
-        (With<CompNode>, Changed<OpacityMixin>),
-    >,
+    mut query: Query<(&OpacityMixin, &mut SvgBundleVariant), Changed<OpacityMixin>>,
 ) {
-    for (OpacityMixin(opacity), mut node_bundle_mixin) in query.iter_mut() {
-        let NodeSvgBundleMixin(node_bundle) = node_bundle_mixin.as_mut();
-        let element = match node_bundle {
-            NodeSvgBundle::Frame(bundle) => &mut bundle.root_g,
-            NodeSvgBundle::Shape(bundle) => &mut bundle.root_g,
-        };
-
-        element.set_style(SvgStyle::Opacity {
-            opacity: opacity.0.get(),
-        });
+    for (OpacityMixin(opacity), mut bundle_variant) in query.iter_mut() {
+        bundle_variant
+            .get_root_element_mut()
+            .set_style(SvgStyle::Opacity {
+                opacity: opacity.0.get(),
+            });
     }
 }
 
 pub fn apply_blend_mode_mixin_changes(
-    mut query: Query<
-        (&BlendModeMixin, &mut NodeSvgBundleMixin),
-        (With<CompNode>, Changed<BlendModeMixin>),
-    >,
+    mut query: Query<(&BlendModeMixin, &mut SvgBundleVariant), Changed<BlendModeMixin>>,
 ) {
-    for (BlendModeMixin(blend_mode), mut node_bundle_mixin) in query.iter_mut() {
-        let NodeSvgBundleMixin(node_bundle) = node_bundle_mixin.as_mut();
-        let element = match node_bundle {
-            NodeSvgBundle::Frame(bundle) => &mut bundle.root_g,
-            NodeSvgBundle::Shape(bundle) => &mut bundle.root_g,
-        };
-
-        element.set_style(SvgStyle::BlendMode {
-            blend_mode: blend_mode.into(),
-        });
+    for (BlendModeMixin(blend_mode), mut bundle_variant) in query.iter_mut() {
+        bundle_variant
+            .get_root_element_mut()
+            .set_style(SvgStyle::BlendMode {
+                blend_mode: blend_mode.into(),
+            });
     }
 }
 
 pub fn apply_path_mixin_changes(
-    mut query: Query<(&PathMixin, &mut NodeSvgBundleMixin), (With<CompNode>, Changed<PathMixin>)>,
-    mut fill_style_bundle_query: Query<&mut StyleSvgBundleMixin, With<FillCompStyle>>,
+    mut query: Query<
+        (&PathMixin, &mut SvgBundleVariant),
+        (With<CompNode>, Without<CompPaint>, Changed<PathMixin>),
+    >,
+    mut style_bundle_query: Query<
+        &mut SvgBundleVariant,
+        (With<CompPaint>, Without<CompNode>, With<FillCompStyle>),
+    >,
 ) {
-    for (PathMixin(path), mut node_bundle_mixin) in query.iter_mut() {
-        let NodeSvgBundleMixin(node_bundle) = node_bundle_mixin.as_mut();
-
-        // Apply path to bundle
-        match node_bundle {
-            NodeSvgBundle::Frame(frame_bundle) => frame_bundle
+    for (PathMixin(path), mut node_bundle_variant) in query.iter_mut() {
+        // Apply path to node bundle
+        match node_bundle_variant.as_mut() {
+            SvgBundleVariant::Frame(bundle) => bundle
                 .children_clipped_path
                 .set_attribute(SvgAttribute::D { d: path.into() }),
             _ => {}
         }
 
-        // Apply path to styles
-        if let Some(styles) = node_bundle.get_styles_mut() {
-            for style_entity in styles.iter_mut() {
-                if let Ok(mut style_bundle_mixin) = fill_style_bundle_query.get_mut(*style_entity) {
-                    let StyleSvgBundleMixin(style_bundle) = style_bundle_mixin.as_mut();
-                    match style_bundle {
-                        StyleSvgBundle::Solid(solid_bundle) => solid_bundle
+        // Apply path to style bundles of node
+        if let Some(style_entities) = node_bundle_variant.get_style_entities() {
+            for style_entity in style_entities {
+                if let Ok(mut style_bundle_variant) = style_bundle_query.get_mut(*style_entity) {
+                    match style_bundle_variant.as_mut() {
+                        SvgBundleVariant::Solid(solid_bundle) => solid_bundle
                             .shape_path
                             .set_attribute(SvgAttribute::D { d: path.into() }),
+                        _ => {}
                     }
                 }
             }
@@ -546,36 +538,31 @@ pub fn apply_path_mixin_changes(
 
 pub fn apply_stroke_path_mixin_changes(
     mut query: Query<
-        (&StrokePathMixin, &mut StyleSvgBundleMixin),
+        (&StrokePathMixin, &mut SvgBundleVariant),
         (With<StrokeCompStyle>, Changed<StrokePathMixin>),
     >,
 ) {
-    for (StrokePathMixin(stroke_path), mut style_bundle_mixin) in query.iter_mut() {
-        let StyleSvgBundleMixin(style_bundle) = style_bundle_mixin.as_mut();
-
+    for (StrokePathMixin(stroke_path), mut bundle_variant) in query.iter_mut() {
         // Apply stroke path to styles
-        match style_bundle {
-            StyleSvgBundle::Solid(solid_bundle) => {
-                solid_bundle.shape_path.set_attribute(SvgAttribute::D {
-                    d: stroke_path.into(),
-                })
-            }
+        match bundle_variant.as_mut() {
+            SvgBundleVariant::Solid(bundle) => bundle.shape_path.set_attribute(SvgAttribute::D {
+                d: stroke_path.into(),
+            }),
+            _ => {}
         }
     }
 }
 
 pub fn apply_solid_paint_changes(
     query: Query<(&SolidCompPaint, &PaintParentMixin), (With<CompPaint>, Changed<SolidCompPaint>)>,
-    mut style_bundle_query: Query<&mut StyleSvgBundleMixin>,
+    mut bundle_query: Query<&mut SvgBundleVariant>,
 ) {
-    for (solid_paint, PaintParentMixin(node_entities)) in query.iter() {
-        for node_entity in node_entities {
-            if let Ok(mut style_bundle_mixin) = style_bundle_query.get_mut(*node_entity) {
-                let StyleSvgBundleMixin(style_bundle) = style_bundle_mixin.as_mut();
-
-                match style_bundle {
-                    StyleSvgBundle::Solid(solid_bundle) => {
-                        solid_bundle.shape_path.set_style(SvgStyle::Fill {
+    for (solid_paint, PaintParentMixin(parent_entities)) in query.iter() {
+        for parent_entity in parent_entities {
+            if let Ok(mut bundle_variant) = bundle_query.get_mut(*parent_entity) {
+                match bundle_variant.as_mut() {
+                    SvgBundleVariant::Solid(bundle) => {
+                        bundle.shape_path.set_style(SvgStyle::Fill {
                             fill: SvgFillStyle::RGB {
                                 red: solid_paint.color.red,
                                 green: solid_paint.color.green,
@@ -583,6 +570,7 @@ pub fn apply_solid_paint_changes(
                             },
                         })
                     }
+                    _ => {}
                 }
             }
         }

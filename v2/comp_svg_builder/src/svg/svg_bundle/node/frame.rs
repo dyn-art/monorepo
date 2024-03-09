@@ -22,9 +22,9 @@ pub struct FrameNodeSvgBundle {
     /**//**//**/ pub children_clipped_path: SvgElement,
     /**/ pub click_area_rect: SvgElement,
     /**/ pub styles_wrapper_g: SvgElement,
-    /**//**/ pub styles: SmallVec<[Entity; 2]>,
+    /**//**/ pub style_entities: SmallVec<[Entity; 2]>,
     /**/ pub children_wrapper_g: SvgElement,
-    /**//**/ pub child_nodes: SmallVec<[Entity; 2]>,
+    /**//**/ pub child_node_entities: SmallVec<[Entity; 2]>,
 }
 
 impl SvgBundle for FrameNodeSvgBundle {
@@ -150,9 +150,9 @@ impl FrameNodeSvgBundle {
             children_clipped_path: children_clipped_path_element,
             click_area_rect: click_area_rect_element,
             styles_wrapper_g: styles_wrapper_g_element,
-            styles: SmallVec::new(),
+            style_entities: SmallVec::new(),
             children_wrapper_g: children_wrapper_g_element,
-            child_nodes: SmallVec::new(),
+            child_node_entities: SmallVec::new(),
         }
     }
 

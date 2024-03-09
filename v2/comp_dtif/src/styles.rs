@@ -2,7 +2,7 @@ use crate::{dtif_injector::DtifInjector, ToEcsBundleImpl};
 use dyn_comp_common::{
     bundles::{FillStyleBundle, StrokeStyleBundle},
     common::{BlendMode, Opacity, Visibility},
-    mixins::{BlendModeMixin, OpacityMixin, PaintMixin, VisibilityMixin},
+    mixins::{BlendModeMixin, OpacityMixin, PaintChildMixin, VisibilityMixin},
     styles::{CompStyle, CompStyleVariant, FillCompStyle, StrokeCompStyle},
 };
 
@@ -34,7 +34,7 @@ impl ToEcsBundleImpl for FillStyle {
                 variant: CompStyleVariant::Fill,
             },
             fill: FillCompStyle,
-            paint: PaintMixin(
+            paint: PaintChildMixin(
                 dtif_injector
                     .get_sid_to_entity()
                     .get(&self.paint_id)
@@ -74,7 +74,7 @@ impl ToEcsBundleImpl for StrokeStyle {
                     ..Default::default()
                 },
             },
-            paint: PaintMixin(
+            paint: PaintChildMixin(
                 dtif_injector
                     .get_sid_to_entity()
                     .get(&self.paint_id)

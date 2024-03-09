@@ -1,7 +1,9 @@
-use super::SvgBundle;
 use crate::{
     resources::svg_context::SvgContextRes,
-    svg::svg_element::{SvgElement, SvgElementId, SvgTag},
+    svg::{
+        svg_bundle::SvgBundle,
+        svg_element::{SvgElement, SvgElementId, SvgTag},
+    },
 };
 use bevy_ecs::entity::Entity;
 

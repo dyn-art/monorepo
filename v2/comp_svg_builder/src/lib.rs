@@ -85,7 +85,8 @@ impl Plugin for CompSvgBuilderPlugin {
                 output_event_sender::OutputEventSenderRes,
             };
             use crate::systems::{
-                extract::extract_svg_node_bundles, queue::queue_svg_bundle_changes,
+                extract::{extract_node_bundles, extract_style_bundles},
+                queue::queue_svg_bundle_changes,
             };
 
             // Register resources
@@ -96,7 +97,8 @@ impl Plugin for CompSvgBuilderPlugin {
             app.add_systems(
                 Last,
                 (
-                    extract_svg_node_bundles.in_set(CompSvgBuilderSystemSet::Extract),
+                    extract_node_bundles.in_set(CompSvgBuilderSystemSet::Extract),
+                    extract_style_bundles.in_set(CompSvgBuilderSystemSet::Extract),
                     queue_svg_bundle_changes.in_set(CompSvgBuilderSystemSet::Queue),
                 ),
             );
