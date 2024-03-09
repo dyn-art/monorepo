@@ -101,6 +101,7 @@ impl DtifInjector {
         // Process child nodes and collect their Bevy entity ids
         let child_entities: Vec<Entity> = dtif_children
             .iter()
+            .rev()
             .filter_map(|child_sid| self.process_node(child_sid.clone(), dtif, world))
             .collect();
 
@@ -120,6 +121,7 @@ impl DtifInjector {
         // Process styles and collect their Bevy entity ids
         let style_entities: SmallVec<[Entity; 2]> = dtif_styles
             .iter()
+            .rev()
             .filter_map(|style| self.process_style(style, node_entity, world))
             .collect();
 

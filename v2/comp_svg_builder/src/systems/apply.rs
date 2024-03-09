@@ -158,7 +158,7 @@ fn reorder_node_children(
 ) -> Result<(), Box<dyn Error>> {
     // Track the original positions of the node children
     #[cfg(feature = "output_svg_element_changes")]
-    let original_positions: SmallVec<[(Entity, SvgElementId); 2]> = {
+    let original_positions: SmallVec<[SvgElementId; 2]> = {
         let child_node_entities = node_bundle_variant_query
             .get(parent_entity)?
             .get_child_node_entities()
@@ -166,15 +166,14 @@ fn reorder_node_children(
         child_node_entities
             .iter()
             .filter_map(|entity| {
-                Some((
-                    *entity,
+                Some(
                     node_bundle_variant_query
                         .get(*entity)
                         .ok()?
                         .get_svg_bundle()
                         .get_root_element()
                         .get_id(),
-                ))
+                )
             })
             .collect()
     };
@@ -184,23 +183,20 @@ fn reorder_node_children(
         .get_child_node_entities_mut()
         .ok_or(NoneErr::new("Failed to retrieve node children!"))?;
 
-    // Apply new order
+    // Apply new order to bundle
     child_node_entities.clear();
     child_node_entities.extend(new_entities_order.iter().copied());
 
     #[cfg(feature = "output_svg_element_changes")]
     {
         // Determine the new positions after sorting
-        let new_positions = original_positions
-            .iter()
-            .map(|(_, id)| *id)
-            .collect::<Vec<_>>();
+        let new_positions: Vec<SvgElementId> = original_positions.iter().map(|id| *id).collect();
 
         // Emit SvgElementReorderedChange events for node children that have been moved
         for (new_index, &element_id) in new_positions.iter().enumerate() {
             let original_index = original_positions
                 .iter()
-                .position(|(_, e)| *e == element_id)
+                .position(|id| *id == element_id)
                 .unwrap_or(new_index);
 
             // If the child has been moved
@@ -346,22 +342,21 @@ fn reorder_node_styles(
 ) -> Result<(), Box<dyn Error>> {
     // Track the original positions of the node styles
     #[cfg(feature = "output_svg_element_changes")]
-    let original_positions: SmallVec<[(Entity, SvgElementId); 2]> = {
+    let original_positions: SmallVec<[SvgElementId; 2]> = {
         let style_entities = node_bundle_variant
             .get_style_entities()
             .ok_or(NoneErr::new("Failed to retrieve node styles!"))?;
         style_entities
             .iter()
             .filter_map(|entity| {
-                Some((
-                    *entity,
+                Some(
                     style_bundle_variant_query
                         .get(*entity)
                         .ok()?
                         .get_svg_bundle()
                         .get_root_element()
                         .get_id(),
-                ))
+                )
             })
             .collect()
     };
@@ -370,23 +365,20 @@ fn reorder_node_styles(
         .get_style_entities_mut()
         .ok_or(NoneErr::new("Failed to retrieve node styles!"))?;
 
-    // Apply new order
+    // Apply new order to bundle
     style_entities.clear();
     style_entities.extend(new_entities_order.iter().copied());
 
     #[cfg(feature = "output_svg_element_changes")]
     {
         // Determine the new positions after sorting
-        let new_positions = original_positions
-            .iter()
-            .map(|(_, id)| *id)
-            .collect::<Vec<_>>();
+        let new_positions: Vec<SvgElementId> = original_positions.iter().map(|id| *id).collect();
 
         // Emit SvgElementReorderedChange events for node styles that have been moved
         for (new_index, &element_id) in new_positions.iter().enumerate() {
             let original_index = original_positions
                 .iter()
-                .position(|(_, e)| *e == element_id)
+                .position(|id| *id == element_id)
                 .unwrap_or(new_index);
 
             // If the style has been moved

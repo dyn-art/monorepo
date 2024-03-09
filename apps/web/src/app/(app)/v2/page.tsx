@@ -43,6 +43,13 @@ const DEFAULT_DTIF: COMP.CompDtif = {
 			cornerRadii: [0, 20, 0, 0],
 			styles: [
 				{
+					type: 'Stroke',
+					width: 5,
+					blendMode: 'Normal',
+					opacity: 1,
+					paintId: 'p3'
+				},
+				{
 					type: 'Fill',
 					blendMode: 'Normal',
 					opacity: 0.5,
@@ -56,10 +63,10 @@ const DEFAULT_DTIF: COMP.CompDtif = {
 				},
 				{
 					type: 'Stroke',
-					width: 5,
+					width: 20,
 					blendMode: 'Normal',
 					opacity: 1,
-					paintId: 'p3'
+					paintId: 'p2'
 				}
 			],
 			opacity: 1,
