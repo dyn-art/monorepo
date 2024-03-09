@@ -3,7 +3,9 @@ pub mod conversions;
 pub mod element_changes;
 pub mod styles;
 
-use self::{attributes::SvgAttribute, styles::SvgStyle};
+use self::{
+    attributes::SvgAttribute, element_changes::SvgElementReorderedChange, styles::SvgStyle,
+};
 use super::svg_bundle::{SvgBundle, SvgBundleVariant};
 use bevy_ecs::{component::Component, entity::Entity, query::Without, system::Query};
 use dyn_comp_common::mixins::Root;
@@ -178,6 +180,48 @@ impl SvgElement {
 
     pub fn clear_children(&mut self) {
         self.children.clear()
+    }
+
+    pub fn swap(&mut self, element_id_1: SvgElementId, element_id_2: SvgElementId) {
+        let index_1 = self
+            .children
+            .iter()
+            .position(|&element_child| element_child.id == element_id_1);
+        let index_2 = self
+            .children
+            .iter()
+            .position(|&element_child| element_child.id == element_id_2);
+
+        if let (Some(i1), Some(i2)) = (index_1, index_2) {
+            // Perform the actual swap in the children vector
+            self.children.swap(i1, i2);
+
+            // For each element, determine the insert_before_id based on the swap
+            let insert_before_id_1 = self
+                .children
+                .get(i2 + 1)
+                .map(|element_child| element_child.id);
+            let insert_before_id_2 = self
+                .children
+                .get(i1 + 1)
+                .map(|element_child| element_child.id);
+
+            // Register changes for both elements
+            self.register_change(SvgElementChange::ElementReordered(
+                SvgElementReorderedChange {
+                    element_id: element_id_1,
+                    new_parent_id: self.get_id(),
+                    insert_before_id: insert_before_id_1,
+                },
+            ));
+            self.register_change(SvgElementChange::ElementReordered(
+                SvgElementReorderedChange {
+                    element_id: element_id_2,
+                    new_parent_id: self.get_id(),
+                    insert_before_id: insert_before_id_2,
+                },
+            ));
+        }
     }
 
     // =========================================================================

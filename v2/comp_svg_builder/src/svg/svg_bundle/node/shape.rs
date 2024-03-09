@@ -79,7 +79,10 @@ impl ShapeNodeSvgBundle {
             use crate::svg::svg_element::styles::SvgFillStyle;
 
             root_g_element.set_attribute(SvgAttribute::Class {
-                class: Self::create_element_name(root_g_element.get_id(), "root"),
+                class: Self::create_element_name(
+                    root_g_element.get_id(),
+                    &format!("root-{:?}", entity),
+                ),
             });
             defs_element.set_attribute(SvgAttribute::Class {
                 class: Self::create_element_name(defs_element.get_id(), "defs"),
