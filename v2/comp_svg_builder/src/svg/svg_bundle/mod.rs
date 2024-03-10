@@ -40,20 +40,27 @@ pub trait SvgBundle: Debug {
     fn get_entity(&self) -> &Entity;
 
     #[cfg(feature = "output_svg_element_changes")]
-    fn drain_changes(&mut self) -> Vec<SvgElementChanges> {
-        let mut drained_changes: Vec<SvgElementChanges> = Vec::new();
+    fn drain_changes(&mut self) -> (Vec<SvgElementChanges>, Vec<SvgElementChanges>) {
+        let mut elements_changes: Vec<SvgElementChanges> = Vec::new();
+        let mut deferred_elements_changes: Vec<SvgElementChanges> = Vec::new();
 
         for element in self.elements_iter_mut() {
-            let changes = element.drain_changes();
-            if !changes.is_empty() {
-                drained_changes.push(SvgElementChanges {
+            let (element_changes, deferred_element_changes) = element.drain_changes();
+            if !element_changes.is_empty() {
+                elements_changes.push(SvgElementChanges {
                     id: element.get_id(),
-                    changes,
+                    changes: element_changes,
+                });
+            }
+            if !deferred_element_changes.is_empty() {
+                deferred_elements_changes.push(SvgElementChanges {
+                    id: element.get_id(),
+                    changes: deferred_element_changes,
                 });
             }
         }
 
-        return drained_changes;
+        return (elements_changes, deferred_elements_changes);
     }
 }
 

@@ -197,7 +197,7 @@ export class SvgRenderer extends Renderer {
 				}
 				case 'ElementAppended': {
 					const toAppendElement = getElement();
-					const parentElement = this._svgElementMap.get(elementChanges.id);
+					const parentElement = this._svgElementMap.get(change.parentId);
 					if (parentElement != null && toAppendElement != null) {
 						parentElement.appendChild(toAppendElement);
 					} else {
@@ -251,26 +251,23 @@ export class SvgRenderer extends Renderer {
 					}
 					break;
 				}
-				case 'ElementReordered': {
-					const elementToReorder = this._svgElementMap.get(change.elementId);
-					const newParentElement = this._svgElementMap.get(change.newParentId);
-					if (elementToReorder != null && newParentElement != null) {
-						if (change.insertBeforeId != null) {
-							const insertBeforeElement = this._svgElementMap.get(change.insertBeforeId);
-							if (insertBeforeElement != null) {
-								newParentElement.insertBefore(elementToReorder, insertBeforeElement);
+				case 'ElementChildrenReordered': {
+					const elementToUpdate = getElement();
+					if (elementToUpdate != null) {
+						// Iterate over the 'order' array and append each child to 'elementToUpdate'
+						// in the new order. This effectively reorders the children.
+						for (const id of change.newOrder) {
+							const childElement = document.getElementById(id.toString());
+							if (childElement != null) {
+								elementToUpdate.appendChild(childElement);
+							} else {
+								console.error(`Failed to query child element (${id}) to reorder!`);
 							}
-							// If insertBeforeId is not found, append at the end as fallback
-							else {
-								newParentElement.appendChild(elementToReorder);
-							}
-						}
-						// If insertBeforeId is null, append at the end
-						else {
-							newParentElement.appendChild(elementToReorder);
 						}
 					} else {
-						console.error(`Failed to query element (${elementChanges.id}) to reorder!`);
+						console.error(
+							`Failed to query element (${elementChanges.id}) to apply new children order (${change.newOrder})!`
+						);
 					}
 					break;
 				}

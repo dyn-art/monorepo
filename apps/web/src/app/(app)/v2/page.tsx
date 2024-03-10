@@ -52,20 +52,20 @@ const DEFAULT_DTIF: COMP.CompDtif = {
 				{
 					type: 'Fill',
 					blendMode: 'Normal',
-					opacity: 0.5,
+					opacity: 0.9,
 					paintId: 'p2'
 				},
 				{
 					type: 'Fill',
 					blendMode: 'Normal',
-					opacity: 1.0,
+					opacity: 0.8,
 					paintId: 'p1'
 				},
 				{
 					type: 'Stroke',
 					width: 20,
 					blendMode: 'Normal',
-					opacity: 1,
+					opacity: 0.7,
 					paintId: 'p2'
 				}
 			],

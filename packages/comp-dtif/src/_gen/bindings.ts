@@ -284,11 +284,16 @@ export type SvgDisplayStyle = "Block" | "None"
  */
 export type SvgElementAppendedChange = { parentId: SvgElementId }
 
-export type SvgElementChange = ({ type: "ElementCreated" } & SvgElementCreatedChange) | ({ type: "ElementDeleted" }) | ({ type: "ElementAppended" } & SvgElementAppendedChange) | ({ type: "AttributeUpdated" } & SvgAttributeUpdatedChange) | ({ type: "AttributeRemoved" } & SvgAttributeRemovedChange) | ({ type: "StyleUpdated" } & SvgStyleUpdatedChange) | ({ type: "StyleRemoved" } & SvgStyleRemovedChange) | ({ type: "ElementReordered" } & SvgElementReorderedChange)
+export type SvgElementChange = ({ type: "ElementCreated" } & SvgElementCreatedChange) | ({ type: "ElementDeleted" }) | ({ type: "ElementAppended" } & SvgElementAppendedChange) | ({ type: "AttributeUpdated" } & SvgAttributeUpdatedChange) | ({ type: "AttributeRemoved" } & SvgAttributeRemovedChange) | ({ type: "StyleUpdated" } & SvgStyleUpdatedChange) | ({ type: "StyleRemoved" } & SvgStyleRemovedChange) | ({ type: "ElementChildrenReordered" } & SvgElementChildrenReorderedChange)
 
 export type SvgElementChanges = { id: SvgElementId; changes: SvgElementChange[] }
 
 export type SvgElementChangesOutputEvent = { changes: SvgElementChanges }
+
+/**
+ * Emitted when children of a SvgElement are reordered.
+ */
+export type SvgElementChildrenReorderedChange = { newOrder: SvgElementId[] }
 
 /**
  * Emitted when a new SvgElement is created.
@@ -301,11 +306,6 @@ export type SvgElementCreatedChange = { tagName: string; attributes: ([string, s
 export type SvgElementDeletedChange = Record<string, never>
 
 export type SvgElementId = number
-
-/**
- * Emitted when an SvgElement is reordered within its parent.
- */
-export type SvgElementReorderedChange = { elementId: SvgElementId; newParentId: SvgElementId; insertBeforeId: SvgElementId | null }
 
 export type SvgFillAttribute = { RGB: { red: number; green: number; blue: number } } | { RGBA: { red: number; green: number; blue: number; alpha: number } } | { Reference: { id: SvgElementId } }
 

@@ -25,37 +25,43 @@ pub fn extract_node_bundles(
     child_query: Query<&Children>,
 ) {
     for (entity, mut bundle_variant, maybe_parent) in query.iter_mut() {
-        let changes = bundle_variant.get_svg_bundle_mut().drain_changes();
-        if changes.is_empty() {
-            return;
+        let (elements_changes, deferred_elements_changes) =
+            bundle_variant.get_svg_bundle_mut().drain_changes();
+
+        if !elements_changes.is_empty() {
+            // Try to get parent entity and the current entity's position in the parent's children array
+            let (parent_entity, index) =
+                if let Some(parent_entity) = maybe_parent.map(|parent| parent.get()) {
+                    if let Ok(children) = child_query.get(parent_entity) {
+                        children
+                            .iter()
+                            .position(|&child| child == entity)
+                            .map(|index| (Some(parent_entity), index))
+                            .unwrap_or((Some(parent_entity), 0))
+                    }
+                    // No children found, default index to 0
+                    else {
+                        (Some(parent_entity), 0)
+                    }
+                }
+                // No parent, so no index
+                else {
+                    (None, 0)
+                };
+
+            changed_svg_bundles_res.push_change(ChangedSvgBundle {
+                entity,
+                parent_entity,
+                elements_changes,
+                index,
+            });
         }
 
-        // Try to get parent entity and the current entity's position in the parent's children array
-        let (parent_entity, index) =
-            if let Some(parent_entity) = maybe_parent.map(|parent| parent.get()) {
-                if let Ok(children) = child_query.get(parent_entity) {
-                    children
-                        .iter()
-                        .position(|&child| child == entity)
-                        .map(|index| (Some(parent_entity), index))
-                        .unwrap_or((Some(parent_entity), 0))
-                }
-                // No children found, default index to 0
-                else {
-                    (Some(parent_entity), 0)
-                }
+        if !deferred_elements_changes.is_empty() {
+            for deferred_change in deferred_elements_changes {
+                changed_svg_bundles_res.push_deferred_change(deferred_change);
             }
-            // No parent, so no index
-            else {
-                (None, 0)
-            };
-
-        changed_svg_bundles_res.push_change(ChangedSvgBundle {
-            entity,
-            parent_entity,
-            elements_changes: changes,
-            index,
-        });
+        }
     }
 }
 
@@ -68,37 +74,43 @@ pub fn extract_style_bundles(
     child_query: Query<&StyleChildrenMixin>,
 ) {
     for (entity, mut bundle_variant, maybe_parent) in query.iter_mut() {
-        let changes = bundle_variant.get_svg_bundle_mut().drain_changes();
-        if changes.is_empty() {
-            return;
+        let (elements_changes, deferred_elements_changes) =
+            bundle_variant.get_svg_bundle_mut().drain_changes();
+
+        if !elements_changes.is_empty() {
+            // Try to get parent entity and the current entity's position in the parent's children array
+            let (parent_entity, index) =
+                if let Some(parent_entity) = maybe_parent.map(|parent| parent.0) {
+                    if let Ok(children) = child_query.get(parent_entity) {
+                        children
+                            .0
+                            .iter()
+                            .position(|&child| child == entity)
+                            .map(|index| (Some(parent_entity), index))
+                            .unwrap_or((Some(parent_entity), 0))
+                    }
+                    // No children found, default index to 0
+                    else {
+                        (Some(parent_entity), 0)
+                    }
+                }
+                // No parent, so no index
+                else {
+                    (None, 0)
+                };
+
+            changed_svg_bundles_res.push_change(ChangedSvgBundle {
+                entity,
+                parent_entity,
+                elements_changes,
+                index,
+            });
         }
 
-        // Try to get parent entity and the current entity's position in the parent's children array
-        let (parent_entity, index) =
-            if let Some(parent_entity) = maybe_parent.map(|parent| parent.0) {
-                if let Ok(children) = child_query.get(parent_entity) {
-                    children
-                        .0
-                        .iter()
-                        .position(|&child| child == entity)
-                        .map(|index| (Some(parent_entity), index))
-                        .unwrap_or((Some(parent_entity), 0))
-                }
-                // No children found, default index to 0
-                else {
-                    (Some(parent_entity), 0)
-                }
+        if !deferred_elements_changes.is_empty() {
+            for deferred_change in deferred_elements_changes {
+                changed_svg_bundles_res.push_deferred_change(deferred_change);
             }
-            // No parent, so no index
-            else {
-                (None, 0)
-            };
-
-        changed_svg_bundles_res.push_change(ChangedSvgBundle {
-            entity,
-            parent_entity,
-            elements_changes: changes,
-            index,
-        });
+        }
     }
 }
