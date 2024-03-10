@@ -2,7 +2,6 @@ use crate::svg::{
     svg_bundle::SvgBundleVariant,
     svg_element::{
         attributes::{SvgAttribute, SvgMeasurementUnit},
-        element_changes::{SvgElementChange, SvgElementReorderedChange},
         styles::{SvgDisplayStyle, SvgFillStyle, SvgStyle},
         SvgElementId,
     },
@@ -122,7 +121,9 @@ fn process_removed_node_children(
             );
         }
 
-        // Note: child_node_entities are synced in "reorder_node_children()"
+        if let Some(child_node_entities) = node_bundle_variant.get_child_node_entities_mut() {
+            child_node_entities.retain(|e| *e != *entity);
+        }
     }
 
     return Ok(());
@@ -148,86 +149,66 @@ fn process_added_node_children(
             );
         }
 
-        // Note: child_node_entities are synced in "reorder_node_children()"
+        if let Some(child_node_entities) = node_bundle_variant.get_child_node_entities_mut() {
+            child_node_entities.push(*entity);
+        }
     }
 
     return Ok(());
 }
 
+// TODO: Improve reorder algo
 fn reorder_node_children(
     parent_entity: Entity,
     new_entities_order: &[Entity],
     node_bundle_variant_query: &mut Query<&mut SvgBundleVariant, With<CompNode>>,
 ) -> Result<(), Box<dyn Error>> {
-    // Track the original positions of the node children
-    #[cfg(feature = "output_svg_element_changes")]
-    let original_positions: SmallVec<[SvgElementId; 2]> = node_bundle_variant_query
+    // Mapping from entity to SvgElementId
+    let mut entity_to_svg_element_id: HashMap<Entity, SvgElementId> = HashMap::new();
+    let child_node_entities = node_bundle_variant_query
         .get(parent_entity)?
         .get_child_node_entities()
-        .ok_or(NoneErr::new("Failed to retrieve node children!"))?
-        .iter()
-        .filter_map(|entity| {
-            Some(
-                node_bundle_variant_query
-                    .get(*entity)
-                    .ok()?
-                    .get_svg_bundle()
-                    .get_root_element()
-                    .get_id(),
-            )
-        })
-        .collect();
+        .ok_or(NoneErr::new("Failed to retrieve node children!"))?;
+    for &entity in child_node_entities {
+        let element_id = node_bundle_variant_query
+            .get(entity)?
+            .get_svg_bundle()
+            .get_root_element()
+            .get_id();
+        entity_to_svg_element_id.insert(entity, element_id);
+    }
 
     let mut node_bundle_variant = node_bundle_variant_query.get_mut(parent_entity)?;
-    let child_node_entities = node_bundle_variant
+
+    // Determine swaps required to achieve the new order
+    let current_order = node_bundle_variant
         .get_child_node_entities_mut()
         .ok_or(NoneErr::new("Failed to retrieve node children!"))?;
-
-    // Apply new order to bundle
-    child_node_entities.clear();
-    child_node_entities.extend(new_entities_order.iter().copied());
-
-    #[cfg(feature = "output_svg_element_changes")]
-    {
-        // Determine the new positions after sorting
-        let new_positions: Vec<SvgElementId> = original_positions.iter().copied().collect();
-
-        // Emit SvgElementReorderedChange events for node children that have been moved
-        for (new_index, &element_id) in new_positions.iter().enumerate() {
-            let original_index = original_positions
-                .iter()
-                .position(|id| *id == element_id)
-                .unwrap_or(new_index);
-
-            // If the child has been moved
-            if original_index != new_index {
-                let children_wrapper_element = node_bundle_variant
-                    .get_children_wrapper_element_mut()
-                    .ok_or(NoneErr::new("Failed to retrieve children wrapper element!"))?;
-                let new_parent_id = children_wrapper_element.get_id();
-
-                // Determine insert_before_id based on the next sibling in the new order
-                let insert_before_id = if new_index + 1 < new_positions.len() {
-                    // There is a next sibling, get its ID
-                    Some(new_positions[new_index + 1])
-                } else {
-                    // No next sibling, append at the end
-                    None
-                };
-
-                children_wrapper_element.register_change(
-                    SvgElementChange::ElementReordered(SvgElementReorderedChange {
-                        element_id,
-                        new_parent_id,
-                        insert_before_id,
-                    }),
-                    true,
-                );
-            }
+    let mut swaps: Vec<(SvgElementId, SvgElementId)> = Vec::new();
+    for (new_index, &entity) in new_entities_order.iter().enumerate() {
+        let current_index = current_order.iter().position(|&e| e == entity).unwrap();
+        if current_index != new_index {
+            let swap_entity = current_order[new_index];
+            let element_id_1 = *entity_to_svg_element_id
+                .get(&entity)
+                .ok_or(NoneErr::new("Entity to SvgElementId mapping failed!"))?;
+            let element_id_2 = *entity_to_svg_element_id
+                .get(&swap_entity)
+                .ok_or(NoneErr::new("Entity to SvgElementId mapping failed!"))?;
+            swaps.push((element_id_1, element_id_2));
+            current_order.swap(new_index, current_index);
         }
     }
 
-    return Ok(());
+    // Apply swaps
+    let children_wrapper_element = node_bundle_variant
+        .get_children_wrapper_element_mut()
+        .ok_or(NoneErr::new("Failed to retrieve children wrapper element!"))?;
+    for (element_id_1, element_id_2) in swaps {
+        children_wrapper_element.swap(element_id_1, element_id_2);
+    }
+
+    Ok(())
 }
 
 pub fn apply_node_styles_changes(
@@ -304,7 +285,7 @@ fn process_removed_node_styles(
         }
 
         if let Some(style_entities) = node_bundle_variant.get_style_entities_mut() {
-            style_entities.retain(|style_entity| *style_entity != *entity);
+            style_entities.retain(|e| *e != *entity);
         }
     }
 
@@ -339,6 +320,7 @@ fn process_added_node_styles(
     return Ok(());
 }
 
+// TODO: Improve reorder algo
 fn reorder_node_styles(
     node_bundle_variant: &mut SvgBundleVariant,
     new_entities_order: &[Entity],
@@ -349,10 +331,10 @@ fn reorder_node_styles(
 ) -> Result<(), Box<dyn Error>> {
     // Mapping from entity to SvgElementId
     let mut entity_to_svg_element_id: HashMap<Entity, SvgElementId> = HashMap::new();
-    for &entity in node_bundle_variant
+    let style_entities = node_bundle_variant
         .get_style_entities()
-        .ok_or(NoneErr::new("Failed to retrieve node styles!"))?
-    {
+        .ok_or(NoneErr::new("Failed to retrieve node styles!"))?;
+    for &entity in style_entities {
         let element_id = style_bundle_variant_query
             .get(entity)?
             .get_svg_bundle()
@@ -388,8 +370,6 @@ fn reorder_node_styles(
     for (element_id_1, element_id_2) in swaps {
         styles_wrapper_element.swap(element_id_1, element_id_2);
     }
-
-    // TODO: Swaps are applied when style_wrapper is created so before the to swap elements exist
 
     Ok(())
 }

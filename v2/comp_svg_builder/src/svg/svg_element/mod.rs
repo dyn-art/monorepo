@@ -261,7 +261,7 @@ impl SvgElement {
     }
 
     #[cfg(feature = "output_svg_element_changes")]
-    pub fn register_change(&mut self, element_change: SvgElementChange, deferred: bool) {
+    fn register_change(&mut self, element_change: SvgElementChange, deferred: bool) {
         // Try to minimize events if element was created by applying changes to the ElementCreated event
         if self.was_created_in_current_update_cycle && !deferred {
             if let Some(update) = self.changes.first_mut() {
