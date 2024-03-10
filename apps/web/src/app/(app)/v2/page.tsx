@@ -59,7 +59,7 @@ const DEFAULT_DTIF: COMP.CompDtif = {
 					type: 'Fill',
 					blendMode: 'Normal',
 					opacity: 0.8,
-					paintId: 'p1'
+					paintId: 'p4'
 				},
 				{
 					type: 'Stroke',
@@ -99,6 +99,28 @@ const DEFAULT_DTIF: COMP.CompDtif = {
 				green: 128,
 				blue: 114
 			}
+		},
+		p4: {
+			type: 'Gradient',
+			variant: { type: 'Linear' },
+			stops: [
+				{
+					color: {
+						red: 138,
+						green: 43,
+						blue: 226
+					},
+					position: 0
+				},
+				{
+					color: {
+						red: 0,
+						green: 191,
+						blue: 225
+					},
+					position: 0
+				}
+			]
 		}
 	},
 	events: [

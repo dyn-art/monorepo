@@ -4,7 +4,7 @@ use crate::{
         svg_bundle::SvgBundle,
         svg_element::{
             styles::{SvgPointerEventsStyle, SvgStyle},
-            SvgElement, SvgElementId, SvgTag,
+            SvgElement, SvgTag,
         },
     },
 };
@@ -117,8 +117,9 @@ impl ShapeNodeSvgBundle {
         }
     }
 
+    #[cfg(feature = "tracing")]
     #[inline]
-    fn create_element_name(id: SvgElementId, category: &str) -> String {
+    fn create_element_name(id: crate::svg::svg_element::SvgElementId, category: &str) -> String {
         format!("shape-node_{}_{}", category, id)
     }
 }

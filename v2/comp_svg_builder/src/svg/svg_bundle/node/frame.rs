@@ -5,7 +5,7 @@ use crate::{
         svg_element::{
             attributes::SvgAttribute,
             styles::{SvgPointerEventsStyle, SvgStyle},
-            SvgElement, SvgElementId, SvgTag,
+            SvgElement, SvgTag,
         },
     },
 };
@@ -159,8 +159,9 @@ impl FrameNodeSvgBundle {
         }
     }
 
+    #[cfg(feature = "tracing")]
     #[inline]
-    fn create_element_name(id: SvgElementId, category: &str) -> String {
+    fn create_element_name(id: crate::svg::svg_element::SvgElementId, category: &str) -> String {
         format!("frame-node_{}_{}", category, id)
     }
 }

@@ -149,7 +149,7 @@ position: Percent;
 /**
  * The color of the stop.
  */
-color: Color; type: "GradientColorStop" }
+color: Color }
 
 export type GradientPaint = { variant: GradientVariant; stops: GradientColorStop[]; blendMode?: BlendMode; opacity?: Opacity }
 

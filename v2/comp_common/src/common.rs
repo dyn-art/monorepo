@@ -387,8 +387,7 @@ pub enum GradientVariant {
 #[derive(Debug, Default, Copy, Clone)]
 #[cfg_attr(
     feature = "serde_support",
-    derive(serde::Serialize, serde::Deserialize, specta::Type),
-    serde(tag = "type")
+    derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
 pub struct GradientColorStop {
     /// The position of the color stop in the gradient, ranging from 0.0 to 1.0.

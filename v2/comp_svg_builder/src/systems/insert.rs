@@ -2,7 +2,7 @@ use crate::{
     resources::svg_context::SvgContextRes,
     svg::svg_bundle::{
         node::{frame::FrameNodeSvgBundle, shape::ShapeNodeSvgBundle},
-        style::solid::SolidStyleSvgBundle,
+        style::{gradient::GradientStyleSvgBundle, solid::SolidStyleSvgBundle},
         SvgBundleVariant,
     },
 };
@@ -14,7 +14,7 @@ use bevy_ecs::{
 use dyn_comp_common::{
     mixins::PaintChildMixin,
     nodes::{CompNode, CompNodeVariant},
-    paints::{CompPaint, CompPaintVariant},
+    paints::{CompPaint, CompPaintVariant, GradientCompPaint, ImageCompPaint},
     styles::{CompStyle, CompStyleVariant},
 };
 
@@ -57,17 +57,31 @@ pub fn insert_style_svg_bundle(
             Or<(Without<SvgBundleVariant>, Changed<PaintChildMixin>)>,
         ),
     >,
-    paint_query: Query<&CompPaint>,
+    paint_query: Query<(
+        &CompPaint,
+        Option<&GradientCompPaint>,
+        Option<&ImageCompPaint>,
+    )>,
 ) {
     for (entity, style, maybe_paint_mixin) in query.iter() {
         if let Some(paint_entity) = maybe_paint_mixin.and_then(|paint_mixin| paint_mixin.0) {
-            if let Ok(paint) = paint_query.get(paint_entity) {
+            if let Ok((paint, maybe_gradient_paint, maybe_image_paint)) =
+                paint_query.get(paint_entity)
+            {
                 let bundle_variant = match (style.variant, paint.variant) {
                     (
                         CompStyleVariant::Fill | CompStyleVariant::Stroke,
                         CompPaintVariant::Solid,
                     ) => Some(SvgBundleVariant::Solid(SolidStyleSvgBundle::new(
                         entity,
+                        &mut svg_context_res,
+                    ))),
+                    (
+                        CompStyleVariant::Fill | CompStyleVariant::Stroke,
+                        CompPaintVariant::Gradient,
+                    ) => Some(SvgBundleVariant::Gradient(GradientStyleSvgBundle::new(
+                        entity,
+                        maybe_gradient_paint.unwrap().variant,
                         &mut svg_context_res,
                     ))),
                     _ => None,

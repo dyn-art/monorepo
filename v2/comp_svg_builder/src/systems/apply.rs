@@ -14,16 +14,17 @@ use bevy_ecs::{
 use bevy_hierarchy::Children;
 use bevy_transform::components::Transform;
 use dyn_comp_common::{
-    common::Visibility,
+    common::{GradientVariant, Size, Visibility},
     error::NoneErr,
     mixins::{
         BlendModeMixin, OpacityMixin, PaintParentMixin, PathMixin, SizeMixin, StrokePathMixin,
         StyleChildrenMixin, VisibilityMixin,
     },
     nodes::CompNode,
-    paints::{CompPaint, SolidCompPaint},
+    paints::{CompPaint, GradientCompPaint, SolidCompPaint},
     styles::{CompStyle, FillCompStyle, StrokeCompStyle},
 };
+use glam::{Mat3, Vec2};
 use smallvec::SmallVec;
 use std::{
     collections::{HashMap, HashSet},
@@ -485,11 +486,11 @@ pub fn apply_stroke_path_mixin_changes(
 
 pub fn apply_solid_paint_changes(
     query: Query<(&SolidCompPaint, &PaintParentMixin), (With<CompPaint>, Changed<SolidCompPaint>)>,
-    mut bundle_query: Query<&mut SvgBundleVariant>,
+    mut parent_query: Query<&mut SvgBundleVariant>,
 ) {
     for (solid_paint, PaintParentMixin(parent_entities)) in query.iter() {
         for parent_entity in parent_entities {
-            if let Ok(mut bundle_variant) = bundle_query.get_mut(*parent_entity) {
+            if let Ok(mut bundle_variant) = parent_query.get_mut(*parent_entity) {
                 match bundle_variant.as_mut() {
                     SvgBundleVariant::Solid(bundle) => {
                         bundle.shape_path.set_style(SvgStyle::Fill {
@@ -505,4 +506,62 @@ pub fn apply_solid_paint_changes(
             }
         }
     }
+}
+
+// TODO
+pub fn apply_gradient_paint_changes(
+    query: Query<
+        (&GradientCompPaint, &PaintParentMixin),
+        (With<CompPaint>, Changed<GradientCompPaint>),
+    >,
+    mut parent_query: Query<(&mut SvgBundleVariant, &SizeMixin)>,
+) {
+    for (gradient_paint, PaintParentMixin(parent_entities)) in query.iter() {
+        for parent_entity in parent_entities {
+            if let Ok((mut bundle_variant, SizeMixin(Size(size)))) =
+                parent_query.get_mut(*parent_entity)
+            {
+                match bundle_variant.as_mut() {
+                    SvgBundleVariant::Gradient(bundle) => {
+                        match gradient_paint.variant {
+                            GradientVariant::Linear { transform } => {
+                                let (start, end) = extract_linear_gradient_params_from_transform(
+                                    size.x, size.y, &transform,
+                                );
+                                bundle.gradient.set_attributes(vec![
+                                    SvgAttribute::X1 { x1: start.x },
+                                    SvgAttribute::Y1 { y1: start.y },
+                                    SvgAttribute::X2 { x2: end.x },
+                                    SvgAttribute::Y2 { y2: end.y },
+                                ]);
+                            }
+                            GradientVariant::Radial { transform } => {
+                                // TODO
+                            }
+                        }
+                    }
+                    _ => {}
+                }
+            }
+        }
+    }
+}
+
+/// Helper function to extract the x and y positions of the start and end of the linear gradient
+/// (scale is not important here).
+///
+/// Credits:
+/// https://github.com/figma-plugin-helper-functions/figma-plugin-helpers/tree/master
+fn extract_linear_gradient_params_from_transform(
+    shape_width: f32,
+    shape_height: f32,
+    transform: &Mat3,
+) -> (Vec2, Vec2) {
+    let mx_inv = transform.inverse();
+    let start_end = [Vec2::new(0.0, 0.5), Vec2::new(1.0, 0.5)].map(|p| mx_inv.transform_point2(p));
+
+    (
+        Vec2::new(start_end[0].x * shape_width, start_end[0].y * shape_height),
+        Vec2::new(start_end[1].x * shape_width, start_end[1].y * shape_height),
+    )
 }

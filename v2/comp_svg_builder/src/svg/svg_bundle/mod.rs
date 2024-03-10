@@ -3,7 +3,7 @@ pub mod style;
 
 use self::{
     node::{frame::FrameNodeSvgBundle, shape::ShapeNodeSvgBundle},
-    style::solid::SolidStyleSvgBundle,
+    style::{gradient::GradientStyleSvgBundle, solid::SolidStyleSvgBundle},
 };
 use bevy_ecs::{component::Component, entity::Entity, query::Without, system::Query};
 use dyn_comp_common::mixins::Root;
@@ -72,7 +72,7 @@ pub enum SvgBundleVariant {
     Shape(ShapeNodeSvgBundle),
     // Styles
     Solid(SolidStyleSvgBundle),
-    // Gradient
+    Gradient(GradientStyleSvgBundle),
     // Image
     // Drop Shadow
 }
@@ -83,6 +83,7 @@ impl SvgBundleVariant {
             SvgBundleVariant::Frame(bundle) => bundle,
             SvgBundleVariant::Shape(bundle) => bundle,
             SvgBundleVariant::Solid(bundle) => bundle,
+            SvgBundleVariant::Gradient(bundle) => bundle,
         }
     }
 
@@ -91,6 +92,7 @@ impl SvgBundleVariant {
             SvgBundleVariant::Frame(bundle) => bundle,
             SvgBundleVariant::Shape(bundle) => bundle,
             SvgBundleVariant::Solid(bundle) => bundle,
+            SvgBundleVariant::Gradient(bundle) => bundle,
         }
     }
 
@@ -129,6 +131,7 @@ impl SvgBundleVariant {
             SvgBundleVariant::Frame(bundle) => &bundle.root_g,
             SvgBundleVariant::Shape(bundle) => &bundle.root_g,
             SvgBundleVariant::Solid(bundle) => &bundle.root_g,
+            SvgBundleVariant::Gradient(bundle) => &bundle.root_g,
         }
     }
 
@@ -137,6 +140,7 @@ impl SvgBundleVariant {
             SvgBundleVariant::Frame(bundle) => &mut bundle.root_g,
             SvgBundleVariant::Shape(bundle) => &mut bundle.root_g,
             SvgBundleVariant::Solid(bundle) => &mut bundle.root_g,
+            SvgBundleVariant::Gradient(bundle) => &mut bundle.root_g,
         }
     }
 
@@ -198,6 +202,7 @@ impl SvgBundleVariant {
                 .get_root_element()
                 .to_string(bundle, Some(bundle_variant_query)),
             SvgBundleVariant::Solid(bundle) => bundle.get_root_element().to_string(bundle, None),
+            SvgBundleVariant::Gradient(bundle) => bundle.get_root_element().to_string(bundle, None),
         }
     }
 }
