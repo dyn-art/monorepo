@@ -205,11 +205,13 @@ fn reorder_node_children(
     }
 
     // Apply swaps
-    let children_wrapper_element = node_bundle_variant
-        .get_children_wrapper_element_mut()
-        .ok_or(NoneErr::new("Failed to retrieve children wrapper element!"))?;
-    for (element_id_1, element_id_2) in swaps {
-        children_wrapper_element.swap(element_id_1, element_id_2);
+    if swaps.len() > 0 {
+        let children_wrapper_element = node_bundle_variant
+            .get_children_wrapper_element_mut()
+            .ok_or(NoneErr::new("Failed to retrieve children wrapper element!"))?;
+        for (element_id_1, element_id_2) in swaps {
+            children_wrapper_element.swap(element_id_1, element_id_2);
+        }
     }
 
     Ok(())
@@ -351,6 +353,14 @@ fn reorder_node_styles(
     let current_order = node_bundle_variant
         .get_style_entities_mut()
         .ok_or(NoneErr::new("Failed to retrieve node styles!"))?;
+    log::info!(
+        "[reorder_node_styles] Current Order: {:?} - {:?}",
+        current_order,
+        current_order
+            .iter()
+            .map(|entity| entity_to_svg_element_id.get(entity).unwrap())
+            .collect::<Vec<_>>()
+    );
     let mut swaps: Vec<(SvgElementId, SvgElementId)> = Vec::new();
     for (new_index, &entity) in new_entities_order.iter().enumerate() {
         let current_index = current_order.iter().position(|&e| e == entity).unwrap();
@@ -367,12 +377,23 @@ fn reorder_node_styles(
         }
     }
 
+    log::info!(
+        "[reorder_node_styles] New Order: {:?} - {:?}",
+        current_order,
+        current_order
+            .iter()
+            .map(|entity| entity_to_svg_element_id.get(entity).unwrap())
+            .collect::<Vec<_>>()
+    );
+
     // Apply swaps
-    let styles_wrapper_element = node_bundle_variant
-        .get_styles_wrapper_element_mut()
-        .ok_or(NoneErr::new("Failed to retrieve styles wrapper element!"))?;
-    for (element_id_1, element_id_2) in swaps {
-        styles_wrapper_element.swap(element_id_1, element_id_2);
+    if swaps.len() > 0 {
+        let styles_wrapper_element = node_bundle_variant
+            .get_styles_wrapper_element_mut()
+            .ok_or(NoneErr::new("Failed to retrieve styles wrapper element!"))?;
+        for (element_id_1, element_id_2) in swaps {
+            styles_wrapper_element.swap(element_id_1, element_id_2);
+        }
     }
 
     Ok(())

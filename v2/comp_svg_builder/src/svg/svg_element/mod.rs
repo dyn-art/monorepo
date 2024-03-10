@@ -194,7 +194,10 @@ impl SvgElement {
         self.children.clear()
     }
 
+    // TODO: Some bug here, because based on to swap elements it should be correct
     pub fn swap(&mut self, element_id_1: SvgElementId, element_id_2: SvgElementId) {
+        log::info!("[swap] {:?} - {:?}", element_id_1, element_id_2);
+
         let index_1 = self
             .children
             .iter()

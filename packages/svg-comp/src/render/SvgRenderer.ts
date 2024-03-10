@@ -140,6 +140,8 @@ export class SvgRenderer extends Renderer {
 				case 'ElementCreated': {
 					const newElement: SVGElement = document.createElementNS(NS, change.tagName);
 
+					console.log(`[ElementCreated] ${elementChanges.id}`);
+
 					// Apply attributes
 					for (const [key, value] of change.attributes) {
 						newElement.setAttribute(key, value);
@@ -254,6 +256,9 @@ export class SvgRenderer extends Renderer {
 				case 'ElementReordered': {
 					const elementToReorder = this._svgElementMap.get(change.elementId);
 					const newParentElement = this._svgElementMap.get(change.newParentId);
+
+					console.log(`[ElementReordered] ${elementChanges.id}`, change);
+
 					if (elementToReorder != null && newParentElement != null) {
 						if (change.insertBeforeId != null) {
 							const insertBeforeElement = this._svgElementMap.get(change.insertBeforeId);
