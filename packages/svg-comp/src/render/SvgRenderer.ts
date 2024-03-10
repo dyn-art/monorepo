@@ -198,8 +198,10 @@ export class SvgRenderer extends Renderer {
 					break;
 				}
 				case 'ElementAppended': {
+					console.log(`[ElementAppended] ${elementChanges.id} to ${change.parentId}`);
+
 					const toAppendElement = getElement();
-					const parentElement = this._svgElementMap.get(elementChanges.id);
+					const parentElement = this._svgElementMap.get(change.parentId);
 					if (parentElement != null && toAppendElement != null) {
 						parentElement.appendChild(toAppendElement);
 					} else {
@@ -264,10 +266,8 @@ export class SvgRenderer extends Renderer {
 							const insertBeforeElement = this._svgElementMap.get(change.insertBeforeId);
 							if (insertBeforeElement != null) {
 								newParentElement.insertBefore(elementToReorder, insertBeforeElement);
-							}
-							// If insertBeforeId is not found, append at the end as fallback
-							else {
-								newParentElement.appendChild(elementToReorder);
+							} else {
+								console.error(`Failed to query insert before element (${change.insertBeforeId})!`);
 							}
 						}
 						// If insertBeforeId is null, append at the end
