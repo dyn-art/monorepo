@@ -215,13 +215,14 @@ fn reorder_node_children(
                     None
                 };
 
-                children_wrapper_element.register_change(SvgElementChange::ElementReordered(
-                    SvgElementReorderedChange {
+                children_wrapper_element.register_change(
+                    SvgElementChange::ElementReordered(SvgElementReorderedChange {
                         element_id,
                         new_parent_id,
                         insert_before_id,
-                    },
-                ));
+                    }),
+                    true,
+                );
             }
         }
     }
