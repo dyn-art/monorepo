@@ -140,8 +140,6 @@ export class SvgRenderer extends Renderer {
 				case 'ElementCreated': {
 					const newElement: SVGElement = document.createElementNS(NS, change.tagName);
 
-					console.log(`[ElementCreated] ${elementChanges.id}`);
-
 					// Apply attributes
 					for (const [key, value] of change.attributes) {
 						newElement.setAttribute(key, value);
@@ -198,8 +196,6 @@ export class SvgRenderer extends Renderer {
 					break;
 				}
 				case 'ElementAppended': {
-					console.log(`[ElementAppended] ${elementChanges.id} to ${change.parentId}`);
-
 					const toAppendElement = getElement();
 					const parentElement = this._svgElementMap.get(change.parentId);
 					if (parentElement != null && toAppendElement != null) {
@@ -255,28 +251,22 @@ export class SvgRenderer extends Renderer {
 					}
 					break;
 				}
-				case 'ElementReordered': {
-					const elementToReorder = this._svgElementMap.get(change.elementId);
-					const newParentElement = this._svgElementMap.get(change.newParentId);
-
-					console.log(`[ElementReordered] ${elementChanges.id}`, change);
-
-					if (elementToReorder != null && newParentElement != null) {
-						if (change.insertBeforeId != null) {
-							const insertBeforeElement = this._svgElementMap.get(change.insertBeforeId);
-							if (insertBeforeElement != null) {
-								newParentElement.insertBefore(elementToReorder, insertBeforeElement);
+				case 'ElementChildrenReordered': {
+					const elementToUpdate = getElement();
+					if (elementToUpdate != null) {
+						// Iterate over the 'order' array and append each child to 'elementToUpdate'
+						// in the new order. This effectively reorders the children.
+						for (const id of change.newOrder) {
+							const childElement = document.getElementById(id.toString());
+							if (childElement != null) {
+								elementToUpdate.appendChild(childElement);
 							} else {
-								console.error(`Failed to query insert before element (${change.insertBeforeId})!`);
+								console.error(`Failed to query child element (${id}) to reorder!`);
 							}
-						}
-						// If insertBeforeId is null, append at the end
-						else {
-							newParentElement.appendChild(elementToReorder);
 						}
 					} else {
 						console.error(
-							`Failed to query elements to reorder children in element (${elementChanges.id})!`
+							`Failed to query element (${elementChanges.id}) to update children order (${change.order})!`
 						);
 					}
 					break;

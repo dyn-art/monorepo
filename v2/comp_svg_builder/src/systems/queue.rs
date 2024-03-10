@@ -41,10 +41,10 @@ pub fn queue_svg_bundle_changes(
 
     // Sort children within their parent grouping by their index
     for children in parent_to_children.values_mut() {
-        children.sort_unstable_by_key(|change| change.index);
+        children.sort_by(|a, b| b.index.cmp(&a.index));
     }
 
-    // Process root nodes in depth-first order, taking ownership of the data
+    // Process root nodes in depth-first order
     let mut sorted_changed_bundles: Vec<ChangedSvgBundle> = Vec::with_capacity(changes_length);
     let mut stack: VecDeque<ChangedSvgBundle> = parent_to_children
         .remove(&None)

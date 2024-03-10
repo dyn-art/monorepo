@@ -284,11 +284,13 @@ export type SvgDisplayStyle = "Block" | "None"
  */
 export type SvgElementAppendedChange = { parentId: SvgElementId }
 
-export type SvgElementChange = ({ type: "ElementCreated" } & SvgElementCreatedChange) | ({ type: "ElementDeleted" }) | ({ type: "ElementAppended" } & SvgElementAppendedChange) | ({ type: "AttributeUpdated" } & SvgAttributeUpdatedChange) | ({ type: "AttributeRemoved" } & SvgAttributeRemovedChange) | ({ type: "StyleUpdated" } & SvgStyleUpdatedChange) | ({ type: "StyleRemoved" } & SvgStyleRemovedChange) | ({ type: "ElementReordered" } & SvgElementReorderedChange)
+export type SvgElementChange = ({ type: "ElementCreated" } & SvgElementCreatedChange) | ({ type: "ElementDeleted" }) | ({ type: "ElementAppended" } & SvgElementAppendedChange) | ({ type: "AttributeUpdated" } & SvgAttributeUpdatedChange) | ({ type: "AttributeRemoved" } & SvgAttributeRemovedChange) | ({ type: "StyleUpdated" } & SvgStyleUpdatedChange) | ({ type: "StyleRemoved" } & SvgStyleRemovedChange) | ({ type: "ElementReordered" } & SvgElementReorderedChange) | ({ type: "ElementChildrenReordered" } & SvgElementChildrenReorderedChange)
 
 export type SvgElementChanges = { id: SvgElementId; changes: SvgElementChange[] }
 
 export type SvgElementChangesOutputEvent = { changes: SvgElementChanges }
+
+export type SvgElementChildrenReorderedChange = { order: SvgElementId[] }
 
 /**
  * Emitted when a new SvgElement is created.

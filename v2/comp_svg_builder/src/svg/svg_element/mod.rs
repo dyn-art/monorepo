@@ -4,11 +4,12 @@ pub mod element_changes;
 pub mod styles;
 
 use self::{
-    attributes::SvgAttribute, element_changes::SvgElementReorderedChange, styles::SvgStyle,
+    attributes::SvgAttribute, element_changes::SvgElementChildrenReorderedChange, styles::SvgStyle,
 };
 use super::svg_bundle::{SvgBundle, SvgBundleVariant};
 use bevy_ecs::{component::Component, entity::Entity, query::Without, system::Query};
 use dyn_comp_common::mixins::Root;
+use smallvec::SmallVec;
 use std::{
     collections::{HashMap, HashSet},
     fmt::Display,
@@ -31,7 +32,7 @@ pub struct SvgElement {
     /// The style properties of the SvgElement.
     styles: HashMap<&'static str, SvgStyle>,
     /// Children of the SvgElement in the Svg tree.
-    children: Vec<SvgElementChild>,
+    children: SmallVec<[SvgElementChild; 2]>,
     /// Applied changes after last drain.
     #[cfg(feature = "output_svg_element_changes")]
     changes: Vec<SvgElementChange>,
@@ -55,7 +56,7 @@ impl SvgElement {
             tag,
             attributes: inital_attributes,
             styles: inital_styles,
-            children: Vec::new(),
+            children: SmallVec::new(),
             #[cfg(feature = "output_svg_element_changes")]
             changes: Vec::new(),
             #[cfg(feature = "output_svg_element_changes")]
@@ -194,47 +195,23 @@ impl SvgElement {
         self.children.clear()
     }
 
-    // TODO: Some bug here, because based on to swap elements it should be correct
-    pub fn swap(&mut self, element_id_1: SvgElementId, element_id_2: SvgElementId) {
-        log::info!("[swap] {:?} - {:?}", element_id_1, element_id_2);
+    pub fn reorder_children_mut<F>(&mut self, reorder_operation: F)
+    where
+        F: FnOnce(&mut SmallVec<[SvgElementChild; 2]>),
+    {
+        let original_order: SmallVec<[SvgElementId; 2]> =
+            self.children.iter().map(|child| child.id).collect();
 
-        let index_1 = self
-            .children
-            .iter()
-            .position(|&element_child| element_child.id == element_id_1);
-        let index_2 = self
-            .children
-            .iter()
-            .position(|&element_child| element_child.id == element_id_2);
+        // Apply the reorder operation provided by the caller
+        reorder_operation(&mut self.children);
 
-        if let (Some(i1), Some(i2)) = (index_1, index_2) {
-            // Perform the actual swap in the children vector
-            self.children.swap(i1, i2);
-
-            // For each element, determine the insert_before_id based on the swap
-            let insert_before_id_1 = self
-                .children
-                .get(i2 + 1)
-                .map(|element_child| element_child.id);
-            let insert_before_id_2 = self
-                .children
-                .get(i1 + 1)
-                .map(|element_child| element_child.id);
-
-            // Register changes for both elements
+        // Check if the order has changed and emit reorder event if so
+        let new_order: SmallVec<[SvgElementId; 2]> =
+            self.children.iter().map(|child| child.id).collect();
+        if new_order != original_order {
             self.register_change(
-                SvgElementChange::ElementReordered(SvgElementReorderedChange {
-                    element_id: element_id_1,
-                    new_parent_id: self.get_id(),
-                    insert_before_id: insert_before_id_1,
-                }),
-                true,
-            );
-            self.register_change(
-                SvgElementChange::ElementReordered(SvgElementReorderedChange {
-                    element_id: element_id_2,
-                    new_parent_id: self.get_id(),
-                    insert_before_id: insert_before_id_2,
+                SvgElementChange::ElementChildrenReordered(SvgElementChildrenReorderedChange {
+                    new_order: new_order.into_vec(),
                 }),
                 true,
             );
