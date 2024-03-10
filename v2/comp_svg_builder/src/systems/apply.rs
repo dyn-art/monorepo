@@ -52,10 +52,14 @@ pub fn apply_node_children_changes(
         let children_query = queries.p0();
         for (parent_entity, children, node_bundle_variant) in children_query.iter() {
             if let Some(child_node_entities) = node_bundle_variant.get_child_node_entities() {
+                let new_child_node_entities: SmallVec<[Entity; 2]> =
+                    children.iter().copied().rev().collect();
+
                 // Identify removed and newly added node entities
                 let current_entities_set: HashSet<Entity> =
                     child_node_entities.iter().copied().collect();
-                let new_entities_set: HashSet<Entity> = children.iter().copied().collect();
+                let new_entities_set: HashSet<Entity> =
+                    new_child_node_entities.iter().copied().collect();
                 let removed_entities: SmallVec<[Entity; 2]> = current_entities_set
                     .difference(&new_entities_set)
                     .copied()
@@ -69,7 +73,7 @@ pub fn apply_node_children_changes(
                     parent_entity,
                     added_entities,
                     removed_entities,
-                    new_entities_order: children.iter().copied().collect(),
+                    new_entities_order: new_child_node_entities,
                 });
             }
         }
@@ -165,11 +169,11 @@ fn reorder_node_children(
 ) -> Result<(), Box<dyn Error>> {
     // Mapping from entity to SvgElementId
     let mut entity_to_svg_element_id: HashMap<Entity, SvgElementId> = HashMap::new();
-    let child_node_entities = node_bundle_variant_query
+    for &entity in node_bundle_variant_query
         .get(parent_entity)?
         .get_child_node_entities()
-        .ok_or(NoneErr::new("Failed to retrieve node children!"))?;
-    for &entity in child_node_entities {
+        .ok_or(NoneErr::new("Failed to retrieve node children!"))?
+    {
         let element_id = node_bundle_variant_query
             .get(entity)?
             .get_svg_bundle()
@@ -331,10 +335,10 @@ fn reorder_node_styles(
 ) -> Result<(), Box<dyn Error>> {
     // Mapping from entity to SvgElementId
     let mut entity_to_svg_element_id: HashMap<Entity, SvgElementId> = HashMap::new();
-    let style_entities = node_bundle_variant
+    for &entity in node_bundle_variant
         .get_style_entities()
-        .ok_or(NoneErr::new("Failed to retrieve node styles!"))?;
-    for &entity in style_entities {
+        .ok_or(NoneErr::new("Failed to retrieve node styles!"))?
+    {
         let element_id = style_bundle_variant_query
             .get(entity)?
             .get_svg_bundle()
