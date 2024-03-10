@@ -45,17 +45,17 @@ pub trait SvgBundle: Debug {
         let mut deferred_elements_changes: Vec<SvgElementChanges> = Vec::new();
 
         for element in self.elements_iter_mut() {
-            let (element_changes, deffered_element_changes) = element.drain_changes();
+            let (element_changes, deferred_element_changes) = element.drain_changes();
             if !element_changes.is_empty() {
                 elements_changes.push(SvgElementChanges {
                     id: element.get_id(),
                     changes: element_changes,
                 });
             }
-            if !deffered_element_changes.is_empty() {
+            if !deferred_element_changes.is_empty() {
                 deferred_elements_changes.push(SvgElementChanges {
                     id: element.get_id(),
-                    changes: deffered_element_changes,
+                    changes: deferred_element_changes,
                 });
             }
         }

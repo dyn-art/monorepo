@@ -266,7 +266,7 @@ export class SvgRenderer extends Renderer {
 						}
 					} else {
 						console.error(
-							`Failed to query element (${elementChanges.id}) to update children order (${change.order})!`
+							`Failed to query element (${elementChanges.id}) to apply new children order (${change.newOrder})!`
 						);
 					}
 					break;

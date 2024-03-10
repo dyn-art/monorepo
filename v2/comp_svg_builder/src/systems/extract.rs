@@ -25,7 +25,7 @@ pub fn extract_node_bundles(
     child_query: Query<&Children>,
 ) {
     for (entity, mut bundle_variant, maybe_parent) in query.iter_mut() {
-        let (elements_changes, deffered_elements_changes) =
+        let (elements_changes, deferred_elements_changes) =
             bundle_variant.get_svg_bundle_mut().drain_changes();
 
         if !elements_changes.is_empty() {
@@ -57,8 +57,8 @@ pub fn extract_node_bundles(
             });
         }
 
-        if !deffered_elements_changes.is_empty() {
-            for deferred_change in deffered_elements_changes {
+        if !deferred_elements_changes.is_empty() {
+            for deferred_change in deferred_elements_changes {
                 changed_svg_bundles_res.push_deferred_change(deferred_change);
             }
         }
@@ -74,7 +74,7 @@ pub fn extract_style_bundles(
     child_query: Query<&StyleChildrenMixin>,
 ) {
     for (entity, mut bundle_variant, maybe_parent) in query.iter_mut() {
-        let (elements_changes, deffered_elements_changes) =
+        let (elements_changes, deferred_elements_changes) =
             bundle_variant.get_svg_bundle_mut().drain_changes();
 
         if !elements_changes.is_empty() {
@@ -107,8 +107,8 @@ pub fn extract_style_bundles(
             });
         }
 
-        if !deffered_elements_changes.is_empty() {
-            for deferred_change in deffered_elements_changes {
+        if !deferred_elements_changes.is_empty() {
+            for deferred_change in deferred_elements_changes {
                 changed_svg_bundles_res.push_deferred_change(deferred_change);
             }
         }

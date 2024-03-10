@@ -36,7 +36,7 @@ pub struct SvgElement {
     /// Applied changes after last drain.
     #[cfg(feature = "output_svg_element_changes")]
     changes: Vec<SvgElementChange>,
-    /// Applied deffered changes after last drain.
+    /// Applied deferred changes after last drain.
     #[cfg(feature = "output_svg_element_changes")]
     deferred_changes: Vec<SvgElementChange>,
     /// Whether the element was created in the current update cycle (before first update drain).
