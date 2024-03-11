@@ -313,7 +313,9 @@ export type SvgElementDeletedChange = Record<string, never>
 
 export type SvgElementId = number
 
-export type SvgHrefAttribute = { Base64: { content: string } } | { Url: { url: string } }
+export type SvgHrefAttribute = { Base64: { content: string; contentType: SvgHrefContentType } } | { Url: { url: string } }
+
+export type SvgHrefContentType = "Jpeg" | "Png"
 
 export type SvgMeasurementUnit = "Pixel" | "Percent"
 

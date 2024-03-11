@@ -154,10 +154,10 @@ impl SvgAttribute {
                 SvgUnits::UserSpaceOnUse => String::from("userSpaceOnUse"),
             },
             Self::Href { href } => match href {
-                // SvgHrefVariant::Base64 {
-                //     content,
-                //     content_type,
-                // } => format!("data:{};base64,{}", content_type.mime_type(), content),
+                SvgHrefAttribute::Base64 {
+                    content,
+                    content_type,
+                } => format!("data:{};base64,{}", content_type.mime_type(), content),
                 SvgHrefAttribute::Base64 { .. } => String::from("todo"),
                 SvgHrefAttribute::Url { url } => url.clone(),
             },
@@ -207,11 +207,30 @@ pub enum SvgHrefAttribute {
     #[serde(rename_all = "camelCase")]
     Base64 {
         content: String,
-        // content_type: ContentType, // TODO: Add ContentType struct in comp_types
+        content_type: SvgHrefContentType,
     },
     Url {
         url: String,
     },
+}
+
+#[derive(Debug, PartialEq, Clone)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type)
+)]
+pub enum SvgHrefContentType {
+    Jpeg,
+    Png,
+}
+
+impl SvgHrefContentType {
+    pub const fn mime_type(&self) -> &'static str {
+        match self {
+            SvgHrefContentType::Jpeg => "image/jpeg",
+            SvgHrefContentType::Png => "image/png",
+        }
+    }
 }
 
 #[derive(Debug, Default, PartialEq, Clone)]

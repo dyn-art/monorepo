@@ -18,12 +18,14 @@ tracing = []
 [dependencies]
 dyn-comp-asset = { path = "../comp_asset" }
 dyn-comp-common = { path = "../comp_common" }
+base64 = "0.22.0"
 bevy_app = { workspace = true }
 bevy_ecs = { workspace = true }
 bevy_hierarchy = { workspace = true }
 bevy_transform = { workspace = true }
 log = { workspace = true }
 glam = { workspace = true }
+imagesize = "0.12"
 smallvec = { workspace = true }
 tiny-skia-path = { workspace = true }
 

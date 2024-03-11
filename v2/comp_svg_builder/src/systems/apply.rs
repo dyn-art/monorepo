@@ -3,12 +3,16 @@ use crate::{
     svg::{
         svg_bundle::SvgBundleVariant,
         svg_element::{
-            attributes::{SvgAttribute, SvgMeasurementUnit, SvgTransformAttribute},
+            attributes::{
+                SvgAttribute, SvgHrefAttribute, SvgHrefContentType, SvgMeasurementUnit,
+                SvgTransformAttribute,
+            },
             styles::{SvgDisplayStyle, SvgStyle},
             SvgElementId, SvgTag,
         },
     },
 };
+use base64::prelude::*;
 use bevy_ecs::{
     entity::Entity,
     query::{Changed, With, Without},
@@ -29,6 +33,7 @@ use dyn_comp_common::{
     styles::{CompStyle, FillCompStyle, StrokeCompStyle},
 };
 use glam::{Mat3, Vec2};
+use imagesize::ImageType;
 use smallvec::SmallVec;
 use std::{
     collections::{HashMap, HashSet},
@@ -385,6 +390,7 @@ pub fn apply_size_mixin_changes(
                 unit: SvgMeasurementUnit::Pixel,
             },
         ]);
+
         if let Some(click_area_element) = bundle_variant.get_click_area_element_mut() {
             click_area_element.set_attributes(vec![
                 SvgAttribute::Width {
@@ -396,6 +402,32 @@ pub fn apply_size_mixin_changes(
                     unit: SvgMeasurementUnit::Pixel,
                 },
             ]);
+        }
+
+        match bundle_variant.as_mut() {
+            SvgBundleVariant::ImageFill(bundle) => {
+                bundle.pattern.set_attributes(vec![
+                    SvgAttribute::Width {
+                        width,
+                        unit: SvgMeasurementUnit::Pixel,
+                    },
+                    SvgAttribute::Height {
+                        height,
+                        unit: SvgMeasurementUnit::Pixel,
+                    },
+                ]);
+                bundle.image.set_attributes(vec![
+                    SvgAttribute::Width {
+                        width,
+                        unit: SvgMeasurementUnit::Pixel,
+                    },
+                    SvgAttribute::Height {
+                        height,
+                        unit: SvgMeasurementUnit::Pixel,
+                    },
+                ]);
+            }
+            _ => {}
         }
     }
 }
@@ -757,4 +789,39 @@ fn calculate_cropped_image_transform(
         adjusted_image_height,
         adjusted_transform,
     );
+}
+
+pub fn apply_image_asset_mixin_changes(
+    asset_db_res: Res<AssetDatabaseRes>,
+    paint_query: Query<
+        (&ImageAssetMixin, &PaintParentMixin),
+        (With<CompPaint>, Changed<ImageAssetMixin>),
+    >,
+    mut style_query: Query<&mut SvgBundleVariant>,
+) {
+    for (ImageAssetMixin(maybe_image_id), PaintParentMixin(paint_parent_entities)) in
+        paint_query.iter()
+    {
+        if let Some(image) = maybe_image_id.and_then(|id| asset_db_res.get_image(id)) {
+            for paint_parent_entity in paint_parent_entities {
+                if let Ok(mut bundle_variant) = style_query.get_mut(*paint_parent_entity) {
+                    match bundle_variant.as_mut() {
+                        SvgBundleVariant::ImageFill(bundle) => {
+                            bundle.image.set_attribute(SvgAttribute::Href {
+                                href: SvgHrefAttribute::Base64 {
+                                    content: BASE64_STANDARD.encode(image.content.clone()),
+                                    content_type: match image.image_type {
+                                        ImageType::Png => SvgHrefContentType::Png,
+                                        ImageType::Jpeg => SvgHrefContentType::Jpeg,
+                                        _ => return,
+                                    },
+                                },
+                            });
+                        }
+                        _ => {}
+                    }
+                }
+            }
+        }
+    }
 }
