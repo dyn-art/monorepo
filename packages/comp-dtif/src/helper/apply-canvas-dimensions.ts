@@ -2,9 +2,9 @@ import type { COMP } from '../comp';
 import { calculateViewport, type TDimensions } from './calculate-viewport';
 
 export function applyCanvasDimensions(
-	dtif: COMP.CompDtif,
+	dtif: COMP.DtifComposition,
 	canvasDimensions: TDimensions
-): COMP.CompDtif {
+): COMP.DtifComposition {
 	dtif.viewport = calculateViewport(canvasDimensions, {
 		width: dtif.size[0],
 		height: dtif.size[1]

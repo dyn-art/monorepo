@@ -24,41 +24,6 @@ export type Color = { red: number; green: number; blue: number }
 
 export type CompCoreInputEvent = ({ type: "CompositionResized" } & CompositionResizedInputEvent) | ({ type: "CompositionViewportChanged" } & CompositionViewportChangedInputEvent) | ({ type: "EntityMoved" } & EntityMovedInputEvent) | ({ type: "EntitySetPosition" } & EntitySetPositionInputEvent) | ({ type: "EntityDeleted" } & EntityDeletedInputEvent)
 
-/**
- * DTIF (Design Tree Interchange Format) utilizes a flat structure for easy readability
- * and efficient access & manipulation of design elements (Nodes, Paints, ..).
- * https://softwareengineering.stackexchange.com/questions/350623/flat-or-nested-json-for-hierarchal-data
- */
-export type CompDtif = { 
-/**
- * The version of the composition type declaration.
- */
-version?: string | null; 
-/**
- * The size of the composition in pixels.
- */
-size: Size; 
-/**
- * The viewport defines the area on the render target to which the camera renders its image.
- */
-viewport?: Viewport | null; 
-/**
- * The identifier of the root node in the composition.
- */
-rootNodeId: string; 
-/**
- * A mapping of node identifiers to their corresponding nodes within the composition.
- */
-nodes: { [key in string]: Node }; 
-/**
- * A mapping of paint identifiers to their corresponding paints within the composition.
- */
-paints?: { [key in string]: Paint }; 
-/**
- * A mapping of asset identifiers to their corresponding assets within the composition.
- */
-assets?: { [key in string]: Asset }; events?: DtifInputEvent[] }
-
 export type ComponentChange = { type: "Size"; size: Size } | { type: "Transform" }
 
 export type CompositionChange = { rootNodes: Entity[]; viewport: Viewport; size: Size }
@@ -88,6 +53,41 @@ export type CursorMovedOnCompInputEvent = { position: Vec2 }
 export type CursorUpOnCompInputEvent = { position: Vec2; button: MouseButton }
 
 export type Degree = number
+
+/**
+ * DTIF (Design Tree Interchange Format) utilizes a flat structure for easy readability
+ * and efficient access & manipulation of design elements (Nodes, Paints, ..).
+ * https://softwareengineering.stackexchange.com/questions/350623/flat-or-nested-json-for-hierarchal-data
+ */
+export type DtifComposition = { 
+/**
+ * The version of the composition type declaration.
+ */
+version?: string | null; 
+/**
+ * The size of the composition in pixels.
+ */
+size: Size; 
+/**
+ * The viewport defines the area on the render target to which the camera renders its image.
+ */
+viewport?: Viewport | null; 
+/**
+ * The identifier of the root node in the composition.
+ */
+rootNodeId: string; 
+/**
+ * A mapping of node identifiers to their corresponding nodes within the composition.
+ */
+nodes: { [key in string]: Node }; 
+/**
+ * A mapping of paint identifiers to their corresponding paints within the composition.
+ */
+paints?: { [key in string]: Paint }; 
+/**
+ * A mapping of asset identifiers to their corresponding assets within the composition.
+ */
+assets?: { [key in string]: Asset }; events?: DtifInputEvent[] }
 
 export type DtifCompositionResizedEvent = { size: Size }
 
@@ -245,7 +245,7 @@ export type Size = Vec2
 
 export type SolidPaint = { color: Color; blendMode?: BlendMode; opacity?: Opacity }
 
-export type SpectaExport = { comp_dtif: CompDtif; svg_comp_input_event: SvgCompInputEvent; svg_comp_output_event: SvgCompOutputEvent }
+export type SpectaExport = { comp_dtif: DtifComposition; svg_comp_input_event: SvgCompInputEvent; svg_comp_output_event: SvgCompOutputEvent }
 
 export type StrokeStyle = { width: number; paintId: string; visibility?: Visibility; blendMode?: BlendMode; opacity?: Opacity }
 

@@ -1,8 +1,8 @@
 import { shortId } from '@dyn/utils';
 import { SvgCompHandle } from '@/rust/dyn-svg-comp-api';
 import type {
-	CompDtif,
 	CompositionChangeOutputEvent,
+	DtifComposition,
 	Entity,
 	SelectionChangeOutputEvent,
 	SvgCompInputEvent,
@@ -142,7 +142,7 @@ export class Composition {
 }
 
 export interface TCompositionConfig {
-	dtif: CompDtif;
+	dtif: DtifComposition;
 	interactive?: boolean;
 }
 

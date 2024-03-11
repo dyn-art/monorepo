@@ -1,10 +1,10 @@
 import type { COMP } from '../comp';
 
-export function isDTIFComposition(value: unknown): value is COMP.CompDtif {
+export function isDTIFComposition(value: unknown): value is COMP.DtifComposition {
 	if (typeof value !== 'object' || value == null) {
 		return false;
 	}
-	const obj = value as Partial<COMP.CompDtif>;
+	const obj = value as Partial<COMP.DtifComposition>;
 	return (
 		Array.isArray(obj.size) &&
 		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- Necessary here as we don't know how long the size array might be

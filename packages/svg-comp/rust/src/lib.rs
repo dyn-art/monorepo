@@ -19,7 +19,7 @@ use dyn_comp_common::{
     mixins::{Root, SizeMixin},
 };
 use dyn_comp_core::{resources::composition::CompositionRes, CompCorePlugin};
-use dyn_comp_dtif::CompDtif;
+use dyn_comp_dtif::DtifComposition;
 use dyn_comp_interaction::CompInteractionPlugin;
 use dyn_comp_svg_builder::{
     events::SvgBuilderOutputEvent, svg::svg_bundle::SvgBundleVariant, CompSvgBuilderPlugin,
@@ -39,7 +39,7 @@ pub struct SvgCompHandle {
 #[wasm_bindgen]
 impl SvgCompHandle {
     pub fn create(js_dtif: JsValue, interactive: bool) -> Result<SvgCompHandle, JsValue> {
-        let dtif: CompDtif = serde_wasm_bindgen::from_value(js_dtif)?;
+        let dtif: DtifComposition = serde_wasm_bindgen::from_value(js_dtif)?;
         let mut app = App::new();
 
         let (svg_builder_output_event_sender, svg_builder_output_event_receiver) =

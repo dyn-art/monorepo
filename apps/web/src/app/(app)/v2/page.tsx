@@ -14,7 +14,7 @@ export default Page;
 
 const WIDTH = 1500;
 const HEIGHT = 500;
-const DEFAULT_DTIF: COMP.CompDtif = {
+const DEFAULT_DTIF: COMP.DtifComposition = {
 	size: [WIDTH, HEIGHT],
 	rootNodeId: 'n1',
 	nodes: {
@@ -59,7 +59,7 @@ const DEFAULT_DTIF: COMP.CompDtif = {
 					type: 'Fill',
 					blendMode: 'Normal',
 					opacity: 0.8,
-					paintId: 'p4'
+					paintId: 'p5'
 				},
 				{
 					type: 'Stroke',

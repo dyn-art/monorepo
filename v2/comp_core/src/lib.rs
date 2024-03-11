@@ -13,7 +13,7 @@ use systems::{outline::rectangle::outline_rectangle, stroke::stroke_path_system}
 
 pub struct CompCorePlugin {
     #[cfg(feature = "dtif")]
-    pub dtif: dyn_comp_dtif::CompDtif,
+    pub dtif: dyn_comp_dtif::DtifComposition,
     #[cfg(not(feature = "dtif"))]
     pub size: Size,
     #[cfg(not(feature = "dtif"))]
@@ -88,7 +88,7 @@ impl Plugin for CompCorePlugin {
 }
 
 #[cfg(feature = "dtif")]
-fn inject_dtif_into_ecs(world: &mut bevy_ecs::world::World, dtif: &dyn_comp_dtif::CompDtif) {
+fn inject_dtif_into_ecs(world: &mut bevy_ecs::world::World, dtif: &dyn_comp_dtif::DtifComposition) {
     use dyn_comp_asset::resources::AssetDatabaseRes;
     use dyn_comp_common::common::Viewport;
     use glam::Vec2;

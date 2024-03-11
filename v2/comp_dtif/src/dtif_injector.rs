@@ -1,5 +1,6 @@
 use crate::{
-    events::DtifInputEvent, nodes::Node, paints::Paint, styles::Style, CompDtif, ToEcsBundleImpl,
+    events::DtifInputEvent, nodes::Node, paints::Paint, styles::Style, DtifComposition,
+    ToEcsBundleImpl,
 };
 use bevy_ecs::{
     entity::Entity,
@@ -37,7 +38,7 @@ impl DtifInjector {
         &self.sid_to_asset_id
     }
 
-    pub fn load_assets(&mut self, dtif: &CompDtif, asset_db: &mut AssetDatabaseRes) {
+    pub fn load_assets(&mut self, dtif: &DtifComposition, asset_db: &mut AssetDatabaseRes) {
         for (sid, asset) in &dtif.assets {
             if let Some(asset_id) = asset_db.insert_asset(asset.clone()) {
                 self.sid_to_asset_id.insert(sid.clone(), asset_id);
@@ -45,7 +46,11 @@ impl DtifInjector {
         }
     }
 
-    pub fn inject_from_root(&mut self, dtif: &CompDtif, world: &mut World) -> Option<Entity> {
+    pub fn inject_from_root(
+        &mut self,
+        dtif: &DtifComposition,
+        world: &mut World,
+    ) -> Option<Entity> {
         // Process paints (before nodes as nodes can reference paint sid's)
         self.process_paints(dtif, world);
 
@@ -63,7 +68,7 @@ impl DtifInjector {
     fn process_node(
         &mut self,
         node_sid: String,
-        dtif: &CompDtif,
+        dtif: &DtifComposition,
         world: &mut World,
     ) -> Option<Entity> {
         dtif.nodes.get(&node_sid).map(|node| {
@@ -89,7 +94,7 @@ impl DtifInjector {
         &mut self,
         node_entity: Entity,
         node: &Node,
-        dtif: &CompDtif,
+        dtif: &DtifComposition,
         world: &mut World,
     ) {
         let dtif_children = match node {
@@ -161,7 +166,7 @@ impl DtifInjector {
         }
     }
 
-    fn process_paints(&mut self, dtif: &CompDtif, world: &mut World) {
+    fn process_paints(&mut self, dtif: &DtifComposition, world: &mut World) {
         for (id, paint) in dtif.paints.iter() {
             let paint_entity = self.spawn_paint(&paint, world).id();
             self.sid_to_entity.insert(id.clone(), paint_entity);

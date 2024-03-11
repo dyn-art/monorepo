@@ -17,7 +17,7 @@ use std::collections::HashMap;
 /// https://softwareengineering.stackexchange.com/questions/350623/flat-or-nested-json-for-hierarchal-data
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
 #[serde(rename_all = "camelCase")]
-pub struct CompDtif {
+pub struct DtifComposition {
     /// The version of the composition type declaration.
     #[serde(default)]
     pub version: Option<String>,
