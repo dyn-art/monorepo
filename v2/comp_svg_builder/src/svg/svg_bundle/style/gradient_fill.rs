@@ -14,7 +14,7 @@ use dyn_comp_common::common::GradientVariant;
 use smallvec::SmallVec;
 
 #[derive(Debug, Clone)]
-pub struct GradientStyleSvgBundle {
+pub struct GradientFillStyleSvgBundle {
     pub entity: Entity,
 
     pub root_g: SvgElement,
@@ -24,7 +24,7 @@ pub struct GradientStyleSvgBundle {
     /**/ pub shape_path: SvgElement,
 }
 
-impl SvgBundle for GradientStyleSvgBundle {
+impl SvgBundle for GradientFillStyleSvgBundle {
     fn get_entity(&self) -> &Entity {
         &self.entity
     }
@@ -58,9 +58,9 @@ impl SvgBundle for GradientStyleSvgBundle {
     }
 }
 
-impl GradientStyleSvgBundle {
+impl GradientFillStyleSvgBundle {
     pub fn new(entity: Entity, gradient_variant: GradientVariant, cx: &mut SvgContextRes) -> Self {
-        log::info!("[SolidPaintSvgBundle::new] {:?}", entity);
+        log::info!("[GradientFillStyleSvgBundle::new] {:?}", entity);
 
         let mut root_g_element = cx.create_bundle_root_element(SvgTag::Group, entity);
 

@@ -2,7 +2,10 @@ use crate::{
     resources::svg_context::SvgContextRes,
     svg::svg_bundle::{
         node::{frame::FrameNodeSvgBundle, shape::ShapeNodeSvgBundle},
-        style::{gradient::GradientStyleSvgBundle, solid::SolidStyleSvgBundle},
+        style::{
+            gradient_fill::GradientFillStyleSvgBundle, image_fill::ImageFillStyleSvgBundle,
+            solid_fill::SolidFillStyleSvgBundle,
+        },
         SvgBundleVariant,
     },
 };
@@ -27,7 +30,7 @@ pub fn insert_node_svg_bundle(
 ) {
     for (entity, CompNode { variant }) in query.iter() {
         let bundle_variant = match variant {
-            CompNodeVariant::Frame => Some(SvgBundleVariant::Frame(FrameNodeSvgBundle::new(
+            CompNodeVariant::Frame => Some(SvgBundleVariant::FrameNode(FrameNodeSvgBundle::new(
                 entity,
                 &mut svg_context_res,
             ))),
@@ -36,10 +39,9 @@ pub fn insert_node_svg_bundle(
             | CompNodeVariant::Polygon
             | CompNodeVariant::Star
             | CompNodeVariant::Text
-            | CompNodeVariant::Vector => Some(SvgBundleVariant::Shape(ShapeNodeSvgBundle::new(
-                entity,
-                &mut svg_context_res,
-            ))),
+            | CompNodeVariant::Vector => Some(SvgBundleVariant::ShapeNode(
+                ShapeNodeSvgBundle::new(entity, &mut svg_context_res),
+            )),
             _ => None,
         };
 
@@ -74,16 +76,26 @@ pub fn insert_style_svg_bundle(
                     (
                         CompStyleVariant::Fill | CompStyleVariant::Stroke,
                         CompPaintVariant::Solid,
-                    ) => Some(SvgBundleVariant::Solid(SolidStyleSvgBundle::new(
+                    ) => Some(SvgBundleVariant::SolidFill(SolidFillStyleSvgBundle::new(
                         entity,
                         &mut svg_context_res,
                     ))),
                     (
                         CompStyleVariant::Fill | CompStyleVariant::Stroke,
                         CompPaintVariant::Gradient,
-                    ) => Some(SvgBundleVariant::Gradient(GradientStyleSvgBundle::new(
+                    ) => Some(SvgBundleVariant::GradientFill(
+                        GradientFillStyleSvgBundle::new(
+                            entity,
+                            maybe_gradient_paint.unwrap().variant,
+                            &mut svg_context_res,
+                        ),
+                    )),
+                    (
+                        CompStyleVariant::Fill | CompStyleVariant::Stroke,
+                        CompPaintVariant::Image,
+                    ) => Some(SvgBundleVariant::ImageFill(ImageFillStyleSvgBundle::new(
                         entity,
-                        maybe_gradient_paint.unwrap().variant,
+                        maybe_image_paint.unwrap().scale_mode,
                         &mut svg_context_res,
                     ))),
                     _ => None,

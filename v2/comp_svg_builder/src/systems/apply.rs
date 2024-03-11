@@ -4,7 +4,7 @@ use crate::{
         svg_bundle::SvgBundleVariant,
         svg_element::{
             attributes::{SvgAttribute, SvgMeasurementUnit},
-            styles::{SvgDisplayStyle, SvgStyle, SvgStyleColor},
+            styles::{SvgDisplayStyle, SvgStyle},
             SvgElementId, SvgTag,
         },
     },
@@ -21,7 +21,7 @@ use dyn_comp_common::{
     error::NoneErr,
     mixins::{
         BlendModeMixin, OpacityMixin, PaintParentMixin, PathMixin, SizeMixin, StrokePathMixin,
-        StyleChildrenMixin, StyleParentMixin, VisibilityMixin,
+        StyleChildrenMixin, VisibilityMixin,
     },
     nodes::CompNode,
     paints::{CompPaint, GradientCompPaint, SolidCompPaint},
@@ -448,7 +448,7 @@ pub fn apply_path_mixin_changes(
     for (PathMixin(path), mut node_bundle_variant) in query.iter_mut() {
         // Apply path to node bundle
         match node_bundle_variant.as_mut() {
-            SvgBundleVariant::Frame(bundle) => bundle
+            SvgBundleVariant::FrameNode(bundle) => bundle
                 .children_clipped_path
                 .set_attribute(SvgAttribute::D { d: path.into() }),
             _ => {}
@@ -459,10 +459,13 @@ pub fn apply_path_mixin_changes(
             for style_entity in style_entities {
                 if let Ok(mut style_bundle_variant) = style_bundle_query.get_mut(*style_entity) {
                     match style_bundle_variant.as_mut() {
-                        SvgBundleVariant::Solid(bundle) => bundle
+                        SvgBundleVariant::SolidFill(bundle) => bundle
                             .shape_path
                             .set_attribute(SvgAttribute::D { d: path.into() }),
-                        SvgBundleVariant::Gradient(bundle) => bundle
+                        SvgBundleVariant::GradientFill(bundle) => bundle
+                            .shape_path
+                            .set_attribute(SvgAttribute::D { d: path.into() }),
+                        SvgBundleVariant::ImageFill(bundle) => bundle
                             .shape_path
                             .set_attribute(SvgAttribute::D { d: path.into() }),
                         _ => {}
@@ -482,10 +485,17 @@ pub fn apply_stroke_path_mixin_changes(
     for (StrokePathMixin(stroke_path), mut bundle_variant) in query.iter_mut() {
         // Apply stroke path to styles
         match bundle_variant.as_mut() {
-            SvgBundleVariant::Solid(bundle) => bundle.shape_path.set_attribute(SvgAttribute::D {
-                d: stroke_path.into(),
-            }),
-            SvgBundleVariant::Gradient(bundle) => {
+            SvgBundleVariant::SolidFill(bundle) => {
+                bundle.shape_path.set_attribute(SvgAttribute::D {
+                    d: stroke_path.into(),
+                })
+            }
+            SvgBundleVariant::GradientFill(bundle) => {
+                bundle.shape_path.set_attribute(SvgAttribute::D {
+                    d: stroke_path.into(),
+                })
+            }
+            SvgBundleVariant::ImageFill(bundle) => {
                 bundle.shape_path.set_attribute(SvgAttribute::D {
                     d: stroke_path.into(),
                 })
@@ -506,7 +516,7 @@ pub fn apply_solid_paint_changes(
         for paint_parent_entity in paint_parent_entities {
             if let Ok(mut bundle_variant) = style_query.get_mut(*paint_parent_entity) {
                 match bundle_variant.as_mut() {
-                    SvgBundleVariant::Solid(bundle) => {
+                    SvgBundleVariant::SolidFill(bundle) => {
                         bundle.shape_path.set_style(SvgStyle::Fill {
                             fill: (&solid_paint.color).into(),
                         })
@@ -533,7 +543,7 @@ pub fn apply_gradient_paint_changes(
                 style_query.get_mut(*paint_parent_entity)
             {
                 match bundle_variant.as_mut() {
-                    SvgBundleVariant::Gradient(bundle) => {
+                    SvgBundleVariant::GradientFill(bundle) => {
                         match gradient_paint.variant {
                             GradientVariant::Linear { transform } => {
                                 let (start, end) = extract_linear_gradient_params_from_transform(

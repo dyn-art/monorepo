@@ -20,7 +20,6 @@ authors = ["@bennoinbeta"]
 bevy_app = "0.13.0"
 bevy_ecs = "0.13.0"
 bevy_hierarchy = "0.13.0"
-bevy_time = "0.13.0"
 bevy_transform = "0.13.0"
 bevy_utils = "0.13.0"
 
