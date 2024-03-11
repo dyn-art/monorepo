@@ -13,7 +13,7 @@ use systems::{
         apply_size_mixin_changes, apply_solid_paint_changes, apply_stroke_path_mixin_changes,
         apply_transform_changes, apply_visibility_mixin_changes,
     },
-    insert::{insert_node_svg_bundle, insert_style_svg_bundle},
+    prepare::{insert_node_svg_bundle, insert_style_svg_bundle, sync_node_size_with_style},
 };
 
 pub struct CompSvgBuilderPlugin {
@@ -27,7 +27,7 @@ pub struct CompSvgBuilderPlugin {
 // due to the deferred execution nature of entity spawn commands within the ECS schedule.
 #[derive(SystemSet, Debug, Hash, PartialEq, Eq, Clone)]
 enum CompSvgBuilderSystemSet {
-    Insert,
+    Prepare,
     PreApply,
     Apply,
     Extract,
@@ -43,7 +43,7 @@ impl Plugin for CompSvgBuilderPlugin {
         app.configure_sets(
             Last,
             (
-                CompSvgBuilderSystemSet::Insert,
+                CompSvgBuilderSystemSet::Prepare,
                 CompSvgBuilderSystemSet::PreApply,
                 CompSvgBuilderSystemSet::Apply,
                 CompSvgBuilderSystemSet::Extract,
@@ -56,9 +56,10 @@ impl Plugin for CompSvgBuilderPlugin {
         app.add_systems(
             Last,
             (
-                insert_node_svg_bundle.in_set(CompSvgBuilderSystemSet::Insert),
+                sync_node_size_with_style.in_set(CompSvgBuilderSystemSet::Prepare),
+                insert_node_svg_bundle.in_set(CompSvgBuilderSystemSet::Prepare),
                 insert_style_svg_bundle
-                    .in_set(CompSvgBuilderSystemSet::Insert)
+                    .in_set(CompSvgBuilderSystemSet::Prepare)
                     .after(insert_node_svg_bundle),
                 apply_node_children_changes.in_set(CompSvgBuilderSystemSet::PreApply),
                 apply_node_styles_changes

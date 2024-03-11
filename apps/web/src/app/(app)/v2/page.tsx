@@ -49,12 +49,12 @@ const DEFAULT_DTIF: COMP.CompDtif = {
 					opacity: 1,
 					paintId: 'p3'
 				},
-				{
-					type: 'Fill',
-					blendMode: 'Normal',
-					opacity: 0.9,
-					paintId: 'p2'
-				},
+				// {
+				// 	type: 'Fill',
+				// 	blendMode: 'Normal',
+				// 	opacity: 0.9,
+				// 	paintId: 'p2'
+				// },
 				{
 					type: 'Fill',
 					blendMode: 'Normal',
@@ -118,7 +118,7 @@ const DEFAULT_DTIF: COMP.CompDtif = {
 						green: 191,
 						blue: 225
 					},
-					position: 0
+					position: 1
 				}
 			]
 		}

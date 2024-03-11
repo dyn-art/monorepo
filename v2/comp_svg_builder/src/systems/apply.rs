@@ -1,15 +1,18 @@
-use crate::svg::{
-    svg_bundle::SvgBundleVariant,
-    svg_element::{
-        attributes::{SvgAttribute, SvgMeasurementUnit},
-        styles::{SvgDisplayStyle, SvgFillStyle, SvgStyle},
-        SvgElementId,
+use crate::{
+    resources::svg_context::SvgContextRes,
+    svg::{
+        svg_bundle::SvgBundleVariant,
+        svg_element::{
+            attributes::{SvgAttribute, SvgMeasurementUnit},
+            styles::{SvgDisplayStyle, SvgStyle, SvgStyleColor},
+            SvgElementId, SvgTag,
+        },
     },
 };
 use bevy_ecs::{
     entity::Entity,
     query::{Changed, With, Without},
-    system::{ParamSet, Query},
+    system::{ParamSet, Query, ResMut},
 };
 use bevy_hierarchy::Children;
 use bevy_transform::components::Transform;
@@ -18,7 +21,7 @@ use dyn_comp_common::{
     error::NoneErr,
     mixins::{
         BlendModeMixin, OpacityMixin, PaintParentMixin, PathMixin, SizeMixin, StrokePathMixin,
-        StyleChildrenMixin, VisibilityMixin,
+        StyleChildrenMixin, StyleParentMixin, VisibilityMixin,
     },
     nodes::CompNode,
     paints::{CompPaint, GradientCompPaint, SolidCompPaint},
@@ -459,6 +462,9 @@ pub fn apply_path_mixin_changes(
                         SvgBundleVariant::Solid(bundle) => bundle
                             .shape_path
                             .set_attribute(SvgAttribute::D { d: path.into() }),
+                        SvgBundleVariant::Gradient(bundle) => bundle
+                            .shape_path
+                            .set_attribute(SvgAttribute::D { d: path.into() }),
                         _ => {}
                     }
                 }
@@ -479,26 +485,30 @@ pub fn apply_stroke_path_mixin_changes(
             SvgBundleVariant::Solid(bundle) => bundle.shape_path.set_attribute(SvgAttribute::D {
                 d: stroke_path.into(),
             }),
+            SvgBundleVariant::Gradient(bundle) => {
+                bundle.shape_path.set_attribute(SvgAttribute::D {
+                    d: stroke_path.into(),
+                })
+            }
             _ => {}
         }
     }
 }
 
 pub fn apply_solid_paint_changes(
-    query: Query<(&SolidCompPaint, &PaintParentMixin), (With<CompPaint>, Changed<SolidCompPaint>)>,
-    mut parent_query: Query<&mut SvgBundleVariant>,
+    paint_query: Query<
+        (&SolidCompPaint, &PaintParentMixin),
+        (With<CompPaint>, Changed<SolidCompPaint>),
+    >,
+    mut style_query: Query<&mut SvgBundleVariant>,
 ) {
-    for (solid_paint, PaintParentMixin(parent_entities)) in query.iter() {
-        for parent_entity in parent_entities {
-            if let Ok(mut bundle_variant) = parent_query.get_mut(*parent_entity) {
+    for (solid_paint, PaintParentMixin(paint_parent_entities)) in paint_query.iter() {
+        for paint_parent_entity in paint_parent_entities {
+            if let Ok(mut bundle_variant) = style_query.get_mut(*paint_parent_entity) {
                 match bundle_variant.as_mut() {
                     SvgBundleVariant::Solid(bundle) => {
                         bundle.shape_path.set_style(SvgStyle::Fill {
-                            fill: SvgFillStyle::RGB {
-                                red: solid_paint.color.red,
-                                green: solid_paint.color.green,
-                                blue: solid_paint.color.blue,
-                            },
+                            fill: (&solid_paint.color).into(),
                         })
                     }
                     _ => {}
@@ -508,18 +518,19 @@ pub fn apply_solid_paint_changes(
     }
 }
 
-// TODO
+// TODO: This system doesn't update if size changes
 pub fn apply_gradient_paint_changes(
-    query: Query<
+    mut svg_context_res: ResMut<SvgContextRes>,
+    paint_query: Query<
         (&GradientCompPaint, &PaintParentMixin),
         (With<CompPaint>, Changed<GradientCompPaint>),
     >,
-    mut parent_query: Query<(&mut SvgBundleVariant, &SizeMixin)>,
+    mut style_query: Query<(&mut SvgBundleVariant, &SizeMixin)>,
 ) {
-    for (gradient_paint, PaintParentMixin(parent_entities)) in query.iter() {
-        for parent_entity in parent_entities {
+    for (gradient_paint, PaintParentMixin(paint_parent_entities)) in paint_query.iter() {
+        for paint_parent_entity in paint_parent_entities {
             if let Ok((mut bundle_variant, SizeMixin(Size(size)))) =
-                parent_query.get_mut(*parent_entity)
+                style_query.get_mut(*paint_parent_entity)
             {
                 match bundle_variant.as_mut() {
                     SvgBundleVariant::Gradient(bundle) => {
@@ -534,6 +545,34 @@ pub fn apply_gradient_paint_changes(
                                     SvgAttribute::X2 { x2: end.x },
                                     SvgAttribute::Y2 { y2: end.y },
                                 ]);
+
+                                // Remove old gradient stop elements
+                                bundle.gradient.clear_children();
+                                bundle
+                                    .gradient_stops
+                                    .drain(..)
+                                    .for_each(|mut gradient_stop| gradient_stop.destroy());
+
+                                // Add new gradient stop elements
+                                for gradient_stop in &gradient_paint.stops {
+                                    let mut gradient_stop_element =
+                                        svg_context_res.create_element(SvgTag::Stop);
+                                    gradient_stop_element.set_attributes(vec![
+                                        SvgAttribute::Offset {
+                                            offset: gradient_stop.position.get(),
+                                        },
+                                        SvgAttribute::StopColor {
+                                            stop_color: (&gradient_stop.color).into(),
+                                        },
+                                        SvgAttribute::StopOpacity {
+                                            stop_opacity: gradient_stop.opacity.get(),
+                                        },
+                                    ]);
+                                    bundle
+                                        .gradient
+                                        .append_child_in_bundle_context(&mut gradient_stop_element);
+                                    bundle.gradient_stops.push(gradient_stop_element);
+                                }
                             }
                             GradientVariant::Radial { transform } => {
                                 // TODO

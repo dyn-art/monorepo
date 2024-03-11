@@ -149,7 +149,11 @@ position: Percent;
 /**
  * The color of the stop.
  */
-color: Color }
+color: Color; 
+/**
+ * The opacity of the stop.
+ */
+opacity?: Percent }
 
 export type GradientPaint = { variant: GradientVariant; stops: GradientColorStop[]; blendMode?: BlendMode; opacity?: Opacity }
 
@@ -247,7 +251,9 @@ export type StrokeStyle = { width: number; paintId: string; visibility?: Visibil
 
 export type Style = ({ type: "Fill" } & FillStyle) | ({ type: "Stroke" } & StrokeStyle)
 
-export type SvgAttribute = { type: "Id"; id: SvgElementId } | { type: "Class"; class: string } | { type: "Width"; width: number; unit: SvgMeasurementUnit } | { type: "Height"; height: number; unit: SvgMeasurementUnit } | { type: "Transform"; transform: SvgTransformAttribute } | { type: "PatternTransform"; patternTransform: SvgTransformAttribute } | { type: "D"; d: SvgPathAttribute } | { type: "ClipPath"; clipPath: SvgElementId } | { type: "Fill"; fill: SvgFillAttribute } | { type: "PatternUnits"; patternUnits: SvgUnits } | { type: "GradientUnits"; gradientUnits: SvgUnits } | { type: "Href"; href: SvgHrefAttribute } | { type: "PreserveAspectRatio"; preserveAspectRatio: string } | { type: "X1"; x1: number } | { type: "Y1"; y1: number } | { type: "X2"; x2: number } | { type: "Y2"; y2: number } | { type: "Offset"; offset: number } | { type: "StopColor"; stopColor: string }
+export type SvgAttribute = { type: "Id"; id: SvgElementId } | { type: "Class"; class: string } | { type: "Width"; width: number; unit: SvgMeasurementUnit } | { type: "Height"; height: number; unit: SvgMeasurementUnit } | { type: "Transform"; transform: SvgTransformAttribute } | { type: "PatternTransform"; patternTransform: SvgTransformAttribute } | { type: "D"; d: SvgPathAttribute } | { type: "ClipPath"; clipPath: SvgElementId } | { type: "Fill"; fill: SvgAttributeColor } | { type: "PatternUnits"; patternUnits: SvgUnits } | { type: "GradientUnits"; gradientUnits: SvgUnits } | { type: "Href"; href: SvgHrefAttribute } | { type: "PreserveAspectRatio"; preserveAspectRatio: string } | { type: "X1"; x1: number } | { type: "Y1"; y1: number } | { type: "X2"; x2: number } | { type: "Y2"; y2: number } | { type: "Offset"; offset: number } | { type: "StopColor"; stopColor: SvgAttributeColor } | { type: "StopOpacity"; stopOpacity: number }
+
+export type SvgAttributeColor = { RGB: { red: number; green: number; blue: number } } | { RGBA: { red: number; green: number; blue: number; alpha: number } } | { Reference: { id: SvgElementId } } | "None"
 
 /**
  * Emitted when an attribute of a SvgElement is removed.
@@ -307,10 +313,6 @@ export type SvgElementDeletedChange = Record<string, never>
 
 export type SvgElementId = number
 
-export type SvgFillAttribute = { RGB: { red: number; green: number; blue: number } } | { RGBA: { red: number; green: number; blue: number; alpha: number } } | { Reference: { id: SvgElementId } }
-
-export type SvgFillStyle = { RGB: { red: number; green: number; blue: number } } | { RGBA: { red: number; green: number; blue: number; alpha: number } } | "None"
-
 export type SvgHrefAttribute = { Base64: { content: string } } | { Url: { url: string } }
 
 export type SvgMeasurementUnit = "Pixel" | "Percent"
@@ -321,9 +323,9 @@ export type SvgPointerEventsStyle = "None" | "All"
 
 export type SvgStringOutputEvent = { value: string }
 
-export type SvgStrokeStyle = { RGB: { red: number; green: number; blue: number } } | { RGBA: { red: number; green: number; blue: number; alpha: number } } | "None"
+export type SvgStyle = { type: "Display"; display: SvgDisplayStyle } | { type: "BlendMode"; blendMode: SvgBlendModeStyle } | { type: "Opacity"; opacity: number } | { type: "Fill"; fill: SvgStyleColor } | { type: "Stroke"; stroke: SvgStyleColor } | { type: "StrokeWidth"; strokeWidth: number } | { type: "StrokeOpacity"; strokeOpacity: number } | { type: "PointerEvents"; pointerEvents: SvgPointerEventsStyle }
 
-export type SvgStyle = { type: "Display"; display: SvgDisplayStyle } | { type: "BlendMode"; blendMode: SvgBlendModeStyle } | { type: "Opacity"; opacity: number } | { type: "Fill"; fill: SvgFillStyle } | { type: "Stroke"; stroke: SvgStrokeStyle } | { type: "StrokeWidth"; strokeWidth: number } | { type: "StrokeOpacity"; strokeOpacity: number } | { type: "PointerEvents"; pointerEvents: SvgPointerEventsStyle }
+export type SvgStyleColor = { RGB: { red: number; green: number; blue: number } } | { RGBA: { red: number; green: number; blue: number; alpha: number } } | { Reference: { id: SvgElementId } } | "None"
 
 /**
  * Emitted when a style property of a SvgElement is removed.

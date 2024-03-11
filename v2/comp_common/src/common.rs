@@ -24,7 +24,7 @@ impl Degree {
     }
 }
 
-#[derive(Debug, Default, PartialEq, Copy, Clone)]
+#[derive(Debug, PartialEq, Copy, Clone)]
 #[cfg_attr(
     feature = "serde_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
@@ -40,6 +40,12 @@ impl Percent {
     #[inline]
     pub fn get(&self) -> f32 {
         self.0
+    }
+}
+
+impl Default for Percent {
+    fn default() -> Self {
+        Self::new(1.0)
     }
 }
 
@@ -395,4 +401,8 @@ pub struct GradientColorStop {
 
     /// The color of the stop.
     pub color: Color,
+
+    /// The opacity of the stop.
+    #[serde(default)]
+    pub opacity: Percent,
 }

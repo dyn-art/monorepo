@@ -76,7 +76,7 @@ impl ShapeNodeSvgBundle {
         #[cfg(feature = "tracing")]
         {
             use crate::svg::svg_element::attributes::SvgAttribute;
-            use crate::svg::svg_element::styles::SvgFillStyle;
+            use crate::svg::svg_element::styles::SvgStyleColor;
 
             root_g_element.set_attribute(SvgAttribute::Class {
                 class: Self::create_element_name(
@@ -94,7 +94,7 @@ impl ShapeNodeSvgBundle {
                 ),
             });
             click_area_rect_element.set_style(SvgStyle::Fill {
-                fill: SvgFillStyle::RGBA {
+                fill: SvgStyleColor::RGBA {
                     red: 255,
                     green: 204,
                     blue: 203,

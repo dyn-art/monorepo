@@ -1,3 +1,5 @@
+use super::SvgElementId;
+
 #[derive(Debug, PartialEq, Clone)]
 #[cfg_attr(
     feature = "serde_support",
@@ -16,10 +18,10 @@ pub enum SvgStyle {
         opacity: f32,
     },
     Fill {
-        fill: SvgFillStyle,
+        fill: SvgStyleColor,
     },
     Stroke {
-        stroke: SvgStrokeStyle,
+        stroke: SvgStyleColor,
     },
     #[cfg_attr(feature = "serde_support", serde(rename_all = "camelCase"))]
     StrokeWidth {
@@ -73,11 +75,11 @@ impl SvgStyle {
                 SvgBlendModeStyle::Color => String::from("color"),
                 SvgBlendModeStyle::Luminosity => String::from("luminosity"),
             },
-            Self::Fill { fill } => match fill {
-                SvgFillStyle::RGB { red, green, blue } => {
+            Self::Fill { fill: color } | Self::Stroke { stroke: color } => match color {
+                SvgStyleColor::RGB { red, green, blue } => {
                     format!("rgb({red}, {green}, {blue})")
                 }
-                SvgFillStyle::RGBA {
+                SvgStyleColor::RGBA {
                     red,
                     green,
                     blue,
@@ -85,21 +87,8 @@ impl SvgStyle {
                 } => {
                     format!("rgb({red}, {green}, {blue}, {alpha})")
                 }
-                SvgFillStyle::None => String::from("none"),
-            },
-            Self::Stroke { stroke } => match stroke {
-                SvgStrokeStyle::RGB { red, green, blue } => {
-                    format!("rgb({red}, {green}, {blue})")
-                }
-                SvgStrokeStyle::RGBA {
-                    red,
-                    green,
-                    blue,
-                    alpha,
-                } => {
-                    format!("rgb({red}, {green}, {blue}, {alpha})")
-                }
-                SvgStrokeStyle::None => String::from("none"),
+                SvgStyleColor::Reference { id } => format!("url(#{id})"),
+                SvgStyleColor::None => String::from("none"),
             },
             Self::StrokeWidth { stroke_width } => stroke_width.to_string(),
             Self::StrokeOpacity { stroke_opacity } => stroke_opacity.to_string(),
@@ -152,46 +141,6 @@ pub enum SvgBlendModeStyle {
     Luminosity,
 }
 
-#[derive(Debug, PartialEq, Copy, Clone)]
-#[cfg_attr(
-    feature = "serde_support",
-    derive(serde::Serialize, serde::Deserialize, specta::Type)
-)]
-pub enum SvgFillStyle {
-    RGB {
-        red: u8,
-        green: u8,
-        blue: u8,
-    },
-    RGBA {
-        red: u8,
-        green: u8,
-        blue: u8,
-        alpha: f32,
-    },
-    None,
-}
-
-#[derive(Debug, PartialEq, Copy, Clone)]
-#[cfg_attr(
-    feature = "serde_support",
-    derive(serde::Serialize, serde::Deserialize, specta::Type)
-)]
-pub enum SvgStrokeStyle {
-    RGB {
-        red: u8,
-        green: u8,
-        blue: u8,
-    },
-    RGBA {
-        red: u8,
-        green: u8,
-        blue: u8,
-        alpha: f32,
-    },
-    None,
-}
-
 #[derive(Debug, Default, PartialEq, Copy, Clone)]
 #[cfg_attr(
     feature = "serde_support",
@@ -201,4 +150,27 @@ pub enum SvgPointerEventsStyle {
     #[default]
     None,
     All,
+}
+
+#[derive(Debug, PartialEq, Copy, Clone)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type)
+)]
+pub enum SvgStyleColor {
+    RGB {
+        red: u8,
+        green: u8,
+        blue: u8,
+    },
+    RGBA {
+        red: u8,
+        green: u8,
+        blue: u8,
+        alpha: f32,
+    },
+    Reference {
+        id: SvgElementId,
+    },
+    None,
 }

@@ -4,6 +4,7 @@ use crate::{
         svg_bundle::SvgBundle,
         svg_element::{
             attributes::{SvgAttribute, SvgUnits},
+            styles::{SvgStyle, SvgStyleColor},
             SvgElement, SvgTag,
         },
     },
@@ -76,6 +77,11 @@ impl GradientStyleSvgBundle {
         defs_element.append_child_in_bundle_context(&mut gradient_element);
 
         let mut shape_path_element = cx.create_element(SvgTag::Path);
+        shape_path_element.set_style(SvgStyle::Fill {
+            fill: SvgStyleColor::Reference {
+                id: gradient_element.get_id(),
+            },
+        });
         root_g_element.append_child_in_bundle_context(&mut shape_path_element);
 
         #[cfg(feature = "tracing")]
