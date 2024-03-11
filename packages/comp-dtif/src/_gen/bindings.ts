@@ -12,7 +12,7 @@ export type AssetContent =
  */
 { type: "Url"; url: string }
 
-export type AssetContentType = "Unknown" | "Jpeg" | "Png" | "Svg" | "Ttf"
+export type AssetContentType = { type: "Unknown" } | { type: "Jpeg" } | { type: "Png" } | { type: "Svg"; width: number; height: number } | { type: "Ttf" }
 
 export type BlendMode = "Normal" | "Multiply" | "Screen" | "Overlay" | "Darken" | "Lighten" | "ColorDodge" | "ColorBurn" | "HardLight" | "SoftLight" | "Difference" | "Exclusion" | "Hue" | "Saturation" | "Color" | "Luminosity"
 
@@ -315,7 +315,7 @@ export type SvgElementId = number
 
 export type SvgHrefAttribute = { Base64: { content: string; contentType: SvgHrefContentType } } | { Url: { url: string } }
 
-export type SvgHrefContentType = "Jpeg" | "Png"
+export type SvgHrefContentType = "Jpeg" | "Png" | "Svg"
 
 export type SvgMeasurementUnit = "Pixel" | "Percent"
 

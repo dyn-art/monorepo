@@ -222,6 +222,7 @@ pub enum SvgHrefAttribute {
 pub enum SvgHrefContentType {
     Jpeg,
     Png,
+    Svg,
 }
 
 impl SvgHrefContentType {
@@ -229,6 +230,7 @@ impl SvgHrefContentType {
         match self {
             SvgHrefContentType::Jpeg => "image/jpeg",
             SvgHrefContentType::Png => "image/png",
+            SvgHrefContentType::Svg => "image/svg+xml",
         }
     }
 }

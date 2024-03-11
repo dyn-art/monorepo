@@ -27,7 +27,8 @@ pub enum AssetContent {
 #[derive(Debug, Default, Copy, Clone)]
 #[cfg_attr(
     feature = "serde_support",
-    derive(serde::Serialize, serde::Deserialize, specta::Type)
+    derive(serde::Serialize, serde::Deserialize, specta::Type),
+    serde(tag = "type")
 )]
 pub enum AssetContentType {
     #[default]
@@ -35,8 +36,10 @@ pub enum AssetContentType {
     // Image
     Jpeg,
     Png,
-    // Vector
-    Svg,
+    Svg {
+        width: u16,
+        height: u16,
+    },
     // Font
     Ttf,
 }
@@ -46,5 +49,13 @@ pub struct ImageAsset {
     pub content: Vec<u8>,
     pub width: u16,
     pub height: u16,
-    pub image_type: ImageType,
+    pub content_type: ImageAssetContentType,
+}
+
+#[derive(Debug, Clone)]
+pub enum ImageAssetContentType {
+    Png,
+    Jpeg,
+    Svg,
+    Unsupported(ImageType),
 }

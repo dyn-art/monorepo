@@ -1,9 +1,9 @@
 use crate::{
-    asset::{Asset, AssetContent, AssetContentType, ImageAsset},
+    asset::{Asset, AssetContent, AssetContentType, ImageAsset, ImageAssetContentType},
     asset_id::{AssetId, FontId, ImageId, InnerImageId},
 };
 use bevy_ecs::system::Resource;
-use imagesize::{blob_size, image_type};
+use imagesize::{blob_size, image_type, ImageType};
 use slotmap::SlotMap;
 use std::sync::Arc;
 
@@ -31,7 +31,7 @@ impl AssetDatabaseRes {
                     None
                 }
             }
-            AssetContentType::Jpeg | AssetContentType::Png => {
+            AssetContentType::Jpeg | AssetContentType::Png | AssetContentType::Svg { .. } => {
                 if let Some(image_id) = self.insert_as_image(asset) {
                     Some(AssetId::Image(image_id))
                 } else {
@@ -45,20 +45,37 @@ impl AssetDatabaseRes {
     pub fn insert_as_image(&mut self, asset: Asset) -> Option<ImageId> {
         match asset.content {
             AssetContent::Binary { content } => {
-                if let Ok(image_type) = image_type(&content) {
-                    if let Ok(image_size) = blob_size(&content) {
+                match asset.content_type {
+                    AssetContentType::Svg { width, height } => {
                         let image_asset = ImageAsset {
                             content,
-                            width: u16::try_from(image_size.width).unwrap(), // TODO: Handle if too large image provided (> 65k pixel)
-                            height: u16::try_from(image_size.height).unwrap(),
-                            image_type,
+                            width,
+                            height,
+                            content_type: ImageAssetContentType::Svg,
                         };
                         Some(ImageId(self.image_db.insert(image_asset)))
-                    } else {
-                        None
                     }
-                } else {
-                    None
+                    _ => {
+                        if let Ok(image_type) = image_type(&content) {
+                            if let Ok(image_size) = blob_size(&content) {
+                                let image_asset = ImageAsset {
+                                    content,
+                                    width: u16::try_from(image_size.width).unwrap(), // TODO: Handle if too large image provided (> 65k pixel)
+                                    height: u16::try_from(image_size.height).unwrap(),
+                                    content_type: match image_type {
+                                        ImageType::Png => ImageAssetContentType::Png,
+                                        ImageType::Jpeg => ImageAssetContentType::Jpeg,
+                                        _ => ImageAssetContentType::Unsupported(image_type),
+                                    },
+                                };
+                                Some(ImageId(self.image_db.insert(image_asset)))
+                            } else {
+                                None
+                            }
+                        } else {
+                            None
+                        }
+                    }
                 }
             }
             _ => None,

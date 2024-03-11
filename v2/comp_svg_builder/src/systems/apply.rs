@@ -20,7 +20,7 @@ use bevy_ecs::{
 };
 use bevy_hierarchy::Children;
 use bevy_transform::components::Transform;
-use dyn_comp_asset::resources::AssetDatabaseRes;
+use dyn_comp_asset::{asset::ImageAssetContentType, resources::AssetDatabaseRes};
 use dyn_comp_common::{
     common::{GradientVariant, ImageScaleMode, Size, Visibility},
     error::NoneErr,
@@ -810,9 +810,10 @@ pub fn apply_image_asset_mixin_changes(
                             bundle.image.set_attribute(SvgAttribute::Href {
                                 href: SvgHrefAttribute::Base64 {
                                     content: BASE64_STANDARD.encode(image.content.clone()),
-                                    content_type: match image.image_type {
-                                        ImageType::Png => SvgHrefContentType::Png,
-                                        ImageType::Jpeg => SvgHrefContentType::Jpeg,
+                                    content_type: match image.content_type {
+                                        ImageAssetContentType::Png => SvgHrefContentType::Png,
+                                        ImageAssetContentType::Jpeg => SvgHrefContentType::Jpeg,
+                                        ImageAssetContentType::Svg => SvgHrefContentType::Svg,
                                         _ => return,
                                     },
                                 },

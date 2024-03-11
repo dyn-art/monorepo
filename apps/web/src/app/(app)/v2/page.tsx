@@ -133,7 +133,7 @@ const DEFAULT_DTIF: COMP.DtifComposition = {
 				type: 'Url',
 				url: 'https://raw.githubusercontent.com/dyndotart/monorepo/develop/docs/resources/images/logo-rounded.png'
 			},
-			contentType: 'Png'
+			contentType: { type: 'Png' }
 		}
 	},
 	events: [
