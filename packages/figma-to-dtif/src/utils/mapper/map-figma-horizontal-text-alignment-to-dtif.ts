@@ -1,6 +1,6 @@
 import type { COMP } from '@dyn/dtif';
 
-export function mapFigmaHorizontalTextAlignmentToDTIF(
+export function mapFigmaHorizontalTextAlignmentToDtif(
 	figmaBlendMode: TextNode['textAlignHorizontal']
 ): COMP.HorizontalTextAlignment {
 	switch (figmaBlendMode) {

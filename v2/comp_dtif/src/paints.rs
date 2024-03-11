@@ -2,8 +2,8 @@ use crate::{dtif_injector::DtifInjector, ToEcsBundleImpl};
 use dyn_comp_asset::asset_id::AssetId;
 use dyn_comp_common::{
     bundles::{GradientPaintBundle, ImagePaintBundle, SolidPaintBundle},
-    common::{BlendMode, Color, GradientColorStop, GradientVariant, ImageScaleMode, Opacity},
-    mixins::{BlendModeMixin, ImageAssetMixin, OpacityMixin},
+    common::{Color, GradientColorStop, GradientVariant, ImageScaleMode},
+    mixins::ImageAssetMixin,
     paints::{CompPaint, CompPaintVariant, GradientCompPaint, ImageCompPaint, SolidCompPaint},
 };
 
@@ -19,10 +19,6 @@ pub enum Paint {
 #[serde(rename_all = "camelCase")]
 pub struct SolidPaint {
     pub color: Color,
-    #[serde(default)]
-    pub blend_mode: BlendMode,
-    #[serde(default)]
-    pub opacity: Opacity,
 }
 
 impl ToEcsBundleImpl for SolidPaint {
@@ -34,8 +30,6 @@ impl ToEcsBundleImpl for SolidPaint {
                 variant: CompPaintVariant::Solid,
             },
             solid: SolidCompPaint { color: self.color },
-            blend_mode: BlendModeMixin(self.blend_mode),
-            opacity: OpacityMixin(self.opacity),
         }
     }
 }
@@ -46,10 +40,6 @@ pub struct ImagePaint {
     pub asset_id: String,
     #[serde(default)]
     pub scale_mode: ImageScaleMode,
-    #[serde(default)]
-    pub blend_mode: BlendMode,
-    #[serde(default)]
-    pub opacity: Opacity,
 }
 
 impl ToEcsBundleImpl for ImagePaint {
@@ -73,8 +63,6 @@ impl ToEcsBundleImpl for ImagePaint {
                     None
                 },
             ),
-            blend_mode: BlendModeMixin(self.blend_mode),
-            opacity: OpacityMixin(self.opacity),
         }
     }
 }
@@ -84,10 +72,6 @@ impl ToEcsBundleImpl for ImagePaint {
 pub struct GradientPaint {
     pub variant: GradientVariant,
     pub stops: Vec<GradientColorStop>,
-    #[serde(default)]
-    pub blend_mode: BlendMode,
-    #[serde(default)]
-    pub opacity: Opacity,
 }
 
 impl ToEcsBundleImpl for GradientPaint {
@@ -102,8 +86,6 @@ impl ToEcsBundleImpl for GradientPaint {
                 variant: self.variant,
                 stops: self.stops.iter().copied().collect(),
             },
-            blend_mode: BlendModeMixin(self.blend_mode),
-            opacity: OpacityMixin(self.opacity),
         }
     }
 }

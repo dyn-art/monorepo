@@ -110,8 +110,6 @@ pub struct TextCompNodeBundle {
 pub struct SolidPaintBundle {
     pub paint: CompPaint,
     pub solid: SolidCompPaint,
-    pub blend_mode: BlendModeMixin,
-    pub opacity: OpacityMixin,
     // https://github.com/Nilirad/bevy_prototype_lyon/issues/207
     // pub parent: PaintParentMixin,
 }
@@ -121,8 +119,6 @@ pub struct ImagePaintBundle {
     pub paint: CompPaint,
     pub image: ImageCompPaint,
     pub asset: ImageAssetMixin,
-    pub blend_mode: BlendModeMixin,
-    pub opacity: OpacityMixin,
     // https://github.com/Nilirad/bevy_prototype_lyon/issues/207
     // pub parent: PaintParentMixin,
 }
@@ -131,8 +127,6 @@ pub struct ImagePaintBundle {
 pub struct GradientPaintBundle {
     pub paint: CompPaint,
     pub gradient: GradientCompPaint,
-    pub blend_mode: BlendModeMixin,
-    pub opacity: OpacityMixin,
     // https://github.com/Nilirad/bevy_prototype_lyon/issues/207
     // pub parent: PaintParentMixin,
 }

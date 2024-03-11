@@ -1,7 +1,7 @@
 use crate::{dtif_injector::DtifInjector, ToEcsBundleImpl};
 use dyn_comp_common::{
     bundles::{FillStyleBundle, StrokeStyleBundle},
-    common::{BlendMode, Opacity, Visibility},
+    common::{BlendMode, Opacity},
     mixins::{BlendModeMixin, OpacityMixin, PaintChildMixin, VisibilityMixin},
     styles::{CompStyle, CompStyleVariant, FillCompStyle, StrokeCompStyle},
 };
@@ -18,7 +18,7 @@ pub enum Style {
 pub struct FillStyle {
     pub paint_id: String,
     #[serde(default)]
-    pub visibility: Visibility,
+    pub visible: bool,
     #[serde(default)]
     pub blend_mode: BlendMode,
     #[serde(default)]
@@ -40,7 +40,7 @@ impl ToEcsBundleImpl for FillStyle {
                     .get(&self.paint_id)
                     .copied(),
             ),
-            visibility: VisibilityMixin(self.visibility),
+            visibility: VisibilityMixin(self.visible),
             blend_mode: BlendModeMixin(self.blend_mode),
             opacity: OpacityMixin(self.opacity),
         }
@@ -53,7 +53,7 @@ pub struct StrokeStyle {
     width: f32,
     pub paint_id: String,
     #[serde(default)]
-    pub visibility: Visibility,
+    pub visible: bool,
     #[serde(default)]
     pub blend_mode: BlendMode,
     #[serde(default)]
@@ -80,7 +80,7 @@ impl ToEcsBundleImpl for StrokeStyle {
                     .get(&self.paint_id)
                     .copied(),
             ),
-            visibility: VisibilityMixin(self.visibility),
+            visibility: VisibilityMixin(self.visible),
             blend_mode: BlendModeMixin(self.blend_mode),
             opacity: OpacityMixin(self.opacity),
         }

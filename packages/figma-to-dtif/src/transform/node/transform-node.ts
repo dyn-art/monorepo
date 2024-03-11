@@ -1,8 +1,9 @@
-import type { COMP } from '@dyn/dtif';
+import type { COMP } from '@dyn/comp-dtif';
 
 import { InvisibleNodeException } from '../../exceptions';
 import type { TToTransformNode } from '../../FigmaNodeTreeProcessor';
 import type { Transformer } from '../../Transformer';
+import type { TFigmaFormat } from '../../types';
 import { transformFrameNode } from './transform-frame-node';
 import { transformGroupNode } from './transform-group-node';
 import { transformNodeToImage } from './transform-node-to-image';
@@ -13,7 +14,7 @@ export async function transformNode(
 	toTransformNode: TToTransformNode,
 	cx: Transformer,
 	config: TTransformNodeConfig
-): Promise<COMP.NodeBundle> {
+): Promise<COMP.Node> {
 	const { includeInvisible, shouldExportFrame } = config;
 
 	// Check whether node is visible
@@ -26,11 +27,12 @@ export async function transformNode(
 			if (toTransformNode.isRoot || !shouldExportFrame) {
 				return transformFrameNode(toTransformNode.node, {
 					childrenIds: toTransformNode.childrenIds,
-					paintIds: toTransformNode.paintIds
+					fills: toTransformNode.fills,
+					strokes: toTransformNode.strokes
 				});
 			}
 			return transformNodeToImage(toTransformNode.node, cx, {
-				contentType: shouldExportFrame.contentType
+				format: shouldExportFrame.format
 			});
 		}
 		case 'Group':
@@ -45,7 +47,7 @@ export async function transformNode(
 			return transformShapeNode(toTransformNode);
 		case 'Uncategorized':
 			return transformNodeToImage(toTransformNode.node, cx, {
-				contentType: 'PNG'
+				format: 'PNG'
 			});
 	}
 }
@@ -53,5 +55,5 @@ export async function transformNode(
 export interface TTransformNodeConfig {
 	includeInvisible: boolean;
 	exportContainerNode: FrameNode;
-	shouldExportFrame: false | { contentType: COMP.ContentType };
+	shouldExportFrame: false | { format: TFigmaFormat };
 }

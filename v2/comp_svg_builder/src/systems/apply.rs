@@ -22,7 +22,7 @@ use bevy_hierarchy::Children;
 use bevy_transform::components::Transform;
 use dyn_comp_asset::{asset::ImageAssetContentType, resources::AssetDatabaseRes};
 use dyn_comp_common::{
-    common::{GradientVariant, ImageScaleMode, Size, Visibility},
+    common::{GradientVariant, ImageScaleMode, Size},
     error::NoneErr,
     mixins::{
         BlendModeMixin, ImageAssetMixin, OpacityMixin, PaintParentMixin, PathMixin, SizeMixin,
@@ -33,7 +33,6 @@ use dyn_comp_common::{
     styles::{CompStyle, FillCompStyle, StrokeCompStyle},
 };
 use glam::{Mat3, Vec2};
-use imagesize::ImageType;
 use smallvec::SmallVec;
 use std::{
     collections::{HashMap, HashSet},
@@ -363,10 +362,11 @@ fn reorder_node_styles(
 pub fn apply_visibility_mixin_changes(
     mut query: Query<(&VisibilityMixin, &mut SvgBundleVariant), Changed<VisibilityMixin>>,
 ) {
-    for (VisibilityMixin(visibility), mut bundle_variant) in query.iter_mut() {
-        let display = match visibility {
-            Visibility::Visible => SvgDisplayStyle::Block,
-            Visibility::Hidden => SvgDisplayStyle::None,
+    for (VisibilityMixin(visible), mut bundle_variant) in query.iter_mut() {
+        let display = if *visible {
+            SvgDisplayStyle::Block
+        } else {
+            SvgDisplayStyle::None
         };
         bundle_variant
             .get_root_element_mut()
