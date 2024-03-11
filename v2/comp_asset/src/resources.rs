@@ -49,8 +49,8 @@ impl AssetDatabaseRes {
                     if let Ok(image_size) = blob_size(&content) {
                         let image_asset = ImageAsset {
                             content,
-                            width: image_size.width,
-                            height: image_size.height,
+                            width: u16::try_from(image_size.width).unwrap(), // TODO: Handle if too large image provided (> 65k pixel)
+                            height: u16::try_from(image_size.height).unwrap(),
                             image_type,
                         };
                         Some(ImageId(self.image_db.insert(image_asset)))

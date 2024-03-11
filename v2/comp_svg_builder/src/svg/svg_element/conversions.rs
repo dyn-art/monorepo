@@ -6,7 +6,7 @@ use super::{
 };
 use bevy_transform::components::Transform;
 use dyn_comp_common::common::{BlendMode, Color};
-use glam::EulerRot;
+use glam::{EulerRot, Mat3};
 use tiny_skia_path::{Path, PathSegment};
 
 impl From<&Transform> for SvgTransformAttribute {
@@ -44,6 +44,24 @@ impl From<&Transform> for SvgTransformAttribute {
             d: cos_a * sy,
             tx,
             ty,
+        }
+    }
+}
+
+impl From<&Mat3> for SvgTransformAttribute {
+    fn from(mat3: &Mat3) -> Self {
+        //   x y z
+        // | a d tx |
+        // | b e ty |
+        // | c f j |
+        // https://developer.mozilla.org/en-US/docs/Web/CSS/transform-function/matrix
+        Self::Matrix {
+            a: mat3.x_axis.x,
+            b: mat3.x_axis.y,
+            c: mat3.y_axis.x,
+            d: mat3.y_axis.y,
+            tx: mat3.z_axis.x,
+            ty: mat3.z_axis.y,
         }
     }
 }

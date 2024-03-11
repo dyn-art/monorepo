@@ -16,6 +16,7 @@ output_svg_string = []
 tracing = []
 
 [dependencies]
+dyn-comp-asset = { path = "../comp_asset" }
 dyn-comp-common = { path = "../comp_common" }
 bevy_app = { workspace = true }
 bevy_ecs = { workspace = true }

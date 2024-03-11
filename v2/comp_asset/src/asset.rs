@@ -44,7 +44,7 @@ pub enum AssetContentType {
 #[derive(Debug, Clone)]
 pub struct ImageAsset {
     pub content: Vec<u8>,
-    pub width: usize,
-    pub height: usize,
+    pub width: u16,
+    pub height: u16,
     pub image_type: ImageType,
 }

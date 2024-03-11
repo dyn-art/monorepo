@@ -555,6 +555,7 @@ dependencies = [
  "bevy_ecs",
  "bevy_hierarchy",
  "bevy_transform",
+ "dyn-comp-asset",
  "dyn-comp-common",
  "glam",
  "log",

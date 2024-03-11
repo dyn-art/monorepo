@@ -121,6 +121,19 @@ const DEFAULT_DTIF: COMP.CompDtif = {
 					position: 1
 				}
 			]
+		},
+		p5: {
+			type: 'Image',
+			assetId: 'a1'
+		}
+	},
+	assets: {
+		a1: {
+			content: {
+				type: 'Url',
+				url: 'https://raw.githubusercontent.com/dyndotart/monorepo/develop/docs/resources/images/logo-rounded.png'
+			},
+			contentType: 'Png'
 		}
 	},
 	events: [

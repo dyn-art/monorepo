@@ -3,7 +3,7 @@ use crate::{
     svg::{
         svg_bundle::SvgBundleVariant,
         svg_element::{
-            attributes::{SvgAttribute, SvgMeasurementUnit},
+            attributes::{SvgAttribute, SvgMeasurementUnit, SvgTransformAttribute},
             styles::{SvgDisplayStyle, SvgStyle},
             SvgElementId, SvgTag,
         },
@@ -12,19 +12,20 @@ use crate::{
 use bevy_ecs::{
     entity::Entity,
     query::{Changed, With, Without},
-    system::{ParamSet, Query, ResMut},
+    system::{ParamSet, Query, Res, ResMut},
 };
 use bevy_hierarchy::Children;
 use bevy_transform::components::Transform;
+use dyn_comp_asset::resources::AssetDatabaseRes;
 use dyn_comp_common::{
-    common::{GradientVariant, Size, Visibility},
+    common::{GradientVariant, ImageScaleMode, Size, Visibility},
     error::NoneErr,
     mixins::{
-        BlendModeMixin, OpacityMixin, PaintParentMixin, PathMixin, SizeMixin, StrokePathMixin,
-        StyleChildrenMixin, VisibilityMixin,
+        BlendModeMixin, ImageAssetMixin, OpacityMixin, PaintParentMixin, PathMixin, SizeMixin,
+        StrokePathMixin, StyleChildrenMixin, VisibilityMixin,
     },
     nodes::CompNode,
-    paints::{CompPaint, GradientCompPaint, SolidCompPaint},
+    paints::{CompPaint, GradientCompPaint, ImageCompPaint, SolidCompPaint},
     styles::{CompStyle, FillCompStyle, StrokeCompStyle},
 };
 use glam::{Mat3, Vec2};
@@ -528,7 +529,8 @@ pub fn apply_solid_paint_changes(
     }
 }
 
-// TODO: This system doesn't update if size changes
+// TODO: This system doesn't account for size changes
+// -> Either new system to handle those or integrate into this system
 pub fn apply_gradient_paint_changes(
     mut svg_context_res: ResMut<SvgContextRes>,
     paint_query: Query<
@@ -613,4 +615,146 @@ fn extract_linear_gradient_params_from_transform(
         Vec2::new(start_end[0].x * shape_width, start_end[0].y * shape_height),
         Vec2::new(start_end[1].x * shape_width, start_end[1].y * shape_height),
     )
+}
+
+// TODO: This system doesn't account for size changes
+// -> Either new system to handle those or integrate into this system
+pub fn apply_image_paint_changes(
+    asset_db_res: Res<AssetDatabaseRes>,
+    paint_query: Query<
+        (&ImageCompPaint, &ImageAssetMixin, &PaintParentMixin),
+        (With<CompPaint>, Changed<ImageCompPaint>),
+    >,
+    mut style_query: Query<(&mut SvgBundleVariant, &SizeMixin)>,
+) {
+    for (image_paint, ImageAssetMixin(maybe_image_id), PaintParentMixin(paint_parent_entities)) in
+        paint_query.iter()
+    {
+        if let Some(image) = maybe_image_id.and_then(|id| asset_db_res.get_image(id)) {
+            for paint_parent_entity in paint_parent_entities {
+                if let Ok((mut bundle_variant, SizeMixin(Size(size)))) =
+                    style_query.get_mut(*paint_parent_entity)
+                {
+                    match bundle_variant.as_mut() {
+                        SvgBundleVariant::ImageFill(bundle) => match image_paint.scale_mode {
+                            ImageScaleMode::Tile {
+                                rotation,
+                                scaling_factor,
+                            } => {
+                                let tile_width = f32::from(image.width) * scaling_factor;
+                                let tile_height = f32::from(image.height) * scaling_factor;
+
+                                bundle.pattern.set_attributes(vec![
+                                    SvgAttribute::PatternTransform {
+                                        pattern_transform: SvgTransformAttribute::Rotate {
+                                            rotation: rotation,
+                                        },
+                                    },
+                                    SvgAttribute::Width {
+                                        width: tile_width,
+                                        unit: SvgMeasurementUnit::Pixel,
+                                    },
+                                    SvgAttribute::Height {
+                                        height: tile_height,
+                                        unit: SvgMeasurementUnit::Pixel,
+                                    },
+                                ]);
+                                bundle.image.set_attributes(vec![
+                                    SvgAttribute::Width {
+                                        width: tile_width,
+                                        unit: SvgMeasurementUnit::Pixel,
+                                    },
+                                    SvgAttribute::Height {
+                                        height: tile_height,
+                                        unit: SvgMeasurementUnit::Pixel,
+                                    },
+                                ]);
+                            }
+                            ImageScaleMode::Crop { transform } => {
+                                let (image_width, image_height, image_transform) =
+                                    calculate_cropped_image_transform(
+                                        (size.x, size.y),
+                                        (f32::from(image.width), f32::from(image.height)),
+                                        &transform,
+                                    );
+
+                                bundle.pattern.set_attributes(vec![
+                                    SvgAttribute::Width {
+                                        width: image_width,
+                                        unit: SvgMeasurementUnit::Pixel,
+                                    },
+                                    SvgAttribute::Height {
+                                        height: image_height,
+                                        unit: SvgMeasurementUnit::Pixel,
+                                    },
+                                ]);
+                                bundle.image.set_attributes(vec![
+                                    SvgAttribute::Transform {
+                                        transform: (&image_transform).into(),
+                                    },
+                                    SvgAttribute::Width {
+                                        width: image_width,
+                                        unit: SvgMeasurementUnit::Pixel,
+                                    },
+                                    SvgAttribute::Height {
+                                        height: image_height,
+                                        unit: SvgMeasurementUnit::Pixel,
+                                    },
+                                ]);
+                            }
+                            _ => {}
+                        },
+                        _ => {}
+                    }
+                }
+            }
+        }
+    }
+}
+
+fn calculate_cropped_image_transform(
+    container_dimensions: (f32, f32),
+    image_content: (f32, f32),
+    transform: &Mat3,
+) -> (f32, f32, Mat3) {
+    let (container_width, container_height) = container_dimensions;
+    let (image_width, image_height) = image_content;
+
+    // Calculate aspect ratios for container and image
+    let container_ratio = container_width / container_height;
+    let image_ratio = image_width / image_height;
+
+    // Determine new image dimensions based on aspect ratio comparison
+    let (adjusted_image_width, adjusted_image_height) = if image_ratio > container_ratio {
+        (container_height * image_ratio, container_height)
+    } else {
+        (container_width, container_width / image_ratio)
+    };
+
+    // Calculate scale adjustment ratios
+    let x_ratio = container_width / adjusted_image_width;
+    let y_ratio = container_height / adjusted_image_height;
+
+    // Extract scale components from the matrix and adjust them
+    let scale_x = transform.x_axis.x;
+    let scale_y = transform.y_axis.y;
+    let adjusted_scale_x = (1.0 / scale_x) * x_ratio;
+    let adjusted_scale_y = (1.0 / scale_y) * y_ratio;
+
+    // Calculate adjusted translation.
+    let tx = -adjusted_image_width * transform.z_axis.x * adjusted_scale_x;
+    let ty = -adjusted_image_height * transform.z_axis.y * adjusted_scale_y;
+
+    // Construct the adjusted transformation matrix
+    let adjusted_transform = Mat3::from_scale_angle_translation(
+        Vec2::new(adjusted_scale_x, adjusted_scale_y),
+        0.0,
+        Vec2::new(tx, ty),
+    );
+
+    return (
+        adjusted_image_width,
+        adjusted_image_height,
+        adjusted_transform,
+    );
 }
