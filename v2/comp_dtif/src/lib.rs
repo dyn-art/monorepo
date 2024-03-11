@@ -1,8 +1,8 @@
-pub mod common;
 pub mod dtif_injector;
 pub mod events;
 pub mod nodes;
 pub mod paints;
+pub mod styles;
 
 use crate::nodes::Node;
 use dtif_injector::DtifInjector;

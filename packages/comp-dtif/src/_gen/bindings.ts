@@ -99,11 +99,7 @@ export type DtifEntityMovedEvent = { entity: string; dx: number; dy: number }
 
 export type DtifEntitySetPositionEvent = { entity: string; x: number; y: number }
 
-export type DtifFill = { paintId: string; blendMode: BlendMode; opacity: Opacity }
-
 export type DtifInputEvent = ({ type: "CompositionResized" } & DtifCompositionResizedEvent) | ({ type: "CompositionViewportChanged" } & DtifCompositionViewportChangedEvent) | ({ type: "EntityMoved" } & DtifEntityMovedEvent) | ({ type: "EntitySetPosition" } & DtifEntitySetPositionEvent) | ({ type: "EntityDeleted" } & DtifEntityDeletedEvent)
-
-export type DtifStroke = { fill: DtifFill; width: number }
 
 export type Entity = number
 
@@ -113,7 +109,7 @@ export type EntityMovedInputEvent = { entity: Entity; dx: number; dy: number }
 
 export type EntitySetPositionInputEvent = { entity: Entity; x: number; y: number }
 
-export type Fill = { paint: Entity; blendMode: BlendMode; opacity: Opacity }
+export type FillStyle = { paintId: string; visibility?: Visibility; blendMode?: BlendMode; opacity?: Opacity }
 
 export type FontMetadata = { 
 /**
@@ -143,7 +139,7 @@ export type FontStyle =
  */
 "Oblique"
 
-export type FrameNode = { clipContent?: boolean; translation: Vec2; angle?: Degree; size: Size; cornerRadii?: CornerRadii; visibility?: Visibility; fill: DtifFill[]; blendMode?: BlendMode; opacity?: Opacity; stroke?: DtifStroke[]; children?: string[] }
+export type FrameNode = { clipContent?: boolean; translation: Vec2; angle?: Degree; size: Size; cornerRadii?: CornerRadii; visibility?: Visibility; blendMode?: BlendMode; opacity?: Opacity; styles?: Style[]; children?: string[] }
 
 export type GradientColorStop = { 
 /**
@@ -153,7 +149,11 @@ position: Percent;
 /**
  * The color of the stop.
  */
-color: Color; type: "GradientColorStop" }
+color: Color; 
+/**
+ * The opacity of the stop.
+ */
+opacity?: Percent }
 
 export type GradientPaint = { variant: GradientVariant; stops: GradientColorStop[]; blendMode?: BlendMode; opacity?: Opacity }
 
@@ -237,7 +237,7 @@ export type Percent = number
 
 export type Pixel = number
 
-export type RectangleNode = { translation: Vec2; angle?: Degree; size: Size; cornerRadii?: CornerRadii; visibility?: Visibility; fill: DtifFill[]; blendMode?: BlendMode; opacity?: Opacity; stroke?: DtifStroke[] }
+export type RectangleNode = { translation: Vec2; angle?: Degree; size: Size; cornerRadii?: CornerRadii; visibility?: Visibility; blendMode?: BlendMode; opacity?: Opacity; styles?: Style[] }
 
 export type SelectionChangeOutputEvent = { selected: Entity[] }
 
@@ -247,9 +247,13 @@ export type SolidPaint = { color: Color; blendMode?: BlendMode; opacity?: Opacit
 
 export type SpectaExport = { comp_dtif: CompDtif; svg_comp_input_event: SvgCompInputEvent; svg_comp_output_event: SvgCompOutputEvent }
 
-export type Stroke = { fill: Fill; width: number }
+export type StrokeStyle = { width: number; paintId: string; visibility?: Visibility; blendMode?: BlendMode; opacity?: Opacity }
 
-export type SvgAttribute = { type: "Id"; id: SvgElementId } | { type: "Class"; class: string } | { type: "Width"; width: number; unit: SvgMeasurementUnit } | { type: "Height"; height: number; unit: SvgMeasurementUnit } | { type: "Transform"; transform: SvgTransformAttribute } | { type: "PatternTransform"; patternTransform: SvgTransformAttribute } | { type: "D"; d: SvgPathAttribute } | { type: "ClipPath"; clipPath: SvgElementId } | { type: "Fill"; fill: SvgFillAttribute } | { type: "PatternUnits"; patternUnits: SvgUnits } | { type: "GradientUnits"; gradientUnits: SvgUnits } | { type: "Href"; href: SvgHrefAttribute } | { type: "PreserveAspectRatio"; preserveAspectRatio: string } | { type: "X1"; x1: number } | { type: "Y1"; y1: number } | { type: "X2"; x2: number } | { type: "Y2"; y2: number } | { type: "Offset"; offset: number } | { type: "StopColor"; stopColor: string }
+export type Style = ({ type: "Fill" } & FillStyle) | ({ type: "Stroke" } & StrokeStyle)
+
+export type SvgAttribute = { type: "Id"; id: SvgElementId } | { type: "Class"; class: string } | { type: "Width"; width: number; unit: SvgMeasurementUnit } | { type: "Height"; height: number; unit: SvgMeasurementUnit } | { type: "Transform"; transform: SvgTransformAttribute } | { type: "PatternTransform"; patternTransform: SvgTransformAttribute } | { type: "D"; d: SvgPathAttribute } | { type: "ClipPath"; clipPath: SvgElementId } | { type: "Fill"; fill: SvgAttributeColor } | { type: "PatternUnits"; patternUnits: SvgUnits } | { type: "GradientUnits"; gradientUnits: SvgUnits } | { type: "Href"; href: SvgHrefAttribute } | { type: "PreserveAspectRatio"; preserveAspectRatio: string } | { type: "X1"; x1: number } | { type: "Y1"; y1: number } | { type: "X2"; x2: number } | { type: "Y2"; y2: number } | { type: "Offset"; offset: number } | { type: "StopColor"; stopColor: SvgAttributeColor } | { type: "StopOpacity"; stopOpacity: number }
+
+export type SvgAttributeColor = { RGB: { red: number; green: number; blue: number } } | { RGBA: { red: number; green: number; blue: number; alpha: number } } | { Reference: { id: SvgElementId } } | "None"
 
 /**
  * Emitted when an attribute of a SvgElement is removed.
@@ -286,11 +290,16 @@ export type SvgDisplayStyle = "Block" | "None"
  */
 export type SvgElementAppendedChange = { parentId: SvgElementId }
 
-export type SvgElementChange = ({ type: "ElementCreated" } & SvgElementCreatedChange) | ({ type: "ElementDeleted" }) | ({ type: "ElementAppended" } & SvgElementAppendedChange) | ({ type: "AttributeUpdated" } & SvgAttributeUpdatedChange) | ({ type: "AttributeRemoved" } & SvgAttributeRemovedChange) | ({ type: "StyleUpdated" } & SvgStyleUpdatedChange) | ({ type: "StyleRemoved" } & SvgStyleRemovedChange) | ({ type: "ElementReordered" } & SvgElementReorderedChange)
+export type SvgElementChange = ({ type: "ElementCreated" } & SvgElementCreatedChange) | ({ type: "ElementDeleted" }) | ({ type: "ElementAppended" } & SvgElementAppendedChange) | ({ type: "AttributeUpdated" } & SvgAttributeUpdatedChange) | ({ type: "AttributeRemoved" } & SvgAttributeRemovedChange) | ({ type: "StyleUpdated" } & SvgStyleUpdatedChange) | ({ type: "StyleRemoved" } & SvgStyleRemovedChange) | ({ type: "ElementChildrenReordered" } & SvgElementChildrenReorderedChange)
 
 export type SvgElementChanges = { id: SvgElementId; changes: SvgElementChange[] }
 
 export type SvgElementChangesOutputEvent = { changes: SvgElementChanges }
+
+/**
+ * Emitted when children of a SvgElement are reordered.
+ */
+export type SvgElementChildrenReorderedChange = { newOrder: SvgElementId[] }
 
 /**
  * Emitted when a new SvgElement is created.
@@ -304,15 +313,6 @@ export type SvgElementDeletedChange = Record<string, never>
 
 export type SvgElementId = number
 
-/**
- * Emitted when an SvgElement is reordered within its parent.
- */
-export type SvgElementReorderedChange = { elementId: SvgElementId; newParentId: SvgElementId; insertBeforeId: SvgElementId | null }
-
-export type SvgFillAttribute = { RGB: { red: number; green: number; blue: number } } | { RGBA: { red: number; green: number; blue: number; alpha: number } } | { Reference: { id: SvgElementId } }
-
-export type SvgFillStyle = { RGB: { red: number; green: number; blue: number } } | { RGBA: { red: number; green: number; blue: number; alpha: number } } | "None"
-
 export type SvgHrefAttribute = { Base64: { content: string } } | { Url: { url: string } }
 
 export type SvgMeasurementUnit = "Pixel" | "Percent"
@@ -323,9 +323,9 @@ export type SvgPointerEventsStyle = "None" | "All"
 
 export type SvgStringOutputEvent = { value: string }
 
-export type SvgStrokeStyle = { RGB: { red: number; green: number; blue: number } } | { RGBA: { red: number; green: number; blue: number; alpha: number } } | "None"
+export type SvgStyle = { type: "Display"; display: SvgDisplayStyle } | { type: "BlendMode"; blendMode: SvgBlendModeStyle } | { type: "Opacity"; opacity: number } | { type: "Fill"; fill: SvgStyleColor } | { type: "Stroke"; stroke: SvgStyleColor } | { type: "StrokeWidth"; strokeWidth: number } | { type: "StrokeOpacity"; strokeOpacity: number } | { type: "PointerEvents"; pointerEvents: SvgPointerEventsStyle }
 
-export type SvgStyle = { type: "Display"; display: SvgDisplayStyle } | { type: "BlendMode"; blendMode: SvgBlendModeStyle } | { type: "Opacity"; opacity: number } | { type: "Fill"; fill: SvgFillStyle } | { type: "Stroke"; stroke: SvgStrokeStyle } | { type: "StrokeWidth"; strokeWidth: number } | { type: "StrokeOpacity"; strokeOpacity: number } | { type: "PointerEvents"; pointerEvents: SvgPointerEventsStyle }
+export type SvgStyleColor = { RGB: { red: number; green: number; blue: number } } | { RGBA: { red: number; green: number; blue: number; alpha: number } } | { Reference: { id: SvgElementId } } | "None"
 
 /**
  * Emitted when a style property of a SvgElement is removed.

@@ -1,8 +1,5 @@
 use crate::{
-    events::DtifInputEvent,
-    nodes::{FrameNode, GroupNode, Node},
-    paints::Paint,
-    CompDtif, ToEcsBundleImpl,
+    events::DtifInputEvent, nodes::Node, paints::Paint, styles::Style, CompDtif, ToEcsBundleImpl,
 };
 use bevy_ecs::{
     entity::Entity,
@@ -12,7 +9,7 @@ use bevy_hierarchy::BuildWorldChildren;
 use dyn_comp_asset::{asset_id::AssetId, resources::AssetDatabaseRes};
 use dyn_comp_common::{
     events::InputEvent,
-    mixins::{FillMixin, PaintParentMixin, Root, StrokeMixin},
+    mixins::{PaintChildMixin, PaintParentMixin, Root, StyleChildrenMixin, StyleParentMixin},
 };
 use smallvec::{smallvec, SmallVec};
 use std::collections::HashMap;
@@ -73,8 +70,7 @@ impl DtifInjector {
             let node_entity = self.spawn_node(node, world).id();
             self.sid_to_entity.insert(node_sid, node_entity);
 
-            self.process_node_fills(node_entity, node, world);
-            self.process_node_strokes(node_entity, node, world);
+            self.process_node_styles(node_entity, node, world);
             self.process_node_children(node_entity, node, dtif, world);
 
             return node_entity;
@@ -96,91 +92,80 @@ impl DtifInjector {
         dtif: &CompDtif,
         world: &mut World,
     ) {
-        if let Node::Frame(FrameNode { children, .. }) | Node::Group(GroupNode { children, .. }) =
-            node
-        {
-            // Process child nodes and collect their Bevy entity ids
-            let new_children: Vec<Entity> = children
-                .iter()
-                .filter_map(|child_sid| self.process_node(child_sid.clone(), dtif, world))
-                .collect();
+        let dtif_children = match node {
+            Node::Frame(node) => &node.children,
+            Node::Group(node) => &node.children,
+            _ => return,
+        };
 
-            // Establish Bevy parent-child relationships
-            if !new_children.is_empty() {
-                world.entity_mut(node_entity).push_children(&new_children);
-            }
+        // Process child nodes and collect their Bevy entity ids
+        let child_entities: Vec<Entity> = dtif_children
+            .iter()
+            .filter_map(|child_sid| self.process_node(child_sid.clone(), dtif, world))
+            .collect();
+
+        // Establish Bevy parent-child relationships
+        if !child_entities.is_empty() {
+            world.entity_mut(node_entity).push_children(&child_entities);
         }
     }
 
-    fn process_node_fills(&mut self, node_entity: Entity, node: &Node, world: &mut World) {
-        let dtif_fills = match node {
-            Node::Frame(node) => &node.fill,
-            Node::Rectangle(node) => &node.fill,
+    fn process_node_styles(&mut self, node_entity: Entity, node: &Node, world: &mut World) {
+        let dtif_styles = match node {
+            Node::Frame(node) => &node.styles,
+            Node::Rectangle(node) => &node.styles,
             _ => return,
         };
-        let fills = dtif_fills
+
+        // Process styles and collect their Bevy entity ids
+        let style_entities: SmallVec<[Entity; 2]> = dtif_styles
             .iter()
-            .rev()
-            .filter_map(|dtif_fill| {
-                let fill = dtif_fill.to_fill(&self)?;
-                let mut paint_entity_world = world.get_entity_mut(fill.paint)?;
+            .filter_map(|style| self.process_style(style, node_entity, world))
+            .collect();
 
-                if let Some(mut paint_parent_mixin) =
-                    paint_entity_world.get_mut::<PaintParentMixin>()
-                {
-                    paint_parent_mixin.0.push(node_entity);
-                } else {
-                    paint_entity_world.insert(PaintParentMixin(smallvec![node_entity]));
-                }
-
-                Some(fill)
-            })
-            .collect::<SmallVec<_>>();
-
-        if !fills.is_empty() {
-            if let Some(mut node_entity_world) = world.get_entity_mut(node_entity) {
-                node_entity_world.insert(FillMixin(fills));
-            }
+        // Establish Bevy parent-child relationship
+        if !style_entities.is_empty() {
+            world
+                .entity_mut(node_entity)
+                .insert(StyleChildrenMixin(style_entities));
         }
     }
 
-    fn process_node_strokes(&mut self, node_entity: Entity, node: &Node, world: &mut World) {
-        let dtif_strokes = match node {
-            Node::Frame(node) => &node.stroke,
-            Node::Rectangle(node) => &node.stroke,
-            _ => return,
-        };
-        let strokes = dtif_strokes
-            .iter()
-            .rev()
-            .filter_map(|dtif_stroke| {
-                let stroke = dtif_stroke.to_storke(&self)?;
-                let mut paint_entity_world = world.get_entity_mut(stroke.fill.paint)?;
+    fn process_style(
+        &self,
+        style: &Style,
+        node_entity: Entity,
+        world: &mut World,
+    ) -> Option<Entity> {
+        // Spawn style
+        let mut style_entity_world_mut = self.spawn_style(style, world);
+        style_entity_world_mut.insert(StyleParentMixin(node_entity));
+        let paint_entity = style_entity_world_mut.get::<PaintChildMixin>()?.0?;
+        let style_entity = style_entity_world_mut.id();
 
-                if let Some(mut paint_parent_mixin) =
-                    paint_entity_world.get_mut::<PaintParentMixin>()
-                {
-                    paint_parent_mixin.0.push(node_entity);
-                } else {
-                    paint_entity_world.insert(PaintParentMixin(smallvec![node_entity]));
-                }
+        // Reference style entity in paint
+        let mut paint_entity_world_mut = world.get_entity_mut(paint_entity)?;
+        if let Some(mut paint_parent_mixin) = paint_entity_world_mut.get_mut::<PaintParentMixin>() {
+            paint_parent_mixin.0.push(style_entity);
+        } else {
+            paint_entity_world_mut.insert(PaintParentMixin(smallvec![style_entity]));
+        }
 
-                Some(stroke)
-            })
-            .collect::<SmallVec<_>>();
+        return Some(style_entity);
+    }
 
-        if !strokes.is_empty() {
-            if let Some(mut node_entity_world) = world.get_entity_mut(node_entity) {
-                node_entity_world.insert(StrokeMixin(strokes));
-            }
+    fn spawn_style<'a>(&self, style: &Style, world: &'a mut World) -> EntityWorldMut<'a> {
+        match style {
+            Style::Fill(style) => world.spawn(style.to_ecs_bundle(&self)),
+            Style::Stroke(style) => world.spawn(style.to_ecs_bundle(&self)),
         }
     }
 
     fn process_paints(&mut self, dtif: &CompDtif, world: &mut World) {
-        dtif.paints.iter().for_each(|(id, paint)| {
+        for (id, paint) in dtif.paints.iter() {
             let paint_entity = self.spawn_paint(&paint, world).id();
             self.sid_to_entity.insert(id.clone(), paint_entity);
-        });
+        }
     }
 
     fn spawn_paint<'a>(&self, paint: &Paint, world: &'a mut World) -> EntityWorldMut<'a> {

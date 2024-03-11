@@ -3,10 +3,13 @@ pub mod conversions;
 pub mod element_changes;
 pub mod styles;
 
-use self::{attributes::SvgAttribute, styles::SvgStyle};
-use super::svg_bundle::{node::NodeSvgBundleMixin, SvgBundle};
+use self::{
+    attributes::SvgAttribute, element_changes::SvgElementChildrenReorderedChange, styles::SvgStyle,
+};
+use super::svg_bundle::{SvgBundle, SvgBundleVariant};
 use bevy_ecs::{component::Component, entity::Entity, query::Without, system::Query};
 use dyn_comp_common::mixins::Root;
+use smallvec::SmallVec;
 use std::{
     collections::{HashMap, HashSet},
     fmt::Display,
@@ -29,10 +32,13 @@ pub struct SvgElement {
     /// The style properties of the SvgElement.
     styles: HashMap<&'static str, SvgStyle>,
     /// Children of the SvgElement in the Svg tree.
-    children: Vec<SvgElementChild>,
+    children: SmallVec<[SvgElementChild; 2]>,
     /// Applied changes after last drain.
     #[cfg(feature = "output_svg_element_changes")]
     changes: Vec<SvgElementChange>,
+    /// Applied deferred changes after last drain.
+    #[cfg(feature = "output_svg_element_changes")]
+    deferred_changes: Vec<SvgElementChange>,
     /// Whether the element was created in the current update cycle (before first update drain).
     #[cfg(feature = "output_svg_element_changes")]
     was_created_in_current_update_cycle: bool,
@@ -50,9 +56,11 @@ impl SvgElement {
             tag,
             attributes: inital_attributes,
             styles: inital_styles,
-            children: Vec::new(),
+            children: SmallVec::new(),
             #[cfg(feature = "output_svg_element_changes")]
             changes: Vec::new(),
+            #[cfg(feature = "output_svg_element_changes")]
+            deferred_changes: Vec::new(),
             #[cfg(feature = "output_svg_element_changes")]
             was_created_in_current_update_cycle: true,
         };
@@ -75,12 +83,13 @@ impl SvgElement {
                 }
             }
 
-            self.register_change(SvgElementChange::AttributeUpdated(
-                SvgAttributeUpdatedChange {
+            self.register_change(
+                SvgElementChange::AttributeUpdated(SvgAttributeUpdatedChange {
                     key: attribute.key(),
                     new_value: attribute.to_svg_string(),
-                },
-            ));
+                }),
+                false,
+            );
         }
 
         self.attributes.insert(attribute.key(), attribute);
@@ -109,10 +118,13 @@ impl SvgElement {
                 }
             }
 
-            self.register_change(SvgElementChange::StyleUpdated(SvgStyleUpdatedChange {
-                key: style.key(),
-                new_value: style.to_svg_string(),
-            }));
+            self.register_change(
+                SvgElementChange::StyleUpdated(SvgStyleUpdatedChange {
+                    key: style.key(),
+                    new_value: style.to_svg_string(),
+                }),
+                false,
+            );
         }
 
         self.styles.insert(style.key(), style);
@@ -162,9 +174,12 @@ impl SvgElement {
 
     #[cfg(feature = "output_svg_element_changes")]
     pub fn append_to_parent(&mut self, parent_id: SvgElementId) {
-        self.register_change(SvgElementChange::ElementAppended(
-            self::element_changes::SvgElementAppendedChange { parent_id },
-        ));
+        self.register_change(
+            SvgElementChange::ElementAppended(self::element_changes::SvgElementAppendedChange {
+                parent_id,
+            }),
+            false,
+        );
     }
 
     pub fn remove_child(&mut self, id: SvgElementId) {
@@ -180,28 +195,55 @@ impl SvgElement {
         self.children.clear()
     }
 
+    pub fn reorder_children_mut<F>(&mut self, reorder_operation: F)
+    where
+        F: FnOnce(&mut SmallVec<[SvgElementChild; 2]>),
+    {
+        let original_order: SmallVec<[SvgElementId; 2]> =
+            self.children.iter().map(|child| child.id).collect();
+
+        // Apply the reorder operation provided by the caller
+        reorder_operation(&mut self.children);
+
+        // Check if the order has changed and emit reorder event if so
+        let new_order: SmallVec<[SvgElementId; 2]> =
+            self.children.iter().map(|child| child.id).collect();
+        if new_order != original_order {
+            self.register_change(
+                SvgElementChange::ElementChildrenReordered(SvgElementChildrenReorderedChange {
+                    new_order: new_order.into_vec(),
+                }),
+                true,
+            );
+        }
+    }
+
     // =========================================================================
     // Changes
     // =========================================================================
 
     #[cfg(feature = "output_svg_element_changes")]
     pub fn init_element_created(&mut self, entity: Option<Entity>) {
-        self.register_change(SvgElementChange::ElementCreated(SvgElementCreatedChange {
-            parent_id: None,
-            tag_name: self.tag.as_str(),
-            attributes: self
-                .attributes
-                .values()
-                .map(|value| value.to_tuple())
-                .collect(),
-            styles: self.styles.values().map(|value| value.to_tuple()).collect(),
-            entity,
-        }));
+        self.register_change(
+            SvgElementChange::ElementCreated(SvgElementCreatedChange {
+                parent_id: None,
+                tag_name: self.tag.as_str(),
+                attributes: self
+                    .attributes
+                    .values()
+                    .map(|value| value.to_tuple())
+                    .collect(),
+                styles: self.styles.values().map(|value| value.to_tuple()).collect(),
+                entity,
+            }),
+            false,
+        );
     }
 
     #[cfg(feature = "output_svg_element_changes")]
-    pub fn register_change(&mut self, element_change: SvgElementChange) {
-        if self.was_created_in_current_update_cycle {
+    fn register_change(&mut self, element_change: SvgElementChange, deferred: bool) {
+        // Try to minimize events if element was created by applying changes to the ElementCreated event
+        if self.was_created_in_current_update_cycle && !deferred {
             if let Some(update) = self.changes.first_mut() {
                 match update {
                     SvgElementChange::ElementCreated(element_created_event) => match element_change
@@ -232,7 +274,12 @@ impl SvgElement {
                 }
             }
         }
-        self.changes.push(element_change);
+
+        if deferred {
+            self.deferred_changes.push(element_change);
+        } else {
+            self.changes.push(element_change);
+        }
     }
 
     // =========================================================================
@@ -240,9 +287,12 @@ impl SvgElement {
     // =========================================================================
 
     #[cfg(feature = "output_svg_element_changes")]
-    pub fn drain_changes(&mut self) -> Vec<SvgElementChange> {
+    pub fn drain_changes(&mut self) -> (Vec<SvgElementChange>, Vec<SvgElementChange>) {
         self.was_created_in_current_update_cycle = false;
-        self.changes.drain(..).collect()
+        return (
+            self.changes.drain(..).collect(),
+            self.deferred_changes.drain(..).collect(),
+        );
     }
 
     /// Destroys this SvgElement.
@@ -250,13 +300,16 @@ impl SvgElement {
     /// It is the responsibility of the caller to ensure that any references to this element are properly managed.
     #[cfg(feature = "output_svg_element_changes")]
     pub fn destroy(&mut self) {
-        self.register_change(SvgElementChange::ElementDeleted(SvgElementDeletedChange {}));
+        self.register_change(
+            SvgElementChange::ElementDeleted(SvgElementDeletedChange {}),
+            true,
+        );
     }
 
     pub fn to_string(
         &self,
         bundle: &dyn SvgBundle,
-        maybe_bundle_query: Option<&Query<&NodeSvgBundleMixin, Without<Root>>>,
+        maybe_bundle_variant_query: Option<&Query<&SvgBundleVariant, Without<Root>>>,
     ) -> String {
         let mut result = String::new();
 
@@ -284,18 +337,19 @@ impl SvgElement {
         }
 
         // Append children
-        let bundle_elements = bundle.get_elements();
+        let bundle_elements = bundle.get_elements_map();
         for child in &self.children {
             match child.identifier {
                 SvgElementChildIdentifier::InSvgBundleContext => {
                     if let Some(child_element) = bundle_elements.get(&child.id) {
-                        result.push_str(&child_element.to_string(bundle, maybe_bundle_query));
+                        result
+                            .push_str(&child_element.to_string(bundle, maybe_bundle_variant_query));
                     }
                 }
                 SvgElementChildIdentifier::InWorldContext(entity) => {
-                    if let Some(bundle_query) = maybe_bundle_query {
-                        if let Ok(NodeSvgBundleMixin(bundle)) = bundle_query.get(entity) {
-                            result.push_str(&bundle.to_string(bundle_query));
+                    if let Some(bundle_variant_query) = maybe_bundle_variant_query {
+                        if let Ok(bundle_variant) = bundle_variant_query.get(entity) {
+                            result.push_str(&bundle_variant.to_string(bundle_variant_query));
                         }
                     }
                 }

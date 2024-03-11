@@ -1,37 +1,37 @@
-use super::FillSvgBundle;
 use crate::{
     resources::svg_context::SvgContextRes,
     svg::{
-        svg_bundle::{stroke::StrokeSvgBundle, SvgBundle},
+        svg_bundle::SvgBundle,
         svg_element::{
             attributes::SvgAttribute,
             styles::{SvgPointerEventsStyle, SvgStyle},
-            SvgElement, SvgElementId, SvgTag,
+            SvgElement, SvgTag,
         },
     },
 };
 use bevy_ecs::entity::Entity;
 use smallvec::SmallVec;
-use std::collections::BTreeMap;
 
 #[derive(Debug, Clone)]
 pub struct FrameNodeSvgBundle {
-    pub node_entity: Entity,
+    pub entity: Entity,
 
     pub root_g: SvgElement,
     /**/ pub defs: SvgElement,
     /**//**/ pub children_clip_path: SvgElement,
     /**//**//**/ pub children_clipped_path: SvgElement,
     /**/ pub click_area_rect: SvgElement,
-    /**/ pub fill_wrapper_g: SvgElement,
-    /**//**/ pub fill_bundles: SmallVec<[FillSvgBundle; 2]>,
-    /**/ pub stroke_wrapper_g: SvgElement,
-    /**//**/ pub stroke_bundles: SmallVec<[StrokeSvgBundle; 2]>,
+    /**/ pub styles_wrapper_g: SvgElement,
+    /**//**/ pub style_entities: SmallVec<[Entity; 2]>,
     /**/ pub children_wrapper_g: SvgElement,
-    /**//**/ pub child_nodes: SmallVec<[Entity; 2]>,
+    /**//**/ pub child_node_entities: SmallVec<[Entity; 2]>,
 }
 
 impl SvgBundle for FrameNodeSvgBundle {
+    fn get_entity(&self) -> &Entity {
+        &self.entity
+    }
+
     fn get_root_element(&self) -> &SvgElement {
         &self.root_g
     }
@@ -40,70 +40,29 @@ impl SvgBundle for FrameNodeSvgBundle {
         &mut self.root_g
     }
 
-    fn get_elements(&self) -> BTreeMap<SvgElementId, &SvgElement> {
-        let mut elements = BTreeMap::new();
-
-        elements.insert(self.root_g.get_id(), &self.root_g);
-        elements.insert(self.defs.get_id(), &self.defs);
-        elements.insert(self.children_clip_path.get_id(), &self.children_clip_path);
-        elements.insert(
-            self.children_clipped_path.get_id(),
-            &self.children_clipped_path,
-        );
-        elements.insert(self.click_area_rect.get_id(), &self.click_area_rect);
-        elements.insert(self.fill_wrapper_g.get_id(), &self.fill_wrapper_g);
-        self.fill_bundles.iter().for_each(|fill| {
-            let elements_map = fill.get_svg_bundle().get_elements();
-            for (_, element) in elements_map {
-                elements.insert(element.get_id(), element);
-            }
-        });
-        elements.insert(self.stroke_wrapper_g.get_id(), &self.stroke_wrapper_g);
-        self.stroke_bundles.iter().for_each(|stroke| {
-            let elements_map = stroke.get_svg_bundle().get_elements();
-            for (_, element) in elements_map {
-                elements.insert(element.get_id(), element);
-            }
-        });
-        elements.insert(self.children_wrapper_g.get_id(), &self.children_wrapper_g);
-
-        return elements;
+    fn elements_iter<'a>(&'a self) -> Box<dyn Iterator<Item = &'a SvgElement> + 'a> {
+        Box::new(
+            std::iter::once(&self.root_g).chain(
+                std::iter::once(&self.defs)
+                    .chain(std::iter::once(&self.children_clip_path))
+                    .chain(std::iter::once(&self.children_clipped_path))
+                    .chain(std::iter::once(&self.click_area_rect))
+                    .chain(std::iter::once(&self.styles_wrapper_g))
+                    .chain(std::iter::once(&self.children_wrapper_g)),
+            ),
+        )
     }
 
-    fn get_elements_mut(&mut self) -> BTreeMap<SvgElementId, &mut SvgElement> {
-        let mut elements = BTreeMap::new();
-
-        elements.insert(self.root_g.get_id(), &mut self.root_g);
-        elements.insert(self.defs.get_id(), &mut self.defs);
-        elements.insert(
-            self.children_clip_path.get_id(),
-            &mut self.children_clip_path,
-        );
-        elements.insert(
-            self.children_clipped_path.get_id(),
-            &mut self.children_clipped_path,
-        );
-        elements.insert(self.click_area_rect.get_id(), &mut self.click_area_rect);
-        elements.insert(self.fill_wrapper_g.get_id(), &mut self.fill_wrapper_g);
-        self.fill_bundles.iter_mut().for_each(|fill| {
-            let elements_map = fill.get_svg_bundle_mut().get_elements_mut();
-            for (_, element) in elements_map {
-                elements.insert(element.get_id(), element);
-            }
-        });
-        elements.insert(self.stroke_wrapper_g.get_id(), &mut self.stroke_wrapper_g);
-        self.stroke_bundles.iter_mut().for_each(|stroke| {
-            let elements_map = stroke.get_svg_bundle_mut().get_elements_mut();
-            for (_, element) in elements_map {
-                elements.insert(element.get_id(), element);
-            }
-        });
-        elements.insert(
-            self.children_wrapper_g.get_id(),
-            &mut self.children_wrapper_g,
-        );
-
-        return elements;
+    fn elements_iter_mut<'a>(&'a mut self) -> Box<dyn Iterator<Item = &'a mut SvgElement> + 'a> {
+        Box::new(
+            std::iter::once(&mut self.root_g)
+                .chain(std::iter::once(&mut self.defs))
+                .chain(std::iter::once(&mut self.children_clip_path))
+                .chain(std::iter::once(&mut self.children_clipped_path))
+                .chain(std::iter::once(&mut self.click_area_rect))
+                .chain(std::iter::once(&mut self.styles_wrapper_g))
+                .chain(std::iter::once(&mut self.children_wrapper_g)),
+        )
     }
 }
 
@@ -129,11 +88,8 @@ impl FrameNodeSvgBundle {
         });
         root_g_element.append_child_in_bundle_context(&mut click_area_rect_element);
 
-        let mut fills_wrapper_g_element = cx.create_element(SvgTag::Group);
-        root_g_element.append_child_in_bundle_context(&mut fills_wrapper_g_element);
-
-        let mut strokes_wrapper_g_element = cx.create_element(SvgTag::Group);
-        root_g_element.append_child_in_bundle_context(&mut strokes_wrapper_g_element);
+        let mut styles_wrapper_g_element = cx.create_element(SvgTag::Group);
+        root_g_element.append_child_in_bundle_context(&mut styles_wrapper_g_element);
 
         let mut children_wrapper_g_element = cx.create_element(SvgTag::Group);
         children_wrapper_g_element.set_attribute(SvgAttribute::ClipPath {
@@ -143,10 +99,13 @@ impl FrameNodeSvgBundle {
 
         #[cfg(feature = "tracing")]
         {
-            use crate::svg::svg_element::styles::SvgFillStyle;
+            use crate::svg::svg_element::styles::SvgStyleColor;
 
             root_g_element.set_attribute(SvgAttribute::Class {
-                class: Self::create_element_name(root_g_element.get_id(), "root"),
+                class: Self::create_element_name(
+                    root_g_element.get_id(),
+                    &format!("root-{:?}", entity),
+                ),
             });
             defs_element.set_attribute(SvgAttribute::Class {
                 class: Self::create_element_name(defs_element.get_id(), "defs"),
@@ -170,18 +129,15 @@ impl FrameNodeSvgBundle {
                 ),
             });
             click_area_rect_element.set_style(SvgStyle::Fill {
-                fill: SvgFillStyle::RGBA {
+                fill: SvgStyleColor::RGBA {
                     red: 255,
                     green: 204,
                     blue: 203,
                     alpha: 0.5,
                 },
             });
-            fills_wrapper_g_element.set_attribute(SvgAttribute::Class {
-                class: Self::create_element_name(fills_wrapper_g_element.get_id(), "fills"),
-            });
-            strokes_wrapper_g_element.set_attribute(SvgAttribute::Class {
-                class: Self::create_element_name(strokes_wrapper_g_element.get_id(), "strokes"),
+            styles_wrapper_g_element.set_attribute(SvgAttribute::Class {
+                class: Self::create_element_name(styles_wrapper_g_element.get_id(), "styles"),
             });
             children_wrapper_g_element.set_attribute(SvgAttribute::Class {
                 class: Self::create_element_name(children_wrapper_g_element.get_id(), "children"),
@@ -189,24 +145,23 @@ impl FrameNodeSvgBundle {
         }
 
         Self {
-            node_entity: entity,
+            entity,
 
             root_g: root_g_element,
             defs: defs_element,
             children_clip_path: children_clip_path_element,
             children_clipped_path: children_clipped_path_element,
             click_area_rect: click_area_rect_element,
-            fill_wrapper_g: fills_wrapper_g_element,
-            fill_bundles: SmallVec::new(),
-            stroke_wrapper_g: strokes_wrapper_g_element,
-            stroke_bundles: SmallVec::new(),
+            styles_wrapper_g: styles_wrapper_g_element,
+            style_entities: SmallVec::new(),
             children_wrapper_g: children_wrapper_g_element,
-            child_nodes: SmallVec::new(),
+            child_node_entities: SmallVec::new(),
         }
     }
 
     #[cfg(feature = "tracing")]
-    fn create_element_name(id: SvgElementId, category: &str) -> String {
+    #[inline]
+    fn create_element_name(id: crate::svg::svg_element::SvgElementId, category: &str) -> String {
         format!("frame-node_{}_{}", category, id)
     }
 }

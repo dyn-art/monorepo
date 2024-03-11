@@ -8,13 +8,12 @@ use bevy_ecs::schedule::{IntoSystemConfigs, IntoSystemSetConfigs, SystemSet};
 use resources::svg_context::SvgContextRes;
 use systems::{
     apply::{
-        apply_blend_mode_mixin_changes, apply_node_children_changes, apply_opacity_mixin_changes,
-        apply_path_mixin_changes, apply_size_mixin_changes, apply_solid_paint_changes,
+        apply_blend_mode_mixin_changes, apply_gradient_paint_changes, apply_node_children_changes,
+        apply_node_styles_changes, apply_opacity_mixin_changes, apply_path_mixin_changes,
+        apply_size_mixin_changes, apply_solid_paint_changes, apply_stroke_path_mixin_changes,
         apply_transform_changes, apply_visibility_mixin_changes,
     },
-    insert::{
-        insert_fills, insert_frame_node_svg_bundle, insert_shape_node_svg_bundle, insert_strokes,
-    },
+    prepare::{insert_node_svg_bundle, insert_style_svg_bundle, sync_node_size_with_style},
 };
 
 pub struct CompSvgBuilderPlugin {
@@ -28,8 +27,8 @@ pub struct CompSvgBuilderPlugin {
 // due to the deferred execution nature of entity spawn commands within the ECS schedule.
 #[derive(SystemSet, Debug, Hash, PartialEq, Eq, Clone)]
 enum CompSvgBuilderSystemSet {
-    Insert,
-    PostInsert,
+    Prepare,
+    PreApply,
     Apply,
     Extract,
     Queue,
@@ -44,8 +43,8 @@ impl Plugin for CompSvgBuilderPlugin {
         app.configure_sets(
             Last,
             (
-                CompSvgBuilderSystemSet::Insert,
-                CompSvgBuilderSystemSet::PostInsert,
+                CompSvgBuilderSystemSet::Prepare,
+                CompSvgBuilderSystemSet::PreApply,
                 CompSvgBuilderSystemSet::Apply,
                 CompSvgBuilderSystemSet::Extract,
                 CompSvgBuilderSystemSet::Queue,
@@ -57,18 +56,24 @@ impl Plugin for CompSvgBuilderPlugin {
         app.add_systems(
             Last,
             (
-                insert_frame_node_svg_bundle.in_set(CompSvgBuilderSystemSet::Insert),
-                insert_shape_node_svg_bundle.in_set(CompSvgBuilderSystemSet::Insert),
-                insert_fills.in_set(CompSvgBuilderSystemSet::PostInsert),
-                insert_strokes.in_set(CompSvgBuilderSystemSet::PostInsert),
-                apply_node_children_changes.in_set(CompSvgBuilderSystemSet::Apply),
+                sync_node_size_with_style.in_set(CompSvgBuilderSystemSet::Prepare),
+                insert_node_svg_bundle.in_set(CompSvgBuilderSystemSet::Prepare),
+                insert_style_svg_bundle
+                    .in_set(CompSvgBuilderSystemSet::Prepare)
+                    .after(insert_node_svg_bundle),
+                apply_node_children_changes.in_set(CompSvgBuilderSystemSet::PreApply),
+                apply_node_styles_changes
+                    .in_set(CompSvgBuilderSystemSet::PreApply)
+                    .after(apply_node_children_changes),
                 apply_visibility_mixin_changes.in_set(CompSvgBuilderSystemSet::Apply),
                 apply_size_mixin_changes.in_set(CompSvgBuilderSystemSet::Apply),
                 apply_transform_changes.in_set(CompSvgBuilderSystemSet::Apply),
                 apply_opacity_mixin_changes.in_set(CompSvgBuilderSystemSet::Apply),
                 apply_blend_mode_mixin_changes.in_set(CompSvgBuilderSystemSet::Apply),
                 apply_path_mixin_changes.in_set(CompSvgBuilderSystemSet::Apply),
+                apply_stroke_path_mixin_changes.in_set(CompSvgBuilderSystemSet::Apply),
                 apply_solid_paint_changes.in_set(CompSvgBuilderSystemSet::Apply),
+                apply_gradient_paint_changes.in_set(CompSvgBuilderSystemSet::Apply),
             ),
         );
 
@@ -83,7 +88,10 @@ impl Plugin for CompSvgBuilderPlugin {
                 changed_svg_bundles::ChangedSvgBundlesRes,
                 output_event_sender::OutputEventSenderRes,
             };
-            use crate::systems::{extract::extract_svg_bundles, queue::queue_svg_bundle_changes};
+            use crate::systems::{
+                extract::{extract_node_bundles, extract_style_bundles},
+                queue::queue_svg_bundle_changes,
+            };
 
             // Register resources
             app.init_resource::<ChangedSvgBundlesRes>();
@@ -93,7 +101,8 @@ impl Plugin for CompSvgBuilderPlugin {
             app.add_systems(
                 Last,
                 (
-                    extract_svg_bundles.in_set(CompSvgBuilderSystemSet::Extract),
+                    extract_node_bundles.in_set(CompSvgBuilderSystemSet::Extract),
+                    extract_style_bundles.in_set(CompSvgBuilderSystemSet::Extract),
                     queue_svg_bundle_changes.in_set(CompSvgBuilderSystemSet::Queue),
                 ),
             );

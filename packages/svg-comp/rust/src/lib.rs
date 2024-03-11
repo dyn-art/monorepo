@@ -22,7 +22,7 @@ use dyn_comp_core::{resources::composition::CompositionRes, CompCorePlugin};
 use dyn_comp_dtif::CompDtif;
 use dyn_comp_interaction::CompInteractionPlugin;
 use dyn_comp_svg_builder::{
-    events::SvgBuilderOutputEvent, svg::svg_bundle::node::NodeSvgBundleMixin, CompSvgBuilderPlugin,
+    events::SvgBuilderOutputEvent, svg::svg_bundle::SvgBundleVariant, CompSvgBuilderPlugin,
 };
 use events::{SvgCompInputEvent, SvgCompOutputEvent};
 use modules::watch::{resources::watched_entities::WatchedEntitiesRes, CompWatchPlugin};
@@ -175,15 +175,16 @@ impl SvgCompHandle {
         ));
 
         let mut system_state: SystemState<(
-            Query<&NodeSvgBundleMixin, With<Root>>,
-            Query<&NodeSvgBundleMixin, Without<Root>>,
+            Query<&SvgBundleVariant, With<Root>>,
+            Query<&SvgBundleVariant, Without<Root>>,
         )> = SystemState::new(&mut self.app.world);
-        let (root_node_query, node_query) = system_state.get(&mut self.app.world);
+        let (root_bundle_variant_query, bundle_variant_query) =
+            system_state.get(&mut self.app.world);
 
         // Construct SVG string starting from root nodes
-        root_node_query
-            .iter()
-            .for_each(|bundle| result.push_str(&bundle.0.to_string(&node_query)));
+        root_bundle_variant_query.iter().for_each(|bundle_variant| {
+            result.push_str(&bundle_variant.to_string(&bundle_variant_query))
+        });
 
         // Close the SVG tag
         result.push_str("</svg>");

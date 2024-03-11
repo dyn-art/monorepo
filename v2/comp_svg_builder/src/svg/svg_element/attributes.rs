@@ -36,7 +36,7 @@ pub enum SvgAttribute {
         clip_path: SvgElementId,
     },
     Fill {
-        fill: SvgFillAttribute,
+        fill: SvgAttributeColor,
     },
     #[cfg_attr(feature = "serde_support", serde(rename_all = "camelCase"))]
     PatternUnits {
@@ -70,7 +70,11 @@ pub enum SvgAttribute {
     },
     #[cfg_attr(feature = "serde_support", serde(rename_all = "camelCase"))]
     StopColor {
-        stop_color: String,
+        stop_color: SvgAttributeColor,
+    },
+    #[cfg_attr(feature = "serde_support", serde(rename_all = "camelCase"))]
+    StopOpacity {
+        stop_opacity: f32,
     },
 }
 
@@ -96,6 +100,7 @@ impl SvgAttribute {
             Self::Y2 { .. } => "y2",
             Self::Offset { .. } => "offset",
             Self::StopColor { .. } => "stop-color",
+            Self::StopOpacity { .. } => "stop-opacity",
         }
     }
 
@@ -124,12 +129,11 @@ impl SvgAttribute {
             },
             Self::D { d } => d.0.clone(),
             Self::ClipPath { clip_path } => format!("url(#{clip_path})"),
-            Self::Fill { fill } => match fill {
-                SvgFillAttribute::Reference { id } => format!("url(#{id})"),
-                SvgFillAttribute::RGB { red, green, blue } => {
+            Self::Fill { fill: color } | Self::StopColor { stop_color: color } => match color {
+                SvgAttributeColor::RGB { red, green, blue } => {
                     format!("rgb({red}, {green}, {blue})")
                 }
-                SvgFillAttribute::RGBA {
+                SvgAttributeColor::RGBA {
                     red,
                     green,
                     blue,
@@ -137,6 +141,8 @@ impl SvgAttribute {
                 } => {
                     format!("rgb({red}, {green}, {blue}, {alpha})")
                 }
+                SvgAttributeColor::Reference { id } => format!("url(#{id})"),
+                SvgAttributeColor::None => String::from("none"),
             },
             Self::PatternUnits {
                 pattern_units: unit,
@@ -163,7 +169,7 @@ impl SvgAttribute {
             Self::X2 { x2 } => x2.to_string(),
             Self::Y2 { y2 } => y2.to_string(),
             Self::Offset { offset } => offset.to_string(),
-            Self::StopColor { stop_color } => stop_color.clone(),
+            Self::StopOpacity { stop_opacity } => stop_opacity.to_string(),
         }
     }
 
@@ -192,28 +198,6 @@ pub enum SvgTransformAttribute {
     },
 }
 
-#[derive(Debug, Default, PartialEq, Copy, Clone)]
-#[cfg_attr(
-    feature = "serde_support",
-    derive(serde::Serialize, serde::Deserialize, specta::Type)
-)]
-pub enum SvgMeasurementUnit {
-    #[default]
-    Pixel,
-    Percent,
-}
-
-#[derive(Debug, Default, PartialEq, Copy, Clone)]
-#[cfg_attr(
-    feature = "serde_support",
-    derive(serde::Serialize, serde::Deserialize, specta::Type)
-)]
-pub enum SvgUnits {
-    #[default]
-    UserSpaceOnUse,
-    ObjectBoundingBox,
-}
-
 #[derive(Debug, PartialEq, Clone)]
 #[cfg_attr(
     feature = "serde_support",
@@ -237,12 +221,34 @@ pub enum SvgHrefAttribute {
 )]
 pub struct SvgPathAttribute(pub String);
 
+#[derive(Debug, Default, PartialEq, Copy, Clone)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type)
+)]
+pub enum SvgMeasurementUnit {
+    #[default]
+    Pixel,
+    Percent,
+}
+
+#[derive(Debug, Default, PartialEq, Copy, Clone)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type)
+)]
+pub enum SvgUnits {
+    #[default]
+    UserSpaceOnUse,
+    ObjectBoundingBox,
+}
+
 #[derive(Debug, PartialEq, Copy, Clone)]
 #[cfg_attr(
     feature = "serde_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
-pub enum SvgFillAttribute {
+pub enum SvgAttributeColor {
     RGB {
         red: u8,
         green: u8,
@@ -257,4 +263,5 @@ pub enum SvgFillAttribute {
     Reference {
         id: SvgElementId,
     },
+    None,
 }

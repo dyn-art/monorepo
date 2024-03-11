@@ -1,11 +1,11 @@
 use std::fmt::{Error, Write};
 
 use super::{
-    attributes::{SvgPathAttribute, SvgTransformAttribute},
-    styles::SvgBlendModeStyle,
+    attributes::{SvgAttributeColor, SvgPathAttribute, SvgTransformAttribute},
+    styles::{SvgBlendModeStyle, SvgStyleColor},
 };
 use bevy_transform::components::Transform;
-use dyn_comp_common::common::BlendMode;
+use dyn_comp_common::common::{BlendMode, Color};
 use glam::EulerRot;
 use tiny_skia_path::{Path, PathSegment};
 
@@ -97,4 +97,24 @@ fn path_to_string(path: &Path) -> Result<String, Error> {
     s.pop(); // ' '
 
     return Ok(s);
+}
+
+impl From<&Color> for SvgAttributeColor {
+    fn from(color: &Color) -> Self {
+        SvgAttributeColor::RGB {
+            red: color.red,
+            green: color.green,
+            blue: color.blue,
+        }
+    }
+}
+
+impl From<&Color> for SvgStyleColor {
+    fn from(color: &Color) -> Self {
+        SvgStyleColor::RGB {
+            red: color.red,
+            green: color.green,
+            blue: color.blue,
+        }
+    }
 }

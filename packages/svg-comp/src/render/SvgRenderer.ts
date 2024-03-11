@@ -172,6 +172,10 @@ export class SvgRenderer extends Renderer {
 						const parentElement = this._svgElementMap.get(change.parentId);
 						if (parentElement != null) {
 							parentElement.appendChild(newElement);
+						} else {
+							console.error(
+								`Failed to query parent element (${change.parentId}) to append element (${elementChanges.id}) to!`
+							);
 						}
 					} else {
 						this._svgElement.appendChild(newElement);
@@ -186,14 +190,20 @@ export class SvgRenderer extends Renderer {
 					if (elementToDelete?.parentNode != null) {
 						elementToDelete.parentNode.removeChild(elementToDelete);
 						this._svgElementMap.delete(elementChanges.id);
+					} else {
+						console.error(`Failed to query to remove element (${elementChanges.id})!`);
 					}
 					break;
 				}
 				case 'ElementAppended': {
 					const toAppendElement = getElement();
-					const parentElement = this._svgElementMap.get(elementChanges.id);
+					const parentElement = this._svgElementMap.get(change.parentId);
 					if (parentElement != null && toAppendElement != null) {
 						parentElement.appendChild(toAppendElement);
+					} else {
+						console.error(
+							`Failed to query parent element (${change.parentId}) to append element (${elementChanges.id}) to!`
+						);
 					}
 					break;
 				}
@@ -201,6 +211,10 @@ export class SvgRenderer extends Renderer {
 					const elementToUpdate = getElement();
 					if (elementToUpdate != null) {
 						elementToUpdate.setAttribute(change.key, change.newValue);
+					} else {
+						console.error(
+							`Failed to query element (${elementChanges.id}) to add attribute (${change.key}) to!`
+						);
 					}
 					break;
 				}
@@ -208,6 +222,10 @@ export class SvgRenderer extends Renderer {
 					const elementToUpdate = getElement();
 					if (elementToUpdate != null) {
 						elementToUpdate.removeAttribute(change.key);
+					} else {
+						console.error(
+							`Failed to query element (${elementChanges.id}) to remove attribute (${change.key}) from!`
+						);
 					}
 					break;
 				}
@@ -215,6 +233,10 @@ export class SvgRenderer extends Renderer {
 					const elementToUpdate = getElement();
 					if (elementToUpdate != null) {
 						elementToUpdate.style.setProperty(change.key, change.newValue);
+					} else {
+						console.error(
+							`Failed to query element (${elementChanges.id}) to add style (${change.key}) to!`
+						);
 					}
 					break;
 				}
@@ -222,27 +244,30 @@ export class SvgRenderer extends Renderer {
 					const elementToUpdate = getElement();
 					if (elementToUpdate != null) {
 						elementToUpdate.style.removeProperty(change.key);
+					} else {
+						console.error(
+							`Failed to query element (${elementChanges.id}) to remove style (${change.key}) from!`
+						);
 					}
 					break;
 				}
-				case 'ElementReordered': {
-					const elementToReorder = this._svgElementMap.get(change.elementId);
-					const newParentElement = this._svgElementMap.get(change.newParentId);
-					if (elementToReorder != null && newParentElement != null) {
-						if (change.insertBeforeId != null) {
-							const insertBeforeElement = this._svgElementMap.get(change.insertBeforeId);
-							if (insertBeforeElement != null) {
-								newParentElement.insertBefore(elementToReorder, insertBeforeElement);
-							}
-							// If insertBeforeId is not found, append at the end as fallback
-							else {
-								newParentElement.appendChild(elementToReorder);
+				case 'ElementChildrenReordered': {
+					const elementToUpdate = getElement();
+					if (elementToUpdate != null) {
+						// Iterate over the 'order' array and append each child to 'elementToUpdate'
+						// in the new order. This effectively reorders the children.
+						for (const id of change.newOrder) {
+							const childElement = document.getElementById(id.toString());
+							if (childElement != null) {
+								elementToUpdate.appendChild(childElement);
+							} else {
+								console.error(`Failed to query child element (${id}) to reorder!`);
 							}
 						}
-						// If insertBeforeId is null, append at the end
-						else {
-							newParentElement.appendChild(elementToReorder);
-						}
+					} else {
+						console.error(
+							`Failed to query element (${elementChanges.id}) to apply new children order (${change.newOrder})!`
+						);
 					}
 					break;
 				}

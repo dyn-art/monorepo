@@ -1,4 +1,3 @@
-use bevy_ecs::entity::Entity;
 use glam::{Mat3, Vec2, Vec4};
 
 #[derive(Debug, Default, PartialEq, Copy, Clone)]
@@ -25,7 +24,7 @@ impl Degree {
     }
 }
 
-#[derive(Debug, Default, PartialEq, Copy, Clone)]
+#[derive(Debug, PartialEq, Copy, Clone)]
 #[cfg_attr(
     feature = "serde_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
@@ -41,6 +40,12 @@ impl Percent {
     #[inline]
     pub fn get(&self) -> f32 {
         self.0
+    }
+}
+
+impl Default for Percent {
+    fn default() -> Self {
+        Self::new(1.0)
     }
 }
 
@@ -218,28 +223,6 @@ pub struct Viewport {
     pub physical_size: Vec2,
 }
 
-#[derive(Debug, Copy, Clone)]
-#[cfg_attr(
-    feature = "serde_support",
-    derive(serde::Serialize, serde::Deserialize, specta::Type)
-)]
-pub struct Stroke {
-    pub fill: Fill,
-    pub width: f32,
-}
-
-#[derive(Debug, Copy, Clone)]
-#[cfg_attr(
-    feature = "serde_support",
-    derive(serde::Serialize, serde::Deserialize, specta::Type),
-    serde(rename_all = "camelCase")
-)]
-pub struct Fill {
-    pub paint: Entity,
-    pub blend_mode: BlendMode,
-    pub opacity: Opacity,
-}
-
 /// A styled text segment.
 #[derive(Debug, Clone)]
 #[cfg_attr(
@@ -410,8 +393,7 @@ pub enum GradientVariant {
 #[derive(Debug, Default, Copy, Clone)]
 #[cfg_attr(
     feature = "serde_support",
-    derive(serde::Serialize, serde::Deserialize, specta::Type),
-    serde(tag = "type")
+    derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
 pub struct GradientColorStop {
     /// The position of the color stop in the gradient, ranging from 0.0 to 1.0.
@@ -419,4 +401,8 @@ pub struct GradientColorStop {
 
     /// The color of the stop.
     pub color: Color,
+
+    /// The opacity of the stop.
+    #[serde(default)]
+    pub opacity: Percent,
 }

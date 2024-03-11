@@ -1,4 +1,4 @@
-use crate::common::{BlendMode, CornerRadii, Fill, Opacity, Size, Stroke, Visibility};
+use crate::common::{BlendMode, CornerRadii, Opacity, Size, Visibility};
 use bevy_ecs::{component::Component, entity::Entity};
 use dyn_comp_asset::asset_id::ImageId;
 use smallvec::SmallVec;
@@ -27,19 +27,23 @@ pub struct VisibilityMixin(pub Visibility);
 #[derive(Component, Debug, Default, Copy, Clone)]
 pub struct OpacityMixin(pub Opacity);
 
-/// Represents a Bezier path for drawing operations.
+/// Represents a Bezier path for drawing shape.
 #[derive(Component, Debug, Clone)]
 pub struct PathMixin(pub tiny_skia_path::Path);
 
-/// Defines fill styles for drawing operations.
-#[derive(Component, Debug, Default, Clone)]
-pub struct FillMixin(pub SmallVec<[Fill; 2]>);
+/// Configures stroke properties for drawing paths.
+#[derive(Component, Debug, Clone)]
+pub struct StrokePathMixin(pub tiny_skia_path::Path);
 
-/// Configures stroke properties for drawing paths, including fill styles and width.
 #[derive(Component, Debug, Default, Clone)]
-pub struct StrokeMixin(pub SmallVec<[Stroke; 2]>);
+pub struct StyleChildrenMixin(pub SmallVec<[Entity; 2]>);
 
-/// Holds references to the parent entities of this entity in the paint context.
+#[derive(Component, Debug, Clone)]
+pub struct StyleParentMixin(pub Entity);
+
+#[derive(Component, Debug, Clone)]
+pub struct PaintChildMixin(pub Option<Entity>);
+
 #[derive(Component, Debug, Default, Clone)]
 pub struct PaintParentMixin(pub SmallVec<[Entity; 2]>);
 

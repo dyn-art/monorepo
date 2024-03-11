@@ -20,12 +20,12 @@ const DEFAULT_DTIF: COMP.CompDtif = {
 	nodes: {
 		n1: {
 			type: 'Frame',
-			angleInRadians: 0,
 			blendMode: 'Normal',
 			clipContent: false,
 			cornerRadii: [0, 0, 0, 0],
-			fill: [
+			styles: [
 				{
+					type: 'Fill',
 					blendMode: 'Normal',
 					opacity: 1.0,
 					paintId: 'p1'
@@ -33,40 +33,44 @@ const DEFAULT_DTIF: COMP.CompDtif = {
 			],
 			opacity: 1,
 			size: [WIDTH, HEIGHT],
-			stroke: [],
 			translation: [0, 0],
 			visibility: 'Visible',
 			children: ['n2']
 		},
 		n2: {
 			type: 'Rectangle',
-			angleInRadians: 0,
 			blendMode: 'Normal',
 			cornerRadii: [0, 20, 0, 0],
-			fill: [
+			styles: [
 				{
+					type: 'Stroke',
+					width: 5,
 					blendMode: 'Normal',
-					opacity: 0.5,
-					paintId: 'p2'
+					opacity: 1,
+					paintId: 'p3'
+				},
+				// {
+				// 	type: 'Fill',
+				// 	blendMode: 'Normal',
+				// 	opacity: 0.9,
+				// 	paintId: 'p2'
+				// },
+				{
+					type: 'Fill',
+					blendMode: 'Normal',
+					opacity: 0.8,
+					paintId: 'p4'
 				},
 				{
+					type: 'Stroke',
+					width: 20,
 					blendMode: 'Normal',
-					opacity: 1.0,
-					paintId: 'p1'
+					opacity: 0.7,
+					paintId: 'p2'
 				}
 			],
 			opacity: 1,
 			size: [100, 100],
-			stroke: [
-				{
-					fill: {
-						blendMode: 'Normal',
-						opacity: 0.5,
-						paintId: 'p3'
-					},
-					width: 5
-				}
-			],
 			translation: [WIDTH / 2, HEIGHT / 2],
 			visibility: 'Visible'
 		}
@@ -95,6 +99,28 @@ const DEFAULT_DTIF: COMP.CompDtif = {
 				green: 128,
 				blue: 114
 			}
+		},
+		p4: {
+			type: 'Gradient',
+			variant: { type: 'Linear' },
+			stops: [
+				{
+					color: {
+						red: 138,
+						green: 43,
+						blue: 226
+					},
+					position: 0
+				},
+				{
+					color: {
+						red: 0,
+						green: 191,
+						blue: 225
+					},
+					position: 1
+				}
+			]
 		}
 	},
 	events: [
