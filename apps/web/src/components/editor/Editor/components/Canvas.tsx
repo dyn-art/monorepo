@@ -3,7 +3,7 @@
 import { useQuery } from '@tanstack/react-query';
 import React from 'react';
 import { applyCanvasDimensions, prepareDtifComposition, type COMP } from '@dyn/comp-dtif';
-import { Composition, SvgRenderer } from '@dyn/svg-comp';
+import { createSvgComposition, type Composition } from '@dyn/svg-comp';
 import { cn, Skeleton } from '@dyn/ui';
 
 export const Canvas: React.FC<TCanvasProps> = (props) => {
@@ -25,7 +25,6 @@ export const Canvas: React.FC<TCanvasProps> = (props) => {
 			return true;
 		}
 	});
-
 	const { data: preparedDtif, isLoading: isPreparingDtif } = useQuery({
 		queryKey: ['prepare-dtif'],
 		queryFn: async () => {
@@ -37,17 +36,16 @@ export const Canvas: React.FC<TCanvasProps> = (props) => {
 		if (!isWasmLoaded || preparedDtif == null || svgContainerRef.current == null) {
 			return;
 		}
-		const newComposition = new Composition({
-			dtif: applyCanvasDimensions(preparedDtif, { width, height })
+
+		const newComposition = createSvgComposition({
+			dtif: applyCanvasDimensions(preparedDtif, { width, height }),
+			renderer: {
+				domElement: svgContainerRef.current as Element
+			},
+			interactive: true
 		});
-		newComposition.renderer = new SvgRenderer(newComposition, {
-			domElement: svgContainerRef.current as Element
-		});
-		newComposition.update();
 		setComposition(newComposition);
-		if (onLoadedComposition != null) {
-			onLoadedComposition(newComposition);
-		}
+		onLoadedComposition?.(newComposition);
 
 		return () => {
 			newComposition.unmount();

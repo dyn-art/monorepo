@@ -1,6 +1,6 @@
 import type { COMP } from '../comp';
 
-export function isDTIFComposition(value: unknown): value is COMP.DtifComposition {
+export function isDtifComposition(value: unknown): value is COMP.DtifComposition {
 	if (typeof value !== 'object' || value == null) {
 		return false;
 	}

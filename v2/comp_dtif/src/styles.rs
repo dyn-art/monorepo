@@ -1,9 +1,6 @@
 use crate::{dtif_injector::DtifInjector, ToEcsBundleImpl};
 use dyn_comp_common::{
-    bundles::{FillStyleBundle, StrokeStyleBundle},
-    common::{BlendMode, Opacity},
-    mixins::{BlendModeMixin, OpacityMixin, PaintChildMixin, VisibilityMixin},
-    styles::{CompStyle, CompStyleVariant, FillCompStyle, StrokeCompStyle},
+    bundles::{FillStyleBundle, StrokeStyleBundle}, common::{BlendMode, Opacity}, default::default_as_true, mixins::{BlendModeMixin, OpacityMixin, PaintChildMixin, VisibilityMixin}, styles::{CompStyle, CompStyleVariant, FillCompStyle, StrokeCompStyle}
 };
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
@@ -17,7 +14,7 @@ pub enum Style {
 #[serde(rename_all = "camelCase")]
 pub struct FillStyle {
     pub paint_id: String,
-    #[serde(default)]
+    #[serde(default = "default_as_true")]
     pub visible: bool,
     #[serde(default)]
     pub blend_mode: BlendMode,
@@ -52,7 +49,7 @@ impl ToEcsBundleImpl for FillStyle {
 pub struct StrokeStyle {
     width: f32,
     pub paint_id: String,
-    #[serde(default)]
+    #[serde(default = "default_as_true")]
     pub visible: bool,
     #[serde(default)]
     pub blend_mode: BlendMode,

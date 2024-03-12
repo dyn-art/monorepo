@@ -150,7 +150,7 @@ export class FigmaNodeTreeProcessor {
 				};
 			})
 			.filter(notEmpty)
-			.reverse(); // Reverse so that the most top style is the first item in the array
+			.reverse(); // Reverse so that the most top fill is the first item in the array
 	}
 
 	// Processes strokes of a node
@@ -195,7 +195,8 @@ export class FigmaNodeTreeProcessor {
 					width: dropMixed(node, 'strokeWeight')
 				};
 			})
-			.filter(notEmpty);
+			.filter(notEmpty)
+			.reverse(); // Reverse so that the most top stroke is the first item in the array
 	}
 
 	// Processes text segments of a text node

@@ -12,6 +12,7 @@ use dyn_comp_common::{
         BlendMode, BreakLineOn, CornerRadii, Degree, HorizontalTextAlignment, Opacity, Size,
         TextSpan, VerticalTextAlignment,
     },
+    default::{default_as_false, default_as_true},
     mixins::{
         BlendModeMixin, CornerRadiiMixin, OpacityMixin, PathMixin, SizeMixin, VisibilityMixin,
     },
@@ -47,7 +48,7 @@ pub struct FrameNode {
     pub size: Size,
     #[serde(default)]
     pub corner_radii: CornerRadii,
-    #[serde(default)]
+    #[serde(default = "default_as_true")]
     pub visible: bool,
     #[serde(default)]
     pub blend_mode: BlendMode,
@@ -57,11 +58,6 @@ pub struct FrameNode {
     pub styles: Vec<Style>,
     #[serde(default)]
     pub children: Vec<String>,
-}
-
-#[inline]
-fn default_as_false() -> bool {
-    false
 }
 
 impl ToEcsBundleImpl for FrameNode {
@@ -97,7 +93,7 @@ pub struct GroupNode {
     #[serde(default)]
     pub angle: Degree,
     pub size: Size,
-    #[serde(default)]
+    #[serde(default = "default_as_true")]
     pub visible: bool,
     #[serde(default)]
     pub blend_mode: BlendMode,
@@ -138,7 +134,7 @@ pub struct RectangleNode {
     pub size: Size,
     #[serde(default)]
     pub corner_radii: CornerRadii,
-    #[serde(default)]
+    #[serde(default = "default_as_true")]
     pub visible: bool,
     #[serde(default)]
     pub blend_mode: BlendMode,
@@ -185,7 +181,7 @@ pub struct EllipseNode {
     #[serde(default)]
     pub angle: Degree,
     pub size: Size,
-    #[serde(default)]
+    #[serde(default = "default_as_true")]
     pub visible: bool,
     #[serde(default)]
     pub blend_mode: BlendMode,
@@ -235,7 +231,7 @@ pub struct StarNode {
     #[serde(default)]
     pub angle: Degree,
     pub size: Size,
-    #[serde(default)]
+    #[serde(default = "default_as_true")]
     pub visible: bool,
     #[serde(default)]
     pub blend_mode: BlendMode,
@@ -285,7 +281,7 @@ pub struct PolygonNode {
     #[serde(default)]
     pub angle: Degree,
     pub size: Size,
-    #[serde(default)]
+    #[serde(default = "default_as_true")]
     pub visible: bool,
     #[serde(default)]
     pub blend_mode: BlendMode,
@@ -339,7 +335,7 @@ pub struct TextNode {
     #[serde(default)]
     pub angle: Degree,
     pub size: Size,
-    #[serde(default)]
+    #[serde(default = "default_as_true")]
     pub visible: bool,
     #[serde(default)]
     pub blend_mode: BlendMode,
@@ -385,7 +381,7 @@ pub struct VectorNode {
     #[serde(default)]
     pub angle: Degree,
     pub size: Size,
-    #[serde(default)]
+    #[serde(default = "default_as_true")]
     pub visible: bool,
     #[serde(default)]
     pub blend_mode: BlendMode,
