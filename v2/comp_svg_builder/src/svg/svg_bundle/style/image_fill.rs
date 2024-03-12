@@ -15,6 +15,7 @@ use dyn_comp_common::common::ImageScaleMode;
 #[derive(Debug, Clone)]
 pub struct ImageFillStyleSvgBundle {
     pub entity: Entity,
+    pub variant: ImageFillStyleVariant,
 
     pub root_g: SvgElement,
     /**/ pub defs: SvgElement,
@@ -117,6 +118,12 @@ impl ImageFillStyleSvgBundle {
 
         Self {
             entity,
+            variant: match scale_mode {
+                ImageScaleMode::Fill => ImageFillStyleVariant::Fill,
+                ImageScaleMode::Fit => ImageFillStyleVariant::Fit,
+                ImageScaleMode::Crop { .. } => ImageFillStyleVariant::Crop,
+                ImageScaleMode::Tile { .. } => ImageFillStyleVariant::Tile,
+            },
 
             root_g: root_g_element,
             defs: defs_element,
@@ -131,4 +138,12 @@ impl ImageFillStyleSvgBundle {
     fn create_element_name(id: crate::svg::svg_element::SvgElementId, category: &str) -> String {
         format!("image-fill_{}_{}", category, id)
     }
+}
+
+#[derive(Debug, Clone)]
+pub enum ImageFillStyleVariant {
+    Fill,
+    Fit,
+    Crop,
+    Tile,
 }

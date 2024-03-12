@@ -1,7 +1,7 @@
 use crate::{
     resources::svg_context::SvgContextRes,
     svg::{
-        svg_bundle::SvgBundleVariant,
+        svg_bundle::{style::image_fill::ImageFillStyleVariant, SvgBundleVariant},
         svg_element::{
             attributes::{
                 SvgAttribute, SvgHrefAttribute, SvgHrefContentType, SvgMeasurementUnit,
@@ -405,28 +405,31 @@ pub fn apply_size_mixin_changes(
         }
 
         match bundle_variant.as_mut() {
-            SvgBundleVariant::ImageFill(bundle) => {
-                bundle.pattern.set_attributes(vec![
-                    SvgAttribute::Width {
-                        width,
-                        unit: SvgMeasurementUnit::Pixel,
-                    },
-                    SvgAttribute::Height {
-                        height,
-                        unit: SvgMeasurementUnit::Pixel,
-                    },
-                ]);
-                bundle.image.set_attributes(vec![
-                    SvgAttribute::Width {
-                        width,
-                        unit: SvgMeasurementUnit::Pixel,
-                    },
-                    SvgAttribute::Height {
-                        height,
-                        unit: SvgMeasurementUnit::Pixel,
-                    },
-                ]);
-            }
+            SvgBundleVariant::ImageFill(bundle) => match bundle.variant {
+                ImageFillStyleVariant::Fill | ImageFillStyleVariant::Fit => {
+                    bundle.pattern.set_attributes(vec![
+                        SvgAttribute::Width {
+                            width,
+                            unit: SvgMeasurementUnit::Pixel,
+                        },
+                        SvgAttribute::Height {
+                            height,
+                            unit: SvgMeasurementUnit::Pixel,
+                        },
+                    ]);
+                    bundle.image.set_attributes(vec![
+                        SvgAttribute::Width {
+                            width,
+                            unit: SvgMeasurementUnit::Pixel,
+                        },
+                        SvgAttribute::Height {
+                            height,
+                            unit: SvgMeasurementUnit::Pixel,
+                        },
+                    ]);
+                }
+                _ => {}
+            },
             _ => {}
         }
     }
@@ -823,6 +826,9 @@ pub fn apply_image_asset_mixin_changes(
                     }
                 }
             }
+        } else {
+            // TODO: Show placeholder image or so?
+            log::warn!("Couldn't find image at {:?}", maybe_image_id);
         }
     }
 }
