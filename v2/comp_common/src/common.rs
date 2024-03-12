@@ -151,17 +151,6 @@ pub enum BlendMode {
     Luminosity,
 }
 
-#[derive(Debug, Default, Copy, Clone)]
-#[cfg_attr(
-    feature = "serde_support",
-    derive(serde::Serialize, serde::Deserialize, specta::Type)
-)]
-pub enum Visibility {
-    #[default]
-    Visible,
-    Hidden,
-}
-
 #[derive(Debug, Copy, Clone)]
 #[cfg_attr(
     feature = "serde_support",

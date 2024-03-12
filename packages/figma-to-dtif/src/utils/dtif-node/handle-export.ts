@@ -1,4 +1,4 @@
-import type { COMP } from '@dyn/dtif';
+import type { COMP } from '@dyn/comp-dtif';
 
 import { UploadStaticDataException } from '../../exceptions';
 import type { TContentType, TExportConfig } from '../../types';
@@ -6,7 +6,7 @@ import type { TContentType, TExportConfig } from '../../types';
 export async function handleExport(
 	binary: Uint8Array,
 	config: TUploadStaticDataConfig
-): Promise<COMP.ImageContentMixin['content']> {
+): Promise<COMP.AssetContent> {
 	const { contentType, key, export: exportConfig, nodeIds = [] } = config;
 
 	if (exportConfig.mode === 'External') {
@@ -14,8 +14,7 @@ export async function handleExport(
 			const response = await exportConfig.uploadData(binary, { key, contentType });
 			return {
 				type: 'Url',
-				url: response.url,
-				contentType: 'PNG'
+				url: response.url
 			};
 		} catch (error) {
 			throw new UploadStaticDataException(nodeIds, error);
@@ -23,8 +22,7 @@ export async function handleExport(
 	}
 	return {
 		type: 'Binary',
-		content: Array.from(binary),
-		contentType: 'PNG'
+		content: Array.from(binary)
 	};
 }
 

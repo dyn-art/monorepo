@@ -1,33 +1,34 @@
-import type { COMP } from '@dyn/dtif';
+import type { COMP } from '@dyn/comp-dtif';
 
-import { ExportFontException } from '../../exceptions';
-import type { TToTransformFont } from '../../FigmaNodeTreeProcessor';
+import { ExportFontAssetException } from '../../exceptions';
+import type { TToTransformFontAsset } from '../../FigmaNodeTreeProcessor';
 import type { TContentType, TExportConfig } from '../../types';
 import { handleExport } from '../../utils';
 
-export async function transformFont(
-	toTransformFont: TToTransformFont,
-	config: TTransformFontConfig
-): Promise<COMP.Font> {
-	const { fontMetadata, nodeIds } = toTransformFont;
+export async function transformFontAsset(
+	asset: TToTransformFontAsset,
+	nodeIds: SceneNode['id'][],
+	config: TTransformFontAssetConfig
+): Promise<COMP.Asset> {
 	const { export: exportConfig, resolveFontContent } = config;
+	const { metadata: fontMetadata } = asset;
 
 	// Resolve font
 	let fontContent;
 	try {
-		fontContent = await resolveFontContent(toTransformFont.fontMetadata);
+		fontContent = await resolveFontContent(asset.metadata);
 		if (fontContent == null) {
-			throw new ExportFontException(fontMetadata, nodeIds, 'No font found!');
+			throw new ExportFontAssetException(fontMetadata, nodeIds, 'No font found!');
 		}
 	} catch (error) {
-		throw new ExportFontException(fontMetadata, nodeIds, error);
+		throw new ExportFontAssetException(fontMetadata, nodeIds, error);
 	}
 
 	// Handle Url
 	if (fontContent.type === 'Url') {
 		return {
-			metadata: fontMetadata,
-			content: fontContent
+			content: fontContent,
+			contentType: { type: 'Ttf' }
 		};
 	}
 
@@ -37,12 +38,12 @@ export async function transformFont(
 		contentType: fontContent.contentType
 	});
 	return {
-		metadata: fontMetadata,
-		content
+		content,
+		contentType: { type: 'Ttf' }
 	};
 }
 
-export interface TTransformFontConfig {
+export interface TTransformFontAssetConfig {
 	export: TExportConfig;
 	resolveFontContent: TResolveFontContent;
 }

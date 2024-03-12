@@ -1,9 +1,14 @@
 import { MD5 } from 'object-hash';
-import type { COMP } from '@dyn/dtif';
-import { ContinuousId, type TContinuousId } from '@dyn/utils';
+import type { COMP } from '@dyn/comp-dtif';
+import { ContinuousId, notEmpty, type TContinuousId } from '@dyn/utils';
 
 import { UnsupportedFigmaNodeException } from './exceptions';
-import type { TFigmaNodeWithChildren, TFigmaNodeWithPaints, TFigmaShapeNode } from './types';
+import type {
+	TFigmaNodeWithChildren,
+	TFigmaNodeWithFills,
+	TFigmaNodeWithStrokes,
+	TFigmaShapeNode
+} from './types';
 import {
 	dropMixed,
 	isFigmaComponentNode,
@@ -22,8 +27,8 @@ export class FigmaNodeTreeProcessor {
 	private _toTransformPaints: TToTransformPaint[] = [];
 	private _toTransformPaintsHashmap = new Map<string, TToTransformHashmapItem>();
 
-	private _toTransformFonts: TToTransformFont[] = [];
-	private _toTransformFontsHashmap = new Map<string, TToTransformHashmapItem>();
+	private _toTransformAssets: TToTransformAsset[] = [];
+	private _toTransformAssetsHashmap = new Map<string, TToTransformHashmapItem>();
 
 	constructor(root: FrameNode) {
 		this._root = root;
@@ -34,7 +39,7 @@ export class FigmaNodeTreeProcessor {
 		rootId: TContinuousId;
 		toTransformNodes: TToTransformNode[];
 		toTransformPaints: TToTransformPaint[];
-		toTransformFonts: TToTransformFont[];
+		toTransformAssets: TToTransformAsset[];
 	} {
 		const rootId = this.walk(this._root, true);
 
@@ -42,7 +47,7 @@ export class FigmaNodeTreeProcessor {
 			rootId,
 			toTransformNodes: this._toTransformNodes,
 			toTransformPaints: this._toTransformPaints,
-			toTransformFonts: this._toTransformFonts
+			toTransformAssets: this._toTransformAssets
 		};
 	}
 
@@ -56,7 +61,8 @@ export class FigmaNodeTreeProcessor {
 				id: nodeId,
 				node,
 				childrenIds: this.processChildren(node),
-				paintIds: this.processPaints(node),
+				fills: this.processFills(node),
+				strokes: this.processStrokes(node),
 				isRoot
 			});
 		} else if (isFigmaGroupNode(node)) {
@@ -71,15 +77,17 @@ export class FigmaNodeTreeProcessor {
 				type: 'Text',
 				id: nodeId,
 				node,
-				segments: this.processFonts(node),
-				paintIds: this.processPaints(node)
+				segments: this.processTextSegments(node),
+				strokes: this.processStrokes(node),
+				fills: this.processFills(node)
 			});
 		} else if (isFigmaShapeNode(node)) {
 			this._toTransformNodes.push({
 				type: 'Shape',
 				id: nodeId,
 				node,
-				paintIds: this.processPaints(node)
+				fills: this.processFills(node),
+				strokes: this.processStrokes(node)
 			});
 		} else if (isFigmaSceneNode(node)) {
 			this._toTransformNodes.push({
@@ -96,22 +104,103 @@ export class FigmaNodeTreeProcessor {
 
 	// Processes children of a node
 	private processChildren(node: TFigmaNodeWithChildren): TContinuousId[] {
-		return node.children.map((child) => this.walk(child));
+		// Reverse so that the most top node is the first item in the array
+		return node.children.map((child) => this.walk(child)).reverse();
 	}
 
-	// Processes paints of a node
-	private processPaints(node: TFigmaNodeWithPaints): TContinuousId[] {
+	// Processes fills of a node
+	private processFills(node: TFigmaNodeWithFills): TToTransformFill[] {
 		const fills = dropMixed(node, 'fills');
-		return fills.map((paint) =>
-			this.getOrGenerateId(this._toTransformPaintsHashmap, this._toTransformPaints, {
-				nodeIds: [node.id],
-				paint
+		return fills
+			.map((fill) => {
+				let paint: TToTransformPaintVariant;
+				switch (fill.type) {
+					case 'SOLID':
+					case 'GRADIENT_LINEAR':
+					case 'GRADIENT_RADIAL':
+					case 'GRADIENT_ANGULAR':
+					case 'GRADIENT_DIAMOND':
+						paint = fill;
+						break;
+					case 'IMAGE':
+						paint = {
+							...fill,
+							assetId: this.getOrGenerateId(
+								this._toTransformAssetsHashmap,
+								this._toTransformAssets,
+								{
+									nodeIds: [node.id],
+									asset: { type: 'Image', hash: fill.imageHash }
+								}
+							)
+						};
+						break;
+					case 'VIDEO':
+						return null;
+				}
+
+				return {
+					paintId: this.getOrGenerateId(this._toTransformPaintsHashmap, this._toTransformPaints, {
+						nodeIds: [node.id],
+						paint
+					}),
+					visible: fill.visible ?? true,
+					opacity: fill.opacity ?? 1,
+					blendMode: fill.blendMode ?? 'PASS_THROUGH'
+				};
 			})
-		);
+			.filter(notEmpty)
+			.reverse(); // Reverse so that the most top fill is the first item in the array
 	}
 
-	// Processes fonts of a node
-	private processFonts(node: TextNode): TTextNodeSegment[] {
+	// Processes strokes of a node
+	private processStrokes(node: TFigmaNodeWithStrokes): TToTransformStroke[] {
+		const strokes = dropMixed(node, 'strokes');
+		return strokes
+			.map((stroke) => {
+				let paint: TToTransformPaintVariant;
+				switch (stroke.type) {
+					case 'SOLID':
+					case 'GRADIENT_LINEAR':
+					case 'GRADIENT_RADIAL':
+					case 'GRADIENT_ANGULAR':
+					case 'GRADIENT_DIAMOND':
+						paint = stroke;
+						break;
+					case 'IMAGE':
+						paint = {
+							...stroke,
+							assetId: this.getOrGenerateId(
+								this._toTransformAssetsHashmap,
+								this._toTransformAssets,
+								{
+									nodeIds: [node.id],
+									asset: { type: 'Image', hash: stroke.imageHash }
+								}
+							)
+						};
+						break;
+					case 'VIDEO':
+						return null;
+				}
+
+				return {
+					paintId: this.getOrGenerateId(this._toTransformPaintsHashmap, this._toTransformPaints, {
+						nodeIds: [node.id],
+						paint
+					}),
+					visible: stroke.visible ?? true,
+					opacity: stroke.opacity ?? 1,
+					blendMode: stroke.blendMode ?? 'PASS_THROUGH',
+					width: dropMixed(node, 'strokeWeight')
+				};
+			})
+			.filter(notEmpty)
+			.reverse(); // Reverse so that the most top stroke is the first item in the array
+	}
+
+	// Processes text segments of a text node
+	private processTextSegments(node: TextNode): TTextNodeSegment[] {
 		const segments = node.getStyledTextSegments([
 			'fontSize',
 			'fontName',
@@ -122,18 +211,20 @@ export class FigmaNodeTreeProcessor {
 		]);
 		return segments.map((segment) => ({
 			...segment,
-			fontId: this.getOrGenerateId(this._toTransformFontsHashmap, this._toTransformFonts, {
+			fontId: this.getOrGenerateId(this._toTransformAssetsHashmap, this._toTransformAssets, {
 				nodeIds: [node.id],
-				fontMetadata: this.extractFontMetadata(segment)
-			})
+				asset: { type: 'Font', metadata: this.extractFontMetadata(segment) }
+			}),
+			fontMetadata: this.extractFontMetadata(segment)
 		}));
 	}
 
 	// Helper to extract font metadata from a node
-	private extractFontMetadata(segment: Omit<TTextNodeSegment, 'fontId'>): COMP.FontMetadata {
+	private extractFontMetadata(
+		segment: Omit<Omit<TTextNodeSegment, 'fontId'>, 'fontMetadata'>
+	): COMP.FontMetadata {
 		return {
 			family: segment.fontName.family,
-			name: segment.fontName.style,
 			weight: segment.fontWeight,
 			style: segment.fontName.style.toLowerCase().includes('italic') ? 'Italic' : 'Normal'
 		};
@@ -171,7 +262,8 @@ export interface TToTransformTextNode extends TToTransformBaseNode {
 	type: 'Text';
 	node: TextNode;
 	segments: TTextNodeSegment[];
-	paintIds: TContinuousId[];
+	fills: TToTransformFill[];
+	strokes: TToTransformStroke[];
 }
 
 export type TTextNodeSegment = Pick<
@@ -184,13 +276,14 @@ export type TTextNodeSegment = Pick<
 	| 'characters'
 	| 'start'
 	| 'end'
-> & { fontId: number };
+> & { fontId: number; fontMetadata: COMP.FontMetadata };
 
 export interface TToTransformFrameNode extends TToTransformBaseNode {
 	type: 'Frame';
 	node: FrameNode | ComponentNode | InstanceNode;
 	childrenIds: TContinuousId[];
-	paintIds: TContinuousId[];
+	fills: TToTransformFill[];
+	strokes: TToTransformStroke[];
 	isRoot: boolean;
 }
 
@@ -203,7 +296,8 @@ export interface TToTransformGroupNode extends TToTransformBaseNode {
 export interface TToTransformShapeNode extends TToTransformBaseNode {
 	type: 'Shape';
 	node: TFigmaShapeNode;
-	paintIds: TContinuousId[];
+	fills: TToTransformFill[];
+	strokes: TToTransformStroke[];
 }
 
 export interface TToTransformUncategorizedSceneNode extends TToTransformBaseNode {
@@ -221,13 +315,43 @@ export type TToTransformNode =
 export interface TToTransformPaint {
 	id: TContinuousId;
 	nodeIds: SceneNode['id'][];
-	paint: Paint;
+	paint: TToTransformPaintVariant;
 }
 
-export interface TToTransformFont {
+export type TToTransformPaintVariant =
+	| SolidPaint
+	| GradientPaint
+	| (ImagePaint & { assetId: TContinuousId });
+
+export interface TToTransformAsset {
 	id: TContinuousId;
 	nodeIds: SceneNode['id'][];
-	fontMetadata: COMP.FontMetadata;
+	asset: TToTransformImageAsset | TToTransformFontAsset;
+}
+
+export interface TToTransformImageAsset {
+	type: 'Image';
+	hash: string | null;
+}
+
+export interface TToTransformFontAsset {
+	type: 'Font';
+	metadata: COMP.FontMetadata;
+}
+
+export interface TToTransformFill {
+	paintId: TContinuousId;
+	visible: boolean;
+	blendMode: BlendMode;
+	opacity: number;
+}
+
+export interface TToTransformStroke {
+	paintId: TContinuousId;
+	visible: boolean;
+	blendMode: BlendMode;
+	opacity: number;
+	width: number;
 }
 
 interface TToTransformHashmapItem {

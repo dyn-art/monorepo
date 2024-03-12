@@ -16,6 +16,7 @@ use smallvec::SmallVec;
 #[derive(Debug, Clone)]
 pub struct GradientFillStyleSvgBundle {
     pub entity: Entity,
+    pub variant: GradientFillStyleVariant,
 
     pub root_g: SvgElement,
     /**/ pub defs: SvgElement,
@@ -107,6 +108,10 @@ impl GradientFillStyleSvgBundle {
 
         Self {
             entity,
+            variant: match gradient_variant {
+                GradientVariant::Linear { .. } => GradientFillStyleVariant::Linear,
+                GradientVariant::Radial { .. } => GradientFillStyleVariant::Radial,
+            },
 
             root_g: root_g_element,
             defs: defs_element,
@@ -121,4 +126,10 @@ impl GradientFillStyleSvgBundle {
     fn create_element_name(id: crate::svg::svg_element::SvgElementId, category: &str) -> String {
         format!("gradient-fill_{}_{}", category, id)
     }
+}
+
+#[derive(Debug, Clone)]
+pub enum GradientFillStyleVariant {
+    Linear,
+    Radial,
 }

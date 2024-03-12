@@ -2,7 +2,7 @@ import { extractErrorData } from '@dyn/utils';
 
 import { NodeException } from './NodeException';
 
-export class ExportImagePaintException extends NodeException {
+export class ExportImageAssetException extends NodeException {
 	public readonly throwable?: Error;
 
 	constructor(nodeIds: SceneNode['id'][], throwable?: unknown) {

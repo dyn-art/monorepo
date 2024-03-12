@@ -1,3 +1,9 @@
-export function mapFigmaRGBToDTIF(rgb: RGB): [number, number, number] {
-	return [rgb.r, rgb.g, rgb.b].map((value) => Math.round(value * 255)) as [number, number, number];
+import type { COMP } from '@dyn/comp-dtif';
+
+export function mapFigmaRGBToDtif(rgb: RGB): COMP.Color {
+	return {
+		red: Math.round(rgb.r * 255),
+		green: Math.round(rgb.g * 255),
+		blue: Math.round(rgb.b * 255)
+	};
 }

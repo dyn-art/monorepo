@@ -87,6 +87,11 @@ impl DtifInjector {
             Node::Frame(node) => world.spawn(node.to_ecs_bundle(&self)),
             Node::Group(node) => world.spawn(node.to_ecs_bundle(&self)),
             Node::Rectangle(node) => world.spawn(node.to_ecs_bundle(&self)),
+            Node::Ellipse(node) => world.spawn(node.to_ecs_bundle(&self)),
+            Node::Star(node) => world.spawn(node.to_ecs_bundle(&self)),
+            Node::Polygon(node) => world.spawn(node.to_ecs_bundle(&self)),
+            Node::Text(node) => world.spawn(node.to_ecs_bundle(&self)),
+            Node::Vector(node) => world.spawn(node.to_ecs_bundle(&self)),
         }
     }
 

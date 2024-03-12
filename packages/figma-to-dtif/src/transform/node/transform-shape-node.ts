@@ -1,4 +1,4 @@
-import type { COMP } from '@dyn/dtif';
+import type { COMP } from '@dyn/comp-dtif';
 
 import { UnsupportedFigmaNodeException } from '../../exceptions';
 import type { TToTransformShapeNode } from '../../FigmaNodeTreeProcessor';
@@ -10,18 +10,33 @@ import { transformVectorNode } from './transform-vector-node';
 
 export async function transformShapeNode(
 	toTransformNode: TToTransformShapeNode
-): Promise<COMP.NodeBundle> {
+): Promise<COMP.Node> {
 	switch (toTransformNode.node.type) {
 		case 'RECTANGLE':
-			return transformRectangleNode(toTransformNode.node, { paintIds: toTransformNode.paintIds });
+			return transformRectangleNode(toTransformNode.node, {
+				fills: toTransformNode.fills,
+				strokes: toTransformNode.strokes
+			});
 		case 'ELLIPSE':
-			return transformEllipseNode(toTransformNode.node, { paintIds: toTransformNode.paintIds });
+			return transformEllipseNode(toTransformNode.node, {
+				fills: toTransformNode.fills,
+				strokes: toTransformNode.strokes
+			});
 		case 'POLYGON':
-			return transformPolygonNode(toTransformNode.node, { paintIds: toTransformNode.paintIds });
+			return transformPolygonNode(toTransformNode.node, {
+				fills: toTransformNode.fills,
+				strokes: toTransformNode.strokes
+			});
 		case 'STAR':
-			return transformStarNode(toTransformNode.node, { paintIds: toTransformNode.paintIds });
+			return transformStarNode(toTransformNode.node, {
+				fills: toTransformNode.fills,
+				strokes: toTransformNode.strokes
+			});
 		case 'VECTOR':
-			return transformVectorNode(toTransformNode.node, { paintIds: toTransformNode.paintIds });
+			return transformVectorNode(toTransformNode.node, {
+				fills: toTransformNode.fills,
+				strokes: toTransformNode.strokes
+			});
 		// case 'LINE':
 		default:
 			throw new UnsupportedFigmaNodeException(toTransformNode.node);

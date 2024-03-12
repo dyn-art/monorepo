@@ -1,6 +1,6 @@
 import type { COMP } from '../comp';
 
-export function isDTIFComposition(value: unknown): value is COMP.DtifComposition {
+export function isDtifComposition(value: unknown): value is COMP.DtifComposition {
 	if (typeof value !== 'object' || value == null) {
 		return false;
 	}
@@ -11,7 +11,7 @@ export function isDTIFComposition(value: unknown): value is COMP.DtifComposition
 		obj.size.length === 2 &&
 		typeof obj.size[0] === 'number' &&
 		typeof obj.size[1] === 'number' &&
-		typeof obj.rootNodeId === 'number' &&
+		typeof obj.rootNodeId === 'string' &&
 		obj.nodes != null &&
 		typeof obj.nodes === 'object' &&
 		Object.values(obj.nodes).every((node) => typeof node === 'object')

@@ -2,8 +2,8 @@
 
 import { useQuery } from '@tanstack/react-query';
 import React from 'react';
-import { applyCanvasDimensions, prepareDtifComposition, type COMP } from '@dyn/comp-dtif';
-import { Composition, SvgRenderer } from '@dyn/svg-comp';
+import { applyCanvasDimensions, type COMP } from '@dyn/comp-dtif';
+import { createSvgComposition, type Composition } from '@dyn/svg-comp';
 import { cn, Skeleton } from '@dyn/ui';
 
 export const Canvas: React.FC<TCanvasProps> = (props) => {
@@ -26,39 +26,31 @@ export const Canvas: React.FC<TCanvasProps> = (props) => {
 		}
 	});
 
-	const { data: preparedDtif, isLoading: isPreparingDtif } = useQuery({
-		queryKey: ['prepare-dtif'],
-		queryFn: async () => {
-			return prepareDtifComposition(dtif);
-		}
-	});
-
 	React.useEffect(() => {
-		if (!isWasmLoaded || preparedDtif == null || svgContainerRef.current == null) {
+		if (!isWasmLoaded || svgContainerRef.current == null) {
 			return;
 		}
-		const newComposition = new Composition({
-			dtif: applyCanvasDimensions(preparedDtif, { width, height })
+
+		const newComposition = createSvgComposition({
+			dtif: applyCanvasDimensions(dtif, { width, height }),
+			renderer: {
+				domElement: svgContainerRef.current as Element
+			},
+			interactive: true
 		});
-		newComposition.renderer = new SvgRenderer(newComposition, {
-			domElement: svgContainerRef.current as Element
-		});
-		newComposition.update();
 		setComposition(newComposition);
-		if (onLoadedComposition != null) {
-			onLoadedComposition(newComposition);
-		}
+		onLoadedComposition?.(newComposition);
 
 		return () => {
 			newComposition.unmount();
 		};
-	}, [isWasmLoaded, width, height, preparedDtif, onLoadedComposition]);
+	}, [isWasmLoaded, width, height, dtif, onLoadedComposition]);
 
 	// =========================================================================
 	// UI
 	// =========================================================================
 
-	if (isWasmLoading || isPreparingDtif) {
+	if (isWasmLoading) {
 		return <Skeleton className="h-full w-full" />;
 	}
 

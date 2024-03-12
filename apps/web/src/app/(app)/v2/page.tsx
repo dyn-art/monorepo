@@ -20,9 +20,6 @@ const DEFAULT_DTIF: COMP.DtifComposition = {
 	nodes: {
 		n1: {
 			type: 'Frame',
-			blendMode: 'Normal',
-			clipContent: false,
-			cornerRadii: [0, 0, 0, 0],
 			styles: [
 				{
 					type: 'Fill',
@@ -31,48 +28,44 @@ const DEFAULT_DTIF: COMP.DtifComposition = {
 					paintId: 'p1'
 				}
 			],
-			opacity: 1,
 			size: [WIDTH, HEIGHT],
 			translation: [0, 0],
-			visibility: 'Visible',
 			children: ['n2']
 		},
 		n2: {
 			type: 'Rectangle',
-			blendMode: 'Normal',
 			cornerRadii: [0, 20, 0, 0],
 			styles: [
-				{
-					type: 'Stroke',
-					width: 5,
-					blendMode: 'Normal',
-					opacity: 1,
-					paintId: 'p3'
-				},
 				// {
-				// 	type: 'Fill',
+				// 	type: 'Stroke',
+				// 	width: 5,
 				// 	blendMode: 'Normal',
-				// 	opacity: 0.9,
-				// 	paintId: 'p2'
+				// 	opacity: 1,
+				// 	paintId: 'p3'
 				// },
 				{
 					type: 'Fill',
 					blendMode: 'Normal',
-					opacity: 0.8,
-					paintId: 'p5'
-				},
-				{
-					type: 'Stroke',
-					width: 20,
-					blendMode: 'Normal',
-					opacity: 0.7,
+					opacity: 0.9,
 					paintId: 'p2'
 				}
+				// {
+				// 	type: 'Fill',
+				// 	blendMode: 'Normal',
+				// 	opacity: 0.8,
+				// 	paintId: 'p5'
+				// },
+				// {
+				// 	type: 'Stroke',
+				// 	width: 20,
+				// 	blendMode: 'Normal',
+				// 	opacity: 0.7,
+				// 	paintId: 'p2'
+				// }
 			],
-			opacity: 1,
 			size: [100, 100],
-			translation: [WIDTH / 2, HEIGHT / 2],
-			visibility: 'Visible'
+			translation: [(WIDTH - 100) / 2, (HEIGHT - 100) / 2],
+			angle: 45
 		}
 	},
 	paints: {

@@ -38,7 +38,15 @@ impl AssetDatabaseRes {
                     None
                 }
             }
-            _ => None,
+            // TODO: More advanced asset content type detection when unknown
+            // (e.g. in case of Figma export its unknown what content type an image has)
+            AssetContentType::Unknown => {
+                if let Some(image_id) = self.insert_as_image(asset) {
+                    Some(AssetId::Image(image_id))
+                } else {
+                    None
+                }
+            }
         }
     }
 

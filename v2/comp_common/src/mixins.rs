@@ -1,4 +1,4 @@
-use crate::common::{BlendMode, CornerRadii, Opacity, Size, Visibility};
+use crate::common::{BlendMode, CornerRadii, Opacity, Size};
 use bevy_ecs::{component::Component, entity::Entity};
 use dyn_comp_asset::asset_id::ImageId;
 use smallvec::SmallVec;
@@ -21,7 +21,7 @@ pub struct BlendModeMixin(pub BlendMode);
 
 /// Controls an entity's visibility state.
 #[derive(Component, Debug, Default, Copy, Clone)]
-pub struct VisibilityMixin(pub Visibility);
+pub struct VisibilityMixin(pub bool);
 
 /// Controls the opacity of an entity, ranging from 0.0 (fully transparent) to 1.0 (fully opaque).
 #[derive(Component, Debug, Default, Copy, Clone)]
