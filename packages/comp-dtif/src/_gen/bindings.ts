@@ -229,7 +229,7 @@ export type Millimeter = number
 
 export type MouseButton = "Left" | "Middle" | "Right" | "Unkown"
 
-export type Node = ({ type: "Frame" } & FrameNode) | ({ type: "Group" } & GroupNode) | ({ type: "Rectangle" } & RectangleNode) | ({ type: "Ellipse" } & EllipseNode) | ({ type: "Star" } & StarNode) | ({ type: "Polygon" } & PolygonNode) | ({ type: "Text" } & TextNode)
+export type Node = ({ type: "Frame" } & FrameNode) | ({ type: "Group" } & GroupNode) | ({ type: "Rectangle" } & RectangleNode) | ({ type: "Ellipse" } & EllipseNode) | ({ type: "Star" } & StarNode) | ({ type: "Polygon" } & PolygonNode) | ({ type: "Text" } & TextNode) | ({ type: "Vector" } & VectorNode)
 
 export type Opacity = Percent
 
@@ -388,6 +388,8 @@ lineHeight: LineHeight }
 export type Vec2 = [number, number]
 
 export type Vec4 = [number, number, number, number]
+
+export type VectorNode = { path: string; translation?: Vec2; angle?: Degree; size: Size; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; styles?: Style[] }
 
 export type VerticalTextAlignment = "Top" | "Center" | "Bottom" | "Justified"
 

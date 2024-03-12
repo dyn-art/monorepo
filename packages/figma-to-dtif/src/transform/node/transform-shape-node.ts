@@ -6,6 +6,7 @@ import { transformEllipseNode } from './transform-ellipse-node';
 import { transformPolygonNode } from './transform-polygon-node';
 import { transformRectangleNode } from './transform-rectangle-node';
 import { transformStarNode } from './transform-star-node';
+import { transformVectorNode } from './transform-vector-node';
 
 export async function transformShapeNode(
 	toTransformNode: TToTransformShapeNode
@@ -31,8 +32,11 @@ export async function transformShapeNode(
 				fills: toTransformNode.fills,
 				strokes: toTransformNode.strokes
 			});
-		// case 'VECTOR':
-		// return transformVectorNode(toTransformNode.node, { paintIds: toTransformNode.paintIds });
+		case 'VECTOR':
+			return transformVectorNode(toTransformNode.node, {
+				fills: toTransformNode.fills,
+				strokes: toTransformNode.strokes
+			});
 		// case 'LINE':
 		default:
 			throw new UnsupportedFigmaNodeException(toTransformNode.node);

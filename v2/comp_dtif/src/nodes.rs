@@ -1,18 +1,23 @@
-use crate::{dtif_injector::DtifInjector, styles::Style, ToEcsBundleImpl};
+use crate::{
+    conversion::string_to_tiny_skia_path, dtif_injector::DtifInjector, styles::Style,
+    ToEcsBundleImpl,
+};
 use bevy_transform::components::Transform;
 use dyn_comp_common::{
     bundles::{
         EllipseCompNodeBundle, FrameCompNodeBundle, GroupCompNodeBundle, PolygonCompNodeBundle,
-        RectangleCompNodeBundle, StarCompNodeBundle, TextCompNodeBundle,
+        RectangleCompNodeBundle, StarCompNodeBundle, TextCompNodeBundle, VectorNodeBundle,
     },
     common::{
         BlendMode, BreakLineOn, CornerRadii, Degree, HorizontalTextAlignment, Opacity, Size,
         TextSpan, VerticalTextAlignment,
     },
-    mixins::{BlendModeMixin, CornerRadiiMixin, OpacityMixin, SizeMixin, VisibilityMixin},
+    mixins::{
+        BlendModeMixin, CornerRadiiMixin, OpacityMixin, PathMixin, SizeMixin, VisibilityMixin,
+    },
     nodes::{
         CompNode, CompNodeVariant, EllipseArcData, EllipseCompNode, FrameCompNode, GroupCompNode,
-        PolygonCompNode, RectangleCompNode, StarCompNode, TextCompNode,
+        PolygonCompNode, RectangleCompNode, StarCompNode, TextCompNode, VectorCompNode,
     },
 };
 use glam::{Quat, Vec2, Vec3};
@@ -27,6 +32,7 @@ pub enum Node {
     Star(StarNode),
     Polygon(PolygonNode),
     Text(TextNode),
+    Vector(VectorNode),
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
@@ -357,6 +363,48 @@ impl ToEcsBundleImpl for TextNode {
                 vertical_text_alignment: self.vertical_text_alignment,
                 linebreak_behavior: self.linebreak_behavior,
             },
+            transform: Transform {
+                translation: Vec3::new(self.translation.x, self.translation.y, 0.0),
+                rotation: Quat::from_rotation_z(self.angle.to_radians()),
+                scale: Vec3::default(),
+            },
+            size: SizeMixin(self.size),
+            visibility: VisibilityMixin(self.visible),
+            blend_mode: BlendModeMixin(self.blend_mode),
+            opacity: OpacityMixin(self.opacity),
+        }
+    }
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
+#[serde(rename_all = "camelCase")]
+pub struct VectorNode {
+    path: String,
+    #[serde(default)]
+    pub translation: Vec2,
+    #[serde(default)]
+    pub angle: Degree,
+    pub size: Size,
+    #[serde(default)]
+    pub visible: bool,
+    #[serde(default)]
+    pub blend_mode: BlendMode,
+    #[serde(default)]
+    pub opacity: Opacity,
+    #[serde(default)]
+    pub styles: Vec<Style>,
+}
+
+impl ToEcsBundleImpl for VectorNode {
+    type Bundle = VectorNodeBundle;
+
+    fn to_ecs_bundle(&self, _: &DtifInjector) -> Self::Bundle {
+        Self::Bundle {
+            node: CompNode {
+                variant: CompNodeVariant::Vector,
+            },
+            path: PathMixin(string_to_tiny_skia_path(&self.path).unwrap()),
+            vector: VectorCompNode,
             transform: Transform {
                 translation: Vec3::new(self.translation.x, self.translation.y, 0.0),
                 rotation: Quat::from_rotation_z(self.angle.to_radians()),

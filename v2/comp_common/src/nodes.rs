@@ -12,11 +12,11 @@ pub enum CompNodeVariant {
     Group,
     Rectangle,
     Frame,
+    Ellipse,
+    Polygon,
+    Star,
     Text,
     Vector,
-    Polygon,
-    Ellipse,
-    Star,
 }
 
 /// Defines a layout container, similar to an HTML `<div>`, for hierarchical organization.
@@ -30,7 +30,7 @@ pub struct FrameCompNode {
 #[derive(Component, Debug, Default, Copy, Clone)]
 pub struct GroupCompNode;
 
-/// A rectangle shape node for graphical compositions.
+/// A rectangle shape node.
 #[derive(Component, Debug, Default, Copy, Clone)]
 pub struct RectangleCompNode;
 
@@ -78,3 +78,7 @@ pub struct TextCompNode {
     /// Line breaking behavior.
     pub linebreak_behavior: BreakLineOn,
 }
+
+/// A vector shape node.
+#[derive(Component, Debug, Default, Clone)]
+pub struct VectorCompNode;

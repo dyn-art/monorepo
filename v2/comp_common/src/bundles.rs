@@ -1,11 +1,11 @@
 use crate::{
     mixins::{
         BlendModeMixin, CornerRadiiMixin, ImageAssetMixin, OpacityMixin, PaintChildMixin,
-        SizeMixin, VisibilityMixin,
+        PathMixin, SizeMixin, VisibilityMixin,
     },
     nodes::{
         CompNode, EllipseCompNode, FrameCompNode, GroupCompNode, PolygonCompNode,
-        RectangleCompNode, StarCompNode, TextCompNode,
+        RectangleCompNode, StarCompNode, TextCompNode, VectorCompNode,
     },
     paints::{CompPaint, GradientCompPaint, ImageCompPaint, SolidCompPaint},
     styles::{CompStyle, FillCompStyle, StrokeCompStyle},
@@ -102,6 +102,20 @@ pub struct TextCompNodeBundle {
     pub visibility: VisibilityMixin,
     pub blend_mode: BlendModeMixin,
     pub opacity: OpacityMixin,
+    // https://github.com/Nilirad/bevy_prototype_lyon/issues/207
+    // pub styles: StylesMixin,
+}
+
+#[derive(Bundle, Debug)]
+pub struct VectorNodeBundle {
+    pub node: CompNode,
+    pub vector: VectorCompNode,
+    pub transform: Transform,
+    pub size: SizeMixin,
+    pub visibility: VisibilityMixin,
+    pub blend_mode: BlendModeMixin,
+    pub opacity: OpacityMixin,
+    pub path: PathMixin,
     // https://github.com/Nilirad/bevy_prototype_lyon/issues/207
     // pub styles: StylesMixin,
 }
