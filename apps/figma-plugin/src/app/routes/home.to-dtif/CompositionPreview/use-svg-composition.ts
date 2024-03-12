@@ -2,6 +2,7 @@ import React from 'react';
 import { applyCanvasDimensions, prepareDtifComposition, type COMP } from '@dyn/figma-to-dtif';
 import { Composition, initWasm, SvgRenderer } from '@dyn/svg-comp';
 
+// TODO: Replace with comp-canvas package once created
 export const useSvgComposition = (
 	props: UseSVGCompositionProps
 ): {

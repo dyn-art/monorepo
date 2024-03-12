@@ -104,7 +104,8 @@ export class FigmaNodeTreeProcessor {
 
 	// Processes children of a node
 	private processChildren(node: TFigmaNodeWithChildren): TContinuousId[] {
-		return node.children.map((child) => this.walk(child));
+		// Reverse so that the most top node is the first item in the array
+		return node.children.map((child) => this.walk(child)).reverse();
 	}
 
 	// Processes fills of a node
@@ -148,7 +149,8 @@ export class FigmaNodeTreeProcessor {
 					blendMode: fill.blendMode ?? 'PASS_THROUGH'
 				};
 			})
-			.filter(notEmpty);
+			.filter(notEmpty)
+			.reverse(); // Reverse so that the most top style is the first item in the array
 	}
 
 	// Processes strokes of a node
