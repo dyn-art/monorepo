@@ -22,7 +22,7 @@ export class SvgRenderer extends Renderer {
 	private _cursorInCompBounds = false;
 
 	constructor(composition: Composition, options: TsvgRendererOptions = {}) {
-		super(composition, true);
+		super(composition, options.callbackBased ?? true);
 		const { domElement = document.body } = options;
 		this._domElement = domElement;
 
@@ -266,7 +266,7 @@ export class SvgRenderer extends Renderer {
 						}
 					} else {
 						console.error(
-							`Failed to query element (${elementChanges.id}) to apply new children order (${change.newOrder})!`
+							`Failed to query element (${elementChanges.id}) to apply new children order!`
 						);
 					}
 					break;
@@ -307,4 +307,5 @@ export class SvgRenderer extends Renderer {
 
 export interface TsvgRendererOptions {
 	domElement?: Element;
+	callbackBased?: boolean;
 }

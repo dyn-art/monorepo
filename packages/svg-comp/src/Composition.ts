@@ -18,8 +18,11 @@ export class Composition {
 	private _renderer: Renderer | null = null;
 
 	private _inputEventQueue: SvgCompInputEvent[] = [];
-
 	private _watchedOutputEventCallbackMap: TWatchedOutputEventsCallbackMap = {};
+
+	// Interaction events debounce
+	private debounceTimeout: number | null = null;
+	private readonly debounceDelay: number = 100; // ms
 
 	constructor(config: TCompositionConfig) {
 		const { dtif, interactive = false } = config;
@@ -116,9 +119,18 @@ export class Composition {
 	public emitInputEvent(event: SvgCompInputEvent, debounce = true): void {
 		this._inputEventQueue.push(event);
 
-		// TODO: debounce
-		if (this.renderer?.isCallbackBased) {
-			// TODO
+		// Delay update call, resetting timer on new events within debounceDelay
+		if (event.type === 'Interaction' && this.renderer?.isCallbackBased) {
+			if (this.debounceTimeout != null) {
+				clearTimeout(this.debounceTimeout);
+			}
+			if (debounce) {
+				this.debounceTimeout = setTimeout(() => {
+					this.update();
+				}, this.debounceDelay) as unknown as number;
+			} else {
+				this.update();
+			}
 		}
 	}
 
