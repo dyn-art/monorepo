@@ -28,7 +28,7 @@ const DTIF: COMP.DTIFComposition = {
 				width: 100,
 				height: 100
 			},
-			relativeTransform: createTransformMatrix((WIDTH - 100) / 2, (HEIGHT - 100) / 2, 30),
+			relativeTransform: createTransformMatrix((WIDTH - 100) / 2, (HEIGHT - 100) / 2, 45),
 			rectangleCornerMixin: {
 				bottomLeftRadius: 20
 			},

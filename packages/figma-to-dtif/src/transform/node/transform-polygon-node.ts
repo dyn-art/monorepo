@@ -18,7 +18,7 @@ export function transformPolygonNode(
 		type: 'Polygon',
 		pointCount: node.pointCount,
 		visible: node.visible,
-		size: [node.height, node.width],
+		size: [node.width, node.height],
 		translation: mapFigmaTransformToTranslation(node.relativeTransform),
 		angle: mapFigmaTransformToRotation(node.relativeTransform),
 		blendMode: mapFigmaBlendModeToDtif(node.blendMode),

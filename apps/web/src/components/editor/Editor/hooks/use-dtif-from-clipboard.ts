@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { isDtifComposition, type COMP } from '@dyn/comp-dtif';
+import { isDtifComposition, prepareDtifComposition, type COMP } from '@dyn/comp-dtif';
 
 export function useDtifFromClipboard(defaultDtif: COMP.DtifComposition): {
 	data?: COMP.DtifComposition;
@@ -8,18 +8,29 @@ export function useDtifFromClipboard(defaultDtif: COMP.DtifComposition): {
 	const { data, isLoading } = useQuery({
 		queryKey: ['prepare-dtif'],
 		queryFn: async () => {
+			let dtif: COMP.DtifComposition = defaultDtif;
+			let loadedFromClipboard = false;
+
+			// Try to load DTIF from clipboard
 			try {
 				const text = await navigator.clipboard.readText();
 				const maybeDtif: unknown = JSON.parse(text);
 				if (isDtifComposition(maybeDtif)) {
-					console.log('Loaded DTIF from Clipboard: ', maybeDtif);
-					return maybeDtif;
+					dtif = maybeDtif;
+					loadedFromClipboard = true;
 				}
-				console.warn('Invalid DTIF from Clipboard!');
 			} catch (e) {
 				console.warn('Failed to load DTIF from Clipboard!');
 			}
-			return defaultDtif;
+
+			// Prepare DTIF by loading assets, ..
+			const preparedDtif = await prepareDtifComposition(dtif);
+			console.log(
+				loadedFromClipboard ? 'Loaded DTIF from Clipboard: ' : 'Loaded default DTIF: ',
+				preparedDtif
+			);
+
+			return preparedDtif;
 		}
 	});
 

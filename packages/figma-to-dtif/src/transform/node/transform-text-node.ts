@@ -48,7 +48,7 @@ export function transformTextNode(
 		verticalTextAlignment: mapFigmaVerticalTextAlignmentToDtif(node.textAlignVertical),
 		linebreakBehavior: 'WordBoundary',
 		visible: node.visible,
-		size: [node.height, node.width],
+		size: [node.width, node.height],
 		translation: mapFigmaTransformToTranslation(node.relativeTransform),
 		angle: mapFigmaTransformToRotation(node.relativeTransform),
 		blendMode: mapFigmaBlendModeToDtif(node.blendMode),

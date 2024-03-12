@@ -34,7 +34,7 @@ export async function transformNodeToImage(
 	return {
 		type: 'Rectangle',
 		visible: node.visible,
-		size: [node.height, node.width],
+		size: [node.width, node.height],
 		translation: mapFigmaTransformToTranslation(node.relativeTransform),
 		angle: mapFigmaTransformToRotation(node.relativeTransform),
 		styles: [{ type: 'Fill', paintId: paintId.toString() }]

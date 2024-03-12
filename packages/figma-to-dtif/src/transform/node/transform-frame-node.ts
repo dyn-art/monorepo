@@ -19,7 +19,7 @@ export function transformFrameNode(
 		clipContent: node.clipsContent,
 		visible: node.visible,
 		children: childrenIds.map((childId) => childId.toString()),
-		size: [node.height, node.width],
+		size: [node.width, node.height],
 		translation: mapFigmaTransformToTranslation(node.relativeTransform),
 		angle: mapFigmaTransformToRotation(node.relativeTransform),
 		cornerRadii: [

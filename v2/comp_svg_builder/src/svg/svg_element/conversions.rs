@@ -34,13 +34,14 @@ impl From<&Transform> for SvgTransformAttribute {
         // Create the SVG transformation matrix
         // This matrix combines rotation and scale, then applies translation
         // https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/transform
+        // https://docs.aspose.com/svg/net/drawing-basics/transformation-matrix/
         // | a c e |
         // | b d f |
         // | 0 0 1 |
         SvgTransformAttribute::Matrix {
             a: cos_a * sx,
-            b: sin_a * sy,
-            c: -sin_a * sx,
+            b: -sin_a * sy,
+            c: sin_a * sx,
             d: cos_a * sy,
             tx,
             ty,

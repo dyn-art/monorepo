@@ -18,7 +18,7 @@ export function transformVectorNode(
 		type: 'Vector',
 		path: node.vectorPaths[0]?.data ?? '', // TODO: Support multi path nodes
 		visible: node.visible,
-		size: [node.height, node.width],
+		size: [node.width, node.height],
 		translation: mapFigmaTransformToTranslation(node.relativeTransform),
 		angle: mapFigmaTransformToRotation(node.relativeTransform),
 		blendMode: mapFigmaBlendModeToDtif(node.blendMode),

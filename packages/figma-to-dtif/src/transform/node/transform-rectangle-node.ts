@@ -17,7 +17,7 @@ export function transformRectangleNode(
 	return {
 		type: 'Rectangle',
 		visible: node.visible,
-		size: [node.height, node.width],
+		size: [node.width, node.height],
 		translation: mapFigmaTransformToTranslation(node.relativeTransform),
 		angle: mapFigmaTransformToRotation(node.relativeTransform),
 		cornerRadii: [
