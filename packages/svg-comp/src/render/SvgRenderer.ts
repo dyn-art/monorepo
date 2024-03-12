@@ -20,6 +20,8 @@ export class SvgRenderer extends Renderer {
 	private _svgElementMap = new Map<SvgElementId, SVGElement>();
 
 	private _cursorInCompBounds = false;
+	private _width: number;
+	private _height: number;
 
 	constructor(composition: Composition, options: TsvgRendererOptions = {}) {
 		super(composition, options.callbackBased ?? true);
@@ -111,7 +113,13 @@ export class SvgRenderer extends Renderer {
 			const compositionPoint = this.pointerEventToCompositionPoint(e);
 			// Check whether cursor actually left composition
 			// or whether its just on some UI layer like the selection box
-			if ((this._cursorInCompBounds && compositionPoint[0] < 0) || compositionPoint[1] < 0) {
+			if (
+				this._cursorInCompBounds &&
+				(compositionPoint[0] < 0 ||
+					compositionPoint[0] > this._width ||
+					compositionPoint[1] < 0 ||
+					compositionPoint[1] > this._height)
+			) {
 				this.composition.emitInputEvent(
 					{
 						type: 'Interaction',
@@ -276,6 +284,8 @@ export class SvgRenderer extends Renderer {
 	}
 
 	public applyCompositionChange(change: CompositionChange): void {
+		this._width = change.size[0];
+		this._height = change.size[1];
 		this._svgElement.setAttribute('width', `${change.size[0]}px`);
 		this._svgElement.setAttribute('height', `${change.size[1]}px`);
 		this._svgElement.setAttribute(
