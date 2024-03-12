@@ -1,14 +1,31 @@
+pub mod components;
 pub mod events;
 pub mod resources;
+mod systems;
+mod utils;
 
 use bevy_app::{App, Plugin, PreUpdate};
-use bevy_ecs::schedule::{IntoSystemSetConfigs, SystemSet};
+use bevy_ecs::schedule::{IntoSystemConfigs, IntoSystemSetConfigs, SystemSet};
 use events::{
     CursorDownOnCompInputEvent, CursorDownOnEntityInputEvent, CursorDownOnResizeHandleInputEvent,
     CursorDownOnRotateHandleInputEvent, CursorEnteredCompInputEvent, CursorExitedCompInputEvent,
     CursorMovedOnCompInputEvent, CursorUpOnCompInputEvent, WheeledOnCompInputEvent,
 };
 use resources::comp_interaction::CompInteractionRes;
+use systems::{
+    composition::{
+        cursor_down::handle_cursor_down_on_comp_event,
+        cursor_entered::handle_cursor_entered_comp_event,
+        cursor_exited::handle_cursor_exited_comp_event,
+        cursor_move::handle_cursor_moved_on_comp_event, cursor_up::handle_cursor_up_on_comp_event,
+        wheel::handle_wheel_on_comp_event,
+    },
+    entity::cursor_down::handle_cursor_down_on_entity_event,
+    ui::{
+        resize_handle::handle_cursor_down_on_resize_handle_event,
+        rotate_handle::handle_cursor_down_on_rotate_handle_event,
+    },
+};
 
 pub struct CompInteractionPlugin;
 
@@ -24,13 +41,10 @@ enum CompInteractionSystemSet {
     Manipulation,
 
     /// Manages continuous actions (e.g. cursor movement, scrolling), providing immediate feedback.
-    ContinuousFeedback,
+    Continuous,
 
     /// Addresses multi-step interactions, preparing for their conclusion.
     Intermediate,
-
-    /// Finalizes interactions, stabilizing states before concluding the active sequence.
-    Termination,
 
     /// Marks the completion of interaction processing, readying the system for new input.
     Last,
@@ -59,15 +73,31 @@ impl Plugin for CompInteractionPlugin {
                 CompInteractionSystemSet::First,
                 CompInteractionSystemSet::Activation,
                 CompInteractionSystemSet::Manipulation,
-                CompInteractionSystemSet::ContinuousFeedback,
+                CompInteractionSystemSet::Continuous,
                 CompInteractionSystemSet::Intermediate,
-                CompInteractionSystemSet::Termination,
                 CompInteractionSystemSet::Last,
             )
                 .chain(),
         );
 
         // Register systems
-        // TODO
+        app.add_systems(
+            PreUpdate,
+            (
+                handle_cursor_entered_comp_event.in_set(CompInteractionSystemSet::First),
+                handle_cursor_down_on_comp_event.in_set(CompInteractionSystemSet::Activation),
+                handle_cursor_down_on_entity_event
+                    .in_set(CompInteractionSystemSet::Activation)
+                    .after(handle_cursor_down_on_comp_event),
+                handle_cursor_down_on_resize_handle_event
+                    .in_set(CompInteractionSystemSet::Manipulation),
+                handle_cursor_down_on_rotate_handle_event
+                    .in_set(CompInteractionSystemSet::Manipulation),
+                handle_cursor_moved_on_comp_event.in_set(CompInteractionSystemSet::Continuous),
+                handle_wheel_on_comp_event.in_set(CompInteractionSystemSet::Continuous),
+                handle_cursor_up_on_comp_event.in_set(CompInteractionSystemSet::Continuous),
+                handle_cursor_exited_comp_event.in_set(CompInteractionSystemSet::Last),
+            ),
+        );
     }
 }

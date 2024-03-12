@@ -49,7 +49,7 @@ pub struct SvgBundleChildrenChange {
 
 pub fn apply_node_children_changes(
     // https://bevyengine.org/learn/errors/
-    mut queries: ParamSet<(
+    mut query_set: ParamSet<(
         Query<(Entity, &Children, &mut SvgBundleVariant), (With<CompNode>, Changed<Children>)>,
         Query<&mut SvgBundleVariant, With<CompNode>>,
     )>,
@@ -58,7 +58,7 @@ pub fn apply_node_children_changes(
 
     // Query changes
     {
-        let children_query = queries.p0();
+        let children_query = query_set.p0();
         for (parent_entity, children, node_bundle_variant) in children_query.iter() {
             if let Some(child_node_entities) = node_bundle_variant.get_child_node_entities() {
                 let new_child_node_entities: SmallVec<[Entity; 2]> =
@@ -90,7 +90,7 @@ pub fn apply_node_children_changes(
 
     // Apply detected changes (Deferred to avoid query conflicts)
     {
-        let mut node_bundle_variant_query = queries.p1();
+        let mut node_bundle_variant_query = query_set.p1();
         for change in changes {
             process_removed_node_children(
                 change.parent_entity,

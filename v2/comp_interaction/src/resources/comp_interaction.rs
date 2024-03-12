@@ -53,11 +53,12 @@ pub enum HandleSide {
     Right = 8,
 }
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Default, PartialEq, Eq, Copy, Clone)]
 #[cfg_attr(feature = "serde_support", derive(serde::Deserialize, specta::Type))]
 pub enum MouseButton {
     Left,
     Middle,
     Right,
+    #[default]
     Unkown,
 }

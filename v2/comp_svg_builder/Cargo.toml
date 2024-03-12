@@ -23,9 +23,9 @@ bevy_app = { workspace = true }
 bevy_ecs = { workspace = true }
 bevy_hierarchy = { workspace = true }
 bevy_transform = { workspace = true }
-log = { workspace = true }
 glam = { workspace = true }
 imagesize = "0.12"
+log = { workspace = true }
 smallvec = { workspace = true }
 tiny-skia-path = { workspace = true }
 

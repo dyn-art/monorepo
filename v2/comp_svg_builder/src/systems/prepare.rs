@@ -98,7 +98,6 @@ pub fn insert_style_svg_bundle(
                         maybe_image_paint.unwrap().scale_mode,
                         &mut svg_context_res,
                     ))),
-                    _ => None,
                 };
 
                 if let Some(bundle_variant) = bundle_variant {

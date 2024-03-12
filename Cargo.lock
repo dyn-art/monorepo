@@ -548,7 +548,9 @@ dependencies = [
  "bevy_ecs",
  "bevy_transform",
  "dyn-comp-common",
+ "dyn-comp-core",
  "glam",
+ "log",
  "serde",
  "specta",
 ]
