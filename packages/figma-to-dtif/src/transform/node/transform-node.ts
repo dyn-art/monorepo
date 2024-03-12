@@ -41,7 +41,8 @@ export async function transformNode(
 			});
 		case 'Text':
 			return transformTextNode(toTransformNode.node, toTransformNode.segments, {
-				paintIds: toTransformNode.paintIds
+				fills: toTransformNode.fills,
+				strokes: toTransformNode.strokes
 			});
 		case 'Shape':
 			return transformShapeNode(toTransformNode);

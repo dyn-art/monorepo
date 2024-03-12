@@ -10,6 +10,7 @@ import {
 } from './FigmaNodeTreeProcessor';
 import {
 	transformAsset,
+	transformNode,
 	transformPaint,
 	type TTransformAssetConfig,
 	type TTransformNodeConfig
@@ -136,8 +137,8 @@ export class Transformer {
 		// Transform nodes
 		for (const toTransformNode of toTransformNodes) {
 			try {
-				// const node = await transformNode(toTransformNode, this, config);
-				// this.insertNode(toTransformNode.id, node);
+				const node = await transformNode(toTransformNode, this, config);
+				this.insertNode(toTransformNode.id, node);
 			} catch (error) {
 				// TODO: Error
 				this._nodesFailedToTransform.push(toTransformNode);
