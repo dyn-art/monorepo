@@ -1,3 +1,5 @@
+use std::f32::consts::PI;
+
 use bevy_ecs::{
     entity::Entity,
     query::{Changed, Or},
@@ -22,24 +24,24 @@ pub fn outline_star(
             continue;
         }
 
-        let radius_x = size.x / 2.0;
-        let radius_y = size.y / 2.0;
-        let inner_radius_x = radius_x * star.inner_radius_ratio;
-        let inner_radius_y = radius_y * star.inner_radius_ratio;
+        let radius = *size / 2.0;
+        let inner_radius = radius * star.inner_radius_ratio;
 
         let mut path_builder = PathBuilder::new();
 
         for i in 0..star.point_count {
-            // Calculate angles for the outer and inner vertices
-            let angle = 2.0 * std::f32::consts::PI / star.point_count as f32 * i as f32
-                - std::f32::consts::PI / 2.0;
-            let inner_angle = angle + std::f32::consts::PI / star.point_count as f32;
+            // Outer vertex
+            let angle = 2.0 * PI / star.point_count as f32 * i as f32 - PI / 2.0;
+            let (x, y) = (
+                radius.x * angle.cos() + radius.x,
+                radius.y * angle.sin() + radius.y,
+            );
 
-            // Calculate coordinates for the outer and inner vertices
-            let (x, y) = (radius_x * angle.cos(), radius_y * angle.sin());
+            // Inner vertex
+            let inner_angle = angle + PI / star.point_count as f32;
             let (inner_x, inner_y) = (
-                inner_radius_x * inner_angle.cos(),
-                inner_radius_y * inner_angle.sin(),
+                inner_radius.x * inner_angle.cos() + radius.x,
+                inner_radius.y * inner_angle.sin() + radius.y,
             );
 
             // Move to the first outer vertex or line to subsequent vertices

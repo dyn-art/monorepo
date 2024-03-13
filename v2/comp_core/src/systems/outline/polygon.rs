@@ -1,3 +1,5 @@
+use std::f32::consts::PI;
+
 use bevy_ecs::{
     entity::Entity,
     query::{Changed, Or},
@@ -22,16 +24,16 @@ pub fn outline_polygon(
             continue;
         }
 
-        let radius_x = size.x / 2.0;
-        let radius_y = size.y / 2.0;
+        let radius = *size / 2.0;
 
         let mut path_builder = PathBuilder::new();
 
         for i in 0..polygon.point_count {
-            let angle = 2.0 * std::f32::consts::PI / polygon.point_count as f32 * i as f32
-                - std::f32::consts::PI / 2.0;
-            let x = radius_x * angle.cos() + radius_x;
-            let y = radius_y * angle.sin() + radius_y;
+            let angle = 2.0 * PI / polygon.point_count as f32 * i as f32 - PI / 2.0;
+            let (x, y) = (
+                radius.x * angle.cos() + radius.x,
+                radius.y * angle.sin() + radius.y,
+            );
 
             // Move to the first vertex or line to subsequent vertices
             if i == 0 {
