@@ -65,9 +65,10 @@ pub fn outline_rectangle(
             path_builder.quad_to(0.0, 0.0, tl_radius, 0.0);
         }
 
+        // Close the path
         path_builder.close();
 
-        // Insert or update the Path component for the entity
+        // Insert or update the PathMixin component for the entity
         if let Some(path) = path_builder.finish() {
             commands.entity(entity).insert(PathMixin(path));
         }

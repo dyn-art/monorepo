@@ -1,5 +1,3 @@
-use std::f32::consts::PI;
-
 use bevy_ecs::{
     entity::Entity,
     query::{Changed, Or},
@@ -10,6 +8,7 @@ use dyn_comp_common::{
     mixins::{PathMixin, SizeMixin},
     nodes::StarCompNode,
 };
+use std::f32::consts::PI;
 use tiny_skia_path::PathBuilder;
 
 pub fn outline_star(
@@ -58,7 +57,7 @@ pub fn outline_star(
         // Close the path to complete the star shape
         path_builder.close();
 
-        // Insert or update the Path component for the entity
+        // Insert or update the PathMixin component for the entity
         if let Some(path) = path_builder.finish() {
             commands.entity(entity).insert(PathMixin(path));
         }

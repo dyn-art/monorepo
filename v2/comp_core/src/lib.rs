@@ -10,7 +10,10 @@ use dyn_comp_common::events::{
 };
 use resources::composition::CompositionRes;
 use systems::{
-    outline::{polygon::outline_polygon, rectangle::outline_rectangle, star::outline_star},
+    outline::{
+        ellipse::outline_ellipse, polygon::outline_polygon, rectangle::outline_rectangle,
+        star::outline_star,
+    },
     stroke::stroke_path_system,
 };
 
@@ -81,8 +84,9 @@ impl Plugin for CompCorePlugin {
             Update,
             (
                 outline_rectangle.in_set(CompCoreSystemSet::Outline),
-                outline_polygon.in_set(CompCoreSystemSet::Outline),
+                outline_ellipse.in_set(CompCoreSystemSet::Outline),
                 outline_star.in_set(CompCoreSystemSet::Outline),
+                outline_polygon.in_set(CompCoreSystemSet::Outline),
                 stroke_path_system.in_set(CompCoreSystemSet::PostOutline),
             ),
         );
