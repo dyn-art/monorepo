@@ -21,7 +21,6 @@ pub fn handle_wheel_on_comp_event(
                 },
             ..
         } = comp_res.as_mut();
-
         let WheeledOnCompInputEvent {
             position: cursor_position,
             delta,
@@ -38,22 +37,19 @@ pub fn handle_wheel_on_comp_event(
             };
 
             // Calculate relative cursor position within the composition
-            let relative_cursor = (*cursor_position / Vec2::new(size.x, size.x))
+            let relative_cursor = (*cursor_position / Vec2::new(size.x, size.y))
                 * Vec2::new(physical_size.x, physical_size.y)
                 + Vec2::new(physical_position.x, physical_position.y);
 
-            let new_size = Vec2::new(size.x, size.y) * scale_factor;
-            let new_physical_position =
-                relative_cursor - (*cursor_position / Vec2::new(size.x, size.y)) * new_size;
+            let new_physical_size = Vec2::new(physical_size.x, physical_size.y) * scale_factor;
+            let new_physical_position = relative_cursor
+                - (*cursor_position / Vec2::new(size.x, size.y)) * new_physical_size;
 
             // Update the composition's viewport
-            physical_position.x = new_physical_position.x;
-            physical_position.y = new_physical_position.y;
-            size.x = new_size.x;
-            size.y = new_size.y;
+            *physical_position = new_physical_position;
+            *physical_size = new_physical_size;
         } else {
-            physical_position.x += delta.x;
-            physical_position.y += delta.y;
+            *physical_position += *delta;
         }
     }
 }
