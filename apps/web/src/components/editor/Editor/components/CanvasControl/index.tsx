@@ -8,6 +8,13 @@ import { useOutputEvent } from '../../hooks';
 export const CanvasControl: React.FC<TProps> = (props) => {
 	const { composition } = props;
 	useOutputEvent(composition, 'CompositionChange');
+	const selectionChangeEvent = useOutputEvent(composition, 'SelectionChange');
+	const selection = React.useMemo(
+		() => selectionChangeEvent?.selected ?? [],
+		[selectionChangeEvent]
+	);
+
+	console.log('[CanvasControl]', { selection });
 
 	return (
 		<svg

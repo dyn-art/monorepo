@@ -1,7 +1,10 @@
 use crate::{
     events::SvgCompOutputEvent,
     modules::watch::{
-        events::{CompositionChangeOutputEvent, WatchedEntityChangesOutputEvent},
+        events::{
+            CompositionChangeOutputEvent, SelectionChangeOutputEvent,
+            WatchedEntityChangesOutputEvent,
+        },
         resources::{
             changed_components::ChangedComponentsRes, output_event_sender::OutputEventSenderRes,
         },
@@ -9,9 +12,13 @@ use crate::{
 };
 use bevy_ecs::{
     change_detection::DetectChanges,
-    system::{Res, ResMut},
+    entity::Entity,
+    query::With,
+    system::{Local, Query, Res, ResMut},
 };
 use dyn_comp_core::resources::composition::CompositionRes;
+use dyn_comp_interaction::components::Selected;
+use std::collections::HashSet;
 
 pub fn queue_changed_components(
     mut changed_components_res: ResMut<ChangedComponentsRes>,
@@ -37,5 +44,25 @@ pub fn queue_composition_changes(
                 viewport: comp_res.viewport,
             },
         ))
+    }
+}
+
+pub fn queue_selection_changes(
+    output_event_sender_res: ResMut<OutputEventSenderRes>,
+    mut last_selected: Local<HashSet<Entity>>,
+    selected_query: Query<Entity, With<Selected>>,
+) {
+    let current_selected: HashSet<Entity> = selected_query.iter().collect();
+
+    // Check if the set of selected entities has changed
+    if *last_selected != current_selected {
+        output_event_sender_res.push_event(SvgCompOutputEvent::SelectionChange(
+            SelectionChangeOutputEvent {
+                selected: (&current_selected).into_iter().copied().collect(),
+            },
+        ));
+
+        // Update the local tracking set
+        *last_selected = current_selected;
     }
 }
