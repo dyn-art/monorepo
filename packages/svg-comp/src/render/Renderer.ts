@@ -1,4 +1,7 @@
-import type { CompositionChange, SvgElementChanges } from '@/rust/dyn-svg-comp-api/bindings';
+import type {
+	CompositionChangeOutputEvent,
+	SvgElementChangesOutputEvent
+} from '@/rust/dyn-svg-comp-api/bindings';
 
 import type { Composition } from '../Composition';
 
@@ -11,10 +14,10 @@ export abstract class Renderer {
 		this._isCallbackBased = isCallbackBased;
 
 		composition.watchOutputEvent('SvgElementChanges', (event) => {
-			this.applyElementChanges(event.changes);
+			this.applyElementChanges(event);
 		});
 		composition.watchOutputEvent('CompositionChange', (event) => {
-			this.applyCompositionChange(event.change);
+			this.applyCompositionChange(event);
 		});
 	}
 
@@ -26,7 +29,7 @@ export abstract class Renderer {
 		return this._isCallbackBased;
 	}
 
-	public abstract applyElementChanges(elementChanges: SvgElementChanges): void;
-	public abstract applyCompositionChange(change: CompositionChange): void;
+	public abstract applyElementChanges(event: SvgElementChangesOutputEvent): void;
+	public abstract applyCompositionChange(event: CompositionChangeOutputEvent): void;
 	public abstract clear(): void;
 }

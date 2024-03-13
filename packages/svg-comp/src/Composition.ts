@@ -8,6 +8,7 @@ import type {
 	SvgCompInputEvent,
 	SvgCompOutputEvent,
 	SvgElementChangesOutputEvent,
+	Viewport,
 	WatchedEntityChangesOutputEvent
 } from '@/rust/dyn-svg-comp-api/bindings';
 
@@ -16,6 +17,10 @@ import type { Renderer } from './render';
 export class Composition {
 	private readonly _svgCompHandle: SvgCompHandle;
 	private _renderer: Renderer | null = null;
+
+	private _width: number;
+	private _height: number;
+	private _viewport: Viewport;
 
 	private _inputEventQueue: SvgCompInputEvent[] = [];
 	private _watchedOutputEventCallbackMap: TWatchedOutputEventsCallbackMap = {};
@@ -27,11 +32,28 @@ export class Composition {
 	constructor(config: TCompositionConfig) {
 		const { dtif, interactive = false } = config;
 		this._svgCompHandle = SvgCompHandle.create(dtif, interactive);
+		this.watchOutputEvent('CompositionChange', (event) => {
+			this._width = event.size[0];
+			this._height = event.size[1];
+			this._viewport = event.viewport;
+		});
 	}
 
 	// =========================================================================
 	// Getter & Setter
 	// =========================================================================
+
+	public get width(): number {
+		return this._width;
+	}
+
+	public get height(): number {
+		return this._height;
+	}
+
+	public get viewport(): Readonly<Viewport> {
+		return this.viewport;
+	}
 
 	public get renderer(): Renderer | null {
 		return this._renderer;
@@ -158,14 +180,14 @@ export interface TCompositionConfig {
 	interactive?: boolean;
 }
 
-interface TOutputEventTypeMap {
+export interface TOutputEventTypeMap {
 	SvgElementChanges: SvgElementChangesOutputEvent;
 	WatchedEntityChanges: WatchedEntityChangesOutputEvent;
 	SelectionChange: SelectionChangeOutputEvent;
 	CompositionChange: CompositionChangeOutputEvent;
 }
 
-type TWatchedOutputEventCallback<GEventType extends keyof TOutputEventTypeMap> = (
+export type TWatchedOutputEventCallback<GEventType extends keyof TOutputEventTypeMap> = (
 	value: TOutputEventTypeMap[GEventType]
 ) => void;
 

@@ -1,9 +1,7 @@
 use crate::{
     events::SvgCompOutputEvent,
     modules::watch::{
-        events::{
-            CompositionChange, CompositionChangeOutputEvent, WatchedEntityChangesOutputEvent,
-        },
+        events::{CompositionChangeOutputEvent, WatchedEntityChangesOutputEvent},
         resources::{
             changed_components::ChangedComponentsRes, output_event_sender::OutputEventSenderRes,
         },
@@ -28,17 +26,15 @@ pub fn queue_changed_components(
 
 pub fn queue_composition_changes(
     output_event_sender_res: ResMut<OutputEventSenderRes>,
-    composition: Res<CompositionRes>,
+    comp_res: Res<CompositionRes>,
 ) {
     // TODO: Can be granulated to avoid sending too much data, but for now, that's good enough
-    if composition.is_changed() {
+    if comp_res.is_changed() {
         output_event_sender_res.push_event(SvgCompOutputEvent::CompositionChange(
             CompositionChangeOutputEvent {
-                change: CompositionChange {
-                    size: composition.size,
-                    root_nodes: composition.root_nodes.clone(),
-                    viewport: composition.viewport,
-                },
+                size: comp_res.size,
+                root_nodes: comp_res.root_nodes.clone(),
+                viewport: comp_res.viewport,
             },
         ))
     }

@@ -1,7 +1,7 @@
 import { intoMouseButton } from '@dyn/comp-dtif';
 import type {
-	CompositionChange,
-	SvgElementChanges,
+	CompositionChangeOutputEvent,
+	SvgElementChangesOutputEvent,
 	SvgElementId,
 	Vec2
 } from '@/rust/dyn-svg-comp-api/bindings';
@@ -20,8 +20,6 @@ export class SvgRenderer extends Renderer {
 	private _svgElementMap = new Map<SvgElementId, SVGElement>();
 
 	private _cursorInCompBounds = false;
-	private _width: number;
-	private _height: number;
 
 	constructor(composition: Composition, options: TsvgRendererOptions = {}) {
 		super(composition, options.callbackBased ?? true);
@@ -31,6 +29,7 @@ export class SvgRenderer extends Renderer {
 		// Create SVG root
 		this._svgElement = document.createElementNS(NS, 'svg');
 		this._svgElement.setAttribute('version', VERSION);
+		this._svgElement.setAttribute('id', 'svg-canvas');
 		this._svgElement.style.setProperty('overflow', 'hidden');
 		// this._svgElement.style.setProperty('pointer-events', 'none');
 		this._domElement.appendChild(this._svgElement);
@@ -116,9 +115,9 @@ export class SvgRenderer extends Renderer {
 			if (
 				this._cursorInCompBounds &&
 				(compositionPoint[0] < 0 ||
-					compositionPoint[0] > this._width ||
+					compositionPoint[0] > this.composition.width ||
 					compositionPoint[1] < 0 ||
-					compositionPoint[1] > this._height)
+					compositionPoint[1] > this.composition.height)
 			) {
 				this.composition.emitInputEvent(
 					{
@@ -134,16 +133,16 @@ export class SvgRenderer extends Renderer {
 		});
 	}
 
-	public applyElementChanges(elementChanges: SvgElementChanges): void {
+	public applyElementChanges(event: SvgElementChangesOutputEvent): void {
 		let element: SVGElement | null = null;
 		const getElement = (): SVGElement | null => {
 			if (element == null) {
-				element = this._svgElementMap.get(elementChanges.id) ?? null;
+				element = this._svgElementMap.get(event.id) ?? null;
 			}
 			return element;
 		};
 
-		for (const change of elementChanges.changes) {
+		for (const change of event.changes) {
 			switch (change.type) {
 				case 'ElementCreated': {
 					const newElement: SVGElement = document.createElementNS(NS, change.tagName);
@@ -182,14 +181,14 @@ export class SvgRenderer extends Renderer {
 							parentElement.appendChild(newElement);
 						} else {
 							console.error(
-								`Failed to query parent element (${change.parentId}) to append element (${elementChanges.id}) to!`
+								`Failed to query parent element (${change.parentId}) to append element (${event.id}) to!`
 							);
 						}
 					} else {
 						this._svgElement.appendChild(newElement);
 					}
 
-					this._svgElementMap.set(elementChanges.id, newElement);
+					this._svgElementMap.set(event.id, newElement);
 					element = newElement;
 					break;
 				}
@@ -197,9 +196,9 @@ export class SvgRenderer extends Renderer {
 					const elementToDelete = getElement();
 					if (elementToDelete?.parentNode != null) {
 						elementToDelete.parentNode.removeChild(elementToDelete);
-						this._svgElementMap.delete(elementChanges.id);
+						this._svgElementMap.delete(event.id);
 					} else {
-						console.error(`Failed to query to remove element (${elementChanges.id})!`);
+						console.error(`Failed to query to remove element (${event.id})!`);
 					}
 					break;
 				}
@@ -210,7 +209,7 @@ export class SvgRenderer extends Renderer {
 						parentElement.appendChild(toAppendElement);
 					} else {
 						console.error(
-							`Failed to query parent element (${change.parentId}) to append element (${elementChanges.id}) to!`
+							`Failed to query parent element (${change.parentId}) to append element (${event.id}) to!`
 						);
 					}
 					break;
@@ -221,7 +220,7 @@ export class SvgRenderer extends Renderer {
 						elementToUpdate.setAttribute(change.key, change.newValue);
 					} else {
 						console.error(
-							`Failed to query element (${elementChanges.id}) to add attribute (${change.key}) to!`
+							`Failed to query element (${event.id}) to add attribute (${change.key}) to!`
 						);
 					}
 					break;
@@ -232,7 +231,7 @@ export class SvgRenderer extends Renderer {
 						elementToUpdate.removeAttribute(change.key);
 					} else {
 						console.error(
-							`Failed to query element (${elementChanges.id}) to remove attribute (${change.key}) from!`
+							`Failed to query element (${event.id}) to remove attribute (${change.key}) from!`
 						);
 					}
 					break;
@@ -242,9 +241,7 @@ export class SvgRenderer extends Renderer {
 					if (elementToUpdate != null) {
 						elementToUpdate.style.setProperty(change.key, change.newValue);
 					} else {
-						console.error(
-							`Failed to query element (${elementChanges.id}) to add style (${change.key}) to!`
-						);
+						console.error(`Failed to query element (${event.id}) to add style (${change.key}) to!`);
 					}
 					break;
 				}
@@ -254,7 +251,7 @@ export class SvgRenderer extends Renderer {
 						elementToUpdate.style.removeProperty(change.key);
 					} else {
 						console.error(
-							`Failed to query element (${elementChanges.id}) to remove style (${change.key}) from!`
+							`Failed to query element (${event.id}) to remove style (${change.key}) from!`
 						);
 					}
 					break;
@@ -273,9 +270,7 @@ export class SvgRenderer extends Renderer {
 							}
 						}
 					} else {
-						console.error(
-							`Failed to query element (${elementChanges.id}) to apply new children order!`
-						);
+						console.error(`Failed to query element (${event.id}) to apply new children order!`);
 					}
 					break;
 				}
@@ -283,14 +278,12 @@ export class SvgRenderer extends Renderer {
 		}
 	}
 
-	public applyCompositionChange(change: CompositionChange): void {
-		this._width = change.size[0];
-		this._height = change.size[1];
-		this._svgElement.setAttribute('width', `${change.size[0]}px`);
-		this._svgElement.setAttribute('height', `${change.size[1]}px`);
+	public applyCompositionChange(event: CompositionChangeOutputEvent): void {
+		this._svgElement.setAttribute('width', `${event.size[0]}px`);
+		this._svgElement.setAttribute('height', `${event.size[1]}px`);
 		this._svgElement.setAttribute(
 			'viewBox',
-			`${change.viewport.physicalPosition[0]} ${change.viewport.physicalPosition[1]} ${change.viewport.physicalSize[0]} ${change.viewport.physicalSize[1]}`
+			`${event.viewport.physicalPosition[0]} ${event.viewport.physicalPosition[1]} ${event.viewport.physicalSize[0]} ${event.viewport.physicalSize[1]}`
 		);
 	}
 

@@ -26,9 +26,7 @@ export type CompCoreInputEvent = ({ type: "CompositionResized" } & CompositionRe
 
 export type ComponentChange = { type: "Size"; size: Size } | { type: "Transform" }
 
-export type CompositionChange = { rootNodes: Entity[]; viewport: Viewport; size: Size }
-
-export type CompositionChangeOutputEvent = { change: CompositionChange }
+export type CompositionChangeOutputEvent = { rootNodes: Entity[]; viewport: Viewport; size: Size }
 
 export type CompositionResizedInputEvent = { size: Size }
 
@@ -298,9 +296,7 @@ export type SvgElementAppendedChange = { parentId: SvgElementId }
 
 export type SvgElementChange = ({ type: "ElementCreated" } & SvgElementCreatedChange) | ({ type: "ElementDeleted" }) | ({ type: "ElementAppended" } & SvgElementAppendedChange) | ({ type: "AttributeUpdated" } & SvgAttributeUpdatedChange) | ({ type: "AttributeRemoved" } & SvgAttributeRemovedChange) | ({ type: "StyleUpdated" } & SvgStyleUpdatedChange) | ({ type: "StyleRemoved" } & SvgStyleRemovedChange) | ({ type: "ElementChildrenReordered" } & SvgElementChildrenReorderedChange)
 
-export type SvgElementChanges = { id: SvgElementId; changes: SvgElementChange[] }
-
-export type SvgElementChangesOutputEvent = { changes: SvgElementChanges }
+export type SvgElementChangesOutputEvent = { id: SvgElementId; changes: SvgElementChange[] }
 
 /**
  * Emitted when children of a SvgElement are reordered.

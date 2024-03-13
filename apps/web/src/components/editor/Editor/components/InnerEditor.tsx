@@ -18,9 +18,7 @@ export const InnerEditor: React.FC<TInnerEditorProps> = (props) => {
 
 	return (
 		<div className="flex flex-col items-center justify-center">
-			<div style={{ width: width + 4, height: height + 4 }}>
-				<Canvas dtif={dtif} height={height} onLoadedComposition={setComposition} width={width} />
-			</div>
+			<Canvas dtif={dtif} height={height} onLoadedComposition={setComposition} width={width} />
 			<div className="flex w-full flex-row items-center justify-between ">
 				<Button
 					onClick={() => {

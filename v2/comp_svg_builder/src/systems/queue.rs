@@ -43,7 +43,8 @@ fn queue_changed_bundles(
     for changed_bundle in sorted_changed_bundles {
         for element_changes in changed_bundle.elements_changes {
             let event = SvgBuilderOutputEvent::SvgElementChanges(SvgElementChangesOutputEvent {
-                changes: element_changes,
+                id: element_changes.id,
+                changes: element_changes.changes,
             });
             output_event_sender_res.push_event(event);
         }
@@ -111,7 +112,8 @@ fn queue_deferred_elements_changes(
     // Send output events
     for deferred_elements_change in deferred_elements_changes {
         let event = SvgBuilderOutputEvent::SvgElementChanges(SvgElementChangesOutputEvent {
-            changes: deferred_elements_change,
+            id: deferred_elements_change.id,
+            changes: deferred_elements_change.changes,
         });
         output_event_sender_res.push_event(event);
     }
