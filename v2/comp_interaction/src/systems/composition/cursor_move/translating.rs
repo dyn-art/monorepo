@@ -4,7 +4,7 @@ use crate::{
 use bevy_ecs::{query::With, system::Query};
 use bevy_transform::components::Transform;
 use dyn_comp_core::resources::composition::CompositionRes;
-use glam::{Vec2, Vec3};
+use glam::Vec2;
 
 pub fn handle_translating(
     comp_res: &CompositionRes,
@@ -19,7 +19,8 @@ pub fn handle_translating(
     let offset = transform_point_to_viewport(comp_res, &(*cursor_position - *current), false);
 
     for mut transform in selected_nodes_query.iter_mut() {
-        transform.translation *= Vec3::new(offset.x, offset.y, 0.0);
+        transform.translation.x += offset.x;
+        transform.translation.y += offset.y;
     }
 
     *current = *cursor_position;

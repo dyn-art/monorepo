@@ -8,7 +8,7 @@ use bevy_ecs::{query::With, system::Query};
 use bevy_transform::components::Transform;
 use dyn_comp_common::{common::Size, mixins::SizeMixin};
 use dyn_comp_core::resources::composition::CompositionRes;
-use glam::{Vec2, Vec3};
+use glam::Vec2;
 
 pub fn handle_resizing(
     comp_res: &CompositionRes,
@@ -32,7 +32,8 @@ pub fn handle_resizing(
             transform.rotation.z,
         );
 
-        transform.translation = Vec3::new(new_bounds.position.x, new_bounds.position.x, 0.0);
+        transform.translation.x = new_bounds.position.x;
+        transform.translation.y = new_bounds.position.y;
         *size = Vec2::new(new_bounds.width, new_bounds.height);
     }
 }
