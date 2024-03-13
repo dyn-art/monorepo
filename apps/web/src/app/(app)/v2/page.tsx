@@ -34,7 +34,7 @@ const DEFAULT_DTIF: COMP.DtifComposition = {
 		},
 		n2: {
 			type: 'Rectangle',
-			cornerRadii: [0, 20, 0, 0],
+			cornerRadii: [10, 20, 30, 40],
 			styles: [
 				// {
 				// 	type: 'Stroke',

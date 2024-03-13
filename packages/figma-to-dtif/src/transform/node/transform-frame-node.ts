@@ -23,10 +23,10 @@ export function transformFrameNode(
 		translation: mapFigmaTransformToTranslation(node.relativeTransform),
 		angle: mapFigmaTransformToRotation(node.relativeTransform),
 		cornerRadii: [
-			node.bottomLeftRadius,
-			node.bottomRightRadius,
 			node.topLeftRadius,
-			node.topRightRadius
+			node.topRightRadius,
+			node.bottomRightRadius,
+			node.bottomLeftRadius
 		],
 		blendMode: mapFigmaBlendModeToDtif(node.blendMode),
 		opacity: node.opacity,

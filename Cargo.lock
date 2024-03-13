@@ -519,6 +519,7 @@ dependencies = [
  "dyn-comp-common",
  "dyn-comp-dtif",
  "glam",
+ "log",
  "smallvec",
  "tiny-skia-path",
 ]

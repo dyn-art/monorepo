@@ -124,6 +124,11 @@ impl DtifInjector {
         let dtif_styles = match node {
             Node::Frame(node) => &node.styles,
             Node::Rectangle(node) => &node.styles,
+            Node::Ellipse(node) => &node.styles,
+            Node::Star(node) => &node.styles,
+            Node::Polygon(node) => &node.styles,
+            Node::Text(node) => &node.styles,
+            Node::Vector(node) => &node.styles,
             _ => return,
         };
 
