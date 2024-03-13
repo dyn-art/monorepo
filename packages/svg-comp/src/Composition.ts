@@ -1,6 +1,7 @@
 import { shortId } from '@dyn/utils';
 import { SvgCompHandle } from '@/rust/dyn-svg-comp-api';
 import type {
+	ComponentChange,
 	CompositionChangeOutputEvent,
 	DtifComposition,
 	Entity,
@@ -9,6 +10,7 @@ import type {
 	SvgCompOutputEvent,
 	SvgElementChangesOutputEvent,
 	Viewport,
+	WatchableComponentVariant,
 	WatchedEntityChangesOutputEvent
 } from '@/rust/dyn-svg-comp-api/bindings';
 
@@ -138,6 +140,32 @@ export class Composition {
 		this._watchedOutputEventCallbackMap[eventType] = callbacks.filter((entry) => entry.id !== id);
 	}
 
+	public watchEntity(
+		entity: Entity,
+		toWatchComponents: WatchableComponentVariant[],
+		callback: TWatchEntityCallback,
+		initialValue = true
+	): () => void {
+		const intialChanges = this._svgCompHandle.watchEntity(entity, toWatchComponents, initialValue);
+
+		// Apply intal changes if found
+		if (initialValue && Array.isArray(intialChanges)) {
+			callback(entity, intialChanges);
+		}
+
+		// Register callback
+		const unregister = this.watchOutputEvent('WatchedEntityChanges', (event) => {
+			if (event.entity === entity) {
+				callback(entity, event.changes);
+			}
+		});
+
+		return () => {
+			unregister();
+			this._svgCompHandle.unregisterEntityCallback(entity);
+		};
+	}
+
 	public emitInputEvent(event: SvgCompInputEvent, debounce = true): void {
 		this._inputEventQueue.push(event);
 
@@ -199,3 +227,5 @@ interface TWatchedOutputEventCallbackEntry<GEventType extends keyof TOutputEvent
 type TWatchedOutputEventsCallbackMap = {
 	[K in SvgCompOutputEvent['type']]?: TWatchedOutputEventCallbackEntry<K>[];
 };
+
+export type TWatchEntityCallback = (entity: Entity, change: ComponentChange[]) => void;

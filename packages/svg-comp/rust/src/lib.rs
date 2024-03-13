@@ -154,8 +154,8 @@ impl SvgCompHandle {
         };
     }
 
-    #[wasm_bindgen(js_name = unregisterEntity)]
-    pub fn unregister_entity(&mut self, js_entity: JsValue) -> Result<bool, JsValue> {
+    #[wasm_bindgen(js_name = unregisterEntityCallback)]
+    pub fn unregister_entity_callback(&mut self, js_entity: JsValue) -> Result<bool, JsValue> {
         let entity: Entity = serde_wasm_bindgen::from_value(js_entity)?;
         return match self.app.world.get_resource_mut::<WatchedEntitiesRes>() {
             Some(mut watched_entities_res) => Ok(watched_entities_res.unregister_entity(entity)),
