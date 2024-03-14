@@ -9,6 +9,7 @@ import type {
 	SvgCompInputEvent,
 	SvgCompOutputEvent,
 	SvgElementChangesOutputEvent,
+	Vec2,
 	Viewport,
 	WatchableComponentVariant,
 	WatchedEntityChangesOutputEvent
@@ -20,8 +21,7 @@ export class Composition {
 	private readonly _svgCompHandle: SvgCompHandle;
 	private _renderer: Renderer | null = null;
 
-	private _width: number;
-	private _height: number;
+	private _size: Vec2;
 	private _viewport: Viewport;
 
 	private _inputEventQueue: SvgCompInputEvent[] = [];
@@ -35,8 +35,7 @@ export class Composition {
 		const { dtif, interactive = false } = config;
 		this._svgCompHandle = SvgCompHandle.create(dtif, interactive);
 		this.watchOutputEvent('CompositionChange', (event) => {
-			this._width = event.size[0];
-			this._height = event.size[1];
+			this._size = event.size;
 			this._viewport = event.viewport;
 		});
 	}
@@ -45,16 +44,12 @@ export class Composition {
 	// Getter & Setter
 	// =========================================================================
 
-	public get width(): number {
-		return this._width;
-	}
-
-	public get height(): number {
-		return this._height;
+	public get size(): Readonly<Vec2> {
+		return this._size;
 	}
 
 	public get viewport(): Readonly<Viewport> {
-		return this.viewport;
+		return this._viewport;
 	}
 
 	public get renderer(): Renderer | null {

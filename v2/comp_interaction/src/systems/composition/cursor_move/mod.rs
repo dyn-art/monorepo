@@ -53,15 +53,15 @@ pub fn handle_cursor_moved_on_comp_event(
             ),
             InteractionMode::Rotating {
                 corner,
-                initial_rotation_in_radians,
-                rotation_in_degrees,
+                initial_rotation_rad,
+                rotation_deg,
             } => handle_rotating(
                 &comp_res,
                 &mut query_set.p2(),
                 event,
                 *corner,
-                *initial_rotation_in_radians,
-                rotation_in_degrees,
+                *initial_rotation_rad,
+                rotation_deg,
             ),
             InteractionMode::Dragging { current } => handle_dragging(&mut comp_res, event, current),
             _ => {}

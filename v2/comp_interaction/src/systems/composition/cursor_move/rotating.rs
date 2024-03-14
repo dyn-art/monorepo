@@ -16,8 +16,8 @@ pub fn handle_rotating(
     >,
     event: &CursorMovedOnCompInputEvent,
     corner: u8,
-    initial_rotation: f32,
-    rotation_in_degrees: &mut f32,
+    initial_rotation_rad: f32,
+    rotation_deg: &mut f32,
 ) {
     let CursorMovedOnCompInputEvent {
         position: cursor_position,
@@ -32,7 +32,7 @@ pub fn handle_rotating(
             global_transform.compute_transform().translation * relative_pivot_point;
 
         // Determine rotation offset based on corner
-        let rotation_offset_in_radians: f32 = match corner {
+        let rotation_offset_rad: f32 = match corner {
             _ if corner == (HandleSide::Top as u8 | HandleSide::Left as u8) => {
                 f32::atan2(-size.y, size.x)
             }
@@ -49,30 +49,30 @@ pub fn handle_rotating(
         };
 
         // Calculate rotation based on the corner
-        let rotation_angle =
-            calculate_rotation(initial_rotation, &cursor_position, &absolute_pivot_point);
-        let final_rotation_angle = rotation_angle + rotation_offset_in_radians - initial_rotation;
+        let rotation_angle_rad = calculate_rotation_rad(
+            initial_rotation_rad,
+            &cursor_position,
+            &absolute_pivot_point,
+        );
+        let final_rotation_angle_rad =
+            rotation_angle_rad + rotation_offset_rad - initial_rotation_rad;
         transform.rotate_around(
             relative_pivot_point,
-            Quat::from_rotation_z(final_rotation_angle),
+            Quat::from_rotation_z(final_rotation_angle_rad),
         );
-        *rotation_in_degrees = final_rotation_angle.to_degrees();
+        *rotation_deg = final_rotation_angle_rad.to_degrees();
     }
 }
 
-fn calculate_rotation(
-    initial_angle_in_radians: f32,
-    cursor_point: &Vec2,
-    pivot_point: &Vec3,
-) -> f32 {
+fn calculate_rotation_rad(initial_angle_rad: f32, cursor_point: &Vec2, pivot_point: &Vec3) -> f32 {
     // Calculate the angle from the pivot point to the current cursor position
-    let current_angle = f32::atan2(
+    let current_angle_rad = f32::atan2(
         cursor_point.y - pivot_point.y,
         cursor_point.x - pivot_point.x,
     );
 
     // Calculate the raw angle difference
-    let angle_diff = current_angle - initial_angle_in_radians;
+    let angle_diff = current_angle_rad - initial_angle_rad;
 
     return -angle_diff;
 }

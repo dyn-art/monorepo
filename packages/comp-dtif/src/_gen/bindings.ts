@@ -24,7 +24,7 @@ export type Color = { red: number; green: number; blue: number }
 
 export type CompCoreInputEvent = ({ type: "CompositionResized" } & CompositionResizedInputEvent) | ({ type: "CompositionViewportChanged" } & CompositionViewportChangedInputEvent) | ({ type: "EntityMoved" } & EntityMovedInputEvent) | ({ type: "EntitySetPosition" } & EntitySetPositionInputEvent) | ({ type: "EntityDeleted" } & EntityDeletedInputEvent)
 
-export type ComponentChange = { type: "Size"; size: Size } | { type: "Transform" }
+export type ComponentChange = { type: "Size"; size: Size } | { type: "Transform"; rotationDeg: number; translation: Vec2 }
 
 export type CompositionChangeOutputEvent = { rootNodes: Entity[]; viewport: Viewport; size: Size }
 
@@ -38,9 +38,9 @@ export type CursorDownOnCompInputEvent = { position: Vec2; button: MouseButton }
 
 export type CursorDownOnEntityInputEvent = { entity: Entity; position: Vec2; button: MouseButton }
 
-export type CursorDownOnResizeHandleInputEvent = { initialBounds: XYWH; corner: number; rotationInRadians: number }
+export type CursorDownOnResizeHandleInputEvent = { initialBounds: XYWH; corner: number; rotationRad: number }
 
-export type CursorDownOnRotateHandleInputEvent = { corner: number; initialRotationInRadians: number }
+export type CursorDownOnRotateHandleInputEvent = { corner: number; initialRotationRad: number }
 
 export type CursorEnteredCompInputEvent = null
 
@@ -209,11 +209,11 @@ export type InteractionMode =
 /**
  * When the user is resizing the selected nodes.
  */
-{ type: "Resizing"; corner: number; initial_bounds: XYWH; rotation_in_degrees: number } | 
+{ type: "Resizing"; corner: number; initial_bounds: XYWH; rotation_deg: number } | 
 /**
  * When the user is rotating the selected nodes.
  */
-{ type: "Rotating"; corner: number; initial_rotation_in_radians: number; rotation_in_degrees: number }
+{ type: "Rotating"; corner: number; initial_rotation_rad: number; rotation_deg: number }
 
 export type LetterSpacing = "Auto" | { Fixed: MeasurementUnit }
 

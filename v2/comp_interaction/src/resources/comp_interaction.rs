@@ -26,13 +26,13 @@ pub enum InteractionMode {
     Resizing {
         corner: u8,
         initial_bounds: XYWH,
-        rotation_in_degrees: f32, // For cursor
+        rotation_deg: f32, // For cursor
     },
     /// When the user is rotating the selected nodes.
     Rotating {
         corner: u8,
-        initial_rotation_in_radians: f32,
-        rotation_in_degrees: f32, // For cursor
+        initial_rotation_rad: f32,
+        rotation_deg: f32, // For cursor
     },
 }
 

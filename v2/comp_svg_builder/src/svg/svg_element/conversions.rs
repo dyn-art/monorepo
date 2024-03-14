@@ -12,9 +12,9 @@ use tiny_skia_path::{Path, PathSegment};
 impl From<&Transform> for SvgTransformAttribute {
     fn from(transform: &Transform) -> Self {
         // Extract the 2D rotation angle (Z axis) from the quaternion
-        let angle = transform.rotation.to_euler(EulerRot::XYZ).2;
-        let cos_a = angle.cos();
-        let sin_a = angle.sin();
+        let angle_rad = transform.rotation.to_euler(EulerRot::XYZ).2;
+        let cos_a = angle_rad.cos();
+        let sin_a = angle_rad.sin();
 
         // Extract scale and ensure default scale is 1,1 if scale is 0,0 indicating no scaling applied
         let sx = if transform.scale.x == 0.0 {

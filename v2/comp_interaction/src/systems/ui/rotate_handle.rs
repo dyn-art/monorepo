@@ -15,8 +15,8 @@ pub fn handle_cursor_down_on_rotate_handle_event(
 
         comp_interaction_res.interaction_mode = InteractionMode::Rotating {
             corner: event.corner,
-            initial_rotation_in_radians: event.initial_rotation_in_radians,
-            rotation_in_degrees: -event.initial_rotation_in_radians.to_degrees(),
+            initial_rotation_rad: event.initial_rotation_rad,
+            rotation_deg: -event.initial_rotation_rad.to_degrees(),
         };
     }
 }

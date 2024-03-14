@@ -36,12 +36,9 @@ pub fn transform_point_to_viewport(
     };
 }
 
-pub fn rotate_point(point: &Vec2, pivot: &Vec2, angle_in_radians: f32) -> Vec2 {
+pub fn rotate_point(point: &Vec2, pivot: &Vec2, angle_rad: f32) -> Vec2 {
     Vec2::new(
-        (point.x - pivot.x) * angle_in_radians.cos() - (point.y - pivot.y) * angle_in_radians.sin()
-            + pivot.x,
-        (point.x - pivot.x) * angle_in_radians.sin()
-            + (point.y - pivot.y) * angle_in_radians.cos()
-            + pivot.y,
+        (point.x - pivot.x) * angle_rad.cos() - (point.y - pivot.y) * angle_rad.sin() + pivot.x,
+        (point.x - pivot.x) * angle_rad.sin() + (point.y - pivot.y) * angle_rad.cos() + pivot.y,
     )
 }

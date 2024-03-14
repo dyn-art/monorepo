@@ -42,7 +42,7 @@ export class SvgRenderer extends Renderer {
 					type: 'Interaction',
 					event: {
 						type: 'CursorMovedOnComposition',
-						position: this.pointerEventToCompositionPoint(e)
+						position: this.pointerEventToCompPoint(e)
 					}
 				},
 				false
@@ -55,7 +55,7 @@ export class SvgRenderer extends Renderer {
 					type: 'Interaction',
 					event: {
 						type: 'WheeledOnComposition',
-						position: this.clientWindowPointToCompositionPoint([e.clientX, e.clientY]),
+						position: this.clientWindowPointToCompPoint([e.clientX, e.clientY]),
 						ctrlKeyPressed: e.ctrlKey,
 						metaKeyPressed: e.metaKey,
 						delta: [e.deltaX, e.deltaY]
@@ -71,7 +71,7 @@ export class SvgRenderer extends Renderer {
 					type: 'Interaction',
 					event: {
 						type: 'CursorDownOnComposition',
-						position: this.pointerEventToCompositionPoint(e),
+						position: this.pointerEventToCompPoint(e),
 						button: intoMouseButton(e.button)
 					}
 				},
@@ -85,7 +85,7 @@ export class SvgRenderer extends Renderer {
 					type: 'Interaction',
 					event: {
 						type: 'CursorUpOnComposition',
-						position: this.pointerEventToCompositionPoint(e),
+						position: this.pointerEventToCompPoint(e),
 						button: intoMouseButton(e.button)
 					}
 				},
@@ -109,15 +109,15 @@ export class SvgRenderer extends Renderer {
 		});
 		this._svgElement.addEventListener('pointerleave', (e) => {
 			e.preventDefault();
-			const compositionPoint = this.pointerEventToCompositionPoint(e);
+			const compPoint = this.pointerEventToCompPoint(e);
 			// Check whether cursor actually left composition
 			// or whether its just on some UI layer like the selection box
 			if (
 				this._cursorInCompBounds &&
-				(compositionPoint[0] < 0 ||
-					compositionPoint[0] > this.composition.width ||
-					compositionPoint[1] < 0 ||
-					compositionPoint[1] > this.composition.height)
+				(compPoint[0] < 0 ||
+					compPoint[0] > this.composition.size[0] ||
+					compPoint[1] < 0 ||
+					compPoint[1] > this.composition.size[1])
 			) {
 				this.composition.emitInputEvent(
 					{
@@ -167,7 +167,7 @@ export class SvgRenderer extends Renderer {
 								event: {
 									type: 'CursorDownOnEntity',
 									entity,
-									position: this.pointerEventToCompositionPoint(e),
+									position: this.pointerEventToCompPoint(e),
 									button: intoMouseButton(e.button)
 								}
 							});
@@ -294,7 +294,7 @@ export class SvgRenderer extends Renderer {
 		}
 	}
 
-	public clientWindowPointToCompositionPoint(clientProint: Vec2): Vec2 {
+	public clientWindowPointToCompPoint(clientProint: Vec2): Vec2 {
 		const rect = this._svgElement.getBoundingClientRect();
 
 		const x = clientProint[0] - rect.left;
@@ -303,8 +303,8 @@ export class SvgRenderer extends Renderer {
 		return [x, y];
 	}
 
-	public pointerEventToCompositionPoint(e: PointerEvent): Vec2 {
-		return this.clientWindowPointToCompositionPoint([e.clientX, e.clientY]);
+	public pointerEventToCompPoint(e: PointerEvent): Vec2 {
+		return this.clientWindowPointToCompPoint([e.clientX, e.clientY]);
 	}
 }
 

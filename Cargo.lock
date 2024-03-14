@@ -590,6 +590,7 @@ dependencies = [
  "dyn-comp-dtif",
  "dyn-comp-interaction",
  "dyn-comp-svg-builder",
+ "glam",
  "js-sys",
  "log",
  "once_cell",
