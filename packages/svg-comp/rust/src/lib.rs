@@ -75,7 +75,7 @@ impl SvgCompHandle {
         if let Ok(input_events) = maybe_input_events {
             for input_event in input_events {
                 match input_event {
-                    SvgCompInputEvent::Comp { event } => {
+                    SvgCompInputEvent::Composition { event } => {
                         event.send_into_ecs(&mut self.app.world);
                     }
                     SvgCompInputEvent::Interaction { event } => {

@@ -17,6 +17,6 @@ pub enum SvgCompOutputEvent {
 #[derive(Debug, Clone, serde::Deserialize, specta::Type)]
 #[serde(tag = "type")]
 pub enum SvgCompInputEvent {
-    Comp { event: CompCoreInputEvent },
+    Composition { event: CompCoreInputEvent },
     Interaction { event: InteractionInputEvent },
 }

@@ -32,6 +32,39 @@ export const CanvasControl: React.FC<TProps> = (props) => {
 							composition={composition}
 							entity={selectedEntity}
 							key={selectedEntity}
+							onResizeHandlePointerDown={(corner, initialBounds, rotationDeg) => {
+								composition.emitInputEvent({
+									type: 'Interaction',
+									event: {
+										type: 'CursorDownOnResizeHandle',
+										corner,
+										initialBounds,
+										rotationRad: rotationDeg * (Math.PI / 180)
+									}
+								});
+							}}
+							onResizeHandlePointerUp={(position) => {
+								composition.emitInputEvent({
+									type: 'Interaction',
+									event: { type: 'CursorUpOnComposition', position, button: 'Left' }
+								});
+							}}
+							onRotateHandlePointerDown={(corner, rotationDeg) => {
+								composition.emitInputEvent({
+									type: 'Interaction',
+									event: {
+										type: 'CursorDownOnRotateHandle',
+										corner,
+										initialRotationRad: rotationDeg * (Math.PI / 180)
+									}
+								});
+							}}
+							onRotateHandlePointerUp={(position) => {
+								composition.emitInputEvent({
+									type: 'Interaction',
+									event: { type: 'CursorUpOnComposition', position, button: 'Left' }
+								});
+							}}
 						/>
 					))}
 				</g>

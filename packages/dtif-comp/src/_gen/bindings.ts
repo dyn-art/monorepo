@@ -283,7 +283,7 @@ export type SvgBuilderOutputEvent =
  */
 ({ type: "SvgString" } & SvgStringOutputEvent)
 
-export type SvgCompInputEvent = { type: "Comp"; event: CompCoreInputEvent } | { type: "Interaction"; event: InteractionInputEvent }
+export type SvgCompInputEvent = { type: "Composition"; event: CompCoreInputEvent } | { type: "Interaction"; event: InteractionInputEvent }
 
 export type SvgCompOutputEvent = ({ type: "SvgElementChanges" } & SvgElementChangesOutputEvent) | ({ type: "CompositionChange" } & CompositionChangeOutputEvent) | ({ type: "WatchedEntityChanges" } & WatchedEntityChangesOutputEvent) | ({ type: "SelectionChange" } & SelectionChangeOutputEvent)
 

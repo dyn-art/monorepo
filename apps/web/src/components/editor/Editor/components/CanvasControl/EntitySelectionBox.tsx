@@ -47,14 +47,14 @@ export const EntitySelectionBox: React.FC<TProps> = (props) => {
 	// Callbacks
 	// =========================================================================
 
-	const handleOnResizeHandlePointerEvents = React.useCallback(
-		(side: EHandleSide, eventType: 'Up' | 'Down', event: React.PointerEvent<SVGAElement>) => {
+	const handleOnResizeHandlePointerEvent = React.useCallback(
+		(side: EHandleSide, eventType: 'Up' | 'Down', event: React.PointerEvent<SVGGElement>) => {
 			event.stopPropagation();
 			if (sizeData == null || transformData == null || composition.renderer == null) {
 				return;
 			}
 			const { size } = sizeData;
-			const { rotationDeg } = transformData;
+			const { translation, rotationDeg } = transformData;
 
 			if (event.button === 0) {
 				switch (eventType) {
@@ -65,9 +65,8 @@ export const EntitySelectionBox: React.FC<TProps> = (props) => {
 						onResizeHandlePointerDown(
 							side,
 							{
-								position: composition.renderer.pointerEventToCompPoint(event),
-								width: size[0],
-								height: size[0]
+								position: translation,
+								size
 							},
 							rotationDeg
 						);
@@ -84,11 +83,26 @@ export const EntitySelectionBox: React.FC<TProps> = (props) => {
 		]
 	);
 
-	const handleOnResizeHandlePointerUp = React.useCallback(
-		(side: EHandleSide, event: React.PointerEvent<SVGAElement>) => {
-			// TODO
+	const handleOnRotateHandlePointerEvent = React.useCallback(
+		(side: EHandleSide, eventType: 'Up' | 'Down', event: React.PointerEvent<SVGGElement>) => {
+			event.stopPropagation();
+			if (transformData == null || composition.renderer == null) {
+				return;
+			}
+			const { rotationDeg } = transformData;
+
+			if (event.button === 0) {
+				switch (eventType) {
+					case 'Up':
+						onRotateHandlePointerUp(composition.renderer.pointerEventToCompPoint(event));
+						break;
+					case 'Down':
+						onRotateHandlePointerDown(side, rotationDeg);
+						break;
+				}
+			}
 		},
-		[]
+		[transformData, composition.renderer, onRotateHandlePointerUp, onRotateHandlePointerDown]
 	);
 
 	// =========================================================================
@@ -129,52 +143,84 @@ export const EntitySelectionBox: React.FC<TProps> = (props) => {
 				<g id="handles">
 					{/* Resize Edge Handles*/}
 					<ResizeEdgeHandle
-						onPointerDown={() => {}}
-						onPointerUp={() => {}}
+						onPointerDown={(e) => {
+							handleOnResizeHandlePointerEvent(EHandleSide.Top, 'Down', e);
+						}}
+						onPointerUp={(e) => {
+							handleOnResizeHandlePointerEvent(EHandleSide.Top, 'Up', e);
+						}}
 						parentSize={factoredSize}
 						position="top"
 					/>
 					<ResizeEdgeHandle
-						onPointerDown={() => {}}
-						onPointerUp={() => {}}
+						onPointerDown={(e) => {
+							handleOnResizeHandlePointerEvent(EHandleSide.Left, 'Down', e);
+						}}
+						onPointerUp={(e) => {
+							handleOnResizeHandlePointerEvent(EHandleSide.Left, 'Up', e);
+						}}
 						parentSize={factoredSize}
 						position="left"
 					/>
 					<ResizeEdgeHandle
-						onPointerDown={() => {}}
-						onPointerUp={() => {}}
+						onPointerDown={(e) => {
+							handleOnResizeHandlePointerEvent(EHandleSide.Bottom, 'Down', e);
+						}}
+						onPointerUp={(e) => {
+							handleOnResizeHandlePointerEvent(EHandleSide.Bottom, 'Up', e);
+						}}
 						parentSize={factoredSize}
 						position="bottom"
 					/>
 					<ResizeEdgeHandle
-						onPointerDown={() => {}}
-						onPointerUp={() => {}}
+						onPointerDown={(e) => {
+							handleOnResizeHandlePointerEvent(EHandleSide.Right, 'Down', e);
+						}}
+						onPointerUp={(e) => {
+							handleOnResizeHandlePointerEvent(EHandleSide.Right, 'Up', e);
+						}}
 						parentSize={factoredSize}
 						position="right"
 					/>
 
 					{/* Resize Corner Handles*/}
 					<ResizeCornerHandle
-						onPointerDown={() => {}}
-						onPointerUp={() => {}}
+						onPointerDown={(e) => {
+							handleOnResizeHandlePointerEvent(EHandleSide.Top + EHandleSide.Left, 'Down', e);
+						}}
+						onPointerUp={(e) => {
+							handleOnResizeHandlePointerEvent(EHandleSide.Top + EHandleSide.Left, 'Up', e);
+						}}
 						parentSize={factoredSize}
 						position="topLeft"
 					/>
 					<ResizeCornerHandle
-						onPointerDown={() => {}}
-						onPointerUp={() => {}}
+						onPointerDown={(e) => {
+							handleOnResizeHandlePointerEvent(EHandleSide.Top + EHandleSide.Right, 'Down', e);
+						}}
+						onPointerUp={(e) => {
+							handleOnResizeHandlePointerEvent(EHandleSide.Top + EHandleSide.Right, 'Up', e);
+						}}
 						parentSize={factoredSize}
 						position="topRight"
 					/>
 					<ResizeCornerHandle
-						onPointerDown={() => {}}
-						onPointerUp={() => {}}
+						onPointerDown={(e) => {
+							handleOnResizeHandlePointerEvent(EHandleSide.Bottom + EHandleSide.Left, 'Down', e);
+						}}
+						onPointerUp={(e) => {
+							handleOnResizeHandlePointerEvent(EHandleSide.Bottom + EHandleSide.Left, 'Up', e);
+						}}
 						parentSize={factoredSize}
 						position="bottomLeft"
 					/>
 					<ResizeCornerHandle
-						onPointerDown={() => {}}
-						onPointerUp={() => {}}
+						onPointerDown={(e) => {
+							handleOnResizeHandlePointerEvent(EHandleSide.Bottom + EHandleSide.Right, 'Down', e);
+						}}
+						onPointerUp={(e) => {
+							handleOnResizeHandlePointerEvent(EHandleSide.Bottom + EHandleSide.Right, 'Up', e);
+						}}
 						parentSize={factoredSize}
 						position="bottomRight"
 					/>
@@ -182,29 +228,45 @@ export const EntitySelectionBox: React.FC<TProps> = (props) => {
 					{/* Rotate Corner Handles*/}
 					<RotateCornerHandle
 						offset={15}
-						onPointerDown={() => {}}
-						onPointerUp={() => {}}
+						onPointerDown={(e) => {
+							handleOnRotateHandlePointerEvent(EHandleSide.Top + EHandleSide.Left, 'Down', e);
+						}}
+						onPointerUp={(e) => {
+							handleOnRotateHandlePointerEvent(EHandleSide.Top + EHandleSide.Left, 'Up', e);
+						}}
 						parentSize={factoredSize}
 						position="topLeft"
 					/>
 					<RotateCornerHandle
 						offset={15}
-						onPointerDown={() => {}}
-						onPointerUp={() => {}}
+						onPointerDown={(e) => {
+							handleOnRotateHandlePointerEvent(EHandleSide.Top + EHandleSide.Right, 'Down', e);
+						}}
+						onPointerUp={(e) => {
+							handleOnRotateHandlePointerEvent(EHandleSide.Top + EHandleSide.Right, 'Up', e);
+						}}
 						parentSize={factoredSize}
 						position="topRight"
 					/>
 					<RotateCornerHandle
 						offset={15}
-						onPointerDown={() => {}}
-						onPointerUp={() => {}}
+						onPointerDown={(e) => {
+							handleOnRotateHandlePointerEvent(EHandleSide.Bottom + EHandleSide.Left, 'Down', e);
+						}}
+						onPointerUp={(e) => {
+							handleOnRotateHandlePointerEvent(EHandleSide.Bottom + EHandleSide.Left, 'Up', e);
+						}}
 						parentSize={factoredSize}
 						position="bottomLeft"
 					/>
 					<RotateCornerHandle
 						offset={15}
-						onPointerDown={() => {}}
-						onPointerUp={() => {}}
+						onPointerDown={(e) => {
+							handleOnRotateHandlePointerEvent(EHandleSide.Bottom + EHandleSide.Right, 'Down', e);
+						}}
+						onPointerUp={(e) => {
+							handleOnRotateHandlePointerEvent(EHandleSide.Bottom + EHandleSide.Right, 'Up', e);
+						}}
 						parentSize={factoredSize}
 						position="bottomRight"
 					/>
