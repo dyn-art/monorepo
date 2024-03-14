@@ -63,8 +63,8 @@ const DEFAULT_DTIF: COMP.DtifComposition = {
 				// 	paintId: 'p2'
 				// }
 			],
-			size: [100, 100],
-			translation: [(WIDTH - 100) / 2, (HEIGHT - 100) / 2],
+			size: [200, 100],
+			translation: [(WIDTH - 200) / 2, (HEIGHT - 100) / 2],
 			angle: 45
 		}
 	},

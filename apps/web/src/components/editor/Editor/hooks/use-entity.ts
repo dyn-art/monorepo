@@ -42,6 +42,11 @@ function changesReducer<GComponentVariants extends COMP.WatchableComponentVarian
 	return { ...state, [type]: change };
 }
 
-type TCombinedComponent<GComponentVariants extends COMP.WatchableComponentVariant[]> = {
-	[K in GComponentVariants[number]]?: Omit<Extract<COMP.ComponentChange, { type: K }>, 'type'>;
+export type TCombinedComponent<GComponentVariants extends COMP.WatchableComponentVariant[]> = {
+	[K in GComponentVariants[number]]?: TComponent<K>;
 };
+
+export type TComponent<GComponentVariant extends COMP.WatchableComponentVariant> = Omit<
+	Extract<COMP.ComponentChange, { type: GComponentVariant }>,
+	'type'
+>;
