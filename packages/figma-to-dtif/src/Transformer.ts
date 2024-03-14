@@ -1,4 +1,4 @@
-import type { COMP } from '@dyn/comp-dtif';
+import type { COMP } from '@dyn/dtif-comp';
 import { ContinuousId, sleep } from '@dyn/utils';
 
 import { FailedToResolveRootNodeException } from './exceptions';

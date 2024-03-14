@@ -1,5 +1,5 @@
 import React from 'react';
-import type { COMP } from '@dyn/comp-dtif';
+import type { COMP } from '@dyn/dtif-comp';
 import type { Composition } from '@dyn/svg-comp';
 
 import { useEntity, useViewportFactor } from '../../hooks';

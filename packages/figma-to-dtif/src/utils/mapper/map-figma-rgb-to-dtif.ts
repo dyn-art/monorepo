@@ -1,4 +1,4 @@
-import type { COMP } from '@dyn/comp-dtif';
+import type { COMP } from '@dyn/dtif-comp';
 
 export function mapFigmaRGBToDtif(rgb: RGB): COMP.Color {
 	return {

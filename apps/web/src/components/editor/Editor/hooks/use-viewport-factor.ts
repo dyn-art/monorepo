@@ -1,5 +1,5 @@
 import React from 'react';
-import type { COMP } from '@dyn/comp-dtif';
+import type { COMP } from '@dyn/dtif-comp';
 import type { Composition } from '@dyn/svg-comp';
 
 export function useViewportFactor(composition: Composition): COMP.Vec2 {

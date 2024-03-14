@@ -32,7 +32,7 @@
 		"object-hash": "^3.0.0"
 	},
 	"devDependencies": {
-		"@dyn/comp-dtif": "workspace:*",
+		"@dyn/dtif-comp": "workspace:*",
 		"@dyn/config": "workspace:*",
 		"@figma/plugin-typings": "^1.88.0",
 		"@types/node": "^20.11.25",

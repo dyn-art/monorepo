@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { isDtifComposition, prepareDtifComposition, type COMP } from '@dyn/comp-dtif';
+import { isDtifComposition, prepareDtifComposition, type COMP } from '@dyn/dtif-comp';
 
 export function useDtifFromClipboard(defaultDtif: COMP.DtifComposition): {
 	data?: COMP.DtifComposition;

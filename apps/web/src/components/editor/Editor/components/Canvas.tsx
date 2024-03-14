@@ -2,7 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import React from 'react';
-import { applyCanvasDimensions, type COMP } from '@dyn/comp-dtif';
+import { applyCanvasDimensions, type COMP } from '@dyn/dtif-comp';
 import { createSvgComposition, type Composition } from '@dyn/svg-comp';
 import { cn, Skeleton } from '@dyn/ui';
 

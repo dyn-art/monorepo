@@ -1,4 +1,4 @@
-import { intoMouseButton } from '@dyn/comp-dtif';
+import { intoMouseButton } from '@dyn/dtif-comp';
 import type {
 	CompositionChangeOutputEvent,
 	SvgElementChangesOutputEvent,

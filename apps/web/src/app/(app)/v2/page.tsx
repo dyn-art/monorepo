@@ -1,5 +1,5 @@
 import React from 'react';
-import type { COMP } from '@dyn/comp-dtif';
+import type { COMP } from '@dyn/dtif-comp';
 import { Editor } from '@/components';
 
 const Page: React.FC = () => {

@@ -23,7 +23,7 @@
 	"homepage": "https://s.dyn.art/github",
 	"dependencies": {
 		"@dyn/dtif": "workspace:*",
-		"@dyn/comp-dtif": "workspace:*",
+		"@dyn/dtif-comp": "workspace:*",
 		"@dyn/svg-comp": "workspace:*",
 		"@dyn/svg-composition": "workspace:*",
 		"@dyn/ui": "workspace:*",
