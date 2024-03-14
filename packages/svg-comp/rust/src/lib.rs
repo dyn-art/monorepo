@@ -171,7 +171,8 @@ impl SvgCompHandle {
         // Open SVG tag
         result.push_str(&format!(
             "<svg width=\"{}\" height=\"{}\" xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\">",
-            comp_res.size.0.x, comp_res.size.0.y
+            comp_res.size.width(),
+            comp_res.size.height()
         ));
 
         let mut system_state: SystemState<(

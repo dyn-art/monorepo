@@ -389,7 +389,7 @@ export type VectorNode = { path: string; translation?: Vec2; angle?: Degree; siz
 
 export type VerticalTextAlignment = "Top" | "Center" | "Bottom" | "Justified"
 
-export type Viewport = { physicalPosition: Vec2; physicalSize: Vec2 }
+export type Viewport = { physicalPosition: Vec2; physicalSize: Size }
 
 export type WatchableComponentVariant = "Size" | "Transform"
 
@@ -397,5 +397,5 @@ export type WatchedEntityChangesOutputEvent = { entity: Entity; changes: Compone
 
 export type WheeledOnCompInputEvent = { position: Vec2; delta: Vec2; ctrlKeyPressed: boolean; metaKeyPressed: boolean }
 
-export type XYWH = { position: Vec2; width: number; height: number }
+export type XYWH = { position: Vec2; size: Size }
 

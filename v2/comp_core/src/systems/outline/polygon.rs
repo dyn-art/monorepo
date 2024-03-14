@@ -4,7 +4,6 @@ use bevy_ecs::{
     system::{Commands, Query},
 };
 use dyn_comp_common::{
-    common::Size,
     mixins::{PathMixin, SizeMixin},
     nodes::PolygonCompNode,
 };
@@ -18,12 +17,12 @@ pub fn outline_polygon(
         Or<(Changed<PolygonCompNode>, Changed<SizeMixin>)>,
     >,
 ) {
-    for (entity, polygon, SizeMixin(Size(size))) in query.iter() {
+    for (entity, polygon, SizeMixin(size)) in query.iter() {
         if polygon.point_count < 3 {
             continue;
         }
 
-        let radius = *size / 2.0;
+        let radius = *size.get() / 2.0;
 
         let mut path_builder = PathBuilder::new();
 

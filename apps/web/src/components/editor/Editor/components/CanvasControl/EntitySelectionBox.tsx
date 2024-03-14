@@ -8,7 +8,15 @@ import { ResizeEdgeHandle } from './ResizeEdgeHandle';
 import { RotateCornerHandle } from './RotateCornerHandle';
 
 export const EntitySelectionBox: React.FC<TProps> = (props) => {
-	const { composition, entity, showHandles = true } = props;
+	const {
+		composition,
+		entity,
+		showHandles = true,
+		onResizeHandlePointerDown,
+		onResizeHandlePointerUp,
+		onRotateHandlePointerDown,
+		onRotateHandlePointerUp
+	} = props;
 	const { Size: sizeData, Transform: transformData } = useEntity(composition, entity, [
 		'Size',
 		'Transform'
@@ -35,21 +43,70 @@ export const EntitySelectionBox: React.FC<TProps> = (props) => {
 		[factor, transformData]
 	);
 
+	// =========================================================================
+	// Callbacks
+	// =========================================================================
+
+	const handleOnResizeHandlePointerEvents = React.useCallback(
+		(side: EHandleSide, eventType: 'Up' | 'Down', event: React.PointerEvent<SVGAElement>) => {
+			event.stopPropagation();
+			if (sizeData == null || transformData == null || composition.renderer == null) {
+				return;
+			}
+			const { size } = sizeData;
+			const { rotationDeg } = transformData;
+
+			if (event.button === 0) {
+				switch (eventType) {
+					case 'Up':
+						onResizeHandlePointerUp(composition.renderer.pointerEventToCompPoint(event));
+						break;
+					case 'Down':
+						onResizeHandlePointerDown(
+							side,
+							{
+								position: composition.renderer.pointerEventToCompPoint(event),
+								width: size[0],
+								height: size[0]
+							},
+							rotationDeg
+						);
+						break;
+				}
+			}
+		},
+		[
+			sizeData,
+			transformData,
+			composition.renderer,
+			onResizeHandlePointerUp,
+			onResizeHandlePointerDown
+		]
+	);
+
+	const handleOnResizeHandlePointerUp = React.useCallback(
+		(side: EHandleSide, event: React.PointerEvent<SVGAElement>) => {
+			// TODO
+		},
+		[]
+	);
+
+	// =========================================================================
+	// UI
+	// =========================================================================
+
 	if (
 		sizeData == null ||
 		factoredSizeData == null ||
 		transformData == null ||
 		factoredTransformData == null
 	) {
-		return;
+		return null;
 	}
+
 	const { size: factoredSize } = factoredSizeData;
 	const { size } = sizeData;
 	const { rotationDeg: rotation, translation: factoredTranslation } = factoredTransformData;
-
-	// =========================================================================
-	// UI
-	// =========================================================================
 
 	return (
 		<g
@@ -181,4 +238,19 @@ interface TProps {
 	entity: COMP.Entity;
 	composition: Composition;
 	showHandles?: boolean;
+	onResizeHandlePointerDown: (
+		corner: EHandleSide,
+		initialBounds: COMP.XYWH,
+		rotationDeg: number
+	) => void;
+	onResizeHandlePointerUp: (position: COMP.Vec2) => void;
+	onRotateHandlePointerDown: (side: EHandleSide, rotationDeg: number) => void;
+	onRotateHandlePointerUp: (position: COMP.Vec2) => void;
+}
+
+export enum EHandleSide {
+	Top = 1,
+	Bottom = 2,
+	Left = 4,
+	Right = 8
 }

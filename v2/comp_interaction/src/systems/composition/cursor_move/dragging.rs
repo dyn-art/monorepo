@@ -1,5 +1,5 @@
 use crate::events::CursorMovedOnCompInputEvent;
-use dyn_comp_common::common::{Size, Viewport};
+use dyn_comp_common::common::Viewport;
 use dyn_comp_core::resources::composition::CompositionRes;
 use glam::Vec2;
 
@@ -17,12 +17,12 @@ pub fn handle_dragging(
             physical_position,
             physical_size,
         },
-        size: Size(size),
+        size,
         ..
     } = comp_res;
 
     let delta = event.position - *current;
-    let factor = physical_size.x / size.x;
+    let factor = physical_size.width() / size.width();
     *physical_position -= delta * factor;
 
     *current = *cursor_position;

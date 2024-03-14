@@ -6,7 +6,7 @@ const INTERACTION_AREA_SIZE = 20;
 const interactionAreaOffset = (INTERACTION_AREA_SIZE - HANDLE_SIZE) / 2;
 
 export const ResizeCornerHandle: React.FC<ResizeCornerHandleProps> = (props) => {
-	const { position, parentSize, onPointerDown, onPointerUp } = props;
+	const { position, parentSize, ...other } = props;
 
 	const [x, y] = React.useMemo<COMP.Vec2>(
 		() => calculatePosition(position, parentSize),
@@ -14,7 +14,7 @@ export const ResizeCornerHandle: React.FC<ResizeCornerHandleProps> = (props) => 
 	);
 
 	return (
-		<g id={`resize-corner-${position}`} onPointerDown={onPointerDown} onPointerUp={onPointerUp}>
+		<g id={`resize-corner-${position}`} {...other}>
 			<rect
 				className="fill-white stroke-blue-400 stroke-1"
 				height={HANDLE_SIZE}
@@ -47,11 +47,9 @@ function calculatePosition(position: TPosition, parentSize: COMP.Size): COMP.Vec
 	}
 }
 
-interface ResizeCornerHandleProps {
+interface ResizeCornerHandleProps extends React.SVGAttributes<SVGGElement> {
 	position: TPosition;
 	parentSize: COMP.Size;
-	onPointerDown: (e: React.PointerEvent) => void;
-	onPointerUp: (e: React.PointerEvent) => void;
 }
 
 type TPosition = 'topLeft' | 'topRight' | 'bottomRight' | 'bottomLeft';

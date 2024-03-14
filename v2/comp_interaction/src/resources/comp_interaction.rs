@@ -1,4 +1,5 @@
 use bevy_ecs::system::Resource;
+use dyn_comp_common::common::Size;
 use glam::Vec2;
 
 #[derive(Resource, Debug, Default)]
@@ -40,8 +41,7 @@ pub enum InteractionMode {
 #[cfg_attr(feature = "serde_support", derive(serde::Deserialize, specta::Type))]
 pub struct XYWH {
     pub position: Vec2,
-    pub width: f32,
-    pub height: f32,
+    pub size: Size,
 }
 
 #[derive(Debug, Copy, Clone)]

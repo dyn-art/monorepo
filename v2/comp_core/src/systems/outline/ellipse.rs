@@ -4,7 +4,6 @@ use bevy_ecs::{
     system::{Commands, Query},
 };
 use dyn_comp_common::{
-    common::Size,
     mixins::{PathMixin, SizeMixin},
     nodes::EllipseCompNode,
 };
@@ -17,14 +16,14 @@ pub fn outline_ellipse(
         Or<(Changed<EllipseCompNode>, Changed<SizeMixin>)>,
     >,
 ) {
-    for (entity, ellipse, SizeMixin(Size(size))) in query.iter() {
+    for (entity, ellipse, SizeMixin(size)) in query.iter() {
         let mut path_builder = PathBuilder::new();
 
         // Handle a full ellipse or circle
         if ellipse.arc_data.starting_angle == 0.0
             && ellipse.arc_data.ending_angle == 2.0 * std::f32::consts::PI
         {
-            path_builder.push_oval(Rect::from_xywh(0.0, 0.0, size.x, size.y).unwrap());
+            path_builder.push_oval(Rect::from_xywh(0.0, 0.0, size.width(), size.height()).unwrap());
         }
         // Handle a ellipse or circle with arc
         else {

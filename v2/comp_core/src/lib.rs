@@ -99,7 +99,7 @@ impl Plugin for CompCorePlugin {
 #[cfg(feature = "dtif")]
 fn inject_dtif_into_ecs(world: &mut bevy_ecs::world::World, dtif: &dyn_comp_dtif::DtifComposition) {
     use dyn_comp_asset::resources::AssetDatabaseRes;
-    use dyn_comp_common::common::Viewport;
+    use dyn_comp_common::common::{Size, Viewport};
     use glam::Vec2;
 
     let mut dtif_injector = dyn_comp_dtif::dtif_injector::DtifInjector::new();
@@ -116,7 +116,7 @@ fn inject_dtif_into_ecs(world: &mut bevy_ecs::world::World, dtif: &dyn_comp_dtif
             root_nodes: vec![root_node_entity],
             viewport: dtif.viewport.unwrap_or(Viewport {
                 physical_position: Vec2::default(),
-                physical_size: Vec2::new(dtif.size.0.x, dtif.size.0.y),
+                physical_size: dtif.size,
             }),
             size: dtif.size,
         })

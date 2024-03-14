@@ -294,17 +294,13 @@ export class SvgRenderer extends Renderer {
 		}
 	}
 
-	public clientWindowPointToCompPoint(clientProint: Vec2): Vec2 {
+	public clientWindowPointToCompPoint(clientPoint: Vec2): Vec2 {
 		const rect = this._svgElement.getBoundingClientRect();
 
-		const x = clientProint[0] - rect.left;
-		const y = clientProint[1] - rect.top;
+		const x = clientPoint[0] - rect.left;
+		const y = clientPoint[1] - rect.top;
 
 		return [x, y];
-	}
-
-	public pointerEventToCompPoint(e: PointerEvent): Vec2 {
-		return this.clientWindowPointToCompPoint([e.clientX, e.clientY]);
 	}
 }
 

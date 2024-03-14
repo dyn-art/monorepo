@@ -1,6 +1,7 @@
 import type {
 	CompositionChangeOutputEvent,
-	SvgElementChangesOutputEvent
+	SvgElementChangesOutputEvent,
+	Vec2
 } from '@/rust/dyn-svg-comp-api/bindings';
 
 import type { Composition } from '../Composition';
@@ -32,4 +33,9 @@ export abstract class Renderer {
 	public abstract applyElementChanges(event: SvgElementChangesOutputEvent): void;
 	public abstract applyCompositionChange(event: CompositionChangeOutputEvent): void;
 	public abstract clear(): void;
+	public abstract clientWindowPointToCompPoint(clientPoint: Vec2): Vec2;
+
+	public pointerEventToCompPoint(event: PointerEvent | { clientX: number; clientY: number }): Vec2 {
+		return this.clientWindowPointToCompPoint([event.clientX, event.clientY]);
+	}
 }

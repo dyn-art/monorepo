@@ -378,15 +378,13 @@ pub fn apply_size_mixin_changes(
     mut query: Query<(&SizeMixin, &mut SvgBundleVariant), Changed<SizeMixin>>,
 ) {
     for (SizeMixin(size), mut bundle_variant) in query.iter_mut() {
-        let [width, height] = size.0.to_array();
-
         bundle_variant.get_root_element_mut().set_attributes(vec![
             SvgAttribute::Width {
-                width,
+                width: size.width(),
                 unit: SvgMeasurementUnit::Pixel,
             },
             SvgAttribute::Height {
-                height,
+                height: size.height(),
                 unit: SvgMeasurementUnit::Pixel,
             },
         ]);
@@ -394,11 +392,11 @@ pub fn apply_size_mixin_changes(
         if let Some(click_area_element) = bundle_variant.get_click_area_element_mut() {
             click_area_element.set_attributes(vec![
                 SvgAttribute::Width {
-                    width,
+                    width: size.width(),
                     unit: SvgMeasurementUnit::Pixel,
                 },
                 SvgAttribute::Height {
-                    height,
+                    height: size.height(),
                     unit: SvgMeasurementUnit::Pixel,
                 },
             ]);
@@ -409,21 +407,21 @@ pub fn apply_size_mixin_changes(
                 ImageFillStyleVariant::Fill | ImageFillStyleVariant::Fit => {
                     bundle.pattern.set_attributes(vec![
                         SvgAttribute::Width {
-                            width,
+                            width: size.width(),
                             unit: SvgMeasurementUnit::Pixel,
                         },
                         SvgAttribute::Height {
-                            height,
+                            height: size.height(),
                             unit: SvgMeasurementUnit::Pixel,
                         },
                     ]);
                     bundle.image.set_attributes(vec![
                         SvgAttribute::Width {
-                            width,
+                            width: size.width(),
                             unit: SvgMeasurementUnit::Pixel,
                         },
                         SvgAttribute::Height {
-                            height,
+                            height: size.height(),
                             unit: SvgMeasurementUnit::Pixel,
                         },
                     ]);
@@ -454,7 +452,7 @@ pub fn apply_opacity_mixin_changes(
         bundle_variant
             .get_root_element_mut()
             .set_style(SvgStyle::Opacity {
-                opacity: opacity.0.get(),
+                opacity: opacity.get(),
             });
     }
 }
@@ -576,16 +574,15 @@ pub fn apply_gradient_paint_changes(
 ) {
     for (gradient_paint, PaintParentMixin(paint_parent_entities)) in paint_query.iter() {
         for paint_parent_entity in paint_parent_entities {
-            if let Ok((mut bundle_variant, SizeMixin(Size(size)))) =
+            if let Ok((mut bundle_variant, SizeMixin(size))) =
                 style_query.get_mut(*paint_parent_entity)
             {
                 match bundle_variant.as_mut() {
                     SvgBundleVariant::GradientFill(bundle) => {
                         match gradient_paint.variant {
                             GradientVariant::Linear { transform } => {
-                                let (start, end) = extract_linear_gradient_params_from_transform(
-                                    size.x, size.y, &transform,
-                                );
+                                let (start, end) =
+                                    extract_linear_gradient_params_from_transform(size, &transform);
                                 bundle.gradient.set_attributes(vec![
                                     SvgAttribute::X1 { x1: start.x },
                                     SvgAttribute::Y1 { y1: start.y },
@@ -639,16 +636,15 @@ pub fn apply_gradient_paint_changes(
 /// Credits:
 /// https://github.com/figma-plugin-helper-functions/figma-plugin-helpers/tree/master
 fn extract_linear_gradient_params_from_transform(
-    shape_width: f32,
-    shape_height: f32,
+    shape_size: &Size,
     transform: &Mat3,
 ) -> (Vec2, Vec2) {
     let mx_inv = transform.inverse();
     let start_end = [Vec2::new(0.0, 0.5), Vec2::new(1.0, 0.5)].map(|p| mx_inv.transform_point2(p));
 
     (
-        Vec2::new(start_end[0].x * shape_width, start_end[0].y * shape_height),
-        Vec2::new(start_end[1].x * shape_width, start_end[1].y * shape_height),
+        start_end[0] * *shape_size.get(),
+        start_end[1] * *shape_size.get(),
     )
 }
 
@@ -667,7 +663,7 @@ pub fn apply_image_paint_changes(
     {
         if let Some(image) = maybe_image_id.and_then(|id| asset_db_res.get_image(id)) {
             for paint_parent_entity in paint_parent_entities {
-                if let Ok((mut bundle_variant, SizeMixin(Size(size)))) =
+                if let Ok((mut bundle_variant, SizeMixin(size))) =
                     style_query.get_mut(*paint_parent_entity)
                 {
                     match bundle_variant.as_mut() {
@@ -708,7 +704,7 @@ pub fn apply_image_paint_changes(
                             ImageScaleMode::Crop { transform } => {
                                 let (image_width, image_height, image_transform) =
                                     calculate_cropped_image_transform(
-                                        (size.x, size.y),
+                                        size,
                                         (f32::from(image.width), f32::from(image.height)),
                                         &transform,
                                     );
@@ -747,28 +743,35 @@ pub fn apply_image_paint_changes(
     }
 }
 
+// TODO: Improve
 fn calculate_cropped_image_transform(
-    container_dimensions: (f32, f32),
-    image_content: (f32, f32),
+    parent_size: &Size,
+    image_size: (f32, f32),
     transform: &Mat3,
 ) -> (f32, f32, Mat3) {
-    let (container_width, container_height) = container_dimensions;
-    let (image_width, image_height) = image_content;
+    let [parent_width, parent_height] = parent_size.get().to_array();
+    let (image_width, image_height) = image_size;
+
+    log::info!(
+        "[calculate_cropped_image_transform] {:?} - {:?}",
+        parent_size,
+        image_size
+    );
 
     // Calculate aspect ratios for container and image
-    let container_ratio = container_width / container_height;
+    let container_ratio = parent_width / parent_height;
     let image_ratio = image_width / image_height;
 
     // Determine new image dimensions based on aspect ratio comparison
     let (adjusted_image_width, adjusted_image_height) = if image_ratio > container_ratio {
-        (container_height * image_ratio, container_height)
+        (parent_height * image_ratio, parent_height)
     } else {
-        (container_width, container_width / image_ratio)
+        (parent_width, parent_width / image_ratio)
     };
 
     // Calculate scale adjustment ratios
-    let x_ratio = container_width / adjusted_image_width;
-    let y_ratio = container_height / adjusted_image_height;
+    let x_ratio = parent_width / adjusted_image_width;
+    let y_ratio = parent_height / adjusted_image_height;
 
     // Extract scale components from the matrix and adjust them
     let scale_x = transform.x_axis.x;

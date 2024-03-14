@@ -117,14 +117,83 @@ impl Default for MeasurementUnit {
     feature = "serde_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
-pub struct Size(pub Vec2);
+pub struct Size(Vec2);
+
+impl Size {
+    #[inline]
+    pub fn new(width: f32, height: f32) -> Self {
+        Self(Vec2::new(width.min(0.0), height.min(0.0)))
+    }
+
+    #[inline]
+    pub fn get_mut(&mut self) -> &mut Vec2 {
+        &mut self.0
+    }
+
+    #[inline]
+    pub fn get(&self) -> &Vec2 {
+        &self.0
+    }
+
+    #[inline]
+    pub fn width(&self) -> f32 {
+        self.0.x
+    }
+
+    #[inline]
+    pub fn height(&self) -> f32 {
+        self.0.y
+    }
+}
 
 #[derive(Debug, Default, Copy, Clone)]
 #[cfg_attr(
     feature = "serde_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
-pub struct CornerRadii(pub Vec4);
+pub struct CornerRadii(Vec4);
+
+impl CornerRadii {
+    #[inline]
+    pub fn new(top_left: f32, top_right: f32, bottom_right: f32, bottom_left: f32) -> Self {
+        Self(Vec4::new(
+            top_left.min(0.0),
+            top_right.min(0.0),
+            bottom_right.min(0.0),
+            bottom_left.min(0.0),
+        ))
+    }
+
+    #[inline]
+    pub fn get_mut(&mut self) -> &mut Vec4 {
+        &mut self.0
+    }
+
+    #[inline]
+    pub fn get(&self) -> &Vec4 {
+        &self.0
+    }
+
+    #[inline]
+    pub fn top_left(&self) -> f32 {
+        self.0.x
+    }
+
+    #[inline]
+    pub fn top_right(&self) -> f32 {
+        self.0.y
+    }
+
+    #[inline]
+    pub fn bottom_right(&self) -> f32 {
+        self.0.z
+    }
+
+    #[inline]
+    pub fn bottom_left(&self) -> f32 {
+        self.0.w
+    }
+}
 
 #[derive(Debug, Default, Copy, Clone)]
 #[cfg_attr(
@@ -156,7 +225,19 @@ pub enum BlendMode {
     feature = "serde_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
-pub struct Opacity(pub Percent);
+pub struct Opacity(Percent);
+
+impl Opacity {
+    #[inline]
+    pub fn new(opacity: f32) -> Self {
+        Self(Percent::new(opacity))
+    }
+
+    #[inline]
+    pub fn get(&self) -> f32 {
+        self.0.get()
+    }
+}
 
 impl Default for Opacity {
     fn default() -> Self {
@@ -209,7 +290,7 @@ impl Color {
 )]
 pub struct Viewport {
     pub physical_position: Vec2,
-    pub physical_size: Vec2,
+    pub physical_size: Size,
 }
 
 /// A styled text segment.

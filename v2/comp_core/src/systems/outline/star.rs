@@ -4,7 +4,6 @@ use bevy_ecs::{
     system::{Commands, Query},
 };
 use dyn_comp_common::{
-    common::Size,
     mixins::{PathMixin, SizeMixin},
     nodes::StarCompNode,
 };
@@ -18,12 +17,12 @@ pub fn outline_star(
         Or<(Changed<StarCompNode>, Changed<SizeMixin>)>,
     >,
 ) {
-    for (entity, star, SizeMixin(Size(size))) in query.iter() {
+    for (entity, star, SizeMixin(size)) in query.iter() {
         if star.point_count < 3 {
             continue;
         }
 
-        let radius = *size / 2.0;
+        let radius = *size.get() / 2.0;
         let inner_radius = radius * star.inner_radius_ratio;
 
         let mut path_builder = PathBuilder::new();

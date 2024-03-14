@@ -4,7 +4,7 @@ import type { COMP } from '@dyn/dtif-comp';
 const INTERACTION_AREA_WIDTH = 8;
 
 export const ResizeEdgeHandle: React.FC<TProps> = (props) => {
-	const { position, parentSize, onPointerDown, onPointerUp } = props;
+	const { position, parentSize, ...other } = props;
 
 	const [width, height] = React.useMemo<COMP.Vec2>(
 		() => [
@@ -19,7 +19,7 @@ export const ResizeEdgeHandle: React.FC<TProps> = (props) => {
 	);
 
 	return (
-		<g id={`resize-edge-${position}`} onPointerDown={onPointerDown} onPointerUp={onPointerUp}>
+		<g id={`resize-edge-${position}`} {...other}>
 			<rect
 				className="stroke-yellow-500 stroke-2"
 				fill="transparent"
@@ -45,11 +45,9 @@ function getPositionStyle(position: TPosition, parentSize: COMP.Size): COMP.Vec2
 	}
 }
 
-interface TProps {
+interface TProps extends React.SVGAttributes<SVGGElement> {
 	position: TPosition;
 	parentSize: COMP.Size;
-	onPointerDown: (e: React.PointerEvent) => void;
-	onPointerUp: (e: React.PointerEvent) => void;
 }
 
 type TPosition = 'top' | 'right' | 'bottom' | 'left';

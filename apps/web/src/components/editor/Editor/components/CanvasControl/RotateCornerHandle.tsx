@@ -4,7 +4,7 @@ import type { COMP } from '@dyn/dtif-comp';
 const INTERACTION_AREA_SIZE = 20;
 
 export const RotateCornerHandle: React.FC<RotateHandleProps> = (props) => {
-	const { position, parentSize, offset, onPointerDown, onPointerUp } = props;
+	const { position, parentSize, offset, ...other } = props;
 
 	const [x, y] = React.useMemo<COMP.Vec2>(
 		() => calculatePosition(position, parentSize, offset),
@@ -12,7 +12,7 @@ export const RotateCornerHandle: React.FC<RotateHandleProps> = (props) => {
 	);
 
 	return (
-		<g id={`rotate-handle-${position}`} onPointerDown={onPointerDown} onPointerUp={onPointerUp}>
+		<g id={`rotate-handle-${position}`} {...other}>
 			<rect
 				className="stroke-red-500 stroke-2"
 				fill="transparent"
@@ -47,12 +47,10 @@ function calculatePosition(position: TPosition, parentSize: COMP.Size, offset: n
 	}
 }
 
-interface RotateHandleProps {
+interface RotateHandleProps extends React.SVGAttributes<SVGGElement> {
 	position: TPosition;
 	parentSize: COMP.Size;
 	offset: number;
-	onPointerDown: (e: React.PointerEvent) => void;
-	onPointerUp: (e: React.PointerEvent) => void;
 }
 
 type TPosition = 'topLeft' | 'topRight' | 'bottomRight' | 'bottomLeft';
