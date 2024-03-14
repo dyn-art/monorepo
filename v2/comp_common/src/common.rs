@@ -122,7 +122,7 @@ pub struct Size(Vec2);
 impl Size {
     #[inline]
     pub fn new(width: f32, height: f32) -> Self {
-        Self(Vec2::new(width.min(0.0), height.min(0.0)))
+        Self(Vec2::new(width.max(0.0), height.max(0.0)))
     }
 
     #[inline]
@@ -157,10 +157,10 @@ impl CornerRadii {
     #[inline]
     pub fn new(top_left: f32, top_right: f32, bottom_right: f32, bottom_left: f32) -> Self {
         Self(Vec4::new(
-            top_left.min(0.0),
-            top_right.min(0.0),
-            bottom_right.min(0.0),
-            bottom_left.min(0.0),
+            top_left.max(0.0),
+            top_right.max(0.0),
+            bottom_right.max(0.0),
+            bottom_left.max(0.0),
         ))
     }
 
