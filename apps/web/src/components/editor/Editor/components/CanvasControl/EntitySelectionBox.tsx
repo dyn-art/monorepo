@@ -3,6 +3,9 @@ import type { COMP } from '@dyn/dtif-comp';
 import type { Composition } from '@dyn/svg-comp';
 
 import { useEntity, useViewportFactor } from '../../hooks';
+import { ResizeCornerHandle } from './ResizeCornerHandle';
+import { ResizeEdgeHandle } from './ResizeEdgeHandle';
+import { RotateCornerHandle } from './RotateCornerHandle';
 
 export const EntitySelectionBox: React.FC<TProps> = (props) => {
 	const { composition, entity, showHandles = true } = props;
@@ -34,6 +37,92 @@ export const EntitySelectionBox: React.FC<TProps> = (props) => {
 				x={0}
 				y={0}
 			/>
+
+			{showHandles ? (
+				<g id="handles">
+					{/* Resize Edge Handles*/}
+					<ResizeEdgeHandle
+						length={size[0] * factor[0]}
+						onPointerDown={() => {}}
+						onPointerUp={() => {}}
+						position="top"
+					/>
+					<ResizeEdgeHandle
+						length={size[1] * factor[1]}
+						onPointerDown={() => {}}
+						onPointerUp={() => {}}
+						position="left"
+					/>
+					<ResizeEdgeHandle
+						length={size[0] * factor[0]}
+						onPointerDown={() => {}}
+						onPointerUp={() => {}}
+						position="bottom"
+					/>
+					<ResizeEdgeHandle
+						length={size[1] * factor[1]}
+						onPointerDown={() => {}}
+						onPointerUp={() => {}}
+						position="right"
+					/>
+
+					{/* Resize Corner Handles*/}
+					<ResizeCornerHandle
+						onPointerDown={() => {}}
+						onPointerUp={() => {}}
+						parentSize={[size[0] * factor[0], size[1] * factor[1]]}
+						position="topLeft"
+					/>
+					<ResizeCornerHandle
+						onPointerDown={() => {}}
+						onPointerUp={() => {}}
+						parentSize={[size[0] * factor[0], size[1] * factor[1]]}
+						position="topRight"
+					/>
+					<ResizeCornerHandle
+						onPointerDown={() => {}}
+						onPointerUp={() => {}}
+						parentSize={[size[0] * factor[0], size[1] * factor[1]]}
+						position="bottomLeft"
+					/>
+					<ResizeCornerHandle
+						onPointerDown={() => {}}
+						onPointerUp={() => {}}
+						parentSize={[size[0] * factor[0], size[1] * factor[1]]}
+						position="bottomRight"
+					/>
+
+					{/* Rotate Corner Handles*/}
+					<RotateCornerHandle
+						offset={15}
+						onPointerDown={() => {}}
+						onPointerUp={() => {}}
+						parentSize={[size[0] * factor[0], size[1] * factor[1]]}
+						position="topLeft"
+					/>
+					<RotateCornerHandle
+						offset={15}
+						onPointerDown={() => {}}
+						onPointerUp={() => {}}
+						parentSize={[size[0] * factor[0], size[1] * factor[1]]}
+						position="topRight"
+					/>
+					<RotateCornerHandle
+						offset={15}
+						onPointerDown={() => {}}
+						onPointerUp={() => {}}
+						parentSize={[size[0] * factor[0], size[1] * factor[1]]}
+						position="bottomLeft"
+					/>
+					<RotateCornerHandle
+						offset={15}
+						onPointerDown={() => {}}
+						onPointerUp={() => {}}
+						parentSize={[size[0] * factor[0], size[1] * factor[1]]}
+						position="bottomRight"
+					/>
+				</g>
+			) : null}
 
 			{/* Dimension Indicator */}
 			{showHandles ? (
