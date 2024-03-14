@@ -29,8 +29,8 @@ export const EntitySelectionBox: React.FC<TProps> = (props) => {
 			{/* Selection Border */}
 			<rect
 				className="pointer-events-none fill-transparent stroke-blue-400 stroke-1"
-				height={size[0] * factor[0]}
-				width={size[1] * factor[1]}
+				height={size[1] * factor[1]}
+				width={size[0] * factor[0]}
 				x={0}
 				y={0}
 			/>
