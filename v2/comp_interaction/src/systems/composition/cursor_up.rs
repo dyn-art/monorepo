@@ -9,9 +9,6 @@ pub fn handle_cursor_up_on_comp_event(
     mut comp_interaction_res: ResMut<CompInteractionRes>,
 ) {
     for event in event_reader.read() {
-        #[cfg(feature = "tracing")]
-        log::info!("[handle_cursor_up_on_comp_event] {:?}", event);
-
         comp_interaction_res.interaction_mode = InteractionMode::None;
     }
 }

@@ -135,7 +135,7 @@ export const EntitySelectionBox: React.FC<TProps> = (props) => {
 			style={{
 				transform: `translate(${factoredTranslation[0] - composition.viewport.physicalPosition[0] * factor[0]}px, ${
 					factoredTranslation[1] - composition.viewport.physicalPosition[1] * factor[0]
-				}px) rotate(${-rotation}deg)`
+				}px) rotate(${rotation}deg)`
 			}}
 		>
 			{/* Selection Border */}

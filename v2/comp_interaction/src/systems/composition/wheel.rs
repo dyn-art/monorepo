@@ -8,9 +8,6 @@ pub fn handle_wheel_on_comp_event(
     mut comp_res: ResMut<CompositionRes>,
 ) {
     for event in event_reader.read() {
-        #[cfg(feature = "tracing")]
-        log::info!("[handle_wheel_on_comp_event] {:?}", event);
-
         let CompositionRes {
             size,
             viewport:

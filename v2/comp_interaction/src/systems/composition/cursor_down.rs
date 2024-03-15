@@ -9,9 +9,6 @@ pub fn handle_cursor_down_on_comp_event(
     mut comp_interaction_res: ResMut<CompInteractionRes>,
 ) {
     for event in event_reader.read() {
-        #[cfg(feature = "tracing")]
-        log::info!("[handle_cursor_down_on_comp_event] {:?}", event);
-
         if event.button == MouseButton::Middle {
             comp_interaction_res.interaction_mode = InteractionMode::Dragging {
                 current: event.position,

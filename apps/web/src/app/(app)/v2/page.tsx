@@ -30,11 +30,10 @@ const DEFAULT_DTIF: COMP.DtifComposition = {
 			],
 			size: [WIDTH, HEIGHT],
 			translation: [0, 0],
-			children: ['n2']
+			children: ['n2', 'n3', 'n4']
 		},
 		n2: {
 			type: 'Rectangle',
-			cornerRadii: [10, 20, 30, 40],
 			styles: [
 				// {
 				// 	type: 'Stroke',
@@ -46,7 +45,7 @@ const DEFAULT_DTIF: COMP.DtifComposition = {
 				{
 					type: 'Fill',
 					blendMode: 'Normal',
-					opacity: 0.9,
+					opacity: 1,
 					paintId: 'p2'
 				}
 				// {
@@ -63,9 +62,21 @@ const DEFAULT_DTIF: COMP.DtifComposition = {
 				// 	paintId: 'p2'
 				// }
 			],
-			size: [200, 100],
-			translation: [(WIDTH - 200) / 2, (HEIGHT - 100) / 2],
-			angle: 45
+			size: [100, 100],
+			translation: [(WIDTH - 100) / 2, (HEIGHT - 100) / 2]
+		},
+		n3: {
+			type: 'Rectangle',
+			styles: [
+				{
+					type: 'Fill',
+					blendMode: 'Normal',
+					opacity: 1,
+					paintId: 'p3'
+				}
+			],
+			size: [100, 200],
+			translation: [(WIDTH - 100) / 2, (HEIGHT - 200) / 2]
 		}
 	},
 	paints: {

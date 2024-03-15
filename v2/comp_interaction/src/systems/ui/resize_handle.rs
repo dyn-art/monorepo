@@ -9,9 +9,6 @@ pub fn handle_cursor_down_on_resize_handle_event(
     mut comp_interaction_res: ResMut<CompInteractionRes>,
 ) {
     for event in event_reader.read() {
-        #[cfg(feature = "tracing")]
-        log::info!("[handle_cursor_down_on_resize_handle_event] {:?}", event);
-
         comp_interaction_res.interaction_mode = InteractionMode::Resizing {
             corner: event.corner,
             initial_bounds: event.initial_bounds.clone(),

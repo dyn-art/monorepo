@@ -29,7 +29,7 @@ pub fn handle_resizing(
             &initial_bounds,
             corner,
             &cursor_position,
-            transform.rotation.to_euler(EulerRot::XYZ).2,
+            -transform.rotation.to_euler(EulerRot::XYZ).2,
         );
 
         transform.translation.x = new_bounds.position.x;

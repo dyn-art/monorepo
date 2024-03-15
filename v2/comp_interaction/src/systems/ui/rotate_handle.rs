@@ -10,9 +10,6 @@ pub fn handle_cursor_down_on_rotate_handle_event(
     mut comp_interaction_res: ResMut<CompInteractionRes>,
 ) {
     for event in event_reader.read() {
-        #[cfg(feature = "tracing")]
-        log::info!("[handle_cursor_down_on_rotate_handle_event] {:?}", event);
-
         comp_interaction_res.interaction_mode = InteractionMode::Rotating {
             corner: event.corner,
             initial_rotation_rad: event.initial_rotation_rad,

@@ -6,56 +6,56 @@ use super::{
 };
 use bevy_transform::components::Transform;
 use dyn_comp_common::common::{BlendMode, Color};
-use glam::{EulerRot, Mat3};
+use glam::Mat3;
 use tiny_skia_path::{Path, PathSegment};
 
 impl From<&Transform> for SvgTransformAttribute {
     fn from(transform: &Transform) -> Self {
-        // Extract the 2D rotation angle (Z axis) from the quaternion
-        let angle_rad = transform.rotation.to_euler(EulerRot::XYZ).2;
-        let cos_a = angle_rad.cos();
-        let sin_a = angle_rad.sin();
+        let mat4 = transform.compute_matrix();
 
-        // Extract scale and ensure default scale is 1,1 if scale is 0,0 indicating no scaling applied
-        let sx = if transform.scale.x == 0.0 {
-            1.0
-        } else {
-            transform.scale.x
-        };
-        let sy = if transform.scale.y == 0.0 {
-            1.0
-        } else {
-            transform.scale.y
-        };
-
-        let tx = transform.translation.x;
-        let ty = transform.translation.y;
-
-        // Create the SVG transformation matrix
-        // This matrix combines rotation and scale, then applies translation
         // https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/transform
         // https://docs.aspose.com/svg/net/drawing-basics/transformation-matrix/
-        // | a c e |
-        // | b d f |
+        //
+        //   x y z (axis)
+        // | a c tx |
+        // | b d ty |
         // | 0 0 1 |
+        //
+        // from
+        //
+        // Mat4 {
+        // x_axis: Vec4(a, b, 0.0, 0.0),
+        // y_axis: Vec4(c, d, 0.0, 0.0),
+        // z_axis: Vec4(0.0, 0.0, 1.0, 0.0),
+        // w_axis: Vec4(tx, ty, 0.0, 1.0)
+        // }
         SvgTransformAttribute::Matrix {
-            a: cos_a * sx,
-            b: -sin_a * sy,
-            c: sin_a * sx,
-            d: cos_a * sy,
-            tx,
-            ty,
+            a: mat4.x_axis.x,
+            b: mat4.x_axis.y,
+            c: mat4.y_axis.x,
+            d: mat4.y_axis.y,
+            tx: mat4.w_axis.x,
+            ty: mat4.w_axis.y,
         }
     }
 }
 
 impl From<&Mat3> for SvgTransformAttribute {
     fn from(mat3: &Mat3) -> Self {
-        //   x y z
-        // | a d tx |
-        // | b e ty |
-        // | c f j |
-        // https://developer.mozilla.org/en-US/docs/Web/CSS/transform-function/matrix
+        // https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/transform
+        // https://docs.aspose.com/svg/net/drawing-basics/transformation-matrix/
+        //
+        //   x y z (axis)
+        // | a c tx |
+        // | b d ty |
+        // | 0 0 1 |
+        // from
+        //
+        // Mat3 {
+        // x_axis: Vec4(a, b, 0.0),
+        // y_axis: Vec4(c, d, 0.0),
+        // z_axis: Vec4(tx, ty, 1.0),
+        // }
         Self::Matrix {
             a: mat3.x_axis.x,
             b: mat3.x_axis.y,
