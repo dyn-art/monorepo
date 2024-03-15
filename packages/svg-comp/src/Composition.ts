@@ -190,8 +190,12 @@ export class Composition {
 	// Other
 	// =========================================================================
 
-	public logEntityComponentsRaw(entity: Entity): void {
-		this._svgCompHandle.logEntityComponentsRaw(entity);
+	public logEntityComponentsRaw(rawEntity: number): void {
+		this._svgCompHandle.logEntityComponentsRaw(rawEntity);
+	}
+
+	public logEntityComponents(entity: Entity): void {
+		this._svgCompHandle.logEntityComponents(entity);
 	}
 
 	public toString(): string | null {

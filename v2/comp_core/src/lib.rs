@@ -3,6 +3,7 @@ mod systems;
 
 use bevy_app::{App, Plugin, Update};
 use bevy_ecs::schedule::{IntoSystemConfigs, IntoSystemSetConfigs, SystemSet};
+use bevy_transform::TransformPlugin;
 use dyn_comp_asset::CompAssetPlugin;
 use dyn_comp_common::events::{
     CompositionResizedInputEvent, CompositionViewportChangedInputEvent, EntityDeletedInputEvent,
@@ -50,6 +51,7 @@ impl Plugin for CompCorePlugin {
     fn build(&self, app: &mut App) {
         // Register plugins
         app.add_plugins(CompAssetPlugin);
+        app.add_plugins(TransformPlugin);
 
         // Register events
         app.add_event::<CompositionResizedInputEvent>();
@@ -99,7 +101,7 @@ impl Plugin for CompCorePlugin {
 #[cfg(feature = "dtif")]
 fn inject_dtif_into_ecs(world: &mut bevy_ecs::world::World, dtif: &dyn_comp_dtif::DtifComposition) {
     use dyn_comp_asset::resources::AssetDatabaseRes;
-    use dyn_comp_common::common::{Size, Viewport};
+    use dyn_comp_common::common::Viewport;
     use glam::Vec2;
 
     let mut dtif_injector = dyn_comp_dtif::dtif_injector::DtifInjector::new();
