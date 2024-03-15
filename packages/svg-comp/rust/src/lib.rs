@@ -96,7 +96,7 @@ impl SvgCompHandle {
         while let Ok(event) = self.svg_builder_output_event_receiver.try_recv() {
             match event {
                 SvgBuilderOutputEvent::SvgElementChanges(event) => {
-                    output_events.push(SvgCompOutputEvent::SvgElementChanges(event))
+                    output_events.push(SvgCompOutputEvent::SvgElementChange(event))
                 }
                 _ => {}
             }

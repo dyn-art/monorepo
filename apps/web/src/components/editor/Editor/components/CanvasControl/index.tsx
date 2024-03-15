@@ -3,13 +3,12 @@
 import React from 'react';
 import type { Composition } from '@dyn/svg-comp';
 
-import { useOutputEvent } from '../../hooks';
+import { useComposition, useSelectedEntities } from '../../hooks';
 import { EntitySelectionBox } from './EntitySelectionBox';
 
 export const CanvasControl: React.FC<TProps> = (props) => {
-	const { composition } = props;
-	useOutputEvent(composition, 'CompositionChange');
-	const { selected: selectedEntities = [] } = useOutputEvent(composition, 'SelectionChange') ?? {};
+	const composition = useComposition(props.composition);
+	const selectedEntities = useSelectedEntities(composition);
 
 	return (
 		<svg

@@ -1,7 +1,7 @@
 #![cfg(feature = "output_svg_element_changes")]
 
 use crate::{
-    events::{SvgBuilderOutputEvent, SvgElementChangesOutputEvent},
+    events::{SvgBuilderOutputEvent, SvgElementChangeOutputEvent},
     resources::{
         changed_svg_bundles::{ChangedSvgBundle, ChangedSvgBundlesRes},
         output_event_sender::OutputEventSenderRes,
@@ -42,7 +42,7 @@ fn queue_changed_bundles(
     // Send output events
     for changed_bundle in sorted_changed_bundles {
         for element_changes in changed_bundle.elements_changes {
-            let event = SvgBuilderOutputEvent::SvgElementChanges(SvgElementChangesOutputEvent {
+            let event = SvgBuilderOutputEvent::SvgElementChanges(SvgElementChangeOutputEvent {
                 id: element_changes.id,
                 changes: element_changes.changes,
             });
@@ -111,7 +111,7 @@ fn queue_deferred_elements_changes(
 ) {
     // Send output events
     for deferred_elements_change in deferred_elements_changes {
-        let event = SvgBuilderOutputEvent::SvgElementChanges(SvgElementChangesOutputEvent {
+        let event = SvgBuilderOutputEvent::SvgElementChanges(SvgElementChangeOutputEvent {
             id: deferred_elements_change.id,
             changes: deferred_elements_change.changes,
         });

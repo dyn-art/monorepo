@@ -5,14 +5,15 @@ import type {
 	CompositionChangeOutputEvent,
 	DtifComposition,
 	Entity,
+	InteractionModeChangeOutputEvent,
 	SelectionChangeOutputEvent,
 	SvgCompInputEvent,
 	SvgCompOutputEvent,
-	SvgElementChangesOutputEvent,
+	SvgElementChangeOutputEvent,
 	Vec2,
 	Viewport,
 	WatchableComponentVariant,
-	WatchedEntityChangesOutputEvent
+	WatchedEntityChangeOutputEvent
 } from '@/rust/dyn-svg-comp-api/bindings';
 
 import type { Renderer } from './render';
@@ -149,7 +150,7 @@ export class Composition {
 		}
 
 		// Register callback
-		const unregister = this.watchOutputEvent('WatchedEntityChanges', (event) => {
+		const unregister = this.watchOutputEvent('WatchedEntityChange', (event) => {
 			if (event.entity === entity) {
 				callback(entity, event.changes);
 			}
@@ -204,14 +205,15 @@ export interface TCompositionConfig {
 }
 
 export interface TOutputEventTypeMap {
-	SvgElementChanges: SvgElementChangesOutputEvent;
-	WatchedEntityChanges: WatchedEntityChangesOutputEvent;
+	SvgElementChange: SvgElementChangeOutputEvent;
+	WatchedEntityChange: WatchedEntityChangeOutputEvent;
 	SelectionChange: SelectionChangeOutputEvent;
 	CompositionChange: CompositionChangeOutputEvent;
+	InteractionModeChange: InteractionModeChangeOutputEvent;
 }
 
 export type TWatchedOutputEventCallback<GEventType extends keyof TOutputEventTypeMap> = (
-	value: TOutputEventTypeMap[GEventType]
+	event: TOutputEventTypeMap[GEventType]
 ) => void;
 
 interface TWatchedOutputEventCallbackEntry<GEventType extends keyof TOutputEventTypeMap> {
