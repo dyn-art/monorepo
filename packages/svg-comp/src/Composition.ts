@@ -24,6 +24,7 @@ export class Composition {
 
 	private _size: Vec2;
 	private _viewport: Viewport;
+	private _selectedEntities: Entity[];
 
 	private _inputEventQueue: SvgCompInputEvent[] = [];
 	private _watchedOutputEventCallbackMap: TWatchedOutputEventsCallbackMap = {};
@@ -39,6 +40,9 @@ export class Composition {
 			this._size = event.size;
 			this._viewport = event.viewport;
 		});
+		this.watchOutputEvent('SelectionChange', (event) => {
+			this._selectedEntities = event.selectedEntities;
+		});
 	}
 
 	// =========================================================================
@@ -51,6 +55,10 @@ export class Composition {
 
 	public get viewport(): Readonly<Viewport> {
 		return this._viewport;
+	}
+
+	public get selectedEntities(): Readonly<Entity[]> {
+		return this._selectedEntities;
 	}
 
 	public get renderer(): Renderer | null {

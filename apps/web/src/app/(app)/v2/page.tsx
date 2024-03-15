@@ -75,8 +75,22 @@ const DEFAULT_DTIF: COMP.DtifComposition = {
 					paintId: 'p3'
 				}
 			],
-			size: [100, 200],
-			translation: [(WIDTH - 100) / 2, (HEIGHT - 200) / 2]
+			size: [100, 100],
+			translation: [(WIDTH - 100) / 2, (HEIGHT - 100) / 2]
+		},
+		n4: {
+			type: 'Rectangle',
+			styles: [
+				{
+					type: 'Fill',
+					blendMode: 'Normal',
+					opacity: 1,
+					paintId: 'p3'
+				}
+			],
+			size: [100, 100],
+			translation: [0, 0],
+			rotationDeg: 45
 		}
 	},
 	paints: {

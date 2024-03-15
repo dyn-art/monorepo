@@ -7,10 +7,14 @@ use bevy_transform::TransformPlugin;
 use dyn_comp_asset::CompAssetPlugin;
 use dyn_comp_common::events::{
     CompositionResizedInputEvent, CompositionViewportChangedInputEvent, EntityDeletedInputEvent,
-    EntityMovedInputEvent, EntitySetPositionInputEvent,
+    EntityMovedInputEvent, EntitySetPositionInputEvent, EntitySetRotationInputEvent,
 };
 use resources::composition::CompositionRes;
 use systems::{
+    events::{
+        handle_entity_deleted_event, handle_entity_moved_event, handle_entity_set_position_event,
+        handle_entity_set_rotation_event,
+    },
     outline::{
         ellipse::outline_ellipse, polygon::outline_polygon, rectangle::outline_rectangle,
         star::outline_star,
@@ -59,6 +63,8 @@ impl Plugin for CompCorePlugin {
         app.add_event::<EntityDeletedInputEvent>();
         app.add_event::<EntityMovedInputEvent>();
         app.add_event::<EntitySetPositionInputEvent>();
+        app.add_event::<EntityDeletedInputEvent>();
+        app.add_event::<EntitySetRotationInputEvent>();
 
         // Register resources
         #[cfg(not(feature = "dtif"))]
@@ -85,6 +91,10 @@ impl Plugin for CompCorePlugin {
         app.add_systems(
             Update,
             (
+                handle_entity_deleted_event.in_set(CompCoreSystemSet::InputEvents),
+                handle_entity_moved_event.in_set(CompCoreSystemSet::InputEvents),
+                handle_entity_set_position_event.in_set(CompCoreSystemSet::InputEvents),
+                handle_entity_set_rotation_event.in_set(CompCoreSystemSet::InputEvents),
                 outline_rectangle.in_set(CompCoreSystemSet::Outline),
                 outline_ellipse.in_set(CompCoreSystemSet::Outline),
                 outline_star.in_set(CompCoreSystemSet::Outline),

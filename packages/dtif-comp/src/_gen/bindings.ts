@@ -22,7 +22,7 @@ export type Centimeter = number
 
 export type Color = { red: number; green: number; blue: number }
 
-export type CompCoreInputEvent = ({ type: "CompositionResized" } & CompositionResizedInputEvent) | ({ type: "CompositionViewportChanged" } & CompositionViewportChangedInputEvent) | ({ type: "EntityMoved" } & EntityMovedInputEvent) | ({ type: "EntitySetPosition" } & EntitySetPositionInputEvent) | ({ type: "EntityDeleted" } & EntityDeletedInputEvent)
+export type CompCoreInputEvent = ({ type: "EntityDeleted" } & EntityDeletedInputEvent) | ({ type: "CompositionResized" } & CompositionResizedInputEvent) | ({ type: "CompositionViewportChanged" } & CompositionViewportChangedInputEvent) | ({ type: "EntityMoved" } & EntityMovedInputEvent) | ({ type: "EntitySetPosition" } & EntitySetPositionInputEvent) | ({ type: "EntitySetRotation" } & EntitySetRotationInputEvent)
 
 export type ComponentChange = { type: "Size"; size: Size } | { type: "Transform"; rotationDeg: number; translation: Vec2 }
 
@@ -108,6 +108,8 @@ export type EntityDeletedInputEvent = { entity: Entity }
 export type EntityMovedInputEvent = { entity: Entity; dx: number; dy: number }
 
 export type EntitySetPositionInputEvent = { entity: Entity; x: number; y: number }
+
+export type EntitySetRotationInputEvent = { entity: Entity; rotationDeg: Degree }
 
 export type FillStyle = { paintId: string; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity }
 

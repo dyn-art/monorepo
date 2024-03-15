@@ -514,6 +514,7 @@ version = "0.0.1"
 dependencies = [
  "bevy_app",
  "bevy_ecs",
+ "bevy_hierarchy",
  "bevy_transform",
  "dyn-comp-asset",
  "dyn-comp-common",

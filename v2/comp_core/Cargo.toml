@@ -19,6 +19,7 @@ dyn-comp-common = { path = "../comp_common" }
 dyn-comp-dtif = { path = "../comp_dtif", optional = true }
 bevy_app = { workspace = true }
 bevy_ecs = { workspace = true }
+bevy_hierarchy = { workspace = true }
 bevy_transform = { workspace = true }
 glam = { workspace = true }
 log = { workspace = true }

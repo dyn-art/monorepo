@@ -27,6 +27,21 @@ export const InnerEditor: React.FC<TInnerEditorProps> = (props) => {
 				>
 					To String
 				</Button>
+				<Button
+					onClick={() => {
+						if (composition != null) {
+							for (const selectedEntity of composition.selectedEntities) {
+								composition.emitInputEvent({
+									type: 'Composition',
+									event: { type: 'EntitySetRotation', entity: selectedEntity, rotationDeg: 45 }
+								});
+							}
+							composition.update();
+						}
+					}}
+				>
+					Rotate Selected
+				</Button>
 			</div>
 		</div>
 	);
