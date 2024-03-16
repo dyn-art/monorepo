@@ -1,5 +1,3 @@
-use std::fmt::{Error, Write};
-
 use super::{
     attributes::{SvgAttributeColor, SvgPathAttribute, SvgTransformAttribute},
     styles::{SvgBlendModeStyle, SvgStyleColor},
@@ -10,6 +8,7 @@ use dyn_comp_common::{
     math::convert_rh_to_lh,
 };
 use glam::Mat3;
+use std::fmt::{Error, Write};
 use tiny_skia_path::{Path, PathSegment};
 
 impl From<&Transform> for SvgTransformAttribute {
