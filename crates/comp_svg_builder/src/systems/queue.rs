@@ -95,9 +95,12 @@ fn process_root_bundles(
     // Process root bundles in depth-first order
     while let Some(change) = root_bundles.pop_front() {
         if let Some(children) = parent_to_children.remove(&Some(change.entity)) {
-            for child in children {
-                root_bundles.push_back(child);
-            }
+            // Note: Reverse the order because in a SVG, the top-most element appears last in the children "array",
+            // contrary to the DtifComposition convention where the first element (index = 0) is at the top
+            children
+                .into_iter()
+                .rev()
+                .for_each(|child| root_bundles.push_back(child));
         }
         sorted_changed_bundles.push(change);
     }

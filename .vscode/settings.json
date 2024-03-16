@@ -9,7 +9,8 @@
 		"**/node_modules": true,
 		"**/dist": true,
 		"**/*.next": true,
-		"**/target": true
+		"**/target": true,
+		"**/_deprecated": true
 	},
 	"files.associations": {
 		"*.scss": "postcss",

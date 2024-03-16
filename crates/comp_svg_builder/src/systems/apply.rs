@@ -61,6 +61,8 @@ pub fn apply_node_children_changes(
         let children_query = query_set.p0();
         for (parent_entity, children, node_bundle_variant) in children_query.iter() {
             if let Some(child_node_entities) = node_bundle_variant.get_child_node_entities() {
+                // Note: Reverse the order because in a SVG, the top-most element appears last in the children "array",
+                // contrary to the DtifComposition convention where the first element (index = 0) is at the top
                 let new_child_node_entities: SmallVec<[Entity; 2]> =
                     children.iter().copied().rev().collect();
 
@@ -225,6 +227,8 @@ pub fn apply_node_styles_changes(
 ) {
     for (StyleChildrenMixin(styles), mut node_bundle_variant) in query.iter_mut() {
         if let Some(style_entities) = node_bundle_variant.get_style_entities() {
+            // Note: Reverse the order because in a SVG, the top-most element appears last in the children "array",
+            // contrary to the DtifComposition convention where the first element (index = 0) is at the top
             let new_style_entities: SmallVec<[Entity; 2]> = styles.iter().copied().rev().collect();
 
             // Identify removed and newly added style entities
