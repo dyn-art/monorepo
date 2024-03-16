@@ -21,6 +21,9 @@ slotmap = "1.0.7"
 tinyvec = { workspace = true }
 imagesize = "0.12"
 
-# serde_support
+# Logging
+log = { workspace = true }
+
+# serde_support (feature)
 specta = { workspace = true, features = ["serde"], optional = true }
 serde = { workspace = true, features = ["derive"], optional = true }
