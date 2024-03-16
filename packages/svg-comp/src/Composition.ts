@@ -9,11 +9,11 @@ import type {
 	SelectionChangeOutputEvent,
 	SvgCompInputEvent,
 	SvgCompOutputEvent,
-	SvgElementChangeOutputEvent,
+	SvgElementChangesOutputEvent,
 	Vec2,
 	Viewport,
 	WatchableComponentVariant,
-	WatchedEntityChangeOutputEvent
+	WatchedEntityChangesOutputEvent
 } from '@/rust/dyn-svg-comp-api/bindings';
 
 import type { Renderer } from './render';
@@ -217,8 +217,8 @@ export interface TCompositionConfig {
 }
 
 export interface TOutputEventTypeMap {
-	SvgElementChange: SvgElementChangeOutputEvent;
-	WatchedEntityChange: WatchedEntityChangeOutputEvent;
+	SvgElementChange: SvgElementChangesOutputEvent;
+	WatchedEntityChange: WatchedEntityChangesOutputEvent;
 	SelectionChange: SelectionChangeOutputEvent;
 	CompositionChange: CompositionChangeOutputEvent;
 	InteractionModeChange: InteractionModeChangeOutputEvent;

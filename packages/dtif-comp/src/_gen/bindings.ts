@@ -282,7 +282,7 @@ export type SvgBuilderOutputEvent =
  * Represents incremental changes to an SVG element.
  * Emitted when the "output_svg_element_changes" feature is enabled.
  */
-({ type: "SvgElementChanges" } & SvgElementChangeOutputEvent) | 
+({ type: "SvgElementChanges" } & SvgElementChangesOutputEvent) | 
 /**
  * Contains the complete SVG as a string.
  * Emitted when the "output_svg_string" feature is enabled.
@@ -291,7 +291,7 @@ export type SvgBuilderOutputEvent =
 
 export type SvgCompInputEvent = { type: "Composition"; event: CompCoreInputEvent } | { type: "Interaction"; event: InteractionInputEvent }
 
-export type SvgCompOutputEvent = ({ type: "SvgElementChange" } & SvgElementChangeOutputEvent) | ({ type: "CompositionChange" } & CompositionChangeOutputEvent) | ({ type: "WatchedEntityChange" } & WatchedEntityChangeOutputEvent) | ({ type: "SelectionChange" } & SelectionChangeOutputEvent) | ({ type: "InteractionModeChange" } & InteractionModeChangeOutputEvent)
+export type SvgCompOutputEvent = ({ type: "SvgElementChange" } & SvgElementChangesOutputEvent) | ({ type: "CompositionChange" } & CompositionChangeOutputEvent) | ({ type: "WatchedEntityChange" } & WatchedEntityChangesOutputEvent) | ({ type: "SelectionChange" } & SelectionChangeOutputEvent) | ({ type: "InteractionModeChange" } & InteractionModeChangeOutputEvent)
 
 export type SvgDisplayStyle = "Block" | "None"
 
@@ -302,7 +302,7 @@ export type SvgElementAppendedChange = { parentId: SvgElementId }
 
 export type SvgElementChange = ({ type: "ElementCreated" } & SvgElementCreatedChange) | ({ type: "ElementDeleted" }) | ({ type: "ElementAppended" } & SvgElementAppendedChange) | ({ type: "AttributeUpdated" } & SvgAttributeUpdatedChange) | ({ type: "AttributeRemoved" } & SvgAttributeRemovedChange) | ({ type: "StyleUpdated" } & SvgStyleUpdatedChange) | ({ type: "StyleRemoved" } & SvgStyleRemovedChange) | ({ type: "ElementChildrenReordered" } & SvgElementChildrenReorderedChange)
 
-export type SvgElementChangeOutputEvent = { id: SvgElementId; changes: SvgElementChange[] }
+export type SvgElementChangesOutputEvent = { id: SvgElementId; changes: SvgElementChange[] }
 
 /**
  * Emitted when children of a SvgElement are reordered.
@@ -399,7 +399,7 @@ export type Viewport = { physicalPosition: Vec2; physicalSize: Size }
 
 export type WatchableComponentVariant = "Size" | "Transform"
 
-export type WatchedEntityChangeOutputEvent = { entity: Entity; changes: ComponentChange[] }
+export type WatchedEntityChangesOutputEvent = { entity: Entity; changes: ComponentChange[] }
 
 export type WheeledOnCompInputEvent = { position: Vec2; delta: Vec2; ctrlKeyPressed: boolean; metaKeyPressed: boolean }
 

@@ -1,6 +1,6 @@
 import type {
 	CompositionChangeOutputEvent,
-	SvgElementChangeOutputEvent,
+	SvgElementChangesOutputEvent,
 	Vec2
 } from '@/rust/dyn-svg-comp-api/bindings';
 
@@ -30,7 +30,7 @@ export abstract class Renderer {
 		return this._isCallbackBased;
 	}
 
-	public abstract applyElementChanges(event: SvgElementChangeOutputEvent): void;
+	public abstract applyElementChanges(event: SvgElementChangesOutputEvent): void;
 	public abstract applyCompositionChange(event: CompositionChangeOutputEvent): void;
 	public abstract clear(): void;
 	public abstract clientWindowPointToCompPoint(clientPoint: Vec2): Vec2;

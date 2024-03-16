@@ -1,7 +1,7 @@
 import { intoMouseButton } from '@dyn/dtif-comp';
 import type {
 	CompositionChangeOutputEvent,
-	SvgElementChangeOutputEvent,
+	SvgElementChangesOutputEvent,
 	SvgElementId,
 	Vec2
 } from '@/rust/dyn-svg-comp-api/bindings';
@@ -133,7 +133,7 @@ export class SvgRenderer extends Renderer {
 		});
 	}
 
-	public applyElementChanges(event: SvgElementChangeOutputEvent): void {
+	public applyElementChanges(event: SvgElementChangesOutputEvent): void {
 		let element: SVGElement | null = null;
 		const getElement = (): SVGElement | null => {
 			if (element == null) {
