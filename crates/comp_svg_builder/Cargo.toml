@@ -1,0 +1,40 @@
+[package]
+name = "dyn-comp-svg-builder"
+version = "0.0.1"
+description = ""
+edition = { workspace = true }
+homepage = { workspace = true }
+repository = { workspace = true }
+license = { workspace = true }
+authors = { workspace = true }
+
+[features]
+default = []
+serde_support = ["dep:serde", "dep:specta", "dyn-comp-common/serde_support"]
+output_svg_element_changes = []
+output_svg_string = []
+tracing = []
+
+[dependencies]
+dyn-comp-asset = { path = "../comp_asset" }
+dyn-comp-common = { path = "../comp_common" }
+base64 = "0.22.0"
+bevy_app = { workspace = true }
+bevy_ecs = { workspace = true }
+bevy_hierarchy = { workspace = true }
+bevy_transform = { workspace = true }
+glam = { workspace = true }
+imagesize = "0.12"
+smallvec = { workspace = true }
+tiny-skia-path = { workspace = true }
+
+# Logging
+log = { workspace = true }
+
+# serde_support (feature)
+specta = { workspace = true, features = [
+    "serde",
+    "glam",
+    "bevy_ecs",
+], optional = true }
+serde = { workspace = true, features = ["derive"], optional = true }

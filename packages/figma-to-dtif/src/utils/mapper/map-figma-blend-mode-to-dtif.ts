@@ -1,6 +1,6 @@
-import type { COMP } from '@dyn/dtif';
+import type { COMP } from '@dyn/dtif-comp';
 
-export function mapFigmaBlendModeToDTIF(figmaBlendMode?: BlendMode): COMP.BlendMode {
+export function mapFigmaBlendModeToDtif(figmaBlendMode?: BlendMode): COMP.BlendMode {
 	switch (figmaBlendMode) {
 		case 'NORMAL':
 			return 'Normal';

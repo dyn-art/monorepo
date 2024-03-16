@@ -34,31 +34,31 @@ async function processNode(node: FrameNode, instance: TPluginHandler): Promise<v
 
 	try {
 		const result = await transformer.transform({
-			font: {
-				export: { mode: 'Inline' },
-				resolveFontContent: async (fontMetadata) => {
-					const urlResponse = await googleClient.getFontFileUrl(fontMetadata.family, {
-						fontWeight: fontMetadata.weight,
-						fontStyle: fontMetadata.style === 'Italic' ? 'italic' : 'regular'
-					});
-					const url = urlResponse.unwrap();
-					if (url == null) {
-						return null;
-					}
+			asset: {
+				font: {
+					export: { mode: 'Inline' },
+					resolveFontContent: async (fontMetadata) => {
+						const urlResponse = await googleClient.getFontFileUrl(fontMetadata.family, {
+							fontWeight: fontMetadata.weight,
+							fontStyle: fontMetadata.style === 'Italic' ? 'italic' : 'regular'
+						});
+						const url = urlResponse.unwrap();
+						if (url == null) {
+							return null;
+						}
 
-					return {
-						type: 'Url',
-						url,
-						contentType: { mimeType: 'font/ttf' }
-					};
-				}
-			},
-			paint: {
+						return {
+							type: 'Url',
+							url,
+							contentType: { mimeType: 'font/ttf' }
+						};
+					}
+				},
 				image: { export: { format: 'PNG', mode: 'Inline' } }
 			},
 			node: {
 				includeInvisible: false,
-				shouldExportFrame: { contentType: 'PNG' }
+				shouldExportFrame: { format: 'PNG' }
 			}
 		});
 		await handleSuccess(result, node, instance);
@@ -69,7 +69,7 @@ async function processNode(node: FrameNode, instance: TPluginHandler): Promise<v
 }
 
 async function handleSuccess(
-	result: COMP.DTIFComposition,
+	result: COMP.DtifComposition,
 	node: SceneNode,
 	instance: TPluginHandler
 ): Promise<void> {

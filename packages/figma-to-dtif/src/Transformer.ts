@@ -1,22 +1,21 @@
-import type { COMP } from '@dyn/dtif';
+import type { COMP } from '@dyn/dtif-comp';
 import { ContinuousId, sleep } from '@dyn/utils';
 
 import { FailedToResolveRootNodeException } from './exceptions';
 import {
 	FigmaNodeTreeProcessor,
-	type TToTransformFont,
+	type TToTransformAsset,
 	type TToTransformNode,
 	type TToTransformPaint
 } from './FigmaNodeTreeProcessor';
 import {
-	transformFont,
+	transformAsset,
 	transformNode,
 	transformPaint,
-	type TTransformFontConfig,
-	type TTransformNodeConfig,
-	type TTransformPaintConfig
+	type TTransformAssetConfig,
+	type TTransformNodeConfig
 } from './transform';
-import { resetNodeBundleTransform } from './utils';
+import { resetDtifNodeTransform } from './utils';
 
 export class Transformer {
 	// Figma Nodes
@@ -25,7 +24,7 @@ export class Transformer {
 	private _nodesFailedToTransform: TToTransformNode[] = [];
 
 	// DTIF Nodes
-	public readonly nodes = new Map<number, COMP.NodeBundle>();
+	public readonly nodes = new Map<number, COMP.Node>();
 	private _rootNodeId: number;
 
 	// Figma Paints
@@ -33,14 +32,14 @@ export class Transformer {
 	private _paintsFailedToTransform: TToTransformPaint[] = [];
 
 	// DTIF Paints
-	public readonly paints = new Map<number, COMP.PaintBundle>();
+	public readonly paints = new Map<number, COMP.Paint>();
 
-	// Fonts
-	private _toTransformFonts: TToTransformFont[] = [];
-	private _fontsFailedToTransform: TToTransformFont[] = [];
+	// Assets
+	private _toTransformAssets: TToTransformAsset[] = [];
+	private _assetsFailedToTransform: TToTransformAsset[] = [];
 
-	// DTIF Fonts
-	public readonly fonts = new Map<number, COMP.Font>();
+	// DTIF Assets
+	public readonly assets = new Map<number, COMP.Asset>();
 
 	// Callbacks
 	private _onTransformStatusUpdate: TOnTransformStatusUpdate | null = null;
@@ -51,34 +50,32 @@ export class Transformer {
 		this._onTransformStatusUpdate = onTransformStatusUpdate;
 	}
 
-	public async transform(config: TTransformConfig): Promise<COMP.DTIFComposition> {
+	public async transform(config: TTransformConfig): Promise<COMP.DtifComposition> {
 		ContinuousId.ZERO;
 		const nodeConfig: TTransformNodeConfig = {
 			includeInvisible: true,
 			exportContainerNode: this.createExportContainerNode(
 				'⏳ Temp export container | Delete if dyn.art plugin not active'
 			),
-			shouldExportFrame: { contentType: 'SVG' },
+			shouldExportFrame: { format: 'SVG' },
 			...(config.node ?? {})
 		};
-		const paintConfig = config.paint;
-		const fontConfig = config.font;
 
 		await this.onTransformStatusUpdate({ type: ETransformStatus.START });
 
-		// Walk Figma tree and discover to transform nodes, paints and fonts
-		const { rootId, toTransformNodes, toTransformPaints, toTransformFonts } =
+		// Walk Figma tree and discover to transform nodes, paints and assets
+		const { rootId, toTransformNodes, toTransformPaints, toTransformAssets } =
 			new FigmaNodeTreeProcessor(this._toTransformRootNode).processNodeTree();
 		this._rootNodeId = rootId;
 		this._toTransformNodes = toTransformNodes;
 		this._toTransformPaints = toTransformPaints;
-		this._toTransformFonts = toTransformFonts;
+		this._toTransformAssets = toTransformAssets;
 
 		this._onTransformStatusUpdate?.({
 			type: ETransformStatus.TRAVERSED_TREE,
 			toTransformNodesCount: this._toTransformNodes.length,
 			toTransformPaintsCount: this._toTransformPaints.length,
-			toTransformFontsCount: this._toTransformFonts.length
+			toTransformAssetsCount: this._toTransformAssets.length
 		});
 
 		// Transform nodes
@@ -87,36 +84,32 @@ export class Transformer {
 
 		// Transform paints
 		await this.onTransformStatusUpdate({ type: ETransformStatus.TRANSFORMING_PAINTS });
-		await this.transformPaints(paintConfig);
+		await this.transformPaints();
 
-		// Transform fonts
-		await this.onTransformStatusUpdate({ type: ETransformStatus.TRANSFORMING_FONTS });
-		await this.transformFonts(fontConfig);
+		// Transform assets
+		await this.onTransformStatusUpdate({ type: ETransformStatus.TRANSFORMING_ASSETS });
+		await this.transformAssets(config.asset);
 
 		// Reset root node layout
 		const rootNode = this.nodes.get(this._rootNodeId);
 		if (rootNode != null) {
-			resetNodeBundleTransform(rootNode);
+			resetDtifNodeTransform(rootNode);
 		} else {
 			throw new FailedToResolveRootNodeException();
 		}
 
 		// Construct composition
 		await this.onTransformStatusUpdate({ type: ETransformStatus.CONSTRUCTING_COMPOSITON });
-		const composition: COMP.DTIFComposition = {
+		const composition: COMP.DtifComposition = {
 			version: '1.0',
-			name: this._toTransformRootNode.name,
-			width: this._toTransformRootNode.width,
-			height: this._toTransformRootNode.height,
+			size: [this._toTransformRootNode.width, this._toTransformRootNode.height],
+			rootNodeId: this._rootNodeId.toString(),
 			nodes: Object.fromEntries(this.nodes),
 			paints: Object.fromEntries(this.paints),
-			fonts: Object.fromEntries(this.fonts),
-			rootNodeId: this._rootNodeId,
-			viewBox: {
-				minX: 0,
-				minY: 0,
-				width: this._toTransformRootNode.width,
-				height: this._toTransformRootNode.height
+			assets: Object.fromEntries(this.assets),
+			viewport: {
+				physicalPosition: [0, 0],
+				physicalSize: [this._toTransformRootNode.width, this._toTransformRootNode.height]
 			}
 		};
 
@@ -153,11 +146,11 @@ export class Transformer {
 		}
 	}
 
-	public insertNode(id: number, node: COMP.NodeBundle): void {
+	public insertNode(id: number, node: COMP.Node): void {
 		this.nodes.set(id, node);
 	}
 
-	private async transformPaints(config: TTransformPaintConfig): Promise<void> {
+	private async transformPaints(): Promise<void> {
 		const toTransformPaints = this._toTransformPaints
 			.splice(0, this._toTransformPaints.length)
 			.concat(this._paintsFailedToTransform.splice(0, this._paintsFailedToTransform.length));
@@ -165,7 +158,7 @@ export class Transformer {
 		// Transform paints
 		for (const toTransformPaint of toTransformPaints) {
 			try {
-				const paint = await transformPaint(toTransformPaint, config);
+				const paint = await transformPaint(toTransformPaint);
 				this.insertPaint(toTransformPaint.id, paint);
 			} catch (error) {
 				// TODO: Error
@@ -174,29 +167,29 @@ export class Transformer {
 		}
 	}
 
-	public insertPaint(id: number, paint: COMP.PaintBundle): void {
+	public insertPaint(id: number, paint: COMP.Paint): void {
 		this.paints.set(id, paint);
 	}
 
-	private async transformFonts(config: TTransformFontConfig): Promise<void> {
-		const toTransformFonts = this._toTransformFonts
-			.splice(0, this._toTransformFonts.length)
-			.concat(this._fontsFailedToTransform.splice(0, this._fontsFailedToTransform.length));
+	private async transformAssets(config: TTransformAssetConfig): Promise<void> {
+		const toTransformAssets = this._toTransformAssets
+			.splice(0, this._toTransformAssets.length)
+			.concat(this._assetsFailedToTransform.splice(0, this._assetsFailedToTransform.length));
 
-		// Transform fonts
-		for (const toTransformFont of toTransformFonts) {
+		// Transform assets
+		for (const toTransformAsset of toTransformAssets) {
 			try {
-				const font = await transformFont(toTransformFont, config);
-				this.insertFont(toTransformFont.id, font);
+				const asset = await transformAsset(toTransformAsset, config);
+				this.insertAsset(toTransformAsset.id, asset);
 			} catch (error) {
 				// TODO: Error
-				this._fontsFailedToTransform.push(toTransformFont);
+				this._assetsFailedToTransform.push(toTransformAsset);
 			}
 		}
 	}
 
-	public insertFont(id: number, font: COMP.Font): void {
-		this.fonts.set(id, font);
+	public insertAsset(id: number, asset: COMP.Asset): void {
+		this.assets.set(id, asset);
 	}
 
 	private createExportContainerNode(name: string): FrameNode {
@@ -210,8 +203,7 @@ export class Transformer {
 
 export interface TTransformConfig {
 	node?: Partial<TTransformNodeConfig>;
-	font: TTransformFontConfig;
-	paint: TTransformPaintConfig;
+	asset: TTransformAssetConfig;
 }
 
 export interface TTransformerOptions {
@@ -226,11 +218,11 @@ export type TTransformStatusUpdate =
 			type: ETransformStatus.TRAVERSED_TREE;
 			toTransformNodesCount: number;
 			toTransformPaintsCount: number;
-			toTransformFontsCount: number;
+			toTransformAssetsCount: number;
 	  }
 	| { type: ETransformStatus.TRANSFORMING_NODES }
 	| { type: ETransformStatus.TRANSFORMING_PAINTS }
-	| { type: ETransformStatus.TRANSFORMING_FONTS }
+	| { type: ETransformStatus.TRANSFORMING_ASSETS }
 	| { type: ETransformStatus.CONSTRUCTING_COMPOSITON }
 	| { type: ETransformStatus.END };
 
@@ -239,13 +231,7 @@ export enum ETransformStatus {
 	TRAVERSED_TREE,
 	TRANSFORMING_NODES,
 	TRANSFORMING_PAINTS,
-	TRANSFORMING_FONTS,
+	TRANSFORMING_ASSETS,
 	CONSTRUCTING_COMPOSITON,
 	END
 }
-
-export type TOnTraversedTree = (data: {
-	toTransformNodesCount: number;
-	toTransformPaintsCount: number;
-	toTransformFontsCount: number;
-}) => void;

@@ -1,6 +1,7 @@
-import type { COMP } from '@dyn/dtif';
+import type { COMP } from '@dyn/dtif-comp';
 
-export function resetNodeBundleTransform(node: COMP.NodeBundle): COMP.NodeBundle {
-	node.relativeTransform = [1, 0, 0, 0, 1, 0, 0, 0, 1];
+export function resetDtifNodeTransform(node: COMP.Node): COMP.Node {
+	node.translation = [0, 0];
+	node.rotationDeg = 0;
 	return node;
 }

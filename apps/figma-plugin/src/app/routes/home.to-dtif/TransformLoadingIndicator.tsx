@@ -38,7 +38,7 @@ export const TransformLoadingIndicator: React.FC<TProps> = (props) => {
 								break;
 							case ETransformStatus.TRAVERSED_TREE:
 								setSubMessage(
-									`Transforming ${args.status.toTransformNodesCount} Nodes, ${args.status.toTransformPaintsCount} Paints and  ${args.status.toTransformFontsCount} Fonts`
+									`Transforming ${args.status.toTransformNodesCount} Nodes, ${args.status.toTransformPaintsCount} Paints and  ${args.status.toTransformAssetsCount} Assets`
 								);
 								break;
 							case ETransformStatus.TRANSFORMING_NODES:
@@ -47,8 +47,8 @@ export const TransformLoadingIndicator: React.FC<TProps> = (props) => {
 							case ETransformStatus.TRANSFORMING_PAINTS:
 								setMessage('Transforming Paints');
 								break;
-							case ETransformStatus.TRANSFORMING_FONTS:
-								setMessage('Transforming Fonts');
+							case ETransformStatus.TRANSFORMING_ASSETS:
+								setMessage('Transforming Assets');
 								break;
 							case ETransformStatus.CONSTRUCTING_COMPOSITON:
 								setMessage('Constructing Composition');

@@ -1,0 +1,34 @@
+[package]
+name = "dyn-comp-common"
+version = "0.0.1"
+description = ""
+edition = { workspace = true }
+homepage = { workspace = true }
+repository = { workspace = true }
+license = { workspace = true }
+authors = { workspace = true }
+
+[features]
+default = []
+serde_support = ["dep:serde", "dep:specta", "dyn-comp-asset/serde_support"]
+tracing = []
+
+[dependencies]
+dyn-comp-asset = { path = "../comp_asset" }
+bevy_ecs = { workspace = true }
+bevy_hierarchy = { workspace = true }
+bevy_transform = { workspace = true }
+glam = { workspace = true }
+smallvec = { workspace = true }
+tiny-skia-path = { workspace = true }
+
+# Logging
+log = { workspace = true }
+
+# serde_support (feature)
+specta = { workspace = true, features = [
+    "serde",
+    "glam",
+    "bevy_ecs",
+], optional = true }
+serde = { workspace = true, features = ["derive"], optional = true }

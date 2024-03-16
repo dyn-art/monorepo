@@ -1,0 +1,33 @@
+[workspace]
+resolver = "2"
+members = ["crates/*", "packages/svg-comp/rust", "apps/comprender"]
+exclude = ["crates/_deprecated"]
+
+[workspace.package]
+edition = "2021"
+homepage = "https://s.dyn.art/github"
+repository = "https://github.com/dyndotart/monorepo"
+license = "AGPL-3.0-or-later"
+authors = ["@bennoinbeta"]
+
+[workspace.dependencies]
+# Bevy
+bevy_app = "0.13.0"
+bevy_ecs = "0.13.0"
+bevy_hierarchy = "0.13.0"
+bevy_transform = "0.13.0"
+bevy_utils = "0.13.0"
+
+# Bindgen
+specta = { git = "https://github.com/oscartbeaumont/specta.git", rev = "5da3e56" }
+serde = "1.0.195"
+serde_json = "1.0.114"
+
+# Logging
+log = "0.4.20"
+
+# Utilities
+glam = "0.25.0"
+smallvec = "1.13.1"
+tinyvec = "1.6.0"
+tiny-skia-path = "0.11.4"

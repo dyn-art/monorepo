@@ -22,9 +22,10 @@
 	},
 	"homepage": "https://s.dyn.art/github",
 	"dependencies": {
-		"@dyn/dtif": "workspace:^",
-		"@dyn/svg-composition": "workspace:^",
+		"@dyn/dtif-comp": "workspace:*",
+		"@dyn/svg-comp": "workspace:*",
 		"@dyn/ui": "workspace:*",
+		"@tanstack/react-query": "^5.22.2",
 		"clsx": "^2.0.0",
 		"next": "14.0.4",
 		"react": "^18.2.0",

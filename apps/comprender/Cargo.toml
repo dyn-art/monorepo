@@ -1,19 +1,16 @@
 [package]
-name = "dyn_comprender"
+name = "dyn-comprender"
 version = "0.0.1"
-edition = "2021"
-description = "Composition Render API"
-homepage = "https://s.dyn.art/github"
-repository = "https://github.com/dyndotart/monorepo"
-license = "AGPL-3.0-or-later"
-
-[features]
-default = []
-tracing = ["dyn_composition/tracing", "dyn_svg_render/tracing"]
-cli = ["dep:clap"]
+description = ""
+edition = { workspace = true }
+homepage = { workspace = true }
+repository = { workspace = true }
+license = { workspace = true }
+authors = { workspace = true }
 
 [lib]
 path = "src/lib.rs"
+crate-type = ["cdylib", "rlib"]
 
 [[bin]]
 name = "dyn_comprender"    # Needs to be called like the package so that the Dockerfile can work with `dyn_[name]` pattern
@@ -23,29 +20,49 @@ path = "src/bin/server.rs"
 name = "cli"
 path = "src/bin/cli.rs"
 
+[features]
+default = []
+cli = ["dep:clap"]
+tracing = [
+    "dyn-comp-core/tracing",
+    "dyn-comp-svg-builder/tracing",
+    "dyn-comp-dtif/tracing",
+]
+
 [dependencies]
-
-# Core dependencies
-dyn_composition = { path = "../../crates/composition", features = [
-    'resolve-url',
+dyn-comp-asset = { path = "../../crates/comp_asset" }
+dyn-comp-core = { path = "../../crates/comp_core", features = ["dtif"] }
+dyn-comp-dtif = { path = "../../crates/comp_dtif" }
+dyn-comp-common = { path = "../../crates/comp_common", features = [
+    "serde_support",
 ] }
-dyn_svg_render = { path = "../../crates/svg_render" }
-dyn_bevy_render_skeleton = { path = "../../crates/bevy_render_skeleton" }
+dyn-comp-svg-builder = { path = "../../crates/comp_svg_builder", features = [
+    "serde_support",
+] }
+bevy_app = { workspace = true }
+bevy_ecs = { workspace = true }
+bevy_transform = { workspace = true }
 axum = "0.7.3"
-serde = { version = "1.0.195", features = ["derive"] }
-serde_json = "1.0.111"
 tokio = { version = "1.35.1", features = ["full"] }
-specta = "2.0.0-rc.7"
-dotenv_config = "0.1.8"
+dotenv_config = "0.1.9"
 dotenvy = "0.15.7"
-resvg = "0.37.0"
-usvg = "0.37.0"
-tiny-skia = "0.11.3"
-reqwest = "0.11.23"
-svg2pdf = "0.9.1"
+resvg = "0.40.0"
+usvg = "0.40.0"
+fontdb = "0.16.2"
+tiny-skia = "0.11.4"
+reqwest = "0.11.26"
+svg2pdf = "0.10.0"
 
-# CLI dependencies
-clap = { version = "4.4.16", features = ["derive"], optional = true }
+# Bindgen
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+specta = { workspace = true }
+
+# Logging
+log = { workspace = true }
+
+# cli (feature)
+clap = { version = "4.5.1", features = ["derive"], optional = true }
 utoipa = { version = "4.2.0", features = ["axum_extras"] }
 
 [profile.release]

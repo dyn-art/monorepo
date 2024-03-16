@@ -25,10 +25,19 @@ export interface TUploadStaticDataResponse {
 
 export type TFigmaNodeWithChildren = FrameNode | InstanceNode | ComponentNode | GroupNode;
 export type TFigmaShapeNode = RectangleNode | EllipseNode | PolygonNode | StarNode | VectorNode;
-export type TFigmaNodeWithPaints =
+export type TFigmaNodeWithFills =
 	| FrameNode
 	| InstanceNode
 	| ComponentNode
 	| TFigmaShapeNode
 	| TextNode
 	| VectorNode;
+export type TFigmaNodeWithStrokes =
+	| FrameNode
+	| InstanceNode
+	| ComponentNode
+	| TFigmaShapeNode
+	| TextNode
+	| VectorNode;
+
+export type TFigmaFormat = 'JPG' | 'PNG' | 'SVG' | 'PDF';

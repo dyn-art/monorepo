@@ -9,7 +9,8 @@
 		"**/node_modules": true,
 		"**/dist": true,
 		"**/*.next": true,
-		"**/target": true
+		"**/target": true,
+		"**/_deprecated": true
 	},
 	"files.associations": {
 		"*.scss": "postcss",
@@ -18,7 +19,6 @@
 		// TypeScript permits comments in tsconfig.json even though standard JSON does not.
 		"*.tsconfig.json": "jsonc"
 	},
-	"cSpell.words": ["tailwindcss"],
 	"explorer.fileNesting.enabled": true,
 	"explorer.fileNesting.patterns": {
 		"*.ts": "${capture}.js, ${capture}.test.ts",
@@ -45,12 +45,5 @@
 	"[rust]": {
 		"editor.defaultFormatter": "rust-lang.rust-analyzer"
 	},
-	"rust-analyzer.linkedProjects": [
-		"apps/comprender/Cargo.toml",
-		"packages/svg-composition/rust/Cargo.toml",
-		"crates/bevy_render_skeleton/Cargo.toml",
-		"crates/composition/Cargo.toml",
-		"crates/svg_render/Cargo.toml"
-	],
 	"rust-analyzer.rename.allowExternalItems": true
 }

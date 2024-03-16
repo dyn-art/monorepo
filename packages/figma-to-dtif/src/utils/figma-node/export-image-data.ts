@@ -1,4 +1,4 @@
-import { ExportImagePaintException } from '../../exceptions';
+import { ExportImageAssetException } from '../../exceptions';
 
 export async function exportFigmaImageData(
 	imageHash: string,
@@ -14,11 +14,11 @@ export async function exportFigmaImageData(
 			size = await image.getSizeAsync();
 		}
 	} catch (error) {
-		throw new ExportImagePaintException(nodeIds, error);
+		throw new ExportImageAssetException(nodeIds, error);
 	}
 
 	if (content == null || size == null) {
-		throw new ExportImagePaintException(nodeIds);
+		throw new ExportImageAssetException(nodeIds);
 	}
 
 	return { content, size };

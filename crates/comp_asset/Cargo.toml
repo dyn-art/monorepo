@@ -1,0 +1,29 @@
+[package]
+name = "dyn-comp-asset"
+version = "0.0.1"
+description = ""
+edition = { workspace = true }
+homepage = { workspace = true }
+repository = { workspace = true }
+license = { workspace = true }
+authors = { workspace = true }
+
+[features]
+default = []
+serde_support = ["dep:serde", "dep:specta"]
+tracing = []
+
+[dependencies]
+bevy_app = { workspace = true }
+bevy_ecs = { workspace = true }
+fontdb = "0.16.0"
+slotmap = "1.0.7"
+tinyvec = { workspace = true }
+imagesize = "0.12"
+
+# Logging
+log = { workspace = true }
+
+# serde_support (feature)
+specta = { workspace = true, features = ["serde"], optional = true }
+serde = { workspace = true, features = ["derive"], optional = true }

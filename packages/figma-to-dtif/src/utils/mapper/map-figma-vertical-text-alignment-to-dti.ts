@@ -1,6 +1,6 @@
-import type { COMP } from '@dyn/dtif';
+import type { COMP } from '@dyn/dtif-comp';
 
-export function mapFigmaVerticalTextAlignmentToDTIF(
+export function mapFigmaVerticalTextAlignmentToDtif(
 	figmaBlendMode: TextNode['textAlignVertical']
 ): COMP.VerticalTextAlignment {
 	switch (figmaBlendMode) {

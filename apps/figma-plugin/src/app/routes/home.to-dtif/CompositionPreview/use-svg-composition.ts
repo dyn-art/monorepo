@@ -1,8 +1,9 @@
 import React from 'react';
-import { applyCanvasDimensions, rustify, type COMP } from '@dyn/figma-to-dtif';
-import { createSVGComposition, initWasm, type Composition } from '@dyn/svg-composition';
+import { applyCanvasDimensions, prepareDtifComposition, type COMP } from '@dyn/figma-to-dtif';
+import { Composition, initWasm, SvgRenderer } from '@dyn/svg-comp';
 
-export const useSVGComposition = (
+// TODO: Replace with comp-canvas package once created
+export const useSvgComposition = (
 	props: UseSVGCompositionProps
 ): {
 	composition: Composition | null;
@@ -13,7 +14,7 @@ export const useSVGComposition = (
 	const svgContainerRef = React.useRef<HTMLDivElement>(null);
 	const [composition, setComposition] = React.useState<Composition | null>(null);
 	const [isLoading, setIsLoading] = React.useState(false);
-	const [rustifiedDTIF, setRustifiedDTIF] = React.useState<COMP.DTIFComposition | null>(null);
+	const [preparedDtif, setPreparedDtif] = React.useState<COMP.DtifComposition | null>(null);
 
 	// Load WASM and rustify DTIF
 	React.useEffect(() => {
@@ -23,8 +24,8 @@ export const useSVGComposition = (
 		const initializeAndRustify = async (): Promise<void> => {
 			await initWasm();
 			if (dtif && isMounted) {
-				const rustified = await rustify(dtif);
-				setRustifiedDTIF(rustified);
+				const rustified = await prepareDtifComposition(dtif);
+				setPreparedDtif(rustified);
 			}
 		};
 
@@ -45,14 +46,19 @@ export const useSVGComposition = (
 
 	// Create SVG Composition
 	React.useEffect(() => {
-		if (rustifiedDTIF != null && svgContainerRef.current != null && composition == null) {
+		if (preparedDtif != null && svgContainerRef.current != null && composition == null) {
 			try {
-				const newComposition = createSVGComposition({
-					render: {
-						domElement: svgContainerRef.current
-					},
-					dtif: applyCanvasDimensions(rustifiedDTIF, dimensions)
+				const newComposition = new Composition({
+					dtif: applyCanvasDimensions(preparedDtif, {
+						width: dimensions.width,
+						height: dimensions.height
+					}),
+					interactive: false
 				});
+				newComposition.renderer = new SvgRenderer(newComposition, {
+					domElement: svgContainerRef.current as Element
+				});
+				newComposition.update();
 
 				setComposition(newComposition);
 				newComposition.update();
@@ -66,13 +72,13 @@ export const useSVGComposition = (
 				composition.unmount();
 			}
 		};
-	}, [rustifiedDTIF, svgContainerRef.current, ...deps]);
+	}, [preparedDtif, svgContainerRef.current, ...deps]);
 
 	return { svgContainerRef, composition, isLoading };
 };
 
 interface UseSVGCompositionProps {
-	dtif?: COMP.DTIFComposition;
+	dtif?: COMP.DtifComposition;
 	deps?: React.DependencyList;
 	dimensions: TDimensions;
 }

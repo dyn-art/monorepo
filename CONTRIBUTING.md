@@ -59,7 +59,6 @@ The structure of the `package.json` file in this project should adhere to a spec
 ```
 
 For specific packages, additional fields should be included as shown below. Note that the fields `source`, `main`, `module`, `types`, and `files` are usually required in packages:
-
 ```json
 {
 	// ..
