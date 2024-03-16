@@ -23,6 +23,7 @@ use std::sync::mpsc::Sender;
 
 pub struct CompWatchPlugin {
     pub output_event_sender: Sender<SvgCompOutputEvent>,
+    pub interactive: bool,
 }
 
 // TODO: Plan to refactor into a sub-application for potential multithreading
@@ -54,8 +55,13 @@ impl Plugin for CompWatchPlugin {
                 queue_changed_components.in_set(CompWatchSystemSet::Queue),
                 queue_composition_changes.in_set(CompWatchSystemSet::Queue),
                 queue_selected_entities_changes.in_set(CompWatchSystemSet::Queue),
-                queue_interaction_mode_changes.in_set(CompWatchSystemSet::Queue),
             ),
         );
+        if self.interactive {
+            app.add_systems(
+                Last,
+                (queue_interaction_mode_changes.in_set(CompWatchSystemSet::Queue),),
+            );
+        }
     }
 }

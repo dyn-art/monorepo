@@ -51,6 +51,7 @@ impl SvgCompHandle {
             CompCorePlugin { dtif },
             CompWatchPlugin {
                 output_event_sender,
+                interactive,
             },
             CompSvgBuilderPlugin {
                 output_event_sender: svg_builder_output_event_sender,
