@@ -1,4 +1,4 @@
-use crate::common::{Size, Viewport};
+use crate::common::{Degree, Size, Viewport};
 use bevy_ecs::{entity::Entity, event::Event, world::World};
 use std::fmt::Debug;
 
@@ -13,11 +13,12 @@ pub trait InputEvent {
     serde(tag = "type")
 )]
 pub enum CompCoreInputEvent {
+    EntityDeleted(EntityDeletedInputEvent),
     CompositionResized(CompositionResizedInputEvent),
     CompositionViewportChanged(CompositionViewportChangedInputEvent),
     EntityMoved(EntityMovedInputEvent),
     EntitySetPosition(EntitySetPositionInputEvent),
-    EntityDeleted(EntityDeletedInputEvent),
+    EntitySetRotation(EntitySetRotationInputEvent),
 }
 
 impl InputEvent for CompCoreInputEvent {
@@ -36,6 +37,9 @@ impl InputEvent for CompCoreInputEvent {
                 world.send_event(event);
             }
             CompCoreInputEvent::EntityDeleted(event) => {
+                world.send_event(event);
+            }
+            CompCoreInputEvent::EntitySetRotation(event) => {
                 world.send_event(event);
             }
         }
@@ -89,4 +93,15 @@ pub struct EntitySetPositionInputEvent {
 )]
 pub struct EntityDeletedInputEvent {
     pub entity: Entity,
+}
+
+#[derive(Event, Debug, Copy, Clone)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type),
+    serde(rename_all = "camelCase")
+)]
+pub struct EntitySetRotationInputEvent {
+    pub entity: Entity,
+    pub rotation_deg: Degree,
 }

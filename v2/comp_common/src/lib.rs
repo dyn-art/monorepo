@@ -3,6 +3,7 @@ pub mod common;
 pub mod default;
 pub mod error;
 pub mod events;
+pub mod math;
 pub mod mixins;
 pub mod nodes;
 pub mod paints;

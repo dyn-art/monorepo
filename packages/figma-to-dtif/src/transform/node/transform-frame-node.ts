@@ -21,7 +21,7 @@ export function transformFrameNode(
 		children: childrenIds.map((childId) => childId.toString()),
 		size: [node.width, node.height],
 		translation: mapFigmaTransformToTranslation(node.relativeTransform),
-		angle: mapFigmaTransformToRotation(node.relativeTransform),
+		rotationDeg: mapFigmaTransformToRotation(node.relativeTransform),
 		cornerRadii: [
 			node.topLeftRadius,
 			node.topRightRadius,

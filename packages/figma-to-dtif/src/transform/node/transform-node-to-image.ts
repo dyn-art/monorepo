@@ -36,7 +36,7 @@ export async function transformNodeToImage(
 		visible: node.visible,
 		size: [node.width, node.height],
 		translation: mapFigmaTransformToTranslation(node.relativeTransform),
-		angle: mapFigmaTransformToRotation(node.relativeTransform),
+		rotationDeg: mapFigmaTransformToRotation(node.relativeTransform),
 		styles: [{ type: 'Fill', paintId: paintId.toString() }]
 	};
 }
