@@ -9,7 +9,7 @@ use crate::svg::svg_element::{element_changes::SvgElementChange, SvgElementId};
 pub enum SvgBuilderOutputEvent {
     /// Represents incremental changes to an SVG element.
     /// Emitted when the "output_svg_element_changes" feature is enabled.
-    SvgElementChanges(SvgElementChangeOutputEvent),
+    SvgElementChanges(SvgElementChangesOutputEvent),
     /// Contains the complete SVG as a string.
     /// Emitted when the "output_svg_string" feature is enabled.
     SvgString(SvgStringOutputEvent),
@@ -17,7 +17,7 @@ pub enum SvgBuilderOutputEvent {
 
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde_support", derive(serde::Serialize, specta::Type))]
-pub struct SvgElementChangeOutputEvent {
+pub struct SvgElementChangesOutputEvent {
     pub id: SvgElementId,
     pub changes: Vec<SvgElementChange>,
 }

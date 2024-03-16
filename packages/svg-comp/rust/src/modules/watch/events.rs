@@ -4,7 +4,7 @@ use dyn_comp_common::common::{Size, Viewport};
 use dyn_comp_interaction::resources::comp_interaction::InteractionMode;
 
 #[derive(Debug, Clone, serde::Serialize, specta::Type)]
-pub struct WatchedEntityChangeOutputEvent {
+pub struct WatchedEntityChangesOutputEvent {
     pub entity: Entity,
     pub changes: Vec<ComponentChange>,
 }

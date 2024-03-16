@@ -592,6 +592,7 @@ pub fn apply_gradient_paint_changes(
 
                                 // Remove old gradient stop elements
                                 bundle.gradient.clear_children();
+                                #[cfg(feature = "output_svg_element_changes")]
                                 bundle
                                     .gradient_stops
                                     .drain(..)

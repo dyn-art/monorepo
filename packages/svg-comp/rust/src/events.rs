@@ -1,17 +1,17 @@
 use crate::modules::watch::events::{
     CompositionChangeOutputEvent, InteractionModeChangeOutputEvent, SelectionChangeOutputEvent,
-    WatchedEntityChangeOutputEvent,
+    WatchedEntityChangesOutputEvent,
 };
 use dyn_comp_common::events::CompCoreInputEvent;
 use dyn_comp_interaction::events::InteractionInputEvent;
-use dyn_comp_svg_builder::events::SvgElementChangeOutputEvent;
+use dyn_comp_svg_builder::events::SvgElementChangesOutputEvent;
 
 #[derive(Debug, Clone, serde::Serialize, specta::Type)]
 #[serde(tag = "type")]
 pub enum SvgCompOutputEvent {
-    SvgElementChange(SvgElementChangeOutputEvent),
+    SvgElementChange(SvgElementChangesOutputEvent),
     CompositionChange(CompositionChangeOutputEvent),
-    WatchedEntityChange(WatchedEntityChangeOutputEvent),
+    WatchedEntityChange(WatchedEntityChangesOutputEvent),
     SelectionChange(SelectionChangeOutputEvent),
     InteractionModeChange(InteractionModeChangeOutputEvent),
 }

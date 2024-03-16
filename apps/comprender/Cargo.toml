@@ -1,19 +1,16 @@
 [package]
 name = "dyn-comprender"
 version = "0.0.1"
-description = "Composition Render API"
-edition = "2021"
-homepage = "https://s.dyn.art/github"
-repository = "https://github.com/dyndotart/monorepo"
-license = "AGPL-3.0-or-later"
-
-[features]
-default = []
-tracing = []
-cli = ["dep:clap"]
+description = ""
+edition = { workspace = true }
+homepage = { workspace = true }
+repository = { workspace = true }
+license = { workspace = true }
+authors = { workspace = true }
 
 [lib]
 path = "src/lib.rs"
+crate-type = ["cdylib", "rlib"]
 
 [[bin]]
 name = "dyn_comprender"    # Needs to be called like the package so that the Dockerfile can work with `dyn_[name]` pattern
@@ -23,7 +20,17 @@ path = "src/bin/server.rs"
 name = "cli"
 path = "src/bin/cli.rs"
 
+[features]
+default = []
+cli = ["dep:clap"]
+tracing = [
+    "dyn-comp-core/tracing",
+    "dyn-comp-svg-builder/tracing",
+    "dyn-comp-dtif/tracing",
+]
+
 [dependencies]
+dyn-comp-asset = { path = "../../crates/comp_asset" }
 dyn-comp-core = { path = "../../crates/comp_core", features = ["dtif"] }
 dyn-comp-dtif = { path = "../../crates/comp_dtif" }
 dyn-comp-common = { path = "../../crates/comp_common", features = [
@@ -31,7 +38,6 @@ dyn-comp-common = { path = "../../crates/comp_common", features = [
 ] }
 dyn-comp-svg-builder = { path = "../../crates/comp_svg_builder", features = [
     "serde_support",
-    "output_svg_element_changes",
 ] }
 bevy_app = { workspace = true }
 bevy_ecs = { workspace = true }
@@ -42,6 +48,7 @@ dotenv_config = "0.1.9"
 dotenvy = "0.15.7"
 resvg = "0.40.0"
 usvg = "0.40.0"
+fontdb = "0.16.2"
 tiny-skia = "0.11.4"
 reqwest = "0.11.26"
 svg2pdf = "0.10.0"
@@ -49,13 +56,7 @@ svg2pdf = "0.10.0"
 # Bindgen
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
-specta = { workspace = true, features = [
-    "typescript",
-    "serde",
-    "glam",
-    "bevy_ecs",
-    "functions",
-] }
+specta = { workspace = true }
 
 # Logging
 log = { workspace = true }

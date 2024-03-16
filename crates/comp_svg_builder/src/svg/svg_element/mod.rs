@@ -199,6 +199,7 @@ impl SvgElement {
     where
         F: FnOnce(&mut SmallVec<[SvgElementChild; 2]>),
     {
+        #[cfg(feature = "output_svg_element_changes")]
         let original_order: SmallVec<[SvgElementId; 2]> =
             self.children.iter().map(|child| child.id).collect();
 
@@ -206,15 +207,18 @@ impl SvgElement {
         reorder_operation(&mut self.children);
 
         // Check if the order has changed and emit reorder event if so
-        let new_order: SmallVec<[SvgElementId; 2]> =
-            self.children.iter().map(|child| child.id).collect();
-        if new_order != original_order {
-            self.register_change(
-                SvgElementChange::ElementChildrenReordered(SvgElementChildrenReorderedChange {
-                    new_order: new_order.into_vec(),
-                }),
-                true,
-            );
+        #[cfg(feature = "output_svg_element_changes")]
+        {
+            let new_order: SmallVec<[SvgElementId; 2]> =
+                self.children.iter().map(|child| child.id).collect();
+            if new_order != original_order {
+                self.register_change(
+                    SvgElementChange::ElementChildrenReordered(SvgElementChildrenReorderedChange {
+                        new_order: new_order.into_vec(),
+                    }),
+                    true,
+                );
+            }
         }
     }
 

@@ -3,7 +3,7 @@ use crate::{
     modules::watch::{
         events::{
             CompositionChangeOutputEvent, InteractionModeChangeOutputEvent, InteractionModeLabel,
-            SelectionChangeOutputEvent, WatchedEntityChangeOutputEvent,
+            SelectionChangeOutputEvent, WatchedEntityChangesOutputEvent,
         },
         resources::{
             changed_components::ChangedComponentsRes, output_event_sender::OutputEventSenderRes,
@@ -26,7 +26,7 @@ pub fn queue_changed_components(
 ) {
     for (entity, changes) in changed_components_res.drain() {
         output_event_sender_res.push_event(SvgCompOutputEvent::WatchedEntityChange(
-            WatchedEntityChangeOutputEvent { entity, changes },
+            WatchedEntityChangesOutputEvent { entity, changes },
         ))
     }
 }
