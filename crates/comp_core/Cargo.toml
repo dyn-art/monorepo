@@ -1,5 +1,5 @@
 [package]
-name = "dyn-comp-dtif"
+name = "dyn-comp-core"
 version = "0.0.1"
 description = ""
 edition = { workspace = true }
@@ -10,17 +10,20 @@ authors = { workspace = true }
 
 [features]
 default = []
+dtif = ["dep:dyn-comp-dtif", "dyn-comp-common/serde_support"]
 tracing = []
 
 [dependencies]
-dyn-comp-asset = { path = "../comp_asset", features = ["serde_support"] }
-dyn-comp-common = { path = "../comp_common", features = ["serde_support"] }
+dyn-comp-asset = { path = "../comp_asset" }
+dyn-comp-common = { path = "../comp_common" }
+dyn-comp-dtif = { path = "../comp_dtif", optional = true }
+bevy_app = { workspace = true }
 bevy_ecs = { workspace = true }
 bevy_hierarchy = { workspace = true }
 bevy_transform = { workspace = true }
-tiny-skia-path = { workspace = true }
 glam = { workspace = true }
-log = { workspace = true }
 smallvec = { workspace = true }
-serde = { workspace = true, features = ["derive"] }
-specta = { workspace = true, features = ["serde", "glam"] }
+tiny-skia-path = { workspace = true }
+
+# Logging
+log = { workspace = true }

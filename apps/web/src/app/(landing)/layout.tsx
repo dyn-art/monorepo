@@ -5,7 +5,7 @@ const Layout: React.FC<TProps> = (props) => {
 
 	return (
 		<Container size="full" tag="main">
-			{children}
+			{children as any}
 		</Container>
 	);
 };

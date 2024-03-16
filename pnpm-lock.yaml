@@ -174,15 +174,9 @@ importers:
       '@dyn/dtif-comp':
         specifier: workspace:*
         version: link:../../packages/dtif-comp
-      '@dyn/dtif':
-        specifier: workspace:*
-        version: link:../../packages/dtif
       '@dyn/svg-comp':
         specifier: workspace:*
         version: link:../../packages/svg-comp
-      '@dyn/svg-composition':
-        specifier: workspace:*
-        version: link:../../packages/svg-composition
       '@dyn/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -316,19 +310,6 @@ importers:
         specifier: ^4.6.0
         version: 4.6.0
 
-  packages/dtif-comp:
-    dependencies:
-      '@dyn/utils':
-        specifier: workspace:*
-        version: link:../utils
-    devDependencies:
-      '@dyn/config':
-        specifier: workspace:*
-        version: link:../config
-      '@types/node':
-        specifier: ^20.8.10
-        version: 20.8.10
-
   packages/config:
     dependencies:
       '@vercel/style-guide':
@@ -348,7 +329,7 @@ importers:
         specifier: ^2.2.0
         version: 2.2.0(eslint@8.57.0)(react@18.2.0)(typescript@5.4.2)
 
-  packages/dtif:
+  packages/dtif-comp:
     dependencies:
       '@dyn/utils':
         specifier: workspace:*
@@ -411,12 +392,12 @@ importers:
         specifier: ^3.0.0
         version: 3.0.0
     devDependencies:
-      '@dyn/dtif-comp':
-        specifier: workspace:*
-        version: link:../dtif-comp
       '@dyn/config':
         specifier: workspace:*
         version: link:../config
+      '@dyn/dtif-comp':
+        specifier: workspace:*
+        version: link:../dtif-comp
       '@figma/plugin-typings':
         specifier: ^1.88.0
         version: 1.88.0
@@ -515,31 +496,6 @@ importers:
       '@dyn/dtif-comp':
         specifier: workspace:*
         version: link:../dtif-comp
-      '@dyn/utils':
-        specifier: workspace:*
-        version: link:../utils
-    devDependencies:
-      '@dyn/config':
-        specifier: workspace:*
-        version: link:../config
-      '@dyn/types':
-        specifier: workspace:*
-        version: link:../types
-      '@rollup/plugin-wasm':
-        specifier: ^6.2.2
-        version: 6.2.2
-      '@types/node':
-        specifier: ^20.8.10
-        version: 20.8.10
-      '@types/react':
-        specifier: ^18.2.33
-        version: 18.2.34
-
-  packages/svg-composition:
-    dependencies:
-      '@dyn/dtif':
-        specifier: workspace:*
-        version: link:../dtif
       '@dyn/utils':
         specifier: workspace:*
         version: link:../utils
@@ -711,7 +667,7 @@ packages:
       '@babel/traverse': 7.23.2
       '@babel/types': 7.23.0
       convert-source-map: 2.0.0
-      debug: 4.3.4(supports-color@5.5.0)
+      debug: 4.3.4(supports-color@8.1.1)
       gensync: 1.0.0-beta.2
       json5: 2.2.3
       semver: 6.3.1
@@ -733,7 +689,7 @@ packages:
       '@babel/traverse': 7.24.0
       '@babel/types': 7.24.0
       convert-source-map: 2.0.0
-      debug: 4.3.4(supports-color@5.5.0)
+      debug: 4.3.4(supports-color@8.1.1)
       gensync: 1.0.0-beta.2
       json5: 2.2.3
       semver: 6.3.1
@@ -1064,7 +1020,7 @@ packages:
       '@babel/helper-split-export-declaration': 7.22.6
       '@babel/parser': 7.23.0
       '@babel/types': 7.23.0
-      debug: 4.3.4(supports-color@5.5.0)
+      debug: 4.3.4(supports-color@8.1.1)
       globals: 11.12.0
     transitivePeerDependencies:
       - supports-color
@@ -1081,7 +1037,7 @@ packages:
       '@babel/helper-split-export-declaration': 7.22.6
       '@babel/parser': 7.24.0
       '@babel/types': 7.24.0
-      debug: 4.3.4(supports-color@5.5.0)
+      debug: 4.3.4(supports-color@8.1.1)
       globals: 11.12.0
     transitivePeerDependencies:
       - supports-color
@@ -1974,7 +1930,7 @@ packages:
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
     dependencies:
       ajv: 6.12.6
-      debug: 4.3.4(supports-color@5.5.0)
+      debug: 4.3.4(supports-color@8.1.1)
       espree: 9.6.1
       globals: 13.24.0
       ignore: 5.3.1
@@ -2035,7 +1991,7 @@ packages:
     engines: {node: '>=10.10.0'}
     dependencies:
       '@humanwhocodes/object-schema': 2.0.2
-      debug: 4.3.4(supports-color@5.5.0)
+      debug: 4.3.4(supports-color@8.1.1)
       minimatch: 3.1.2
     transitivePeerDependencies:
       - supports-color
@@ -3672,7 +3628,7 @@ packages:
       '@typescript-eslint/scope-manager': 5.62.0
       '@typescript-eslint/type-utils': 5.62.0(eslint@8.57.0)(typescript@5.4.2)
       '@typescript-eslint/utils': 5.62.0(eslint@8.57.0)(typescript@5.4.2)
-      debug: 4.3.4(supports-color@5.5.0)
+      debug: 4.3.4(supports-color@8.1.1)
       eslint: 8.57.0
       graphemer: 1.4.0
       ignore: 5.2.4
@@ -3701,7 +3657,7 @@ packages:
       '@typescript-eslint/type-utils': 6.9.1(eslint@8.57.0)(typescript@5.4.2)
       '@typescript-eslint/utils': 6.9.1(eslint@8.57.0)(typescript@5.4.2)
       '@typescript-eslint/visitor-keys': 6.9.1
-      debug: 4.3.4(supports-color@5.5.0)
+      debug: 4.3.4(supports-color@8.1.1)
       eslint: 8.57.0
       graphemer: 1.4.0
       ignore: 5.2.4
@@ -3726,7 +3682,7 @@ packages:
       '@typescript-eslint/scope-manager': 5.62.0
       '@typescript-eslint/types': 5.62.0
       '@typescript-eslint/typescript-estree': 5.62.0(typescript@5.4.2)
-      debug: 4.3.4(supports-color@5.5.0)
+      debug: 4.3.4(supports-color@8.1.1)
       eslint: 8.57.0
       typescript: 5.4.2
     transitivePeerDependencies:
@@ -3746,7 +3702,7 @@ packages:
       '@typescript-eslint/types': 6.9.1
       '@typescript-eslint/typescript-estree': 6.9.1(typescript@5.4.2)
       '@typescript-eslint/visitor-keys': 6.9.1
-      debug: 4.3.4(supports-color@5.5.0)
+      debug: 4.3.4(supports-color@8.1.1)
       eslint: 8.57.0
       typescript: 5.4.2
     transitivePeerDependencies:
@@ -3780,7 +3736,7 @@ packages:
     dependencies:
       '@typescript-eslint/typescript-estree': 5.62.0(typescript@5.4.2)
       '@typescript-eslint/utils': 5.62.0(eslint@8.57.0)(typescript@5.4.2)
-      debug: 4.3.4(supports-color@5.5.0)
+      debug: 4.3.4(supports-color@8.1.1)
       eslint: 8.57.0
       tsutils: 3.21.0(typescript@5.4.2)
       typescript: 5.4.2
@@ -3800,7 +3756,7 @@ packages:
     dependencies:
       '@typescript-eslint/typescript-estree': 6.9.1(typescript@5.4.2)
       '@typescript-eslint/utils': 6.9.1(eslint@8.57.0)(typescript@5.4.2)
-      debug: 4.3.4(supports-color@5.5.0)
+      debug: 4.3.4(supports-color@8.1.1)
       eslint: 8.57.0
       ts-api-utils: 1.0.3(typescript@5.4.2)
       typescript: 5.4.2
@@ -3828,7 +3784,7 @@ packages:
     dependencies:
       '@typescript-eslint/types': 5.62.0
       '@typescript-eslint/visitor-keys': 5.62.0
-      debug: 4.3.4(supports-color@5.5.0)
+      debug: 4.3.4(supports-color@8.1.1)
       globby: 11.1.0
       is-glob: 4.0.3
       semver: 7.6.0
@@ -3848,7 +3804,7 @@ packages:
     dependencies:
       '@typescript-eslint/types': 6.9.1
       '@typescript-eslint/visitor-keys': 6.9.1
-      debug: 4.3.4(supports-color@5.5.0)
+      debug: 4.3.4(supports-color@8.1.1)
       globby: 11.1.0
       is-glob: 4.0.3
       semver: 7.6.0
@@ -4926,6 +4882,7 @@ packages:
     dependencies:
       ms: 2.1.2
       supports-color: 5.5.0
+    dev: true
 
   /debug@4.3.4(supports-color@8.1.1):
     resolution: {integrity: sha512-PRWFHuSU3eDtQJPvnNY7Jcket1j0t5OuOsFzPPzsekD52Zl8qUfFIPEiswXqIvHWGVHOgX+7G/vCNNhehwxfkQ==}
@@ -4938,7 +4895,6 @@ packages:
     dependencies:
       ms: 2.1.2
       supports-color: 8.1.1
-    dev: false
 
   /deep-eql@4.1.3:
     resolution: {integrity: sha512-WaEtAOpRA1MQ0eohqZjpGD8zdI0Ovsm8mmFhaDN8dvDZzyoUMcYDnf5Y6iu7HTXxf8JDS23qWa4a+hKCDyOPzw==}
@@ -5423,7 +5379,7 @@ packages:
       eslint: '*'
       eslint-plugin-import: '*'
     dependencies:
-      debug: 4.3.4(supports-color@5.5.0)
+      debug: 4.3.4(supports-color@8.1.1)
       enhanced-resolve: 5.15.0
       eslint: 8.57.0
       eslint-module-utils: 2.8.0(@typescript-eslint/parser@5.62.0)(eslint-import-resolver-node@0.3.7)(eslint-import-resolver-typescript@3.6.1)(eslint@8.57.0)
@@ -5897,7 +5853,7 @@ packages:
       ajv: 6.12.6
       chalk: 4.1.2
       cross-spawn: 7.0.3
-      debug: 4.3.4(supports-color@5.5.0)
+      debug: 4.3.4(supports-color@8.1.1)
       doctrine: 3.0.0
       escape-string-regexp: 4.0.0
       eslint-scope: 7.2.2
@@ -9010,7 +8966,7 @@ packages:
       rollup: ^1.20.0 || ^2.0.0 || ^3.0.0 || ^4.0.0
     dependencies:
       '@rollup/pluginutils': 5.0.5(rollup@4.2.0)
-      debug: 4.3.4(supports-color@5.5.0)
+      debug: 4.3.4(supports-color@8.1.1)
       es-module-lexer: 1.3.1
       esbuild: 0.20.1
       get-tsconfig: 4.7.2
@@ -10220,7 +10176,7 @@ packages:
     hasBin: true
     dependencies:
       cac: 6.7.14
-      debug: 4.3.4(supports-color@5.5.0)
+      debug: 4.3.4(supports-color@8.1.1)
       pathe: 1.1.2
       picocolors: 1.0.0
       vite: 5.1.6(@types/node@20.11.26)
@@ -10243,7 +10199,7 @@ packages:
       vite:
         optional: true
     dependencies:
-      debug: 4.3.4(supports-color@5.5.0)
+      debug: 4.3.4(supports-color@8.1.1)
       globrex: 0.1.2
       tsconfck: 2.1.2(typescript@5.4.2)
     transitivePeerDependencies:
@@ -10259,7 +10215,7 @@ packages:
       vite:
         optional: true
     dependencies:
-      debug: 4.3.4(supports-color@5.5.0)
+      debug: 4.3.4(supports-color@8.1.1)
       globrex: 0.1.2
       tsconfck: 3.0.3(typescript@5.4.2)
       vite: 5.1.6(@types/node@20.11.26)
@@ -10336,7 +10292,7 @@ packages:
       '@vitest/utils': 1.3.1
       acorn-walk: 8.3.2
       chai: 4.4.1
-      debug: 4.3.4(supports-color@5.5.0)
+      debug: 4.3.4(supports-color@8.1.1)
       execa: 8.0.1
       local-pkg: 0.5.0
       magic-string: 0.30.8
