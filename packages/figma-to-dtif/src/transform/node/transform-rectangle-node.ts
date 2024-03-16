@@ -1,4 +1,4 @@
-import type { COMP } from '@dyn/comp-dtif';
+import type { COMP } from '@dyn/dtif-comp';
 
 import type { TToTransformFill, TToTransformStroke } from '../../FigmaNodeTreeProcessor';
 import {
@@ -19,12 +19,12 @@ export function transformRectangleNode(
 		visible: node.visible,
 		size: [node.width, node.height],
 		translation: mapFigmaTransformToTranslation(node.relativeTransform),
-		angle: mapFigmaTransformToRotation(node.relativeTransform),
+		rotationDeg: mapFigmaTransformToRotation(node.relativeTransform),
 		cornerRadii: [
-			node.bottomLeftRadius,
-			node.bottomRightRadius,
 			node.topLeftRadius,
-			node.topRightRadius
+			node.topRightRadius,
+			node.bottomRightRadius,
+			node.bottomLeftRadius
 		],
 		blendMode: mapFigmaBlendModeToDtif(node.blendMode),
 		opacity: node.opacity,

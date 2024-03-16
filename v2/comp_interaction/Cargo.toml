@@ -15,10 +15,12 @@ tracing = []
 
 [dependencies]
 dyn-comp-common = { path = "../comp_common" }
+dyn-comp-core = { path = "../comp_core" }
 bevy_app = { workspace = true }
 bevy_ecs = { workspace = true }
 bevy_transform = { workspace = true }
 glam = { workspace = true }
+log = { workspace = true }
 
 # serde_support
 specta = { workspace = true, features = [

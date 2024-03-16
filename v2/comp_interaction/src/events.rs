@@ -114,7 +114,7 @@ pub struct WheeledOnCompInputEvent {
 pub struct CursorDownOnResizeHandleInputEvent {
     pub initial_bounds: XYWH,
     pub corner: u8,
-    pub rotation_in_radians: f32,
+    pub rotation_rad: f32,
 }
 
 #[derive(Event, Debug, Copy, Clone)]
@@ -125,5 +125,5 @@ pub struct CursorDownOnResizeHandleInputEvent {
 )]
 pub struct CursorDownOnRotateHandleInputEvent {
     pub corner: u8,
-    pub initial_rotation_in_radians: f32,
+    pub initial_rotation_rad: f32,
 }

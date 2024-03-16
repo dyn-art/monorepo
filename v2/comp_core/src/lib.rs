@@ -3,13 +3,24 @@ mod systems;
 
 use bevy_app::{App, Plugin, Update};
 use bevy_ecs::schedule::{IntoSystemConfigs, IntoSystemSetConfigs, SystemSet};
+use bevy_transform::TransformPlugin;
 use dyn_comp_asset::CompAssetPlugin;
 use dyn_comp_common::events::{
     CompositionResizedInputEvent, CompositionViewportChangedInputEvent, EntityDeletedInputEvent,
-    EntityMovedInputEvent, EntitySetPositionInputEvent,
+    EntityMovedInputEvent, EntitySetPositionInputEvent, EntitySetRotationInputEvent,
 };
 use resources::composition::CompositionRes;
-use systems::{outline::rectangle::outline_rectangle, stroke::stroke_path_system};
+use systems::{
+    events::{
+        handle_entity_deleted_event, handle_entity_moved_event, handle_entity_set_position_event,
+        handle_entity_set_rotation_event,
+    },
+    outline::{
+        ellipse::outline_ellipse, polygon::outline_polygon, rectangle::outline_rectangle,
+        star::outline_star,
+    },
+    stroke::stroke_path_system,
+};
 
 pub struct CompCorePlugin {
     #[cfg(feature = "dtif")]
@@ -44,6 +55,7 @@ impl Plugin for CompCorePlugin {
     fn build(&self, app: &mut App) {
         // Register plugins
         app.add_plugins(CompAssetPlugin);
+        app.add_plugins(TransformPlugin);
 
         // Register events
         app.add_event::<CompositionResizedInputEvent>();
@@ -51,6 +63,8 @@ impl Plugin for CompCorePlugin {
         app.add_event::<EntityDeletedInputEvent>();
         app.add_event::<EntityMovedInputEvent>();
         app.add_event::<EntitySetPositionInputEvent>();
+        app.add_event::<EntityDeletedInputEvent>();
+        app.add_event::<EntitySetRotationInputEvent>();
 
         // Register resources
         #[cfg(not(feature = "dtif"))]
@@ -77,7 +91,14 @@ impl Plugin for CompCorePlugin {
         app.add_systems(
             Update,
             (
+                handle_entity_deleted_event.in_set(CompCoreSystemSet::InputEvents),
+                handle_entity_moved_event.in_set(CompCoreSystemSet::InputEvents),
+                handle_entity_set_position_event.in_set(CompCoreSystemSet::InputEvents),
+                handle_entity_set_rotation_event.in_set(CompCoreSystemSet::InputEvents),
                 outline_rectangle.in_set(CompCoreSystemSet::Outline),
+                outline_ellipse.in_set(CompCoreSystemSet::Outline),
+                outline_star.in_set(CompCoreSystemSet::Outline),
+                outline_polygon.in_set(CompCoreSystemSet::Outline),
                 stroke_path_system.in_set(CompCoreSystemSet::PostOutline),
             ),
         );
@@ -107,7 +128,7 @@ fn inject_dtif_into_ecs(world: &mut bevy_ecs::world::World, dtif: &dyn_comp_dtif
             root_nodes: vec![root_node_entity],
             viewport: dtif.viewport.unwrap_or(Viewport {
                 physical_position: Vec2::default(),
-                physical_size: Vec2::new(dtif.size.0.x, dtif.size.0.y),
+                physical_size: dtif.size,
             }),
             size: dtif.size,
         })

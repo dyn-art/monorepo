@@ -10,7 +10,10 @@ use self::{
     },
     systems::{
         extract::extract_changed_components,
-        queue::{queue_changed_components, queue_composition_changes},
+        queue::{
+            queue_changed_components, queue_composition_changes, queue_interaction_mode_changes,
+            queue_selected_entities_changes,
+        },
     },
 };
 use crate::events::SvgCompOutputEvent;
@@ -50,6 +53,8 @@ impl Plugin for CompWatchPlugin {
                 extract_changed_components.in_set(CompWatchSystemSet::Extract),
                 queue_changed_components.in_set(CompWatchSystemSet::Queue),
                 queue_composition_changes.in_set(CompWatchSystemSet::Queue),
+                queue_selected_entities_changes.in_set(CompWatchSystemSet::Queue),
+                queue_interaction_mode_changes.in_set(CompWatchSystemSet::Queue),
             ),
         );
     }

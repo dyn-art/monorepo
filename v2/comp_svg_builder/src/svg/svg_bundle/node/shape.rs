@@ -3,7 +3,7 @@ use crate::{
     svg::{
         svg_bundle::SvgBundle,
         svg_element::{
-            styles::{SvgPointerEventsStyle, SvgStyle},
+            styles::{SvgPointerEventsStyle, SvgStyle, SvgStyleColor},
             SvgElement, SvgTag,
         },
     },
@@ -65,9 +65,14 @@ impl ShapeNodeSvgBundle {
         root_g_element.append_child_in_bundle_context(&mut defs_element);
 
         let mut click_area_rect_element = cx.create_element(SvgTag::Rect);
-        click_area_rect_element.set_style(SvgStyle::PointerEvents {
-            pointer_events: SvgPointerEventsStyle::All,
-        });
+        click_area_rect_element.set_styles(vec![
+            SvgStyle::PointerEvents {
+                pointer_events: SvgPointerEventsStyle::All,
+            },
+            SvgStyle::Fill {
+                fill: SvgStyleColor::None,
+            },
+        ]);
         root_g_element.append_child_in_bundle_context(&mut click_area_rect_element);
 
         let mut styles_wrapper_g_element = cx.create_element(SvgTag::Group);
@@ -76,7 +81,6 @@ impl ShapeNodeSvgBundle {
         #[cfg(feature = "tracing")]
         {
             use crate::svg::svg_element::attributes::SvgAttribute;
-            use crate::svg::svg_element::styles::SvgStyleColor;
 
             root_g_element.set_attribute(SvgAttribute::Class {
                 class: Self::create_element_name(

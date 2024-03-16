@@ -1,4 +1,4 @@
-import type { COMP } from '@dyn/comp-dtif';
+import type { COMP } from '@dyn/dtif-comp';
 
 import type { TToTransformFill, TToTransformStroke } from '../../FigmaNodeTreeProcessor';
 import { mapFigmaBlendModeToDtif } from '../mapper/map-figma-blend-mode-to-dtif';

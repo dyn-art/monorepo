@@ -2,13 +2,14 @@
 
 import { useQuery } from '@tanstack/react-query';
 import React from 'react';
-import { applyCanvasDimensions, type COMP } from '@dyn/comp-dtif';
+import { applyCanvasDimensions, type COMP } from '@dyn/dtif-comp';
 import { createSvgComposition, type Composition } from '@dyn/svg-comp';
 import { cn, Skeleton } from '@dyn/ui';
 
+import { CanvasControl } from './CanvasControl';
+
 export const Canvas: React.FC<TCanvasProps> = (props) => {
 	const { dtif, width, height, onLoadedComposition, ...other } = props;
-
 	const svgContainerRef = React.useRef<HTMLDivElement>(null);
 	const [composition, setComposition] = React.useState<Composition | null>(null);
 
@@ -50,11 +51,17 @@ export const Canvas: React.FC<TCanvasProps> = (props) => {
 	// UI
 	// =========================================================================
 
-	if (isWasmLoading) {
-		return <Skeleton className="h-full w-full" />;
-	}
-
-	return <div {...other} className={cn('bg-gray-100', other.className)} ref={svgContainerRef} />;
+	return (
+		<div
+			{...other}
+			className={cn('relative bg-gray-100', other.className)}
+			ref={svgContainerRef}
+			style={{ width, height }}
+		>
+			{isWasmLoading ? <Skeleton className="h-full w-full" /> : null}
+			{composition != null && <CanvasControl composition={composition} />}
+		</div>
+	);
 };
 
 export type TCanvasProps = {

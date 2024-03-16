@@ -1,14 +1,19 @@
 import { shortId } from '@dyn/utils';
 import { SvgCompHandle } from '@/rust/dyn-svg-comp-api';
 import type {
+	ComponentChange,
 	CompositionChangeOutputEvent,
 	DtifComposition,
 	Entity,
+	InteractionModeChangeOutputEvent,
 	SelectionChangeOutputEvent,
 	SvgCompInputEvent,
 	SvgCompOutputEvent,
-	SvgElementChangesOutputEvent,
-	WatchedEntityChangesOutputEvent
+	SvgElementChangeOutputEvent,
+	Vec2,
+	Viewport,
+	WatchableComponentVariant,
+	WatchedEntityChangeOutputEvent
 } from '@/rust/dyn-svg-comp-api/bindings';
 
 import type { Renderer } from './render';
@@ -17,18 +22,44 @@ export class Composition {
 	private readonly _svgCompHandle: SvgCompHandle;
 	private _renderer: Renderer | null = null;
 
-	private _inputEventQueue: SvgCompInputEvent[] = [];
+	private _size: Vec2;
+	private _viewport: Viewport;
+	private _selectedEntities: Entity[];
 
+	private _inputEventQueue: SvgCompInputEvent[] = [];
 	private _watchedOutputEventCallbackMap: TWatchedOutputEventsCallbackMap = {};
+
+	// Interaction events debounce
+	private debounceTimeout: number | null = null;
+	private readonly debounceDelay: number = 100; // ms
 
 	constructor(config: TCompositionConfig) {
 		const { dtif, interactive = false } = config;
 		this._svgCompHandle = SvgCompHandle.create(dtif, interactive);
+		this.watchOutputEvent('CompositionChange', (event) => {
+			this._size = event.size;
+			this._viewport = event.viewport;
+		});
+		this.watchOutputEvent('SelectionChange', (event) => {
+			this._selectedEntities = event.selectedEntities;
+		});
 	}
 
 	// =========================================================================
 	// Getter & Setter
 	// =========================================================================
+
+	public get size(): Readonly<Vec2> {
+		return this._size;
+	}
+
+	public get viewport(): Readonly<Viewport> {
+		return this._viewport;
+	}
+
+	public get selectedEntities(): Readonly<Entity[]> {
+		return this._selectedEntities;
+	}
 
 	public get renderer(): Renderer | null {
 		return this._renderer;
@@ -113,12 +144,47 @@ export class Composition {
 		this._watchedOutputEventCallbackMap[eventType] = callbacks.filter((entry) => entry.id !== id);
 	}
 
+	public watchEntity(
+		entity: Entity,
+		toWatchComponents: WatchableComponentVariant[],
+		callback: TWatchEntityCallback,
+		initialValue = true
+	): () => void {
+		const intialChanges = this._svgCompHandle.watchEntity(entity, toWatchComponents, initialValue);
+
+		// Apply intal changes if found
+		if (initialValue && Array.isArray(intialChanges)) {
+			callback(entity, intialChanges);
+		}
+
+		// Register callback
+		const unregister = this.watchOutputEvent('WatchedEntityChange', (event) => {
+			if (event.entity === entity) {
+				callback(entity, event.changes);
+			}
+		});
+
+		return () => {
+			unregister();
+			this._svgCompHandle.unregisterEntityCallback(entity);
+		};
+	}
+
 	public emitInputEvent(event: SvgCompInputEvent, debounce = true): void {
 		this._inputEventQueue.push(event);
 
-		// TODO: debounce
-		if (this.renderer?.isCallbackBased) {
-			// TODO
+		// Delay update call, resetting timer on new events within debounceDelay
+		if (event.type === 'Interaction' && this.renderer?.isCallbackBased) {
+			if (this.debounceTimeout != null) {
+				clearTimeout(this.debounceTimeout);
+			}
+			if (debounce) {
+				this.debounceTimeout = setTimeout(() => {
+					this.update();
+				}, this.debounceDelay) as unknown as number;
+			} else {
+				this.update();
+			}
 		}
 	}
 
@@ -132,8 +198,12 @@ export class Composition {
 	// Other
 	// =========================================================================
 
-	public logEntityComponentsRaw(entity: Entity): void {
-		this._svgCompHandle.logEntityComponentsRaw(entity);
+	public logEntityComponentsRaw(rawEntity: number): void {
+		this._svgCompHandle.logEntityComponentsRaw(rawEntity);
+	}
+
+	public logEntityComponents(entity: Entity): void {
+		this._svgCompHandle.logEntityComponents(entity);
 	}
 
 	public toString(): string | null {
@@ -146,15 +216,16 @@ export interface TCompositionConfig {
 	interactive?: boolean;
 }
 
-interface TOutputEventTypeMap {
-	SvgElementChanges: SvgElementChangesOutputEvent;
-	WatchedEntityChanges: WatchedEntityChangesOutputEvent;
+export interface TOutputEventTypeMap {
+	SvgElementChange: SvgElementChangeOutputEvent;
+	WatchedEntityChange: WatchedEntityChangeOutputEvent;
 	SelectionChange: SelectionChangeOutputEvent;
 	CompositionChange: CompositionChangeOutputEvent;
+	InteractionModeChange: InteractionModeChangeOutputEvent;
 }
 
-type TWatchedOutputEventCallback<GEventType extends keyof TOutputEventTypeMap> = (
-	value: TOutputEventTypeMap[GEventType]
+export type TWatchedOutputEventCallback<GEventType extends keyof TOutputEventTypeMap> = (
+	event: TOutputEventTypeMap[GEventType]
 ) => void;
 
 interface TWatchedOutputEventCallbackEntry<GEventType extends keyof TOutputEventTypeMap> {
@@ -165,3 +236,5 @@ interface TWatchedOutputEventCallbackEntry<GEventType extends keyof TOutputEvent
 type TWatchedOutputEventsCallbackMap = {
 	[K in SvgCompOutputEvent['type']]?: TWatchedOutputEventCallbackEntry<K>[];
 };
+
+export type TWatchEntityCallback = (entity: Entity, change: ComponentChange[]) => void;

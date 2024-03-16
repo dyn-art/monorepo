@@ -1,4 +1,5 @@
 use bevy_ecs::system::Resource;
+use dyn_comp_common::common::Size;
 use glam::Vec2;
 
 #[derive(Resource, Debug, Default)]
@@ -26,13 +27,13 @@ pub enum InteractionMode {
     Resizing {
         corner: u8,
         initial_bounds: XYWH,
-        rotation_in_degrees: f32, // For cursor
+        rotation_deg: f32, // For cursor
     },
     /// When the user is rotating the selected nodes.
     Rotating {
         corner: u8,
-        initial_rotation_in_radians: f32,
-        rotation_in_degrees: f32, // For cursor
+        initial_rotation_rad: f32,
+        rotation_deg: f32, // For cursor
     },
 }
 
@@ -40,8 +41,7 @@ pub enum InteractionMode {
 #[cfg_attr(feature = "serde_support", derive(serde::Deserialize, specta::Type))]
 pub struct XYWH {
     pub position: Vec2,
-    pub width: f32,
-    pub height: f32,
+    pub size: Size,
 }
 
 #[derive(Debug, Copy, Clone)]
@@ -53,11 +53,12 @@ pub enum HandleSide {
     Right = 8,
 }
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Default, PartialEq, Eq, Copy, Clone)]
 #[cfg_attr(feature = "serde_support", derive(serde::Deserialize, specta::Type))]
 pub enum MouseButton {
     Left,
     Middle,
     Right,
+    #[default]
     Unkown,
 }

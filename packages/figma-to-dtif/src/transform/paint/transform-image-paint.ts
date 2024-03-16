@@ -1,4 +1,4 @@
-import type { COMP } from '@dyn/comp-dtif';
+import type { COMP } from '@dyn/dtif-comp';
 import type { TContinuousId } from '@dyn/utils';
 
 import { mapFigmaTransformToMat3 } from '../../utils';

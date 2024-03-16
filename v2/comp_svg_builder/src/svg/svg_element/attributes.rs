@@ -158,7 +158,6 @@ impl SvgAttribute {
                     content,
                     content_type,
                 } => format!("data:{};base64,{}", content_type.mime_type(), content),
-                SvgHrefAttribute::Base64 { .. } => String::from("todo"),
                 SvgHrefAttribute::Url { url } => url.clone(),
             },
             Self::PreserveAspectRatio {

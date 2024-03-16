@@ -22,13 +22,11 @@ export type Centimeter = number
 
 export type Color = { red: number; green: number; blue: number }
 
-export type CompCoreInputEvent = ({ type: "CompositionResized" } & CompositionResizedInputEvent) | ({ type: "CompositionViewportChanged" } & CompositionViewportChangedInputEvent) | ({ type: "EntityMoved" } & EntityMovedInputEvent) | ({ type: "EntitySetPosition" } & EntitySetPositionInputEvent) | ({ type: "EntityDeleted" } & EntityDeletedInputEvent)
+export type CompCoreInputEvent = ({ type: "EntityDeleted" } & EntityDeletedInputEvent) | ({ type: "CompositionResized" } & CompositionResizedInputEvent) | ({ type: "CompositionViewportChanged" } & CompositionViewportChangedInputEvent) | ({ type: "EntityMoved" } & EntityMovedInputEvent) | ({ type: "EntitySetPosition" } & EntitySetPositionInputEvent) | ({ type: "EntitySetRotation" } & EntitySetRotationInputEvent)
 
-export type ComponentChange = { type: "Size"; size: Size } | { type: "Transform" }
+export type ComponentChange = { type: "Size"; size: Size } | { type: "Transform"; rotationDeg: number; translation: Vec2 }
 
-export type CompositionChange = { rootNodes: Entity[]; viewport: Viewport; size: Size }
-
-export type CompositionChangeOutputEvent = { change: CompositionChange }
+export type CompositionChangeOutputEvent = { rootNodes: Entity[]; viewport: Viewport; size: Size }
 
 export type CompositionResizedInputEvent = { size: Size }
 
@@ -40,9 +38,9 @@ export type CursorDownOnCompInputEvent = { position: Vec2; button: MouseButton }
 
 export type CursorDownOnEntityInputEvent = { entity: Entity; position: Vec2; button: MouseButton }
 
-export type CursorDownOnResizeHandleInputEvent = { initialBounds: XYWH; corner: number; rotationInRadians: number }
+export type CursorDownOnResizeHandleInputEvent = { initialBounds: XYWH; corner: number; rotationRad: number }
 
-export type CursorDownOnRotateHandleInputEvent = { corner: number; initialRotationInRadians: number }
+export type CursorDownOnRotateHandleInputEvent = { corner: number; initialRotationRad: number }
 
 export type CursorEnteredCompInputEvent = null
 
@@ -101,7 +99,7 @@ export type DtifEntitySetPositionEvent = { entity: string; x: number; y: number 
 
 export type DtifInputEvent = ({ type: "CompositionResized" } & DtifCompositionResizedEvent) | ({ type: "CompositionViewportChanged" } & DtifCompositionViewportChangedEvent) | ({ type: "EntityMoved" } & DtifEntityMovedEvent) | ({ type: "EntitySetPosition" } & DtifEntitySetPositionEvent) | ({ type: "EntityDeleted" } & DtifEntityDeletedEvent)
 
-export type EllipseNode = { startingAngle?: number; endingAngle?: number; innerRadiusRatio?: number; translation?: Vec2; angle?: Degree; size: Size; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; styles?: Style[] }
+export type EllipseNode = { startingAngle?: number; endingAngle?: number; innerRadiusRatio?: number; translation?: Vec2; rotationDeg?: Degree; size: Size; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; styles?: Style[] }
 
 export type Entity = number
 
@@ -110,6 +108,8 @@ export type EntityDeletedInputEvent = { entity: Entity }
 export type EntityMovedInputEvent = { entity: Entity; dx: number; dy: number }
 
 export type EntitySetPositionInputEvent = { entity: Entity; x: number; y: number }
+
+export type EntitySetRotationInputEvent = { entity: Entity; rotationDeg: Degree }
 
 export type FillStyle = { paintId: string; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity }
 
@@ -141,7 +141,7 @@ export type FontStyle =
  */
 "Oblique"
 
-export type FrameNode = { clipContent?: boolean; translation?: Vec2; angle?: Degree; size: Size; cornerRadii?: CornerRadii; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; styles?: Style[]; children?: string[] }
+export type FrameNode = { clipContent?: boolean; translation?: Vec2; rotationDeg?: Degree; size: Size; cornerRadii?: CornerRadii; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; styles?: Style[]; children?: string[] }
 
 export type GradientColorStop = { 
 /**
@@ -161,7 +161,7 @@ export type GradientPaint = { variant: GradientVariant; stops: GradientColorStop
 
 export type GradientVariant = { type: "Linear"; transform?: Mat3 } | { type: "Radial"; transform?: Mat3 }
 
-export type GroupNode = { translation?: Vec2; angle?: Degree; size: Size; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; children?: string[] }
+export type GroupNode = { translation?: Vec2; rotationDeg?: Degree; size: Size; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; children?: string[] }
 
 export type HandleSide = "Top" | "Bottom" | "Left" | "Right"
 
@@ -211,11 +211,15 @@ export type InteractionMode =
 /**
  * When the user is resizing the selected nodes.
  */
-{ type: "Resizing"; corner: number; initial_bounds: XYWH; rotation_in_degrees: number } | 
+{ type: "Resizing"; corner: number; initial_bounds: XYWH; rotation_deg: number } | 
 /**
  * When the user is rotating the selected nodes.
  */
-{ type: "Rotating"; corner: number; initial_rotation_in_radians: number; rotation_in_degrees: number }
+{ type: "Rotating"; corner: number; initial_rotation_rad: number; rotation_deg: number }
+
+export type InteractionModeChangeOutputEvent = { interactionMode: InteractionModeLabel }
+
+export type InteractionModeLabel = "None" | "Pressing" | "Translating" | "Resizing" | "Rotating" | "Dragging"
 
 export type LetterSpacing = "Auto" | { Fixed: MeasurementUnit }
 
@@ -239,11 +243,11 @@ export type Percent = number
 
 export type Pixel = number
 
-export type PolygonNode = { pointCount?: number; translation?: Vec2; angle?: Degree; size: Size; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; styles?: Style[] }
+export type PolygonNode = { pointCount?: number; translation?: Vec2; rotationDeg?: Degree; size: Size; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; styles?: Style[] }
 
-export type RectangleNode = { translation?: Vec2; angle?: Degree; size: Size; cornerRadii?: CornerRadii; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; styles?: Style[] }
+export type RectangleNode = { translation?: Vec2; rotationDeg?: Degree; size: Size; cornerRadii?: CornerRadii; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; styles?: Style[] }
 
-export type SelectionChangeOutputEvent = { selected: Entity[] }
+export type SelectionChangeOutputEvent = { selectedEntities: Entity[] }
 
 export type Size = Vec2
 
@@ -251,7 +255,7 @@ export type SolidPaint = { color: Color }
 
 export type SpectaExport = { comp_dtif: DtifComposition; svg_comp_input_event: SvgCompInputEvent; svg_comp_output_event: SvgCompOutputEvent }
 
-export type StarNode = { innerRadiusRatio?: number; pointCount?: number; translation?: Vec2; angle?: Degree; size: Size; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; styles?: Style[] }
+export type StarNode = { innerRadiusRatio?: number; pointCount?: number; translation?: Vec2; rotationDeg?: Degree; size: Size; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; styles?: Style[] }
 
 export type StrokeStyle = { width: number; paintId: string; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity }
 
@@ -278,16 +282,16 @@ export type SvgBuilderOutputEvent =
  * Represents incremental changes to an SVG element.
  * Emitted when the "output_svg_element_changes" feature is enabled.
  */
-({ type: "SvgElementChanges" } & SvgElementChangesOutputEvent) | 
+({ type: "SvgElementChanges" } & SvgElementChangeOutputEvent) | 
 /**
  * Contains the complete SVG as a string.
  * Emitted when the "output_svg_string" feature is enabled.
  */
 ({ type: "SvgString" } & SvgStringOutputEvent)
 
-export type SvgCompInputEvent = { type: "Comp"; event: CompCoreInputEvent } | { type: "Interaction"; event: InteractionInputEvent }
+export type SvgCompInputEvent = { type: "Composition"; event: CompCoreInputEvent } | { type: "Interaction"; event: InteractionInputEvent }
 
-export type SvgCompOutputEvent = ({ type: "SvgElementChanges" } & SvgElementChangesOutputEvent) | ({ type: "CompositionChange" } & CompositionChangeOutputEvent) | ({ type: "WatchedEntityChanges" } & WatchedEntityChangesOutputEvent) | ({ type: "SelectionChange" } & SelectionChangeOutputEvent)
+export type SvgCompOutputEvent = ({ type: "SvgElementChange" } & SvgElementChangeOutputEvent) | ({ type: "CompositionChange" } & CompositionChangeOutputEvent) | ({ type: "WatchedEntityChange" } & WatchedEntityChangeOutputEvent) | ({ type: "SelectionChange" } & SelectionChangeOutputEvent) | ({ type: "InteractionModeChange" } & InteractionModeChangeOutputEvent)
 
 export type SvgDisplayStyle = "Block" | "None"
 
@@ -298,9 +302,7 @@ export type SvgElementAppendedChange = { parentId: SvgElementId }
 
 export type SvgElementChange = ({ type: "ElementCreated" } & SvgElementCreatedChange) | ({ type: "ElementDeleted" }) | ({ type: "ElementAppended" } & SvgElementAppendedChange) | ({ type: "AttributeUpdated" } & SvgAttributeUpdatedChange) | ({ type: "AttributeRemoved" } & SvgAttributeRemovedChange) | ({ type: "StyleUpdated" } & SvgStyleUpdatedChange) | ({ type: "StyleRemoved" } & SvgStyleRemovedChange) | ({ type: "ElementChildrenReordered" } & SvgElementChildrenReorderedChange)
 
-export type SvgElementChanges = { id: SvgElementId; changes: SvgElementChange[] }
-
-export type SvgElementChangesOutputEvent = { changes: SvgElementChanges }
+export type SvgElementChangeOutputEvent = { id: SvgElementId; changes: SvgElementChange[] }
 
 /**
  * Emitted when children of a SvgElement are reordered.
@@ -349,7 +351,7 @@ export type SvgTransformAttribute = { type: "Matrix"; a: number; b: number; c: n
 
 export type SvgUnits = "UserSpaceOnUse" | "ObjectBoundingBox"
 
-export type TextNode = { spans: TextSpan[]; horizontalTextAlignment?: HorizontalTextAlignment; verticalTextAlignment?: VerticalTextAlignment; linebreakBehavior?: BreakLineOn; translation?: Vec2; angle?: Degree; size: Size; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; styles?: Style[] }
+export type TextNode = { spans: TextSpan[]; horizontalTextAlignment?: HorizontalTextAlignment; verticalTextAlignment?: VerticalTextAlignment; linebreakBehavior?: BreakLineOn; translation?: Vec2; rotationDeg?: Degree; size: Size; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; styles?: Style[] }
 
 /**
  * A styled text segment.
@@ -389,17 +391,17 @@ export type Vec2 = [number, number]
 
 export type Vec4 = [number, number, number, number]
 
-export type VectorNode = { path: string; translation?: Vec2; angle?: Degree; size: Size; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; styles?: Style[] }
+export type VectorNode = { path: string; translation?: Vec2; rotationDeg?: Degree; size: Size; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; styles?: Style[] }
 
 export type VerticalTextAlignment = "Top" | "Center" | "Bottom" | "Justified"
 
-export type Viewport = { physicalPosition: Vec2; physicalSize: Vec2 }
+export type Viewport = { physicalPosition: Vec2; physicalSize: Size }
 
 export type WatchableComponentVariant = "Size" | "Transform"
 
-export type WatchedEntityChangesOutputEvent = { entity: Entity; changes: ComponentChange[] }
+export type WatchedEntityChangeOutputEvent = { entity: Entity; changes: ComponentChange[] }
 
 export type WheeledOnCompInputEvent = { position: Vec2; delta: Vec2; ctrlKeyPressed: boolean; metaKeyPressed: boolean }
 
-export type XYWH = { position: Vec2; width: number; height: number }
+export type XYWH = { position: Vec2; size: Size }
 

@@ -171,9 +171,9 @@ importers:
 
   apps/web:
     dependencies:
-      '@dyn/comp-dtif':
+      '@dyn/dtif-comp':
         specifier: workspace:*
-        version: link:../../packages/comp-dtif
+        version: link:../../packages/dtif-comp
       '@dyn/dtif':
         specifier: workspace:*
         version: link:../../packages/dtif
@@ -316,7 +316,7 @@ importers:
         specifier: ^4.6.0
         version: 4.6.0
 
-  packages/comp-dtif:
+  packages/dtif-comp:
     dependencies:
       '@dyn/utils':
         specifier: workspace:*
@@ -411,9 +411,9 @@ importers:
         specifier: ^3.0.0
         version: 3.0.0
     devDependencies:
-      '@dyn/comp-dtif':
+      '@dyn/dtif-comp':
         specifier: workspace:*
-        version: link:../comp-dtif
+        version: link:../dtif-comp
       '@dyn/config':
         specifier: workspace:*
         version: link:../config
@@ -512,9 +512,9 @@ importers:
 
   packages/svg-comp:
     dependencies:
-      '@dyn/comp-dtif':
+      '@dyn/dtif-comp':
         specifier: workspace:*
-        version: link:../comp-dtif
+        version: link:../dtif-comp
       '@dyn/utils':
         specifier: workspace:*
         version: link:../utils

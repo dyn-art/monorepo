@@ -15,13 +15,11 @@ use bevy_ecs::{
     system::{Commands, Query, ResMut},
 };
 use dyn_comp_common::{
-    common::Size,
     mixins::{PaintChildMixin, SizeMixin, StyleChildrenMixin, StyleParentMixin},
     nodes::{CompNode, CompNodeVariant},
     paints::{CompPaint, CompPaintVariant, GradientCompPaint, ImageCompPaint},
     styles::{CompStyle, CompStyleVariant},
 };
-use glam::Vec2;
 
 pub fn insert_node_svg_bundle(
     mut commands: Commands,
@@ -98,7 +96,6 @@ pub fn insert_style_svg_bundle(
                         maybe_image_paint.unwrap().scale_mode,
                         &mut svg_context_res,
                     ))),
-                    _ => None,
                 };
 
                 if let Some(bundle_variant) = bundle_variant {
@@ -133,23 +130,20 @@ pub fn sync_node_size_with_style(
         (With<CompStyle>, Without<CompNode>, Without<SizeMixin>),
     >,
 ) {
-    for (node_entity, SizeMixin(Size(size)), StyleChildrenMixin(children)) in node_query.iter() {
+    for (node_entity, SizeMixin(size), StyleChildrenMixin(children)) in node_query.iter() {
         // Update existing DimensionMixin for children with Paint and DimensionMixin
         for (paint_entity, StyleParentMixin(parent), mut size_mixin) in
             style_with_size_query.iter_mut()
         {
             if children.contains(&paint_entity) && *parent == node_entity {
-                size_mixin.0 .0.x = size.x;
-                size_mixin.0 .0.y = size.y;
+                size_mixin.0 = *size;
             }
         }
 
         // Add DimensionMixin for children with Paint but without DimensionMixin
         for (paint_entity, StyleParentMixin(parent)) in style_without_size_query.iter() {
             if children.contains(&paint_entity) && *parent == node_entity {
-                commands
-                    .entity(paint_entity)
-                    .insert(SizeMixin(Size(Vec2::new(size.x, size.y))));
+                commands.entity(paint_entity).insert(SizeMixin(*size));
             }
         }
     }

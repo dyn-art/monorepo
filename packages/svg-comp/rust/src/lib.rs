@@ -75,7 +75,7 @@ impl SvgCompHandle {
         if let Ok(input_events) = maybe_input_events {
             for input_event in input_events {
                 match input_event {
-                    SvgCompInputEvent::Comp { event } => {
+                    SvgCompInputEvent::Composition { event } => {
                         event.send_into_ecs(&mut self.app.world);
                     }
                     SvgCompInputEvent::Interaction { event } => {
@@ -96,7 +96,7 @@ impl SvgCompHandle {
         while let Ok(event) = self.svg_builder_output_event_receiver.try_recv() {
             match event {
                 SvgBuilderOutputEvent::SvgElementChanges(event) => {
-                    output_events.push(SvgCompOutputEvent::SvgElementChanges(event))
+                    output_events.push(SvgCompOutputEvent::SvgElementChange(event))
                 }
                 _ => {}
             }
@@ -154,8 +154,8 @@ impl SvgCompHandle {
         };
     }
 
-    #[wasm_bindgen(js_name = unregisterEntity)]
-    pub fn unregister_entity(&mut self, js_entity: JsValue) -> Result<bool, JsValue> {
+    #[wasm_bindgen(js_name = unregisterEntityCallback)]
+    pub fn unregister_entity_callback(&mut self, js_entity: JsValue) -> Result<bool, JsValue> {
         let entity: Entity = serde_wasm_bindgen::from_value(js_entity)?;
         return match self.app.world.get_resource_mut::<WatchedEntitiesRes>() {
             Some(mut watched_entities_res) => Ok(watched_entities_res.unregister_entity(entity)),
@@ -171,7 +171,8 @@ impl SvgCompHandle {
         // Open SVG tag
         result.push_str(&format!(
             "<svg width=\"{}\" height=\"{}\" xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\">",
-            comp_res.size.0.x, comp_res.size.0.y
+            comp_res.size.width(),
+            comp_res.size.height()
         ));
 
         let mut system_state: SystemState<(

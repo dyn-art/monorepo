@@ -11,13 +11,13 @@ use crate::{
     styles::{CompStyle, FillCompStyle, StrokeCompStyle},
 };
 use bevy_ecs::bundle::Bundle;
-use bevy_transform::components::Transform;
+use bevy_transform::TransformBundle;
 
 #[derive(Bundle, Debug)]
 pub struct FrameCompNodeBundle {
     pub node: CompNode,
     pub frame: FrameCompNode,
-    pub transform: Transform,
+    pub transform: TransformBundle,
     pub size: SizeMixin,
     pub corner_radii: CornerRadiiMixin,
     pub visibility: VisibilityMixin,
@@ -32,7 +32,7 @@ pub struct FrameCompNodeBundle {
 pub struct GroupCompNodeBundle {
     pub node: CompNode,
     pub group: GroupCompNode,
-    pub transform: Transform,
+    pub transform: TransformBundle,
     pub visibility: VisibilityMixin,
     pub blend_mode: BlendModeMixin,
     pub opacity: OpacityMixin,
@@ -44,7 +44,7 @@ pub struct GroupCompNodeBundle {
 pub struct RectangleCompNodeBundle {
     pub node: CompNode,
     pub rectangle: RectangleCompNode,
-    pub transform: Transform,
+    pub transform: TransformBundle,
     pub size: SizeMixin,
     pub corner_radii: CornerRadiiMixin,
     pub visibility: VisibilityMixin,
@@ -58,7 +58,7 @@ pub struct RectangleCompNodeBundle {
 pub struct EllipseCompNodeBundle {
     pub node: CompNode,
     pub ellipse: EllipseCompNode,
-    pub transform: Transform,
+    pub transform: TransformBundle,
     pub size: SizeMixin,
     pub visibility: VisibilityMixin,
     pub blend_mode: BlendModeMixin,
@@ -71,7 +71,7 @@ pub struct EllipseCompNodeBundle {
 pub struct StarCompNodeBundle {
     pub node: CompNode,
     pub star: StarCompNode,
-    pub transform: Transform,
+    pub transform: TransformBundle,
     pub size: SizeMixin,
     pub visibility: VisibilityMixin,
     pub blend_mode: BlendModeMixin,
@@ -84,7 +84,7 @@ pub struct StarCompNodeBundle {
 pub struct PolygonCompNodeBundle {
     pub node: CompNode,
     pub polygon: PolygonCompNode,
-    pub transform: Transform,
+    pub transform: TransformBundle,
     pub size: SizeMixin,
     pub visibility: VisibilityMixin,
     pub blend_mode: BlendModeMixin,
@@ -97,7 +97,7 @@ pub struct PolygonCompNodeBundle {
 pub struct TextCompNodeBundle {
     pub node: CompNode,
     pub text: TextCompNode,
-    pub transform: Transform,
+    pub transform: TransformBundle,
     pub size: SizeMixin,
     pub visibility: VisibilityMixin,
     pub blend_mode: BlendModeMixin,
@@ -110,7 +110,7 @@ pub struct TextCompNodeBundle {
 pub struct VectorNodeBundle {
     pub node: CompNode,
     pub vector: VectorCompNode,
-    pub transform: Transform,
+    pub transform: TransformBundle,
     pub size: SizeMixin,
     pub visibility: VisibilityMixin,
     pub blend_mode: BlendModeMixin,
