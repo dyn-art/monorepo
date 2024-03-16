@@ -207,6 +207,8 @@ impl SvgElement {
         reorder_operation(&mut self.children);
 
         // Check if the order has changed and emit reorder event if so
+        // TODO: Actually only necessary if the parent wasn't created in this update cycle
+        // because if the parent was created it already gets sorted by the queue system
         #[cfg(feature = "output_svg_element_changes")]
         {
             let new_order: SmallVec<[SvgElementId; 2]> =
