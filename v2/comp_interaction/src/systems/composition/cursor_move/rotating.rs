@@ -4,9 +4,12 @@ use crate::{
 };
 use bevy_ecs::{query::With, system::Query};
 use bevy_transform::components::{GlobalTransform, Transform};
-use dyn_comp_common::mixins::SizeMixin;
+use dyn_comp_common::{
+    math::{rotate_around_point, transform_to_z_rotation_rad},
+    mixins::SizeMixin,
+};
 use dyn_comp_core::resources::composition::CompositionRes;
-use glam::{EulerRot, Mat4, Quat, Vec2, Vec3};
+use glam::{Vec2, Vec3};
 
 pub fn handle_rotating(
     comp_res: &CompositionRes,
@@ -51,31 +54,23 @@ pub fn handle_rotating(
         let rotation_angle_rad =
             calculate_rotation_rad(initial_rotation_rad, &cursor_position, &global_pivot_point);
         let final_rotation_angle_rad =
-            -rotation_angle_rad + rotation_offset_rad - initial_rotation_rad;
+            (-rotation_angle_rad + rotation_offset_rad - initial_rotation_rad) * -1.0;
 
         // Apply rotation
         let reset_rotation_transform_mat4 = rotate_around_point(
             transform.compute_matrix(),
-            -transform.rotation.to_euler(EulerRot::XYZ).2,
+            -transform_to_z_rotation_rad(&transform),
             pivot_point,
         );
         let rotation_transform_mat4 = rotate_around_point(
             reset_rotation_transform_mat4,
-            -final_rotation_angle_rad,
+            final_rotation_angle_rad,
             pivot_point,
         );
         *transform = Transform::from_matrix(rotation_transform_mat4);
 
-        *rotation_deg = -final_rotation_angle_rad.to_degrees();
+        *rotation_deg = final_rotation_angle_rad.to_degrees();
     }
-}
-
-// https://math.stackexchange.com/questions/2093314/rotation-matrix-of-rotation-around-a-point-other-than-the-origin
-pub fn rotate_around_point(transform: Mat4, angle_rad: f32, pivot_point: Vec3) -> Mat4 {
-    let translate_to_pivot = Mat4::from_translation(pivot_point);
-    let translate_to_origin = Mat4::from_translation(-pivot_point);
-    let rotation = Mat4::from_quat(Quat::from_rotation_z(angle_rad));
-    return transform * (translate_to_pivot * rotation * translate_to_origin);
 }
 
 fn calculate_rotation_rad(initial_angle_rad: f32, cursor_point: &Vec2, pivot_point: &Vec3) -> f32 {

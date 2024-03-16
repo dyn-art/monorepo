@@ -73,7 +73,7 @@ impl ToEcsBundleImpl for FrameNode {
             },
             transform: TransformBundle::from_transform(Transform {
                 translation: Vec3::new(self.translation.x, self.translation.y, 0.0),
-                rotation: Quat::from_rotation_z(-self.rotation_deg.to_radians()),
+                rotation: Quat::from_rotation_z(self.rotation_deg.to_radians()),
                 scale: Vec3::ONE,
             }),
             size: SizeMixin(self.size),
@@ -114,7 +114,7 @@ impl ToEcsBundleImpl for GroupNode {
             group: GroupCompNode,
             transform: TransformBundle::from_transform(Transform {
                 translation: Vec3::new(self.translation.x, self.translation.y, 0.0),
-                rotation: Quat::from_rotation_z(-self.rotation_deg.to_radians()),
+                rotation: Quat::from_rotation_z(self.rotation_deg.to_radians()),
                 scale: Vec3::ONE,
             }),
             visibility: VisibilityMixin(self.visible),
@@ -155,7 +155,7 @@ impl ToEcsBundleImpl for RectangleNode {
             rectangle: RectangleCompNode::default(),
             transform: TransformBundle::from_transform(Transform {
                 translation: Vec3::new(self.translation.x, self.translation.y, 0.0),
-                rotation: Quat::from_rotation_z(-self.rotation_deg.to_radians()),
+                rotation: Quat::from_rotation_z(self.rotation_deg.to_radians()),
                 scale: Vec3::ONE,
             }),
             size: SizeMixin(self.size),
@@ -208,7 +208,7 @@ impl ToEcsBundleImpl for EllipseNode {
             },
             transform: TransformBundle::from_transform(Transform {
                 translation: Vec3::new(self.translation.x, self.translation.y, 0.0),
-                rotation: Quat::from_rotation_z(-self.rotation_deg.to_radians()),
+                rotation: Quat::from_rotation_z(self.rotation_deg.to_radians()),
                 scale: Vec3::ONE,
             }),
             size: SizeMixin(self.size),
@@ -255,7 +255,7 @@ impl ToEcsBundleImpl for StarNode {
             },
             transform: TransformBundle::from_transform(Transform {
                 translation: Vec3::new(self.translation.x, self.translation.y, 0.0),
-                rotation: Quat::from_rotation_z(-self.rotation_deg.to_radians()),
+                rotation: Quat::from_rotation_z(self.rotation_deg.to_radians()),
                 scale: Vec3::ONE,
             }),
             size: SizeMixin(self.size),
@@ -304,7 +304,7 @@ impl ToEcsBundleImpl for PolygonNode {
             },
             transform: TransformBundle::from_transform(Transform {
                 translation: Vec3::new(self.translation.x, self.translation.y, 0.0),
-                rotation: Quat::from_rotation_z(-self.rotation_deg.to_radians()),
+                rotation: Quat::from_rotation_z(self.rotation_deg.to_radians()),
                 scale: Vec3::ONE,
             }),
             size: SizeMixin(self.size),
@@ -361,7 +361,7 @@ impl ToEcsBundleImpl for TextNode {
             },
             transform: TransformBundle::from_transform(Transform {
                 translation: Vec3::new(self.translation.x, self.translation.y, 0.0),
-                rotation: Quat::from_rotation_z(-self.rotation_deg.to_radians()),
+                rotation: Quat::from_rotation_z(self.rotation_deg.to_radians()),
                 scale: Vec3::ONE,
             }),
             size: SizeMixin(self.size),
@@ -403,7 +403,7 @@ impl ToEcsBundleImpl for VectorNode {
             vector: VectorCompNode,
             transform: TransformBundle::from_transform(Transform {
                 translation: Vec3::new(self.translation.x, self.translation.y, 0.0),
-                rotation: Quat::from_rotation_z(-self.rotation_deg.to_radians()),
+                rotation: Quat::from_rotation_z(self.rotation_deg.to_radians()),
                 scale: Vec3::ONE,
             }),
             size: SizeMixin(self.size),

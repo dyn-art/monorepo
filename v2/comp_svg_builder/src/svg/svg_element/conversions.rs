@@ -5,13 +5,16 @@ use super::{
     styles::{SvgBlendModeStyle, SvgStyleColor},
 };
 use bevy_transform::components::Transform;
-use dyn_comp_common::common::{BlendMode, Color};
+use dyn_comp_common::{
+    common::{BlendMode, Color},
+    math::convert_rh_to_lh,
+};
 use glam::Mat3;
 use tiny_skia_path::{Path, PathSegment};
 
 impl From<&Transform> for SvgTransformAttribute {
     fn from(transform: &Transform) -> Self {
-        let mat4 = transform.compute_matrix();
+        let mat4 = convert_rh_to_lh(transform.compute_matrix());
 
         // https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/transform
         // https://docs.aspose.com/svg/net/drawing-basics/transformation-matrix/

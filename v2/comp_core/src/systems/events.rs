@@ -9,9 +9,10 @@ use dyn_comp_common::{
         EntityDeletedInputEvent, EntityMovedInputEvent, EntitySetPositionInputEvent,
         EntitySetRotationInputEvent,
     },
+    math::{rotate_around_point, transform_to_z_rotation_rad},
     mixins::SizeMixin,
 };
-use glam::{EulerRot, Mat4, Quat, Vec3};
+use glam::Vec3;
 
 // https://bevy-cheatbook.github.io/fundamentals/hierarchy.html#despawning-child-entities
 // https://github.com/bevyengine/bevy/issues/5584
@@ -60,7 +61,7 @@ pub fn handle_entity_set_rotation_event(
             let pivot_point = Vec3::new(size.width() / 2.0, size.height() / 2.0, 0.0);
             let reset_rotation_transform_mat4 = rotate_around_point(
                 transform.compute_matrix(),
-                -transform.rotation.to_euler(EulerRot::XYZ).2,
+                -transform_to_z_rotation_rad(&transform),
                 pivot_point,
             );
             let rotation_transform_mat4 = rotate_around_point(
@@ -71,17 +72,4 @@ pub fn handle_entity_set_rotation_event(
             *transform = Transform::from_matrix(rotation_transform_mat4);
         }
     }
-}
-
-// https://math.stackexchange.com/questions/2093314/rotation-matrix-of-rotation-around-a-point-other-than-the-origin
-pub fn rotate_around_point(transform: Mat4, angle_rad: f32, pivot_point: Vec3) -> Mat4 {
-    let translate_to_pivot = Mat4::from_translation(pivot_point);
-    let translate_to_origin = Mat4::from_translation(-pivot_point);
-    let rotation = Mat4::from_quat(Quat::from_rotation_z(angle_rad));
-
-    // b: -mat4.x_axis.y,
-    // c: -mat4.y_axis.x,
-    let rotation_around_pivot = translate_to_pivot * rotation * translate_to_origin;
-
-    return transform * rotation_around_pivot;
 }

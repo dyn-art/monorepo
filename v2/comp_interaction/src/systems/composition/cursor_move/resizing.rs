@@ -6,9 +6,9 @@ use crate::{
 };
 use bevy_ecs::{query::With, system::Query};
 use bevy_transform::components::Transform;
-use dyn_comp_common::mixins::SizeMixin;
+use dyn_comp_common::{math::transform_to_z_rotation_rad, mixins::SizeMixin};
 use dyn_comp_core::resources::composition::CompositionRes;
-use glam::{EulerRot, Vec2};
+use glam::Vec2;
 
 pub fn handle_resizing(
     comp_res: &CompositionRes,
@@ -29,7 +29,7 @@ pub fn handle_resizing(
             &initial_bounds,
             corner,
             &cursor_position,
-            -transform.rotation.to_euler(EulerRot::XYZ).2,
+            -transform_to_z_rotation_rad(&transform),
         );
 
         transform.translation.x = new_bounds.position.x;
