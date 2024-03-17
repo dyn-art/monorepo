@@ -1,0 +1,20 @@
+[package]
+name = "dyn-attributed-string"
+version = "0.0.1"
+description = ""
+edition = { workspace = true }
+homepage = { workspace = true }
+repository = { workspace = true }
+license = { workspace = true }
+authors = { workspace = true }
+
+[features]
+default = []
+tracing = []
+
+[dependencies]
+ropey = "1.6.1"
+rust-lapper = "1.1.0"
+
+# Logging
+log = { workspace = true }
