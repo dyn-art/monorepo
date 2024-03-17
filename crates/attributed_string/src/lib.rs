@@ -1,105 +1,103 @@
-use ropey::Rope;
+pub mod token;
+
+use crate::token::{LinbreakToken, TextFragmentToken, TokenVariant, WordSeparatorToken};
 use rust_lapper::{Interval, Lapper};
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-enum FontStyle {
-    Normal,
-    Italic,
-    Bold,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-enum Attribute {
-    FontSize(u32),
-    FontStyle(FontStyle),
-    Color(u8, u8, u8),
-}
-
-#[derive(Default, Debug, PartialEq, Eq, Clone)]
-struct Attributes {
-    font_size: Option<u32>,
-    font_style: Option<FontStyle>,
-    color: Option<(u8, u8, u8)>,
-}
-
-impl Attributes {
-    pub fn update(&mut self, attribute: Attribute) {
-        match attribute {
-            Attribute::FontSize(size) => self.font_size = Some(size),
-            Attribute::FontStyle(style) => self.font_style = Some(style),
-            Attribute::Color(r, g, b) => self.color = Some((r, g, b)),
-        }
-    }
-}
-
-type TextRange = Interval<usize, Attributes>;
+use smallvec::SmallVec;
+use std::ops::Range;
 
 #[derive(Debug, Clone)]
 struct AttributedString {
-    text: Rope,
-    attribute_intervals: Lapper<usize, Attributes>,
+    text: String,
+    token_stream: SmallVec<[TokenVariant; 8]>,
+    attribute_intervals: Lapper<usize, Attribute>,
 }
+
+#[derive(Debug, PartialEq, Eq, Clone)]
+struct Attribute {
+    // TODO
+}
+
+type AttributeInterval = Interval<usize, Attribute>;
 
 impl AttributedString {
-    pub fn new(text: &str, attributes: Vec<TextRange>) -> Self {
+    pub fn new(text: String, attribute_intervals: Vec<AttributeInterval>) -> Self {
         Self {
-            text: Rope::from_str(text),
-            attribute_intervals: Lapper::new(attributes),
+            text,
+            token_stream: SmallVec::new(),
+            attribute_intervals: Lapper::new(attribute_intervals),
         }
     }
 
-    pub fn string(&self) -> String {
-        self.text.to_string()
-    }
+    pub fn tokanize(&mut self) {
+        let mut token_stream: SmallVec<[TokenVariant; 8]> = SmallVec::new();
 
-    pub fn length(&self) -> usize {
-        self.text.len_chars()
-    }
+        // Tokenize the text, considering spaces and line breaks
+        let mut start = 0;
+        for (index, match_str) in self
+            .text
+            .match_indices(|c: char| is_word_separator_char(c) || is_linebreak_char(c))
+        {
+            // Create a text fragment token for non-whitespace segments
+            if start != index {
+                token_stream.push(TokenVariant::TextFragment(TextFragmentToken {
+                    range: Range {
+                        start: index,
+                        end: match_str.len(),
+                    },
+                    token_cluster: SmallVec::new(),
+                }));
+            }
 
-    pub fn attributes(&self, start: usize, stop: usize) -> Vec<Attributes> {
-        self.attribute_intervals
-            .find(start, stop)
-            .map(|interval| interval.val.clone())
-            .collect()
-    }
+            // Create a token for each space or line break
+            token_stream.push(match match_str.chars().next() {
+                Some(c) if is_word_separator_char(c) => {
+                    TokenVariant::WordSeparator(WordSeparatorToken {
+                        range: Range {
+                            start: index,
+                            end: match_str.len(),
+                        },
+                        token_cluster: SmallVec::new(),
+                    })
+                }
+                Some(c) if is_linebreak_char(c) => TokenVariant::Linbreak(LinbreakToken {
+                    range: Range {
+                        start: index,
+                        end: match_str.len(),
+                    },
+                }),
+                _ => TokenVariant::Unresolved, // Should never happen
+            });
 
-    pub fn insert_attribute(&mut self, elem: TextRange) {
-        self.attribute_intervals.insert(elem);
-    }
-
-    pub fn insert_attributes(&mut self, elems: Vec<TextRange>) {
-        for elem in elems {
-            self.attribute_intervals.insert(elem);
+            start = index + match_str.len();
         }
+
+        // Handle the last text fragment in the segment, if any
+        if start < self.text.len() {
+            token_stream.push(TokenVariant::TextFragment(TextFragmentToken {
+                range: Range {
+                    start,
+                    end: self.text.len(),
+                },
+                token_cluster: SmallVec::new(),
+            }));
+        }
+
+        self.token_stream = token_stream;
+    }
+
+    pub fn outline() {
+        // TODO
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+// https://www.w3.org/TR/css-text-3/#word-separator
+pub fn is_word_separator_char(c: char) -> bool {
+    matches!(
+        c as u32,
+        0x0020 | 0x00A0 | 0x1361 | 0x010100 | 0x010101 | 0x01039F | 0x01091F
+    )
+}
 
-    #[test]
-    fn attribute_insertion_and_query() {
-        let mut attributed_string = AttributedString::new("Hello, World!", vec![]);
-        let start = 0;
-        let stop = 5;
-        let attrs = Attributes {
-            font_size: Some(14),
-            font_style: Some(FontStyle::Bold),
-            color: Some((255, 0, 0)),
-        };
-        let text_range = Interval {
-            start,
-            stop,
-            val: attrs,
-        };
-
-        attributed_string.insert_attribute(text_range);
-
-        let query_attrs = attributed_string.attributes(start, stop);
-        assert_eq!(query_attrs.len(), 1);
-        assert_eq!(query_attrs[0].font_size, Some(14));
-        assert_eq!(query_attrs[0].font_style, Some(FontStyle::Bold));
-        assert_eq!(query_attrs[0].color, Some((255, 0, 0)));
-    }
+pub fn is_linebreak_char(c: char) -> bool {
+    matches!(c, '\n')
 }
