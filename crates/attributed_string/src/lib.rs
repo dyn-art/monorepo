@@ -1,14 +1,15 @@
 pub mod token;
+pub mod usvg;
 
-use crate::token::{LinbreakToken, TextFragmentToken, TokenVariant, WordSeparatorToken};
 use rust_lapper::{Interval, Lapper};
 use smallvec::SmallVec;
 use std::ops::Range;
+use token::{Token, TokenVariant};
 
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 struct AttributedString {
     text: String,
-    token_stream: SmallVec<[TokenVariant; 8]>,
+    token_stream: SmallVec<[Token; 8]>,
     attribute_intervals: Lapper<usize, Attribute>,
 }
 
@@ -29,7 +30,7 @@ impl AttributedString {
     }
 
     pub fn tokanize(&mut self) {
-        let mut token_stream: SmallVec<[TokenVariant; 8]> = SmallVec::new();
+        let mut token_stream: SmallVec<[Token; 8]> = SmallVec::new();
 
         // Tokenize the text, considering spaces and line breaks
         let mut start = 0;
@@ -39,33 +40,35 @@ impl AttributedString {
         {
             // Create a text fragment token for non-whitespace segments
             if start != index {
-                token_stream.push(TokenVariant::TextFragment(TextFragmentToken {
+                token_stream.push(Token {
+                    // text: String::from(match_str),
+                    variant: TokenVariant::TextFragment,
                     range: Range {
                         start: index,
                         end: match_str.len(),
                     },
-                    token_cluster: SmallVec::new(),
-                }));
+                })
             }
 
             // Create a token for each space or line break
             token_stream.push(match match_str.chars().next() {
-                Some(c) if is_word_separator_char(c) => {
-                    TokenVariant::WordSeparator(WordSeparatorToken {
-                        range: Range {
-                            start: index,
-                            end: match_str.len(),
-                        },
-                        token_cluster: SmallVec::new(),
-                    })
-                }
-                Some(c) if is_linebreak_char(c) => TokenVariant::Linbreak(LinbreakToken {
+                Some(c) if is_word_separator_char(c) => Token {
+                    // text: String::from(match_str),
+                    variant: TokenVariant::WordSeparator,
                     range: Range {
                         start: index,
                         end: match_str.len(),
                     },
-                }),
-                _ => TokenVariant::Unresolved, // Should never happen
+                },
+                Some(c) if is_linebreak_char(c) => Token {
+                    // text: String::from(match_str),
+                    variant: TokenVariant::Linebreak,
+                    range: Range {
+                        start: index,
+                        end: match_str.len(),
+                    },
+                },
+                _ => continue, // Should never happen
             });
 
             start = index + match_str.len();
@@ -73,20 +76,26 @@ impl AttributedString {
 
         // Handle the last text fragment in the segment, if any
         if start < self.text.len() {
-            token_stream.push(TokenVariant::TextFragment(TextFragmentToken {
+            token_stream.push(Token {
+                // text: String::from(&self.text[start..]),
+                variant: TokenVariant::TextFragment,
                 range: Range {
                     start,
                     end: self.text.len(),
                 },
-                token_cluster: SmallVec::new(),
-            }));
+            });
         }
 
         self.token_stream = token_stream;
     }
 
-    pub fn outline() {
+    pub fn outline(&mut self, fontdb: &fontdb::Database) {
         // TODO
+    }
+
+    pub fn to_paths(&mut self) -> Vec<()> {
+        // TODO
+        Vec::new()
     }
 }
 

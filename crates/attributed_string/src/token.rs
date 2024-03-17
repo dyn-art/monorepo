@@ -1,70 +1,29 @@
-use smallvec::SmallVec;
 use std::ops::Range;
 
-#[derive(Debug, Clone)]
+/// Represents a segment of text extracted during parsing.
+///
+/// Each `Token` holds a portion of text, its position within the original text,
+/// and its categorized type based on the parsing logic.
+#[derive(Clone)]
+pub struct Token {
+    /// The actual text this token represents.
+    // pub text: String,
+    /// The start and end indices of this token in the original text,
+    /// allowing for position tracking and identifying attributes.
+    pub range: Range<usize>,
+    /// The category of this token, defining its role and significance during parsing.
+    pub variant: TokenVariant,
+}
+
+/// Categorizes types of tokens encountered during text parsing.
+///
+/// This enum allows for distinguishing between various types of text elements, such as words, separators, or line breaks, facilitating their appropriate handling.
+#[derive(Clone)]
 pub enum TokenVariant {
-    Cluster(GlyphClusterToken),
-    WordSeparator(WordSeparatorToken),
-    Linbreak(LinbreakToken),
-    TextFragment(TextFragmentToken),
-    Unresolved,
-}
-
-trait Token {
-    fn get_range(&self) -> &Range<usize>;
-}
-
-/// A TextFragment Token
-#[derive(Debug, Clone)]
-pub struct TextFragmentToken {
-    pub range: Range<usize>,
-
-    pub token_cluster: SmallVec<[GlyphClusterToken; 5]>,
-}
-
-impl Token for TextFragmentToken {
-    fn get_range(&self) -> &Range<usize> {
-        &self.range
-    }
-}
-
-/// A GlyphCluster/Grapheme Token
-#[derive(Debug, Clone)]
-pub struct GlyphClusterToken {
-    pub range: Range<usize>,
-
-    // Set after outline
-    outlined: Option<()>,
-}
-
-impl Token for GlyphClusterToken {
-    fn get_range(&self) -> &Range<usize> {
-        &self.range
-    }
-}
-
-/// A Word Separator Token
-#[derive(Debug, Clone)]
-pub struct WordSeparatorToken {
-    pub range: Range<usize>,
-
-    pub token_cluster: SmallVec<[GlyphClusterToken; 2]>,
-}
-
-impl Token for WordSeparatorToken {
-    fn get_range(&self) -> &Range<usize> {
-        &self.range
-    }
-}
-
-/// A Linebreak Token
-#[derive(Debug, Clone)]
-pub struct LinbreakToken {
-    pub range: Range<usize>,
-}
-
-impl Token for LinbreakToken {
-    fn get_range(&self) -> &Range<usize> {
-        &self.range
-    }
+    /// A separator that indicates boundaries between words (e.g., spaces, punctuation).
+    WordSeparator,
+    /// A line break in the text, aiding in text structure recognition.
+    Linebreak,
+    /// A continuous fragment of text, typically a word or number.
+    TextFragment,
 }

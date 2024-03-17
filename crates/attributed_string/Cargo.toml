@@ -13,9 +13,15 @@ default = []
 tracing = []
 
 [dependencies]
+fontdb = "0.16.0"
+rustybuzz = "0.13.0"
 ropey = "1.6.1"
 rust-lapper = "1.1.0"
 smallvec = { workspace = true }
+tiny-skia-path = { workspace = true }
+unicode-bidi = "0.3"
+unicode-script = "0.5"
+unicode-vo = "0.1"
 
 # Logging
 log = { workspace = true }
