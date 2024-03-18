@@ -14,7 +14,7 @@ use self::{
     glyph::Glyph,
     outlined_cluster::OutlinedCluster,
     resolved_font::ResolvedFont,
-    text::{Font, FontFamily, FontStretch, FontStyle},
+    text::{Font, FontFamily, FontStretch, FontStyle, TextAnchor},
 };
 use crate::usvg::{byte_index::ByteIndex, database::DatabaseExt};
 use rustybuzz::ttf_parser::GlyphId;
@@ -349,4 +349,16 @@ pub fn find_font_for_char(
     }
 
     None
+}
+
+pub fn clusters_length(clusters: &[OutlinedCluster]) -> f32 {
+    clusters.iter().fold(0.0, |w, cluster| w + cluster.advance)
+}
+
+pub fn process_anchor(a: TextAnchor, text_width: f32) -> f32 {
+    match a {
+        TextAnchor::Start => 0.0, // Nothing.
+        TextAnchor::Middle => -text_width / 2.0,
+        TextAnchor::End => -text_width,
+    }
 }

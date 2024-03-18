@@ -1,20 +1,17 @@
+pub mod attribute;
+pub mod font;
 pub mod token;
 pub mod usvg;
 
-use ordered_float::OrderedFloat;
-use rust_lapper::{Interval, Lapper};
-use std::{ops::Range, sync::Arc};
+use attribute::{Attribute, AttributeInterval};
+use rust_lapper::Lapper;
+use std::ops::Range;
+use tiny_skia_path::{Path, Transform};
 use token::{Token, TokenVariant};
 use usvg::{
     database::FontsCache,
-    glyph::{Glyph, GlyphClusters},
-    outline_cluster, resolve_font,
-    resolved_font::ResolvedFont,
-    shape_text,
-    text::{
-        AlignmentBaseline, BaselineShift, DominantBaseline, Font, LengthAdjust, TextAnchor,
-        TextFlow, WritingMode,
-    },
+    process_anchor,
+    text::{TextAnchor, TextFlow, TextPath, WritingMode},
 };
 
 /// `AttributedString` represents a string with associated attributes applied
@@ -22,16 +19,16 @@ use usvg::{
 #[derive(Clone)]
 struct AttributedString {
     /// The full text as a `String` without any attribute information.
-    text: String,
+    pub text: String,
 
     /// A list of tokens derived from the text.
     ///
     /// Each `Token` represents a semantically meaningful unit of the text, such as a `TextFragment`, `WordSeparator` or `Linebreak`,
     /// facilitating further processing.
-    token_stream: Vec<Token>,
+    pub token_stream: Vec<Token>,
 
     /// Attribute intervals mapped to text ranges.
-    attribute_intervals: Lapper<usize, Attribute>,
+    pub attribute_intervals: Lapper<usize, Attribute>,
 
     /// Defines the anchoring position of the text relative to its container.
     pub anchor: TextAnchor,
@@ -42,40 +39,6 @@ struct AttributedString {
     /// Specifies the writing mode for the text.
     pub writing_mode: WritingMode,
 }
-
-#[derive(Debug, PartialEq, Eq, Clone)]
-struct Attribute {
-    /// A font.
-    pub font: Font,
-    /// A font size.
-    pub font_size: OrderedFloat<f32>,
-    /// Indicates that small caps should be used.
-    ///
-    /// Set by `font-variant="small-caps"`
-    pub small_caps: bool,
-    /// Indicates that a kerning should be applied.
-    ///
-    /// Supports both `kerning` and `font-kerning` properties.
-    pub apply_kerning: bool,
-    /// A span dominant baseline.
-    pub dominant_baseline: DominantBaseline,
-    /// A span alignment baseline.
-    pub alignment_baseline: AlignmentBaseline,
-    /// A list of all baseline shift that should be applied to this span.
-    ///
-    /// Ordered from `text` element down to the actual `span` element.
-    pub baseline_shift: Vec<BaselineShift>,
-    /// A letter spacing property.
-    pub letter_spacing: OrderedFloat<f32>,
-    /// A word spacing property.
-    pub word_spacing: OrderedFloat<f32>,
-    /// A text length property.
-    pub text_length: Option<OrderedFloat<f32>>,
-    /// A length adjust property.
-    pub length_adjust: LengthAdjust,
-}
-
-type AttributeInterval = Interval<usize, Attribute>;
 
 impl AttributedString {
     pub fn new(text: String, attribute_intervals: Vec<AttributeInterval>) -> Self {
@@ -142,65 +105,16 @@ impl AttributedString {
         self.token_stream = token_stream;
     }
 
-    pub fn outline(&mut self, fonts_cache: &mut FontsCache, fontdb: &fontdb::Database) {
-        if !self.attribute_intervals.overlaps_merged {
-            self.attribute_intervals.merge_overlaps();
-        }
-
+    pub fn shape_glyphs(&mut self, fonts_cache: &mut FontsCache, fontdb: &fontdb::Database) {
         // TODO: Are inter-glyph covered by TextFragment's
         // or do they go beyond line breaks, word separator?
         for token in &mut self.token_stream {
-            let mut glyphs: Vec<Option<Glyph>> = vec![None; token.range.end - token.range.start];
-
-            // Outline token and thus create glyphs based on attributes
-            for Interval { start, stop, val } in self
-                .attribute_intervals
-                .find(token.range.start, token.range.end)
-            {
-                let resolved_font = match Self::resolve_font(&val.font, fonts_cache, fontdb) {
-                    Some(v) => v.clone(),
-                    None => continue,
-                };
-
-                let text_range = token.range.start.max(*start)..token.range.end.min(*stop);
-                let interval_glyphs = shape_text(
-                    &self.text[text_range.clone()],
-                    resolved_font,
-                    val.small_caps,
-                    val.apply_kerning,
-                    fontdb,
-                );
-
-                // Add interval_glyphs to glyphs vector at start to stop index
-                for (index, glyph) in interval_glyphs.into_iter().enumerate() {
-                    let global_index = text_range.start - token.range.start + index;
-                    glyphs[global_index] = Some(glyph);
-                }
-            }
-
-            // Validate glyphs
-            let maybe_glyphs_len = glyphs.len();
-            let glyphs: Vec<Glyph> = glyphs.into_iter().filter_map(|glyph| glyph).collect();
-            if glyphs.is_empty() || glyphs.len() != maybe_glyphs_len {
-                continue;
-            }
-
-            // Convert glyphs to outlined glyph clusters
-            for (range, byte_idx) in GlyphClusters::new(&glyphs) {
-                let interval_index = token.range.start + byte_idx.value();
-                let maybe_interval = self
-                    .attribute_intervals
-                    .find(interval_index, interval_index + 1)
-                    .last();
-                if let Some(interval) = maybe_interval {
-                    token.outlined_clusters.push(outline_cluster(
-                        &glyphs[range],
-                        &self.text[token.range.clone()],
-                        interval.val.font_size.0,
-                        fontdb,
-                    ));
-                }
-            }
+            token.shape_glyphs(
+                &self.text,
+                &mut self.attribute_intervals,
+                fonts_cache,
+                fontdb,
+            );
         }
     }
 
@@ -210,28 +124,72 @@ impl AttributedString {
         // apply_letter_spacing
         // apply_word_spacing
         // apply_length_adjust
+
+        self.resolve_clusters_positions();
     }
 
-    pub fn to_paths(&mut self) -> Vec<()> {
+    /// Resolves clusters positions.
+    ///
+    /// Mainly sets the `transform` property.
+    ///
+    /// Returns the last text position. The next text chunk should start from that position.
+    fn resolve_clusters_positions(&mut self) {
+        match self.text_flow {
+            TextFlow::Linear => self.resolve_clusters_positions_horizontal(),
+            TextFlow::Path(ref path) => Self::resolve_clusters_positions_path(path),
+        }
+    }
+
+    // TODO: Apply linebreaks
+    fn resolve_clusters_positions_horizontal(&mut self) {
+        let mut x = process_anchor(
+            self.anchor,
+            self.token_stream
+                .iter()
+                .fold(0.0, |acc, token| acc + token.clusers_length()),
+        );
+        let y = 0.0;
+
+        for token in self.token_stream.iter_mut() {
+            for cluster in token.outlined_clusters.iter_mut() {
+                cluster.transform = cluster.transform.pre_translate(x, y);
+                x += cluster.advance;
+            }
+        }
+    }
+
+    fn resolve_clusters_positions_path(path: &TextPath) {
         // TODO
-        Vec::new()
     }
 
-    fn resolve_font<'a>(
-        font: &Font,
-        fonts_cache: &'a mut FontsCache,
+    pub fn to_paths(
+        &mut self,
+        fonts_cache: &mut FontsCache,
         fontdb: &fontdb::Database,
-    ) -> Option<&'a Arc<ResolvedFont>> {
-        // Check if the font is already in the cache
-        if !fonts_cache.contains_key(font) {
-            if let Some(resolved_font) = resolve_font(font, fontdb) {
-                fonts_cache.insert(font.clone(), Arc::new(resolved_font));
-            } else {
-                return None;
+    ) -> Vec<Path> {
+        let mut new_paths: Vec<Path> = Vec::new();
+        let (x, y) = (0.0, 0.0);
+
+        let mut text_ts = Transform::default();
+        if self.writing_mode == WritingMode::TopToBottom {
+            if let TextFlow::Linear = self.text_flow {
+                text_ts = text_ts.pre_rotate_at(90.0, x, y);
             }
         }
 
-        return fonts_cache.get(font);
+        // Outline tokens
+        for token in &mut self.token_stream {
+            if let Some(path) = token.outline() {
+                new_paths.push(path);
+            }
+        }
+
+        // Outline text decorations
+        for interval in self.attribute_intervals.iter() {
+            // TODO
+        }
+
+        return new_paths;
     }
 }
 
@@ -251,6 +209,8 @@ pub fn is_linebreak_char(c: char) -> bool {
 mod tests {
     use self::usvg::text::{FontFamily, FontStretch, FontStyle};
     use super::*;
+    use crate::usvg::text::{AlignmentBaseline, DominantBaseline, Font, LengthAdjust};
+    use ordered_float::OrderedFloat;
     use std::collections::HashMap;
 
     #[test]
@@ -284,13 +244,20 @@ mod tests {
         let mut attributed_string = AttributedString::new(text, attribute_intervals);
 
         attributed_string.tokanize();
+        attributed_string.shape_glyphs(&mut fonts_cache, &fontdb);
+        attributed_string.apply_modifications();
 
-        attributed_string.outline(&mut fonts_cache, &fontdb);
+        let paths = attributed_string.to_paths(&mut fonts_cache, &fontdb);
+        let mut path_builder = tiny_skia_path::PathBuilder::new();
+        for path in &paths {
+            path_builder.push_path(&path);
+        }
+        let path = path_builder.finish();
 
-        assert!(
-            !attributed_string.token_stream.is_empty(),
-            "Token stream should not be empty after processing."
-        );
+        // https://yqnn.github.io/svg-path-editor/
+        println!("Paths: {:?}", path);
+
+        assert_eq!(path.is_some(), true);
     }
 
     fn get_fontdb_with_system_fonts() -> fontdb::Database {
