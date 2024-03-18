@@ -750,6 +750,7 @@ dependencies = [
  "rust-lapper",
  "rustybuzz 0.13.0",
  "smallvec",
+ "strict-num 0.2.0",
  "tiny-skia-path",
  "unicode-bidi",
  "unicode-script",
@@ -2370,6 +2371,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "strict-num"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "290fd5eab900654f4c270bc1cfaeb0f2c17b6851fa448fc22e1778dec105ac68"
+dependencies = [
+ "float-cmp",
+]
+
+[[package]]
 name = "strsim"
 version = "0.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2524,7 +2534,7 @@ checksum = "9c9e7fc0c2e86a30b117d0462aa261b72b7a99b7ebd7deb3a14ceda95c5bdc93"
 dependencies = [
  "arrayref",
  "bytemuck",
- "strict-num",
+ "strict-num 0.1.1",
 ]
 
 [[package]]
@@ -2859,7 +2869,7 @@ dependencies = [
  "rustybuzz 0.12.1",
  "simplecss",
  "siphasher",
- "strict-num",
+ "strict-num 0.1.1",
  "svgtypes 0.14.0",
  "tiny-skia-path",
  "unicode-bidi",
@@ -2908,7 +2918,7 @@ version = "0.38.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "18863e0404ed153d6e56362c5b1146db9f4f262a3244e3cf2dbe7d8a85909f05"
 dependencies = [
- "strict-num",
+ "strict-num 0.1.1",
  "svgtypes 0.13.0",
  "tiny-skia-path",
 ]

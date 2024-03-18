@@ -3,6 +3,7 @@
 
 pub mod byte_index;
 pub mod database;
+pub mod geom;
 pub mod glyph;
 pub mod outlined_cluster;
 pub mod path_builder;

@@ -19,6 +19,7 @@ rustybuzz = "0.13.0"
 ropey = "1.6.1"
 rust-lapper = "1.1.0"
 smallvec = { workspace = true }
+strict-num = "0.2.0"
 tiny-skia-path = { workspace = true }
 unicode-bidi = "0.3"
 unicode-script = "0.5"

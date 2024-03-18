@@ -1,7 +1,8 @@
 // This code is closely derived from:
 // https://github.com/RazrFalcon/resvg/blob/master/crates/usvg/src/tree/text.rs
 
-use std::fmt::Display;
+use super::geom::NonEmptyString;
+use std::{fmt::Display, sync::Arc};
 
 /// A type of font family.
 #[derive(Clone, PartialEq, Eq, Debug, Hash)]
@@ -160,4 +161,67 @@ impl Default for LengthAdjust {
     fn default() -> Self {
         Self::Spacing
     }
+}
+
+/// A text chunk anchor property.
+#[allow(missing_docs)]
+#[derive(Clone, Copy, PartialEq, Debug)]
+pub enum TextAnchor {
+    Start,
+    Middle,
+    End,
+}
+
+impl Default for TextAnchor {
+    fn default() -> Self {
+        Self::Start
+    }
+}
+
+/// A path used by text-on-path.
+#[derive(Debug)]
+pub struct TextPath {
+    pub id: NonEmptyString,
+    pub start_offset: f32,
+    pub path: Arc<tiny_skia_path::Path>,
+}
+
+impl TextPath {
+    /// Element's ID.
+    ///
+    /// Taken from the SVG itself.
+    pub fn id(&self) -> &str {
+        self.id.get()
+    }
+
+    /// A text offset in SVG coordinates.
+    ///
+    /// Percentage values already resolved.
+    pub fn start_offset(&self) -> f32 {
+        self.start_offset
+    }
+
+    /// A path.
+    pub fn path(&self) -> &tiny_skia_path::Path {
+        &self.path
+    }
+}
+
+/// A text chunk flow property.
+#[derive(Clone, Debug)]
+pub enum TextFlow {
+    /// A linear layout.
+    ///
+    /// Includes left-to-right, right-to-left and top-to-bottom.
+    Linear,
+    /// A text-on-path layout.
+    Path(Arc<TextPath>),
+}
+
+/// A writing mode.
+#[allow(missing_docs)]
+#[derive(Clone, Copy, PartialEq, Debug)]
+pub enum WritingMode {
+    LeftToRight,
+    TopToBottom,
 }

@@ -11,14 +11,36 @@ use usvg::{
     outline_cluster, resolve_font,
     resolved_font::ResolvedFont,
     shape_text,
-    text::{AlignmentBaseline, BaselineShift, DominantBaseline, Font, LengthAdjust},
+    text::{
+        AlignmentBaseline, BaselineShift, DominantBaseline, Font, LengthAdjust, TextAnchor,
+        TextFlow, WritingMode,
+    },
 };
 
+/// `AttributedString` represents a string with associated attributes applied
+/// to certain ranges.
 #[derive(Clone)]
 struct AttributedString {
+    /// The full text as a `String` without any attribute information.
     text: String,
+
+    /// A list of tokens derived from the text.
+    ///
+    /// Each `Token` represents a semantically meaningful unit of the text, such as a `TextFragment`, `WordSeparator` or `Linebreak`,
+    /// facilitating further processing.
     token_stream: Vec<Token>,
+
+    /// Attribute intervals mapped to text ranges.
     attribute_intervals: Lapper<usize, Attribute>,
+
+    /// Defines the anchoring position of the text relative to its container.
+    pub anchor: TextAnchor,
+
+    /// Describes how text is divided and flowed within a layout.
+    pub text_flow: TextFlow,
+
+    /// Specifies the writing mode for the text.
+    pub writing_mode: WritingMode,
 }
 
 #[derive(Debug, PartialEq, Eq, Clone)]
@@ -61,6 +83,9 @@ impl AttributedString {
             text,
             token_stream: Vec::new(),
             attribute_intervals: Lapper::new(attribute_intervals),
+            anchor: TextAnchor::Start,
+            text_flow: TextFlow::Linear,
+            writing_mode: WritingMode::LeftToRight,
         }
     }
 
@@ -179,6 +204,19 @@ impl AttributedString {
         }
     }
 
+    pub fn apply_modifications(&mut self) {
+        // TODO
+        // apply_writing_mode
+        // apply_letter_spacing
+        // apply_word_spacing
+        // apply_length_adjust
+    }
+
+    pub fn to_paths(&mut self) -> Vec<()> {
+        // TODO
+        Vec::new()
+    }
+
     fn resolve_font<'a>(
         font: &Font,
         fonts_cache: &'a mut FontsCache,
@@ -194,11 +232,6 @@ impl AttributedString {
         }
 
         return fonts_cache.get(font);
-    }
-
-    pub fn to_paths(&mut self) -> Vec<()> {
-        // TODO
-        Vec::new()
     }
 }
 
