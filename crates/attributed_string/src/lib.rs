@@ -146,7 +146,6 @@ impl AttributedString {
                     fontdb,
                 );
 
-                // TODO: overflow
                 // Add interval_glyphs to glyphs vector at start to stop index
                 for (index, glyph) in interval_glyphs.into_iter().enumerate() {
                     let global_index = text_range.start - token.range.start + index;
