@@ -1,5 +1,4 @@
 use crate::usvg::outlined_cluster::OutlinedCluster;
-use smallvec::SmallVec;
 use std::ops::Range;
 
 /// Represents a segment of text extracted during parsing.
@@ -8,13 +7,23 @@ use std::ops::Range;
 /// and its categorized type based on the parsing logic.
 #[derive(Clone)]
 pub struct Token {
+    /// The category of this token, defining its role and significance during parsing.
+    pub variant: TokenVariant,
     /// Byte range in the original text marking the token's start and end indices.
     /// Enables attribute identification and position tracking.
     pub range: Range<usize>,
-    /// The category of this token, defining its role and significance during parsing.
-    pub variant: TokenVariant,
     ///
-    pub outlined_clusters: SmallVec<[OutlinedCluster; 2]>,
+    pub outlined_clusters: Vec<OutlinedCluster>,
+}
+
+impl Token {
+    pub fn new(variant: TokenVariant, range: Range<usize>) -> Self {
+        Self {
+            variant,
+            range,
+            outlined_clusters: Vec::new(),
+        }
+    }
 }
 
 /// Categorizes types of tokens encountered during text parsing.

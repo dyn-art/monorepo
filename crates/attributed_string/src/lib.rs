@@ -3,7 +3,6 @@ pub mod usvg;
 
 use ordered_float::OrderedFloat;
 use rust_lapper::{Interval, Lapper};
-use smallvec::SmallVec;
 use std::{ops::Range, sync::Arc};
 use token::{Token, TokenVariant};
 use usvg::{
@@ -76,31 +75,28 @@ impl AttributedString {
         {
             // Create a text fragment token for non-whitespace segments
             if start != index {
-                token_stream.push(Token {
-                    variant: TokenVariant::TextFragment,
-                    range: Range { start, end: index },
-                    outlined_clusters: SmallVec::new(),
-                })
+                token_stream.push(Token::new(
+                    TokenVariant::TextFragment,
+                    Range { start, end: index },
+                ));
             }
 
             // Create a token for each space or line break
             token_stream.push(match match_str.chars().next() {
-                Some(c) if is_word_separator_char(c) => Token {
-                    variant: TokenVariant::WordSeparator,
-                    range: Range {
+                Some(c) if is_word_separator_char(c) => Token::new(
+                    TokenVariant::WordSeparator,
+                    Range {
                         start: index,
                         end: index + match_str.len(),
                     },
-                    outlined_clusters: SmallVec::new(),
-                },
-                Some(c) if is_linebreak_char(c) => Token {
-                    variant: TokenVariant::Linebreak,
-                    range: Range {
+                ),
+                Some(c) if is_linebreak_char(c) => Token::new(
+                    TokenVariant::Linebreak,
+                    Range {
                         start: index,
                         end: index + match_str.len(),
                     },
-                    outlined_clusters: SmallVec::new(),
-                },
+                ),
                 _ => continue, // Should never happen
             });
 
@@ -109,14 +105,13 @@ impl AttributedString {
 
         // Handle the last text fragment in the segment, if any
         if start < self.text.len() {
-            token_stream.push(Token {
-                variant: TokenVariant::TextFragment,
-                range: Range {
+            token_stream.push(Token::new(
+                TokenVariant::TextFragment,
+                Range {
                     start,
                     end: self.text.len(),
                 },
-                outlined_clusters: SmallVec::new(),
-            });
+            ));
         }
 
         self.token_stream = token_stream;
@@ -142,17 +137,19 @@ impl AttributedString {
                     None => continue,
                 };
 
+                let text_range = token.range.start.max(*start)..token.range.end.min(*stop);
                 let interval_glyphs = shape_text(
-                    &self.text[token.range.start.max(*start)..token.range.end.min(*stop)],
+                    &self.text[text_range.clone()],
                     resolved_font,
                     val.small_caps,
                     val.apply_kerning,
                     fontdb,
                 );
 
+                // TODO: overflow
                 // Add interval_glyphs to glyphs vector at start to stop index
                 for (index, glyph) in interval_glyphs.into_iter().enumerate() {
-                    let global_index = start - token.range.start + index;
+                    let global_index = text_range.start - token.range.start + index;
                     glyphs[global_index] = Some(glyph);
                 }
             }
@@ -169,7 +166,7 @@ impl AttributedString {
                 let interval_index = token.range.start + byte_idx.value();
                 let maybe_interval = self
                     .attribute_intervals
-                    .find(interval_index, interval_index)
+                    .find(interval_index, interval_index + 1)
                     .last();
                 if let Some(interval) = maybe_interval {
                     token.outlined_clusters.push(outline_cluster(
