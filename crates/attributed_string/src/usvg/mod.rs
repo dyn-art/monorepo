@@ -9,11 +9,72 @@ pub mod path_builder;
 pub mod resolved_font;
 pub mod text;
 
-use self::{glyph::Glyph, outlined_cluster::OutlinedCluster, resolved_font::ResolvedFont};
+use self::{
+    glyph::Glyph,
+    outlined_cluster::OutlinedCluster,
+    resolved_font::ResolvedFont,
+    text::{Font, FontFamily, FontStretch, FontStyle},
+};
 use crate::usvg::{byte_index::ByteIndex, database::DatabaseExt};
 use rustybuzz::ttf_parser::GlyphId;
 use std::sync::Arc;
 use tiny_skia_path::Transform;
+
+pub fn resolve_font(font: &Font, fontdb: &fontdb::Database) -> Option<ResolvedFont> {
+    let mut name_list = Vec::new();
+    for family in &font.families {
+        name_list.push(match family {
+            FontFamily::Serif => fontdb::Family::Serif,
+            FontFamily::SansSerif => fontdb::Family::SansSerif,
+            FontFamily::Cursive => fontdb::Family::Cursive,
+            FontFamily::Fantasy => fontdb::Family::Fantasy,
+            FontFamily::Monospace => fontdb::Family::Monospace,
+            FontFamily::Named(s) => fontdb::Family::Name(s),
+        });
+    }
+
+    // Use the default font as fallback.
+    name_list.push(fontdb::Family::Serif);
+
+    let stretch = match font.stretch {
+        FontStretch::UltraCondensed => fontdb::Stretch::UltraCondensed,
+        FontStretch::ExtraCondensed => fontdb::Stretch::ExtraCondensed,
+        FontStretch::Condensed => fontdb::Stretch::Condensed,
+        FontStretch::SemiCondensed => fontdb::Stretch::SemiCondensed,
+        FontStretch::Normal => fontdb::Stretch::Normal,
+        FontStretch::SemiExpanded => fontdb::Stretch::SemiExpanded,
+        FontStretch::Expanded => fontdb::Stretch::Expanded,
+        FontStretch::ExtraExpanded => fontdb::Stretch::ExtraExpanded,
+        FontStretch::UltraExpanded => fontdb::Stretch::UltraExpanded,
+    };
+
+    let style = match font.style {
+        FontStyle::Normal => fontdb::Style::Normal,
+        FontStyle::Italic => fontdb::Style::Italic,
+        FontStyle::Oblique => fontdb::Style::Oblique,
+    };
+
+    let query = fontdb::Query {
+        families: &name_list,
+        weight: fontdb::Weight(font.weight),
+        stretch,
+        style,
+    };
+
+    let id = fontdb.query(&query);
+    if id.is_none() {
+        log::warn!(
+            "No match for '{}' font-family.",
+            font.families
+                .iter()
+                .map(|f| f.to_string())
+                .collect::<Vec<_>>()
+                .join(", ")
+        );
+    }
+
+    fontdb.load_font(id?)
+}
 
 /// Text shaping with font fallback.
 pub fn shape_text(

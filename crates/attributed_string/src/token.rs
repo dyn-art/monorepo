@@ -8,10 +8,8 @@ use std::ops::Range;
 /// and its categorized type based on the parsing logic.
 #[derive(Clone)]
 pub struct Token {
-    /// The actual text this token represents.
-    // pub text: String,
-    /// The start and end indices of this token in the original text,
-    /// allowing for position tracking and identifying attributes.
+    /// Byte range in the original text marking the token's start and end indices.
+    /// Enables attribute identification and position tracking.
     pub range: Range<usize>,
     /// The category of this token, defining its role and significance during parsing.
     pub variant: TokenVariant,

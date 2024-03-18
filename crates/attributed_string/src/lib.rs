@@ -4,19 +4,21 @@ pub mod usvg;
 use ordered_float::OrderedFloat;
 use rust_lapper::{Interval, Lapper};
 use smallvec::SmallVec;
-use std::ops::Range;
+use std::{ops::Range, sync::Arc};
 use token::{Token, TokenVariant};
 use usvg::{
     database::FontsCache,
     glyph::{Glyph, GlyphClusters},
-    outline_cluster, shape_text,
+    outline_cluster, resolve_font,
+    resolved_font::ResolvedFont,
+    shape_text,
     text::{AlignmentBaseline, BaselineShift, DominantBaseline, Font, LengthAdjust},
 };
 
 #[derive(Clone)]
 struct AttributedString {
     text: String,
-    token_stream: SmallVec<[Token; 8]>,
+    token_stream: Vec<Token>,
     attribute_intervals: Lapper<usize, Attribute>,
 }
 
@@ -58,13 +60,13 @@ impl AttributedString {
     pub fn new(text: String, attribute_intervals: Vec<AttributeInterval>) -> Self {
         Self {
             text,
-            token_stream: SmallVec::new(),
+            token_stream: Vec::new(),
             attribute_intervals: Lapper::new(attribute_intervals),
         }
     }
 
     pub fn tokanize(&mut self) {
-        let mut token_stream: SmallVec<[Token; 8]> = SmallVec::new();
+        let mut token_stream = Vec::new();
 
         // Tokenize the text, considering spaces and line breaks
         let mut start = 0;
@@ -75,12 +77,8 @@ impl AttributedString {
             // Create a text fragment token for non-whitespace segments
             if start != index {
                 token_stream.push(Token {
-                    // text: String::from(match_str),
                     variant: TokenVariant::TextFragment,
-                    range: Range {
-                        start: index,
-                        end: match_str.len(),
-                    },
+                    range: Range { start, end: index },
                     outlined_clusters: SmallVec::new(),
                 })
             }
@@ -88,20 +86,18 @@ impl AttributedString {
             // Create a token for each space or line break
             token_stream.push(match match_str.chars().next() {
                 Some(c) if is_word_separator_char(c) => Token {
-                    // text: String::from(match_str),
                     variant: TokenVariant::WordSeparator,
                     range: Range {
                         start: index,
-                        end: match_str.len(),
+                        end: index + match_str.len(),
                     },
                     outlined_clusters: SmallVec::new(),
                 },
                 Some(c) if is_linebreak_char(c) => Token {
-                    // text: String::from(match_str),
                     variant: TokenVariant::Linebreak,
                     range: Range {
                         start: index,
-                        end: match_str.len(),
+                        end: index + match_str.len(),
                     },
                     outlined_clusters: SmallVec::new(),
                 },
@@ -114,7 +110,6 @@ impl AttributedString {
         // Handle the last text fragment in the segment, if any
         if start < self.text.len() {
             token_stream.push(Token {
-                // text: String::from(&self.text[start..]),
                 variant: TokenVariant::TextFragment,
                 range: Range {
                     start,
@@ -127,7 +122,7 @@ impl AttributedString {
         self.token_stream = token_stream;
     }
 
-    pub fn outline(&mut self, fonts_cache: &FontsCache, fontdb: &fontdb::Database) {
+    pub fn outline(&mut self, fonts_cache: &mut FontsCache, fontdb: &fontdb::Database) {
         if !self.attribute_intervals.overlaps_merged {
             self.attribute_intervals.merge_overlaps();
         }
@@ -142,14 +137,14 @@ impl AttributedString {
                 .attribute_intervals
                 .find(token.range.start, token.range.end)
             {
-                let font = match fonts_cache.get(&val.font) {
+                let resolved_font = match Self::resolve_font(&val.font, fonts_cache, fontdb) {
                     Some(v) => v.clone(),
                     None => continue,
                 };
 
                 let interval_glyphs = shape_text(
-                    &self.text[*start..*stop],
-                    font,
+                    &self.text[token.range.start.max(*start)..token.range.end.min(*stop)],
+                    resolved_font,
                     val.small_caps,
                     val.apply_kerning,
                     fontdb,
@@ -170,8 +165,8 @@ impl AttributedString {
             }
 
             // Convert glyphs to outlined glyph clusters
-            for (range, byte_index) in GlyphClusters::new(&glyphs) {
-                let interval_index = token.range.start + byte_index.value();
+            for (range, byte_idx) in GlyphClusters::new(&glyphs) {
+                let interval_index = token.range.start + byte_idx.value();
                 let maybe_interval = self
                     .attribute_intervals
                     .find(interval_index, interval_index)
@@ -186,6 +181,23 @@ impl AttributedString {
                 }
             }
         }
+    }
+
+    fn resolve_font<'a>(
+        font: &Font,
+        fonts_cache: &'a mut FontsCache,
+        fontdb: &fontdb::Database,
+    ) -> Option<&'a Arc<ResolvedFont>> {
+        // Check if the font is already in the cache
+        if !fonts_cache.contains_key(font) {
+            if let Some(resolved_font) = resolve_font(font, fontdb) {
+                fonts_cache.insert(font.clone(), Arc::new(resolved_font));
+            } else {
+                return None;
+            }
+        }
+
+        return fonts_cache.get(font);
     }
 
     pub fn to_paths(&mut self) -> Vec<()> {
@@ -204,4 +216,62 @@ pub fn is_word_separator_char(c: char) -> bool {
 
 pub fn is_linebreak_char(c: char) -> bool {
     matches!(c, '\n')
+}
+
+#[cfg(test)]
+mod tests {
+    use self::usvg::text::{FontFamily, FontStretch, FontStyle};
+    use super::*;
+    use std::collections::HashMap;
+
+    #[test]
+    fn attributed_string_e2e() {
+        let fontdb = get_fontdb_with_system_fonts();
+        let mut fonts_cache: FontsCache = HashMap::new();
+
+        let text = String::from("Hello, world! This is a test!");
+        let attribute_intervals = vec![AttributeInterval {
+            start: 0,
+            stop: text.len(),
+            val: Attribute {
+                font: Font {
+                    families: vec![FontFamily::Serif],
+                    stretch: FontStretch::default(),
+                    style: FontStyle::default(),
+                    weight: 10,
+                },
+                font_size: OrderedFloat(12.0),
+                small_caps: false,
+                apply_kerning: true,
+                dominant_baseline: DominantBaseline::Alphabetic,
+                alignment_baseline: AlignmentBaseline::Baseline,
+                baseline_shift: vec![],
+                letter_spacing: OrderedFloat(0.0),
+                word_spacing: OrderedFloat(0.0),
+                text_length: None,
+                length_adjust: LengthAdjust::SpacingAndGlyphs,
+            },
+        }];
+        let mut attributed_string = AttributedString::new(text, attribute_intervals);
+
+        attributed_string.tokanize();
+
+        attributed_string.outline(&mut fonts_cache, &fontdb);
+
+        assert!(
+            !attributed_string.token_stream.is_empty(),
+            "Token stream should not be empty after processing."
+        );
+    }
+
+    fn get_fontdb_with_system_fonts() -> fontdb::Database {
+        let mut db = fontdb::Database::new();
+        db.load_system_fonts();
+        db.set_serif_family("Times New Roman");
+        db.set_sans_serif_family("Arial");
+        db.set_cursive_family("Comic Sans MS");
+        db.set_fantasy_family("Impact");
+        db.set_monospace_family("Courier New");
+        return db;
+    }
 }
