@@ -2,6 +2,7 @@ use crate::{
     attribute::Attribute,
     font::resolve_font_from_cache,
     usvg::{
+        byte_index::ByteIndex,
         clusters_length,
         database::FontsCache,
         glyph::{Glyph, GlyphClusters},
@@ -49,6 +50,7 @@ impl Token {
         fontdb: &fontdb::Database,
     ) {
         let mut glyphs: Vec<Option<Glyph>> = vec![None; self.range.end - self.range.start];
+        let mut interval_start_byte_idx = ByteIndex::new(0);
 
         // Outline token and thus create glyphs based on attributes
         for Interval { start, stop, val } in
@@ -69,9 +71,18 @@ impl Token {
             );
 
             // Add interval_glyphs to glyphs vector at start to stop index
-            for (index, glyph) in interval_glyphs.into_iter().enumerate() {
-                let global_index = text_range.start - self.range.start + index;
-                glyphs[global_index] = Some(glyph);
+            let interval_glyphs_len = interval_glyphs.len();
+            for (index, mut glyph) in interval_glyphs.into_iter().enumerate() {
+                let glyphs_index = text_range.start - self.range.start + index;
+
+                // Update byte index (index of char in token text)
+                glyph.byte_idx =
+                    ByteIndex::new(glyph.byte_idx.value() + interval_start_byte_idx.value());
+                if index == interval_glyphs_len - 1 {
+                    interval_start_byte_idx = ByteIndex::new(glyph.byte_idx.value() + 1);
+                }
+
+                glyphs[glyphs_index] = Some(glyph);
             }
         }
 

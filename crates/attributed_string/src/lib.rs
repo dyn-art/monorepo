@@ -11,7 +11,7 @@ use token::{Token, TokenVariant};
 use usvg::{
     database::FontsCache,
     process_anchor,
-    text::{TextAnchor, TextFlow, TextPath, WritingMode},
+    text::{TextAnchor, TextFlow, WritingMode},
 };
 
 /// `AttributedString` represents a string with associated attributes applied
@@ -136,7 +136,7 @@ impl AttributedString {
     fn resolve_clusters_positions(&mut self) {
         match self.text_flow {
             TextFlow::Linear => self.resolve_clusters_positions_horizontal(),
-            TextFlow::Path(ref path) => Self::resolve_clusters_positions_path(path),
+            _ => {}
         }
     }
 
@@ -156,10 +156,6 @@ impl AttributedString {
                 x += cluster.advance;
             }
         }
-    }
-
-    fn resolve_clusters_positions_path(path: &TextPath) {
-        // TODO
     }
 
     pub fn to_paths(
@@ -219,28 +215,52 @@ mod tests {
         let mut fonts_cache: FontsCache = HashMap::new();
 
         let text = String::from("Hello, world! This is a test!");
-        let attribute_intervals = vec![AttributeInterval {
-            start: 0,
-            stop: text.len(),
-            val: Attribute {
-                font: Font {
-                    families: vec![FontFamily::Serif],
-                    stretch: FontStretch::default(),
-                    style: FontStyle::default(),
-                    weight: 10,
+        let attribute_intervals = vec![
+            AttributeInterval {
+                start: 0,
+                stop: 10,
+                val: Attribute {
+                    font: Font {
+                        families: vec![FontFamily::Monospace],
+                        stretch: FontStretch::default(),
+                        style: FontStyle::default(),
+                        weight: 10,
+                    },
+                    font_size: OrderedFloat(24.0),
+                    small_caps: false,
+                    apply_kerning: true,
+                    dominant_baseline: DominantBaseline::Alphabetic,
+                    alignment_baseline: AlignmentBaseline::Baseline,
+                    baseline_shift: vec![],
+                    letter_spacing: OrderedFloat(0.0),
+                    word_spacing: OrderedFloat(0.0),
+                    text_length: None,
+                    length_adjust: LengthAdjust::SpacingAndGlyphs,
                 },
-                font_size: OrderedFloat(12.0),
-                small_caps: false,
-                apply_kerning: true,
-                dominant_baseline: DominantBaseline::Alphabetic,
-                alignment_baseline: AlignmentBaseline::Baseline,
-                baseline_shift: vec![],
-                letter_spacing: OrderedFloat(0.0),
-                word_spacing: OrderedFloat(0.0),
-                text_length: None,
-                length_adjust: LengthAdjust::SpacingAndGlyphs,
             },
-        }];
+            AttributeInterval {
+                start: 10,
+                stop: text.len(),
+                val: Attribute {
+                    font: Font {
+                        families: vec![FontFamily::Serif],
+                        stretch: FontStretch::default(),
+                        style: FontStyle::default(),
+                        weight: 10,
+                    },
+                    font_size: OrderedFloat(12.0),
+                    small_caps: false,
+                    apply_kerning: true,
+                    dominant_baseline: DominantBaseline::Alphabetic,
+                    alignment_baseline: AlignmentBaseline::Baseline,
+                    baseline_shift: vec![],
+                    letter_spacing: OrderedFloat(0.0),
+                    word_spacing: OrderedFloat(0.0),
+                    text_length: None,
+                    length_adjust: LengthAdjust::SpacingAndGlyphs,
+                },
+            },
+        ];
         let mut attributed_string = AttributedString::new(text, attribute_intervals);
 
         attributed_string.tokanize();
