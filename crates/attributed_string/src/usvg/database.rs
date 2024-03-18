@@ -1,10 +1,10 @@
 // This code is closely derived from:
 // https://github.com/RazrFalcon/resvg/blob/master/crates/usvg/src/text_to_paths.rs
 
-use super::{path_builder::PathBuilder, resolved_font::ResolvedFont};
+use super::{path_builder::PathBuilder, resolved_font::ResolvedFont, text::Font};
 use fontdb::{Database, ID};
 use rustybuzz::ttf_parser::{self, GlyphId};
-use std::num::NonZeroU16;
+use std::{collections::HashMap, num::NonZeroU16, sync::Arc};
 
 pub trait DatabaseExt {
     fn load_font(&self, id: ID) -> Option<ResolvedFont>;
@@ -110,3 +110,5 @@ impl DatabaseExt for Database {
         res == Some(Some(true))
     }
 }
+
+pub type FontsCache = HashMap<Font, Arc<ResolvedFont>>;

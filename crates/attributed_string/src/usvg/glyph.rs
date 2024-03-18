@@ -49,7 +49,7 @@ pub struct GlyphClusters<'a> {
 }
 
 impl<'a> GlyphClusters<'a> {
-    fn new(data: &'a [Glyph]) -> Self {
+    pub fn new(data: &'a [Glyph]) -> Self {
         GlyphClusters { data, idx: 0 }
     }
 }

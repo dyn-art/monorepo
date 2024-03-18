@@ -16,7 +16,7 @@ use std::sync::Arc;
 use tiny_skia_path::Transform;
 
 /// Text shaping with font fallback.
-fn shape_text(
+pub fn shape_text(
     text: &str,
     font: Arc<ResolvedFont>,
     small_caps: bool,
@@ -103,7 +103,7 @@ fn shape_text(
 /// Converts a text into a list of glyph IDs.
 ///
 /// This function will do the BIDI reordering and text shaping.
-fn shape_text_with_font(
+pub fn shape_text_with_font(
     text: &str,
     font: Arc<ResolvedFont>,
     small_caps: bool,
@@ -180,7 +180,7 @@ fn shape_text_with_font(
 /// Outlines a glyph cluster.
 ///
 /// Uses one or more `Glyph`s to construct an `OutlinedCluster`.
-fn outline_cluster(
+pub fn outline_cluster(
     glyphs: &[Glyph],
     text: &str,
     font_size: f32,
@@ -243,7 +243,7 @@ fn outline_cluster(
 /// Finds a font with a specified char.
 ///
 /// This is a rudimentary font fallback algorithm.
-fn find_font_for_char(
+pub fn find_font_for_char(
     c: char,
     exclude_fonts: &[fontdb::ID],
     fontdb: &fontdb::Database,

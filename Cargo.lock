@@ -745,6 +745,7 @@ version = "0.0.1"
 dependencies = [
  "fontdb",
  "log",
+ "ordered-float",
  "ropey",
  "rust-lapper",
  "rustybuzz 0.13.0",
@@ -1716,6 +1717,15 @@ dependencies = [
  "libc",
  "pkg-config",
  "vcpkg",
+]
+
+[[package]]
+name = "ordered-float"
+version = "4.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a76df7075c7d4d01fdcb46c912dd17fba5b60c78ea480b475f2b6ab6f666584e"
+dependencies = [
+ "num-traits",
 ]
 
 [[package]]

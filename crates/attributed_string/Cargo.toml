@@ -14,6 +14,7 @@ tracing = []
 
 [dependencies]
 fontdb = "0.16.0"
+ordered-float = "4.2.0"
 rustybuzz = "0.13.0"
 ropey = "1.6.1"
 rust-lapper = "1.1.0"
