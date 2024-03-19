@@ -17,11 +17,13 @@ fontdb = "0.16.0"
 ordered-float = "4.2.0"
 rustybuzz = "0.13.0"
 ropey = "1.6.1"
-rust-lapper = "1.1.0"
+# rust-lapper = { git = "https://github.com/bennoinbeta/rust-lapper.git", rev = "ac47eb7" }
+rust-lapper = { path = "/Users/benno/Desktop/workspace/contribution/code/rust-lapper" }
 smallvec = { workspace = true }
 strict-num = "0.2.0"
 tiny-skia-path = { workspace = true }
 unicode-bidi = "0.3"
+unicode-linebreak = "0.1.5"
 unicode-script = "0.5"
 unicode-vo = "0.1"
 

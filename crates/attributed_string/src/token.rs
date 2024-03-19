@@ -42,6 +42,9 @@ impl Token {
         clusters_length(&self.outlined_clusters)
     }
 
+    // TODO: Does it make more sense to shape the glyphs from the attribute intervals
+    // instead of from the tokens (thus always having to query the corresponding attributes)
+    // now that we have guranteed there are not overlapping attributes (due to `divide_overlaps_with`).
     pub fn shape_glyphs(
         &mut self,
         text: &String,

@@ -8,6 +8,7 @@ use rust_lapper::Lapper;
 use std::ops::Range;
 use tiny_skia_path::{Path, Transform};
 use token::{Token, TokenVariant};
+use unicode_linebreak::BreakClass;
 use usvg::{
     database::FontsCache,
     process_anchor,
@@ -38,60 +39,85 @@ struct AttributedString {
 
     /// Specifies the writing mode for the text.
     pub writing_mode: WritingMode,
+
+    pub width: f32,
+
+    pub height: f32,
 }
 
 impl AttributedString {
     pub fn new(text: String, attribute_intervals: Vec<AttributeInterval>) -> Self {
+        // Merge overlapping intervals
+        let mut attribute_intervals = Lapper::new(attribute_intervals);
+        attribute_intervals.divide_overlaps_with(|overlaps| {
+            // TODO: Make attribute attributes optional or something to merge them
+            overlaps.get(0).unwrap().clone().clone()
+        });
+
         Self {
             text,
             token_stream: Vec::new(),
-            attribute_intervals: Lapper::new(attribute_intervals),
+            attribute_intervals,
             anchor: TextAnchor::Start,
             text_flow: TextFlow::Linear,
             writing_mode: WritingMode::LeftToRight,
+            width: 100.0,
+            height: 100.0,
         }
     }
 
-    pub fn tokanize(&mut self) {
+    pub fn tokenize(&mut self) {
         let mut token_stream = Vec::new();
 
-        // Tokenize the text, considering spaces and line breaks
+        let chars: Vec<char> = self.text.chars().collect();
         let mut start = 0;
-        for (index, match_str) in self
-            .text
-            .match_indices(|c: char| is_word_separator_char(c) || is_linebreak_char(c))
-        {
-            // Create a text fragment token for non-whitespace segments
-            if start != index {
-                token_stream.push(Token::new(
-                    TokenVariant::TextFragment,
-                    Range { start, end: index },
-                ));
+
+        // Process each character for potential tokenization
+        for (index, _char) in chars.iter().enumerate() {
+            let break_class = unicode_linebreak::break_property(*_char as u32);
+
+            match break_class {
+                BreakClass::Mandatory | BreakClass::LineFeed | BreakClass::CarriageReturn => {
+                    if start != index {
+                        // Add text fragment token
+                        token_stream.push(Token::new(
+                            TokenVariant::TextFragment,
+                            Range { start, end: index },
+                        ));
+                    }
+                    // Add line break token
+                    token_stream.push(Token::new(
+                        TokenVariant::Linebreak,
+                        Range {
+                            start: index,
+                            end: index + 1,
+                        },
+                    ));
+                    start = index + 1;
+                }
+                BreakClass::Space | BreakClass::ZeroWidthSpace => {
+                    if start != index {
+                        // Add text fragment token
+                        token_stream.push(Token::new(
+                            TokenVariant::TextFragment,
+                            Range { start, end: index },
+                        ));
+                    }
+                    // Add word separator token
+                    token_stream.push(Token::new(
+                        TokenVariant::WordSeparator,
+                        Range {
+                            start: index,
+                            end: index + 1,
+                        },
+                    ));
+                    start = index + 1;
+                }
+                _ => {}
             }
-
-            // Create a token for each space or line break
-            token_stream.push(match match_str.chars().next() {
-                Some(c) if is_word_separator_char(c) => Token::new(
-                    TokenVariant::WordSeparator,
-                    Range {
-                        start: index,
-                        end: index + match_str.len(),
-                    },
-                ),
-                Some(c) if is_linebreak_char(c) => Token::new(
-                    TokenVariant::Linebreak,
-                    Range {
-                        start: index,
-                        end: index + match_str.len(),
-                    },
-                ),
-                _ => continue, // Should never happen
-            });
-
-            start = index + match_str.len();
         }
 
-        // Handle the last text fragment in the segment, if any
+        // Handle the last text fragment, if any
         if start < self.text.len() {
             token_stream.push(Token::new(
                 TokenVariant::TextFragment,
@@ -263,7 +289,7 @@ mod tests {
         ];
         let mut attributed_string = AttributedString::new(text, attribute_intervals);
 
-        attributed_string.tokanize();
+        attributed_string.tokenize();
         attributed_string.shape_glyphs(&mut fonts_cache, &fontdb);
         attributed_string.apply_modifications();
 
