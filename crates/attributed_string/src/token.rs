@@ -3,7 +3,6 @@ use crate::{
     font::resolve_font_from_cache,
     usvg::{
         byte_index::ByteIndex,
-        clusters_length,
         database::FontsCache,
         glyph::{Glyph, GlyphClusters},
         outline_cluster,
@@ -24,6 +23,7 @@ pub struct Token {
     pub variant: TokenVariant,
     /// Byte range in the original text marking the token's start and end indices.
     /// Enables attribute identification and position tracking.
+    /// Inclusive start, exclusive of stop (start <= x < end).
     pub range: Range<usize>,
     ///
     pub outlined_clusters: Vec<OutlinedCluster>,
@@ -38,8 +38,16 @@ impl Token {
         }
     }
 
-    pub fn clusers_length(&self) -> f32 {
-        clusters_length(&self.outlined_clusters)
+    pub fn get_advance(&self) -> f32 {
+        self.outlined_clusters
+            .iter()
+            .fold(0.0, |acc, oc| acc + oc.advance)
+    }
+
+    pub fn get_max_height(&self) -> f32 {
+        self.outlined_clusters
+            .iter()
+            .fold(0.0, |acc, oc| acc.max(oc.height()))
     }
 
     // TODO: Does it make more sense to shape the glyphs from the attribute intervals

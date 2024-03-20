@@ -63,7 +63,7 @@ pub struct OutlinedCluster {
 }
 
 impl OutlinedCluster {
-    fn height(&self) -> f32 {
+    pub fn height(&self) -> f32 {
         self.ascent - self.descent
     }
 }

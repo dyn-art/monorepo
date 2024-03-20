@@ -11,7 +11,6 @@ use token::{Token, TokenVariant};
 use unicode_linebreak::BreakClass;
 use usvg::{
     database::FontsCache,
-    process_anchor,
     text::{TextAnchor, TextFlow, WritingMode},
 };
 
@@ -77,14 +76,18 @@ impl AttributedString {
             let break_class = unicode_linebreak::break_property(*_char as u32);
 
             match break_class {
-                BreakClass::Mandatory | BreakClass::LineFeed | BreakClass::CarriageReturn => {
+                BreakClass::Mandatory
+                | BreakClass::LineFeed
+                | BreakClass::NextLine
+                | BreakClass::CarriageReturn => {
+                    // Add text fragment token
                     if start != index {
-                        // Add text fragment token
                         token_stream.push(Token::new(
                             TokenVariant::TextFragment,
                             Range { start, end: index },
                         ));
                     }
+
                     // Add line break token
                     token_stream.push(Token::new(
                         TokenVariant::Linebreak,
@@ -96,13 +99,14 @@ impl AttributedString {
                     start = index + 1;
                 }
                 BreakClass::Space | BreakClass::ZeroWidthSpace => {
+                    // Add text fragment token
                     if start != index {
-                        // Add text fragment token
                         token_stream.push(Token::new(
                             TokenVariant::TextFragment,
                             Range { start, end: index },
                         ));
                     }
+
                     // Add word separator token
                     token_stream.push(Token::new(
                         TokenVariant::WordSeparator,
@@ -166,17 +170,48 @@ impl AttributedString {
         }
     }
 
-    // TODO: Apply linebreaks
     fn resolve_clusters_positions_horizontal(&mut self) {
-        let mut x = process_anchor(
-            self.anchor,
-            self.token_stream
-                .iter()
-                .fold(0.0, |acc, token| acc + token.clusers_length()),
-        );
-        let y = 0.0;
+        // let mut x = process_anchor(
+        //     self.anchor,
+        //     self.token_stream
+        //         .iter()
+        //         .fold(0.0, |acc, token| acc + token.get_advance()),
+        // );
+        let mut x = 0.0;
+        let mut y = 0.0;
 
+        let mut current_width = 0.0;
+        let mut current_line_height = 0.0;
         for token in self.token_stream.iter_mut() {
+            let token_width = token.get_advance();
+            let token_height = token.get_max_height();
+
+            let force_break = match token.variant {
+                TokenVariant::Linebreak => true,
+                _ => false,
+            };
+            let will_wrap = current_width + token_width > self.width || force_break;
+
+            if will_wrap {
+                let ignore = match token.variant {
+                    TokenVariant::Linebreak => true,
+                    TokenVariant::WordSeparator => true,
+                    _ => false,
+                };
+
+                y += current_line_height;
+                current_width = if ignore { 0.0 } else { token_width };
+                current_line_height = if ignore { 0.0 } else { token_height };
+            } else {
+                current_width += token_width;
+                if token_height > current_line_height {
+                    current_line_height = token_height;
+                }
+            }
+
+            x = current_width - token_width;
+
+            // Position clusters of token
             for cluster in token.outlined_clusters.iter_mut() {
                 cluster.transform = cluster.transform.pre_translate(x, y);
                 x += cluster.advance;
@@ -213,18 +248,6 @@ impl AttributedString {
 
         return new_paths;
     }
-}
-
-// https://www.w3.org/TR/css-text-3/#word-separator
-pub fn is_word_separator_char(c: char) -> bool {
-    matches!(
-        c as u32,
-        0x0020 | 0x00A0 | 0x1361 | 0x010100 | 0x010101 | 0x01039F | 0x01091F
-    )
-}
-
-pub fn is_linebreak_char(c: char) -> bool {
-    matches!(c, '\n')
 }
 
 #[cfg(test)]
