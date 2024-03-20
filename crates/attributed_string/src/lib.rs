@@ -1,9 +1,10 @@
-pub mod attribute;
+pub mod attrs;
 pub mod font;
 pub mod token;
 pub mod usvg;
 
-use attribute::{Attribute, AttributeInterval};
+use attrs::{Attrs, AttrsInterval};
+use glam::Vec2;
 use rust_lapper::Lapper;
 use std::ops::Range;
 use tiny_skia_path::{Path, Transform};
@@ -18,50 +19,36 @@ use usvg::{
 /// to certain ranges.
 #[derive(Clone)]
 struct AttributedString {
-    /// The full text as a `String` without any attribute information.
-    pub text: String,
+    text: String,
+    token_stream: Vec<Token>,
+    attrs_intervals: Lapper<usize, Attrs>,
 
-    /// A list of tokens derived from the text.
-    ///
-    /// Each `Token` represents a semantically meaningful unit of the text, such as a `TextFragment`, `WordSeparator` or `Linebreak`,
-    /// facilitating further processing.
-    pub token_stream: Vec<Token>,
+    anchor: TextAnchor,
+    text_flow: TextFlow,
+    writing_mode: WritingMode,
 
-    /// Attribute intervals mapped to text ranges.
-    pub attribute_intervals: Lapper<usize, Attribute>,
-
-    /// Defines the anchoring position of the text relative to its container.
-    pub anchor: TextAnchor,
-
-    /// Describes how text is divided and flowed within a layout.
-    pub text_flow: TextFlow,
-
-    /// Specifies the writing mode for the text.
-    pub writing_mode: WritingMode,
-
-    pub width: f32,
-
-    pub height: f32,
+    bbox: Vec2,
 }
 
 impl AttributedString {
-    pub fn new(text: String, attribute_intervals: Vec<AttributeInterval>) -> Self {
-        // Merge overlapping intervals
-        let mut attribute_intervals = Lapper::new(attribute_intervals);
-        attribute_intervals.divide_overlaps_with(|overlaps| {
-            // TODO: Make attribute attributes optional or something to merge them
-            overlaps.get(0).unwrap().clone().clone()
+    pub fn new(text: String, attrs_intervals: Vec<AttrsInterval>, bbox: Vec2) -> Self {
+        let mut attrs_intervals = Lapper::new(attrs_intervals);
+        attrs_intervals.divide_overlaps_with(|overlaps| {
+            let mut merged_attrs = Attrs::new();
+            for &attrs in overlaps.iter() {
+                merged_attrs.merge(attrs.clone());
+            }
+            return merged_attrs;
         });
 
         Self {
             text,
             token_stream: Vec::new(),
-            attribute_intervals,
+            attrs_intervals,
             anchor: TextAnchor::Start,
             text_flow: TextFlow::Linear,
             writing_mode: WritingMode::LeftToRight,
-            width: 100.0,
-            height: 100.0,
+            bbox,
         }
     }
 
@@ -139,12 +126,7 @@ impl AttributedString {
         // TODO: Are inter-glyph covered by TextFragment's
         // or do they go beyond line breaks, word separator?
         for token in &mut self.token_stream {
-            token.shape_glyphs(
-                &self.text,
-                &mut self.attribute_intervals,
-                fonts_cache,
-                fontdb,
-            );
+            token.shape_glyphs(&self.text, &mut self.attrs_intervals, fonts_cache, fontdb);
         }
     }
 
@@ -190,7 +172,7 @@ impl AttributedString {
                 TokenVariant::Linebreak => true,
                 _ => false,
             };
-            let will_wrap = current_width + token_width > self.width || force_break;
+            let will_wrap = current_width + token_width > self.bbox.x || force_break;
 
             if will_wrap {
                 let ignore = match token.variant {
@@ -242,7 +224,7 @@ impl AttributedString {
         }
 
         // Outline text decorations
-        for interval in self.attribute_intervals.iter() {
+        for interval in self.attrs_intervals.iter() {
             // TODO
         }
 
@@ -252,10 +234,8 @@ impl AttributedString {
 
 #[cfg(test)]
 mod tests {
-    use self::usvg::text::{FontFamily, FontStretch, FontStyle};
+    use self::usvg::text::FontFamily;
     use super::*;
-    use crate::usvg::text::{AlignmentBaseline, DominantBaseline, Font, LengthAdjust};
-    use ordered_float::OrderedFloat;
     use std::collections::HashMap;
 
     #[test]
@@ -265,52 +245,25 @@ mod tests {
 
         let text = String::from("Hello, world! This is a test!");
         let attribute_intervals = vec![
-            AttributeInterval {
+            AttrsInterval {
                 start: 0,
                 stop: 10,
-                val: Attribute {
-                    font: Font {
-                        families: vec![FontFamily::Monospace],
-                        stretch: FontStretch::default(),
-                        style: FontStyle::default(),
-                        weight: 10,
-                    },
-                    font_size: OrderedFloat(24.0),
-                    small_caps: false,
-                    apply_kerning: true,
-                    dominant_baseline: DominantBaseline::Alphabetic,
-                    alignment_baseline: AlignmentBaseline::Baseline,
-                    baseline_shift: vec![],
-                    letter_spacing: OrderedFloat(0.0),
-                    word_spacing: OrderedFloat(0.0),
-                    text_length: None,
-                    length_adjust: LengthAdjust::SpacingAndGlyphs,
-                },
+                val: Attrs::new()
+                    .font_family(FontFamily::Monospace)
+                    .font_weight(400)
+                    .font_size(24.0),
             },
-            AttributeInterval {
+            AttrsInterval {
                 start: 10,
                 stop: text.len(),
-                val: Attribute {
-                    font: Font {
-                        families: vec![FontFamily::Serif],
-                        stretch: FontStretch::default(),
-                        style: FontStyle::default(),
-                        weight: 10,
-                    },
-                    font_size: OrderedFloat(12.0),
-                    small_caps: false,
-                    apply_kerning: true,
-                    dominant_baseline: DominantBaseline::Alphabetic,
-                    alignment_baseline: AlignmentBaseline::Baseline,
-                    baseline_shift: vec![],
-                    letter_spacing: OrderedFloat(0.0),
-                    word_spacing: OrderedFloat(0.0),
-                    text_length: None,
-                    length_adjust: LengthAdjust::SpacingAndGlyphs,
-                },
+                val: Attrs::new()
+                    .font_family(FontFamily::Serif)
+                    .font_weight(400)
+                    .font_size(12.0),
             },
         ];
-        let mut attributed_string = AttributedString::new(text, attribute_intervals);
+        let mut attributed_string =
+            AttributedString::new(text, attribute_intervals, Vec2::new(100.0, 100.0));
 
         attributed_string.tokenize();
         attributed_string.shape_glyphs(&mut fonts_cache, &fontdb);

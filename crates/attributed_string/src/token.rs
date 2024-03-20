@@ -1,5 +1,5 @@
 use crate::{
-    attribute::Attribute,
+    attrs::Attrs,
     font::resolve_font_from_cache,
     usvg::{
         byte_index::ByteIndex,
@@ -8,6 +8,7 @@ use crate::{
         outline_cluster,
         outlined_cluster::OutlinedCluster,
         shape_text,
+        text::Font,
     },
 };
 use rust_lapper::{Interval, Lapper};
@@ -56,7 +57,7 @@ impl Token {
     pub fn shape_glyphs(
         &mut self,
         text: &String,
-        attribute_intervals: &Lapper<usize, Attribute>,
+        attrs_intervals: &Lapper<usize, Attrs>,
         fonts_cache: &mut FontsCache,
         fontdb: &fontdb::Database,
     ) {
@@ -64,10 +65,18 @@ impl Token {
         let mut interval_start_byte_idx = ByteIndex::new(0);
 
         // Outline token and thus create glyphs based on attributes
-        for Interval { start, stop, val } in
-            attribute_intervals.find(self.range.start, self.range.end)
+        for Interval { start, stop, val } in attrs_intervals.find(self.range.start, self.range.end)
         {
-            let resolved_font = match resolve_font_from_cache(&val.font, fonts_cache, fontdb) {
+            let resolved_font = match resolve_font_from_cache(
+                &Font {
+                    families: vec![val.get_font_family().clone()],
+                    stretch: val.get_font_stretch(),
+                    style: val.get_font_style(),
+                    weight: val.get_font_weight(),
+                },
+                fonts_cache,
+                fontdb,
+            ) {
                 Some(v) => v.clone(),
                 None => continue,
             };
@@ -76,8 +85,8 @@ impl Token {
             let interval_glyphs = shape_text(
                 &text[text_range.clone()],
                 resolved_font,
-                val.small_caps,
-                val.apply_kerning,
+                val.get_small_caps(),
+                val.get_apply_kerning(),
                 fontdb,
             );
 
@@ -107,14 +116,14 @@ impl Token {
         // Convert glyphs to outlined glyph clusters
         for (range, byte_idx) in GlyphClusters::new(&glyphs) {
             let interval_index = self.range.start + byte_idx.value();
-            let maybe_interval = attribute_intervals
+            let maybe_interval = attrs_intervals
                 .find(interval_index, interval_index + 1)
                 .last();
             if let Some(interval) = maybe_interval {
                 self.outlined_clusters.push(outline_cluster(
                     &glyphs[range],
                     &text[self.range.clone()],
-                    interval.val.font_size.0,
+                    interval.val.get_font_size(),
                     fontdb,
                 ));
             }

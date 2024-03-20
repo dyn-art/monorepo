@@ -15,6 +15,7 @@ tracing = []
 [dependencies]
 fontdb = "0.16.0"
 ordered-float = "4.2.0"
+glam = { workspace = true }
 rustybuzz = "0.13.0"
 ropey = "1.6.1"
 # rust-lapper = { git = "https://github.com/bennoinbeta/rust-lapper.git", rev = "ac47eb7" }

@@ -9,7 +9,7 @@ use strict_num::ApproxEqUlps;
 pub struct NonEmptyString(String);
 
 impl NonEmptyString {
-    pub(crate) fn new(string: String) -> Option<Self> {
+    pub fn new(string: String) -> Option<Self> {
         if string.trim().is_empty() {
             return None;
         }

@@ -744,6 +744,7 @@ name = "dyn-attributed-string"
 version = "0.0.1"
 dependencies = [
  "fontdb",
+ "glam",
  "log",
  "ordered-float",
  "ropey",
