@@ -750,6 +750,27 @@ dependencies = [
  "ropey",
  "rust-lapper",
  "rustybuzz 0.13.0",
+ "self_cell",
+ "smallvec",
+ "strict-num 0.2.0",
+ "tiny-skia-path",
+ "unicode-bidi",
+ "unicode-linebreak",
+ "unicode-script",
+ "unicode-vo",
+]
+
+[[package]]
+name = "dyn-attributed-string-v1"
+version = "0.0.1"
+dependencies = [
+ "fontdb",
+ "glam",
+ "log",
+ "ordered-float",
+ "ropey",
+ "rust-lapper",
+ "rustybuzz 0.13.0",
  "smallvec",
  "strict-num 0.2.0",
  "tiny-skia-path",
@@ -2179,6 +2200,12 @@ dependencies = [
  "core-foundation-sys",
  "libc",
 ]
+
+[[package]]
+name = "self_cell"
+version = "1.0.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "58bf37232d3bb9a2c4e641ca2a11d83b5062066f88df7fed36c28772046d65ba"
 
 [[package]]
 name = "serde"
