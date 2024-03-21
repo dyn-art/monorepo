@@ -1,6 +1,6 @@
 use crate::{
-    attrs::{FontAttrs, FontFamily, FontStretch, FontStyle},
-    font::Font,
+    attrs::{Attrs, FontAttrs, FontFamily, FontStretch, FontStyle},
+    font::{Font, FontId},
 };
 use rustybuzz::ttf_parser;
 use std::{
@@ -10,7 +10,7 @@ use std::{
 
 #[derive(Debug, PartialEq, Eq, Hash, Clone)]
 struct ShapePlanKey {
-    font_id: fontdb::ID,
+    font_id: FontId,
     direction: rustybuzz::Direction,
     script: rustybuzz::Script,
     language: Option<rustybuzz::Language>,
@@ -18,8 +18,8 @@ struct ShapePlanKey {
 
 pub struct FontsCache {
     db: fontdb::Database,
-    fonts_cache: HashMap<fontdb::ID, Option<Arc<Font>>>,
-    font_attrs_cache: HashMap<FontAttrs, fontdb::ID>,
+    fonts_cache: HashMap<FontId, Option<Arc<Font>>>,
+    font_attrs_cache: HashMap<FontAttrs, FontId>,
     font_shape_plan_cache: HashMap<ShapePlanKey, rustybuzz::ShapePlan>,
 }
 
@@ -50,7 +50,7 @@ impl FontsCache {
         self.db.set_monospace_family("Courier New");
     }
 
-    pub fn get_font_by_id(&mut self, id: fontdb::ID) -> Option<Arc<Font>> {
+    pub fn get_font_by_id(&mut self, id: FontId) -> Option<Arc<Font>> {
         self.fonts_cache
             .entry(id)
             .or_insert_with(|| match self.db.load_font(id) {
@@ -66,7 +66,18 @@ impl FontsCache {
             .clone()
     }
 
-    pub fn get_font_by_attrs(&mut self, font_attrs: FontAttrs) -> Option<Arc<Font>> {
+    pub fn get_font_by_attrs(&mut self, attrs: Attrs) -> Option<Arc<Font>> {
+        let mut font: Option<Arc<Font>> = None;
+        if let Some(font_id) = attrs.get_font_id() {
+            font = self.get_font_by_id(font_id);
+        }
+        if font.is_none() {
+            font = self.get_font_by_font_attrs(FontAttrs::from_attrs(&attrs));
+        }
+        return font;
+    }
+
+    pub fn get_font_by_font_attrs(&mut self, font_attrs: FontAttrs) -> Option<Arc<Font>> {
         let id = match self.font_attrs_cache.entry(font_attrs) {
             Entry::Occupied(occ) => *occ.get(),
             Entry::Vacant(vac) => {
@@ -125,11 +136,7 @@ impl FontsCache {
         return self.get_font_by_id(id);
     }
 
-    pub fn get_font_for_char(
-        &mut self,
-        c: char,
-        exclude_fonts: &[fontdb::ID],
-    ) -> Option<Arc<Font>> {
+    pub fn get_font_for_char(&mut self, c: char, exclude_fonts: &[FontId]) -> Option<Arc<Font>> {
         let base_font_id = exclude_fonts[0];
         let mut maybe_face_id = None;
 
@@ -215,12 +222,12 @@ impl FontsCache {
 }
 
 trait DatabaseExt {
-    fn load_font(&self, id: fontdb::ID) -> Option<Font>;
-    fn has_char(&self, id: fontdb::ID, c: char) -> bool;
+    fn load_font(&self, id: FontId) -> Option<Font>;
+    fn has_char(&self, id: FontId, c: char) -> bool;
 }
 
 impl DatabaseExt for fontdb::Database {
-    fn load_font(&self, id: fontdb::ID) -> Option<Font> {
+    fn load_font(&self, id: FontId) -> Option<Font> {
         let info = self.face(id)?;
 
         let data: Arc<dyn AsRef<[u8]> + Sync + Send> = match &info.source {
@@ -235,7 +242,7 @@ impl DatabaseExt for fontdb::Database {
         return Font::new(id, info.index, data);
     }
 
-    fn has_char(&self, id: fontdb::ID, c: char) -> bool {
+    fn has_char(&self, id: FontId, c: char) -> bool {
         let res = self.with_face_data(id, |font_data, face_index| -> Option<bool> {
             let font = ttf_parser::Face::parse(font_data, face_index).ok()?;
             font.glyph_index(c)?;
@@ -257,7 +264,7 @@ mod tests {
     fn e2e() {
         let mut fonts_cache = FontsCache::new();
         fonts_cache.load_system_fonts();
-        let maybe_font = fonts_cache.get_font_by_attrs(FontAttrs::from_attrs(
+        let maybe_font = fonts_cache.get_font_by_font_attrs(FontAttrs::from_attrs(
             &Attrs::new().font_family(FontFamily::Serif).font_weight(400),
         ));
 

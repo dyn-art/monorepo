@@ -1,9 +1,12 @@
 use ordered_float::OrderedFloat;
-use rust_lapper::Interval;
+use rust_lapper::{Interval, Lapper};
 use std::fmt::Display;
+
+use crate::font::FontId;
 
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct Attrs {
+    font_id: Option<FontId>,
     font_family: Option<FontFamily>,
     font_style: Option<FontStyle>,
     font_stretch: Option<FontStretch>,
@@ -16,6 +19,7 @@ pub struct Attrs {
 impl Attrs {
     pub fn new() -> Self {
         Self {
+            font_id: None,
             font_family: None,
             font_style: None,
             font_stretch: None,
@@ -24,6 +28,15 @@ impl Attrs {
             small_caps: None,
             apply_kerning: None,
         }
+    }
+
+    pub fn font_id(mut self, font_id: FontId) -> Self {
+        self.font_id = Some(font_id);
+        self
+    }
+
+    pub fn get_font_id(&self) -> Option<FontId> {
+        self.font_id
     }
 
     pub fn font_family(mut self, font_family: FontFamily) -> Self {
@@ -137,6 +150,7 @@ impl FontAttrs {
 }
 
 pub type AttrsInterval = Interval<usize, Attrs>;
+pub type AttrsIntervals = Lapper<usize, Attrs>;
 
 /// A type of font family.
 #[derive(Clone, PartialEq, Eq, Debug, Hash)]

@@ -14,7 +14,7 @@ self_cell!(
 );
 
 pub struct Font {
-    id: fontdb::ID,
+    id: FontId,
     owned_face: OwnedFace,
     data: Arc<dyn AsRef<[u8]> + Send + Sync>,
 }
@@ -29,7 +29,7 @@ impl std::fmt::Debug for Font {
 
 impl Font {
     pub fn new(
-        id: fontdb::ID,
+        id: FontId,
         face_index: u32,
         data: Arc<dyn AsRef<[u8]> + Send + Sync>,
     ) -> Option<Self> {
@@ -44,7 +44,7 @@ impl Font {
     }
 
     #[inline]
-    pub fn id(&self) -> fontdb::ID {
+    pub fn id(&self) -> FontId {
         self.id
     }
 
@@ -226,3 +226,5 @@ impl Font {
         return (glyphs, missing, glyph_buffer.clear());
     }
 }
+
+pub type FontId = fontdb::ID;
