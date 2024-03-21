@@ -55,6 +55,9 @@ impl AttributedString {
             (start..end, level)
         });
 
+        // TODO: Bidi Paragraphs do not directly identify the level differences instead more when a linebreak happens
+        // But since we can identify that with unicode_linebreak its probably best
+        // if we identify the spans based on level differences within the BidiInfo struct?
         for (para_range, para_level) in bidi_para_range_iter {
             let mut start = para_range.start;
             let para_text = &self.text[para_range.clone()];
@@ -66,6 +69,8 @@ impl AttributedString {
                 let break_class = unicode_linebreak::break_property(_char as u32);
 
                 match break_class {
+                    // Handle line break
+                    // TODO: Should the line breaks happen based on the bidi paragraphs?
                     BreakClass::Mandatory
                     | BreakClass::LineFeed
                     | BreakClass::NextLine
@@ -93,6 +98,8 @@ impl AttributedString {
                         )));
                         start = global_index + 1;
                     }
+
+                    // Handle text segment separation
                     BreakClass::Space | BreakClass::ZeroWidthSpace => {
                         // Add text fragment token
                         if start != global_index {
@@ -155,7 +162,7 @@ mod tests {
 
     #[test]
     fn e2e() {
-        let text = String::from("Hello, world! שלום עולם! This is a mix of English and Hebrew.");
+        let text = String::from("Hello, world!\nשלום עולם!\nThis is a mix of English and Hebrew.");
         let attrs_intervals = vec![
             AttrsInterval {
                 start: 0,
@@ -178,6 +185,8 @@ mod tests {
             AttributedString::new(text, attrs_intervals, Vec2::new(100.0, 50.0));
 
         attributed_string.tokenize();
+
+        println!("{:#?}", attributed_string);
 
         assert_eq!(attributed_string.token_stream.is_empty(), false);
     }

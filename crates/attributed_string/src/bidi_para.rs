@@ -27,15 +27,36 @@ impl<'text> Iterator for BidiParagraphs<'text> {
     fn next(&mut self) -> Option<Self::Item> {
         let para = self.info.next()?;
         let paragraph = &self.text[para.range];
-        // `para.range` includes the newline that splits the line, so remove it if present
-        let mut char_indices = paragraph.char_indices();
-        if let Some(i) = char_indices.next_back().and_then(|(i, c)| {
-            // `BidiClass::B` is a Paragraph_Separator (various newline characters)
-            (bidi_class(c) == BidiClass::B).then_some(i)
-        }) {
-            Some((&paragraph[0..i], para.level))
-        } else {
-            Some((paragraph, para.level))
-        }
+        Some((paragraph, para.level))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn e2e() {
+        // This example text is defined using `concat!` because some browsers
+        // and text editors have trouble displaying bidi strings.
+        let text = concat!["א", "ב", "ג", "a", "b", "c",];
+
+        // Resolve embedding levels within the text.  Pass `None` to detect the
+        // paragraph level automatically.
+        let bidi_info = BidiInfo::new(&text, None);
+
+        // This paragraph has embedding level 1 because its first strong character is RTL.
+        assert_eq!(bidi_info.paragraphs.len(), 1);
+        let para = &bidi_info.paragraphs[0];
+        assert_eq!(para.level.number(), 1);
+        assert_eq!(para.level.is_rtl(), true);
+
+        // Re-ordering is done after wrapping each paragraph into a sequence of
+        // lines. For this example, I'll just use a single line that spans the
+        // entire paragraph.
+        let line = para.range.clone();
+
+        let display = bidi_info.reorder_line(para, line);
+        assert_eq!(display, concat!["a", "b", "c", "ג", "ב", "א",]);
     }
 }
