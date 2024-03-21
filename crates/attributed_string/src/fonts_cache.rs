@@ -2,21 +2,11 @@ use crate::{
     attrs::{FontAttrs, FontFamily, FontStretch, FontStyle},
     font::Font,
 };
-use rustybuzz::{ttf_parser, Face as RustybuzzFace};
-use self_cell::self_cell;
+use rustybuzz::ttf_parser;
 use std::{
     collections::{hash_map::Entry, HashMap},
     sync::Arc,
 };
-
-self_cell!(
-    pub(crate) struct OwnedFace {
-        owner: Arc<dyn AsRef<[u8]> + Send + Sync>,
-
-        #[covariant]
-        dependent: RustybuzzFace,
-    }
-);
 
 #[derive(Debug, PartialEq, Eq, Hash, Clone)]
 struct ShapePlanKey {
@@ -211,7 +201,7 @@ impl FontsCache {
                 } = vac.key();
 
                 let plan = rustybuzz::ShapePlan::new(
-                    font.rustybuzz(),
+                    font.owned_face(),
                     *direction,
                     Some(*script),
                     language.as_ref(),
@@ -242,14 +232,7 @@ impl DatabaseExt for fontdb::Database {
             fontdb::Source::SharedFile(_path, data) => Arc::clone(data),
         };
 
-        return Some(Font {
-            id,
-            rustybuzz: OwnedFace::try_new(Arc::clone(&data), |data| {
-                RustybuzzFace::from_slice((**data).as_ref(), info.index).ok_or(())
-            })
-            .ok()?,
-            data,
-        });
+        return Font::new(id, info.index, data);
     }
 
     fn has_char(&self, id: fontdb::ID, c: char) -> bool {
@@ -280,7 +263,7 @@ mod tests {
 
         if let Some(font) = &maybe_font {
             let text = String::from("Hello World");
-            let (glyphs, missing, buffer) = font.shape_text(
+            let (glyphs, missing, _) = font.shape_text(
                 &text,
                 Range {
                     start: 0,

@@ -1,16 +1,22 @@
-use crate::{
-    fonts_cache::{FontsCache, OwnedFace},
-    glyph::Glyph,
-    path_builder::PathBuilder,
-};
+use crate::{fonts_cache::FontsCache, glyph::Glyph, path_builder::PathBuilder};
 use glam::Vec2;
-use rustybuzz::ttf_parser;
+use rustybuzz::{ttf_parser, Face as RustybuzzFace};
+use self_cell::self_cell;
 use std::{collections::HashSet, ops::Range, sync::Arc};
 
+self_cell!(
+    pub(crate) struct OwnedFace {
+        owner: Arc<dyn AsRef<[u8]> + Send + Sync>,
+
+        #[covariant]
+        dependent: RustybuzzFace,
+    }
+);
+
 pub struct Font {
-    pub(crate) id: fontdb::ID,
-    pub(crate) rustybuzz: OwnedFace,
-    pub(crate) data: Arc<dyn AsRef<[u8]> + Send + Sync>,
+    id: fontdb::ID,
+    owned_face: OwnedFace,
+    data: Arc<dyn AsRef<[u8]> + Send + Sync>,
 }
 
 impl std::fmt::Debug for Font {
@@ -22,6 +28,21 @@ impl std::fmt::Debug for Font {
 }
 
 impl Font {
+    pub fn new(
+        id: fontdb::ID,
+        face_index: u32,
+        data: Arc<dyn AsRef<[u8]> + Send + Sync>,
+    ) -> Option<Self> {
+        Some(Self {
+            id,
+            owned_face: OwnedFace::try_new(Arc::clone(&data), |data| {
+                RustybuzzFace::from_slice((**data).as_ref(), face_index).ok_or(())
+            })
+            .ok()?,
+            data,
+        })
+    }
+
     #[inline]
     pub fn id(&self) -> fontdb::ID {
         self.id
@@ -33,13 +54,13 @@ impl Font {
     }
 
     #[inline]
-    pub fn rustybuzz(&self) -> &rustybuzz::Face<'_> {
-        self.rustybuzz.borrow_dependent()
+    pub fn owned_face(&self) -> &rustybuzz::Face<'_> {
+        self.owned_face.borrow_dependent()
     }
 
     #[inline]
     pub fn font_scale(&self) -> f32 {
-        self.rustybuzz().units_per_em() as f32
+        self.owned_face().units_per_em() as f32
     }
 
     #[inline]
@@ -49,12 +70,12 @@ impl Font {
 
     #[inline]
     pub fn ascent(&self, font_size: f32) -> f32 {
-        self.rustybuzz().ascender() as f32 * self.scale(font_size)
+        self.owned_face().ascender() as f32 * self.scale(font_size)
     }
 
     #[inline]
     pub fn descent(&self, font_size: f32) -> f32 {
-        self.rustybuzz().descender() as f32 * self.scale(font_size)
+        self.owned_face().descender() as f32 * self.scale(font_size)
     }
 
     #[inline]
@@ -66,7 +87,7 @@ impl Font {
         let mut builder = PathBuilder {
             builder: tiny_skia_path::PathBuilder::new(),
         };
-        self.rustybuzz().outline_glyph(glyph_id, &mut builder)?;
+        self.owned_face().outline_glyph(glyph_id, &mut builder)?;
         builder.builder.finish()
     }
 
@@ -143,11 +164,11 @@ impl Font {
         buffer.guess_segment_properties();
 
         let rtl = matches!(buffer.direction(), rustybuzz::Direction::RightToLeft);
-        let ascent = self.rustybuzz().ascender() as f32 / self.font_scale();
-        let descent = -self.rustybuzz().descender() as f32 / self.font_scale();
+        let ascent = self.owned_face().ascender() as f32 / self.font_scale();
+        let descent = self.owned_face().descender() as f32 / self.font_scale();
 
         let shape_plan = fonts_cache.get_shape_plan(self, &buffer);
-        let glyph_buffer = rustybuzz::shape_with_plan(self.rustybuzz(), shape_plan, buffer);
+        let glyph_buffer = rustybuzz::shape_with_plan(self.owned_face(), shape_plan, buffer);
         let glyph_infos = glyph_buffer.glyph_infos();
         let glyph_positions = glyph_buffer.glyph_positions();
 
@@ -155,7 +176,6 @@ impl Font {
         for (info, pos) in glyph_infos.iter().zip(glyph_positions.iter()) {
             let advance = Vec2::new(pos.x_advance as f32, pos.y_advance as f32) / self.font_scale();
             let offset = Vec2::new(pos.x_offset as f32, pos.y_offset as f32) / self.font_scale();
-
             let start_glyph = range.start + info.cluster as usize;
 
             if info.glyph_id == 0 {
