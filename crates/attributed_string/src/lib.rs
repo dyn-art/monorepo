@@ -118,7 +118,29 @@ impl AttributedString {
         }
 
         for line in lines.iter() {
-            // TODO
+            if line.get_span_ranges().is_empty() {
+                continue;
+            }
+
+            let mut pos = Vec2::new(0.0, 0.0);
+            let mut max_ascent: f32 = 0.0;
+            let mut max_descent: f32 = 0.0;
+
+            for span_range in line.get_span_ranges().iter() {
+                let span = &self.spans[span_range.index];
+                let attrs = &self.attrs_intervals.intervals[span.get_attrs_index()].val;
+                let font_size = attrs.get_font_size();
+
+                for glyph_token in span.iter_glyphs_in_range(line.get_range()) {
+                    let advance = glyph_token.get_glyph().advance * font_size;
+
+                    // glyph_token.set_transform(pos); // TODO
+
+                    pos += advance;
+                    max_ascent = max_ascent.max(glyph_token.get_glyph().ascent);
+                    max_descent = max_descent.max(glyph_token.get_glyph().descent);
+                }
+            }
         }
 
         self.lines = lines;

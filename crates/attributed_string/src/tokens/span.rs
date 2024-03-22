@@ -1,6 +1,6 @@
 use super::shape::{
     glyph::GlyphToken, linebreak::LinebreakToken, text_fragment::TextFragmentToken,
-    word_separator::WordSeparatorToken, ShapeBuffer, ShapeTokenVariant,
+    word_separator::WordSeparatorToken, ShapeBuffer, ShapeToken, ShapeTokenVariant,
 };
 use crate::{attrs::Attrs, fonts_cache::FontsCache};
 use glam::Vec2;
@@ -152,7 +152,12 @@ impl SpanToken {
 
     #[inline]
     pub fn iter_glyphs(&self) -> GlyphTokenRefIterator {
-        GlyphTokenRefIterator::new(self)
+        GlyphTokenRefIterator::new(self, self.range.clone())
+    }
+
+    #[inline]
+    pub fn iter_glyphs_in_range(&self, range: Range<usize>) -> GlyphTokenRefIterator {
+        GlyphTokenRefIterator::new(self, range)
     }
 }
 
@@ -162,15 +167,22 @@ pub struct GlyphTokenRefIterator<'a> {
     token_index: usize,
     // Tracks the position within the current ShapeTokenVariant's GlyphToken vector
     glyph_index: usize,
+    // The range of interest for yielding GlyphTokens
+    range: Range<usize>,
 }
 
 impl<'a> GlyphTokenRefIterator<'a> {
-    pub fn new(span_token: &'a SpanToken) -> Self {
+    pub fn new(span_token: &'a SpanToken, range: Range<usize>) -> Self {
         Self {
             span_token,
             token_index: 0,
             glyph_index: 0,
+            range,
         }
+    }
+
+    fn is_within_range(&self, token_range: &Range<usize>) -> bool {
+        self.range.start <= token_range.start && token_range.end <= self.range.end
     }
 }
 
@@ -180,34 +192,50 @@ impl<'a> Iterator for GlyphTokenRefIterator<'a> {
     fn next(&mut self) -> Option<Self::Item> {
         while self.token_index < self.span_token.tokens.len() {
             match &self.span_token.tokens[self.token_index] {
-                // Move to next token after yielding a Glyph
+                // Move to next token after yielding a glyph
                 ShapeTokenVariant::Glyph(glyph) if self.glyph_index == 0 => {
                     self.token_index += 1;
-                    return Some(glyph);
+                    if self.is_within_range(glyph.get_range()) {
+                        return Some(glyph);
+                    }
                 }
                 ShapeTokenVariant::WordSeparator(token)
                     if self.glyph_index < token.get_tokens().len() =>
                 {
                     let glyph = &token.get_tokens()[self.glyph_index];
-                    self.glyph_index += 1;
-                    if self.glyph_index == token.get_tokens().len() {
+
+                    if self.is_within_range(token.get_range()) {
+                        self.glyph_index += 1;
+                        if self.glyph_index == token.get_tokens().len() {
+                            // Reset glyph_index and move to next token for next call
+                            self.glyph_index = 0;
+                            self.token_index += 1;
+                        }
+                        return Some(glyph);
+                    } else {
                         // Reset glyph_index and move to next token for next call
                         self.glyph_index = 0;
                         self.token_index += 1;
                     }
-                    return Some(glyph);
                 }
                 ShapeTokenVariant::TextFragment(token)
                     if self.glyph_index < token.get_tokens().len() =>
                 {
                     let glyph = &token.get_tokens()[self.glyph_index];
-                    self.glyph_index += 1;
-                    if self.glyph_index == token.get_tokens().len() {
+
+                    if self.is_within_range(token.get_range()) {
+                        self.glyph_index += 1;
+                        if self.glyph_index == token.get_tokens().len() {
+                            // Reset glyph_index and move to next token for next call
+                            self.glyph_index = 0;
+                            self.token_index += 1;
+                        }
+                        return Some(glyph);
+                    } else {
                         // Reset glyph_index and move to next token for next call
                         self.glyph_index = 0;
                         self.token_index += 1;
                     }
-                    return Some(glyph);
                 }
                 // For non-glyph-carrying tokens or if no more glyphs in current token, move to the next one
                 _ => {

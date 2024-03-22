@@ -26,6 +26,18 @@ impl GlyphToken {
             bbox: Vec2::default(),
         }
     }
+
+    pub fn get_glyph(&self) -> &Glyph {
+        &self.glyph
+    }
+
+    pub fn get_transform(&self) -> &Vec2 {
+        &self.transform
+    }
+
+    pub fn set_transform(&mut self, transform: Vec2) {
+        self.transform = transform;
+    }
 }
 
 impl ShapeToken for GlyphToken {

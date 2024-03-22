@@ -6,12 +6,18 @@ use super::span::SpanToken;
 #[derive(Debug, Clone)]
 pub struct LineToken {
     span_ranges: Vec<SpanRange>,
+    max_ascent: f32,
+    max_descent: f32,
 }
 
 impl LineToken {
     pub fn new(mut span_ranges: Vec<SpanRange>) -> Self {
         sort_span_ranges(&mut span_ranges);
-        Self { span_ranges }
+        Self {
+            span_ranges,
+            max_ascent: 0.0,
+            max_descent: 0.0,
+        }
     }
 
     pub fn get_range(&self) -> Range<usize> {
@@ -41,8 +47,8 @@ impl LineToken {
 
 #[derive(Debug, Clone)]
 pub struct SpanRange {
-    index: usize,
-    range: Range<usize>,
+    pub index: usize,
+    pub range: Range<usize>,
 }
 
 impl SpanRange {
