@@ -762,26 +762,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "dyn-attributed-string-v1"
-version = "0.0.1"
-dependencies = [
- "fontdb",
- "glam",
- "log",
- "ordered-float",
- "ropey",
- "rust-lapper",
- "rustybuzz 0.13.0",
- "smallvec",
- "strict-num 0.2.0",
- "tiny-skia-path",
- "unicode-bidi",
- "unicode-linebreak",
- "unicode-script",
- "unicode-vo",
-]
-
-[[package]]
 name = "dyn-comp-asset"
 version = "0.0.1"
 dependencies = [

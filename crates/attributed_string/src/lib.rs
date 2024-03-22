@@ -5,10 +5,11 @@ pub mod glyph;
 pub mod path_builder;
 pub mod tokens;
 
+use crate::tokens::shape::ShapeToken;
 use attrs::{Attrs, AttrsInterval, AttrsIntervals};
 use fonts_cache::FontsCache;
 use glam::Vec2;
-use rust_lapper::{Interval, Lapper};
+use rust_lapper::Lapper;
 use tokens::{layout::paragraph::ParagraphToken, span::SpanToken};
 
 #[derive(Debug, Clone)]
@@ -95,6 +96,15 @@ impl AttributedString {
     pub fn layout(&mut self) {
         // TODO: Layout tokens by createing lines, ..
     }
+
+    pub fn to_path(&self) {
+        // TODO
+        for span in self.shape_tokens.iter() {
+            for glyph in span.iter_glyphs() {
+                log::info!("Glyph: {:?}", glyph.get_range());
+            }
+        }
+    }
 }
 
 #[cfg(test)]
@@ -118,30 +128,32 @@ mod tests {
 
         let text = String::from("Hello, world!\nשלום עולם!\nThis is a mix of English and Hebrew.");
         let attrs_intervals = vec![
-            // AttrsInterval {
-            //     start: 0,
-            //     stop: 10,
-            //     val: Attrs::new()
-            //         .font_family(FontFamily::Monospace)
-            //         .font_weight(400)
-            //         .font_size(24.0),
-            // },
-            // AttrsInterval {
-            //     start: 10,
-            //     stop: text.len(),
-            //     val: Attrs::new()
-            //         .font_family(FontFamily::Serif)
-            //         .font_weight(400)
-            //         .font_size(12.0),
-            // },
+            AttrsInterval {
+                start: 0,
+                stop: 10,
+                val: Attrs::new()
+                    .font_family(FontFamily::Monospace)
+                    .font_weight(400)
+                    .font_size(24.0),
+            },
+            AttrsInterval {
+                start: 10,
+                stop: text.len(),
+                val: Attrs::new()
+                    .font_family(FontFamily::Serif)
+                    .font_weight(400)
+                    .font_size(12.0),
+            },
         ];
 
         let mut attributed_string =
             AttributedString::new(text, attrs_intervals, Vec2::new(100.0, 50.0));
 
         attributed_string.tokenize(&mut fonts_cache);
+        attributed_string.layout();
+        attributed_string.to_path();
 
-        println!("{:#?}", attributed_string);
+        // println!("{:#?}", attributed_string);
 
         assert_eq!(attributed_string.shape_tokens.is_empty(), false);
     }

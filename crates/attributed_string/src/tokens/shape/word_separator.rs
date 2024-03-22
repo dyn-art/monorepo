@@ -47,6 +47,10 @@ impl WordSeparatorToken {
             advance: Vec2::default(),
         };
     }
+
+    pub fn get_tokens(&self) -> &Vec<GlyphToken> {
+        &self.tokens
+    }
 }
 
 impl ShapeToken for WordSeparatorToken {
