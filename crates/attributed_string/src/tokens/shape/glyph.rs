@@ -11,7 +11,10 @@ use std::ops::Range;
 #[derive(Debug, Clone)]
 pub struct GlyphToken {
     glyph: Glyph,
+    /// Cached transform after applying the layout.
     transform: Vec2,
+    /// Cached bounding box after applying the layout.
+    bbox: Vec2,
 }
 
 impl GlyphToken {
@@ -20,6 +23,7 @@ impl GlyphToken {
         Self {
             glyph,
             transform: Vec2::default(),
+            bbox: Vec2::default(),
         }
     }
 }

@@ -103,7 +103,12 @@ impl AttributedString {
         // TODO
         for span in self.shape_tokens.iter() {
             for glyph in span.iter_glyphs() {
-                log::info!("Glyph: {:?}", glyph.get_range());
+                log::info!(
+                    "Glyph: Range({:?}), {:?}, AttrsIndex({})",
+                    glyph.get_range(),
+                    span.get_level(),
+                    span.get_attrs_index()
+                );
             }
         }
     }

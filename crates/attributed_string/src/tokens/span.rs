@@ -126,6 +126,11 @@ impl SpanToken {
     }
 
     #[inline]
+    pub fn get_attrs_index(&self) -> usize {
+        self.attrs_index
+    }
+
+    #[inline]
     pub fn get_tokens(&self) -> &Vec<ShapeTokenVariant> {
         &self.tokens
     }
