@@ -47,7 +47,7 @@ impl AttributedString {
         let bidi_info = unicode_bidi::BidiInfo::new(&self.text, None);
 
         // Determine spans
-        for attrs_interval in self.attrs_intervals.iter() {
+        for (index, attrs_interval) in self.attrs_intervals.iter().enumerate() {
             let mut span_start = attrs_interval.start;
             let mut current_bidi_level = bidi_info.levels[span_start];
 
@@ -60,6 +60,7 @@ impl AttributedString {
                         &self.text,
                         span_start..i,
                         current_bidi_level,
+                        index,
                         &attrs_interval.val,
                         fonts_cache,
                     ));
@@ -75,6 +76,7 @@ impl AttributedString {
                 &self.text,
                 span_start..attrs_interval.stop,
                 current_bidi_level,
+                index,
                 &attrs_interval.val,
                 fonts_cache,
             ));

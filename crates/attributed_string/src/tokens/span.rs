@@ -9,11 +9,10 @@ use unicode_linebreak::BreakClass;
 
 /// A span of text with common attributes.
 /// It is guranteed that a span only matches one attribute set.
-// TODO: Should this token own a copy of attrs
 #[derive(Debug, Clone)]
 pub struct SpanToken {
-    // Most likely exactly correlates to an attribute range if no bidi paragraph.
     range: Range<usize>,
+    attrs_index: usize,
     /// Shape tokens within the span, including glyphs, words, and separators.
     tokens: Vec<ShapeTokenVariant>,
     /// Bidi level for handling text directionality within the span.
@@ -25,6 +24,7 @@ impl SpanToken {
         text: &str,
         range: Range<usize>,
         level: unicode_bidi::Level,
+        attrs_index: usize,
         attrs: &Attrs,
         fonts_cache: &mut FontsCache,
     ) -> Self {
@@ -114,6 +114,7 @@ impl SpanToken {
 
         return Self {
             range,
+            attrs_index,
             tokens,
             level,
         };
