@@ -10,19 +10,26 @@ use attrs::{Attrs, AttrsInterval, AttrsIntervals};
 use fonts_cache::FontsCache;
 use glam::Vec2;
 use rust_lapper::Lapper;
-use tokens::{layout::paragraph::ParagraphToken, span::SpanToken};
+use tokens::{
+    line::{LineToken, SpanRange},
+    span::SpanToken,
+};
 
 #[derive(Debug, Clone)]
 struct AttributedString {
     text: String,
-    shape_tokens: Vec<SpanToken>,
-    layout_tokens: Vec<ParagraphToken>,
+    spans: Vec<SpanToken>,
+    lines: Vec<LineToken>,
     attrs_intervals: AttrsIntervals,
-    bbox: Vec2,
+    config: AttributedStringConfig,
 }
 
 impl AttributedString {
-    pub fn new(text: String, mut attrs_intervals: Vec<AttrsInterval>, bbox: Vec2) -> Self {
+    pub fn new(
+        text: String,
+        mut attrs_intervals: Vec<AttrsInterval>,
+        config: AttributedStringConfig,
+    ) -> Self {
         if attrs_intervals.is_empty() {
             attrs_intervals.push(AttrsInterval {
                 start: 0,
@@ -33,14 +40,14 @@ impl AttributedString {
 
         return Self {
             text,
-            shape_tokens: Vec::new(),
-            layout_tokens: Vec::new(),
+            spans: Vec::new(),
+            lines: Vec::new(),
             attrs_intervals: Lapper::new(attrs_intervals),
-            bbox,
+            config,
         };
     }
 
-    pub fn tokenize(&mut self, fonts_cache: &mut FontsCache) {
+    pub fn tokenize_text(&mut self, fonts_cache: &mut FontsCache) {
         self.devide_overlapping_attrs();
 
         let mut spans: Vec<SpanToken> = Vec::new();
@@ -82,7 +89,7 @@ impl AttributedString {
             ));
         }
 
-        self.shape_tokens = spans;
+        self.spans = spans;
     }
 
     pub fn devide_overlapping_attrs(&mut self) {
@@ -96,12 +103,30 @@ impl AttributedString {
     }
 
     pub fn layout(&mut self) {
-        // TODO: Layout tokens by createing lines, ..
+        let mut lines: Vec<LineToken> = Vec::new();
+
+        match self.config.line_wrap {
+            LineWrap::None => {
+                let mut span_ranges: Vec<SpanRange> = Vec::new();
+                for (index, span) in self.spans.iter().enumerate() {
+                    span_ranges.push(SpanRange::from_span(index, &span));
+                }
+                lines.push(LineToken::new(span_ranges));
+            }
+            // TODO: Other line wrap implementations
+            _ => {}
+        }
+
+        for line in lines.iter() {
+            // TODO
+        }
+
+        self.lines = lines;
     }
 
     pub fn to_path(&self) {
         // TODO
-        for span in self.shape_tokens.iter() {
+        for span in self.spans.iter() {
             for glyph in span.iter_glyphs() {
                 log::info!(
                     "Glyph: Range({:?}), {:?}, AttrsIndex({})",
@@ -112,6 +137,25 @@ impl AttributedString {
             }
         }
     }
+}
+
+#[derive(Debug, Default, Clone)]
+struct AttributedStringConfig {
+    pub bbox: Vec2,
+    pub line_wrap: LineWrap,
+}
+
+#[derive(Debug, Default, Clone, Copy)]
+pub enum LineWrap {
+    /// No wrapping
+    #[default]
+    None,
+    /// Wraps at a glyph level
+    Glyph,
+    /// Wraps at the word level
+    Word,
+    /// Wraps at the word level, or fallback to glyph level if a word can't fit on a line by itself
+    WordOrGlyph,
 }
 
 #[cfg(test)]
@@ -153,16 +197,20 @@ mod tests {
             },
         ];
 
-        let mut attributed_string =
-            AttributedString::new(text, attrs_intervals, Vec2::new(100.0, 50.0));
+        let mut attributed_string = AttributedString::new(
+            text,
+            attrs_intervals,
+            AttributedStringConfig {
+                bbox: Vec2::new(100.0, 100.0),
+                ..Default::default()
+            },
+        );
 
-        attributed_string.tokenize(&mut fonts_cache);
+        attributed_string.tokenize_text(&mut fonts_cache);
         attributed_string.layout();
         attributed_string.to_path();
 
-        // println!("{:#?}", attributed_string);
-
-        assert_eq!(attributed_string.shape_tokens.is_empty(), false);
+        assert_eq!(attributed_string.spans.is_empty(), false);
     }
 
     #[test]
