@@ -1,4 +1,4 @@
-use super::Token;
+use super::ShapeToken;
 use glam::Vec2;
 use std::ops::Range;
 
@@ -14,7 +14,7 @@ pub struct BitmapToken {
     pub alt_text: String,
 }
 
-impl Token for BitmapToken {
+impl ShapeToken for BitmapToken {
     fn get_range(&self) -> &Range<usize> {
         &self.range
     }

@@ -1,10 +1,11 @@
-use super::{line::LineToken, Token};
+use super::{line::LineToken, LayoutToken, SpanIndex};
 use std::ops::Range;
 
 /// Encapsulates a paragraph, potentially containing multiple lines with varied directionality and alignment.
 #[derive(Debug, Clone)]
 pub struct ParagraphToken {
     pub range: Range<usize>,
+    pub span_indicies: Vec<SpanIndex>,
     /// Line tokens that make up the paragraph.
     pub lines: Vec<LineToken>,
     /// Indentation level for the paragraph, useful for blockquotes or nested lists.
@@ -15,8 +16,12 @@ pub struct ParagraphToken {
     pub space_after: f32,
 }
 
-impl Token for ParagraphToken {
+impl LayoutToken for ParagraphToken {
     fn get_range(&self) -> &Range<usize> {
         &self.range
+    }
+
+    fn get_span_indices(&self) -> &Vec<SpanIndex> {
+        &self.span_indicies
     }
 }

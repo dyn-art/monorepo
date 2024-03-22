@@ -1,5 +1,4 @@
 pub mod attrs;
-pub mod bidi_para;
 pub mod font;
 pub mod fonts_cache;
 pub mod glyph;
@@ -7,147 +6,90 @@ pub mod path_builder;
 pub mod tokens;
 
 use attrs::{Attrs, AttrsInterval, AttrsIntervals};
-use bidi_para::BidiParagraphs;
+use fonts_cache::FontsCache;
 use glam::Vec2;
-use rust_lapper::Lapper;
-use std::ops::Range;
-use tokens::{
-    linebreak::LinebreakToken, span::SpanToken, text_fragment::TextFragmentToken,
-    word_separator::WordSeparatorToken, TokenVariant,
-};
-use unicode_linebreak::BreakClass;
+use rust_lapper::{Interval, Lapper};
+use tokens::{layout::paragraph::ParagraphToken, span::SpanToken};
 
 #[derive(Debug, Clone)]
 struct AttributedString {
     text: String,
-    token_stream: Vec<TokenVariant>,
+    shape_tokens: Vec<SpanToken>,
+    layout_tokens: Vec<ParagraphToken>,
     attrs_intervals: AttrsIntervals,
     bbox: Vec2,
 }
 
 impl AttributedString {
-    pub fn new(text: String, attrs_intervals: Vec<AttrsInterval>, bbox: Vec2) -> Self {
-        let mut attrs_intervals = Lapper::new(attrs_intervals);
-        attrs_intervals.divide_overlaps_with(|overlaps| {
+    pub fn new(text: String, mut attrs_intervals: Vec<AttrsInterval>, bbox: Vec2) -> Self {
+        if attrs_intervals.is_empty() {
+            attrs_intervals.push(AttrsInterval {
+                start: 0,
+                stop: text.len(),
+                val: Attrs::new(),
+            });
+        }
+
+        return Self {
+            text,
+            shape_tokens: Vec::new(),
+            layout_tokens: Vec::new(),
+            attrs_intervals: Lapper::new(attrs_intervals),
+            bbox,
+        };
+    }
+
+    pub fn tokenize(&mut self, fonts_cache: &mut FontsCache) {
+        self.devide_overlapping_attrs();
+
+        let mut spans: Vec<SpanToken> = Vec::new();
+        let bidi_info = unicode_bidi::BidiInfo::new(&self.text, None);
+
+        // Determine spans
+        for attrs_interval in self.attrs_intervals.iter() {
+            let mut span_start = attrs_interval.start;
+            let mut current_bidi_level = bidi_info.levels[span_start];
+
+            for i in attrs_interval.start..attrs_interval.stop {
+                let char_bidi_level = bidi_info.levels[i];
+
+                // When bidi level changes, create a new span for the previous segment
+                if char_bidi_level != current_bidi_level {
+                    spans.push(SpanToken::from_text(
+                        &self.text,
+                        span_start..i,
+                        current_bidi_level,
+                        &attrs_interval.val,
+                        fonts_cache,
+                    ));
+
+                    // Update for the new span
+                    span_start = i;
+                    current_bidi_level = char_bidi_level;
+                }
+            }
+
+            // Ensure to add the last span in the current attribute range
+            spans.push(SpanToken::from_text(
+                &self.text,
+                span_start..attrs_interval.stop,
+                current_bidi_level,
+                &attrs_interval.val,
+                fonts_cache,
+            ));
+        }
+
+        self.shape_tokens = spans;
+    }
+
+    pub fn devide_overlapping_attrs(&mut self) {
+        self.attrs_intervals.divide_overlaps_with(|overlaps| {
             let mut merged_attrs = Attrs::new();
             for &attrs in overlaps.iter() {
                 merged_attrs.merge(attrs.clone());
             }
             return merged_attrs;
         });
-
-        Self {
-            text,
-            token_stream: Vec::new(),
-            attrs_intervals,
-            bbox,
-        }
-    }
-
-    pub fn tokenize(&mut self) {
-        let mut token_stream: Vec<TokenVariant> = Vec::new();
-        let text_start = self.text.as_ptr() as usize;
-
-        // Process bidi paragraphs
-        let bidi_para_range_iter = BidiParagraphs::new(&self.text).map(|(para, level)| {
-            let start = para.as_ptr() as usize - text_start;
-            let end = start + para.len();
-            (start..end, level)
-        });
-
-        // TODO: Bidi Paragraphs do not directly identify the level differences instead more when a linebreak happens
-        // But since we can identify that with unicode_linebreak its probably best
-        // if we identify the spans based on level differences within the BidiInfo struct?
-        for (para_range, para_level) in bidi_para_range_iter {
-            let mut start = para_range.start;
-            let para_text = &self.text[para_range.clone()];
-            let mut span_token = SpanToken::new(para_range.clone(), para_level);
-
-            // Process each character for potential tokenization within the paragraph
-            for (index, _char) in para_text.char_indices() {
-                let global_index = start + index; // Adjust index relative to the entire text
-                let break_class = unicode_linebreak::break_property(_char as u32);
-
-                match break_class {
-                    // Handle line break
-                    // TODO: Should the line breaks happen based on the bidi paragraphs?
-                    BreakClass::Mandatory
-                    | BreakClass::LineFeed
-                    | BreakClass::NextLine
-                    | BreakClass::CarriageReturn => {
-                        // Add text fragment token
-                        if start != global_index {
-                            span_token.push_token(TokenVariant::TextFragment(
-                                TextFragmentToken::from_text(
-                                    &self.text,
-                                    Range {
-                                        start,
-                                        end: global_index,
-                                    },
-                                    &self.attrs_intervals,
-                                ),
-                            ));
-                        }
-
-                        // Add line break token
-                        span_token.push_token(TokenVariant::Linebreak(LinebreakToken::new(
-                            Range {
-                                start: global_index,
-                                end: global_index + 1,
-                            },
-                        )));
-                        start = global_index + 1;
-                    }
-
-                    // Handle text segment separation
-                    BreakClass::Space | BreakClass::ZeroWidthSpace => {
-                        // Add text fragment token
-                        if start != global_index {
-                            span_token.push_token(TokenVariant::TextFragment(
-                                TextFragmentToken::from_text(
-                                    &self.text,
-                                    Range {
-                                        start,
-                                        end: global_index,
-                                    },
-                                    &self.attrs_intervals,
-                                ),
-                            ));
-                        }
-
-                        // Add word separator token
-                        span_token.push_token(TokenVariant::WordSeparator(
-                            WordSeparatorToken::from_text(
-                                &self.text,
-                                Range {
-                                    start: global_index,
-                                    end: global_index + 1,
-                                },
-                                &self.attrs_intervals,
-                            ),
-                        ));
-                        start = global_index + 1;
-                    }
-                    _ => {}
-                }
-            }
-
-            // Handle the last text fragment within the paragraph, if any
-            if start < para_range.end {
-                span_token.push_token(TokenVariant::TextFragment(TextFragmentToken::from_text(
-                    &self.text,
-                    Range {
-                        start,
-                        end: para_range.end,
-                    },
-                    &self.attrs_intervals,
-                )));
-            }
-
-            token_stream.push(TokenVariant::Span(span_token));
-        }
-
-        self.token_stream = token_stream;
     }
 
     pub fn layout(&mut self) {
@@ -159,35 +101,73 @@ impl AttributedString {
 mod tests {
     use self::attrs::FontFamily;
     use super::*;
+    use unicode_bidi::BidiInfo;
+
+    fn init() {
+        let _ = env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("info"))
+            .is_test(true)
+            .try_init();
+    }
 
     #[test]
     fn e2e() {
+        init();
+
+        let mut fonts_cache = FontsCache::new();
+        fonts_cache.load_system_fonts();
+
         let text = String::from("Hello, world!\nשלום עולם!\nThis is a mix of English and Hebrew.");
         let attrs_intervals = vec![
-            AttrsInterval {
-                start: 0,
-                stop: 10,
-                val: Attrs::new()
-                    .font_family(FontFamily::Monospace)
-                    .font_weight(400)
-                    .font_size(24.0),
-            },
-            AttrsInterval {
-                start: 10,
-                stop: text.len(),
-                val: Attrs::new()
-                    .font_family(FontFamily::Serif)
-                    .font_weight(400)
-                    .font_size(12.0),
-            },
+            // AttrsInterval {
+            //     start: 0,
+            //     stop: 10,
+            //     val: Attrs::new()
+            //         .font_family(FontFamily::Monospace)
+            //         .font_weight(400)
+            //         .font_size(24.0),
+            // },
+            // AttrsInterval {
+            //     start: 10,
+            //     stop: text.len(),
+            //     val: Attrs::new()
+            //         .font_family(FontFamily::Serif)
+            //         .font_weight(400)
+            //         .font_size(12.0),
+            // },
         ];
+
         let mut attributed_string =
             AttributedString::new(text, attrs_intervals, Vec2::new(100.0, 50.0));
 
-        attributed_string.tokenize();
+        attributed_string.tokenize(&mut fonts_cache);
 
         println!("{:#?}", attributed_string);
 
-        assert_eq!(attributed_string.token_stream.is_empty(), false);
+        assert_eq!(attributed_string.shape_tokens.is_empty(), false);
+    }
+
+    #[test]
+    fn bidi_para_e2e() {
+        // This example text is defined using `concat!` because some browsers
+        // and text editors have trouble displaying bidi strings.
+        let text = concat!["א", "ב", "ג", "a", "b", "c",];
+
+        // Resolve embedding levels within the text.  Pass `None` to detect the
+        // paragraph level automatically.
+        let bidi_info = BidiInfo::new(&text, None);
+
+        // This paragraph has embedding level 1 because its first strong character is RTL.
+        assert_eq!(bidi_info.paragraphs.len(), 1);
+        let para = &bidi_info.paragraphs[0];
+        assert_eq!(para.level.number(), 1);
+        assert_eq!(para.level.is_rtl(), true);
+
+        // Re-ordering is done after wrapping each paragraph into a sequence of
+        // lines. For this example, I'll just use a single line that spans the
+        // entire paragraph.
+        let line = para.range.clone();
+
+        let display = bidi_info.reorder_line(para, line);
+        assert_eq!(display, concat!["a", "b", "c", "ג", "ב", "א",]);
     }
 }

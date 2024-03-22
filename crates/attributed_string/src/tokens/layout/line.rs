@@ -1,18 +1,21 @@
-use super::{span::SpanToken, Token};
+use super::{LayoutToken, SpanIndex};
 use std::ops::Range;
 
 /// Represents a line of text, composed of multiple spans for simplicity.
 #[derive(Debug, Clone)]
 pub struct LineToken {
     pub range: Range<usize>,
-    /// Span tokens that make up the line.
-    pub tokens: Vec<SpanToken>,
+    pub span_indicies: Vec<SpanIndex>,
     // /// Alignment of the line within its container.
     // pub alignment: TextAlignment,
 }
 
-impl Token for LineToken {
+impl LayoutToken for LineToken {
     fn get_range(&self) -> &Range<usize> {
         &self.range
+    }
+
+    fn get_span_indices(&self) -> &Vec<SpanIndex> {
+        &self.span_indicies
     }
 }

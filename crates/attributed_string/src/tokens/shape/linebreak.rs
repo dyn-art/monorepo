@@ -1,4 +1,4 @@
-use super::Token;
+use super::ShapeToken;
 use std::ops::Range;
 
 #[derive(Debug, Clone)]
@@ -8,11 +8,12 @@ pub struct LinebreakToken {
 
 impl LinebreakToken {
     pub fn new(range: Range<usize>) -> Self {
+        log::info!("LinebreakToken for range: {:?}", range);
         Self { range }
     }
 }
 
-impl Token for LinebreakToken {
+impl ShapeToken for LinebreakToken {
     fn get_range(&self) -> &Range<usize> {
         &self.range
     }

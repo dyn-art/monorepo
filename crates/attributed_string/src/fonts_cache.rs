@@ -66,7 +66,7 @@ impl FontsCache {
             .clone()
     }
 
-    pub fn get_font_by_attrs(&mut self, attrs: Attrs) -> Option<Arc<Font>> {
+    pub fn get_font_by_attrs(&mut self, attrs: &Attrs) -> Option<Arc<Font>> {
         let mut font: Option<Arc<Font>> = None;
         if let Some(font_id) = attrs.get_font_id() {
             font = self.get_font_by_id(font_id);
