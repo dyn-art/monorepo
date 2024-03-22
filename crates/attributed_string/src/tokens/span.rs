@@ -1,6 +1,6 @@
 use super::shape::{
     glyph::GlyphToken, linebreak::LinebreakToken, text_fragment::TextFragmentToken,
-    word_separator::WordSeparatorToken, ShapeBuffer, ShapeToken, ShapeTokenVariant,
+    word_separator::WordSeparatorToken, ShapeBuffer, ShapeTokenVariant,
 };
 use crate::{attrs::Attrs, fonts_cache::FontsCache};
 use glam::Vec2;
@@ -150,102 +150,38 @@ impl SpanToken {
         Vec2::default()
     }
 
-    #[inline]
-    pub fn iter_glyphs(&self) -> GlyphTokenRefIterator {
-        GlyphTokenRefIterator::new(self, self.range.clone())
+    pub fn iter_glyphs<'a>(&'a self) -> impl Iterator<Item = &'a GlyphToken> + 'a {
+        self.tokens
+            .iter()
+            .flat_map(|token_variant| match token_variant {
+                ShapeTokenVariant::Glyph(token) => Box::new(std::iter::once(token))
+                    as Box<dyn Iterator<Item = &'a GlyphToken> + 'a>,
+                ShapeTokenVariant::TextFragment(token) => Box::new(token.get_tokens().iter())
+                    as Box<dyn Iterator<Item = &'a GlyphToken> + 'a>,
+                ShapeTokenVariant::WordSeparator(token) => Box::new(token.get_tokens().iter())
+                    as Box<dyn Iterator<Item = &'a GlyphToken> + 'a>,
+                _ => Box::new(std::iter::empty()) as Box<dyn Iterator<Item = &'a GlyphToken> + 'a>,
+            })
     }
 
-    #[inline]
-    pub fn iter_glyphs_in_range(&self, range: Range<usize>) -> GlyphTokenRefIterator {
-        GlyphTokenRefIterator::new(self, range)
-    }
-}
-
-pub struct GlyphTokenRefIterator<'a> {
-    span_token: &'a SpanToken,
-    // Tracks the current position in the top-level tokens vector
-    token_index: usize,
-    // Tracks the position within the current ShapeTokenVariant's GlyphToken vector
-    glyph_index: usize,
-    // The range of interest for yielding GlyphTokens
-    range: Range<usize>,
-}
-
-impl<'a> GlyphTokenRefIterator<'a> {
-    pub fn new(span_token: &'a SpanToken, range: Range<usize>) -> Self {
-        Self {
-            span_token,
-            token_index: 0,
-            glyph_index: 0,
-            range,
-        }
-    }
-
-    fn is_within_range(&self, token_range: &Range<usize>) -> bool {
-        self.range.start <= token_range.start && token_range.end <= self.range.end
-    }
-}
-
-impl<'a> Iterator for GlyphTokenRefIterator<'a> {
-    type Item = &'a GlyphToken;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        while self.token_index < self.span_token.tokens.len() {
-            match &self.span_token.tokens[self.token_index] {
-                // Move to next token after yielding a glyph
-                ShapeTokenVariant::Glyph(glyph) if self.glyph_index == 0 => {
-                    self.token_index += 1;
-                    if self.is_within_range(glyph.get_range()) {
-                        return Some(glyph);
-                    }
+    pub(crate) fn iter_glyphs_mut<'a>(
+        &'a mut self,
+    ) -> impl Iterator<Item = &'a mut GlyphToken> + 'a {
+        self.tokens
+            .iter_mut()
+            .flat_map(|token_variant| match token_variant {
+                ShapeTokenVariant::Glyph(token) => Box::new(std::iter::once(token))
+                    as Box<dyn Iterator<Item = &'a mut GlyphToken> + 'a>,
+                ShapeTokenVariant::TextFragment(token) => {
+                    Box::new(token.get_tokens_mut().iter_mut())
+                        as Box<dyn Iterator<Item = &'a mut GlyphToken> + 'a>
                 }
-                ShapeTokenVariant::WordSeparator(token)
-                    if self.glyph_index < token.get_tokens().len() =>
-                {
-                    let glyph = &token.get_tokens()[self.glyph_index];
-
-                    if self.is_within_range(token.get_range()) {
-                        self.glyph_index += 1;
-                        if self.glyph_index == token.get_tokens().len() {
-                            // Reset glyph_index and move to next token for next call
-                            self.glyph_index = 0;
-                            self.token_index += 1;
-                        }
-                        return Some(glyph);
-                    } else {
-                        // Reset glyph_index and move to next token for next call
-                        self.glyph_index = 0;
-                        self.token_index += 1;
-                    }
+                ShapeTokenVariant::WordSeparator(token) => {
+                    Box::new(token.get_tokens_mut().iter_mut())
+                        as Box<dyn Iterator<Item = &'a mut GlyphToken> + 'a>
                 }
-                ShapeTokenVariant::TextFragment(token)
-                    if self.glyph_index < token.get_tokens().len() =>
-                {
-                    let glyph = &token.get_tokens()[self.glyph_index];
-
-                    if self.is_within_range(token.get_range()) {
-                        self.glyph_index += 1;
-                        if self.glyph_index == token.get_tokens().len() {
-                            // Reset glyph_index and move to next token for next call
-                            self.glyph_index = 0;
-                            self.token_index += 1;
-                        }
-                        return Some(glyph);
-                    } else {
-                        // Reset glyph_index and move to next token for next call
-                        self.glyph_index = 0;
-                        self.token_index += 1;
-                    }
-                }
-                // For non-glyph-carrying tokens or if no more glyphs in current token, move to the next one
-                _ => {
-                    self.token_index += 1;
-                    self.glyph_index = 0;
-                }
-            }
-        }
-
-        // No more tokens or glyphs left
-        None
+                _ => Box::new(std::iter::empty())
+                    as Box<dyn Iterator<Item = &'a mut GlyphToken> + 'a>,
+            })
     }
 }

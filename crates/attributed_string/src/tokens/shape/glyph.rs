@@ -1,9 +1,5 @@
 use super::ShapeToken;
-use crate::{
-    attrs::Attrs,
-    fonts_cache::FontsCache,
-    glyph::{self, Glyph},
-};
+use crate::glyph::Glyph;
 use glam::Vec2;
 use std::ops::Range;
 

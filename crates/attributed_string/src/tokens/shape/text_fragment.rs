@@ -51,6 +51,10 @@ impl TextFragmentToken {
     pub fn get_tokens(&self) -> &Vec<GlyphToken> {
         &self.tokens
     }
+
+    pub(crate) fn get_tokens_mut(&mut self) -> &mut Vec<GlyphToken> {
+        &mut self.tokens
+    }
 }
 
 impl ShapeToken for TextFragmentToken {

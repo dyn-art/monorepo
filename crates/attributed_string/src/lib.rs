@@ -4,6 +4,7 @@ pub mod fonts_cache;
 pub mod glyph;
 pub mod path_builder;
 pub mod tokens;
+pub mod utils;
 
 use crate::tokens::shape::ShapeToken;
 use attrs::{Attrs, AttrsInterval, AttrsIntervals};
@@ -14,6 +15,7 @@ use tokens::{
     line::{LineToken, SpanRange},
     span::SpanToken,
 };
+use utils::is_range_within;
 
 #[derive(Debug, Clone)]
 struct AttributedString {
@@ -121,20 +123,25 @@ impl AttributedString {
             if line.get_span_ranges().is_empty() {
                 continue;
             }
+            let line_range = line.get_range();
 
             let mut pos = Vec2::new(0.0, 0.0);
             let mut max_ascent: f32 = 0.0;
             let mut max_descent: f32 = 0.0;
 
             for span_range in line.get_span_ranges().iter() {
-                let span = &self.spans[span_range.index];
+                let span = &mut self.spans[span_range.index];
                 let attrs = &self.attrs_intervals.intervals[span.get_attrs_index()].val;
                 let font_size = attrs.get_font_size();
 
-                for glyph_token in span.iter_glyphs_in_range(line.get_range()) {
+                for glyph_token in span.iter_glyphs_mut() {
+                    if !is_range_within(glyph_token.get_range(), &line_range) {
+                        continue;
+                    }
+
                     let advance = glyph_token.get_glyph().advance * font_size;
 
-                    // glyph_token.set_transform(pos); // TODO
+                    glyph_token.set_transform(pos);
 
                     pos += advance;
                     max_ascent = max_ascent.max(glyph_token.get_glyph().ascent);
@@ -151,10 +158,11 @@ impl AttributedString {
         for span in self.spans.iter() {
             for glyph in span.iter_glyphs() {
                 log::info!(
-                    "Glyph: Range({:?}), {:?}, AttrsIndex({})",
+                    "Glyph: Range({:?}), {:?}, AttrsIndex({}), {:?}",
                     glyph.get_range(),
                     span.get_level(),
-                    span.get_attrs_index()
+                    span.get_attrs_index(),
+                    glyph.get_transform()
                 );
             }
         }
