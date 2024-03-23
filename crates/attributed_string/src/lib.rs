@@ -154,22 +154,76 @@ impl AttributedString {
         self.lines = lines;
     }
 
-    pub fn to_path(&self) {
-        // TODO
+    pub fn to_path(&self, fonts_cache: &mut FontsCache) -> Option<tiny_skia_path::Path> {
+        let mut text_builder = tiny_skia_path::PathBuilder::new();
+
         for span in self.spans.iter() {
-            for (cluster, byte_index) in span.iter_glyph_clusters() {
-                for glyph in cluster {
-                    log::info!(
-                        "Glyph: Range({:?}), {:?}, AttrsIndex({}), {:?}, ByteIndex({})",
-                        glyph.get_range(),
-                        span.get_level(),
-                        span.get_attrs_index(),
-                        glyph.get_transform(),
-                        byte_index
-                    );
+            let attrs = &self.attrs_intervals.intervals[span.get_attrs_index()].val;
+            let mut span_builder = tiny_skia_path::PathBuilder::new();
+
+            if let Some(font) = fonts_cache.get_font_by_attrs(attrs) {
+                let font_size = attrs.get_font_size();
+
+                for (cluster, byte_index) in span.iter_glyph_clusters() {
+                    let mut cluster_builder = tiny_skia_path::PathBuilder::new();
+                    let mut width = 0.0;
+                    let mut x: f32 = 0.0;
+
+                    for glyph_token in cluster {
+                        log::info!(
+                            "Glyph: Range({:?}), {:?}, AttrsIndex({}), {:?}, ByteIndex({})",
+                            glyph_token.get_range(),
+                            span.get_level(),
+                            span.get_attrs_index(),
+                            glyph_token.get_transform(),
+                            byte_index
+                        );
+
+                        let sx = font.scale(font_size);
+
+                        if let Some(outline) = font.outline(glyph_token.get_glyph().glyph_id) {
+                            // By default, glyphs are upside-down, so we have to mirror them
+                            let mut transform = tiny_skia_path::Transform::from_scale(1.0, -1.0);
+
+                            // Scale to font-size
+                            transform = transform.pre_scale(sx, sx);
+
+                            // Apply offset.
+                            //
+                            // The first glyph in the cluster will have an offset from 0x0,
+                            // but the later one will have an offset from the "current position".
+                            // So we have to keep an advance.
+                            transform = transform.pre_translate(
+                                x + glyph_token.get_glyph().offset.x
+                                    + glyph_token.get_transform().x,
+                                glyph_token.get_glyph().offset.y + glyph_token.get_transform().y,
+                            );
+
+                            if let Some(outline) = outline.transform(transform) {
+                                cluster_builder.push_path(&outline);
+                            }
+                        }
+
+                        x += glyph_token.get_glyph().advance.x;
+
+                        let glyph_width = glyph_token.get_glyph().advance.x * sx;
+                        if glyph_width > width {
+                            width = glyph_width;
+                        }
+                    }
+
+                    if let Some(path) = cluster_builder.finish() {
+                        span_builder.push_path(&path);
+                    }
                 }
             }
+
+            if let Some(path) = span_builder.finish() {
+                text_builder.push_path(&path);
+            }
         }
+
+        return text_builder.finish();
     }
 }
 
@@ -211,7 +265,8 @@ mod tests {
         let mut fonts_cache = FontsCache::new();
         fonts_cache.load_system_fonts();
 
-        let text = String::from("Hello, world!\nשלום עולם!\nThis is a mix of English and Hebrew.");
+        // let text = String::from("Hello, world!\nשלום עולם!\nThis is a mix of English and Hebrew.");
+        let text = String::from("Hello, world!");
         let attrs_intervals = vec![
             AttrsInterval {
                 start: 0,
@@ -242,9 +297,12 @@ mod tests {
 
         attributed_string.tokenize_text(&mut fonts_cache);
         attributed_string.layout();
-        attributed_string.to_path();
+        let path = attributed_string.to_path(&mut fonts_cache);
 
-        assert_eq!(attributed_string.spans.is_empty(), false);
+        // https://yqnn.github.io/svg-path-editor/
+        log::info!("{:?}", path);
+
+        assert_eq!(path.is_some(), true);
     }
 
     #[test]

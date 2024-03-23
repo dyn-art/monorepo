@@ -188,6 +188,7 @@ impl Font {
                     end: range.end, // Set later to adjust for glyph clusters (graphemes)
                 },
                 advance,
+                size: advance,
                 offset,
                 ascent,
                 descent,
