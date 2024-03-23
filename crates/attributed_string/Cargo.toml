@@ -1,5 +1,5 @@
 [package]
-name = "dyn-attributed-string"
+name = "attributed-string"
 version = "0.0.1"
 description = ""
 edition = { workspace = true }

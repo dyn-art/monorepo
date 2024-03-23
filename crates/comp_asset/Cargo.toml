@@ -14,6 +14,7 @@ serde_support = ["dep:serde", "dep:specta"]
 tracing = []
 
 [dependencies]
+attributed-string = { path = "../attributed_string" }
 bevy_app = { workspace = true }
 bevy_ecs = { workspace = true }
 fontdb = "0.16.0"

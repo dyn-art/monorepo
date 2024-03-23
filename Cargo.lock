@@ -223,6 +223,28 @@ dependencies = [
 ]
 
 [[package]]
+name = "attributed-string"
+version = "0.0.1"
+dependencies = [
+ "env_logger",
+ "fontdb",
+ "glam",
+ "log",
+ "ordered-float",
+ "ropey",
+ "rust-lapper",
+ "rustybuzz 0.13.0",
+ "self_cell",
+ "smallvec",
+ "strict-num 0.2.0",
+ "tiny-skia-path",
+ "unicode-bidi",
+ "unicode-linebreak",
+ "unicode-script",
+ "unicode-vo",
+]
+
+[[package]]
 name = "autocfg"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -740,31 +762,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9ea835d29036a4087793836fa931b08837ad5e957da9e23886b29586fb9b6650"
 
 [[package]]
-name = "dyn-attributed-string"
-version = "0.0.1"
-dependencies = [
- "env_logger",
- "fontdb",
- "glam",
- "log",
- "ordered-float",
- "ropey",
- "rust-lapper",
- "rustybuzz 0.13.0",
- "self_cell",
- "smallvec",
- "strict-num 0.2.0",
- "tiny-skia-path",
- "unicode-bidi",
- "unicode-linebreak",
- "unicode-script",
- "unicode-vo",
-]
-
-[[package]]
 name = "dyn-comp-asset"
 version = "0.0.1"
 dependencies = [
+ "attributed-string",
  "bevy_app",
  "bevy_ecs",
  "fontdb",

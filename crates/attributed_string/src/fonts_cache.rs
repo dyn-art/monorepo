@@ -16,6 +16,7 @@ struct ShapePlanKey {
     language: Option<rustybuzz::Language>,
 }
 
+#[derive(Default)]
 pub struct FontsCache {
     db: fontdb::Database,
     fonts_cache: HashMap<FontId, Option<Arc<Font>>>,
@@ -33,11 +34,11 @@ impl FontsCache {
         }
     }
 
-    pub fn db(&self) -> &fontdb::Database {
+    pub fn get_db(&self) -> &fontdb::Database {
         &self.db
     }
 
-    pub fn db_mut(&mut self) -> &mut fontdb::Database {
+    pub fn get_db_mut(&mut self) -> &mut fontdb::Database {
         &mut self.db
     }
 
