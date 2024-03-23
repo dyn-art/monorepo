@@ -142,7 +142,8 @@ impl AttributedString {
 
                     let advance = glyph_token.get_glyph().advance * font_size;
 
-                    glyph_token.set_transform(pos);
+                    glyph_token
+                        .set_transform(glyph_token.get_transform().pre_translate(pos.x, pos.y));
 
                     pos += advance;
                     max_ascent = max_ascent.max(glyph_token.get_glyph().ascent);
@@ -194,12 +195,15 @@ impl AttributedString {
                             // but the later one will have an offset from the "current position".
                             // So we have to keep an advance.
                             transform = transform.pre_translate(
-                                x + glyph_token.get_glyph().offset.x
-                                    + glyph_token.get_transform().x,
-                                glyph_token.get_glyph().offset.y + glyph_token.get_transform().y,
+                                x + glyph_token.get_glyph().offset.x,
+                                glyph_token.get_glyph().offset.y,
                             );
 
-                            if let Some(outline) = outline.transform(transform) {
+                            if let Some(outline) = outline
+                                .transform(transform)
+                                // TODO: Figure out why pre translating the glyph token transform doesn't work?
+                                .and_then(|p| p.transform(glyph_token.get_transform().clone()))
+                            {
                                 cluster_builder.push_path(&outline);
                             }
                         }
@@ -265,8 +269,7 @@ mod tests {
         let mut fonts_cache = FontsCache::new();
         fonts_cache.load_system_fonts();
 
-        // let text = String::from("Hello, world!\nשלום עולם!\nThis is a mix of English and Hebrew.");
-        let text = String::from("Hello, world!");
+        let text = String::from("Hello, world!\nשלום עולם!\nThis is a mix of English and Hebrew.");
         let attrs_intervals = vec![
             AttrsInterval {
                 start: 0,
