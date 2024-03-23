@@ -2,6 +2,7 @@ pub mod attrs;
 pub mod font;
 pub mod fonts_cache;
 pub mod glyph;
+pub mod glyph_clusters;
 pub mod path_builder;
 pub mod tokens;
 pub mod utils;

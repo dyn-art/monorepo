@@ -156,11 +156,11 @@ impl Font {
         fonts_cache: &mut FontsCache,
     ) -> (Vec<Glyph>, Vec<usize>, rustybuzz::UnicodeBuffer) {
         let mut glyphs = Vec::new();
-        let mut missing = Vec::new();
-        let run = &text[range.clone()];
+        let mut missing_glyphs = Vec::new();
+        let run_text = &text[range.clone()];
 
         // Prepare buffer for this run
-        buffer.push_str(run);
+        buffer.push_str(run_text);
         buffer.guess_segment_properties();
 
         let rtl = matches!(buffer.direction(), rustybuzz::Direction::RightToLeft);
@@ -176,16 +176,16 @@ impl Font {
         for (info, pos) in glyph_infos.iter().zip(glyph_positions.iter()) {
             let advance = Vec2::new(pos.x_advance as f32, pos.y_advance as f32) / self.font_scale();
             let offset = Vec2::new(pos.x_offset as f32, pos.y_offset as f32) / self.font_scale();
-            let start_glyph = range.start + info.cluster as usize;
+            let start_glyph = range.start + info.cluster as usize; // Byte Index
 
             if info.glyph_id == 0 {
-                missing.push(start_glyph);
+                missing_glyphs.push(start_glyph);
             }
 
             glyphs.push(Glyph {
                 range: Range {
                     start: start_glyph,
-                    end: range.end, // Set later
+                    end: range.end, // Set later to adjust for glyph clusters (graphemes)
                 },
                 advance,
                 offset,
@@ -198,7 +198,14 @@ impl Font {
             });
         }
 
-        // Adjust end of glyphs
+        Self::adjust_glyph_ends(&mut glyphs, rtl);
+
+        return (glyphs, missing_glyphs, glyph_buffer.clear());
+    }
+
+    /// Adjusts end of glyphs to ensure correct glyph cluster boundaries.
+    fn adjust_glyph_ends(glyphs: &mut [Glyph], rtl: bool) {
+        // For RTL, iterate normally as the logic and visual order align more closely
         if rtl {
             for i in 1..glyphs.len() {
                 let next_start = glyphs[i - 1].range.start;
@@ -210,7 +217,9 @@ impl Font {
                     prev.range.end = next_start;
                 }
             }
-        } else {
+        }
+        // For LTR, iterate in reverse to correctly adjust end positions based on the visual ordering
+        else {
             for i in (1..glyphs.len()).rev() {
                 let next_start = glyphs[i].range.start;
                 let next_end = glyphs[i].range.end;
@@ -222,9 +231,52 @@ impl Font {
                 }
             }
         }
-
-        return (glyphs, missing, glyph_buffer.clear());
     }
 }
 
 pub type FontId = fontdb::ID;
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn it_adjusts_glyph_ends_correctly_for_ltr() {
+        let glyph_ranges = vec![0..1, 2..3, 2..4, 2..5, 3..6, 4..7, 4..8, 5..9, 5..10];
+        let expected_glyph_ranges = vec![0..2, 2..3, 2..3, 2..3, 3..4, 4..5, 4..5, 5..10, 5..10];
+
+        let mut glyphs = &mut glyph_ranges
+            .iter()
+            .map(|r| Glyph {
+                range: r.clone(),
+                ..Default::default()
+            })
+            .collect::<Vec<_>>();
+        Font::adjust_glyph_ends(&mut glyphs, false);
+
+        assert_eq!(
+            glyphs.iter().map(|g| g.range.clone()).collect::<Vec<_>>(),
+            expected_glyph_ranges
+        );
+    }
+
+    #[test]
+    fn it_adjusts_glyph_ends_correctly_for_rtl() {
+        let glyph_ranges = vec![0..1, 2..3, 2..4, 2..5, 3..6, 4..7, 4..8, 5..9, 5..10];
+        let expected_glyph_ranges = vec![0..1, 2..0, 2..0, 2..0, 3..2, 4..3, 4..3, 5..4, 5..4];
+
+        let mut glyphs = &mut glyph_ranges
+            .iter()
+            .map(|r| Glyph {
+                range: r.clone(),
+                ..Default::default()
+            })
+            .collect::<Vec<_>>();
+        Font::adjust_glyph_ends(&mut glyphs, true);
+
+        assert_eq!(
+            glyphs.iter().map(|g| g.range.clone()).collect::<Vec<_>>(),
+            expected_glyph_ranges
+        );
+    }
+}
