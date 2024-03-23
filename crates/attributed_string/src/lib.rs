@@ -157,14 +157,17 @@ impl AttributedString {
     pub fn to_path(&self) {
         // TODO
         for span in self.spans.iter() {
-            for glyph in span.iter_glyphs() {
-                log::info!(
-                    "Glyph: Range({:?}), {:?}, AttrsIndex({}), {:?}",
-                    glyph.get_range(),
-                    span.get_level(),
-                    span.get_attrs_index(),
-                    glyph.get_transform()
-                );
+            for (cluster, byte_index) in span.iter_glyph_clusters() {
+                for glyph in cluster {
+                    log::info!(
+                        "Glyph: Range({:?}), {:?}, AttrsIndex({}), {:?}, ByteIndex({})",
+                        glyph.get_range(),
+                        span.get_level(),
+                        span.get_attrs_index(),
+                        glyph.get_transform(),
+                        byte_index
+                    );
+                }
             }
         }
     }

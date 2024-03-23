@@ -12,14 +12,17 @@ use std::ops::Range;
 ///
 /// Given glyphs with starting positions like: 0, 2, 2, 2, 3, 4, 4, 5, 5,
 /// the iterator will produce clusters with indices: [0, 1], [1, 4], [4, 5], [5, 7], [7, 9]
-struct GlyphClusters<'a> {
-    data: &'a [Glyph],
-    idx: usize,
+pub struct GlyphClusters<'a> {
+    glyphs: &'a [Glyph],
+    index: usize,
 }
 
 impl<'a> GlyphClusters<'a> {
-    fn new(data: &'a [Glyph]) -> Self {
-        GlyphClusters { data, idx: 0 }
+    pub fn new(data: &'a [Glyph]) -> Self {
+        GlyphClusters {
+            glyphs: data,
+            index: 0,
+        }
     }
 }
 
@@ -27,20 +30,21 @@ impl<'a> Iterator for GlyphClusters<'a> {
     type Item = (Range<usize>, usize);
 
     fn next(&mut self) -> Option<Self::Item> {
-        if self.idx >= self.data.len() {
+        if self.index >= self.glyphs.len() {
             return None;
         }
 
-        let start = self.idx;
-        let cluster_start = self.data[self.idx].range.start;
+        let start = self.index;
+        let cluster_start = self.glyphs[self.index].range.start;
 
         // Iterate through the glyphs, incrementing `self.idx` for each glyph
-        // that belongs to the current cluster (having the same `start` value).
-        while self.idx < self.data.len() && self.data[self.idx].range.start == cluster_start {
-            self.idx += 1;
+        // that belongs to the current cluster (having the same byte index and thus `start` value)
+        while self.index < self.glyphs.len() && self.glyphs[self.index].range.start == cluster_start
+        {
+            self.index += 1;
         }
 
-        Some((start..self.idx, cluster_start))
+        Some((start..self.index, cluster_start))
     }
 }
 

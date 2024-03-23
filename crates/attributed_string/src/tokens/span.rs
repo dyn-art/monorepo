@@ -1,6 +1,6 @@
 use super::shape::{
     glyph::GlyphToken, linebreak::LinebreakToken, text_fragment::TextFragmentToken,
-    word_separator::WordSeparatorToken, ShapeBuffer, ShapeTokenVariant,
+    word_separator::WordSeparatorToken, ShapeBuffer, ShapeToken, ShapeTokenVariant,
 };
 use crate::{attrs::Attrs, fonts_cache::FontsCache};
 use glam::Vec2;
@@ -183,5 +183,71 @@ impl SpanToken {
                 _ => Box::new(std::iter::empty())
                     as Box<dyn Iterator<Item = &'a mut GlyphToken> + 'a>,
             })
+    }
+
+    /// An iterator over glyph clusters within the span.
+    ///
+    /// This iterator groups adjacent glyphs based on their starting position (byte index),
+    /// considering glyphs with the same `start` value as part of the same cluster.
+    /// It's particularly useful for processing text where multiple glyphs
+    /// contribute to a single visual character (grapheme) or are otherwise logically grouped.
+    ///
+    /// # Example
+    ///
+    /// Given glyphs with starting positions like: 0, 2, 2, 2, 3, 4, 4, 5, 5,
+    /// the iterator will produce clusters with indices: [0, 1], [1, 4], [4, 5], [5, 7], [7, 9]
+    pub fn iter_glyph_clusters<'a>(
+        &'a self,
+    ) -> impl Iterator<Item = (Vec<&'a GlyphToken>, usize)> + 'a {
+        GlyphClusterIterator::new(&self.tokens)
+    }
+}
+
+struct GlyphClusterIterator<'a> {
+    glyphs: Vec<&'a GlyphToken>,
+    index: usize,
+}
+
+impl<'a> GlyphClusterIterator<'a> {
+    fn new(tokens: &'a [ShapeTokenVariant]) -> Self {
+        let glyphs: Vec<&GlyphToken> = tokens
+            .iter()
+            .flat_map(|token_variant| match token_variant {
+                ShapeTokenVariant::Glyph(token) => vec![token],
+                ShapeTokenVariant::TextFragment(token) => token.get_tokens().iter().collect(),
+                ShapeTokenVariant::WordSeparator(token) => token.get_tokens().iter().collect(),
+                _ => Vec::new(),
+            })
+            .collect();
+
+        Self { glyphs, index: 0 }
+    }
+}
+
+impl<'a> Iterator for GlyphClusterIterator<'a> {
+    type Item = (Vec<&'a GlyphToken>, usize);
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.index >= self.glyphs.len() {
+            return None;
+        }
+
+        let mut cluster = Vec::new();
+        let cluster_start = self.glyphs[self.index].get_range().start;
+
+        // Iterate through the glyphs, and collect glyphs
+        // that belong to the current cluster (having the same byte index and thus `start` value)
+        while self.index < self.glyphs.len()
+            && self.glyphs[self.index].get_range().start == cluster_start
+        {
+            cluster.push(self.glyphs[self.index]);
+            self.index += 1;
+        }
+
+        if !cluster.is_empty() {
+            Some((cluster, cluster_start))
+        } else {
+            None
+        }
     }
 }
