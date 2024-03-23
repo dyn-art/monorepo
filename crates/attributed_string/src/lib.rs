@@ -14,6 +14,7 @@ use glam::Vec2;
 use rust_lapper::Lapper;
 use tokens::{
     line::{LineToken, SpanRange},
+    shape::ShapeTokenVariant,
     span::SpanToken,
 };
 use utils::is_range_within;
@@ -109,24 +110,49 @@ impl AttributedString {
         let mut lines: Vec<LineToken> = Vec::new();
 
         match self.config.line_wrap {
+            // Only wrap if explicit Linebreak
             LineWrap::None => {
-                let mut span_ranges: Vec<SpanRange> = Vec::new();
+                let mut current_span_ranges: Vec<SpanRange> = Vec::new();
                 for (index, span) in self.spans.iter().enumerate() {
-                    span_ranges.push(SpanRange::from_span(index, &span));
+                    let mut span_range_start = span.get_range().start;
+
+                    for token_variant in span.get_tokens() {
+                        if let ShapeTokenVariant::Linebreak(token) = token_variant {
+                            current_span_ranges.push(SpanRange::new(
+                                index,
+                                span_range_start..token.get_range().end,
+                            ));
+                            lines.push(LineToken::new(std::mem::take(&mut current_span_ranges)));
+                            span_range_start = token.get_range().end;
+                        }
+                    }
+
+                    if span_range_start < span.get_range().end {
+                        current_span_ranges.push(SpanRange::new(
+                            index,
+                            span_range_start..span.get_range().end,
+                        ));
+                    }
                 }
-                lines.push(LineToken::new(span_ranges));
+
+                if !current_span_ranges.is_empty() {
+                    lines.push(LineToken::new(current_span_ranges));
+                }
             }
             // TODO: Other line wrap implementations
             _ => {}
         }
 
+        let mut current_pos = Vec2::new(0.0, 0.0);
         for line in lines.iter() {
             if line.get_span_ranges().is_empty() {
                 continue;
             }
             let line_range = line.get_range();
 
-            let mut pos = Vec2::new(0.0, 0.0);
+            current_pos.x = 0.0;
+            current_pos.y += line.height(&self.spans, &self.attrs_intervals);
+
             let mut max_ascent: f32 = 0.0;
             let mut max_descent: f32 = 0.0;
 
@@ -142,10 +168,13 @@ impl AttributedString {
 
                     let advance = glyph_token.get_glyph().advance * font_size;
 
-                    glyph_token
-                        .set_transform(glyph_token.get_transform().pre_translate(pos.x, pos.y));
+                    glyph_token.set_transform(
+                        glyph_token
+                            .get_transform()
+                            .pre_translate(current_pos.x, current_pos.y),
+                    );
 
-                    pos += advance;
+                    current_pos.x += advance.x;
                     max_ascent = max_ascent.max(glyph_token.get_glyph().ascent);
                     max_descent = max_descent.max(glyph_token.get_glyph().descent);
                 }

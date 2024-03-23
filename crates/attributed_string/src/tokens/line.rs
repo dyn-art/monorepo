@@ -1,6 +1,6 @@
+use super::{shape::ShapeToken, span::SpanToken};
+use crate::{attrs::AttrsIntervals, utils::is_range_within};
 use std::ops::Range;
-
-use super::span::SpanToken;
 
 /// Represents a line of text.
 #[derive(Debug, Clone)]
@@ -43,6 +43,28 @@ impl LineToken {
         self.span_ranges.push(span_range);
         sort_span_ranges(&mut self.span_ranges);
     }
+
+    // TODO: Improve
+    pub fn height(&self, spans: &[SpanToken], attrs_intervals: &AttrsIntervals) -> f32 {
+        let line_range = self.get_range();
+        let mut current_height: f32 = 0.0;
+
+        for span_range in self.span_ranges.iter() {
+            let span = &spans[span_range.index];
+            let attrs = &attrs_intervals.intervals[span.get_attrs_index()].val;
+
+            for glyph_token in span.iter_glyphs() {
+                if !is_range_within(glyph_token.get_range(), &line_range) {
+                    continue;
+                }
+
+                current_height =
+                    current_height.max(glyph_token.get_glyph().height() * attrs.get_font_size());
+            }
+        }
+
+        return current_height;
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -54,13 +76,6 @@ pub struct SpanRange {
 impl SpanRange {
     pub fn new(index: usize, range: Range<usize>) -> Self {
         Self { index, range }
-    }
-
-    pub fn from_span(index: usize, span: &SpanToken) -> Self {
-        Self {
-            index,
-            range: span.get_range().clone(),
-        }
     }
 }
 

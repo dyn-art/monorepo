@@ -35,6 +35,10 @@ impl GlyphToken {
     pub fn set_transform(&mut self, transform: Transform) {
         self.transform = transform;
     }
+
+    pub fn get_height(&self) -> f32 {
+        self.glyph.height()
+    }
 }
 
 impl ShapeToken for GlyphToken {
