@@ -8,8 +8,8 @@ pub mod utils;
 
 use crate::{outline::outline, tokens::shape::ShapeToken};
 use attrs::{Attrs, AttrsInterval, AttrsIntervals};
-use dyn_fonts_book::{em::Em, FontsBook};
-use dyn_units::abs::Abs;
+use dyn_fonts_book::FontsBook;
+use dyn_utils::units::{abs::Abs, em::Em};
 use glam::Vec2;
 use rust_lapper::Lapper;
 use tokens::{
@@ -283,7 +283,6 @@ pub enum LineWrap {
 mod tests {
     use super::*;
     use dyn_fonts_book::font::{info::FontFamily, variant::FontWeight};
-    use dyn_units::abs::Abs;
     use unicode_bidi::BidiInfo;
 
     fn init() {

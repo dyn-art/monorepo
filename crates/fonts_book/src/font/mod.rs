@@ -3,8 +3,7 @@ pub mod metrics;
 pub mod variant;
 
 use self::metrics::FontMetrics;
-use crate::em::Em;
-use dyn_units::abs::Abs;
+use dyn_utils::units::{abs::Abs, em::Em};
 use rustybuzz::{ttf_parser::GlyphId, Face as RustybuzzFace};
 use self_cell::self_cell;
 use std::{

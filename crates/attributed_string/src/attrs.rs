@@ -3,7 +3,7 @@ use dyn_fonts_book::font::{
     variant::{FontStretch, FontStyle, FontVariant, FontWeight},
     FontId,
 };
-use dyn_units::abs::Abs;
+use dyn_utils::units::abs::Abs;
 use rust_lapper::{Interval, Lapper};
 
 #[derive(Debug, PartialEq, Eq, Clone)]

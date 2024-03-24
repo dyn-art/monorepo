@@ -1,14 +1,18 @@
 // Based on:
 // https://github.com/typst/typst/blob/main/crates/typst/src/layout/abs.rs
 
-use crate::scalar::Scalar;
-use crate::Numeric;
+use super::scalar::Scalar;
+use super::Numeric;
 use std::fmt::{self, Debug, Formatter};
 use std::iter::Sum;
 use std::ops::{Add, Div, Mul, Neg, Rem};
 
 /// An absolute length.
 #[derive(Default, Eq, PartialEq, Ord, PartialOrd, Hash, Clone, Copy)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type)
+)]
 pub struct Abs(Scalar);
 
 impl Abs {
@@ -17,13 +21,8 @@ impl Abs {
         Self(Scalar::ZERO)
     }
 
-    /// The infinite length.
-    pub const fn inf() -> Self {
-        Self(Scalar::INFINITY)
-    }
-
     /// Create an absolute length from a number of raw units.
-    pub const fn raw(raw: f32) -> Self {
+    pub fn raw(raw: f32) -> Self {
         Self(Scalar::new(raw))
     }
 
@@ -53,69 +52,33 @@ impl Abs {
     }
 
     /// Get the value of this absolute length in raw units.
-    pub const fn to_raw(self) -> f32 {
+    pub fn to_raw(&self) -> f32 {
         (self.0).get()
     }
 
     /// Get the value of this absolute length in a unit.
-    pub fn to_unit(self, unit: AbsUnit) -> f32 {
+    pub fn to_unit(&self, unit: AbsUnit) -> f32 {
         self.to_raw() / unit.raw_scale()
     }
 
     /// Convert this to a number of points.
-    pub fn to_pt(self) -> f32 {
+    pub fn to_pt(&self) -> f32 {
         self.to_unit(AbsUnit::Pt)
     }
 
     /// Convert this to a number of millimeters.
-    pub fn to_mm(self) -> f32 {
+    pub fn to_mm(&self) -> f32 {
         self.to_unit(AbsUnit::Mm)
     }
 
     /// Convert this to a number of centimeters.
-    pub fn to_cm(self) -> f32 {
+    pub fn to_cm(&self) -> f32 {
         self.to_unit(AbsUnit::Cm)
     }
 
     /// Convert this to a number of inches.
-    pub fn to_inches(self) -> f32 {
+    pub fn to_inches(&self) -> f32 {
         self.to_unit(AbsUnit::In)
-    }
-
-    /// The absolute value of this length.
-    pub fn abs(self) -> Self {
-        Self::raw(self.to_raw().abs())
-    }
-
-    /// The minimum of this and another absolute length.
-    pub fn min(self, other: Self) -> Self {
-        Self(self.0.min(other.0))
-    }
-
-    /// Set to the minimum of this and another absolute length.
-    pub fn set_min(&mut self, other: Self) {
-        *self = (*self).min(other);
-    }
-
-    /// The maximum of this and another absolute length.
-    pub fn max(self, other: Self) -> Self {
-        Self(self.0.max(other.0))
-    }
-
-    /// Set to the maximum of this and another absolute length.
-    pub fn set_max(&mut self, other: Self) {
-        *self = (*self).max(other);
-    }
-
-    /// Whether the other absolute length fits into this one (i.e. is smaller).
-    /// Allows for a bit of slack.
-    pub fn fits(self, other: Self) -> bool {
-        self.0 + 1e-6 >= other.0
-    }
-
-    /// Compares two absolute lengths for whether they are approximately equal.
-    pub fn approx_eq(self, other: Self) -> bool {
-        self == other || (self - other).to_raw().abs() < 1e-6
     }
 }
 
@@ -150,6 +113,8 @@ impl Add for Abs {
         Self(self.0 + other.0)
     }
 }
+
+sub_impl!(Abs - Abs -> Abs);
 
 impl Mul<f32> for Abs {
     type Output = Self;
@@ -203,16 +168,20 @@ impl<'a> Sum<&'a Self> for Abs {
     }
 }
 
-sub_impl!(Abs - Abs -> Abs);
 assign_impl!(Abs += Abs);
 assign_impl!(Abs -= Abs);
 assign_impl!(Abs *= f32);
 assign_impl!(Abs /= f32);
 
 /// Different units of absolute measurement.
-#[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
+#[derive(Default, Debug, Eq, PartialEq, Hash, Clone, Copy)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type)
+)]
 pub enum AbsUnit {
     /// Points.
+    #[default]
     Pt,
     /// Millimeters.
     Mm,

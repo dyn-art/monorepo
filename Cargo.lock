@@ -227,7 +227,7 @@ name = "attributed-string"
 version = "0.0.1"
 dependencies = [
  "dyn-fonts-book",
- "dyn-units",
+ "dyn-utils",
  "env_logger",
  "fontdb",
  "glam",
@@ -897,7 +897,7 @@ dependencies = [
 name = "dyn-fonts-book"
 version = "0.0.1"
 dependencies = [
- "dyn-units",
+ "dyn-utils",
  "env_logger",
  "fontdb",
  "log",
@@ -932,11 +932,13 @@ dependencies = [
 ]
 
 [[package]]
-name = "dyn-units"
+name = "dyn-utils"
 version = "0.0.1"
 dependencies = [
  "env_logger",
  "log",
+ "serde",
+ "specta",
 ]
 
 [[package]]

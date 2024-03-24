@@ -1,7 +1,12 @@
 #[macro_use]
 pub mod macros;
 pub mod abs;
+pub mod angle;
+pub mod em;
+pub mod opacity;
+pub mod ratio;
 pub mod scalar;
+pub mod size;
 
 use std::fmt::Debug;
 use std::ops::{Add, Div, Mul, Neg, Sub};

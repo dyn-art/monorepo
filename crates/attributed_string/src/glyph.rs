@@ -1,4 +1,5 @@
-use dyn_fonts_book::{em::Em, font::FontId};
+use dyn_fonts_book::font::FontId;
+use dyn_utils::units::em::Em;
 use rustybuzz::ttf_parser::GlyphId;
 use std::ops::Range;
 

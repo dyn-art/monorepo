@@ -1,9 +1,9 @@
 // Based on:
 // https://github.com/typst/typst/blob/main/crates/typst/src/util/scalar.rs
 
-use crate::Numeric;
+use super::Numeric;
 use std::cmp::Ordering;
-use std::fmt::{self, Debug, Formatter};
+use std::fmt::{Debug, Formatter};
 use std::hash::{Hash, Hasher};
 use std::iter::Sum;
 use std::ops::{
@@ -14,6 +14,10 @@ use std::ops::{
 ///
 /// Panics if it's `NaN` during any of those operations.
 #[derive(Default, Clone, Copy)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type)
+)]
 pub struct Scalar(f32);
 
 impl Scalar {
@@ -29,12 +33,12 @@ impl Scalar {
     /// Creates a [`Scalar`] with the given value.
     ///
     /// If the value is NaN, then it is set to `0.0` in the result.
-    pub const fn new(x: f32) -> Self {
+    pub fn new(x: f32) -> Self {
         Self(if is_nan(x) { 0.0 } else { x })
     }
 
     /// Gets the value of this [`Scalar`].
-    pub const fn get(self) -> f32 {
+    pub fn get(&self) -> f32 {
         self.0
     }
 }
@@ -62,7 +66,7 @@ impl Numeric for Scalar {
 }
 
 impl Debug for Scalar {
-    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
         self.0.fmt(f)
     }
 }

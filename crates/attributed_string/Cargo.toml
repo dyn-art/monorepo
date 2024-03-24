@@ -13,8 +13,8 @@ default = []
 tracing = []
 
 [dependencies]
-dyn-fonts-book = { path = "../dyn_fonts_book" }
-dyn-units = { path = "../dyn_units" }
+dyn-fonts-book = { path = "../fonts_book" }
+dyn-utils = { path = "../utils" }
 fontdb = "0.16.0"
 glam = { workspace = true }
 rustybuzz = "0.13.0"

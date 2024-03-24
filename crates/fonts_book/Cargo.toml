@@ -13,7 +13,7 @@ default = []
 tracing = []
 
 [dependencies]
-dyn-units = { path = "../dyn_units" }
+dyn-utils = { path = "../utils" }
 fontdb = "0.16.0"
 rustybuzz = "0.13.0"
 self_cell = "1.0.3"

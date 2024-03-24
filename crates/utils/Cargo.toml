@@ -1,5 +1,5 @@
 [package]
-name = "dyn-units"
+name = "dyn-utils"
 version = "0.0.1"
 description = ""
 edition = { workspace = true }
@@ -9,11 +9,19 @@ license = { workspace = true }
 authors = { workspace = true }
 
 [features]
-default = []
+default = ["serde_support"]
+serde_support = ["dep:serde", "dep:specta"]
 tracing = []
 
 [dependencies]
 
+# serde_support (feature)
+specta = { workspace = true, features = [
+    "serde",
+    "glam",
+    "bevy_ecs",
+], optional = true }
+serde = { workspace = true, features = ["derive"], optional = true }
 
 # Logging
 log = { workspace = true }

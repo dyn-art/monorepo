@@ -1,6 +1,9 @@
-use dyn_units::abs::Abs;
-use dyn_units::scalar::Scalar;
-use dyn_units::{assign_impl, sub_impl, Numeric};
+// Based on:
+// https://github.com/typst/typst/blob/main/crates/typst/src/layout/em.rs
+
+use super::abs::Abs;
+use super::scalar::Scalar;
+use super::Numeric;
 use std::fmt::{Debug, Formatter};
 use std::iter::Sum;
 use std::ops::{Add, Div, Mul, Neg};
@@ -8,7 +11,7 @@ use std::ops::{Add, Div, Mul, Neg};
 /// A length that is relative to the font size.
 ///
 /// `1em` is the same as the font size.
-#[derive(Default, Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]
+#[derive(Default, Eq, PartialEq, Ord, PartialOrd, Hash, Clone, Copy)]
 pub struct Em(Scalar);
 
 impl Em {
@@ -17,13 +20,8 @@ impl Em {
         Self(Scalar::ZERO)
     }
 
-    /// The font size.
-    pub const fn one() -> Self {
-        Self(Scalar::ONE)
-    }
-
     /// Create a font-relative length.
-    pub const fn new(em: f32) -> Self {
+    pub fn new(em: f32) -> Self {
         Self(Scalar::new(em))
     }
 
@@ -32,28 +30,13 @@ impl Em {
         Self(Scalar::new(units.into() / units_per_em))
     }
 
-    /// Create an em length from a length at the given font size.
-    pub fn from_length(length: Abs, font_size: Abs) -> Self {
-        let result = length / font_size;
-        if result.is_finite() {
-            Self(Scalar::new(result))
-        } else {
-            Self::zero()
-        }
-    }
-
     /// The number of em units.
-    pub const fn get(self) -> f32 {
+    pub fn get(&self) -> f32 {
         (self.0).get()
     }
 
-    /// The absolute value of this em length.
-    pub fn abs(self) -> Self {
-        Self::new(self.get().abs())
-    }
-
     /// Convert to an absolute length at the given font size.
-    pub fn at(self, font_size: Abs) -> Abs {
+    pub fn at(&self, font_size: Abs) -> Abs {
         let resolved = font_size * self.get();
         if resolved.is_finite() {
             resolved
@@ -95,6 +78,8 @@ impl Add for Em {
     }
 }
 
+sub_impl!(Em - Em -> Em);
+
 impl Mul<f32> for Em {
     type Output = Self;
 
@@ -133,7 +118,6 @@ impl Sum for Em {
     }
 }
 
-sub_impl!(Em - Em -> Em);
 assign_impl!(Em += Em);
 assign_impl!(Em -= Em);
 assign_impl!(Em *= f32);

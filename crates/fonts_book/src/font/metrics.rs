@@ -1,4 +1,4 @@
-use crate::em::Em;
+use dyn_utils::units::em::Em;
 
 /// Metrics of a font.
 #[derive(Debug, Clone, Copy)]
