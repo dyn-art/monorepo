@@ -226,11 +226,12 @@ dependencies = [
 name = "attributed-string"
 version = "0.0.1"
 dependencies = [
+ "dyn-fonts-book",
+ "dyn-units",
  "env_logger",
  "fontdb",
  "glam",
  "log",
- "ordered-float",
  "ropey",
  "rust-lapper",
  "rustybuzz 0.13.0",
@@ -765,9 +766,9 @@ checksum = "9ea835d29036a4087793836fa931b08837ad5e957da9e23886b29586fb9b6650"
 name = "dyn-comp-asset"
 version = "0.0.1"
 dependencies = [
- "attributed-string",
  "bevy_app",
  "bevy_ecs",
+ "dyn-fonts-book",
  "fontdb",
  "imagesize",
  "log",
@@ -893,6 +894,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "dyn-fonts-book"
+version = "0.0.1"
+dependencies = [
+ "dyn-units",
+ "env_logger",
+ "fontdb",
+ "log",
+ "rustybuzz 0.13.0",
+ "self_cell",
+]
+
+[[package]]
 name = "dyn-svg-comp-api"
 version = "0.0.1"
 dependencies = [
@@ -916,6 +929,14 @@ dependencies = [
  "specta",
  "wasm-bindgen",
  "wasm-bindgen-test",
+]
+
+[[package]]
+name = "dyn-units"
+version = "0.0.1"
+dependencies = [
+ "env_logger",
+ "log",
 ]
 
 [[package]]
@@ -1752,15 +1773,6 @@ dependencies = [
  "libc",
  "pkg-config",
  "vcpkg",
-]
-
-[[package]]
-name = "ordered-float"
-version = "4.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a76df7075c7d4d01fdcb46c912dd17fba5b60c78ea480b475f2b6ab6f666584e"
-dependencies = [
- "num-traits",
 ]
 
 [[package]]

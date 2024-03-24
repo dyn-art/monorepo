@@ -2,7 +2,8 @@ use super::shape::{
     glyph::GlyphToken, linebreak::LinebreakToken, text_fragment::TextFragmentToken,
     word_separator::WordSeparatorToken, ShapeBuffer, ShapeToken, ShapeTokenVariant,
 };
-use crate::{attrs::Attrs, fonts_cache::FontsCache};
+use crate::attrs::Attrs;
+use dyn_fonts_book::FontsBook;
 use glam::Vec2;
 use std::ops::Range;
 use unicode_linebreak::BreakClass;
@@ -26,7 +27,7 @@ impl SpanToken {
         level: unicode_bidi::Level,
         attrs_index: usize,
         attrs: &Attrs,
-        fonts_cache: &mut FontsCache,
+        fonts_book: &mut FontsBook,
     ) -> Self {
         let mut tokens: Vec<ShapeTokenVariant> = Vec::new();
         let span_text = &text[range.clone()];
@@ -56,7 +57,7 @@ impl SpanToken {
                                 start..global_index,
                                 attrs,
                                 &mut shape_buffer,
-                                fonts_cache,
+                                fonts_book,
                             ),
                         ));
                     }
@@ -78,7 +79,7 @@ impl SpanToken {
                                 start..global_index,
                                 attrs,
                                 &mut shape_buffer,
-                                fonts_cache,
+                                fonts_book,
                             ),
                         ));
                     }
@@ -90,7 +91,7 @@ impl SpanToken {
                             global_index..global_index + 1,
                             attrs,
                             &mut shape_buffer,
-                            fonts_cache,
+                            fonts_book,
                         ),
                     ));
                     start = global_index + 1;
@@ -107,7 +108,7 @@ impl SpanToken {
                     start..range.end,
                     attrs,
                     &mut shape_buffer,
-                    fonts_cache,
+                    fonts_book,
                 ),
             ));
         }

@@ -1,15 +1,15 @@
 pub mod attrs;
-pub mod font;
-pub mod fonts_cache;
 pub mod glyph;
 pub mod glyph_clusters;
-pub mod path_builder;
+pub mod outline;
+pub mod shape;
 pub mod tokens;
 pub mod utils;
 
-use crate::tokens::shape::ShapeToken;
+use crate::{outline::outline, tokens::shape::ShapeToken};
 use attrs::{Attrs, AttrsInterval, AttrsIntervals};
-use fonts_cache::FontsCache;
+use dyn_fonts_book::{em::Em, FontsBook};
+use dyn_units::abs::Abs;
 use glam::Vec2;
 use rust_lapper::Lapper;
 use tokens::{
@@ -51,7 +51,7 @@ impl AttributedString {
         };
     }
 
-    pub fn tokenize_text(&mut self, fonts_cache: &mut FontsCache) {
+    pub fn tokenize_text(&mut self, fonts_book: &mut FontsBook) {
         self.devide_overlapping_attrs();
 
         let mut spans: Vec<SpanToken> = Vec::new();
@@ -73,7 +73,7 @@ impl AttributedString {
                         current_bidi_level,
                         index,
                         &attrs_interval.val,
-                        fonts_cache,
+                        fonts_book,
                     ));
 
                     // Update for the new span
@@ -89,7 +89,7 @@ impl AttributedString {
                 current_bidi_level,
                 index,
                 &attrs_interval.val,
-                fonts_cache,
+                fonts_book,
             ));
         }
 
@@ -153,8 +153,8 @@ impl AttributedString {
             current_pos.x = 0.0;
             current_pos.y += line.height(&self.spans, &self.attrs_intervals);
 
-            let mut max_ascent: f32 = 0.0;
-            let mut max_descent: f32 = 0.0;
+            let mut max_ascent = Em::zero();
+            let mut max_descent = Em::zero();
 
             for span_range in line.get_span_ranges().iter() {
                 let span = &mut self.spans[span_range.index];
@@ -166,7 +166,7 @@ impl AttributedString {
                         continue;
                     }
 
-                    let advance = glyph_token.get_glyph().advance * font_size;
+                    let x_advance = glyph_token.get_glyph().x_advance.at(font_size).to_pt();
 
                     glyph_token.set_transform(
                         glyph_token
@@ -174,7 +174,7 @@ impl AttributedString {
                             .pre_translate(current_pos.x, current_pos.y),
                     );
 
-                    current_pos.x += advance.x;
+                    current_pos.x += x_advance;
                     max_ascent = max_ascent.max(glyph_token.get_glyph().ascent);
                     max_descent = max_descent.max(glyph_token.get_glyph().descent);
                 }
@@ -184,20 +184,20 @@ impl AttributedString {
         self.lines = lines;
     }
 
-    pub fn to_path(&self, fonts_cache: &mut FontsCache) -> Option<tiny_skia_path::Path> {
+    pub fn to_path(&self, fonts_book: &mut FontsBook) -> Option<tiny_skia_path::Path> {
         let mut text_builder = tiny_skia_path::PathBuilder::new();
 
         for span in self.spans.iter() {
             let attrs = &self.attrs_intervals.intervals[span.get_attrs_index()].val;
             let mut span_builder = tiny_skia_path::PathBuilder::new();
 
-            if let Some(font) = fonts_cache.get_font_by_attrs(attrs) {
+            if let Some(font) = fonts_book.get_font_by_info(attrs.get_font_info()) {
                 let font_size = attrs.get_font_size();
 
                 for (cluster, byte_index) in span.iter_glyph_clusters() {
                     let mut cluster_builder = tiny_skia_path::PathBuilder::new();
-                    let mut width = 0.0;
-                    let mut x: f32 = 0.0;
+                    let mut width = Abs::zero();
+                    let mut x = Em::zero();
 
                     for glyph_token in cluster {
                         log::info!(
@@ -209,14 +209,14 @@ impl AttributedString {
                             byte_index
                         );
 
-                        let sx = font.scale(font_size);
+                        let sx = font.get_scale_factor(font_size);
 
-                        if let Some(outline) = font.outline(glyph_token.get_glyph().glyph_id) {
+                        if let Some(outline) = outline(glyph_token.get_glyph().glyph_id, &font) {
                             // By default, glyphs are upside-down, so we have to mirror them
                             let mut transform = tiny_skia_path::Transform::from_scale(1.0, -1.0);
 
                             // Scale to font-size
-                            transform = transform.pre_scale(sx, sx);
+                            transform = transform.pre_scale(sx.to_pt(), sx.to_pt());
 
                             // Apply offset.
                             //
@@ -224,8 +224,8 @@ impl AttributedString {
                             // but the later one will have an offset from the "current position".
                             // So we have to keep an advance.
                             transform = transform.pre_translate(
-                                x + glyph_token.get_glyph().offset.x,
-                                glyph_token.get_glyph().offset.y,
+                                (x + glyph_token.get_glyph().x_offset).get(),
+                                glyph_token.get_glyph().y_offset.get(),
                             );
 
                             if let Some(outline) = outline
@@ -237,9 +237,9 @@ impl AttributedString {
                             }
                         }
 
-                        x += glyph_token.get_glyph().advance.x;
+                        x += glyph_token.get_glyph().x_advance;
 
-                        let glyph_width = glyph_token.get_glyph().advance.x * sx;
+                        let glyph_width = glyph_token.get_glyph().x_advance.at(font_size);
                         if glyph_width > width {
                             width = glyph_width;
                         }
@@ -281,8 +281,9 @@ pub enum LineWrap {
 
 #[cfg(test)]
 mod tests {
-    use self::attrs::FontFamily;
     use super::*;
+    use dyn_fonts_book::font::{info::FontFamily, variant::FontWeight};
+    use dyn_units::abs::Abs;
     use unicode_bidi::BidiInfo;
 
     fn init() {
@@ -295,8 +296,8 @@ mod tests {
     fn e2e() {
         init();
 
-        let mut fonts_cache = FontsCache::new();
-        fonts_cache.load_system_fonts();
+        let mut fonts_book = FontsBook::new();
+        fonts_book.load_system_fonts();
 
         let text = String::from("Hello, world!\nשלום עולם!\nThis is a mix of English and Hebrew.");
         let attrs_intervals = vec![
@@ -305,16 +306,16 @@ mod tests {
                 stop: 10,
                 val: Attrs::new()
                     .font_family(FontFamily::Monospace)
-                    .font_weight(400)
-                    .font_size(24.0),
+                    .font_weight(FontWeight::REGULAR)
+                    .font_size(Abs::pt(24.0)),
             },
             AttrsInterval {
                 start: 10,
                 stop: text.len(),
                 val: Attrs::new()
                     .font_family(FontFamily::Serif)
-                    .font_weight(400)
-                    .font_size(12.0),
+                    .font_weight(FontWeight::REGULAR)
+                    .font_size(Abs::pt(12.0)),
             },
         ];
 
@@ -327,9 +328,9 @@ mod tests {
             },
         );
 
-        attributed_string.tokenize_text(&mut fonts_cache);
+        attributed_string.tokenize_text(&mut fonts_book);
         attributed_string.layout();
-        let path = attributed_string.to_path(&mut fonts_cache);
+        let path = attributed_string.to_path(&mut fonts_book);
 
         // https://yqnn.github.io/svg-path-editor/
         log::info!("{:?}", path);

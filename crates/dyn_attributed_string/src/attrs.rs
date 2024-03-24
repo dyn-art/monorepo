@@ -1,8 +1,10 @@
-use ordered_float::OrderedFloat;
+use dyn_fonts_book::font::{
+    info::{FontFamily, FontInfo},
+    variant::{FontStretch, FontStyle, FontVariant, FontWeight},
+    FontId,
+};
+use dyn_units::abs::Abs;
 use rust_lapper::{Interval, Lapper};
-use std::fmt::Display;
-
-use crate::font::FontId;
 
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct Attrs {
@@ -10,8 +12,8 @@ pub struct Attrs {
     font_family: Option<FontFamily>,
     font_style: Option<FontStyle>,
     font_stretch: Option<FontStretch>,
-    font_weight: Option<u16>,
-    font_size: Option<OrderedFloat<f32>>,
+    font_weight: Option<FontWeight>,
+    font_size: Option<Abs>,
     small_caps: Option<bool>,
     apply_kerning: Option<bool>,
 }
@@ -66,25 +68,25 @@ impl Attrs {
     }
 
     pub fn get_font_stretch(&self) -> FontStretch {
-        self.font_stretch.unwrap_or(FontStretch::Normal)
+        self.font_stretch.unwrap_or(FontStretch::NORMAL)
     }
 
-    pub fn font_weight(mut self, font_weight: u16) -> Self {
+    pub fn font_weight(mut self, font_weight: FontWeight) -> Self {
         self.font_weight = Some(font_weight);
         self
     }
 
-    pub fn get_font_weight(&self) -> u16 {
-        self.font_weight.unwrap_or(400)
+    pub fn get_font_weight(&self) -> FontWeight {
+        self.font_weight.unwrap_or(FontWeight::REGULAR)
     }
 
-    pub fn font_size(mut self, font_size: f32) -> Self {
-        self.font_size = Some(OrderedFloat(font_size));
+    pub fn font_size(mut self, font_size: Abs) -> Self {
+        self.font_size = Some(font_size);
         self
     }
 
-    pub fn get_font_size(&self) -> f32 {
-        self.font_size.map(|fs| fs.0).unwrap_or(16.0)
+    pub fn get_font_size(&self) -> Abs {
+        self.font_size.map(|fs| fs).unwrap_or(Abs::pt(16.0))
     }
 
     pub fn small_caps(mut self, small_caps: bool) -> Self {
@@ -103,6 +105,17 @@ impl Attrs {
 
     pub fn get_apply_kerning(&self) -> bool {
         self.apply_kerning.unwrap_or(false)
+    }
+
+    pub fn get_font_info(&self) -> FontInfo {
+        FontInfo {
+            family: self.get_font_family().clone(),
+            variant: FontVariant::new(
+                self.get_font_style(),
+                self.get_font_weight(),
+                self.get_font_stretch(),
+            ),
+        }
     }
 
     pub fn merge(&mut self, to_merge_attrs: Attrs) {
@@ -130,95 +143,5 @@ impl Attrs {
     }
 }
 
-#[derive(Debug, PartialEq, Eq, Hash, Clone)]
-pub struct FontAttrs {
-    pub family: FontFamily,
-    pub style: FontStyle,
-    pub stretch: FontStretch,
-    pub weight: u16,
-}
-
-impl FontAttrs {
-    pub fn from_attrs(attrs: &Attrs) -> Self {
-        Self {
-            family: attrs.get_font_family().clone(),
-            style: attrs.get_font_style(),
-            stretch: attrs.get_font_stretch(),
-            weight: attrs.get_font_weight(),
-        }
-    }
-}
-
 pub type AttrsInterval = Interval<usize, Attrs>;
 pub type AttrsIntervals = Lapper<usize, Attrs>;
-
-/// A type of font family.
-#[derive(Clone, PartialEq, Eq, Debug, Hash)]
-pub enum FontFamily {
-    /// A serif font.
-    Serif,
-    /// A sans-serif font.
-    SansSerif,
-    /// A cursive font.
-    Cursive,
-    /// A fantasy font.
-    Fantasy,
-    /// A monospace font.
-    Monospace,
-    /// A custom named font.
-    Named(String),
-}
-
-impl Display for FontFamily {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let str = match self {
-            FontFamily::Monospace => "monospace".to_string(),
-            FontFamily::Serif => "serif".to_string(),
-            FontFamily::SansSerif => "sans-serif".to_string(),
-            FontFamily::Cursive => "cursive".to_string(),
-            FontFamily::Fantasy => "fantasy".to_string(),
-            FontFamily::Named(s) => format!("\"{}\"", s),
-        };
-        write!(f, "{}", str)
-    }
-}
-
-/// A font stretch property.
-#[allow(missing_docs)]
-#[derive(Clone, Copy, Eq, PartialEq, Ord, PartialOrd, Debug, Hash)]
-pub enum FontStretch {
-    UltraCondensed,
-    ExtraCondensed,
-    Condensed,
-    SemiCondensed,
-    Normal,
-    SemiExpanded,
-    Expanded,
-    ExtraExpanded,
-    UltraExpanded,
-}
-
-impl Default for FontStretch {
-    #[inline]
-    fn default() -> Self {
-        Self::Normal
-    }
-}
-
-/// A font style property.
-#[derive(Clone, Copy, PartialEq, Eq, Debug, Hash)]
-pub enum FontStyle {
-    /// A face that is neither italic not obliqued.
-    Normal,
-    /// A form that is generally cursive in nature.
-    Italic,
-    /// A typically-sloped version of the regular face.
-    Oblique,
-}
-
-impl Default for FontStyle {
-    #[inline]
-    fn default() -> FontStyle {
-        Self::Normal
-    }
-}

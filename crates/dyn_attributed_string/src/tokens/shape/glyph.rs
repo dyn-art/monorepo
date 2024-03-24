@@ -1,6 +1,5 @@
 use super::ShapeToken;
 use crate::glyph::Glyph;
-use glam::Vec2;
 use std::ops::Range;
 use tiny_skia_path::Transform;
 
@@ -8,19 +7,15 @@ use tiny_skia_path::Transform;
 #[derive(Debug, Clone)]
 pub struct GlyphToken {
     glyph: Glyph,
-    /// Cached transform after applying the layout.
+    /// Transform after applying the layout.
     transform: Transform,
-    /// Cached bounding box after applying the layout.
-    bbox: Vec2,
 }
 
 impl GlyphToken {
     pub fn new(glyph: Glyph) -> Self {
-        // log::info!("GlyphToken for range: {:?}", glyph.range);
         Self {
             glyph,
             transform: Transform::default(),
-            bbox: Vec2::default(),
         }
     }
 
@@ -34,10 +29,6 @@ impl GlyphToken {
 
     pub fn set_transform(&mut self, transform: Transform) {
         self.transform = transform;
-    }
-
-    pub fn get_height(&self) -> f32 {
-        self.glyph.height()
     }
 }
 

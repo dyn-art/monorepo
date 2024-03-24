@@ -13,8 +13,9 @@ default = []
 tracing = []
 
 [dependencies]
+dyn-fonts-book = { path = "../dyn_fonts_book" }
+dyn-units = { path = "../dyn_units" }
 fontdb = "0.16.0"
-ordered-float = "4.2.0"
 glam = { workspace = true }
 rustybuzz = "0.13.0"
 ropey = "1.6.1"

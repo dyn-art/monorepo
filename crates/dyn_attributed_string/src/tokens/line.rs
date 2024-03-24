@@ -58,8 +58,13 @@ impl LineToken {
                     continue;
                 }
 
-                current_height =
-                    current_height.max(glyph_token.get_glyph().height() * attrs.get_font_size());
+                current_height = current_height.max(
+                    glyph_token
+                        .get_glyph()
+                        .height()
+                        .at(attrs.get_font_size())
+                        .to_pt(),
+                );
             }
         }
 

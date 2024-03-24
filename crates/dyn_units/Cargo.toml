@@ -1,0 +1,22 @@
+[package]
+name = "dyn-units"
+version = "0.0.1"
+description = ""
+edition = { workspace = true }
+homepage = { workspace = true }
+repository = { workspace = true }
+license = { workspace = true }
+authors = { workspace = true }
+
+[features]
+default = []
+tracing = []
+
+[dependencies]
+
+
+# Logging
+log = { workspace = true }
+
+[dev-dependencies]
+env_logger = "0.11.3"

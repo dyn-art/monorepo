@@ -1,7 +1,8 @@
+use dyn_fonts_book::FontsBook;
 use glam::Vec2;
 
 use super::{glyph::GlyphToken, ShapeBuffer, ShapeToken};
-use crate::{attrs::Attrs, fonts_cache::FontsCache};
+use crate::{attrs::Attrs, shape::shape_text_with_fallback};
 use std::ops::Range;
 
 /// Represents spaces or punctuation between words.
@@ -20,7 +21,7 @@ impl WordSeparatorToken {
         range: Range<usize>,
         attrs: &Attrs,
         shape_buffer: &mut ShapeBuffer,
-        fonts_cache: &mut FontsCache,
+        fonts_book: &mut FontsBook,
     ) -> Self {
         let mut tokens: Vec<GlyphToken> = Vec::with_capacity(range.len());
 
@@ -30,12 +31,13 @@ impl WordSeparatorToken {
             range
         );
 
-        if let Some(font) = fonts_cache.get_font_by_attrs(attrs) {
-            let (glyphs, buffer) = font.shape_text_with_fallback(
+        if let Some(font) = fonts_book.get_font_by_info(attrs.get_font_info()) {
+            let (glyphs, buffer) = shape_text_with_fallback(
                 text,
                 range.clone(),
                 shape_buffer.buffer.take().unwrap_or_default(),
-                fonts_cache,
+                &font,
+                fonts_book,
             );
             shape_buffer.buffer = Some(buffer);
             tokens.extend(glyphs.into_iter().map(|glyph| GlyphToken::new(glyph)));
