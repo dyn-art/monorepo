@@ -29,6 +29,10 @@ impl Size {
         )
     }
 
+    pub fn rwidth(&self) -> Abs {
+        self.0
+    }
+
     pub fn width(&self) -> f32 {
         self.0.to_pt()
     }
@@ -39,6 +43,10 @@ impl Size {
 
     pub fn height(&self) -> f32 {
         self.1.to_pt()
+    }
+
+    pub fn rheight(&self) -> Abs {
+        self.1
     }
 
     pub fn set_height(&mut self, height: Abs) {

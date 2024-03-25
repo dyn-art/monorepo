@@ -1,4 +1,5 @@
 use dyn_fonts_book::FontsBook;
+use dyn_utils::units::em::Em;
 use glam::Vec2;
 
 use super::{glyph::GlyphToken, ShapeBuffer, ShapeToken};
@@ -56,6 +57,12 @@ impl WordSeparatorToken {
 
     pub(crate) fn get_tokens_mut(&mut self) -> &mut Vec<GlyphToken> {
         &mut self.tokens
+    }
+
+    pub fn x_advance(&self) -> Em {
+        self.tokens
+            .iter()
+            .fold(Em::zero(), |acc, token| acc + token.get_glyph().x_advance)
     }
 }
 

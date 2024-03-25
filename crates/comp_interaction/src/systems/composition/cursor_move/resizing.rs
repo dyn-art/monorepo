@@ -6,7 +6,7 @@ use crate::{
 };
 use bevy_ecs::{query::With, system::Query};
 use bevy_transform::components::Transform;
-use dyn_comp_bundles::{components::mixins::SizeMixin, math::transform_to_z_rotation_rad};
+use dyn_comp_bundles::{components::mixins::SizeMixin, utils::transform_to_z_rotation_rad};
 use dyn_comp_core::resources::composition::CompositionRes;
 use dyn_utils::units::abs::Abs;
 use glam::Vec2;

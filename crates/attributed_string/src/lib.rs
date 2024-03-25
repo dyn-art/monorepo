@@ -1,27 +1,24 @@
 pub mod attrs;
 pub mod glyph;
 pub mod glyph_clusters;
+pub mod line_wrap;
 pub mod outline;
 pub mod shape;
 pub mod tokens;
 pub mod utils;
 
-pub use dyn_fonts_book;
-
 use crate::{outline::outline, tokens::shape::ShapeToken};
 use attrs::{Attrs, AttrsInterval, AttrsIntervals};
+pub use dyn_fonts_book;
 use dyn_fonts_book::FontsBook;
 use dyn_utils::{
     properties::size::Size,
     units::{abs::Abs, em::Em},
 };
 use glam::Vec2;
+use line_wrap::{no_wrap::NoLineWrap, text_fragment_wrap::TextFragmentWrap, LineWrapStrategy};
 use rust_lapper::Lapper;
-use tokens::{
-    line::{LineToken, SpanRange},
-    shape::ShapeTokenVariant,
-    span::SpanToken,
-};
+use tokens::{line::LineToken, span::SpanToken};
 use utils::is_range_within;
 
 #[derive(Debug, Clone)]
@@ -114,42 +111,15 @@ impl AttributedString {
     }
 
     pub fn layout(&mut self) {
-        let mut lines: Vec<LineToken> = Vec::new();
+        let mut line_wrap_strategy: Box<dyn LineWrapStrategy> = match self.config.line_wrap {
+            LineWrap::None => Box::new(NoLineWrap),
+            LineWrap::Word => Box::new(TextFragmentWrap),
+            _ => Box::new(NoLineWrap),
+        };
+        let lines =
+            line_wrap_strategy.compute_lines(&self.spans, &self.attrs_intervals, &self.config.size);
 
-        match self.config.line_wrap {
-            // Only wrap if explicit Linebreak
-            LineWrap::None => {
-                let mut current_span_ranges: Vec<SpanRange> = Vec::new();
-                for (index, span) in self.spans.iter().enumerate() {
-                    let mut span_range_start = span.get_range().start;
-
-                    for token_variant in span.get_tokens() {
-                        if let ShapeTokenVariant::Linebreak(token) = token_variant {
-                            current_span_ranges.push(SpanRange::new(
-                                index,
-                                span_range_start..token.get_range().end,
-                            ));
-                            lines.push(LineToken::new(std::mem::take(&mut current_span_ranges)));
-                            span_range_start = token.get_range().end;
-                        }
-                    }
-
-                    if span_range_start < span.get_range().end {
-                        current_span_ranges.push(SpanRange::new(
-                            index,
-                            span_range_start..span.get_range().end,
-                        ));
-                    }
-                }
-
-                if !current_span_ranges.is_empty() {
-                    lines.push(LineToken::new(current_span_ranges));
-                }
-            }
-            // TODO: Other line wrap implementations
-            _ => {}
-        }
-
+        // Apply layout based on line tokens
         let mut current_pos = Vec2::new(0.0, 0.0);
         for (index, line) in lines.iter().enumerate() {
             if line.get_span_ranges().is_empty() {
@@ -339,7 +309,7 @@ mod tests {
             attrs_intervals,
             AttributedStringConfig {
                 size: Size::new(Abs::pt(100.0), Abs::pt(100.0)),
-                ..Default::default()
+                line_wrap: LineWrap::Word,
             },
         );
 

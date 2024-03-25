@@ -10,7 +10,7 @@ use dyn_comp_bundles::{
         EntityDeletedInputEvent, EntityMovedInputEvent, EntitySetPositionInputEvent,
         EntitySetRotationInputEvent,
     },
-    math::transform_to_z_rotation_rad,
+    utils::transform_to_z_rotation_rad,
 };
 use dyn_utils::math::matrix::rotate_around_point;
 use glam::Vec3;

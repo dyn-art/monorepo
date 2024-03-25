@@ -3,7 +3,7 @@ use bevy_ecs::{
     query::{Changed, Or},
     system::{Commands, Query, ResMut},
 };
-use dyn_attributed_string::{AttributedString, AttributedStringConfig, LineWrap};
+use dyn_attributed_string::{AttributedString, AttributedStringConfig};
 use dyn_comp_asset::resources::AssetsRes;
 use dyn_comp_bundles::components::{
     mixins::{PathMixin, SizeMixin},
@@ -28,8 +28,7 @@ pub fn outline_text(
                 .collect(),
             AttributedStringConfig {
                 size: *size,
-                // line_wrap: text.line_wrap,
-                line_wrap: LineWrap::None, // TODO
+                line_wrap: text.line_wrap,
             },
         );
 

@@ -1,7 +1,7 @@
 use super::{glyph::GlyphToken, ShapeBuffer, ShapeToken};
 use crate::{attrs::Attrs, shape::shape_text_with_fallback};
 use dyn_fonts_book::FontsBook;
-use glam::Vec2;
+use dyn_utils::units::em::Em;
 use std::ops::Range;
 
 /// Groups glyphs into a continuous fragment of text, typically a word or number.
@@ -10,8 +10,6 @@ pub struct TextFragmentToken {
     range: Range<usize>,
     /// Glyph tokens that make up the word.
     tokens: Vec<GlyphToken>,
-    /// Cached advance after applying the layout.
-    advance: Vec2,
 }
 
 impl TextFragmentToken {
@@ -42,11 +40,7 @@ impl TextFragmentToken {
             tokens.extend(glyphs.into_iter().map(|glyph| GlyphToken::new(glyph)));
         }
 
-        return Self {
-            range,
-            tokens,
-            advance: Vec2::default(),
-        };
+        return Self { range, tokens };
     }
 
     pub fn get_tokens(&self) -> &Vec<GlyphToken> {
@@ -55,6 +49,12 @@ impl TextFragmentToken {
 
     pub(crate) fn get_tokens_mut(&mut self) -> &mut Vec<GlyphToken> {
         &mut self.tokens
+    }
+
+    pub fn x_advance(&self) -> Em {
+        self.tokens
+            .iter()
+            .fold(Em::zero(), |acc, token| acc + token.get_glyph().x_advance)
     }
 }
 
