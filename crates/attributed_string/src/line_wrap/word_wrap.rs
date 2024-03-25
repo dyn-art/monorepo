@@ -13,6 +13,7 @@ use dyn_utils::{properties::size::Size, units::abs::Abs};
 /// or line breaks based on specified width constraints.
 pub struct WordWrap;
 
+// TODO: Does not work
 impl LineWrapStrategy for WordWrap {
     fn compute_lines(
         &mut self,
@@ -23,7 +24,11 @@ impl LineWrapStrategy for WordWrap {
         let mut lines: Vec<LineToken> = Vec::new();
 
         let mut current_span_ranges: Vec<SpanRange> = Vec::new();
-        let mut current_line_width: Abs = Abs::pt(0.0);
+        let mut current_line_width = Abs::pt(0.0);
+
+        let mut overflown_span_ranges: Vec<SpanRange> = Vec::new();
+        let mut current_word_width = Abs::pt(0.0);
+        let mut in_overflow = false;
 
         for (index, span) in spans.iter().enumerate() {
             let mut span_range_start = span.get_range().start;
@@ -35,38 +40,58 @@ impl LineWrapStrategy for WordWrap {
                     ShapeTokenVariant::TextFragment(token) => {
                         let token_width = token.x_advance().at(font_size);
 
-                        // If adding this token exceeds line width, break line
+                        // If adding this token exceeds line width,
+                        // mark start of overflow without immediate line break.
+                        // This avoids breaking within words across spans,
+                        // setting up for cohesive word wrap.
                         if current_line_width + token_width > size.rwidth() {
-                            current_span_ranges.push(SpanRange::new(
+                            overflown_span_ranges.push(SpanRange::new(
                                 index,
                                 span_range_start..token.get_range().end,
                             ));
-                            lines.push(LineToken::new(std::mem::take(&mut current_span_ranges)));
                             span_range_start = token.get_range().end;
-                            current_line_width = Abs::pt(0.0);
+                            in_overflow = true;
                         }
 
+                        current_word_width += token_width;
                         current_line_width += token_width;
                     }
                     ShapeTokenVariant::WordSeparator(token) => {
-                        current_line_width += token.x_advance().at(font_size);
-                    }
-                    ShapeTokenVariant::Glyph(token) => {
-                        current_line_width += token.get_glyph().x_advance.at(font_size);
+                        let separator_width = token.x_advance().at(font_size);
+
+                        if in_overflow {
+                            lines.push(LineToken::new(std::mem::take(&mut current_span_ranges)));
+                            current_span_ranges.append(&mut overflown_span_ranges);
+                            current_line_width = current_word_width;
+                            current_word_width = Abs::pt(0.0);
+                            in_overflow = false;
+                        }
+
+                        current_line_width += separator_width;
                     }
                     ShapeTokenVariant::Linebreak(token) => {
                         current_span_ranges.push(SpanRange::new(
                             index,
                             span_range_start..token.get_range().end,
                         ));
-                        lines.push(LineToken::new(std::mem::take(&mut current_span_ranges)));
                         span_range_start = token.get_range().end;
-                        current_line_width = Abs::pt(0.0);
+                        lines.push(LineToken::new(std::mem::take(&mut current_span_ranges)));
+
+                        if in_overflow {
+                            current_span_ranges.append(&mut overflown_span_ranges);
+                            current_line_width = current_word_width;
+                            current_word_width = Abs::pt(0.0);
+                            in_overflow = false;
+                        } else {
+                            current_line_width = Abs::pt(0.0);
+                            current_word_width = Abs::pt(0.0);
+                        }
                     }
                     _ => {}
                 }
             }
 
+            // Handle any remaining span range at the end
             if span_range_start < span.get_range().end {
                 current_span_ranges.push(SpanRange::new(
                     index,
@@ -75,6 +100,7 @@ impl LineWrapStrategy for WordWrap {
             }
         }
 
+        // Handle any remaining span ranges at the end
         if !current_span_ranges.is_empty() {
             lines.push(LineToken::new(current_span_ranges));
         }

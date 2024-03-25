@@ -310,7 +310,7 @@ mod tests {
             text,
             attrs_intervals,
             AttributedStringConfig {
-                size: Size::new(Abs::pt(100.0), Abs::pt(100.0)),
+                size: Size::new(Abs::pt(150.0), Abs::pt(100.0)),
                 line_wrap: LineWrap::Word,
             },
         );

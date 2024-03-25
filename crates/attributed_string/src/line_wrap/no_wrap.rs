@@ -32,8 +32,8 @@ impl LineWrapStrategy for NoLineWrap {
                             index,
                             span_range_start..token.get_range().end,
                         ));
-                        lines.push(LineToken::new(std::mem::take(&mut current_span_ranges)));
                         span_range_start = token.get_range().end;
+                        lines.push(LineToken::new(std::mem::take(&mut current_span_ranges)));
                     }
                     _ => {}
                 }
