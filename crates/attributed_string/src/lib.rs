@@ -102,13 +102,15 @@ impl AttributedString {
     }
 
     pub fn devide_overlapping_attrs(&mut self) {
-        self.attrs_intervals.divide_overlaps_with(|overlaps| {
-            let mut merged_attrs = Attrs::new();
-            for &attrs in overlaps.iter() {
-                merged_attrs.merge(attrs.clone());
-            }
-            return merged_attrs;
-        });
+        if !self.attrs_intervals.overlaps_merged {
+            self.attrs_intervals.divide_overlaps_with(|overlaps| {
+                let mut merged_attrs = Attrs::new();
+                for &attrs in overlaps.iter() {
+                    merged_attrs.merge(attrs.clone());
+                }
+                return merged_attrs;
+            });
+        }
     }
 
     pub fn layout(&mut self) {
@@ -149,7 +151,7 @@ impl AttributedString {
         }
 
         let mut current_pos = Vec2::new(0.0, 0.0);
-        for line in lines.iter() {
+        for (index, line) in lines.iter().enumerate() {
             if line.get_span_ranges().is_empty() {
                 continue;
             }
@@ -157,6 +159,11 @@ impl AttributedString {
 
             current_pos.x = 0.0;
             current_pos.y += line.height(&self.spans, &self.attrs_intervals);
+
+            // To mirror figmas behavior
+            if index == 0 {
+                current_pos.y *= 0.78;
+            }
 
             let mut max_ascent = Em::zero();
             let mut max_descent = Em::zero();

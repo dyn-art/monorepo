@@ -4,7 +4,6 @@ use super::shape::{
 };
 use crate::attrs::Attrs;
 use dyn_fonts_book::FontsBook;
-use glam::Vec2;
 use std::ops::Range;
 use unicode_linebreak::BreakClass;
 
@@ -139,16 +138,6 @@ impl SpanToken {
     #[inline]
     pub fn get_level(&self) -> &unicode_bidi::Level {
         &self.level
-    }
-
-    pub fn get_bbox() -> Vec2 {
-        // TODO
-        Vec2::default()
-    }
-
-    pub fn get_transform() -> Vec2 {
-        // TODO
-        Vec2::default()
     }
 
     pub fn iter_glyphs<'a>(&'a self) -> impl Iterator<Item = &'a GlyphToken> + 'a {
