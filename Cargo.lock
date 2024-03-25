@@ -803,6 +803,7 @@ dependencies = [
  "bevy_ecs",
  "bevy_hierarchy",
  "bevy_transform",
+ "dyn-attributed-string",
  "dyn-comp-asset",
  "dyn-comp-bundles",
  "dyn-comp-dtif",

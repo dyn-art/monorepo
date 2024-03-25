@@ -20,7 +20,7 @@ use bevy_ecs::{
 };
 use bevy_hierarchy::Children;
 use bevy_transform::components::Transform;
-use dyn_comp_asset::{asset::ImageAssetContentType, resources::AssetDatabaseRes};
+use dyn_comp_asset::{asset::ImageAssetContentType, resources::AssetsRes};
 use dyn_comp_bundles::components::{
     mixins::{
         BlendModeMixin, ImageAssetMixin, OpacityMixin, PaintParentMixin, PathMixin, SizeMixin,
@@ -658,7 +658,7 @@ fn extract_linear_gradient_params_from_transform(
 // TODO: This system doesn't account for size changes
 // -> Either new system to handle those or integrate into this system
 pub fn apply_image_paint_changes(
-    asset_db_res: Res<AssetDatabaseRes>,
+    assets_res: Res<AssetsRes>,
     paint_query: Query<
         (&ImageCompPaint, &ImageAssetMixin, &PaintParentMixin),
         (With<CompPaint>, Changed<ImageCompPaint>),
@@ -668,7 +668,7 @@ pub fn apply_image_paint_changes(
     for (image_paint, ImageAssetMixin(maybe_image_id), PaintParentMixin(paint_parent_entities)) in
         paint_query.iter()
     {
-        if let Some(image) = maybe_image_id.and_then(|id| asset_db_res.get_image(id)) {
+        if let Some(image) = maybe_image_id.and_then(|id| assets_res.get_image(id)) {
             for paint_parent_entity in paint_parent_entities {
                 if let Ok((mut bundle_variant, SizeMixin(size))) =
                     style_query.get_mut(*paint_parent_entity)
@@ -805,7 +805,7 @@ fn calculate_cropped_image_transform(
 }
 
 pub fn apply_image_asset_mixin_changes(
-    asset_db_res: Res<AssetDatabaseRes>,
+    assets_res: Res<AssetsRes>,
     paint_query: Query<
         (&ImageAssetMixin, &PaintParentMixin),
         (With<CompPaint>, Changed<ImageAssetMixin>),
@@ -815,7 +815,7 @@ pub fn apply_image_asset_mixin_changes(
     for (ImageAssetMixin(maybe_image_id), PaintParentMixin(paint_parent_entities)) in
         paint_query.iter()
     {
-        if let Some(image) = maybe_image_id.and_then(|id| asset_db_res.get_image(id)) {
+        if let Some(image) = maybe_image_id.and_then(|id| assets_res.get_image(id)) {
             for paint_parent_entity in paint_parent_entities {
                 if let Ok(mut bundle_variant) = style_query.get_mut(*paint_parent_entity) {
                     match bundle_variant.as_mut() {

@@ -14,6 +14,7 @@ dtif = [
     "dep:dyn-comp-dtif",
     "dyn-comp-bundles/serde_support",
     "dyn-utils/serde_support",
+    "dyn-attributed-string/serde_support",
 ]
 tracing = []
 
@@ -21,6 +22,7 @@ tracing = []
 dyn-comp-asset = { path = "../comp_asset" }
 dyn-comp-bundles = { path = "../comp_bundles" }
 dyn-comp-dtif = { path = "../comp_dtif", optional = true }
+dyn-attributed-string = { path = "../attributed_string" }
 dyn-utils = { path = "../utils" }
 bevy_app = { workspace = true }
 bevy_ecs = { workspace = true }

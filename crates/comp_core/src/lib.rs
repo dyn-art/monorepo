@@ -17,7 +17,7 @@ use systems::{
     },
     outline::{
         ellipse::outline_ellipse, polygon::outline_polygon, rectangle::outline_rectangle,
-        star::outline_star,
+        star::outline_star, text::outline_text,
     },
     stroke::stroke_path_system,
 };
@@ -99,6 +99,7 @@ impl Plugin for CompCorePlugin {
                 outline_ellipse.in_set(CompCoreSystemSet::Outline),
                 outline_star.in_set(CompCoreSystemSet::Outline),
                 outline_polygon.in_set(CompCoreSystemSet::Outline),
+                outline_text.in_set(CompCoreSystemSet::Outline),
                 stroke_path_system.in_set(CompCoreSystemSet::PostOutline),
             ),
         );
@@ -110,14 +111,14 @@ impl Plugin for CompCorePlugin {
 
 #[cfg(feature = "dtif")]
 fn inject_dtif_into_ecs(world: &mut bevy_ecs::world::World, dtif: &dyn_comp_dtif::DtifComposition) {
-    use dyn_comp_asset::resources::AssetDatabaseRes;
+    use dyn_comp_asset::resources::AssetsRes;
     use dyn_comp_bundles::properties::Viewport;
     use glam::Vec2;
 
     let mut dtif_injector = dyn_comp_dtif::dtif_injector::DtifInjector::new();
 
     // Load assets
-    if let Some(mut asset_db) = world.get_resource_mut::<AssetDatabaseRes>() {
+    if let Some(mut asset_db) = world.get_resource_mut::<AssetsRes>() {
         dtif_injector.load_assets(dtif, asset_db.as_mut());
     }
 

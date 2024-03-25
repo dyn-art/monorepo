@@ -1,6 +1,9 @@
-use dyn_attributed_string::dyn_fonts_book::font::{
-    info::FontFamily,
-    variant::{FontStretch, FontStyle, FontWeight},
+use dyn_attributed_string::{
+    attrs::{Attrs, AttrsInterval},
+    dyn_fonts_book::font::{
+        info::FontFamily,
+        variant::{FontStretch, FontStyle, FontWeight},
+    },
 };
 use dyn_utils::{properties::size::Size, units::abs::Abs};
 use glam::Vec2;
@@ -26,6 +29,25 @@ pub struct TextAttributeInterval {
     pub start: usize,
     pub end: usize,
     pub attributes: TextAttributes,
+}
+
+impl TextAttributeInterval {
+    pub fn to_attrs_interval(&self) -> AttrsInterval {
+        AttrsInterval {
+            start: self.start,
+            stop: self.end,
+            val: Attrs {
+                font_id: None,
+                font_family: self.attributes.font_family.clone(),
+                font_style: self.attributes.font_style,
+                font_stretch: self.attributes.font_stretch,
+                font_weight: self.attributes.font_weight,
+                font_size: self.attributes.font_size,
+                small_caps: self.attributes.small_caps,
+                apply_kerning: self.attributes.apply_kerning,
+            },
+        }
+    }
 }
 
 #[derive(Debug, Default, Clone)]

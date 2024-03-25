@@ -9,17 +9,17 @@ use slotmap::SlotMap;
 use std::sync::Arc;
 
 #[derive(Resource, Default)]
-pub struct AssetDatabaseRes {
+pub struct AssetsRes {
     image_db: SlotMap<InnerImageId, ImageAsset>,
     fonts_book: FontsBook,
 }
 
-impl AssetDatabaseRes {
-    pub fn get_fonts_cache(&self) -> &FontsBook {
+impl AssetsRes {
+    pub fn get_fonts_book(&self) -> &FontsBook {
         &self.fonts_book
     }
 
-    pub fn get_fonts_cache_mut(&mut self) -> &mut FontsBook {
+    pub fn get_fonts_book_mut(&mut self) -> &mut FontsBook {
         &mut self.fonts_book
     }
 

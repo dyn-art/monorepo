@@ -11,7 +11,10 @@ pub use dyn_fonts_book;
 use crate::{outline::outline, tokens::shape::ShapeToken};
 use attrs::{Attrs, AttrsInterval, AttrsIntervals};
 use dyn_fonts_book::FontsBook;
-use dyn_utils::units::{abs::Abs, em::Em};
+use dyn_utils::{
+    properties::size::Size,
+    units::{abs::Abs, em::Em},
+};
 use glam::Vec2;
 use rust_lapper::Lapper;
 use tokens::{
@@ -22,7 +25,7 @@ use tokens::{
 use utils::is_range_within;
 
 #[derive(Debug, Clone)]
-struct AttributedString {
+pub struct AttributedString {
     text: String,
     spans: Vec<SpanToken>,
     lines: Vec<LineToken>,
@@ -263,8 +266,8 @@ impl AttributedString {
 }
 
 #[derive(Debug, Default, Clone)]
-struct AttributedStringConfig {
-    pub bbox: Vec2,
+pub struct AttributedStringConfig {
+    pub size: Size,
     pub line_wrap: LineWrap,
 }
 
@@ -328,7 +331,7 @@ mod tests {
             text,
             attrs_intervals,
             AttributedStringConfig {
-                bbox: Vec2::new(100.0, 100.0),
+                size: Size::new(Abs::pt(100.0), Abs::pt(100.0)),
                 ..Default::default()
             },
         );

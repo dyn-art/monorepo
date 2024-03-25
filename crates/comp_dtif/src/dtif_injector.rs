@@ -7,7 +7,7 @@ use bevy_ecs::{
     world::{EntityWorldMut, World},
 };
 use bevy_hierarchy::BuildWorldChildren;
-use dyn_comp_asset::{asset_id::AssetId, resources::AssetDatabaseRes};
+use dyn_comp_asset::{asset_id::AssetId, resources::AssetsRes};
 use dyn_comp_bundles::{
     components::mixins::{
         PaintChildMixin, PaintParentMixin, Root, StyleChildrenMixin, StyleParentMixin,
@@ -40,7 +40,7 @@ impl DtifInjector {
         &self.sid_to_asset_id
     }
 
-    pub fn load_assets(&mut self, dtif: &DtifComposition, asset_db: &mut AssetDatabaseRes) {
+    pub fn load_assets(&mut self, dtif: &DtifComposition, asset_db: &mut AssetsRes) {
         for (sid, asset) in &dtif.assets {
             if let Some(asset_id) = asset_db.insert_asset(asset.clone()) {
                 self.sid_to_asset_id.insert(sid.clone(), asset_id);

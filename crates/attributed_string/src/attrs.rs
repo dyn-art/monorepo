@@ -8,14 +8,14 @@ use rust_lapper::{Interval, Lapper};
 
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct Attrs {
-    font_id: Option<FontId>,
-    font_family: Option<FontFamily>,
-    font_style: Option<FontStyle>,
-    font_stretch: Option<FontStretch>,
-    font_weight: Option<FontWeight>,
-    font_size: Option<Abs>,
-    small_caps: Option<bool>,
-    apply_kerning: Option<bool>,
+    pub font_id: Option<FontId>,
+    pub font_family: Option<FontFamily>,
+    pub font_style: Option<FontStyle>,
+    pub font_stretch: Option<FontStretch>,
+    pub font_weight: Option<FontWeight>,
+    pub font_size: Option<Abs>,
+    pub small_caps: Option<bool>,
+    pub apply_kerning: Option<bool>,
 }
 
 impl Attrs {
