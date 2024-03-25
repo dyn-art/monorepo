@@ -25,6 +25,18 @@ pub enum ShapeTokenVariant {
     TextFragment(TextFragmentToken),
 }
 
+impl ShapeTokenVariant {
+    pub fn get_shape_token(&self) -> &dyn ShapeToken {
+        match self {
+            ShapeTokenVariant::Glyph(token) => token,
+            ShapeTokenVariant::WordSeparator(token) => token,
+            ShapeTokenVariant::Linebreak(token) => token,
+            ShapeTokenVariant::Bitmap(token) => token,
+            ShapeTokenVariant::TextFragment(token) => token,
+        }
+    }
+}
+
 #[derive(Debug)]
 pub struct ShapeBuffer {
     pub buffer: Option<rustybuzz::UnicodeBuffer>,

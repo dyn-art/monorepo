@@ -1,5 +1,5 @@
 pub mod no_wrap;
-pub mod text_fragment_wrap;
+pub mod word_wrap;
 
 use crate::{
     attrs::AttrsIntervals,

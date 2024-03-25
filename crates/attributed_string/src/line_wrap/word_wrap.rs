@@ -11,9 +11,9 @@ use dyn_utils::{properties::size::Size, units::abs::Abs};
 
 /// Line wrap strategy that wraps text at word boundaries
 /// or line breaks based on specified width constraints.
-pub struct TextFragmentWrap;
+pub struct WordWrap;
 
-impl LineWrapStrategy for TextFragmentWrap {
+impl LineWrapStrategy for WordWrap {
     fn compute_lines(
         &mut self,
         spans: &[SpanToken],

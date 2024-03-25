@@ -16,7 +16,7 @@ use dyn_utils::{
     units::{abs::Abs, em::Em},
 };
 use glam::Vec2;
-use line_wrap::{no_wrap::NoLineWrap, text_fragment_wrap::TextFragmentWrap, LineWrapStrategy};
+use line_wrap::{no_wrap::NoLineWrap, word_wrap::WordWrap, LineWrapStrategy};
 use rust_lapper::Lapper;
 use tokens::{line::LineToken, span::SpanToken};
 use utils::is_range_within;
@@ -113,7 +113,7 @@ impl AttributedString {
     pub fn layout(&mut self) {
         let mut line_wrap_strategy: Box<dyn LineWrapStrategy> = match self.config.line_wrap {
             LineWrap::None => Box::new(NoLineWrap),
-            LineWrap::Word => Box::new(TextFragmentWrap),
+            LineWrap::Word => Box::new(WordWrap),
             _ => Box::new(NoLineWrap),
         };
         let lines =
@@ -128,12 +128,14 @@ impl AttributedString {
             let line_range = line.get_range();
 
             current_pos.x = 0.0;
-            current_pos.y += line.height(&self.spans, &self.attrs_intervals);
-
-            // To mirror figmas behavior
-            if index == 0 {
-                current_pos.y *= 0.78;
-            }
+            current_pos.y += if index == 0 {
+                // TODO: for the first line apply the glyph height
+                // starting from the baseline not the decsent
+                // so basically the plain ascent?
+                line.height(&self.spans, &self.attrs_intervals) * 0.78
+            } else {
+                line.height(&self.spans, &self.attrs_intervals)
+            };
 
             let mut max_ascent = Em::zero();
             let mut max_descent = Em::zero();

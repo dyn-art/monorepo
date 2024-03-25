@@ -20,8 +20,8 @@ impl LineWrapStrategy for NoLineWrap {
         _: &Size,
     ) -> Vec<LineToken> {
         let mut lines: Vec<LineToken> = Vec::new();
-
         let mut current_span_ranges: Vec<SpanRange> = Vec::new();
+
         for (index, span) in spans.iter().enumerate() {
             let mut span_range_start = span.get_range().start;
 
@@ -39,6 +39,7 @@ impl LineWrapStrategy for NoLineWrap {
                 }
             }
 
+            // Handle any remaining span range at the end
             if span_range_start < span.get_range().end {
                 current_span_ranges.push(SpanRange::new(
                     index,
@@ -47,6 +48,7 @@ impl LineWrapStrategy for NoLineWrap {
             }
         }
 
+        // Handle any remaining span ranges at the end
         if !current_span_ranges.is_empty() {
             lines.push(LineToken::new(current_span_ranges));
         }
