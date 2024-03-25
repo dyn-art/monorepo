@@ -39,7 +39,7 @@ impl LineWrapStrategy for NoLineWrap {
                 }
             }
 
-            // Handle any remaining span range at the end
+            // Account for remaining span range
             if span_range_start < span.get_range().end {
                 current_span_ranges.push(SpanRange::new(
                     index,
@@ -48,7 +48,7 @@ impl LineWrapStrategy for NoLineWrap {
             }
         }
 
-        // Handle any remaining span ranges at the end
+        // Create new line from remaining span ranges
         if !current_span_ranges.is_empty() {
             lines.push(LineToken::new(current_span_ranges));
         }
