@@ -1,7 +1,8 @@
 use crate::events::WheeledOnCompInputEvent;
 use bevy_ecs::{event::EventReader, system::ResMut};
-use dyn_comp_common::common::{Size, Viewport};
+use dyn_comp_bundles::viewport::Viewport;
 use dyn_comp_core::resources::composition::CompositionRes;
+use dyn_utils::{properties::size::Size, units::abs::Abs};
 
 pub fn handle_wheel_on_comp_event(
     mut event_reader: EventReader<WheeledOnCompInputEvent>,
@@ -34,14 +35,14 @@ pub fn handle_wheel_on_comp_event(
 
             // Calculate relative cursor position within the composition
             let relative_cursor =
-                (*cursor_position / *size.get()) * *physical_size.get() + *physical_position;
+                (*cursor_position / size.to_vec2()) * physical_size.to_vec2() + *physical_position;
 
             let new_physical_size = Size::new(
-                physical_size.width() * scale_factor,
-                physical_size.height() * scale_factor,
+                Abs::pt(physical_size.width() * scale_factor),
+                Abs::pt(physical_size.height() * scale_factor),
             );
             let new_physical_position =
-                relative_cursor - (*cursor_position / *size.get()) * *new_physical_size.get();
+                relative_cursor - (*cursor_position / size.to_vec2()) * new_physical_size.to_vec2();
 
             // Update the composition's viewport
             *physical_position = new_physical_position;

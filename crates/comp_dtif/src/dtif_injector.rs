@@ -8,9 +8,11 @@ use bevy_ecs::{
 };
 use bevy_hierarchy::BuildWorldChildren;
 use dyn_comp_asset::{asset_id::AssetId, resources::AssetDatabaseRes};
-use dyn_comp_common::{
+use dyn_comp_bundles::{
+    components::mixins::{
+        PaintChildMixin, PaintParentMixin, Root, StyleChildrenMixin, StyleParentMixin,
+    },
     events::InputEvent,
-    mixins::{PaintChildMixin, PaintParentMixin, Root, StyleChildrenMixin, StyleParentMixin},
 };
 use smallvec::{smallvec, SmallVec};
 use std::collections::HashMap;

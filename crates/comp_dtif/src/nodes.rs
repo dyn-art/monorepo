@@ -3,23 +3,25 @@ use crate::{
     ToEcsBundleImpl,
 };
 use bevy_transform::{components::Transform, TransformBundle};
-use dyn_comp_common::{
-    bundles::{
-        EllipseCompNodeBundle, FrameCompNodeBundle, GroupCompNodeBundle, PolygonCompNodeBundle,
-        RectangleCompNodeBundle, StarCompNodeBundle, TextCompNodeBundle, VectorNodeBundle,
+use dyn_comp_bundles::{
+    components::{
+        mixins::{
+            BlendMode, BlendModeMixin, CornerRadiiMixin, OpacityMixin, PathMixin, SizeMixin,
+            VisibilityMixin,
+        },
+        nodes::{
+            BreakLineOn, CompNode, CompNodeVariant, EllipseArcData, EllipseCompNode, FrameCompNode,
+            GroupCompNode, HorizontalTextAlignment, PolygonCompNode, RectangleCompNode,
+            StarCompNode, TextCompNode, TextSpan, VectorCompNode, VerticalTextAlignment,
+        },
     },
-    common::{
-        BlendMode, BreakLineOn, CornerRadii, Degree, HorizontalTextAlignment, Opacity, Size,
-        TextSpan, VerticalTextAlignment,
-    },
-    default::{default_as_false, default_as_true},
-    mixins::{
-        BlendModeMixin, CornerRadiiMixin, OpacityMixin, PathMixin, SizeMixin, VisibilityMixin,
-    },
-    nodes::{
-        CompNode, CompNodeVariant, EllipseArcData, EllipseCompNode, FrameCompNode, GroupCompNode,
-        PolygonCompNode, RectangleCompNode, StarCompNode, TextCompNode, VectorCompNode,
-    },
+    EllipseCompNodeBundle, FrameCompNodeBundle, GroupCompNodeBundle, PolygonCompNodeBundle,
+    RectangleCompNodeBundle, StarCompNodeBundle, TextCompNodeBundle, VectorNodeBundle,
+};
+use dyn_utils::{
+    properties::{corner_radii::CornerRadii, opacity::Opacity, size::Size},
+    serde::{default_as_false, default_as_true},
+    units::angle::Angle,
 };
 use glam::{Quat, Vec2, Vec3};
 
@@ -44,7 +46,7 @@ pub struct FrameNode {
     #[serde(default)]
     pub translation: Vec2,
     #[serde(default)]
-    pub rotation_deg: Degree,
+    pub rotation_deg: Angle,
     pub size: Size,
     #[serde(default)]
     pub corner_radii: CornerRadii,
@@ -73,7 +75,7 @@ impl ToEcsBundleImpl for FrameNode {
             },
             transform: TransformBundle::from_transform(Transform {
                 translation: Vec3::new(self.translation.x, self.translation.y, 0.0),
-                rotation: Quat::from_rotation_z(self.rotation_deg.to_radians()),
+                rotation: Quat::from_rotation_z(self.rotation_deg.to_rad()),
                 scale: Vec3::ONE,
             }),
             size: SizeMixin(self.size),
@@ -91,7 +93,7 @@ pub struct GroupNode {
     #[serde(default)]
     pub translation: Vec2,
     #[serde(default)]
-    pub rotation_deg: Degree,
+    pub rotation_deg: Angle,
     pub size: Size,
     #[serde(default = "default_as_true")]
     pub visible: bool,
@@ -114,7 +116,7 @@ impl ToEcsBundleImpl for GroupNode {
             group: GroupCompNode,
             transform: TransformBundle::from_transform(Transform {
                 translation: Vec3::new(self.translation.x, self.translation.y, 0.0),
-                rotation: Quat::from_rotation_z(self.rotation_deg.to_radians()),
+                rotation: Quat::from_rotation_z(self.rotation_deg.to_rad()),
                 scale: Vec3::ONE,
             }),
             visibility: VisibilityMixin(self.visible),
@@ -130,7 +132,7 @@ pub struct RectangleNode {
     #[serde(default)]
     pub translation: Vec2,
     #[serde(default)]
-    pub rotation_deg: Degree,
+    pub rotation_deg: Angle,
     pub size: Size,
     #[serde(default)]
     pub corner_radii: CornerRadii,
@@ -155,7 +157,7 @@ impl ToEcsBundleImpl for RectangleNode {
             rectangle: RectangleCompNode::default(),
             transform: TransformBundle::from_transform(Transform {
                 translation: Vec3::new(self.translation.x, self.translation.y, 0.0),
-                rotation: Quat::from_rotation_z(self.rotation_deg.to_radians()),
+                rotation: Quat::from_rotation_z(self.rotation_deg.to_rad()),
                 scale: Vec3::ONE,
             }),
             size: SizeMixin(self.size),
@@ -179,7 +181,7 @@ pub struct EllipseNode {
     #[serde(default)]
     pub translation: Vec2,
     #[serde(default)]
-    pub rotation_deg: Degree,
+    pub rotation_deg: Angle,
     pub size: Size,
     #[serde(default = "default_as_true")]
     pub visible: bool,
@@ -208,7 +210,7 @@ impl ToEcsBundleImpl for EllipseNode {
             },
             transform: TransformBundle::from_transform(Transform {
                 translation: Vec3::new(self.translation.x, self.translation.y, 0.0),
-                rotation: Quat::from_rotation_z(self.rotation_deg.to_radians()),
+                rotation: Quat::from_rotation_z(self.rotation_deg.to_rad()),
                 scale: Vec3::ONE,
             }),
             size: SizeMixin(self.size),
@@ -229,7 +231,7 @@ pub struct StarNode {
     #[serde(default)]
     pub translation: Vec2,
     #[serde(default)]
-    pub rotation_deg: Degree,
+    pub rotation_deg: Angle,
     pub size: Size,
     #[serde(default = "default_as_true")]
     pub visible: bool,
@@ -255,7 +257,7 @@ impl ToEcsBundleImpl for StarNode {
             },
             transform: TransformBundle::from_transform(Transform {
                 translation: Vec3::new(self.translation.x, self.translation.y, 0.0),
-                rotation: Quat::from_rotation_z(self.rotation_deg.to_radians()),
+                rotation: Quat::from_rotation_z(self.rotation_deg.to_rad()),
                 scale: Vec3::ONE,
             }),
             size: SizeMixin(self.size),
@@ -279,7 +281,7 @@ pub struct PolygonNode {
     #[serde(default)]
     pub translation: Vec2,
     #[serde(default)]
-    pub rotation_deg: Degree,
+    pub rotation_deg: Angle,
     pub size: Size,
     #[serde(default = "default_as_true")]
     pub visible: bool,
@@ -304,7 +306,7 @@ impl ToEcsBundleImpl for PolygonNode {
             },
             transform: TransformBundle::from_transform(Transform {
                 translation: Vec3::new(self.translation.x, self.translation.y, 0.0),
-                rotation: Quat::from_rotation_z(self.rotation_deg.to_radians()),
+                rotation: Quat::from_rotation_z(self.rotation_deg.to_rad()),
                 scale: Vec3::ONE,
             }),
             size: SizeMixin(self.size),
@@ -333,7 +335,7 @@ pub struct TextNode {
     #[serde(default)]
     pub translation: Vec2,
     #[serde(default)]
-    pub rotation_deg: Degree,
+    pub rotation_deg: Angle,
     pub size: Size,
     #[serde(default = "default_as_true")]
     pub visible: bool,
@@ -361,7 +363,7 @@ impl ToEcsBundleImpl for TextNode {
             },
             transform: TransformBundle::from_transform(Transform {
                 translation: Vec3::new(self.translation.x, self.translation.y, 0.0),
-                rotation: Quat::from_rotation_z(self.rotation_deg.to_radians()),
+                rotation: Quat::from_rotation_z(self.rotation_deg.to_rad()),
                 scale: Vec3::ONE,
             }),
             size: SizeMixin(self.size),
@@ -379,7 +381,7 @@ pub struct VectorNode {
     #[serde(default)]
     pub translation: Vec2,
     #[serde(default)]
-    pub rotation_deg: Degree,
+    pub rotation_deg: Angle,
     pub size: Size,
     #[serde(default = "default_as_true")]
     pub visible: bool,
@@ -403,7 +405,7 @@ impl ToEcsBundleImpl for VectorNode {
             vector: VectorCompNode,
             transform: TransformBundle::from_transform(Transform {
                 translation: Vec3::new(self.translation.x, self.translation.y, 0.0),
-                rotation: Quat::from_rotation_z(self.rotation_deg.to_radians()),
+                rotation: Quat::from_rotation_z(self.rotation_deg.to_rad()),
                 scale: Vec3::ONE,
             }),
             size: SizeMixin(self.size),

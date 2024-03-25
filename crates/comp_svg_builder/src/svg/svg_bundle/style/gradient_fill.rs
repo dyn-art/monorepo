@@ -10,7 +10,7 @@ use crate::{
     },
 };
 use bevy_ecs::entity::Entity;
-use dyn_comp_common::common::GradientVariant;
+use dyn_comp_bundles::components::paints::GradientVariant;
 use smallvec::SmallVec;
 
 #[derive(Debug, Clone)]

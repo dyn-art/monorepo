@@ -1,8 +1,9 @@
-use super::{abs::Abs, ratio::Ratio};
+use crate::units::{abs::Abs, ratio::Ratio};
+use glam::Vec2;
 
 const MIN_SIZE: f32 = 0.0;
 
-/// A size in 2D with a width and a height.
+/// An absolute size in 2D with a width and a height.
 #[derive(Debug, Default, Eq, PartialEq, Ord, PartialOrd, Hash, Clone, Copy)]
 #[cfg_attr(
     feature = "serde_support",
@@ -18,23 +19,38 @@ impl Size {
 
     /// Create a new instance from the two components.
     pub fn new(width: Abs, height: Abs) -> Self {
-        Self(width.min(Abs::pt(MIN_SIZE)), height.min(Abs::pt(MIN_SIZE)))
+        Self(width.max(Abs::pt(MIN_SIZE)), height.max(Abs::pt(MIN_SIZE)))
     }
 
-    pub fn get_width(&self) -> Abs {
-        self.0
+    pub fn from_vec2(vec2: Vec2) -> Self {
+        Self(
+            Abs::pt(vec2.x).min(Abs::pt(MIN_SIZE)),
+            Abs::pt(vec2.y).min(Abs::pt(MIN_SIZE)),
+        )
+    }
+
+    pub fn width(&self) -> f32 {
+        self.0.to_pt()
     }
 
     pub fn set_width(&mut self, width: Abs) {
         self.0 = width
     }
 
-    pub fn get_height(&self) -> Abs {
-        self.1
+    pub fn height(&self) -> f32 {
+        self.1.to_pt()
     }
 
     pub fn set_height(&mut self, height: Abs) {
         self.1 = height
+    }
+
+    pub fn to_vec2(&self) -> Vec2 {
+        Vec2::new(self.0.to_pt(), self.1.to_pt())
+    }
+
+    pub fn to_tuple(&self) -> (f32, f32) {
+        (self.0.to_pt(), self.1.to_pt())
     }
 
     /// Converts to a ratio of width to height.

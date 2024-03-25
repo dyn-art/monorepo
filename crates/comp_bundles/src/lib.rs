@@ -1,4 +1,11 @@
-use crate::{
+pub mod components;
+pub mod events;
+pub mod math;
+pub mod viewport;
+
+use bevy_ecs::bundle::Bundle;
+use bevy_transform::TransformBundle;
+use components::{
     mixins::{
         BlendModeMixin, CornerRadiiMixin, ImageAssetMixin, OpacityMixin, PaintChildMixin,
         PathMixin, SizeMixin, VisibilityMixin,
@@ -10,8 +17,6 @@ use crate::{
     paints::{CompPaint, GradientCompPaint, ImageCompPaint, SolidCompPaint},
     styles::{CompStyle, FillCompStyle, StrokeCompStyle},
 };
-use bevy_ecs::bundle::Bundle;
-use bevy_transform::TransformBundle;
 
 #[derive(Bundle, Debug)]
 pub struct FrameCompNodeBundle {

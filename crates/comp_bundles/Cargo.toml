@@ -1,5 +1,5 @@
 [package]
-name = "dyn-comp-common"
+name = "dyn-comp-bundles"
 version = "0.0.1"
 description = ""
 edition = { workspace = true }
@@ -15,6 +15,7 @@ tracing = []
 
 [dependencies]
 dyn-comp-asset = { path = "../comp_asset" }
+dyn-utils = { path = "../utils" }
 bevy_ecs = { workspace = true }
 bevy_hierarchy = { workspace = true }
 bevy_transform = { workspace = true }

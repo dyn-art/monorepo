@@ -3,7 +3,7 @@ use bevy_ecs::{
     query::{Changed, Or},
     system::{Commands, Query},
 };
-use dyn_comp_common::{
+use dyn_comp_bundles::components::{
     mixins::{PathMixin, SizeMixin},
     nodes::PolygonCompNode,
 };
@@ -22,7 +22,7 @@ pub fn outline_polygon(
             continue;
         }
 
-        let radius = *size.get() / 2.0;
+        let radius = size.to_vec2() / 2.0;
 
         let mut path_builder = PathBuilder::new();
 

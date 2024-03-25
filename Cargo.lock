@@ -779,13 +779,14 @@ dependencies = [
 ]
 
 [[package]]
-name = "dyn-comp-common"
+name = "dyn-comp-bundles"
 version = "0.0.1"
 dependencies = [
  "bevy_ecs",
  "bevy_hierarchy",
  "bevy_transform",
  "dyn-comp-asset",
+ "dyn-utils",
  "glam",
  "log",
  "serde",
@@ -803,8 +804,9 @@ dependencies = [
  "bevy_hierarchy",
  "bevy_transform",
  "dyn-comp-asset",
- "dyn-comp-common",
+ "dyn-comp-bundles",
  "dyn-comp-dtif",
+ "dyn-utils",
  "glam",
  "log",
  "smallvec",
@@ -819,7 +821,8 @@ dependencies = [
  "bevy_hierarchy",
  "bevy_transform",
  "dyn-comp-asset",
- "dyn-comp-common",
+ "dyn-comp-bundles",
+ "dyn-utils",
  "glam",
  "log",
  "serde",
@@ -835,8 +838,9 @@ dependencies = [
  "bevy_app",
  "bevy_ecs",
  "bevy_transform",
- "dyn-comp-common",
+ "dyn-comp-bundles",
  "dyn-comp-core",
+ "dyn-utils",
  "glam",
  "log",
  "serde",
@@ -853,7 +857,8 @@ dependencies = [
  "bevy_hierarchy",
  "bevy_transform",
  "dyn-comp-asset",
- "dyn-comp-common",
+ "dyn-comp-bundles",
+ "dyn-utils",
  "glam",
  "imagesize",
  "log",
@@ -875,7 +880,7 @@ dependencies = [
  "dotenv_config",
  "dotenvy",
  "dyn-comp-asset",
- "dyn-comp-common",
+ "dyn-comp-bundles",
  "dyn-comp-core",
  "dyn-comp-dtif",
  "dyn-comp-svg-builder",
@@ -914,11 +919,12 @@ dependencies = [
  "bevy_transform",
  "clap",
  "console_error_panic_hook",
- "dyn-comp-common",
+ "dyn-comp-bundles",
  "dyn-comp-core",
  "dyn-comp-dtif",
  "dyn-comp-interaction",
  "dyn-comp-svg-builder",
+ "dyn-utils",
  "glam",
  "js-sys",
  "log",
@@ -936,6 +942,7 @@ name = "dyn-utils"
 version = "0.0.1"
 dependencies = [
  "env_logger",
+ "glam",
  "log",
  "serde",
  "specta",

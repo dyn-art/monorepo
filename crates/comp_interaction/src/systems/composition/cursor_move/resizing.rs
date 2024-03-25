@@ -6,8 +6,9 @@ use crate::{
 };
 use bevy_ecs::{query::With, system::Query};
 use bevy_transform::components::Transform;
-use dyn_comp_common::{math::transform_to_z_rotation_rad, mixins::SizeMixin};
+use dyn_comp_bundles::{components::mixins::SizeMixin, math::transform_to_z_rotation_rad};
 use dyn_comp_core::resources::composition::CompositionRes;
+use dyn_utils::units::abs::Abs;
 use glam::Vec2;
 
 pub fn handle_resizing(
@@ -50,23 +51,29 @@ pub fn resize_bounds(bounds: &XYWH, corner: u8, cursor_point: &Vec2, angle_rad: 
         result.position.x = unrotated_cursor_point
             .x
             .min(bounds.position.x + bounds.size.width());
-        result.size.get_mut().x =
-            (bounds.position.x + bounds.size.width() - unrotated_cursor_point.x).abs();
+        result.size.set_width(Abs::pt(
+            (bounds.position.x + bounds.size.width() - unrotated_cursor_point.x).abs(),
+        ));
     }
     if (corner & HandleSide::Right as u8) == HandleSide::Right as u8 {
         result.position.x = unrotated_cursor_point.x.min(bounds.position.x);
-        result.size.get_mut().x = (unrotated_cursor_point.x - bounds.position.x).abs();
+        result.size.set_width(Abs::pt(
+            (unrotated_cursor_point.x - bounds.position.x).abs(),
+        ));
     }
     if (corner & HandleSide::Top as u8) == HandleSide::Top as u8 {
         result.position.y = unrotated_cursor_point
             .y
             .min(bounds.position.y + bounds.size.height() as f32);
-        result.size.get_mut().y =
-            (bounds.position.y + bounds.size.height() - unrotated_cursor_point.y).abs();
+        result.size.set_height(Abs::pt(
+            (bounds.position.y + bounds.size.height() - unrotated_cursor_point.y).abs(),
+        ));
     }
     if (corner & HandleSide::Bottom as u8) == HandleSide::Bottom as u8 {
         result.position.y = unrotated_cursor_point.y.min(bounds.position.y);
-        result.size.get_mut().y = (unrotated_cursor_point.y - bounds.position.y).abs();
+        result.size.set_height(Abs::pt(
+            (unrotated_cursor_point.y - bounds.position.y).abs(),
+        ));
     }
 
     // Rotate the bounds back to the original angle

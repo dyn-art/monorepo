@@ -20,6 +20,18 @@ impl Color {
     pub fn white() -> Color {
         Color::new_rgb(255, 255, 255)
     }
+
+    pub fn get_red(&self) -> u8 {
+        self.0
+    }
+
+    pub fn get_green(&self) -> u8 {
+        self.1
+    }
+
+    pub fn get_blue(&self) -> u8 {
+        self.2
+    }
 }
 
 impl Default for Color {

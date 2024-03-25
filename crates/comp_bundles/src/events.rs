@@ -1,5 +1,6 @@
-use crate::common::{Degree, Size, Viewport};
+use crate::viewport::Viewport;
 use bevy_ecs::{entity::Entity, event::Event, world::World};
+use dyn_utils::{properties::size::Size, units::angle::Angle};
 use std::fmt::Debug;
 
 pub trait InputEvent {
@@ -103,5 +104,5 @@ pub struct EntityDeletedInputEvent {
 )]
 pub struct EntitySetRotationInputEvent {
     pub entity: Entity,
-    pub rotation_deg: Degree,
+    pub rotation_deg: Angle,
 }

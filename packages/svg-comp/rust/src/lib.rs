@@ -14,9 +14,9 @@ use bevy_ecs::{
     system::{Query, SystemState},
 };
 use bevy_transform::components::Transform;
-use dyn_comp_common::{
+use dyn_comp_bundles::{
+    components::mixins::{Root, SizeMixin},
     events::InputEvent,
-    mixins::{Root, SizeMixin},
 };
 use dyn_comp_core::{resources::composition::CompositionRes, CompCorePlugin};
 use dyn_comp_dtif::DtifComposition;

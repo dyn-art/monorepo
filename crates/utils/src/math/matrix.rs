@@ -1,9 +1,4 @@
-use bevy_transform::components::Transform;
-use glam::{EulerRot, Mat4, Quat, Vec3};
-
-pub fn transform_to_z_rotation_rad(transform: &Transform) -> f32 {
-    transform.rotation.to_euler(EulerRot::XYZ).2
-}
+use glam::{Mat4, Quat, Vec3};
 
 // Adjusts Bevy's right-handed coordinate system transformation for SVG's left-handed system
 // by mirroring the z-axis

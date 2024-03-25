@@ -21,17 +21,19 @@ use bevy_ecs::{
 use bevy_hierarchy::Children;
 use bevy_transform::components::Transform;
 use dyn_comp_asset::{asset::ImageAssetContentType, resources::AssetDatabaseRes};
-use dyn_comp_common::{
-    common::{GradientVariant, ImageScaleMode, Size},
-    error::NoneErr,
+use dyn_comp_bundles::components::{
     mixins::{
         BlendModeMixin, ImageAssetMixin, OpacityMixin, PaintParentMixin, PathMixin, SizeMixin,
         StrokePathMixin, StyleChildrenMixin, VisibilityMixin,
     },
     nodes::CompNode,
-    paints::{CompPaint, GradientCompPaint, ImageCompPaint, SolidCompPaint},
+    paints::{
+        CompPaint, GradientCompPaint, GradientVariant, ImageCompPaint, ImageScaleMode,
+        SolidCompPaint,
+    },
     styles::{CompStyle, FillCompStyle, StrokeCompStyle},
 };
+use dyn_utils::{error::NoneErr, properties::size::Size};
 use glam::{Mat3, Vec2};
 use smallvec::SmallVec;
 use std::{
@@ -648,8 +650,8 @@ fn extract_linear_gradient_params_from_transform(
     let start_end = [Vec2::new(0.0, 0.5), Vec2::new(1.0, 0.5)].map(|p| mx_inv.transform_point2(p));
 
     (
-        start_end[0] * *shape_size.get(),
-        start_end[1] * *shape_size.get(),
+        start_end[0] * shape_size.to_vec2(),
+        start_end[1] * shape_size.to_vec2(),
     )
 }
 
@@ -754,7 +756,7 @@ fn calculate_cropped_image_transform(
     image_size: (f32, f32),
     transform: &Mat3,
 ) -> (f32, f32, Mat3) {
-    let [parent_width, parent_height] = parent_size.get().to_array();
+    let (parent_width, parent_height) = parent_size.to_tuple();
     let (image_width, image_height) = image_size;
 
     log::info!(

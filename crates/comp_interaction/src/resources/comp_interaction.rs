@@ -1,5 +1,5 @@
 use bevy_ecs::system::Resource;
-use dyn_comp_common::common::Size;
+use dyn_utils::properties::size::Size;
 use glam::Vec2;
 
 #[derive(Resource, Debug, Default)]

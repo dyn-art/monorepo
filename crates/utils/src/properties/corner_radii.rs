@@ -12,7 +12,7 @@ impl CornerRadii {
         Self(top_left, top_right, bottom_right, bottom_left)
     }
 
-    pub fn get_tl(&self) -> Angle {
+    pub fn tl(&self) -> Angle {
         self.0
     }
 
@@ -20,7 +20,7 @@ impl CornerRadii {
         self.0 = top_left
     }
 
-    pub fn get_tr(&self) -> Angle {
+    pub fn tr(&self) -> Angle {
         self.1
     }
 
@@ -28,7 +28,7 @@ impl CornerRadii {
         self.1 = top_right
     }
 
-    pub fn get_br(&self) -> Angle {
+    pub fn br(&self) -> Angle {
         self.2
     }
 
@@ -36,7 +36,7 @@ impl CornerRadii {
         self.2 = bottom_right
     }
 
-    pub fn get_bl(&self) -> Angle {
+    pub fn bl(&self) -> Angle {
         self.3
     }
 

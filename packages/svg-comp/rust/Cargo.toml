@@ -33,7 +33,7 @@ tracing = [
 [dependencies]
 dyn-comp-core = { path = "../../../crates/comp_core", features = ["dtif"] }
 dyn-comp-dtif = { path = "../../../crates/comp_dtif" }
-dyn-comp-common = { path = "../../../crates/comp_common", features = [
+dyn-comp-bundles = { path = "../../../crates/comp_bundles", features = [
     "serde_support",
 ] }
 dyn-comp-interaction = { path = "../../../crates/comp_interaction", features = [
@@ -43,6 +43,7 @@ dyn-comp-svg-builder = { path = "../../../crates/comp_svg_builder", features = [
     "serde_support",
     "output_svg_element_changes",
 ] }
+dyn-utils = { path = "../../../crates/utils", features = ["serde_support"] }
 bevy_app = { workspace = true }
 bevy_ecs = { workspace = true }
 bevy_transform = { workspace = true }

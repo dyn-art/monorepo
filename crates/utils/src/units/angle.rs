@@ -12,7 +12,7 @@ const MAX_ANGLE_RAD: f32 = 2.0 * PI; // 360 degrees in radians
 
 /// An angle describing a rotation.
 #[derive(Default, Eq, PartialEq, Ord, PartialOrd, Hash, Clone, Copy)]
-#[cfg_attr(feature = "serde_support", derive(serde::Serialize, specta::Type))]
+#[cfg_attr(feature = "serde_support", derive(specta::Type))]
 pub struct Angle(Scalar);
 
 impl Angle {
@@ -23,7 +23,7 @@ impl Angle {
 
     /// Create an angle from a number of raw units.
     pub fn raw(raw: f32) -> Self {
-        Self(Scalar::new(raw.min(MIN_ANGLE_RAD).max(MAX_ANGLE_RAD)))
+        Self(Scalar::new(raw.max(MIN_ANGLE_RAD).min(MAX_ANGLE_RAD)))
     }
 
     /// Create an angle from a value in a unit.
@@ -134,13 +134,23 @@ assign_impl!(Angle *= f32);
 assign_impl!(Angle /= f32);
 
 #[cfg(feature = "serde_support")]
+impl serde::Serialize for Angle {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        Scalar::new(self.to_deg()).serialize(serializer)
+    }
+}
+
+#[cfg(feature = "serde_support")]
 impl<'de> serde::Deserialize<'de> for Angle {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
         let scalar = Scalar::deserialize(deserializer)?;
-        Ok(Angle::raw(scalar.get()))
+        Ok(Angle::deg(scalar.get()))
     }
 }
 

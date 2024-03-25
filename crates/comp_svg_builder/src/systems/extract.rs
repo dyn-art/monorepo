@@ -10,7 +10,7 @@ use bevy_ecs::{
     system::{Query, ResMut},
 };
 use bevy_hierarchy::{Children, Parent};
-use dyn_comp_common::{
+use dyn_comp_bundles::components::{
     mixins::{StyleChildrenMixin, StyleParentMixin},
     nodes::CompNode,
     styles::CompStyle,

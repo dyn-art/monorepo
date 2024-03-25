@@ -32,14 +32,14 @@ export function transformTextNode(
 						fontSize: segment.fontSize,
 						letterSpacing:
 							segment.letterSpacing.unit === 'PIXELS'
-								? { Fixed: { type: 'Pixels', pixels: segment.letterSpacing.value } }
-								: { Fixed: { type: 'Percent', percent: segment.letterSpacing.value } },
+								? { Fixed: segment.letterSpacing.value }
+								: { Fixed: node.width * segment.letterSpacing.value },
 						lineHeight:
 							// eslint-disable-next-line no-nested-ternary -- Readable enough
 							segment.lineHeight.unit === 'PIXELS'
-								? { Fixed: { type: 'Pixels', pixels: segment.lineHeight.value } }
+								? { Fixed: segment.lineHeight.value }
 								: segment.lineHeight.unit === 'PERCENT'
-									? { Fixed: { type: 'Percent', percent: segment.lineHeight.value } }
+									? { Fixed: node.height * segment.lineHeight.value }
 									: 'Auto'
 					}
 				}) as COMP.TextSpan

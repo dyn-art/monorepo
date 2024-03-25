@@ -14,7 +14,7 @@ use bevy_ecs::{
     query::{Changed, Or, With, Without},
     system::{Commands, Query, ResMut},
 };
-use dyn_comp_common::{
+use dyn_comp_bundles::components::{
     mixins::{PaintChildMixin, SizeMixin, StyleChildrenMixin, StyleParentMixin},
     nodes::{CompNode, CompNodeVariant},
     paints::{CompPaint, CompPaintVariant, GradientCompPaint, ImageCompPaint},

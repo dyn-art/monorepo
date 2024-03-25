@@ -1,6 +1,6 @@
-use crate::common::{BlendMode, CornerRadii, Opacity, Size};
 use bevy_ecs::{component::Component, entity::Entity};
 use dyn_comp_asset::asset_id::ImageId;
+use dyn_utils::properties::{corner_radii::CornerRadii, opacity::Opacity, size::Size};
 use smallvec::SmallVec;
 
 /// Marks an entity as the root or top-level entity.
@@ -18,6 +18,31 @@ pub struct CornerRadiiMixin(pub CornerRadii);
 /// Specifies an entity's blend mode for color blending with underlying colors.
 #[derive(Component, Debug, Default, Copy, Clone)]
 pub struct BlendModeMixin(pub BlendMode);
+
+#[derive(Debug, Default, Copy, Clone)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type)
+)]
+pub enum BlendMode {
+    #[default]
+    Normal,
+    Multiply,
+    Screen,
+    Overlay,
+    Darken,
+    Lighten,
+    ColorDodge,
+    ColorBurn,
+    HardLight,
+    SoftLight,
+    Difference,
+    Exclusion,
+    Hue,
+    Saturation,
+    Color,
+    Luminosity,
+}
 
 /// Controls an entity's visibility state.
 #[derive(Component, Debug, Default, Copy, Clone)]
