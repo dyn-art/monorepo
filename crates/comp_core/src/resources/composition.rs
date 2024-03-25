@@ -1,5 +1,5 @@
 use bevy_ecs::{entity::Entity, system::Resource};
-use dyn_comp_bundles::viewport::Viewport;
+use dyn_comp_bundles::properties::Viewport;
 use dyn_utils::properties::size::Size;
 
 #[derive(Resource, Debug)]

@@ -60,8 +60,6 @@ export type AssetContentType = { type: "Unknown" } | { type: "Jpeg" } | { type: 
 
 export type BlendMode = "Normal" | "Multiply" | "Screen" | "Overlay" | "Darken" | "Lighten" | "ColorDodge" | "ColorBurn" | "HardLight" | "SoftLight" | "Difference" | "Exclusion" | "Hue" | "Saturation" | "Color" | "Luminosity"
 
-export type BreakLineOn = "WordBoundary" | "AnyCharacter" | "NoWrap"
-
 export type Color = [number, number, number]
 
 export type CompCoreInputEvent = ({ type: "EntityDeleted" } & EntityDeletedInputEvent) | ({ type: "CompositionResized" } & CompositionResizedInputEvent) | ({ type: "CompositionViewportChanged" } & CompositionViewportChangedInputEvent) | ({ type: "EntityMoved" } & EntityMovedInputEvent) | ({ type: "EntitySetPosition" } & EntitySetPositionInputEvent) | ({ type: "EntitySetRotation" } & EntitySetRotationInputEvent)
@@ -153,33 +151,92 @@ export type EntitySetRotationInputEvent = { entity: Entity; rotationDeg: Angle }
 
 export type FillStyle = { paintId: string; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity }
 
-export type FontMetadata = { 
 /**
- * The font family to which this font belongs.
+ * A typographic font family.
  */
-family: string; 
+export type FontFamily = 
 /**
- * The style of the font, such as italic or normal.
+ * A serif font.
  */
-style: FontStyle; 
+"Serif" | 
 /**
- * The weight of the font, typically ranging from 100 (thin) to 900 (black).
+ * A sans-serif font.
  */
-weight: number }
+"SansSerif" | 
+/**
+ * A cursive font.
+ */
+"Cursive" | 
+/**
+ * A fantasy font.
+ */
+"Fantasy" | 
+/**
+ * A monospace font.
+ */
+"Monospace" | 
+/**
+ * A custom named font.
+ */
+{ Named: string }
 
+/**
+ * Properties of a single font.
+ */
+export type FontInfo = { 
+/**
+ * The typographic font family this font is part of.
+ */
+family: FontFamily; 
+/**
+ * Properties that distinguish this font from other fonts in the same
+ * family.
+ */
+variant: FontVariant }
+
+/**
+ * The width of a font.
+ */
+export type FontStretch = number
+
+/**
+ * The style of a font.
+ */
 export type FontStyle = 
 /**
- * A face that is neither italic not obliqued.
+ * The default, typically upright style.
  */
 "Normal" | 
 /**
- * A form that is generally cursive in nature.
+ * A cursive style with custom letterform.
  */
 "Italic" | 
 /**
- * A typically-sloped version of the regular face.
+ * Just a slanted version of the normal style.
  */
 "Oblique"
+
+/**
+ * Properties that distinguish a font from other fonts in the same family.
+ */
+export type FontVariant = { 
+/**
+ * The style of the font (normal / italic / oblique).
+ */
+style: FontStyle; 
+/**
+ * How heavy the font is (100 - 900).
+ */
+weight: FontWeight; 
+/**
+ * How condensed or expanded the font is (0.5 - 2.0).
+ */
+stretch: FontStretch }
+
+/**
+ * The weight of a font.
+ */
+export type FontWeight = number
 
 export type FrameNode = { clipContent?: boolean; translation?: Vec2; rotationDeg?: Angle; size: Size; cornerRadii?: CornerRadii; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; styles?: Style[]; children?: string[] }
 
@@ -204,8 +261,6 @@ export type GradientVariant = { type: "Linear"; transform?: Mat3 } | { type: "Ra
 export type GroupNode = { translation?: Vec2; rotationDeg?: Angle; size: Size; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; children?: string[] }
 
 export type HandleSide = "Top" | "Bottom" | "Left" | "Right"
-
-export type HorizontalTextAlignment = "Left" | "Center" | "Right" | "Justified"
 
 export type ImagePaint = { assetId: string; scaleMode?: ImageScaleMode }
 
@@ -259,9 +314,23 @@ export type InteractionModeChangeOutputEvent = { interactionMode: InteractionMod
 
 export type InteractionModeLabel = "None" | "Pressing" | "Translating" | "Resizing" | "Rotating" | "Dragging"
 
-export type LetterSpacing = "Auto" | { Fixed: Abs }
-
-export type LineHeight = "Auto" | { Fixed: Abs }
+export type LineWrap = 
+/**
+ * No wrapping
+ */
+"None" | 
+/**
+ * Wraps at a glyph level
+ */
+"Glyph" | 
+/**
+ * Wraps at the word level
+ */
+"Word" | 
+/**
+ * Wraps at the word level, or fallback to glyph level if a word can't fit on a line by itself
+ */
+"WordOrGlyph"
 
 export type Mat3 = [number, number, number, number, number, number, number, number, number]
 
@@ -401,47 +470,15 @@ export type SvgTransformAttribute = { type: "Matrix"; a: number; b: number; c: n
 
 export type SvgUnits = "UserSpaceOnUse" | "ObjectBoundingBox"
 
-export type TextNode = { spans: TextSpan[]; horizontalTextAlignment?: HorizontalTextAlignment; verticalTextAlignment?: VerticalTextAlignment; linebreakBehavior?: BreakLineOn; translation?: Vec2; rotationDeg?: Angle; size: Size; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; styles?: Style[] }
+export type TextAttributeInterval = { start: number; end: number; attributes: TextAttributes }
 
-/**
- * A styled text segment.
- */
-export type TextSpan = { 
-/**
- * Text content.
- */
-text: string; 
-/**
- * Font metadata.
- */
-font: FontMetadata; 
-/**
- * Style properties.
- */
-style: TextStyle }
+export type TextAttributes = { fontFamily?: FontFamily | null; fontStyle?: FontStyle | null; fontStretch?: FontStretch | null; fontWeight?: FontWeight | null; fontSize?: Abs | null; smallCaps?: boolean | null; applyKerning?: boolean | null }
 
-/**
- * Style properties for a text segment.
- */
-export type TextStyle = { 
-/**
- * Glyph height in pixels, may scale with window.
- */
-fontSize: number; 
-/**
- * Character spacing.
- */
-letterSpacing: LetterSpacing; 
-/**
- * Line spacing.
- */
-lineHeight: LineHeight }
+export type TextNode = { text: string; attributes: TextAttributeInterval[]; lineWrap?: LineWrap; translation?: Vec2; rotationDeg?: Angle; size: Size; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; styles?: Style[] }
 
 export type Vec2 = [number, number]
 
 export type VectorNode = { path: string; translation?: Vec2; rotationDeg?: Angle; size: Size; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; styles?: Style[] }
-
-export type VerticalTextAlignment = "Top" | "Center" | "Bottom" | "Justified"
 
 export type Viewport = { physicalPosition: Vec2; physicalSize: Size }
 

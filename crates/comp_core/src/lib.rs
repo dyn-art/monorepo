@@ -111,7 +111,7 @@ impl Plugin for CompCorePlugin {
 #[cfg(feature = "dtif")]
 fn inject_dtif_into_ecs(world: &mut bevy_ecs::world::World, dtif: &dyn_comp_dtif::DtifComposition) {
     use dyn_comp_asset::resources::AssetDatabaseRes;
-    use dyn_comp_bundles::viewport::Viewport;
+    use dyn_comp_bundles::properties::Viewport;
     use glam::Vec2;
 
     let mut dtif_injector = dyn_comp_dtif::dtif_injector::DtifInjector::new();

@@ -6,6 +6,8 @@ pub mod shape;
 pub mod tokens;
 pub mod utils;
 
+pub use dyn_fonts_book;
+
 use crate::{outline::outline, tokens::shape::ShapeToken};
 use attrs::{Attrs, AttrsInterval, AttrsIntervals};
 use dyn_fonts_book::FontsBook;
@@ -267,6 +269,10 @@ struct AttributedStringConfig {
 }
 
 #[derive(Debug, Default, Clone, Copy)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type)
+)]
 pub enum LineWrap {
     /// No wrapping
     #[default]

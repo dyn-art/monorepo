@@ -11,17 +11,17 @@ export async function transformFontAsset(
 	config: TTransformFontAssetConfig
 ): Promise<COMP.Asset> {
 	const { export: exportConfig, resolveFontContent } = config;
-	const { metadata: fontMetadata } = asset;
+	const { info: fontInfo } = asset;
 
 	// Resolve font
 	let fontContent;
 	try {
-		fontContent = await resolveFontContent(asset.metadata);
+		fontContent = await resolveFontContent(asset.info);
 		if (fontContent == null) {
-			throw new ExportFontAssetException(fontMetadata, nodeIds, 'No font found!');
+			throw new ExportFontAssetException(fontInfo, nodeIds, 'No font found!');
 		}
 	} catch (error) {
-		throw new ExportFontAssetException(fontMetadata, nodeIds, error);
+		throw new ExportFontAssetException(fontInfo, nodeIds, error);
 	}
 
 	// Handle Url
@@ -48,7 +48,7 @@ export interface TTransformFontAssetConfig {
 	resolveFontContent: TResolveFontContent;
 }
 
-export type TResolveFontContent = (fontMetadata: COMP.FontMetadata) => Promise<TFontContent>;
+export type TResolveFontContent = (fontInfo: COMP.FontInfo) => Promise<TFontContent>;
 
 type TFontContent =
 	| { type: 'Binary'; content: Uint8Array; contentType: TContentType }

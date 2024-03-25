@@ -3,6 +3,7 @@ use crate::{
     ToEcsBundleImpl,
 };
 use bevy_transform::{components::Transform, TransformBundle};
+use dyn_attributed_string::LineWrap;
 use dyn_comp_bundles::{
     components::{
         mixins::{
@@ -10,11 +11,12 @@ use dyn_comp_bundles::{
             VisibilityMixin,
         },
         nodes::{
-            BreakLineOn, CompNode, CompNodeVariant, EllipseArcData, EllipseCompNode, FrameCompNode,
-            GroupCompNode, HorizontalTextAlignment, PolygonCompNode, RectangleCompNode,
-            StarCompNode, TextCompNode, TextSpan, VectorCompNode, VerticalTextAlignment,
+            CompNode, CompNodeVariant, EllipseArcData, EllipseCompNode, FrameCompNode,
+            GroupCompNode, PolygonCompNode, RectangleCompNode, StarCompNode, TextCompNode,
+            VectorCompNode,
         },
     },
+    properties::TextAttributeInterval,
     EllipseCompNodeBundle, FrameCompNodeBundle, GroupCompNodeBundle, PolygonCompNodeBundle,
     RectangleCompNodeBundle, StarCompNodeBundle, TextCompNodeBundle, VectorNodeBundle,
 };
@@ -325,13 +327,10 @@ fn default_polygon_point_count() -> u8 {
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
 #[serde(rename_all = "camelCase")]
 pub struct TextNode {
-    pub spans: Vec<TextSpan>,
+    pub text: String,
+    pub attributes: Vec<TextAttributeInterval>,
     #[serde(default)]
-    pub horizontal_text_alignment: HorizontalTextAlignment,
-    #[serde(default)]
-    pub vertical_text_alignment: VerticalTextAlignment,
-    #[serde(default)]
-    pub linebreak_behavior: BreakLineOn,
+    pub line_wrap: LineWrap,
     #[serde(default)]
     pub translation: Vec2,
     #[serde(default)]
@@ -356,10 +355,9 @@ impl ToEcsBundleImpl for TextNode {
                 variant: CompNodeVariant::Text,
             },
             text: TextCompNode {
-                spans: self.spans.iter().cloned().collect(),
-                horizontal_text_alignment: self.horizontal_text_alignment,
-                vertical_text_alignment: self.vertical_text_alignment,
-                linebreak_behavior: self.linebreak_behavior,
+                text: self.text.clone(),
+                attributes: self.attributes.iter().cloned().collect(),
+                line_wrap: self.line_wrap,
             },
             transform: TransformBundle::from_transform(Transform {
                 translation: Vec3::new(self.translation.x, self.translation.y, 0.0),

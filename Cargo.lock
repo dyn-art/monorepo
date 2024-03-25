@@ -223,29 +223,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "attributed-string"
-version = "0.0.1"
-dependencies = [
- "dyn-fonts-book",
- "dyn-utils",
- "env_logger",
- "fontdb",
- "glam",
- "log",
- "ropey",
- "rust-lapper",
- "rustybuzz 0.13.0",
- "self_cell",
- "smallvec",
- "strict-num 0.2.0",
- "tiny-skia-path",
- "unicode-bidi",
- "unicode-linebreak",
- "unicode-script",
- "unicode-vo",
-]
-
-[[package]]
 name = "autocfg"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -763,6 +740,28 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9ea835d29036a4087793836fa931b08837ad5e957da9e23886b29586fb9b6650"
 
 [[package]]
+name = "dyn-attributed-string"
+version = "0.0.1"
+dependencies = [
+ "dyn-fonts-book",
+ "dyn-utils",
+ "env_logger",
+ "fontdb",
+ "glam",
+ "log",
+ "rust-lapper",
+ "rustybuzz 0.13.0",
+ "serde",
+ "smallvec",
+ "specta",
+ "tiny-skia-path",
+ "unicode-bidi",
+ "unicode-linebreak",
+ "unicode-script",
+ "unicode-vo",
+]
+
+[[package]]
 name = "dyn-comp-asset"
 version = "0.0.1"
 dependencies = [
@@ -785,6 +784,7 @@ dependencies = [
  "bevy_ecs",
  "bevy_hierarchy",
  "bevy_transform",
+ "dyn-attributed-string",
  "dyn-comp-asset",
  "dyn-utils",
  "glam",
@@ -820,6 +820,7 @@ dependencies = [
  "bevy_ecs",
  "bevy_hierarchy",
  "bevy_transform",
+ "dyn-attributed-string",
  "dyn-comp-asset",
  "dyn-comp-bundles",
  "dyn-utils",
@@ -908,6 +909,8 @@ dependencies = [
  "log",
  "rustybuzz 0.13.0",
  "self_cell",
+ "serde",
+ "specta",
 ]
 
 [[package]]
@@ -2089,16 +2092,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "ropey"
-version = "1.6.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "93411e420bcd1a75ddd1dc3caf18c23155eda2c090631a85af21ba19e97093b5"
-dependencies = [
- "smallvec",
- "str_indices",
-]
-
-[[package]]
 name = "roxmltree"
 version = "0.19.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2415,25 +2408,10 @@ dependencies = [
 ]
 
 [[package]]
-name = "str_indices"
-version = "0.4.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e9557cb6521e8d009c51a8666f09356f4b817ba9ba0981a305bd86aee47bd35c"
-
-[[package]]
 name = "strict-num"
 version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6637bab7722d379c8b41ba849228d680cc12d0a45ba1fa2b48f2a30577a06731"
-dependencies = [
- "float-cmp",
-]
-
-[[package]]
-name = "strict-num"
-version = "0.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "290fd5eab900654f4c270bc1cfaeb0f2c17b6851fa448fc22e1778dec105ac68"
 dependencies = [
  "float-cmp",
 ]
@@ -2593,7 +2571,7 @@ checksum = "9c9e7fc0c2e86a30b117d0462aa261b72b7a99b7ebd7deb3a14ceda95c5bdc93"
 dependencies = [
  "arrayref",
  "bytemuck",
- "strict-num 0.1.1",
+ "strict-num",
 ]
 
 [[package]]
@@ -2934,7 +2912,7 @@ dependencies = [
  "rustybuzz 0.12.1",
  "simplecss",
  "siphasher",
- "strict-num 0.1.1",
+ "strict-num",
  "svgtypes 0.14.0",
  "tiny-skia-path",
  "unicode-bidi",
@@ -2983,7 +2961,7 @@ version = "0.38.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "18863e0404ed153d6e56362c5b1146db9f4f262a3244e3cf2dbe7d8a85909f05"
 dependencies = [
- "strict-num 0.1.1",
+ "strict-num",
  "svgtypes 0.13.0",
  "tiny-skia-path",
 ]

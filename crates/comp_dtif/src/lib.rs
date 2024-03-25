@@ -8,7 +8,7 @@ pub mod styles;
 use crate::nodes::Node;
 use dtif_injector::DtifInjector;
 use dyn_comp_asset::asset::Asset;
-use dyn_comp_bundles::viewport::Viewport;
+use dyn_comp_bundles::properties::Viewport;
 use dyn_utils::properties::size::Size;
 use events::DtifInputEvent;
 use paints::Paint;

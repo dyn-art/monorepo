@@ -77,7 +77,7 @@ export class FigmaNodeTreeProcessor {
 				type: 'Text',
 				id: nodeId,
 				node,
-				segments: this.processTextSegments(node),
+				attributes: this.processTextSegments(node),
 				strokes: this.processStrokes(node),
 				fills: this.processFills(node)
 			});
@@ -200,7 +200,7 @@ export class FigmaNodeTreeProcessor {
 	}
 
 	// Processes text segments of a text node
-	private processTextSegments(node: TextNode): TTextNodeSegment[] {
+	private processTextSegments(node: TextNode): TTextNodeAttributeInterval[] {
 		const segments = node.getStyledTextSegments([
 			'fontSize',
 			'fontName',
@@ -213,20 +213,23 @@ export class FigmaNodeTreeProcessor {
 			...segment,
 			fontId: this.getOrGenerateId(this._toTransformAssetsHashmap, this._toTransformAssets, {
 				nodeIds: [node.id],
-				asset: { type: 'Font', metadata: this.extractFontMetadata(segment) }
+				asset: { type: 'Font', info: this.extractFontInfo(segment) }
 			}),
-			fontMetadata: this.extractFontMetadata(segment)
+			fontInfo: this.extractFontInfo(segment)
 		}));
 	}
 
-	// Helper to extract font metadata from a node
-	private extractFontMetadata(
-		segment: Omit<Omit<TTextNodeSegment, 'fontId'>, 'fontMetadata'>
-	): COMP.FontMetadata {
+	// Helper to extract font metadata from a text node segment
+	private extractFontInfo(
+		segment: Omit<Omit<TTextNodeAttributeInterval, 'fontId'>, 'fontInfo'>
+	): COMP.FontInfo {
 		return {
-			family: segment.fontName.family,
-			weight: segment.fontWeight,
-			style: segment.fontName.style.toLowerCase().includes('italic') ? 'Italic' : 'Normal'
+			family: { Named: segment.fontName.family },
+			variant: {
+				weight: segment.fontWeight,
+				style: segment.fontName.style.toLowerCase().includes('italic') ? 'Italic' : 'Normal',
+				stretch: 1
+			}
 		};
 	}
 
@@ -261,12 +264,12 @@ interface TToTransformBaseNode {
 export interface TToTransformTextNode extends TToTransformBaseNode {
 	type: 'Text';
 	node: TextNode;
-	segments: TTextNodeSegment[];
+	attributes: TTextNodeAttributeInterval[];
 	fills: TToTransformFill[];
 	strokes: TToTransformStroke[];
 }
 
-export type TTextNodeSegment = Pick<
+export type TTextNodeAttributeInterval = Pick<
 	StyledTextSegment,
 	| 'fontSize'
 	| 'fontName'
@@ -276,7 +279,7 @@ export type TTextNodeSegment = Pick<
 	| 'characters'
 	| 'start'
 	| 'end'
-> & { fontId: number; fontMetadata: COMP.FontMetadata };
+> & { fontId: number; fontInfo: COMP.FontInfo };
 
 export interface TToTransformFrameNode extends TToTransformBaseNode {
 	type: 'Frame';
@@ -336,7 +339,7 @@ export interface TToTransformImageAsset {
 
 export interface TToTransformFontAsset {
 	type: 'Font';
-	metadata: COMP.FontMetadata;
+	info: COMP.FontInfo;
 }
 
 export interface TToTransformFill {

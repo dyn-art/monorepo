@@ -40,7 +40,7 @@ export async function transformNode(
 				childrenIds: toTransformNode.childrenIds
 			});
 		case 'Text':
-			return transformTextNode(toTransformNode.node, toTransformNode.segments, {
+			return transformTextNode(toTransformNode.node, toTransformNode.attributes, {
 				fills: toTransformNode.fills,
 				strokes: toTransformNode.strokes
 			});

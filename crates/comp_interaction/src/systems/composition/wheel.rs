@@ -1,6 +1,6 @@
 use crate::events::WheeledOnCompInputEvent;
 use bevy_ecs::{event::EventReader, system::ResMut};
-use dyn_comp_bundles::viewport::Viewport;
+use dyn_comp_bundles::properties::Viewport;
 use dyn_comp_core::resources::composition::CompositionRes;
 use dyn_utils::{properties::size::Size, units::abs::Abs};
 

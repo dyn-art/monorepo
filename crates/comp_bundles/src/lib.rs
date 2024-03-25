@@ -1,7 +1,7 @@
 pub mod components;
 pub mod events;
 pub mod math;
-pub mod viewport;
+pub mod properties;
 
 use bevy_ecs::bundle::Bundle;
 use bevy_transform::TransformBundle;

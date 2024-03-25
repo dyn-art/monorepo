@@ -4,7 +4,7 @@ use dyn_comp_bundles::{
         CompCoreInputEvent, CompositionResizedInputEvent, CompositionViewportChangedInputEvent,
         EntityDeletedInputEvent, EntityMovedInputEvent, EntitySetPositionInputEvent,
     },
-    viewport::Viewport,
+    properties::Viewport,
 };
 use dyn_utils::properties::size::Size;
 use std::collections::HashMap;

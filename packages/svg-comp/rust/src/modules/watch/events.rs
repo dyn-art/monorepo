@@ -1,6 +1,6 @@
 use super::component_change::ComponentChange;
 use bevy_ecs::entity::Entity;
-use dyn_comp_bundles::viewport::Viewport;
+use dyn_comp_bundles::properties::Viewport;
 use dyn_comp_interaction::resources::comp_interaction::InteractionMode;
 use dyn_utils::properties::size::Size;
 

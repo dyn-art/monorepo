@@ -1,4 +1,4 @@
-use dyn_comp_bundles::viewport::Viewport;
+use dyn_comp_bundles::properties::Viewport;
 use dyn_comp_core::resources::composition::CompositionRes;
 use glam::Vec2;
 

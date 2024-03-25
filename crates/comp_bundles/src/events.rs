@@ -1,4 +1,4 @@
-use crate::viewport::Viewport;
+use crate::properties::Viewport;
 use bevy_ecs::{entity::Entity, event::Event, world::World};
 use dyn_utils::{properties::size::Size, units::angle::Angle};
 use std::fmt::Debug;
