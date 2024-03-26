@@ -2,7 +2,7 @@ use super::shape::{
     glyph::GlyphToken, linebreak::LinebreakToken, text_fragment::TextFragmentToken,
     word_separator::WordSeparatorToken, ShapeBuffer, ShapeToken, ShapeTokenVariant,
 };
-use crate::attrs::Attrs;
+use crate::{attrs::Attrs, utils::is_range_within};
 use dyn_fonts_book::FontsBook;
 use std::ops::Range;
 use unicode_linebreak::BreakClass;
@@ -173,6 +173,29 @@ impl SpanToken {
                 _ => Box::new(std::iter::empty())
                     as Box<dyn Iterator<Item = &'a mut GlyphToken> + 'a>,
             })
+    }
+
+    pub(crate) fn iter_glyphs_in_range_mut<'a>(
+        &'a mut self,
+        range: &'a Range<usize>,
+    ) -> impl Iterator<Item = &'a mut GlyphToken> + 'a {
+        self.tokens
+            .iter_mut()
+            .flat_map(|token_variant| match token_variant {
+                ShapeTokenVariant::Glyph(token) => Box::new(std::iter::once(token))
+                    as Box<dyn Iterator<Item = &'a mut GlyphToken> + 'a>,
+                ShapeTokenVariant::TextFragment(token) => {
+                    Box::new(token.get_tokens_mut().iter_mut())
+                        as Box<dyn Iterator<Item = &'a mut GlyphToken> + 'a>
+                }
+                ShapeTokenVariant::WordSeparator(token) => {
+                    Box::new(token.get_tokens_mut().iter_mut())
+                        as Box<dyn Iterator<Item = &'a mut GlyphToken> + 'a>
+                }
+                _ => Box::new(std::iter::empty())
+                    as Box<dyn Iterator<Item = &'a mut GlyphToken> + 'a>,
+            })
+            .filter(move |glyph| is_range_within(glyph.get_range(), &range))
     }
 
     /// An iterator over glyph clusters within the span.

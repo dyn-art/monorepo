@@ -7,7 +7,7 @@ pub mod shape;
 pub mod tokens;
 pub mod utils;
 
-use crate::{outline::outline, tokens::shape::ShapeToken};
+use crate::outline::outline;
 use attrs::{Attrs, AttrsInterval, AttrsIntervals};
 pub use dyn_fonts_book;
 use dyn_fonts_book::FontsBook;
@@ -19,7 +19,6 @@ use glam::Vec2;
 use line_wrap::{no_wrap::NoLineWrap, word_wrap::WordWrap, LineWrapStrategy};
 use rust_lapper::Lapper;
 use tokens::{line::LineToken, span::SpanToken};
-use utils::is_range_within;
 
 #[derive(Debug, Clone)]
 pub struct AttributedString {
@@ -133,7 +132,6 @@ impl AttributedString {
             if line.get_span_ranges().is_empty() {
                 continue;
             }
-            let line_range = line.get_range();
 
             current_pos.x = 0.0;
             current_pos.y += if index == 0 {
@@ -147,11 +145,7 @@ impl AttributedString {
                 let attrs = &self.attrs_intervals.intervals[span.get_attrs_index()].val;
                 let font_size = attrs.get_font_size();
 
-                for glyph_token in span.iter_glyphs_mut() {
-                    if !is_range_within(glyph_token.get_range(), &line_range) {
-                        continue;
-                    }
-
+                for glyph_token in span.iter_glyphs_in_range_mut(&span_range.range) {
                     let x_advance = glyph_token.get_glyph().x_advance.at(font_size).to_pt();
 
                     glyph_token.set_transform(
@@ -184,15 +178,6 @@ impl AttributedString {
                     let mut x = Em::zero();
 
                     for glyph_token in cluster {
-                        log::info!(
-                            "Glyph: Range({:?}), {:?}, AttrsIndex({}), {:?}, ByteIndex({})",
-                            glyph_token.get_range(),
-                            span.get_level(),
-                            span.get_attrs_index(),
-                            glyph_token.get_transform(),
-                            byte_index
-                        );
-
                         let sx = font.get_scale_factor(font_size);
 
                         if let Some(outline) = outline(glyph_token.get_glyph().glyph_id, &font) {
