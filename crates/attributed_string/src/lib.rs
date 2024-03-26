@@ -110,14 +110,22 @@ impl AttributedString {
         }
     }
 
-    pub fn layout(&mut self) {
+    pub fn compute_lines(&self) -> Vec<LineToken> {
         let mut line_wrap_strategy: Box<dyn LineWrapStrategy> = match self.config.line_wrap {
             LineWrap::None => Box::new(NoLineWrap),
-            LineWrap::Word => Box::new(WordWrap),
+            LineWrap::Word => Box::new(WordWrap::new()),
             _ => Box::new(NoLineWrap),
         };
-        let lines =
-            line_wrap_strategy.compute_lines(&self.spans, &self.attrs_intervals, &self.config.size);
+        return line_wrap_strategy.compute_lines(
+            &self.spans,
+            &self.attrs_intervals,
+            &self.config.size,
+            &self.text,
+        );
+    }
+
+    pub fn layout(&mut self) {
+        let lines = self.compute_lines();
 
         // Apply layout based on line tokens
         let mut current_pos = Vec2::new(0.0, 0.0);

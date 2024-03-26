@@ -70,9 +70,39 @@ impl LineToken {
 
         return current_height;
     }
+
+    /// Merges contiguous spans with the same index within this line token.
+    pub fn merge_contiguous_spans(&mut self) {
+        let mut merged: Vec<SpanRange> = Vec::new();
+        let mut last_span: Option<SpanRange> = None;
+
+        for span in self.span_ranges.iter() {
+            match last_span.as_mut() {
+                // If the current span continues from the last
+                // and has the same index, extend the range
+                Some(last) if last.index == span.index && last.range.end == span.range.start => {
+                    last.range.end = span.range.end;
+                }
+                // Otherwise, push the last span to the merged list and update last_span
+                _ => {
+                    if let Some(last) = last_span.take() {
+                        merged.push(last);
+                    }
+                    last_span = Some(span.clone());
+                }
+            }
+        }
+
+        // Add the last span in the sequence
+        if let Some(last) = last_span {
+            merged.push(last);
+        }
+
+        self.span_ranges = merged;
+    }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Default, PartialEq, Eq, Clone)]
 pub struct SpanRange {
     pub index: usize,
     pub range: Range<usize>,

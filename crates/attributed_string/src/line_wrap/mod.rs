@@ -13,5 +13,6 @@ pub trait LineWrapStrategy {
         spans: &[SpanToken],
         attrs_intervals: &AttrsIntervals,
         size: &Size,
+        text: &str, // For debugging
     ) -> Vec<LineToken>;
 }
