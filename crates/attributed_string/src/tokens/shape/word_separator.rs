@@ -1,9 +1,7 @@
-use dyn_fonts_book::FontsBook;
-use dyn_utils::units::em::Em;
-use glam::Vec2;
-
 use super::{glyph::GlyphToken, ShapeBuffer, ShapeToken};
 use crate::{attrs::Attrs, shape::shape_text_with_fallback};
+use dyn_fonts_book::FontsBook;
+use dyn_utils::units::em::Em;
 use std::ops::Range;
 
 /// Represents spaces or punctuation between words.
@@ -12,8 +10,6 @@ pub struct WordSeparatorToken {
     range: Range<usize>,
     /// Glyph tokens that make up the word separator.
     tokens: Vec<GlyphToken>,
-    /// Cached advance after applying the layout.
-    advance: Vec2,
 }
 
 impl WordSeparatorToken {
@@ -44,11 +40,7 @@ impl WordSeparatorToken {
             tokens.extend(glyphs.into_iter().map(|glyph| GlyphToken::new(glyph)));
         }
 
-        return Self {
-            range,
-            tokens,
-            advance: Vec2::default(),
-        };
+        return Self { range, tokens };
     }
 
     pub fn get_tokens(&self) -> &Vec<GlyphToken> {

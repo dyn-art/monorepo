@@ -7,7 +7,7 @@ use tiny_skia_path::Transform;
 #[derive(Debug, Clone)]
 pub struct GlyphToken {
     glyph: Glyph,
-    /// Transform after applying the layout.
+    /// Cached transform after applying the layout.
     transform: Transform,
 }
 

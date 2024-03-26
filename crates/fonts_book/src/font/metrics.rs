@@ -59,7 +59,7 @@ impl FontMetrics {
             thickness: underline.thickness,
         };
 
-        Self {
+        return Self {
             units_per_em,
             ascender,
             cap_height,
@@ -68,7 +68,7 @@ impl FontMetrics {
             strikethrough,
             underline,
             overline,
-        }
+        };
     }
 }
 

@@ -137,16 +137,10 @@ impl AttributedString {
 
             current_pos.x = 0.0;
             current_pos.y += if index == 0 {
-                // TODO: for the first line apply the glyph height
-                // starting from the baseline not the decsent
-                // so basically the plain ascent?
-                line.height(&self.spans, &self.attrs_intervals) * 0.78
+                line.max_ascent(&self.spans, &self.attrs_intervals)
             } else {
-                line.height(&self.spans, &self.attrs_intervals)
+                line.max_height(&self.spans, &self.attrs_intervals)
             };
-
-            let mut max_ascent = Em::zero();
-            let mut max_descent = Em::zero();
 
             for span_range in line.get_span_ranges().iter() {
                 let span = &mut self.spans[span_range.index];
@@ -167,8 +161,6 @@ impl AttributedString {
                     );
 
                     current_pos.x += x_advance;
-                    max_ascent = max_ascent.max(glyph_token.get_glyph().ascent);
-                    max_descent = max_descent.max(glyph_token.get_glyph().descent);
                 }
             }
         }

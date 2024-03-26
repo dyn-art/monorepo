@@ -188,7 +188,8 @@ impl FontsBook {
             script: buffer.script(),
             language: buffer.language(),
         };
-        match self.font_shape_plan_cache.entry(key) {
+
+        return match self.font_shape_plan_cache.entry(key) {
             Entry::Occupied(occ) => occ.into_mut(),
             Entry::Vacant(vac) => {
                 let ShapePlanKey {
@@ -208,7 +209,7 @@ impl FontsBook {
 
                 vac.insert(plan)
             }
-        }
+        };
     }
 }
 
