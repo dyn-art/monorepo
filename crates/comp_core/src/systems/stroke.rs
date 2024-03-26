@@ -5,7 +5,7 @@ use bevy_ecs::{
     query::Changed,
     system::{Commands, Query},
 };
-use dyn_comp_common::{
+use dyn_comp_bundles::components::{
     mixins::{PathMixin, StrokePathMixin, StyleChildrenMixin, StyleParentMixin},
     styles::StrokeCompStyle,
 };

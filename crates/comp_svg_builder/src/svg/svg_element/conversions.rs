@@ -3,10 +3,8 @@ use super::{
     styles::{SvgBlendModeStyle, SvgStyleColor},
 };
 use bevy_transform::components::Transform;
-use dyn_comp_common::{
-    common::{BlendMode, Color},
-    math::convert_rh_to_lh,
-};
+use dyn_comp_bundles::components::mixins::BlendMode;
+use dyn_utils::{math::matrix::convert_rh_to_lh, properties::color::Color};
 use glam::Mat3;
 use std::fmt::{Error, Write};
 use tiny_skia_path::{Path, PathSegment};
@@ -123,9 +121,9 @@ fn path_to_string(path: &Path) -> Result<String, Error> {
 impl From<&Color> for SvgAttributeColor {
     fn from(color: &Color) -> Self {
         SvgAttributeColor::RGB {
-            red: color.red,
-            green: color.green,
-            blue: color.blue,
+            red: color.get_red(),
+            green: color.get_green(),
+            blue: color.get_blue(),
         }
     }
 }
@@ -133,9 +131,9 @@ impl From<&Color> for SvgAttributeColor {
 impl From<&Color> for SvgStyleColor {
     fn from(color: &Color) -> Self {
         SvgStyleColor::RGB {
-            red: color.red,
-            green: color.green,
-            blue: color.blue,
+            red: color.get_red(),
+            green: color.get_green(),
+            blue: color.get_blue(),
         }
     }
 }

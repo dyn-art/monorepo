@@ -20,18 +20,20 @@ use bevy_ecs::{
 };
 use bevy_hierarchy::Children;
 use bevy_transform::components::Transform;
-use dyn_comp_asset::{asset::ImageAssetContentType, resources::AssetDatabaseRes};
-use dyn_comp_common::{
-    common::{GradientVariant, ImageScaleMode, Size},
-    error::NoneErr,
+use dyn_comp_asset::{asset::ImageAssetContentType, resources::AssetsRes};
+use dyn_comp_bundles::components::{
     mixins::{
         BlendModeMixin, ImageAssetMixin, OpacityMixin, PaintParentMixin, PathMixin, SizeMixin,
         StrokePathMixin, StyleChildrenMixin, VisibilityMixin,
     },
     nodes::CompNode,
-    paints::{CompPaint, GradientCompPaint, ImageCompPaint, SolidCompPaint},
+    paints::{
+        CompPaint, GradientCompPaint, GradientVariant, ImageCompPaint, ImageScaleMode,
+        SolidCompPaint,
+    },
     styles::{CompStyle, FillCompStyle, StrokeCompStyle},
 };
+use dyn_utils::{error::NoneErr, properties::size::Size};
 use glam::{Mat3, Vec2};
 use smallvec::SmallVec;
 use std::{
@@ -648,15 +650,15 @@ fn extract_linear_gradient_params_from_transform(
     let start_end = [Vec2::new(0.0, 0.5), Vec2::new(1.0, 0.5)].map(|p| mx_inv.transform_point2(p));
 
     (
-        start_end[0] * *shape_size.get(),
-        start_end[1] * *shape_size.get(),
+        start_end[0] * shape_size.to_vec2(),
+        start_end[1] * shape_size.to_vec2(),
     )
 }
 
 // TODO: This system doesn't account for size changes
 // -> Either new system to handle those or integrate into this system
 pub fn apply_image_paint_changes(
-    asset_db_res: Res<AssetDatabaseRes>,
+    assets_res: Res<AssetsRes>,
     paint_query: Query<
         (&ImageCompPaint, &ImageAssetMixin, &PaintParentMixin),
         (With<CompPaint>, Changed<ImageCompPaint>),
@@ -666,7 +668,7 @@ pub fn apply_image_paint_changes(
     for (image_paint, ImageAssetMixin(maybe_image_id), PaintParentMixin(paint_parent_entities)) in
         paint_query.iter()
     {
-        if let Some(image) = maybe_image_id.and_then(|id| asset_db_res.get_image(id)) {
+        if let Some(image) = maybe_image_id.and_then(|id| assets_res.get_image(id)) {
             for paint_parent_entity in paint_parent_entities {
                 if let Ok((mut bundle_variant, SizeMixin(size))) =
                     style_query.get_mut(*paint_parent_entity)
@@ -754,7 +756,7 @@ fn calculate_cropped_image_transform(
     image_size: (f32, f32),
     transform: &Mat3,
 ) -> (f32, f32, Mat3) {
-    let [parent_width, parent_height] = parent_size.get().to_array();
+    let (parent_width, parent_height) = parent_size.to_tuple();
     let (image_width, image_height) = image_size;
 
     log::info!(
@@ -803,7 +805,7 @@ fn calculate_cropped_image_transform(
 }
 
 pub fn apply_image_asset_mixin_changes(
-    asset_db_res: Res<AssetDatabaseRes>,
+    assets_res: Res<AssetsRes>,
     paint_query: Query<
         (&ImageAssetMixin, &PaintParentMixin),
         (With<CompPaint>, Changed<ImageAssetMixin>),
@@ -813,7 +815,7 @@ pub fn apply_image_asset_mixin_changes(
     for (ImageAssetMixin(maybe_image_id), PaintParentMixin(paint_parent_entities)) in
         paint_query.iter()
     {
-        if let Some(image) = maybe_image_id.and_then(|id| asset_db_res.get_image(id)) {
+        if let Some(image) = maybe_image_id.and_then(|id| assets_res.get_image(id)) {
             for paint_parent_entity in paint_parent_entities {
                 if let Ok(mut bundle_variant) = style_query.get_mut(*paint_parent_entity) {
                     match bundle_variant.as_mut() {

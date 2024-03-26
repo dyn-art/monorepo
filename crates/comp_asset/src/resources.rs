@@ -3,19 +3,24 @@ use crate::{
     asset_id::{AssetId, FontId, ImageId, InnerImageId},
 };
 use bevy_ecs::system::Resource;
+use dyn_fonts_book::FontsBook;
 use imagesize::{blob_size, image_type, ImageType};
 use slotmap::SlotMap;
 use std::sync::Arc;
 
-#[derive(Resource, Debug, Default)]
-pub struct AssetDatabaseRes {
-    font_db: fontdb::Database,
+#[derive(Resource, Default)]
+pub struct AssetsRes {
     image_db: SlotMap<InnerImageId, ImageAsset>,
+    fonts_book: FontsBook,
 }
 
-impl AssetDatabaseRes {
-    pub fn get_font_db(&self) -> &fontdb::Database {
-        &self.font_db
+impl AssetsRes {
+    pub fn get_fonts_book(&self) -> &FontsBook {
+        &self.fonts_book
+    }
+
+    pub fn get_fonts_book_mut(&mut self) -> &mut FontsBook {
+        &mut self.fonts_book
     }
 
     pub fn get_image(&self, id: ImageId) -> Option<&ImageAsset> {
@@ -95,7 +100,8 @@ impl AssetDatabaseRes {
             AssetContentType::Ttf => match asset.content {
                 AssetContent::Binary { content } => {
                     let font_face_ids = self
-                        .font_db
+                        .fonts_book
+                        .get_db_mut()
                         .load_font_source(fontdb::Source::Binary(Arc::new(content)));
                     if font_face_ids.len() > 0 {
                         Some(FontId(font_face_ids))

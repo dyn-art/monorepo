@@ -8,7 +8,7 @@ use self::{
 };
 use super::svg_bundle::{SvgBundle, SvgBundleVariant};
 use bevy_ecs::{component::Component, entity::Entity, query::Without, system::Query};
-use dyn_comp_common::mixins::Root;
+use dyn_comp_bundles::components::mixins::Root;
 use smallvec::SmallVec;
 use std::{
     collections::{HashMap, HashSet},

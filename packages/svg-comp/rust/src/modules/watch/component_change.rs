@@ -1,5 +1,6 @@
 use bevy_transform::components::Transform;
-use dyn_comp_common::{common::Size, mixins::SizeMixin};
+use dyn_comp_bundles::components::mixins::SizeMixin;
+use dyn_utils::properties::size::Size;
 use glam::{EulerRot, Vec2};
 
 #[derive(Debug, Clone, serde::Serialize, specta::Type)]

@@ -2,7 +2,7 @@ use crate::modules::watch::events::{
     CompositionChangeOutputEvent, InteractionModeChangeOutputEvent, SelectionChangeOutputEvent,
     WatchedEntityChangesOutputEvent,
 };
-use dyn_comp_common::events::CompCoreInputEvent;
+use dyn_comp_bundles::events::CompCoreInputEvent;
 use dyn_comp_interaction::events::InteractionInputEvent;
 use dyn_comp_svg_builder::events::SvgElementChangesOutputEvent;
 

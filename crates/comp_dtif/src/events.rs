@@ -1,11 +1,12 @@
 use bevy_ecs::entity::Entity;
-use dyn_comp_common::{
-    common::{Size, Viewport},
+use dyn_comp_bundles::{
     events::{
         CompCoreInputEvent, CompositionResizedInputEvent, CompositionViewportChangedInputEvent,
         EntityDeletedInputEvent, EntityMovedInputEvent, EntitySetPositionInputEvent,
     },
+    properties::Viewport,
 };
+use dyn_utils::properties::size::Size;
 use std::collections::HashMap;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]

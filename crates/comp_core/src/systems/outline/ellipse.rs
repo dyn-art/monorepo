@@ -3,7 +3,7 @@ use bevy_ecs::{
     query::{Changed, Or},
     system::{Commands, Query},
 };
-use dyn_comp_common::{
+use dyn_comp_bundles::components::{
     mixins::{PathMixin, SizeMixin},
     nodes::EllipseCompNode,
 };

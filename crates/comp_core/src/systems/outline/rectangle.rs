@@ -3,7 +3,7 @@ use bevy_ecs::{
     query::{Changed, Or},
     system::{Commands, Query},
 };
-use dyn_comp_common::mixins::{CornerRadiiMixin, PathMixin, SizeMixin};
+use dyn_comp_bundles::components::mixins::{CornerRadiiMixin, PathMixin, SizeMixin};
 use tiny_skia_path::PathBuilder;
 
 pub fn outline_rectangle(
@@ -14,13 +14,14 @@ pub fn outline_rectangle(
     >,
 ) {
     for (entity, CornerRadiiMixin(corner_radii), SizeMixin(size)) in query.iter() {
-        let max_radius = (size.width().min(size.height())) / 2.0;
+        let (width, height) = size.to_tuple();
+        let max_radius = (width.min(height)) / 2.0;
         let min_radius = |radius: f32| -> f32 { radius.min(max_radius) };
 
-        let tl_radius = min_radius(corner_radii.top_left());
-        let tr_radius = min_radius(corner_radii.top_right());
-        let br_radius = min_radius(corner_radii.bottom_right());
-        let bl_radius = min_radius(corner_radii.bottom_left());
+        let tl_radius = min_radius(corner_radii.tl().to_rad());
+        let tr_radius = min_radius(corner_radii.tr().to_rad());
+        let br_radius = min_radius(corner_radii.br().to_rad());
+        let bl_radius = min_radius(corner_radii.bl().to_rad());
 
         let mut path_builder = PathBuilder::new();
 
@@ -32,32 +33,27 @@ pub fn outline_rectangle(
         }
 
         // Top edge
-        path_builder.line_to(size.width() - tr_radius, 0.0);
+        path_builder.line_to(width - tr_radius, 0.0);
 
         // Top right corner
         if tr_radius > 0.0 {
-            path_builder.quad_to(size.width(), 0.0, size.width(), tr_radius);
+            path_builder.quad_to(width, 0.0, width, tr_radius);
         }
 
         // Right edge
-        path_builder.line_to(size.width(), size.height() - br_radius);
+        path_builder.line_to(width, height - br_radius);
 
         // Bottom right corner
         if br_radius > 0.0 {
-            path_builder.quad_to(
-                size.width(),
-                size.height(),
-                size.width() - br_radius,
-                size.height(),
-            );
+            path_builder.quad_to(width, height, width - br_radius, height);
         }
 
         // Bottom edge
-        path_builder.line_to(bl_radius, size.height());
+        path_builder.line_to(bl_radius, height);
 
         // Bottom left corner
         if bl_radius > 0.0 {
-            path_builder.quad_to(0.0, size.height(), 0.0, size.height() - bl_radius);
+            path_builder.quad_to(0.0, height, 0.0, height - bl_radius);
         }
 
         // Left edge and close path back to start

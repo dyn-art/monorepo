@@ -9,7 +9,7 @@ use bevy_ecs::{
     query::{With, Without},
     system::{Commands, Query, ResMut},
 };
-use dyn_comp_common::{
+use dyn_comp_bundles::components::{
     mixins::Root,
     nodes::{CompNode, FrameCompNode},
 };

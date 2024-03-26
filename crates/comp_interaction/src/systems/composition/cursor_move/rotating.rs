@@ -4,11 +4,9 @@ use crate::{
 };
 use bevy_ecs::{query::With, system::Query};
 use bevy_transform::components::{GlobalTransform, Transform};
-use dyn_comp_common::{
-    math::{rotate_around_point, transform_to_z_rotation_rad},
-    mixins::SizeMixin,
-};
+use dyn_comp_bundles::{components::mixins::SizeMixin, utils::transform_to_z_rotation_rad};
 use dyn_comp_core::resources::composition::CompositionRes;
+use dyn_utils::math::matrix::rotate_around_point;
 use glam::{Vec2, Vec3};
 
 pub fn handle_rotating(
@@ -30,22 +28,23 @@ pub fn handle_rotating(
 
     for (mut transform, global_transform, SizeMixin(size)) in selected_nodes_query.iter_mut() {
         let computed_global_transform = global_transform.compute_transform();
-        let pivot_point = Vec3::new(size.width() / 2.0, size.height() / 2.0, 0.0);
+        let (width, height) = size.to_tuple();
+        let pivot_point = Vec3::new(width / 2.0, height / 2.0, 0.0);
         let global_pivot_point = computed_global_transform.transform_point(pivot_point);
 
         // Determine rotation offset based on corner
         let rotation_offset_rad: f32 = match corner {
             _ if corner == (HandleSide::Top as u8 | HandleSide::Left as u8) => {
-                f32::atan2(-size.height(), -size.width())
+                f32::atan2(-height, -width)
             }
             _ if corner == (HandleSide::Top as u8 | HandleSide::Right as u8) => {
-                f32::atan2(-size.height(), size.width())
+                f32::atan2(-height, width)
             }
             _ if corner == (HandleSide::Bottom as u8 | HandleSide::Right as u8) => {
-                f32::atan2(size.height(), size.width())
+                f32::atan2(height, width)
             }
             _ if corner == (HandleSide::Bottom as u8 | HandleSide::Left as u8) => {
-                f32::atan2(size.height(), -size.width())
+                f32::atan2(height, -width)
             }
             _ => 0.0,
         };

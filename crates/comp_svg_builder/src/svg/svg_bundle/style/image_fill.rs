@@ -10,7 +10,7 @@ use crate::{
     },
 };
 use bevy_ecs::entity::Entity;
-use dyn_comp_common::common::ImageScaleMode;
+use dyn_comp_bundles::components::paints::ImageScaleMode;
 
 #[derive(Debug, Clone)]
 pub struct ImageFillStyleSvgBundle {

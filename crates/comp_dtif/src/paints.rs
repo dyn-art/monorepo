@@ -1,11 +1,16 @@
 use crate::{dtif_injector::DtifInjector, ToEcsBundleImpl};
 use dyn_comp_asset::asset_id::AssetId;
-use dyn_comp_common::{
-    bundles::{GradientPaintBundle, ImagePaintBundle, SolidPaintBundle},
-    common::{Color, GradientColorStop, GradientVariant, ImageScaleMode},
-    mixins::ImageAssetMixin,
-    paints::{CompPaint, CompPaintVariant, GradientCompPaint, ImageCompPaint, SolidCompPaint},
+use dyn_comp_bundles::{
+    components::{
+        mixins::ImageAssetMixin,
+        paints::{
+            CompPaint, CompPaintVariant, GradientColorStop, GradientCompPaint, GradientVariant,
+            ImageCompPaint, ImageScaleMode, SolidCompPaint,
+        },
+    },
+    GradientPaintBundle, ImagePaintBundle, SolidPaintBundle,
 };
+use dyn_utils::properties::color::Color;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
 #[serde(tag = "type")]

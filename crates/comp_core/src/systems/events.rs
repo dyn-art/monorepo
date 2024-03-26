@@ -4,14 +4,15 @@ use bevy_ecs::{
 };
 use bevy_hierarchy::DespawnRecursiveExt;
 use bevy_transform::components::Transform;
-use dyn_comp_common::{
+use dyn_comp_bundles::{
+    components::mixins::SizeMixin,
     events::{
         EntityDeletedInputEvent, EntityMovedInputEvent, EntitySetPositionInputEvent,
         EntitySetRotationInputEvent,
     },
-    math::{rotate_around_point, transform_to_z_rotation_rad},
-    mixins::SizeMixin,
+    utils::transform_to_z_rotation_rad,
 };
+use dyn_utils::math::matrix::rotate_around_point;
 use glam::Vec3;
 
 // https://bevy-cheatbook.github.io/fundamentals/hierarchy.html#despawning-child-entities
@@ -66,7 +67,7 @@ pub fn handle_entity_set_rotation_event(
             );
             let rotation_transform_mat4 = rotate_around_point(
                 reset_rotation_transform_mat4,
-                rotation_deg.to_radians(),
+                rotation_deg.to_rad(),
                 pivot_point,
             );
             *transform = Transform::from_matrix(rotation_transform_mat4);

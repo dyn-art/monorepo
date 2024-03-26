@@ -1,7 +1,12 @@
 use crate::{dtif_injector::DtifInjector, ToEcsBundleImpl};
-use dyn_comp_common::{
-    bundles::{FillStyleBundle, StrokeStyleBundle}, common::{BlendMode, Opacity}, default::default_as_true, mixins::{BlendModeMixin, OpacityMixin, PaintChildMixin, VisibilityMixin}, styles::{CompStyle, CompStyleVariant, FillCompStyle, StrokeCompStyle}
+use dyn_comp_bundles::{
+    components::{
+        mixins::{BlendMode, BlendModeMixin, OpacityMixin, PaintChildMixin, VisibilityMixin},
+        styles::{CompStyle, CompStyleVariant, FillCompStyle, StrokeCompStyle},
+    },
+    FillStyleBundle, StrokeStyleBundle,
 };
+use dyn_utils::{properties::opacity::Opacity, serde::default_as_true};
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
 #[serde(tag = "type")]

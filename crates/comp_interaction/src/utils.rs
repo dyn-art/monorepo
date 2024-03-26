@@ -1,4 +1,4 @@
-use dyn_comp_common::common::Viewport;
+use dyn_comp_bundles::properties::Viewport;
 use dyn_comp_core::resources::composition::CompositionRes;
 use glam::Vec2;
 
@@ -21,7 +21,7 @@ pub fn transform_point_to_viewport(
         ..
     } = comp_res;
 
-    let normalized_point = *point / *size.get() * *physical_size.get();
+    let normalized_point = *point / size.to_vec2() * physical_size.to_vec2();
 
     return if apply_min_offset {
         normalized_point + *physical_position

@@ -96,46 +96,26 @@ const DEFAULT_DTIF: COMP.DtifComposition = {
 	paints: {
 		p1: {
 			type: 'Solid',
-			color: {
-				red: 229,
-				green: 229,
-				blue: 229
-			}
+			color: [229, 229, 229]
 		},
 		p2: {
 			type: 'Solid',
-			color: {
-				red: 0,
-				green: 128,
-				blue: 0
-			}
+			color: [0, 128, 0]
 		},
 		p3: {
 			type: 'Solid',
-			color: {
-				red: 250,
-				green: 128,
-				blue: 114
-			}
+			color: [250, 128, 114]
 		},
 		p4: {
 			type: 'Gradient',
 			variant: { type: 'Linear' },
 			stops: [
 				{
-					color: {
-						red: 138,
-						green: 43,
-						blue: 226
-					},
+					color: [138, 43, 226],
 					position: 0
 				},
 				{
-					color: {
-						red: 0,
-						green: 191,
-						blue: 225
-					},
+					color: [0, 191, 225],
 					position: 1
 				}
 			]
@@ -149,7 +129,7 @@ const DEFAULT_DTIF: COMP.DtifComposition = {
 		a1: {
 			content: {
 				type: 'Url',
-				url: 'https://raw.githubusercontent.com/dyndotart/monorepo/develop/docs/resources/images/logo-rounded.png'
+				url: 'https://avatars.githubusercontent.com/u/108551717?s=200&v=4'
 			},
 			contentType: { type: 'Png' }
 		}

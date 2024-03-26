@@ -18,7 +18,7 @@ use bevy_ecs::{
     system::{ParamSet, Query, ResMut},
 };
 use bevy_transform::components::{GlobalTransform, Transform};
-use dyn_comp_common::mixins::SizeMixin;
+use dyn_comp_bundles::components::mixins::SizeMixin;
 use dyn_comp_core::resources::composition::CompositionRes;
 
 pub fn handle_cursor_moved_on_comp_event(
