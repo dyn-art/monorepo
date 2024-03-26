@@ -127,6 +127,7 @@ impl LineWrapStrategy for WordWrap {
                 } else {
                     if should_wrap {
                         self.handle_wrap(token_variant);
+                        self.add_non_word_part(token_width, span_range);
                     } else {
                         if !self.current_word.is_empty() {
                             self.finalize_word();
@@ -165,7 +166,10 @@ mod tests {
         AttributedString, AttributedStringConfig, LineWrap,
     };
     use dyn_fonts_book::{
-        font::{info::FontFamily, variant::FontWeight},
+        font::{
+            info::FontFamily,
+            variant::{FontStyle, FontWeight},
+        },
         FontsBook,
     };
     use std::ops::Range;
@@ -177,7 +181,7 @@ mod tests {
     }
 
     #[test]
-    fn e2e() {
+    fn e2e_case1() {
         init();
 
         let mut fonts_book = FontsBook::new();
@@ -247,6 +251,109 @@ mod tests {
             vec![SpanRange {
                 index: 3,
                 range: Range { start: 62, end: 69 },
+            }],
+        ];
+
+        assert_eq!(line_ranges, expected_line_ranges);
+    }
+
+    #[test]
+    fn e2e_case2() {
+        init();
+
+        let mut fonts_book = FontsBook::new();
+        fonts_book.load_system_fonts();
+
+        let text = String::from("Hello there Jeff! Long line test testtestExtra small");
+        let attrs_intervals = vec![
+            AttrsInterval {
+                start: 0,
+                stop: 12,
+                val: Attrs::new()
+                    .font_family(FontFamily::Monospace)
+                    .font_weight(FontWeight::REGULAR)
+                    .font_style(FontStyle::Normal)
+                    .font_size(Abs::pt(48.0)),
+            },
+            AttrsInterval {
+                start: 12,
+                stop: 16,
+                val: Attrs::new()
+                    .font_family(FontFamily::Serif)
+                    .font_weight(FontWeight::REGULAR)
+                    .font_style(FontStyle::Italic)
+                    .font_size(Abs::pt(70.0)),
+            },
+            AttrsInterval {
+                start: 16,
+                stop: 41,
+                val: Attrs::new()
+                    .font_family(FontFamily::Monospace)
+                    .font_weight(FontWeight::REGULAR)
+                    .font_style(FontStyle::Normal)
+                    .font_size(Abs::pt(48.0)),
+            },
+            AttrsInterval {
+                start: 41,
+                stop: 52,
+                val: Attrs::new()
+                    .font_family(FontFamily::Monospace)
+                    .font_weight(FontWeight::REGULAR)
+                    .font_style(FontStyle::Normal)
+                    .font_size(Abs::pt(24.0)),
+            },
+        ];
+
+        let mut attributed_string = AttributedString::new(
+            text,
+            attrs_intervals,
+            AttributedStringConfig {
+                size: Size::new(Abs::pt(378.0), Abs::pt(238.0)),
+                line_wrap: LineWrap::Word,
+            },
+        );
+
+        attributed_string.tokenize_text(&mut fonts_book);
+
+        let lines = attributed_string.compute_lines();
+        let line_ranges = lines
+            .iter()
+            .map(|line| line.get_span_ranges())
+            .cloned()
+            .collect::<Vec<_>>();
+
+        let expected_line_ranges = vec![
+            vec![SpanRange {
+                index: 0,
+                range: Range { start: 0, end: 12 },
+            }],
+            vec![
+                SpanRange {
+                    index: 1,
+                    range: Range { start: 12, end: 16 },
+                },
+                SpanRange {
+                    index: 2,
+                    range: Range { start: 16, end: 23 },
+                },
+            ],
+            vec![SpanRange {
+                index: 2,
+                range: Range { start: 23, end: 33 },
+            }],
+            vec![
+                SpanRange {
+                    index: 2,
+                    range: Range { start: 33, end: 41 },
+                },
+                SpanRange {
+                    index: 3,
+                    range: Range { start: 41, end: 47 },
+                },
+            ],
+            vec![SpanRange {
+                index: 3,
+                range: Range { start: 47, end: 52 },
             }],
         ];
 

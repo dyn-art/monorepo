@@ -319,7 +319,7 @@ mod tests {
         attributed_string.layout();
         let path = attributed_string.to_path(&mut fonts_book);
 
-        // https://yqnn.github.io/svg-path-editor/
+        // https://svg-path.com/
         log::info!("{:?}", path);
 
         assert_eq!(path.is_some(), true);
