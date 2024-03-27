@@ -2303,6 +2303,7 @@ checksum = "3cd14fd5e3b777a7422cca79358c57a8f6e3a703d9ac187448d0daf220c2407f"
 [[package]]
 name = "rust-lapper"
 version = "1.1.0"
+source = "git+https://github.com/bennoinbeta/rust-lapper.git?branch=21-merge-overlaps-loses-values#f7430b784220f252035c22e332d501208a9c1475"
 dependencies = [
  "num-traits",
 ]
