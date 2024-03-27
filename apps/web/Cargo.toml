@@ -12,8 +12,8 @@ authors = { workspace = true }
 path = "rust/lib.rs"
 
 [[bin]]
-name = "crab"
-path = "api/crab.rs"
+name = "render"
+path = "api/render.rs"
 
 [features]
 default = []
@@ -36,9 +36,18 @@ dyn-comp-svg-builder = { path = "../../crates/comp_svg_builder", features = [
 bevy_app = { workspace = true }
 bevy_ecs = { workspace = true }
 bevy_transform = { workspace = true }
+
+fontdb = "0.16.2"
+tiny-skia = "0.11.4"
+reqwest = "0.12.2"
+resvg = "0.40.0"
+svg2pdf = "0.10.0"
+serde = { workspace = true }
+serde_json = { workspace = true, features = ["raw_value"] }
 tokio = { version = "1.36.0", features = ["macros"] }
-serde_json = { version = "1.0.115", features = ["raw_value"] }
 vercel_runtime = { version = "1.1.1" }
+url = "2.5.0"
+usvg = "0.40.0"
 
 # Logging
 log = { workspace = true }
