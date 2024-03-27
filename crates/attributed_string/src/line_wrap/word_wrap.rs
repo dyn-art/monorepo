@@ -32,7 +32,15 @@ impl WordWrap {
         }
     }
 
-    fn start_new_line(&mut self) {
+    fn start_new_line(&mut self, last: bool) {
+        // Append current word to current line if it's the last line and it fits
+        if last && !self.in_overflow && !self.current_word.is_empty() {
+            self.current_line.append(&mut self.current_word);
+            self.current_line_width += self.current_word_width;
+            self.current_word_width = Abs::zero();
+        }
+
+        // Add the current line to lines and prepare for next line
         if !self.current_line.is_empty() {
             let mut line = LineToken::new(std::mem::take(&mut self.current_line));
             line.merge_contiguous_spans();
@@ -40,11 +48,16 @@ impl WordWrap {
             self.current_line_width = Abs::zero();
         }
 
-        // If current_word is not empty, it means we have a pending word to add to the new line
+        // Prepare the next line with the current word if it's not empty
         if !self.current_word.is_empty() {
             self.current_line.append(&mut self.current_word);
-            self.current_line_width = self.current_word_width; // Start with the width of the current word
+            self.current_line_width = self.current_word_width;
             self.current_word_width = Abs::zero();
+        }
+
+        // If the last line caused an overflow, don't forget the last word
+        if last && !self.current_line.is_empty() {
+            self.start_new_line(false);
         }
     }
 
@@ -66,15 +79,15 @@ impl WordWrap {
 
     fn handle_wrap(&mut self, token_variant: &ShapeTokenVariant) {
         if self.in_overflow {
-            self.start_new_line();
+            self.start_new_line(false);
             if matches!(token_variant, ShapeTokenVariant::Linebreak(_)) {
-                self.start_new_line();
+                self.start_new_line(false);
             }
         } else {
             if !self.current_word.is_empty() {
                 self.finalize_word();
             }
-            self.start_new_line();
+            self.start_new_line(false);
         }
     }
 }
@@ -150,10 +163,7 @@ impl LineWrapStrategy for WordWrap {
         }
 
         // Flush any remaining parts to a new line
-        self.start_new_line();
-        if !self.current_line.is_empty() {
-            self.start_new_line();
-        }
+        self.start_new_line(true);
 
         return std::mem::take(&mut self.lines);
     }
@@ -357,6 +367,54 @@ mod tests {
                 range: Range { start: 47, end: 52 },
             }],
         ];
+
+        assert_eq!(line_ranges, expected_line_ranges);
+    }
+
+    #[test]
+    fn e2e_case3() {
+        init();
+
+        let mut fonts_book = FontsBook::new();
+        fonts_book.load_system_fonts();
+
+        let text = String::from("BLOCKCHAIN        SOLANA");
+        let text_len = text.len();
+        let attrs_intervals = vec![AttrsInterval {
+            start: 0,
+            stop: text_len,
+            val: Attrs::new()
+                .font_family(FontFamily::Monospace)
+                .font_weight(FontWeight::REGULAR)
+                .font_style(FontStyle::Normal)
+                .font_size(Abs::pt(14.0)),
+        }];
+
+        let mut attributed_string = AttributedString::new(
+            text,
+            attrs_intervals,
+            AttributedStringConfig {
+                size: Size::new(Abs::pt(210.0), Abs::pt(20.0)),
+                line_wrap: LineWrap::Word,
+            },
+        );
+
+        attributed_string.tokenize_text(&mut fonts_book);
+
+        let lines = attributed_string.compute_lines();
+        let line_ranges = lines
+            .iter()
+            .map(|line| line.get_span_ranges())
+            .cloned()
+            .collect::<Vec<_>>();
+
+        let expected_line_ranges = vec![vec![SpanRange {
+            index: 0,
+            range: Range {
+                start: 0,
+                end: text_len,
+            },
+        }]];
 
         assert_eq!(line_ranges, expected_line_ranges);
     }
