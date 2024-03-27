@@ -61,7 +61,7 @@ async function processNode(node: FrameNode, instance: TPluginHandler): Promise<v
 			},
 			node: {
 				includeInvisible: false,
-				shouldExportFrame: { format: 'PNG' }
+				shouldExportFrame: false
 			}
 		});
 		await handleSuccess(result, node, instance);

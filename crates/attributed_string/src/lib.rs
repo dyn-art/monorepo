@@ -57,13 +57,30 @@ impl AttributedString {
 
         let mut spans: Vec<SpanToken> = Vec::new();
         let bidi_info = unicode_bidi::BidiInfo::new(&self.text, None);
+        let text_len = self.text.len();
 
         // Determine spans
-        for (index, attrs_interval) in self.attrs_intervals.iter().enumerate() {
+        for (attrs_index, attrs_interval) in self.attrs_intervals.iter().enumerate() {
+            if attrs_interval.start >= text_len {
+                log::warn!(
+                    "Attributes interval overflow for Start: {} at Text length of {}",
+                    attrs_interval.start,
+                    text_len
+                );
+                break;
+            }
             let mut span_start = attrs_interval.start;
             let mut current_bidi_level = bidi_info.levels[span_start];
 
             for i in attrs_interval.start..attrs_interval.stop {
+                if i >= text_len {
+                    log::warn!(
+                        "Attributes interval overflow for Index: {} at Text length of {}",
+                        i,
+                        text_len
+                    );
+                    break;
+                }
                 let char_bidi_level = bidi_info.levels[i];
 
                 // When bidi level changes, create a new span for the previous segment
@@ -72,7 +89,7 @@ impl AttributedString {
                         &self.text,
                         span_start..i,
                         current_bidi_level,
-                        index,
+                        attrs_index,
                         &attrs_interval.val,
                         fonts_book,
                     ));
@@ -83,12 +100,21 @@ impl AttributedString {
                 }
             }
 
+            if attrs_interval.stop > text_len {
+                log::warn!(
+                    "Attributes interval overflow for Stop: {} at Text length of {}",
+                    attrs_interval.stop,
+                    text_len
+                );
+                break;
+            }
+
             // Ensure to add the last span in the current attribute range
             spans.push(SpanToken::from_text(
                 &self.text,
                 span_start..attrs_interval.stop,
                 current_bidi_level,
-                index,
+                attrs_index,
                 &attrs_interval.val,
                 fonts_book,
             ));

@@ -29,7 +29,7 @@ impl SpanToken {
         fonts_book: &mut FontsBook,
     ) -> Self {
         let mut tokens: Vec<ShapeTokenVariant> = Vec::new();
-        let span_text = &text[range.clone()];
+        let span_text = &text[range.clone()]; // TODO: This cause issue if range partly ranges into multi byte char (e.g. "·" if range ends at index 1 although the char is 2 bytes long)
         let mut shape_buffer = ShapeBuffer {
             buffer: Some(rustybuzz::UnicodeBuffer::new()),
         };

@@ -4,7 +4,8 @@
 	"version": "0.0.1",
 	"private": true,
 	"scripts": {
-		"start:dev": "next dev & pnpm run start:dev:rust",
+		"start:dev": "pnpm run start:dev:app & pnpm run start:dev:rust",
+		"start:dev:app": "next dev",
 		"start:dev:rust": "npx vercel dev --listen 3001",
 		"build": "next build",
 		"build:vercel": "cd ../.. && pnpm run prebuild:vercel && turbo run build --filter=web",
