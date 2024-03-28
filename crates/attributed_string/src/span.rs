@@ -1,45 +1,104 @@
-use super::shape::{
-    glyph::GlyphToken, linebreak::LinebreakToken, text_fragment::TextFragmentToken,
-    word_separator::WordSeparatorToken, ShapeBuffer, ShapeToken, ShapeTokenVariant,
-};
-use crate::{attrs::Attrs, utils::is_range_within};
-use dyn_fonts_book::FontsBook;
 use std::ops::Range;
+
+use dyn_fonts_book::FontsBook;
+use rust_lapper::{Interval, Lapper};
 use unicode_linebreak::BreakClass;
 
-/// A span of text with common attributes.
-/// It is guranteed that a span only matches one attribute set.
+use crate::{
+    attrs::Attrs,
+    shape_tokens::{
+        glyph::GlyphToken, linebreak::LinebreakToken, text_fragment::TextFragmentToken,
+        word_separator::WordSeparatorToken, ShapeBuffer, ShapeToken, ShapeTokenVariant,
+    },
+    utils::is_range_within,
+};
+
 #[derive(Debug, Clone)]
-pub struct SpanToken {
+pub struct Span {
     range: Range<usize>,
-    attrs_index: usize,
-    /// Shape tokens within the span, including glyphs, words, and separators.
+    dirty: bool,
     tokens: Vec<ShapeTokenVariant>,
-    /// Bidi level for handling text directionality within the span.
     level: unicode_bidi::Level,
+    attrs: Attrs,
 }
 
-impl SpanToken {
-    pub fn from_text(
-        text: &str,
-        range: Range<usize>,
-        level: unicode_bidi::Level,
-        attrs_index: usize,
-        attrs: &Attrs,
-        fonts_book: &mut FontsBook,
-    ) -> Self {
+impl Span {
+    pub fn new(range: Range<usize>, attrs: Attrs) -> Self {
+        Self {
+            range,
+            dirty: true,
+            tokens: Vec::new(),
+            level: unicode_bidi::LTR_LEVEL,
+            attrs,
+        }
+    }
+
+    #[inline]
+    pub fn get_range(&self) -> &Range<usize> {
+        &self.range
+    }
+
+    #[inline]
+    pub fn is_dirty(&self) -> bool {
+        self.dirty
+    }
+
+    #[inline]
+    pub fn get_tokens(&self) -> &Vec<ShapeTokenVariant> {
+        &self.tokens
+    }
+
+    #[inline]
+    pub fn get_level(&self) -> &unicode_bidi::Level {
+        &self.level
+    }
+
+    #[inline]
+    pub fn get_attrs(&self) -> &Attrs {
+        &self.attrs
+    }
+
+    #[inline]
+    pub fn mark_dirty(&mut self) {
+        self.dirty = true;
+    }
+
+    pub fn divide_at_bidi(self, bidi_info: &unicode_bidi::BidiInfo) -> Vec<Self> {
+        let mut current_bidi_level = bidi_info.levels[self.range.start];
+        let mut new_spans: Vec<Self> = Vec::new();
+        let mut span_start = self.range.start;
+
+        for i in self.range.clone() {
+            let char_bidi_level = bidi_info.levels[i];
+            if char_bidi_level != current_bidi_level {
+                new_spans.push(Self::new(span_start..i, self.attrs.clone()));
+                span_start = i;
+                current_bidi_level = char_bidi_level;
+            }
+        }
+
+        if new_spans.len() > 0 {
+            new_spans.push(Self::new(span_start..self.range.end, self.attrs.clone()))
+        } else {
+            new_spans.push(self)
+        }
+
+        return new_spans;
+    }
+
+    pub fn compute_tokens(&mut self, text: &str, fonts_book: &mut FontsBook) {
         let mut tokens: Vec<ShapeTokenVariant> = Vec::new();
-        let span_text = &text[range.clone()]; // TODO: This cause issue if range partly ranges into multi byte char (e.g. "·" if range ends at index 1 although the char is 2 bytes long)
+        let span_text = &text[self.range.clone()]; // TODO: This cause issue if range partly ranges into multi byte char (e.g. "·" if range ends at index 1 although the char is 2 bytes long)
         let mut shape_buffer = ShapeBuffer {
             buffer: Some(rustybuzz::UnicodeBuffer::new()),
         };
 
-        log::info!("SpanToken for text: '{}' ({:?})", span_text, range);
+        log::info!("SpanToken for text: '{}' ({:?})", span_text, self.range);
 
         // Process each character for potential tokenization within the paragraph
-        let mut start = range.start;
+        let mut start = self.range.start;
         for (index, _char) in span_text.char_indices() {
-            let global_index = range.start + index; // Adjust index relative to the entire text
+            let global_index = self.range.start + index; // Adjust index relative to the entire text
             let break_class = unicode_linebreak::break_property(_char as u32);
 
             match break_class {
@@ -54,7 +113,7 @@ impl SpanToken {
                             TextFragmentToken::from_text(
                                 text,
                                 start..global_index,
-                                attrs,
+                                &self.attrs,
                                 &mut shape_buffer,
                                 fonts_book,
                             ),
@@ -76,7 +135,7 @@ impl SpanToken {
                             TextFragmentToken::from_text(
                                 text,
                                 start..global_index,
-                                attrs,
+                                &self.attrs,
                                 &mut shape_buffer,
                                 fonts_book,
                             ),
@@ -88,7 +147,7 @@ impl SpanToken {
                         WordSeparatorToken::from_text(
                             text,
                             global_index..global_index + 1,
-                            attrs,
+                            &self.attrs,
                             &mut shape_buffer,
                             fonts_book,
                         ),
@@ -100,44 +159,19 @@ impl SpanToken {
         }
 
         // Handle the last text fragment within the paragraph, if any
-        if start < range.end {
+        if start < self.range.end {
             tokens.push(ShapeTokenVariant::TextFragment(
                 TextFragmentToken::from_text(
                     text,
-                    start..range.end,
-                    attrs,
+                    start..self.range.end,
+                    &self.attrs,
                     &mut shape_buffer,
                     fonts_book,
                 ),
             ));
         }
 
-        return Self {
-            range,
-            attrs_index,
-            tokens,
-            level,
-        };
-    }
-
-    #[inline]
-    pub fn get_range(&self) -> &Range<usize> {
-        &self.range
-    }
-
-    #[inline]
-    pub fn get_attrs_index(&self) -> usize {
-        self.attrs_index
-    }
-
-    #[inline]
-    pub fn get_tokens(&self) -> &Vec<ShapeTokenVariant> {
-        &self.tokens
-    }
-
-    #[inline]
-    pub fn get_level(&self) -> &unicode_bidi::Level {
-        &self.level
+        self.tokens = tokens;
     }
 
     pub fn iter_glyphs<'a>(&'a self) -> impl Iterator<Item = &'a GlyphToken> + 'a {
@@ -215,6 +249,9 @@ impl SpanToken {
         GlyphClusterIterator::new(&self.tokens)
     }
 }
+
+pub type SpanInterval = Interval<usize, Span>;
+pub type SpanIntervals = Lapper<usize, Span>;
 
 struct GlyphClusterIterator<'a> {
     glyphs: Vec<&'a GlyphToken>,

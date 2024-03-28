@@ -1,10 +1,12 @@
 pub mod attrs;
 pub mod glyph;
 pub mod glyph_clusters;
+pub mod line;
 pub mod line_wrap;
 pub mod outline;
 pub mod shape;
-pub mod tokens;
+pub mod shape_tokens;
+pub mod span;
 pub mod utils;
 
 use crate::outline::outline;
@@ -16,15 +18,16 @@ use dyn_utils::{
     units::{abs::Abs, em::Em},
 };
 use glam::Vec2;
+use line::Line;
 use line_wrap::{no_wrap::NoLineWrap, word_wrap::WordWrap, LineWrapStrategy};
-use rust_lapper::Lapper;
-use tokens::{line::LineToken, span::SpanToken};
+use rust_lapper::{Interval, Lapper};
+use span::{Span, SpanIntervals};
 
 #[derive(Debug, Clone)]
 pub struct AttributedString {
     text: String,
-    spans: Vec<SpanToken>,
-    lines: Vec<LineToken>,
+    spans: SpanIntervals,
+    lines: Vec<Line>,
     attrs_intervals: AttrsIntervals,
     config: AttributedStringConfig,
 }
@@ -43,9 +46,29 @@ impl AttributedString {
             });
         }
 
+        let text_len = text.len();
+        let bidi_info = unicode_bidi::BidiInfo::new(&text, None);
+        let span_intervals = attrs_intervals
+            .iter()
+            .filter_map(|interval| {
+                if interval.start > 0 && interval.stop <= text_len {
+                    Some(Span::new(interval.start..interval.stop, interval.val.clone()))
+                } else {
+                    log::warn!("Attribute interval from {} to {} was dropped because it was not in the provided text boundaries!", interval.start, interval.stop);
+                    None
+                }
+            })
+            .flat_map(|span| span.divide_at_bidi(&bidi_info))
+            .map(|span| Interval {
+                start: span.get_range().start,
+                stop: span.get_range().end,
+                val: span,
+            })
+            .collect::<Vec<_>>();
+
         return Self {
             text,
-            spans: Vec::new(),
+            spans: Lapper::new(span_intervals),
             lines: Vec::new(),
             attrs_intervals: Lapper::new(attrs_intervals),
             config,
@@ -53,134 +76,82 @@ impl AttributedString {
     }
 
     pub fn tokenize_text(&mut self, fonts_book: &mut FontsBook) {
-        self.devide_overlapping_attrs();
+        self.divide_overlapping_spans();
 
-        let mut spans: Vec<SpanToken> = Vec::new();
-        let bidi_info = unicode_bidi::BidiInfo::new(&self.text, None);
-        let text_len = self.text.len();
-
-        // Determine spans
-        for (attrs_index, attrs_interval) in self.attrs_intervals.iter().enumerate() {
-            if attrs_interval.start >= text_len {
-                log::warn!(
-                    "Attributes interval overflow for Start: {} at Text length of {}",
-                    attrs_interval.start,
-                    text_len
-                );
-                break;
+        for Interval { val: span, .. } in self.spans.iter() {
+            if span.is_dirty() {
+                span.compute_tokens(&self.text, fonts_book);
             }
-            let mut span_start = attrs_interval.start;
-            let mut current_bidi_level = bidi_info.levels[span_start];
-
-            for i in attrs_interval.start..attrs_interval.stop {
-                if i >= text_len {
-                    log::warn!(
-                        "Attributes interval overflow for Index: {} at Text length of {}",
-                        i,
-                        text_len
-                    );
-                    break;
-                }
-                let char_bidi_level = bidi_info.levels[i];
-
-                // When bidi level changes, create a new span for the previous segment
-                if char_bidi_level != current_bidi_level {
-                    spans.push(SpanToken::from_text(
-                        &self.text,
-                        span_start..i,
-                        current_bidi_level,
-                        attrs_index,
-                        &attrs_interval.val,
-                        fonts_book,
-                    ));
-
-                    // Update for the new span
-                    span_start = i;
-                    current_bidi_level = char_bidi_level;
-                }
-            }
-
-            if attrs_interval.stop > text_len {
-                log::warn!(
-                    "Attributes interval overflow for Stop: {} at Text length of {}",
-                    attrs_interval.stop,
-                    text_len
-                );
-                break;
-            }
-
-            // Ensure to add the last span in the current attribute range
-            spans.push(SpanToken::from_text(
-                &self.text,
-                span_start..attrs_interval.stop,
-                current_bidi_level,
-                attrs_index,
-                &attrs_interval.val,
-                fonts_book,
-            ));
-        }
-
-        self.spans = spans;
-    }
-
-    pub fn devide_overlapping_attrs(&mut self) {
-        if !self.attrs_intervals.overlaps_merged {
-            self.attrs_intervals.divide_overlaps_with(|overlaps| {
-                let mut merged_attrs = Attrs::new();
-                for &attrs in overlaps.iter() {
-                    merged_attrs.merge(attrs.clone());
-                }
-                return merged_attrs;
-            });
         }
     }
 
-    pub fn compute_lines(&self) -> Vec<LineToken> {
+    pub fn divide_overlapping_spans(&mut self) {
+        if !self.spans.overlaps_merged {
+            self.spans
+                .divide_overlaps_with(|overlaps, range| match overlaps.len() {
+                    0 => panic!("Failed to devide overlapping spans!"), // Should never happen
+                    1 => {
+                        let mut overlap = overlaps[0].clone();
+                        if overlap.get_range().clone() != range {
+                            overlap.mark_dirty();
+                        }
+
+                        return overlap;
+                    }
+                    _ => {
+                        let mut merged_attrs = Attrs::new();
+                        for &span in overlaps.iter() {
+                            merged_attrs.merge(span.get_attrs().clone());
+                        }
+
+                        return Span::new(range, merged_attrs);
+                    }
+                });
+        }
+    }
+
+    pub fn compute_lines(&self) -> Vec<Line> {
         let mut line_wrap_strategy: Box<dyn LineWrapStrategy> = match self.config.line_wrap {
             LineWrap::None => Box::new(NoLineWrap),
             LineWrap::Word => Box::new(WordWrap::new()),
             _ => Box::new(NoLineWrap),
         };
-        return line_wrap_strategy.compute_lines(
-            &self.spans,
-            &self.attrs_intervals,
-            &self.config.size,
-            &self.text,
-        );
+        return line_wrap_strategy.compute_lines(&self.spans, &self.config.size, &self.text);
     }
 
     pub fn layout(&mut self) {
         let lines = self.compute_lines();
 
-        // Apply layout based on line tokens
+        // Layout tokens based on lines
         let mut current_pos = Vec2::new(0.0, 0.0);
         for (index, line) in lines.iter().enumerate() {
-            if line.get_span_ranges().is_empty() {
+            if line.get_ranges().is_empty() {
                 continue;
             }
 
             current_pos.x = 0.0;
             current_pos.y += if index == 0 {
-                line.max_ascent(&self.spans, &self.attrs_intervals)
+                line.max_ascent(&self.spans)
             } else {
-                line.max_height(&self.spans, &self.attrs_intervals)
+                line.max_height(&self.spans)
             };
 
-            for span_range in line.get_span_ranges().iter() {
-                let span = &mut self.spans[span_range.index];
-                let attrs = &self.attrs_intervals.intervals[span.get_attrs_index()].val;
-                let font_size = attrs.get_font_size();
+            for range in line.get_ranges().iter() {
+                for Interval { val: span, .. } in self.spans.find(range.start, range.end) {
+                    let font_size = span.get_attrs().get_font_size();
 
-                for glyph_token in span.iter_glyphs_in_range_mut(&span_range.range) {
-                    let x_advance = glyph_token.get_glyph().x_advance.at(font_size).to_pt();
+                    // TODO: Need mutable find for lapper
+                    for glyph_token in span.iter_glyphs_in_range_mut(&range) {
+                        let x_advance = glyph_token.get_glyph().x_advance.at(font_size).to_pt();
 
-                    glyph_token.set_transform(
-                        glyph_token
-                            .get_transform()
-                            .pre_translate(current_pos.x, current_pos.y),
-                    );
+                        glyph_token.set_transform(
+                            glyph_token
+                                .get_transform()
+                                .pre_translate(current_pos.x, current_pos.y),
+                        );
 
-                    current_pos.x += x_advance;
+                        current_pos.x += x_advance;
+                    }
                 }
             }
         }
@@ -191,12 +162,11 @@ impl AttributedString {
     pub fn to_path(&self, fonts_book: &mut FontsBook) -> Option<tiny_skia_path::Path> {
         let mut text_builder = tiny_skia_path::PathBuilder::new();
 
-        for span in self.spans.iter() {
-            let attrs = &self.attrs_intervals.intervals[span.get_attrs_index()].val;
+        for Interval { val: span, .. } in self.spans.iter() {
             let mut span_builder = tiny_skia_path::PathBuilder::new();
 
-            if let Some(font) = fonts_book.get_font_by_info(attrs.get_font_info()) {
-                let font_size = attrs.get_font_size();
+            if let Some(font) = fonts_book.get_font_by_info(span.get_attrs().get_font_info()) {
+                let font_size = span.get_attrs().get_font_size();
 
                 for (cluster, byte_index) in span.iter_glyph_clusters() {
                     let mut cluster_builder = tiny_skia_path::PathBuilder::new();
