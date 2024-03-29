@@ -1,5 +1,5 @@
 use crate::span::SpanIntervals;
-use dyn_utils::units::{abs::Abs, em::Em};
+use dyn_utils::units::abs::Abs;
 use rust_lapper::Interval;
 use std::ops::Range;
 
@@ -34,12 +34,12 @@ impl Line {
         for range in self.ranges.iter() {
             for Interval { val: span, .. } in spans.find(range.start, range.end) {
                 for glyph_token in span.iter_glyphs_in_range(range) {
-                    current_height = current_height.max(
-                        glyph_token
-                            .get_glyph()
-                            .height()
-                            .at(span.get_attrs().get_font_size()),
-                    );
+                    let height = span
+                        .get_attrs()
+                        .get_line_height()
+                        .unwrap_or(glyph_token.get_glyph().height());
+                    current_height =
+                        current_height.max(height.at(span.get_attrs().get_font_size()));
                 }
             }
         }

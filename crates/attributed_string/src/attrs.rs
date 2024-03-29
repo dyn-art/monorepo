@@ -18,6 +18,7 @@ pub struct Attrs {
     pub apply_kerning: Option<bool>,
     pub letter_spacing: Option<Em>,
     pub word_spacing: Option<Em>,
+    pub line_height: Option<Em>,
 }
 
 impl Attrs {
@@ -33,6 +34,7 @@ impl Attrs {
             apply_kerning: None,
             letter_spacing: None,
             word_spacing: None,
+            line_height: None,
         }
     }
 
@@ -127,6 +129,15 @@ impl Attrs {
 
     pub fn get_word_spacing(&self) -> Em {
         self.word_spacing.unwrap_or(Em::zero())
+    }
+
+    pub fn line_height(mut self, line_height: Em) -> Self {
+        self.line_height = Some(line_height);
+        self
+    }
+
+    pub fn get_line_height(&self) -> Option<Em> {
+        self.line_height
     }
 
     pub fn get_font_info(&self) -> FontInfo {

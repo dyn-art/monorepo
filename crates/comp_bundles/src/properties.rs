@@ -50,6 +50,7 @@ impl TextAttributeInterval {
                 apply_kerning: self.attributes.apply_kerning,
                 letter_spacing: self.attributes.letter_spacing,
                 word_spacing: self.attributes.word_spacing,
+                line_height: self.attributes.line_height,
             },
         }
     }
@@ -80,4 +81,6 @@ pub struct TextAttributes {
     pub letter_spacing: Option<Em>,
     #[cfg_attr(feature = "serde_support", serde(default))]
     pub word_spacing: Option<Em>,
+    #[cfg_attr(feature = "serde_support", serde(default))]
+    pub line_height: Option<Em>,
 }
