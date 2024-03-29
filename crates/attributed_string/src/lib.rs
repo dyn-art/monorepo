@@ -4,6 +4,7 @@ pub mod glyph_clusters;
 pub mod line;
 pub mod line_wrap;
 pub mod outline;
+pub mod script;
 pub mod shape;
 pub mod shape_tokens;
 pub mod span;
@@ -17,7 +18,6 @@ use dyn_utils::{
     properties::size::Size,
     units::{abs::Abs, em::Em},
 };
-use glam::Vec2;
 use line::Line;
 use line_wrap::{no_wrap::NoLineWrap, word_wrap::WordWrap, LineWrapStrategy};
 use rust_lapper::{Interval, Lapper};
@@ -57,7 +57,7 @@ impl AttributedString {
                     None
                 }
             })
-            .flat_map(|span| span.divide_at_bidi(&bidi_info))
+            .flat_map(|span| span.divide_at_bidi_level(&bidi_info))
             .map(|span| Interval {
                 start: span.get_range().start,
                 stop: span.get_range().end,
@@ -118,17 +118,26 @@ impl AttributedString {
     }
 
     pub fn layout(&mut self) {
+        for (span, ..) in self.spans.iter_mut() {
+            span.apply_letter_spacing();
+            span.apply_word_spacing();
+        }
+        self.layout_lines();
+    }
+
+    pub fn layout_lines(&mut self) {
         let lines = self.compute_lines();
 
         // Layout tokens based on lines
-        let mut current_pos = Vec2::new(0.0, 0.0);
+        let mut current_pos_x: Abs;
+        let mut current_pos_y = Abs::zero();
         for (index, line) in lines.iter().enumerate() {
             if line.get_ranges().is_empty() {
                 continue;
             }
 
-            current_pos.x = 0.0;
-            current_pos.y += if index == 0 {
+            current_pos_x = Abs::zero();
+            current_pos_y += if index == 0 {
                 line.max_ascent(&self.spans)
             } else {
                 line.max_height(&self.spans)
@@ -137,18 +146,12 @@ impl AttributedString {
             for range in line.get_ranges().iter() {
                 for (span, ..) in self.spans.find_mut(range.start, range.end) {
                     let font_size = span.get_attrs().get_font_size();
-
-                    // TODO: Need mutable find for lapper
                     for glyph_token in span.iter_glyphs_in_range_mut(&range) {
-                        let x_advance = glyph_token.get_glyph().x_advance.at(font_size).to_pt();
+                        glyph_token.transform = glyph_token
+                            .transform
+                            .pre_translate(current_pos_x.to_pt(), current_pos_y.to_pt());
 
-                        glyph_token.set_transform(
-                            glyph_token
-                                .get_transform()
-                                .pre_translate(current_pos.x, current_pos.y),
-                        );
-
-                        current_pos.x += x_advance;
+                        current_pos_x += glyph_token.x_advance.at(font_size);
                     }
                 }
             }
@@ -166,7 +169,7 @@ impl AttributedString {
             if let Some(font) = fonts_book.get_font_by_info(span.get_attrs().get_font_info()) {
                 let font_size = span.get_attrs().get_font_size();
 
-                for (cluster, byte_index) in span.iter_glyph_clusters() {
+                for (cluster, _) in span.iter_glyph_clusters() {
                     let mut cluster_builder = tiny_skia_path::PathBuilder::new();
                     let mut width = Abs::zero();
                     let mut x = Em::zero();
@@ -194,15 +197,15 @@ impl AttributedString {
                             if let Some(outline) = outline
                                 .transform(transform)
                                 // TODO: Figure out why pre translating the glyph token transform doesn't work?
-                                .and_then(|p| p.transform(glyph_token.get_transform().clone()))
+                                .and_then(|p| p.transform(glyph_token.transform))
                             {
                                 cluster_builder.push_path(&outline);
                             }
                         }
 
-                        x += glyph_token.get_glyph().x_advance;
+                        x += glyph_token.x_advance;
 
-                        let glyph_width = glyph_token.get_glyph().x_advance.at(font_size);
+                        let glyph_width = glyph_token.x_advance.at(font_size);
                         if glyph_width > width {
                             width = glyph_width;
                         }
@@ -273,7 +276,8 @@ mod tests {
                 val: Attrs::new()
                     .font_family(FontFamily::Monospace)
                     .font_weight(FontWeight::REGULAR)
-                    .font_size(Abs::pt(24.0)),
+                    .font_size(Abs::pt(24.0))
+                    .letter_spacing(Em::new(0.5)),
             },
             AttrsInterval {
                 start: 10,
@@ -281,7 +285,8 @@ mod tests {
                 val: Attrs::new()
                     .font_family(FontFamily::Serif)
                     .font_weight(FontWeight::REGULAR)
-                    .font_size(Abs::pt(12.0)),
+                    .font_size(Abs::pt(12.0))
+                    .word_spacing(Em::new(0.5)),
             },
         ];
 

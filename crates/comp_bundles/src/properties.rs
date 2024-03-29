@@ -5,7 +5,10 @@ use dyn_attributed_string::{
         variant::{FontStretch, FontStyle, FontWeight},
     },
 };
-use dyn_utils::{properties::size::Size, units::abs::Abs};
+use dyn_utils::{
+    properties::size::Size,
+    units::{abs::Abs, em::Em},
+};
 use glam::Vec2;
 
 #[derive(Debug, Default, Copy, Clone)]
@@ -45,6 +48,8 @@ impl TextAttributeInterval {
                 font_size: self.attributes.font_size,
                 small_caps: self.attributes.small_caps,
                 apply_kerning: self.attributes.apply_kerning,
+                letter_spacing: self.attributes.letter_spacing,
+                word_spacing: self.attributes.word_spacing,
             },
         }
     }
@@ -71,4 +76,8 @@ pub struct TextAttributes {
     pub small_caps: Option<bool>,
     #[cfg_attr(feature = "serde_support", serde(default))]
     pub apply_kerning: Option<bool>,
+    #[cfg_attr(feature = "serde_support", serde(default))]
+    pub letter_spacing: Option<Em>,
+    #[cfg_attr(feature = "serde_support", serde(default))]
+    pub word_spacing: Option<Em>,
 }

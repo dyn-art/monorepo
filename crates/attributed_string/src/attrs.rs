@@ -3,7 +3,7 @@ use dyn_fonts_book::font::{
     variant::{FontStretch, FontStyle, FontVariant, FontWeight},
     FontId,
 };
-use dyn_utils::units::abs::Abs;
+use dyn_utils::units::{abs::Abs, em::Em};
 use rust_lapper::Interval;
 
 #[derive(Debug, PartialEq, Eq, Clone)]
@@ -16,6 +16,8 @@ pub struct Attrs {
     pub font_size: Option<Abs>,
     pub small_caps: Option<bool>,
     pub apply_kerning: Option<bool>,
+    pub letter_spacing: Option<Em>,
+    pub word_spacing: Option<Em>,
 }
 
 impl Attrs {
@@ -29,6 +31,8 @@ impl Attrs {
             font_size: None,
             small_caps: None,
             apply_kerning: None,
+            letter_spacing: None,
+            word_spacing: None,
         }
     }
 
@@ -105,6 +109,24 @@ impl Attrs {
 
     pub fn get_apply_kerning(&self) -> bool {
         self.apply_kerning.unwrap_or(false)
+    }
+
+    pub fn letter_spacing(mut self, letter_spacing: Em) -> Self {
+        self.letter_spacing = Some(letter_spacing);
+        self
+    }
+
+    pub fn get_letter_spacing(&self) -> Em {
+        self.letter_spacing.unwrap_or(Em::zero())
+    }
+
+    pub fn word_spacing(mut self, word_spacing: Em) -> Self {
+        self.word_spacing = Some(word_spacing);
+        self
+    }
+
+    pub fn get_word_spacing(&self) -> Em {
+        self.word_spacing.unwrap_or(Em::zero())
     }
 
     pub fn get_font_info(&self) -> FontInfo {

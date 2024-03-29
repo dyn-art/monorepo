@@ -101,6 +101,7 @@ pub fn shape_text(
             glyph_id: ttf_parser::GlyphId(
                 info.glyph_id.try_into().expect("Failed to cast glyph id!"),
             ),
+            codepoint: text[start_glyph..].chars().next().unwrap(),
             range: Range {
                 start: start_glyph,
                 end: range.end, // Set later to adjust for glyph clusters (graphemes)

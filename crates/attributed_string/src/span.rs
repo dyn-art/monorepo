@@ -1,17 +1,18 @@
-use std::ops::Range;
-
-use dyn_fonts_book::FontsBook;
-use rust_lapper::{Interval, Lapper};
-use unicode_linebreak::BreakClass;
-
 use crate::{
     attrs::Attrs,
+    script::script_supports_letter_spacing,
     shape_tokens::{
         glyph::GlyphToken, linebreak::LinebreakToken, text_fragment::TextFragmentToken,
         word_separator::WordSeparatorToken, ShapeBuffer, ShapeToken, ShapeTokenVariant,
     },
     utils::is_range_within,
 };
+use dyn_fonts_book::FontsBook;
+use dyn_utils::units::{em::Em, Numeric};
+use rust_lapper::{Interval, Lapper};
+use std::ops::Range;
+use unicode_linebreak::BreakClass;
+use unicode_script::UnicodeScript;
 
 #[derive(Debug, Clone)]
 pub struct Span {
@@ -63,7 +64,7 @@ impl Span {
         self.dirty = true;
     }
 
-    pub fn divide_at_bidi(self, bidi_info: &unicode_bidi::BidiInfo) -> Vec<Self> {
+    pub fn divide_at_bidi_level(self, bidi_info: &unicode_bidi::BidiInfo) -> Vec<Self> {
         let mut current_bidi_level = bidi_info.levels[self.range.start];
         let mut new_spans: Vec<Self> = Vec::new();
         let mut span_start = self.range.start;
@@ -88,7 +89,13 @@ impl Span {
 
     pub fn compute_tokens(&mut self, text: &str, fonts_book: &mut FontsBook) {
         let mut tokens: Vec<ShapeTokenVariant> = Vec::new();
-        let span_text = &text[self.range.clone()]; // TODO: This cause issue if range partly ranges into multi byte char (e.g. "·" if range ends at index 1 although the char is 2 bytes long)
+        let span_text = match text.get(self.range.clone()) {
+            Some(v) => v,
+            None => {
+                log::error!("Failed to retrieve text slice for range {:?}! Either the range is out of bound or partly ranges into a multi byte char (e.g. '·' if range ends at index 1 although the char is 2 bytes long).", self.range);
+                return;
+            }
+        };
         let mut shape_buffer = ShapeBuffer {
             buffer: Some(rustybuzz::UnicodeBuffer::new()),
         };
@@ -172,6 +179,71 @@ impl Span {
         }
 
         self.tokens = tokens;
+    }
+
+    /// Applies letter-spacing to a span.
+    ///
+    /// [In the CSS spec](https://www.w3.org/TR/css-text-3/#letter-spacing-property)
+    pub fn apply_letter_spacing(&mut self) {
+        let letter_spacing = self.attrs.get_letter_spacing();
+        if letter_spacing.is_zero() {
+            return;
+        }
+
+        let glyps_len = self.get_glyphs_len();
+        for (index, glyph_token) in self.iter_glyphs_mut().enumerate() {
+            let script = glyph_token.get_glyph().codepoint.script();
+            if script_supports_letter_spacing(script) {
+                // A space after the last cluster should be ignored,
+                // since it affects the bbox and text alignment.
+                if index != glyps_len - 1 {
+                    glyph_token.x_advance += letter_spacing;
+                }
+
+                // If the cluster advance became negative - clear it.
+                // This is an UB so we can do whatever we want, and we mimic Chrome's behavior.
+                if !glyph_token.x_advance.is_finite() && glyph_token.x_advance.get() < 0.0 {
+                    glyph_token.x_advance = Em::zero();
+                }
+            }
+        }
+    }
+
+    /// Applies word-spacing to a span.
+    ///
+    /// [In the CSS spec](https://www.w3.org/TR/css-text-3/#propdef-word-spacing)
+    pub fn apply_word_spacing(&mut self) {
+        let word_spacing = self.attrs.get_word_spacing();
+        if word_spacing.is_zero() {
+            return;
+        }
+
+        for token_variant in self.tokens.iter_mut() {
+            match token_variant {
+                ShapeTokenVariant::WordSeparator(token) => {
+                    if let Some(glyph_token) = token.get_tokens_mut().first_mut() {
+                        // Technically, word spacing 'should be applied half on each
+                        // side of the character', but it doesn't affect us in any way,
+                        // so we are ignoring this.
+                        glyph_token.x_advance += word_spacing;
+                    }
+                }
+                _ => {}
+            }
+        }
+    }
+
+    pub fn get_glyphs_len(&self) -> usize {
+        let mut length = 0;
+        for token_variant in self.tokens.iter() {
+            length += match token_variant {
+                ShapeTokenVariant::Glyph(_) => 1,
+                ShapeTokenVariant::TextFragment(token) => token.get_tokens().len(),
+                ShapeTokenVariant::WordSeparator(token) => token.get_tokens().len(),
+                _ => 0,
+            };
+        }
+        return length;
     }
 
     pub fn iter_glyphs<'a>(&'a self) -> impl Iterator<Item = &'a GlyphToken> + 'a {

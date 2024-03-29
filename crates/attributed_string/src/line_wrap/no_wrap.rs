@@ -12,11 +12,11 @@ use std::ops::Range;
 pub struct NoLineWrap;
 
 impl LineWrapStrategy for NoLineWrap {
-    fn compute_lines(&mut self, spans: &SpanIntervals, size: &Size, _: &str) -> Vec<Line> {
+    fn compute_lines(&mut self, spans: &SpanIntervals, _: &Size, _: &str) -> Vec<Line> {
         let mut lines: Vec<Line> = Vec::new();
         let mut current_line_ranges: Vec<Range<usize>> = Vec::new();
 
-        for (index, Interval { val: span, .. }) in spans.iter().enumerate() {
+        for Interval { val: span, .. } in spans.iter() {
             let mut span_range_start = span.get_range().start;
 
             for token_variant in span.get_tokens() {

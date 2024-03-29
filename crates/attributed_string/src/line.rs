@@ -1,4 +1,5 @@
 use crate::span::SpanIntervals;
+use dyn_utils::units::{abs::Abs, em::Em};
 use rust_lapper::Interval;
 use std::ops::Range;
 
@@ -27,8 +28,8 @@ impl Line {
         &self.ranges
     }
 
-    pub fn max_height(&self, spans: &SpanIntervals) -> f32 {
-        let mut current_height: f32 = 0.0;
+    pub fn max_height(&self, spans: &SpanIntervals) -> Abs {
+        let mut current_height = Abs::zero();
 
         for range in self.ranges.iter() {
             for Interval { val: span, .. } in spans.find(range.start, range.end) {
@@ -37,8 +38,7 @@ impl Line {
                         glyph_token
                             .get_glyph()
                             .height()
-                            .at(span.get_attrs().get_font_size())
-                            .to_pt(),
+                            .at(span.get_attrs().get_font_size()),
                     );
                 }
             }
@@ -47,8 +47,8 @@ impl Line {
         return current_height;
     }
 
-    pub fn max_ascent(&self, spans: &SpanIntervals) -> f32 {
-        let mut current_ascent: f32 = 0.0;
+    pub fn max_ascent(&self, spans: &SpanIntervals) -> Abs {
+        let mut current_ascent = Abs::zero();
 
         for range in self.ranges.iter() {
             for Interval { val: span, .. } in spans.find(range.start, range.end) {
@@ -57,8 +57,7 @@ impl Line {
                         glyph_token
                             .get_glyph()
                             .ascent
-                            .at(span.get_attrs().get_font_size())
-                            .to_pt(),
+                            .at(span.get_attrs().get_font_size()),
                     );
                 }
             }

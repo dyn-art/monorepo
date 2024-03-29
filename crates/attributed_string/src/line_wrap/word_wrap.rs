@@ -94,7 +94,7 @@ impl WordWrap {
 // TODO: Improve this implementation right now its not efficient in every way
 impl LineWrapStrategy for WordWrap {
     fn compute_lines(&mut self, spans: &SpanIntervals, size: &Size, _: &str) -> Vec<Line> {
-        for (index, Interval { val: span, .. }) in spans.iter().enumerate() {
+        for Interval { val: span, .. } in spans.iter() {
             let mut span_range_start = span.get_range().start;
             let font_size = span.get_attrs().get_font_size();
 

@@ -9,6 +9,8 @@ pub struct Glyph {
     pub font_id: FontId,
     /// A glyph id.
     pub glyph_id: GlyphId,
+    /// Codepoint in the orignal string.
+    pub codepoint: char,
     /// Position in bytes in the original string.
     pub range: Range<usize>,
     /// A width relative the font size.
