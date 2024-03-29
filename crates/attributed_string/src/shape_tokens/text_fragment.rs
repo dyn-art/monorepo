@@ -1,7 +1,7 @@
 use super::{glyph::GlyphToken, ShapeBuffer, ShapeToken};
 use crate::{attrs::Attrs, shape::shape_text_with_fallback};
 use dyn_fonts_book::FontsBook;
-use dyn_utils::units::em::Em;
+use dyn_utils::units::{abs::Abs, em::Em};
 use std::ops::Range;
 
 /// Groups glyphs into a continuous fragment of text, typically a word or number.
@@ -55,10 +55,10 @@ impl TextFragmentToken {
         &mut self.tokens
     }
 
-    pub fn x_advance(&self) -> Em {
+    pub fn x_advance(&self) -> Abs {
         self.tokens
             .iter()
-            .fold(Em::zero(), |acc, token| acc + token.get_glyph().x_advance)
+            .fold(Abs::zero(), |acc, token| acc + token.x_advance)
     }
 }
 

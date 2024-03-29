@@ -1,4 +1,5 @@
 import type { COMP } from '@dyn/dtif-comp';
+import { calculateBytes } from '@dyn/utils';
 
 import type {
 	TToTransformFill,
@@ -28,8 +29,8 @@ export function transformTextNode(
 			// Figma works on char and not byte level for their ranges.
 			// e.g. for "·" the end is 1 although it should be 2 on byte level.
 			// Thus we need to map from char to byte level.
-			let currentStart = nextStart === 0 ? attribute.start : nextStart;
-			nextStart = nextStart + bytes(attribute.characters);
+			const currentStart = nextStart === 0 ? attribute.start : nextStart;
+			nextStart = nextStart + calculateBytes(attribute.characters);
 
 			return {
 				start: currentStart,
@@ -39,7 +40,27 @@ export function transformTextNode(
 					fontStretch: attribute.fontInfo.variant.stretch,
 					fontStyle: attribute.fontInfo.variant.style,
 					fontWeight: attribute.fontInfo.variant.weight,
-					fontSize: attribute.fontSize
+					fontSize: attribute.fontSize,
+					letterSpacing:
+						attribute.letterSpacing.unit === 'PERCENT'
+							? {
+									type: 'Em',
+									value: attribute.letterSpacing.value / 100
+								}
+							: { type: 'Abs', value: attribute.letterSpacing.value },
+					lineHeight:
+						// eslint-disable-next-line no-nested-ternary -- Ok here
+						attribute.lineHeight.unit === 'AUTO'
+							? undefined
+							: attribute.lineHeight.unit === 'PERCENT'
+								? {
+										type: 'Em',
+										value: attribute.lineHeight.value / 100
+									}
+								: {
+										type: 'Abs',
+										value: attribute.lineHeight.value
+									}
 				}
 			};
 		}),
@@ -57,35 +78,4 @@ export function transformTextNode(
 interface TTransformTextNodeNodeConfig {
 	fills: TToTransformFill[];
 	strokes: TToTransformStroke[];
-}
-
-// Custom implementation because "TextEncoder", "Blob", "Buffer" is ofc not supported in Figma Plugin environment
-// https://stackoverflow.com/questions/2219526/how-many-bytes-in-a-javascript-string
-function bytes(str: String) {
-	let bytes = 0,
-		len = str.length,
-		codePoint,
-		next,
-		i;
-
-	for (i = 0; i < len; i++) {
-		codePoint = str.charCodeAt(i);
-
-		// Lone surrogates cannot be passed to encodeURI
-		if (codePoint >= 0xd800 && codePoint < 0xe000) {
-			if (codePoint < 0xdc00 && i + 1 < len) {
-				next = str.charCodeAt(i + 1);
-
-				if (next >= 0xdc00 && next < 0xe000) {
-					bytes += 4;
-					i++;
-					continue;
-				}
-			}
-		}
-
-		bytes += codePoint < 0x80 ? 1 : codePoint < 0x800 ? 2 : 3;
-	}
-
-	return bytes;
 }

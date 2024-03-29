@@ -96,19 +96,15 @@ impl LineWrapStrategy for WordWrap {
     fn compute_lines(&mut self, spans: &SpanIntervals, size: &Size, _: &str) -> Vec<Line> {
         for Interval { val: span, .. } in spans.iter() {
             let mut span_range_start = span.get_range().start;
-            let font_size = span.get_attrs().get_font_size();
 
             for token_variant in span.get_tokens() {
                 let (token_width, token_range_end) = match token_variant {
-                    ShapeTokenVariant::Glyph(token) => (
-                        token.get_glyph().x_advance.at(font_size),
-                        token.get_range().end,
-                    ),
+                    ShapeTokenVariant::Glyph(token) => (token.x_advance, token.get_range().end),
                     ShapeTokenVariant::TextFragment(token) => {
-                        (token.x_advance().at(font_size), token.get_range().end)
+                        (token.x_advance(), token.get_range().end)
                     }
                     ShapeTokenVariant::WordSeparator(token) => {
-                        (token.x_advance().at(font_size), token.get_range().end)
+                        (token.x_advance(), token.get_range().end)
                     }
                     ShapeTokenVariant::Linebreak(token) => (Abs::pt(0.0), token.get_range().end),
                     ShapeTokenVariant::Bitmap(token) => (Abs::pt(0.0), token.get_range().end),
