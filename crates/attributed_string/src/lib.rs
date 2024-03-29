@@ -14,10 +14,7 @@ use crate::outline::outline;
 use attrs::{Attrs, AttrsInterval};
 pub use dyn_fonts_book;
 use dyn_fonts_book::FontsBook;
-use dyn_utils::{
-    properties::size::Size,
-    units::{abs::Abs, em::Em},
-};
+use dyn_utils::{properties::size::Size, units::abs::Abs};
 use line::Line;
 use line_wrap::{no_wrap::NoLineWrap, word_wrap::WordWrap, LineWrapStrategy};
 use rust_lapper::{Interval, Lapper};
@@ -145,13 +142,12 @@ impl AttributedString {
 
             for range in line.get_ranges().iter() {
                 for (span, ..) in self.spans.find_mut(range.start, range.end) {
-                    let font_size = span.get_attrs().get_font_size();
                     for glyph_token in span.iter_glyphs_in_range_mut(&range) {
                         glyph_token.transform = glyph_token
                             .transform
                             .pre_translate(current_pos_x.to_pt(), current_pos_y.to_pt());
 
-                        current_pos_x += glyph_token.x_advance.at(font_size);
+                        current_pos_x += glyph_token.x_advance;
                     }
                 }
             }
@@ -172,7 +168,7 @@ impl AttributedString {
                 for (cluster, _) in span.iter_glyph_clusters() {
                     let mut cluster_builder = tiny_skia_path::PathBuilder::new();
                     let mut width = Abs::zero();
-                    let mut x = Em::zero();
+                    let mut x = Abs::zero();
 
                     for glyph_token in cluster {
                         let sx = font.get_scale_factor(font_size);
@@ -184,28 +180,25 @@ impl AttributedString {
                             // Scale to font-size
                             transform = transform.pre_scale(sx.to_pt(), sx.to_pt());
 
-                            // Apply offset.
+                            // Apply offset and transform.
                             //
                             // The first glyph in the cluster will have an offset from 0x0,
                             // but the later one will have an offset from the "current position".
                             // So we have to keep an advance.
-                            transform = transform.pre_translate(
-                                (x + glyph_token.get_glyph().x_offset).get(),
-                                glyph_token.get_glyph().y_offset.get(),
-                            );
+                            transform.tx += (x + glyph_token.get_glyph().x_offset.at(font_size))
+                                .to_pt()
+                                + glyph_token.transform.tx;
+                            transform.ty += glyph_token.get_glyph().y_offset.at(font_size).to_pt()
+                                + glyph_token.transform.ty;
 
-                            if let Some(outline) = outline
-                                .transform(transform)
-                                // TODO: Figure out why pre translating the glyph token transform doesn't work?
-                                .and_then(|p| p.transform(glyph_token.transform))
-                            {
+                            if let Some(outline) = outline.transform(transform) {
                                 cluster_builder.push_path(&outline);
                             }
                         }
 
                         x += glyph_token.x_advance;
 
-                        let glyph_width = glyph_token.x_advance.at(font_size);
+                        let glyph_width = glyph_token.x_advance;
                         if glyph_width > width {
                             width = glyph_width;
                         }
@@ -253,6 +246,7 @@ pub enum LineWrap {
 mod tests {
     use super::*;
     use dyn_fonts_book::font::{info::FontFamily, variant::FontWeight};
+    use dyn_utils::units::{em::Em, font_unit::FontUnit};
     use unicode_bidi::BidiInfo;
 
     fn init() {
@@ -277,7 +271,7 @@ mod tests {
                     .font_family(FontFamily::Monospace)
                     .font_weight(FontWeight::REGULAR)
                     .font_size(Abs::pt(24.0))
-                    .letter_spacing(Em::new(0.5)),
+                    .letter_spacing(FontUnit::em(Em::new(0.5))),
             },
             AttrsInterval {
                 start: 10,
@@ -286,7 +280,7 @@ mod tests {
                     .font_family(FontFamily::Serif)
                     .font_weight(FontWeight::REGULAR)
                     .font_size(Abs::pt(12.0))
-                    .word_spacing(Em::new(0.5)),
+                    .word_spacing(FontUnit::em(Em::new(0.5))),
             },
         ];
 

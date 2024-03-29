@@ -1,6 +1,6 @@
 use super::ShapeToken;
 use crate::glyph::Glyph;
-use dyn_utils::units::em::Em;
+use dyn_utils::units::abs::Abs;
 use std::ops::Range;
 use tiny_skia_path::Transform;
 
@@ -10,22 +10,22 @@ pub struct GlyphToken {
     glyph: Glyph,
     /// Cached transform after applying the layout.
     pub transform: Transform,
-    /// Cached advance in horizontal direction after applying layout relative the font size.
-    pub x_advance: Em,
-    /// Cached advance in vertical direction after applying layout relative the font size.
-    pub y_advance: Em,
+    /// Cached advance in horizontal direction after applying layout.
+    pub x_advance: Abs,
+    /// Cached advance in vertical direction after applying layout.
+    pub y_advance: Abs,
 }
 
 impl GlyphToken {
-    pub fn new(glyph: Glyph) -> Self {
+    pub fn new(glyph: Glyph, font_size: Abs) -> Self {
         let x_advance = glyph.x_advance;
         let y_advance = glyph.y_advance;
 
         Self {
             glyph,
             transform: Transform::default(),
-            x_advance,
-            y_advance,
+            x_advance: x_advance.at(font_size),
+            y_advance: y_advance.at(font_size),
         }
     }
 

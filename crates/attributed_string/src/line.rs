@@ -37,9 +37,14 @@ impl Line {
                     let height = span
                         .get_attrs()
                         .get_line_height()
-                        .unwrap_or(glyph_token.get_glyph().height());
-                    current_height =
-                        current_height.max(height.at(span.get_attrs().get_font_size()));
+                        .map(|h| h.at(span.get_attrs().get_font_size()))
+                        .unwrap_or(
+                            glyph_token
+                                .get_glyph()
+                                .height()
+                                .at(span.get_attrs().get_font_size()),
+                        );
+                    current_height = current_height.max(height);
                 }
             }
         }

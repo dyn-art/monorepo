@@ -7,7 +7,7 @@ use dyn_attributed_string::{
 };
 use dyn_utils::{
     properties::size::Size,
-    units::{abs::Abs, em::Em},
+    units::{abs::Abs, font_unit::FontUnit},
 };
 use glam::Vec2;
 
@@ -78,9 +78,9 @@ pub struct TextAttributes {
     #[cfg_attr(feature = "serde_support", serde(default))]
     pub apply_kerning: Option<bool>,
     #[cfg_attr(feature = "serde_support", serde(default))]
-    pub letter_spacing: Option<Em>,
+    pub letter_spacing: Option<FontUnit>,
     #[cfg_attr(feature = "serde_support", serde(default))]
-    pub word_spacing: Option<Em>,
+    pub word_spacing: Option<FontUnit>,
     #[cfg_attr(feature = "serde_support", serde(default))]
-    pub line_height: Option<Em>,
+    pub line_height: Option<FontUnit>,
 }

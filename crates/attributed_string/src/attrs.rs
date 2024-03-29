@@ -3,7 +3,7 @@ use dyn_fonts_book::font::{
     variant::{FontStretch, FontStyle, FontVariant, FontWeight},
     FontId,
 };
-use dyn_utils::units::{abs::Abs, em::Em};
+use dyn_utils::units::{abs::Abs, font_unit::FontUnit};
 use rust_lapper::Interval;
 
 #[derive(Debug, PartialEq, Eq, Clone)]
@@ -16,9 +16,9 @@ pub struct Attrs {
     pub font_size: Option<Abs>,
     pub small_caps: Option<bool>,
     pub apply_kerning: Option<bool>,
-    pub letter_spacing: Option<Em>,
-    pub word_spacing: Option<Em>,
-    pub line_height: Option<Em>,
+    pub letter_spacing: Option<FontUnit>,
+    pub word_spacing: Option<FontUnit>,
+    pub line_height: Option<FontUnit>,
 }
 
 impl Attrs {
@@ -113,30 +113,30 @@ impl Attrs {
         self.apply_kerning.unwrap_or(false)
     }
 
-    pub fn letter_spacing(mut self, letter_spacing: Em) -> Self {
+    pub fn letter_spacing(mut self, letter_spacing: FontUnit) -> Self {
         self.letter_spacing = Some(letter_spacing);
         self
     }
 
-    pub fn get_letter_spacing(&self) -> Em {
-        self.letter_spacing.unwrap_or(Em::zero())
+    pub fn get_letter_spacing(&self) -> FontUnit {
+        self.letter_spacing.unwrap_or(FontUnit::zero())
     }
 
-    pub fn word_spacing(mut self, word_spacing: Em) -> Self {
+    pub fn word_spacing(mut self, word_spacing: FontUnit) -> Self {
         self.word_spacing = Some(word_spacing);
         self
     }
 
-    pub fn get_word_spacing(&self) -> Em {
-        self.word_spacing.unwrap_or(Em::zero())
+    pub fn get_word_spacing(&self) -> FontUnit {
+        self.word_spacing.unwrap_or(FontUnit::zero())
     }
 
-    pub fn line_height(mut self, line_height: Em) -> Self {
+    pub fn line_height(mut self, line_height: FontUnit) -> Self {
         self.line_height = Some(line_height);
         self
     }
 
-    pub fn get_line_height(&self) -> Option<Em> {
+    pub fn get_line_height(&self) -> Option<FontUnit> {
         self.line_height
     }
 

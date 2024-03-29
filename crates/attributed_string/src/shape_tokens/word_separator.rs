@@ -37,7 +37,11 @@ impl WordSeparatorToken {
                 fonts_book,
             );
             shape_buffer.buffer = Some(buffer);
-            tokens.extend(glyphs.into_iter().map(|glyph| GlyphToken::new(glyph)));
+            tokens.extend(
+                glyphs
+                    .into_iter()
+                    .map(|glyph| GlyphToken::new(glyph, attrs.get_font_size())),
+            );
         }
 
         return Self { range, tokens };

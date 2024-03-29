@@ -8,7 +8,7 @@ use crate::{
     utils::is_range_within,
 };
 use dyn_fonts_book::FontsBook;
-use dyn_utils::units::{em::Em, Numeric};
+use dyn_utils::units::{abs::Abs, Numeric};
 use rust_lapper::{Interval, Lapper};
 use std::ops::Range;
 use unicode_linebreak::BreakClass;
@@ -191,19 +191,20 @@ impl Span {
         }
 
         let glyps_len = self.get_glyphs_len();
+        let font_size = self.attrs.get_font_size();
         for (index, glyph_token) in self.iter_glyphs_mut().enumerate() {
             let script = glyph_token.get_glyph().codepoint.script();
             if script_supports_letter_spacing(script) {
                 // A space after the last cluster should be ignored,
                 // since it affects the bbox and text alignment.
                 if index != glyps_len - 1 {
-                    glyph_token.x_advance += letter_spacing;
+                    glyph_token.x_advance += letter_spacing.at(font_size);
                 }
 
                 // If the cluster advance became negative - clear it.
                 // This is an UB so we can do whatever we want, and we mimic Chrome's behavior.
-                if !glyph_token.x_advance.is_finite() && glyph_token.x_advance.get() < 0.0 {
-                    glyph_token.x_advance = Em::zero();
+                if !glyph_token.x_advance.is_finite() && glyph_token.x_advance < Abs::zero() {
+                    glyph_token.x_advance = Abs::zero();
                 }
             }
         }
@@ -225,7 +226,7 @@ impl Span {
                         // Technically, word spacing 'should be applied half on each
                         // side of the character', but it doesn't affect us in any way,
                         // so we are ignoring this.
-                        glyph_token.x_advance += word_spacing;
+                        glyph_token.x_advance += word_spacing.at(self.attrs.get_font_size());
                     }
                 }
                 _ => {}
