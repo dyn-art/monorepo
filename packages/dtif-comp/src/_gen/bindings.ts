@@ -139,6 +139,13 @@ export type DtifInputEvent = ({ type: "CompositionResized" } & DtifCompositionRe
 
 export type EllipseNode = { startingAngle?: number; endingAngle?: number; innerRadiusRatio?: number; translation?: Vec2; rotationDeg?: Angle; size: Size; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; styles?: Style[] }
 
+/**
+ * A length that is relative to the font size.
+ * 
+ * `1em` is the same as the font size.
+ */
+export type Em = Scalar
+
 export type Entity = number
 
 export type EntityDeletedInputEvent = { entity: Entity }
@@ -215,6 +222,12 @@ export type FontStyle =
  * Just a slanted version of the normal style.
  */
 "Oblique"
+
+/**
+ * A font unit.
+ * https://fonts.google.com/knowledge/glossary/unit
+ */
+export type FontUnit = { type: "Abs"; value: Abs } | { type: "Em"; value: Em }
 
 /**
  * Properties that distinguish a font from other fonts in the same family.
@@ -472,7 +485,7 @@ export type SvgUnits = "UserSpaceOnUse" | "ObjectBoundingBox"
 
 export type TextAttributeInterval = { start: number; end: number; attributes: TextAttributes }
 
-export type TextAttributes = { fontFamily?: FontFamily | null; fontStyle?: FontStyle | null; fontStretch?: FontStretch | null; fontWeight?: FontWeight | null; fontSize?: Abs | null; smallCaps?: boolean | null; applyKerning?: boolean | null }
+export type TextAttributes = { fontFamily?: FontFamily | null; fontStyle?: FontStyle | null; fontStretch?: FontStretch | null; fontWeight?: FontWeight | null; fontSize?: Abs | null; smallCaps?: boolean | null; applyKerning?: boolean | null; letterSpacing?: FontUnit | null; wordSpacing?: FontUnit | null; lineHeight?: FontUnit | null }
 
 export type TextNode = { text: string; attributes: TextAttributeInterval[]; lineWrap?: LineWrap; translation?: Vec2; rotationDeg?: Angle; size: Size; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; styles?: Style[] }
 

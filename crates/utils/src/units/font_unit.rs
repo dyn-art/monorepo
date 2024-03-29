@@ -9,44 +9,46 @@ use super::{abs::Abs, em::Em, Numeric};
     serde(tag = "type")
 )]
 pub enum FontUnit {
-    Abs(Abs),
-    Em(Em),
+    Abs { value: Abs },
+    Em { value: Em },
 }
 
 impl FontUnit {
     /// The zero font unit.
     pub const fn zero() -> Self {
-        Self::Abs(Abs::zero())
+        Self::Abs { value: Abs::zero() }
     }
 
     /// Create a font-relative length.
-    pub fn em(em: Em) -> Self {
-        Self::Em(em)
+    pub fn em(value: Em) -> Self {
+        Self::Em { value }
     }
 
     /// Create a font-absolute length.
-    pub fn abs(abs: Abs) -> Self {
-        Self::Abs(abs)
+    pub fn abs(value: Abs) -> Self {
+        Self::Abs { value }
     }
 
     /// Convert to an absolute length at the given font size.
     pub fn at(&self, font_size: Abs) -> Abs {
         match self {
-            Self::Abs(abs) => *abs,
-            Self::Em(em) => em.at(font_size),
+            Self::Abs { value } => *value,
+            Self::Em { value } => value.at(font_size),
         }
     }
 
     pub fn is_zero(&self) -> bool {
         match self {
-            Self::Abs(abs) => abs.is_zero(),
-            Self::Em(em) => em.is_zero(),
+            Self::Abs { value } => value.is_zero(),
+            Self::Em { value } => value.is_zero(),
         }
     }
 }
 
 impl Default for FontUnit {
     fn default() -> Self {
-        Self::Abs(Abs::default())
+        Self::Abs {
+            value: Abs::default(),
+        }
     }
 }
