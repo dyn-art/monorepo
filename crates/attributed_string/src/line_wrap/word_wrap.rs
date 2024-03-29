@@ -128,8 +128,9 @@ impl LineWrapStrategy for WordWrap {
                 } else {
                     if should_wrap {
                         self.handle_wrap(token_variant);
-                        // TODO: Should the space be removed? or added to the next line?
-                        // self.add_non_word_part(token_width, span_range);
+                        if self.in_overflow {
+                            self.add_non_word_part(token_width, range);
+                        }
                     } else {
                         if !self.current_word.is_empty() {
                             self.finalize_word();
