@@ -10,7 +10,7 @@ pub mod span;
 pub mod utils;
 
 use crate::outline::outline;
-use attrs::{Attrs, AttrsInterval, AttrsIntervals};
+use attrs::{Attrs, AttrsInterval};
 pub use dyn_fonts_book;
 use dyn_fonts_book::FontsBook;
 use dyn_utils::{
@@ -28,7 +28,6 @@ pub struct AttributedString {
     text: String,
     spans: SpanIntervals,
     lines: Vec<Line>,
-    attrs_intervals: AttrsIntervals,
     config: AttributedStringConfig,
 }
 
@@ -51,7 +50,7 @@ impl AttributedString {
         let span_intervals = attrs_intervals
             .iter()
             .filter_map(|interval| {
-                if interval.start > 0 && interval.stop <= text_len {
+                if  interval.stop <= text_len {
                     Some(Span::new(interval.start..interval.stop, interval.val.clone()))
                 } else {
                     log::warn!("Attribute interval from {} to {} was dropped because it was not in the provided text boundaries!", interval.start, interval.stop);
@@ -70,7 +69,6 @@ impl AttributedString {
             text,
             spans: Lapper::new(span_intervals),
             lines: Vec::new(),
-            attrs_intervals: Lapper::new(attrs_intervals),
             config,
         };
     }
@@ -78,7 +76,7 @@ impl AttributedString {
     pub fn tokenize_text(&mut self, fonts_book: &mut FontsBook) {
         self.divide_overlapping_spans();
 
-        for Interval { val: span, .. } in self.spans.iter() {
+        for (span, ..) in self.spans.iter_mut() {
             if span.is_dirty() {
                 span.compute_tokens(&self.text, fonts_book);
             }
@@ -137,7 +135,7 @@ impl AttributedString {
             };
 
             for range in line.get_ranges().iter() {
-                for Interval { val: span, .. } in self.spans.find(range.start, range.end) {
+                for (span, ..) in self.spans.find_mut(range.start, range.end) {
                     let font_size = span.get_attrs().get_font_size();
 
                     // TODO: Need mutable find for lapper

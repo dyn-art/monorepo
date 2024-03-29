@@ -188,6 +188,24 @@ impl Span {
             })
     }
 
+    pub fn iter_glyphs_in_range<'a>(
+        &'a self,
+        range: &'a Range<usize>,
+    ) -> impl Iterator<Item = &'a GlyphToken> + 'a {
+        self.tokens
+            .iter()
+            .flat_map(|token_variant| match token_variant {
+                ShapeTokenVariant::Glyph(token) => Box::new(std::iter::once(token))
+                    as Box<dyn Iterator<Item = &'a GlyphToken> + 'a>,
+                ShapeTokenVariant::TextFragment(token) => Box::new(token.get_tokens().iter())
+                    as Box<dyn Iterator<Item = &'a GlyphToken> + 'a>,
+                ShapeTokenVariant::WordSeparator(token) => Box::new(token.get_tokens().iter())
+                    as Box<dyn Iterator<Item = &'a GlyphToken> + 'a>,
+                _ => Box::new(std::iter::empty()) as Box<dyn Iterator<Item = &'a GlyphToken> + 'a>,
+            })
+            .filter(move |glyph| is_range_within(glyph.get_range(), &range))
+    }
+
     pub(crate) fn iter_glyphs_mut<'a>(
         &'a mut self,
     ) -> impl Iterator<Item = &'a mut GlyphToken> + 'a {

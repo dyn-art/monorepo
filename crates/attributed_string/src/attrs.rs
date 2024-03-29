@@ -4,7 +4,7 @@ use dyn_fonts_book::font::{
     FontId,
 };
 use dyn_utils::units::abs::Abs;
-use rust_lapper::{Interval, Lapper};
+use rust_lapper::Interval;
 
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct Attrs {
@@ -144,4 +144,3 @@ impl Attrs {
 }
 
 pub type AttrsInterval = Interval<usize, Attrs>;
-pub type AttrsIntervals = Lapper<usize, Attrs>;

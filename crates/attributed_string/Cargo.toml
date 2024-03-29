@@ -24,7 +24,7 @@ dyn-utils = { path = "../utils" }
 fontdb = "0.16.0"
 glam = { workspace = true }
 rustybuzz = "0.13.0"
-rust-lapper = { git = "https://github.com/bennoinbeta/rust-lapper.git", branch = "21-merge-overlaps-loses-values" }
+rust-lapper = { git = "https://github.com/bennoinbeta/rust-lapper.git", rev = "a03107f" }
 smallvec = { workspace = true }
 tiny-skia-path = { workspace = true }
 unicode-bidi = "0.3"

@@ -32,7 +32,7 @@ impl Line {
 
         for range in self.ranges.iter() {
             for Interval { val: span, .. } in spans.find(range.start, range.end) {
-                for glyph_token in span.iter_glyphs_in_range_mut(range) {
+                for glyph_token in span.iter_glyphs_in_range(range) {
                     current_height = current_height.max(
                         glyph_token
                             .get_glyph()
@@ -52,7 +52,7 @@ impl Line {
 
         for range in self.ranges.iter() {
             for Interval { val: span, .. } in spans.find(range.start, range.end) {
-                for glyph_token in span.iter_glyphs_in_range_mut(range) {
+                for glyph_token in span.iter_glyphs_in_range(range) {
                     current_ascent = current_ascent.max(
                         glyph_token
                             .get_glyph()
