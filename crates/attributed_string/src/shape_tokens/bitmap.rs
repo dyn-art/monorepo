@@ -1,4 +1,5 @@
 use super::ShapeToken;
+use dyn_utils::units::abs::Abs;
 use glam::Vec2;
 use std::ops::Range;
 
@@ -17,5 +18,13 @@ pub struct BitmapToken {
 impl ShapeToken for BitmapToken {
     fn get_range(&self) -> &Range<usize> {
         &self.range
+    }
+
+    fn get_width(&self) -> Abs {
+        Abs::pt(self.size.x)
+    }
+
+    fn get_height(&self) -> Abs {
+        Abs::pt(self.size.y)
     }
 }

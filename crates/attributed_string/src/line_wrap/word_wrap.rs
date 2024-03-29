@@ -210,6 +210,7 @@ mod tests {
             AttributedStringConfig {
                 size: Size::new(Abs::pt(150.0), Abs::pt(100.0)),
                 line_wrap: LineWrap::Word,
+                ..Default::default()
             },
         );
 
@@ -286,6 +287,7 @@ mod tests {
             AttributedStringConfig {
                 size: Size::new(Abs::pt(378.0), Abs::pt(238.0)),
                 line_wrap: LineWrap::Word,
+                ..Default::default()
             },
         );
 
@@ -334,6 +336,7 @@ mod tests {
             AttributedStringConfig {
                 size: Size::new(Abs::pt(202.0), Abs::pt(16.0)),
                 line_wrap: LineWrap::Word,
+                ..Default::default()
             },
         );
 

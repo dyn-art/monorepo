@@ -38,4 +38,12 @@ impl ShapeToken for GlyphToken {
     fn get_range(&self) -> &Range<usize> {
         &self.glyph.range
     }
+
+    fn get_width(&self) -> Abs {
+        self.x_advance
+    }
+
+    fn get_height(&self) -> Abs {
+        self.y_advance
+    }
 }

@@ -3,7 +3,7 @@ use crate::{
     ToEcsBundleImpl,
 };
 use bevy_transform::{components::Transform, TransformBundle};
-use dyn_attributed_string::LineWrap;
+use dyn_attributed_string::{HorizontalTextAlignment, LineWrap, VerticalTextAlignment};
 use dyn_comp_bundles::{
     components::{
         mixins::{
@@ -332,6 +332,10 @@ pub struct TextNode {
     #[serde(default)]
     pub line_wrap: LineWrap,
     #[serde(default)]
+    pub horizontal_text_alignment: Option<HorizontalTextAlignment>,
+    #[serde(default)]
+    pub vertical_text_alignment: Option<VerticalTextAlignment>,
+    #[serde(default)]
     pub translation: Vec2,
     #[serde(default)]
     pub rotation_deg: Angle,
@@ -358,6 +362,8 @@ impl ToEcsBundleImpl for TextNode {
                 text: self.text.clone(),
                 attributes: self.attributes.iter().cloned().collect(),
                 line_wrap: self.line_wrap,
+                horizontal_text_alignment: self.horizontal_text_alignment,
+                vertical_text_alignment: self.vertical_text_alignment,
             },
             transform: TransformBundle::from_transform(Transform {
                 translation: Vec3::new(self.translation.x, self.translation.y, 0.0),

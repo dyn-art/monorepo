@@ -19,7 +19,7 @@ pub struct Span {
     range: Range<usize>,
     dirty: bool,
     tokens: Vec<ShapeTokenVariant>,
-    level: unicode_bidi::Level,
+    bidi_level: unicode_bidi::Level,
     attrs: Attrs,
 }
 
@@ -29,7 +29,7 @@ impl Span {
             range,
             dirty: true,
             tokens: Vec::new(),
-            level: unicode_bidi::LTR_LEVEL,
+            bidi_level: unicode_bidi::LTR_LEVEL,
             attrs,
         }
     }
@@ -50,8 +50,8 @@ impl Span {
     }
 
     #[inline]
-    pub fn get_level(&self) -> &unicode_bidi::Level {
-        &self.level
+    pub fn get_bidi_level(&self) -> &unicode_bidi::Level {
+        &self.bidi_level
     }
 
     #[inline]
@@ -232,6 +232,18 @@ impl Span {
                 _ => {}
             }
         }
+    }
+
+    pub fn width(&self) -> Abs {
+        self.tokens.iter().fold(Abs::zero(), |acc, token| {
+            token.get_shape_token().get_width()
+        })
+    }
+
+    pub fn height(&self) -> Abs {
+        self.tokens.iter().fold(Abs::zero(), |acc, token| {
+            token.get_shape_token().get_height()
+        })
     }
 
     pub fn get_glyphs_len(&self) -> usize {

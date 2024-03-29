@@ -29,6 +29,8 @@ pub fn outline_text(
             AttributedStringConfig {
                 size: *size,
                 line_wrap: text.line_wrap,
+                horizontal_text_alignment: text.horizontal_text_alignment,
+                vertical_text_alignment: text.vertical_text_alignment,
             },
         );
 

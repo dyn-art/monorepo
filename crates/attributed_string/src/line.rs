@@ -28,6 +28,42 @@ impl Line {
         &self.ranges
     }
 
+    pub fn direction(&self, spans: &SpanIntervals) -> LineDirection {
+        let mut ltr_count = 0;
+        let mut rtl_count = 0;
+
+        for range in self.ranges.iter() {
+            for interval in spans.find(range.start, range.end) {
+                if interval.val.get_bidi_level().number() % 2 == 0 {
+                    ltr_count += 1;
+                } else {
+                    rtl_count += 1;
+                }
+            }
+        }
+
+        // Determine direction based on the counts
+        if ltr_count > 0 && rtl_count > 0 {
+            LineDirection::Mixed
+        } else if rtl_count > 0 {
+            LineDirection::RightToLeft
+        } else {
+            LineDirection::LeftToRight
+        }
+    }
+
+    pub fn width(&self, spans: &SpanIntervals) -> Abs {
+        let mut width = Abs::zero();
+
+        for range in self.ranges.iter() {
+            for Interval { val: span, .. } in spans.find(range.start, range.end) {
+                width += span.width();
+            }
+        }
+
+        return width;
+    }
+
     pub fn max_height(&self, spans: &SpanIntervals) -> Abs {
         let mut current_height = Abs::zero();
 
@@ -99,4 +135,12 @@ impl Line {
 
         self.ranges = merged;
     }
+}
+
+#[derive(Debug, Default, PartialEq, Eq, Clone, Copy)]
+pub enum LineDirection {
+    #[default]
+    Mixed,
+    LeftToRight,
+    RightToLeft,
 }

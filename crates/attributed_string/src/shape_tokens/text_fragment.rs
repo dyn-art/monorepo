@@ -60,10 +60,24 @@ impl TextFragmentToken {
             .iter()
             .fold(Abs::zero(), |acc, token| acc + token.x_advance)
     }
+
+    pub fn y_advance(&self) -> Abs {
+        self.tokens
+            .iter()
+            .fold(Abs::zero(), |acc, token| acc + token.y_advance)
+    }
 }
 
 impl ShapeToken for TextFragmentToken {
     fn get_range(&self) -> &Range<usize> {
         &self.range
+    }
+
+    fn get_width(&self) -> Abs {
+        self.x_advance()
+    }
+
+    fn get_height(&self) -> Abs {
+        self.y_advance()
     }
 }

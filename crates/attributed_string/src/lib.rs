@@ -15,7 +15,7 @@ use attrs::{Attrs, AttrsInterval};
 pub use dyn_fonts_book;
 use dyn_fonts_book::FontsBook;
 use dyn_utils::{properties::size::Size, units::abs::Abs};
-use line::Line;
+use line::{Line, LineDirection};
 use line_wrap::{no_wrap::NoLineWrap, word_wrap::WordWrap, LineWrapStrategy};
 use rust_lapper::{Interval, Lapper};
 use span::{Span, SpanIntervals};
@@ -125,16 +125,49 @@ impl AttributedString {
     pub fn layout_lines(&mut self) {
         let lines = self.compute_lines();
 
+        let container_width = self.config.size.rwidth();
+        let mut curr_pos_x: Abs;
+        let mut curr_pos_y = Abs::zero();
+
         // Layout tokens based on lines
-        let mut current_pos_x: Abs;
-        let mut current_pos_y = Abs::zero();
         for (index, line) in lines.iter().enumerate() {
             if line.get_ranges().is_empty() {
                 continue;
             }
 
-            current_pos_x = Abs::zero();
-            current_pos_y += if index == 0 {
+            let line_direction = line.direction(&self.spans);
+            let line_width = line.width(&self.spans);
+            let horizontal_text_alignment = match self.config.horizontal_text_alignment {
+                Some(v) => v,
+                None => match line_direction {
+                    LineDirection::LeftToRight | LineDirection::Mixed => {
+                        HorizontalTextAlignment::Left
+                    }
+                    LineDirection::RightToLeft => HorizontalTextAlignment::Right,
+                },
+            };
+            // TODO:
+            let alignment_correction = match (horizontal_text_alignment, line_direction) {
+                (HorizontalTextAlignment::Left, LineDirection::RightToLeft) => {
+                    container_width - line_width
+                }
+                (HorizontalTextAlignment::Left, LineDirection::LeftToRight) => Abs::zero(),
+                (HorizontalTextAlignment::Right, LineDirection::RightToLeft) => Abs::zero(),
+                (HorizontalTextAlignment::Right, LineDirection::LeftToRight) => {
+                    container_width - line_width
+                }
+                (HorizontalTextAlignment::Center, _) => (container_width - line_width) / 2.0,
+                (HorizontalTextAlignment::Justified, _) => Abs::zero(),
+                (HorizontalTextAlignment::Left, _) => Abs::zero(),
+                (HorizontalTextAlignment::Right, _) => Abs::zero(),
+            };
+
+            curr_pos_x = if line_direction == LineDirection::RightToLeft {
+                container_width - alignment_correction
+            } else {
+                alignment_correction
+            };
+            curr_pos_y += if index == 0 {
                 line.max_ascent(&self.spans)
             } else {
                 line.max_height(&self.spans)
@@ -145,9 +178,9 @@ impl AttributedString {
                     for glyph_token in span.iter_glyphs_in_range_mut(&range) {
                         glyph_token.transform = glyph_token
                             .transform
-                            .pre_translate(current_pos_x.to_pt(), current_pos_y.to_pt());
+                            .pre_translate(curr_pos_x.to_pt(), curr_pos_y.to_pt());
 
-                        current_pos_x += glyph_token.x_advance;
+                        curr_pos_x += glyph_token.x_advance;
                     }
                 }
             }
@@ -223,6 +256,8 @@ impl AttributedString {
 pub struct AttributedStringConfig {
     pub size: Size,
     pub line_wrap: LineWrap,
+    pub horizontal_text_alignment: Option<HorizontalTextAlignment>,
+    pub vertical_text_alignment: Option<VerticalTextAlignment>,
 }
 
 #[derive(Debug, Default, Clone, Copy)]
@@ -240,6 +275,32 @@ pub enum LineWrap {
     Word,
     /// Wraps at the word level, or fallback to glyph level if a word can't fit on a line by itself
     WordOrGlyph,
+}
+
+#[derive(Debug, Default, Clone, Copy)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type)
+)]
+pub enum HorizontalTextAlignment {
+    #[default]
+    Left,
+    Right,
+    Center,
+    Justified,
+}
+
+#[derive(Debug, Default, Clone, Copy)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type)
+)]
+pub enum VerticalTextAlignment {
+    #[default]
+    Top,
+    Bottom,
+    Center,
+    Justified,
 }
 
 #[cfg(test)]
@@ -290,6 +351,7 @@ mod tests {
             AttributedStringConfig {
                 size: Size::new(Abs::pt(150.0), Abs::pt(100.0)),
                 line_wrap: LineWrap::Word,
+                ..Default::default()
             },
         );
 
