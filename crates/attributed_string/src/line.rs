@@ -34,19 +34,15 @@ impl Line {
 
         for range in self.ranges.iter() {
             for Interval { val: span, .. } in spans.find(range.start, range.end) {
-                let range_len = (range.start.max(span.get_range().start)
-                    ..range.end.min(span.get_range().end))
-                    .len();
-                if span
-                    .get_bidi_level()
-                    .unwrap_or(unicode_bidi::LTR_LEVEL)
-                    .number()
-                    % 2
-                    == 0
-                {
-                    ltr_count += range_len;
-                } else {
+                let range_len = Range {
+                    start: range.start.max(span.get_range().start),
+                    end: range.end.min(span.get_range().end),
+                }
+                .len();
+                if span.is_rtl() {
                     rtl_count += range_len;
+                } else {
+                    ltr_count += range_len;
                 }
             }
         }

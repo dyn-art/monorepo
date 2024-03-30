@@ -126,8 +126,26 @@ impl AttributedString {
         let lines = self.compute_lines();
 
         let container_width = self.config.size.rwidth();
+        let container_height = self.config.size.rheight();
+
+        let total_text_height = lines
+            .iter()
+            .enumerate()
+            .fold(Abs::zero(), |acc, (index, line)| {
+                if index == 0 {
+                    acc + line.get_max_ascent(&self.spans)
+                } else {
+                    acc + line.get_max_height(&self.spans)
+                }
+            });
+        let vertical_alignment_correction = match self.config.vertical_text_alignment {
+            VerticalTextAlignment::Top => Abs::zero(),
+            VerticalTextAlignment::Bottom => container_height - total_text_height,
+            VerticalTextAlignment::Center => (container_height - total_text_height) / 2.0,
+        };
+
         let mut curr_pos_x: Abs;
-        let mut curr_pos_y = Abs::zero();
+        let mut curr_pos_y = vertical_alignment_correction;
 
         // Layout tokens based on lines
         for (index, line) in lines.iter().enumerate() {
@@ -137,32 +155,31 @@ impl AttributedString {
 
             let line_direction = line.get_direction(&self.spans);
             let line_width = line.get_width(&self.spans);
-            let alignment_correction = match (self.config.horizontal_text_alignment, line_direction)
-            {
-                // If alignment is Left, it's always 0 since we start drawing from the left
-                (HorizontalTextAlignment::Left, _) => Abs::zero(),
 
-                // If alignment is Right, we shift by `container_width - line_width` to start drawing from the right
-                (HorizontalTextAlignment::Right, _) => container_width - line_width,
+            let horizontal_alignment_correction =
+                match (self.config.horizontal_text_alignment, line_direction) {
+                    // If alignment is Left, it's always 0 since we start drawing from the left
+                    (HorizontalTextAlignment::Left, _) => Abs::zero(),
 
-                // Center alignment calculates the midpoint regardless of text direction
-                (HorizontalTextAlignment::Center, _) => (container_width - line_width) / 2.0,
+                    // If alignment is Right, we shift by `container_width - line_width` to start drawing from the right
+                    (HorizontalTextAlignment::Right, _) => container_width - line_width,
 
-                // For Start and End, adjust based on the text direction
-                (HorizontalTextAlignment::Start, LineDirection::LeftToRight) => Abs::zero(),
-                (HorizontalTextAlignment::End, LineDirection::LeftToRight) => {
-                    container_width - line_width
-                }
-                (HorizontalTextAlignment::Start, LineDirection::RightToLeft) => {
-                    container_width - line_width
-                }
-                (HorizontalTextAlignment::End, LineDirection::RightToLeft) => Abs::zero(),
+                    // Center alignment calculates the midpoint regardless of text direction
+                    (HorizontalTextAlignment::Center, _) => (container_width - line_width) / 2.0,
 
-                // Justified alignment is handled later
-                (HorizontalTextAlignment::Justified, _) => Abs::zero(),
-            };
+                    // For Start and End, adjust based on the text direction
+                    (HorizontalTextAlignment::Start, LineDirection::LeftToRight) => Abs::zero(),
+                    (HorizontalTextAlignment::End, LineDirection::LeftToRight) => {
+                        container_width - line_width
+                    }
+                    (HorizontalTextAlignment::Start, LineDirection::RightToLeft) => {
+                        container_width - line_width
+                    }
+                    (HorizontalTextAlignment::End, LineDirection::RightToLeft) => Abs::zero(),
+                    // (HorizontalTextAlignment::Justified, _) => Abs::zero(),
+                };
 
-            curr_pos_x = alignment_correction;
+            curr_pos_x = horizontal_alignment_correction;
             curr_pos_y += if index == 0 {
                 line.get_max_ascent(&self.spans)
             } else {
@@ -307,7 +324,7 @@ pub enum HorizontalTextAlignment {
     Left,
     Right,
     Center,
-    Justified,
+    // Justified,
 }
 
 #[derive(Debug, Default, Clone, Copy)]
@@ -317,12 +334,10 @@ pub enum HorizontalTextAlignment {
 )]
 pub enum VerticalTextAlignment {
     #[default]
-    Start,
-    End,
     Top,
     Bottom,
     Center,
-    Justified,
+    // Justified,
 }
 
 #[cfg(test)]
@@ -373,7 +388,7 @@ mod tests {
                 size: Size::new(Abs::pt(150.0), Abs::pt(100.0)),
                 line_wrap: LineWrap::Word,
                 horizontal_text_alignment: HorizontalTextAlignment::Start,
-                ..Default::default()
+                vertical_text_alignment: VerticalTextAlignment::Center,
             },
         );
 

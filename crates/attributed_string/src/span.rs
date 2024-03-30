@@ -9,6 +9,7 @@ use crate::{
 };
 use dyn_fonts_book::FontsBook;
 use dyn_utils::units::{abs::Abs, Numeric};
+use either::Either;
 use rust_lapper::{Interval, Lapper};
 use std::ops::Range;
 use unicode_linebreak::BreakClass;
@@ -48,6 +49,11 @@ impl Span {
     }
 
     #[inline]
+    pub fn mark_dirty(&mut self) {
+        self.dirty = true;
+    }
+
+    #[inline]
     pub fn is_dirty(&self) -> bool {
         self.dirty
     }
@@ -68,8 +74,13 @@ impl Span {
     }
 
     #[inline]
-    pub fn mark_dirty(&mut self) {
-        self.dirty = true;
+    pub fn is_rtl(&self) -> bool {
+        self.bidi_level.map_or(false, |level| level.is_rtl())
+    }
+
+    #[inline]
+    pub fn is_ltr(&self) -> bool {
+        !self.is_rtl()
     }
 
     pub fn divide_at_bidi_level(mut self, bidi_info: &unicode_bidi::BidiInfo) -> Vec<Self> {
@@ -207,7 +218,7 @@ impl Span {
             return;
         }
 
-        let glyps_len = self.get_glyphs_len();
+        let glyps_len = self.get_glyph_count();
         let font_size = self.attrs.get_font_size();
         for (index, glyph_token) in self.iter_glyphs_mut().enumerate() {
             let script = glyph_token.get_glyph().codepoint.script();
@@ -251,16 +262,33 @@ impl Span {
         }
     }
 
+    pub fn iter_tokens<'a>(&'a self) -> impl Iterator<Item = &'a ShapeTokenVariant> + 'a {
+        if self.is_rtl() {
+            Either::Left(self.tokens.iter().rev())
+        } else {
+            Either::Right(self.tokens.iter())
+        }
+    }
+
     pub fn iter_tokens_in_range<'a>(
         &'a self,
         range: &'a Range<usize>,
     ) -> impl Iterator<Item = &'a ShapeTokenVariant> + 'a {
-        self.tokens
-            .iter()
+        self.iter_tokens()
             .filter(move |token| is_range_within(token.get_shape_token().get_range(), &range))
     }
 
-    pub fn get_glyphs_len(&self) -> usize {
+    pub fn iter_tokens_mut<'a>(
+        &'a mut self,
+    ) -> impl Iterator<Item = &'a mut ShapeTokenVariant> + 'a {
+        if self.is_rtl() {
+            Either::Left(self.tokens.iter_mut().rev())
+        } else {
+            Either::Right(self.tokens.iter_mut())
+        }
+    }
+
+    pub fn get_glyph_count(&self) -> usize {
         let mut length = 0;
         for token_variant in self.tokens.iter() {
             length += match token_variant {
@@ -274,8 +302,7 @@ impl Span {
     }
 
     pub fn iter_glyphs<'a>(&'a self) -> impl Iterator<Item = &'a GlyphToken> + 'a {
-        self.tokens
-            .iter()
+        self.iter_tokens()
             .flat_map(|token_variant| match token_variant {
                 ShapeTokenVariant::Glyph(token) => Box::new(std::iter::once(token))
                     as Box<dyn Iterator<Item = &'a GlyphToken> + 'a>,
@@ -291,26 +318,15 @@ impl Span {
         &'a self,
         range: &'a Range<usize>,
     ) -> impl Iterator<Item = &'a GlyphToken> + 'a {
-        self.tokens
-            .iter()
-            .flat_map(|token_variant| match token_variant {
-                ShapeTokenVariant::Glyph(token) => Box::new(std::iter::once(token))
-                    as Box<dyn Iterator<Item = &'a GlyphToken> + 'a>,
-                ShapeTokenVariant::TextFragment(token) => Box::new(token.get_tokens().iter())
-                    as Box<dyn Iterator<Item = &'a GlyphToken> + 'a>,
-                ShapeTokenVariant::WordSeparator(token) => Box::new(token.get_tokens().iter())
-                    as Box<dyn Iterator<Item = &'a GlyphToken> + 'a>,
-                _ => Box::new(std::iter::empty()) as Box<dyn Iterator<Item = &'a GlyphToken> + 'a>,
-            })
+        self.iter_glyphs()
             .filter(move |glyph| is_range_within(glyph.get_range(), &range))
     }
 
     pub(crate) fn iter_glyphs_mut<'a>(
         &'a mut self,
     ) -> impl Iterator<Item = &'a mut GlyphToken> + 'a {
-        self.tokens
-            .iter_mut()
-            .flat_map(|token_variant| match token_variant {
+        self.iter_tokens_mut()
+            .flat_map(move |token_variant| match token_variant {
                 ShapeTokenVariant::Glyph(token) => Box::new(std::iter::once(token))
                     as Box<dyn Iterator<Item = &'a mut GlyphToken> + 'a>,
                 ShapeTokenVariant::TextFragment(token) => {
@@ -330,22 +346,7 @@ impl Span {
         &'a mut self,
         range: &'a Range<usize>,
     ) -> impl Iterator<Item = &'a mut GlyphToken> + 'a {
-        self.tokens
-            .iter_mut()
-            .flat_map(|token_variant| match token_variant {
-                ShapeTokenVariant::Glyph(token) => Box::new(std::iter::once(token))
-                    as Box<dyn Iterator<Item = &'a mut GlyphToken> + 'a>,
-                ShapeTokenVariant::TextFragment(token) => {
-                    Box::new(token.get_tokens_mut().iter_mut())
-                        as Box<dyn Iterator<Item = &'a mut GlyphToken> + 'a>
-                }
-                ShapeTokenVariant::WordSeparator(token) => {
-                    Box::new(token.get_tokens_mut().iter_mut())
-                        as Box<dyn Iterator<Item = &'a mut GlyphToken> + 'a>
-                }
-                _ => Box::new(std::iter::empty())
-                    as Box<dyn Iterator<Item = &'a mut GlyphToken> + 'a>,
-            })
+        self.iter_glyphs_mut()
             .filter(move |glyph| is_range_within(glyph.get_range(), &range))
     }
 
@@ -387,7 +388,7 @@ impl<'a> GlyphClusterIterator<'a> {
             })
             .collect();
 
-        Self { glyphs, index: 0 }
+        return Self { glyphs, index: 0 };
     }
 }
 
