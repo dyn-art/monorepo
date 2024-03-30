@@ -40,6 +40,13 @@ impl ShapeTokenVariant {
             ShapeTokenVariant::TextFragment(token) => token,
         }
     }
+
+    pub fn is_blank(&self) -> bool {
+        match self {
+            ShapeTokenVariant::WordSeparator(_) | ShapeTokenVariant::Linebreak(_) => true,
+            _ => false,
+        }
+    }
 }
 
 #[derive(Debug)]

@@ -135,42 +135,38 @@ impl AttributedString {
                 continue;
             }
 
-            let line_direction = line.direction(&self.spans);
-            let line_width = line.width(&self.spans);
-            let horizontal_text_alignment = match self.config.horizontal_text_alignment {
-                Some(v) => v,
-                None => match line_direction {
-                    LineDirection::LeftToRight | LineDirection::Mixed => {
-                        HorizontalTextAlignment::Left
-                    }
-                    LineDirection::RightToLeft => HorizontalTextAlignment::Right,
-                },
-            };
-            // TODO:
-            let alignment_correction = match (horizontal_text_alignment, line_direction) {
-                (HorizontalTextAlignment::Left, LineDirection::RightToLeft) => {
-                    container_width - line_width
-                }
-                (HorizontalTextAlignment::Left, LineDirection::LeftToRight) => Abs::zero(),
-                (HorizontalTextAlignment::Right, LineDirection::RightToLeft) => Abs::zero(),
-                (HorizontalTextAlignment::Right, LineDirection::LeftToRight) => {
-                    container_width - line_width
-                }
-                (HorizontalTextAlignment::Center, _) => (container_width - line_width) / 2.0,
-                (HorizontalTextAlignment::Justified, _) => Abs::zero(),
+            let line_direction = line.get_direction(&self.spans);
+            let line_width = line.get_width(&self.spans);
+            let alignment_correction = match (self.config.horizontal_text_alignment, line_direction)
+            {
+                // If alignment is Left, it's always 0 since we start drawing from the left
                 (HorizontalTextAlignment::Left, _) => Abs::zero(),
-                (HorizontalTextAlignment::Right, _) => Abs::zero(),
+
+                // If alignment is Right, we shift by `container_width - line_width` to start drawing from the right
+                (HorizontalTextAlignment::Right, _) => container_width - line_width,
+
+                // Center alignment calculates the midpoint regardless of text direction
+                (HorizontalTextAlignment::Center, _) => (container_width - line_width) / 2.0,
+
+                // For Start and End, adjust based on the text direction
+                (HorizontalTextAlignment::Start, LineDirection::LeftToRight) => Abs::zero(),
+                (HorizontalTextAlignment::End, LineDirection::LeftToRight) => {
+                    container_width - line_width
+                }
+                (HorizontalTextAlignment::Start, LineDirection::RightToLeft) => {
+                    container_width - line_width
+                }
+                (HorizontalTextAlignment::End, LineDirection::RightToLeft) => Abs::zero(),
+
+                // Justified alignment is handled later
+                (HorizontalTextAlignment::Justified, _) => Abs::zero(),
             };
 
-            curr_pos_x = if line_direction == LineDirection::RightToLeft {
-                container_width - alignment_correction
-            } else {
-                alignment_correction
-            };
+            curr_pos_x = alignment_correction;
             curr_pos_y += if index == 0 {
-                line.max_ascent(&self.spans)
+                line.get_max_ascent(&self.spans)
             } else {
-                line.max_height(&self.spans)
+                line.get_max_height(&self.spans)
             };
 
             for range in line.get_ranges().iter() {
@@ -248,6 +244,28 @@ impl AttributedString {
             }
         }
 
+        // Draw bounding box
+        // let rect_path = tiny_skia_path::PathBuilder::from_rect(
+        //     tiny_skia_path::Rect::from_xywh(
+        //         0.0,
+        //         0.0,
+        //         self.config.size.width(),
+        //         self.config.size.height(),
+        //     )
+        //     .unwrap(),
+        // );
+        // let stroked_rect_path = tiny_skia_path::PathStroker::new()
+        //     .stroke(
+        //         &rect_path,
+        //         &tiny_skia_path::Stroke {
+        //             width: 1.0,
+        //             ..Default::default()
+        //         },
+        //         1.0,
+        //     )
+        //     .unwrap();
+        // text_builder.push_path(&stroked_rect_path);
+
         return text_builder.finish();
     }
 }
@@ -256,8 +274,8 @@ impl AttributedString {
 pub struct AttributedStringConfig {
     pub size: Size,
     pub line_wrap: LineWrap,
-    pub horizontal_text_alignment: Option<HorizontalTextAlignment>,
-    pub vertical_text_alignment: Option<VerticalTextAlignment>,
+    pub horizontal_text_alignment: HorizontalTextAlignment,
+    pub vertical_text_alignment: VerticalTextAlignment,
 }
 
 #[derive(Debug, Default, Clone, Copy)]
@@ -284,6 +302,8 @@ pub enum LineWrap {
 )]
 pub enum HorizontalTextAlignment {
     #[default]
+    Start,
+    End,
     Left,
     Right,
     Center,
@@ -297,6 +317,8 @@ pub enum HorizontalTextAlignment {
 )]
 pub enum VerticalTextAlignment {
     #[default]
+    Start,
+    End,
     Top,
     Bottom,
     Center,
@@ -340,8 +362,7 @@ mod tests {
                 val: Attrs::new()
                     .font_family(FontFamily::Serif)
                     .font_weight(FontWeight::REGULAR)
-                    .font_size(Abs::pt(12.0))
-                    .word_spacing(FontUnit::em(Em::new(0.5))),
+                    .font_size(Abs::pt(12.0)), // .word_spacing(FontUnit::em(Em::new(0.5))),
             },
         ];
 
@@ -351,6 +372,7 @@ mod tests {
             AttributedStringConfig {
                 size: Size::new(Abs::pt(150.0), Abs::pt(100.0)),
                 line_wrap: LineWrap::Word,
+                horizontal_text_alignment: HorizontalTextAlignment::Start,
                 ..Default::default()
             },
         );

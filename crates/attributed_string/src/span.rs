@@ -19,17 +19,25 @@ pub struct Span {
     range: Range<usize>,
     dirty: bool,
     tokens: Vec<ShapeTokenVariant>,
-    bidi_level: unicode_bidi::Level,
+    bidi_level: Option<unicode_bidi::Level>,
     attrs: Attrs,
 }
 
 impl Span {
     pub fn new(range: Range<usize>, attrs: Attrs) -> Self {
+        Self::new_with_bidi(range, attrs, None)
+    }
+
+    pub fn new_with_bidi(
+        range: Range<usize>,
+        attrs: Attrs,
+        bidi_level: Option<unicode_bidi::Level>,
+    ) -> Self {
         Self {
             range,
             dirty: true,
             tokens: Vec::new(),
-            bidi_level: unicode_bidi::LTR_LEVEL,
+            bidi_level,
             attrs,
         }
     }
@@ -50,7 +58,7 @@ impl Span {
     }
 
     #[inline]
-    pub fn get_bidi_level(&self) -> &unicode_bidi::Level {
+    pub fn get_bidi_level(&self) -> &Option<unicode_bidi::Level> {
         &self.bidi_level
     }
 
@@ -64,7 +72,7 @@ impl Span {
         self.dirty = true;
     }
 
-    pub fn divide_at_bidi_level(self, bidi_info: &unicode_bidi::BidiInfo) -> Vec<Self> {
+    pub fn divide_at_bidi_level(mut self, bidi_info: &unicode_bidi::BidiInfo) -> Vec<Self> {
         let mut current_bidi_level = bidi_info.levels[self.range.start];
         let mut new_spans: Vec<Self> = Vec::new();
         let mut span_start = self.range.start;
@@ -72,15 +80,24 @@ impl Span {
         for i in self.range.clone() {
             let char_bidi_level = bidi_info.levels[i];
             if char_bidi_level != current_bidi_level {
-                new_spans.push(Self::new(span_start..i, self.attrs.clone()));
+                new_spans.push(Self::new_with_bidi(
+                    span_start..i,
+                    self.attrs.clone(),
+                    Some(current_bidi_level),
+                ));
                 span_start = i;
                 current_bidi_level = char_bidi_level;
             }
         }
 
         if new_spans.len() > 0 {
-            new_spans.push(Self::new(span_start..self.range.end, self.attrs.clone()))
+            new_spans.push(Self::new_with_bidi(
+                span_start..self.range.end,
+                self.attrs.clone(),
+                Some(current_bidi_level),
+            ))
         } else {
+            self.bidi_level = Some(current_bidi_level);
             new_spans.push(self)
         }
 
@@ -234,16 +251,13 @@ impl Span {
         }
     }
 
-    pub fn width(&self) -> Abs {
-        self.tokens.iter().fold(Abs::zero(), |acc, token| {
-            token.get_shape_token().get_width()
-        })
-    }
-
-    pub fn height(&self) -> Abs {
-        self.tokens.iter().fold(Abs::zero(), |acc, token| {
-            token.get_shape_token().get_height()
-        })
+    pub fn iter_tokens_in_range<'a>(
+        &'a self,
+        range: &'a Range<usize>,
+    ) -> impl Iterator<Item = &'a ShapeTokenVariant> + 'a {
+        self.tokens
+            .iter()
+            .filter(move |token| is_range_within(token.get_shape_token().get_range(), &range))
     }
 
     pub fn get_glyphs_len(&self) -> usize {
