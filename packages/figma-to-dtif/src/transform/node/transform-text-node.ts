@@ -9,6 +9,8 @@ import type {
 import {
 	createDtifStyles,
 	mapFigmaBlendModeToDtif,
+	mapFigmaTextAlignHorizontalToDtif,
+	mapFigmaTextAlignVerticalToDtif,
 	mapFigmaTransformToRotation,
 	mapFigmaTransformToTranslation
 } from '../../utils';
@@ -65,6 +67,8 @@ export function transformTextNode(
 			};
 		}),
 		lineWrap: 'Word',
+		horizontalTextAlignment: mapFigmaTextAlignHorizontalToDtif(node.textAlignHorizontal),
+		verticalTextAlignment: mapFigmaTextAlignVerticalToDtif(node.textAlignVertical),
 		visible: node.visible,
 		size: [node.width, node.height],
 		translation: mapFigmaTransformToTranslation(node.relativeTransform),

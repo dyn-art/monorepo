@@ -74,8 +74,8 @@ pub struct TextCompNode {
     pub text: String,
     pub attributes: SmallVec<[TextAttributeInterval; 2]>,
     pub line_wrap: LineWrap,
-    pub horizontal_text_alignment: Option<HorizontalTextAlignment>,
-    pub vertical_text_alignment: Option<VerticalTextAlignment>,
+    pub horizontal_text_alignment: HorizontalTextAlignment,
+    pub vertical_text_alignment: VerticalTextAlignment,
 }
 
 /// A vector shape node.

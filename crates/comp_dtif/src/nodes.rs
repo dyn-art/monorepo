@@ -332,9 +332,9 @@ pub struct TextNode {
     #[serde(default)]
     pub line_wrap: LineWrap,
     #[serde(default)]
-    pub horizontal_text_alignment: Option<HorizontalTextAlignment>,
+    pub horizontal_text_alignment: HorizontalTextAlignment,
     #[serde(default)]
-    pub vertical_text_alignment: Option<VerticalTextAlignment>,
+    pub vertical_text_alignment: VerticalTextAlignment,
     #[serde(default)]
     pub translation: Vec2,
     #[serde(default)]

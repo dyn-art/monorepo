@@ -158,16 +158,9 @@ impl AttributedString {
 
             let horizontal_alignment_correction =
                 match (self.config.horizontal_text_alignment, line_direction) {
-                    // If alignment is Left, it's always 0 since we start drawing from the left
                     (HorizontalTextAlignment::Left, _) => Abs::zero(),
-
-                    // If alignment is Right, we shift by `container_width - line_width` to start drawing from the right
                     (HorizontalTextAlignment::Right, _) => container_width - line_width,
-
-                    // Center alignment calculates the midpoint regardless of text direction
                     (HorizontalTextAlignment::Center, _) => (container_width - line_width) / 2.0,
-
-                    // For Start and End, adjust based on the text direction
                     (HorizontalTextAlignment::Start, LineDirection::LeftToRight) => Abs::zero(),
                     (HorizontalTextAlignment::End, LineDirection::LeftToRight) => {
                         container_width - line_width
@@ -176,7 +169,6 @@ impl AttributedString {
                         container_width - line_width
                     }
                     (HorizontalTextAlignment::End, LineDirection::RightToLeft) => Abs::zero(),
-                    // (HorizontalTextAlignment::Justified, _) => Abs::zero(),
                 };
 
             curr_pos_x = horizontal_alignment_correction;
@@ -324,7 +316,7 @@ pub enum HorizontalTextAlignment {
     Left,
     Right,
     Center,
-    // Justified,
+    // Justified, // TODO
 }
 
 #[derive(Debug, Default, Clone, Copy)]
@@ -337,7 +329,7 @@ pub enum VerticalTextAlignment {
     Top,
     Bottom,
     Center,
-    // Justified,
+    // Justified, // TODO
 }
 
 #[cfg(test)]
