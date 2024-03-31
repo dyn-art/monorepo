@@ -40,18 +40,29 @@ impl FontsBook {
 
     pub fn load_system_fonts(&mut self) {
         self.db.load_system_fonts();
-
-        self.db.set_serif_family("Times New Roman");
-        self.db.set_sans_serif_family("Arial");
-        self.db.set_cursive_family("Comic Sans MS");
-        self.db.set_fantasy_family("Impact");
-        self.db.set_monospace_family("Courier New");
     }
 
     pub fn get_font_by_id(&mut self, id: FontId) -> Option<Font> {
         self.fonts_cache
             .entry(id)
             .or_insert_with(|| match self.db.load_font(id) {
+                Some(font) => Some(font),
+                None => {
+                    log::warn!(
+                        "Failed to load font '{}'",
+                        self.db.face(id)?.post_script_name
+                    );
+                    None
+                }
+            })
+            .clone()
+    }
+
+    pub fn get_font_by_id_no_cache(&self, id: FontId) -> Option<Font> {
+        self.fonts_cache
+            .get(&id)
+            .cloned()
+            .unwrap_or_else(|| match self.db.load_font(id) {
                 Some(font) => Some(font),
                 None => {
                     log::warn!(
@@ -117,7 +128,11 @@ impl FontsBook {
                     style,
                 };
 
-                self.db.query(&query).map(|id| {
+                let maybe_id = self.db.query(&query);
+                if maybe_id.is_none() {
+                    log::warn!("Failed find font for query: {:?}", query);
+                }
+                maybe_id.map(|id| {
                     vac.insert(id);
                     id
                 })?
@@ -148,20 +163,24 @@ impl FontsBook {
             }
 
             // Check that the new face contains the char
-            if !self.db.has_char(face.id, _char) {
+            if !self
+                .get_font_by_id_no_cache(face.id)
+                .map(|font| font.has_char(_char))
+                .unwrap_or(false)
+            {
                 continue;
             }
 
             let base_family = base_face
                 .families
                 .iter()
-                .find(|f| f.1 == fontdb::Language::English_UnitedStates)
+                .find(|(_, language)| *language == fontdb::Language::English_UnitedStates)
                 .unwrap_or(&base_face.families[0]);
 
             let new_family = face
                 .families
                 .iter()
-                .find(|f| f.1 == fontdb::Language::English_UnitedStates)
+                .find(|(_, language)| *language == fontdb::Language::English_UnitedStates)
                 .unwrap_or(&base_face.families[0]);
 
             log::warn!("Fallback from {} to {}.", base_family.0, new_family.0);

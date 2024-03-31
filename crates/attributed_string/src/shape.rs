@@ -13,24 +13,24 @@ pub fn shape_text_with_fallback(
     let mut current_buffer = buffer;
 
     // Shape text
-    let (mut glyphs, missing, buffer) =
+    let (mut glyphs, missing_glyphs, buffer) =
         shape_text(text, range.clone(), current_buffer, font, fonts_book);
     current_buffer = buffer;
 
-    // Remember all fonts used for shaping
-    let mut used_fonts = vec![font.get_id()];
+    // Remember all fonts already used for shaping
+    let mut used_font_ids = vec![font.get_id()];
 
-    let mut resolved_set: HashSet<usize> = HashSet::new();
-    let text_bytes = text.as_bytes();
-    for &index in &missing {
-        let fallback_font =
-            match fonts_book.get_font_for_char(text_bytes[index] as char, &used_fonts) {
-                Some(font) => font,
-                None => continue,
-            };
+    let mut resolved_glyphs_set: HashSet<MissingGlyph> = HashSet::new();
+    for &missing_glyph in &missing_glyphs {
+        let fallback_font = match fonts_book
+            .get_font_for_char(glyphs[missing_glyph.index].codepoint, &used_font_ids)
+        {
+            Some(v) => v,
+            None => continue,
+        };
 
         // Shape text again, using a new font
-        let (mut fallback_glyphs, fallback_missing, buffer) = shape_text(
+        let (fallback_glyphs, fallback_missing_glyphs, buffer) = shape_text(
             text,
             range.clone(),
             current_buffer,
@@ -39,27 +39,41 @@ pub fn shape_text_with_fallback(
         );
         current_buffer = buffer;
 
-        // Identify resolved glyphs
-        let resolved: Vec<_> = missing
-            .iter()
-            .filter(|item| !fallback_missing.contains(item))
+        // If all glyphs could be resolved use those
+        if fallback_glyphs.len() == glyphs.len() {
+            glyphs = fallback_glyphs;
+            break;
+        }
+
+        let mut fallback_glyphs: Vec<Option<Glyph>> = fallback_glyphs
+            .into_iter()
+            .map(|glyph| Some(glyph))
             .collect();
+        let fallback_missing_glyphs_set: HashSet<MissingGlyph> =
+            fallback_missing_glyphs.into_iter().collect();
+
+        // Identify resolved glyphs
+        let resolved_glyphs = missing_glyphs
+            .iter()
+            .filter(|item| !fallback_missing_glyphs_set.contains(item))
+            .collect::<Vec<_>>();
 
         // Apply resolved glyphs
-        for &i in resolved {
-            if resolved_set.contains(&i) {
-                glyphs[i] = fallback_glyphs.swap_remove(i);
-                resolved_set.insert(i);
+        for &resolved_glyph in resolved_glyphs {
+            if !resolved_glyphs_set.contains(&resolved_glyph) {
+                glyphs[resolved_glyph.index] =
+                    fallback_glyphs[resolved_glyph.index].take().unwrap();
+                resolved_glyphs_set.insert(resolved_glyph);
             }
         }
 
         // Chech whether all glyphs have been resolved already
-        if missing.len() == resolved_set.len() {
+        if missing_glyphs.len() == resolved_glyphs_set.len() {
             break;
         }
 
         // Remember this font
-        used_fonts.push(fallback_font.get_id());
+        used_font_ids.push(fallback_font.get_id());
     }
 
     return (glyphs, current_buffer);
@@ -71,7 +85,7 @@ pub fn shape_text(
     mut buffer: rustybuzz::UnicodeBuffer,
     font: &Font,
     fonts_book: &mut FontsBook,
-) -> (Vec<Glyph>, Vec<usize>, rustybuzz::UnicodeBuffer) {
+) -> (Vec<Glyph>, Vec<MissingGlyph>, rustybuzz::UnicodeBuffer) {
     let mut glyphs = Vec::new();
     let mut missing_glyphs = Vec::new();
     let run_text = &text[range.clone()];
@@ -80,7 +94,7 @@ pub fn shape_text(
     buffer.push_str(run_text);
     buffer.guess_segment_properties();
 
-    let rtl = matches!(buffer.direction(), rustybuzz::Direction::RightToLeft);
+    let is_rtl = matches!(buffer.direction(), rustybuzz::Direction::RightToLeft);
 
     let shape_plan = fonts_book.get_shape_plan(font, &buffer);
     let glyph_buffer = rustybuzz::shape_with_plan(font.get_rustybuzz(), shape_plan, buffer);
@@ -93,7 +107,10 @@ pub fn shape_text(
         let start_glyph = range.start + info.cluster as usize; // Byte Index
 
         if info.glyph_id == 0 {
-            missing_glyphs.push(start_glyph);
+            missing_glyphs.push(MissingGlyph {
+                byte_index: start_glyph,
+                index: glyphs.len(),
+            });
         }
 
         glyphs.push(Glyph {
@@ -101,6 +118,7 @@ pub fn shape_text(
             glyph_id: ttf_parser::GlyphId(
                 info.glyph_id.try_into().expect("Failed to cast glyph id!"),
             ),
+            codepoint: text[start_glyph..].chars().next().unwrap(),
             range: Range {
                 start: start_glyph,
                 end: range.end, // Set later to adjust for glyph clusters (graphemes)
@@ -115,9 +133,15 @@ pub fn shape_text(
         });
     }
 
-    adjust_glyph_ends(&mut glyphs, rtl);
+    adjust_glyph_ends(&mut glyphs, is_rtl);
 
     return (glyphs, missing_glyphs, glyph_buffer.clear());
+}
+
+#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
+pub struct MissingGlyph {
+    byte_index: usize,
+    index: usize,
 }
 
 /// Adjusts end of glyphs to ensure correct glyph cluster boundaries.

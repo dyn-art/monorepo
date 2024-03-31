@@ -139,6 +139,13 @@ export type DtifInputEvent = ({ type: "CompositionResized" } & DtifCompositionRe
 
 export type EllipseNode = { startingAngle?: number; endingAngle?: number; innerRadiusRatio?: number; translation?: Vec2; rotationDeg?: Angle; size: Size; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; styles?: Style[] }
 
+/**
+ * A length that is relative to the font size.
+ * 
+ * `1em` is the same as the font size.
+ */
+export type Em = Scalar
+
 export type Entity = number
 
 export type EntityDeletedInputEvent = { entity: Entity }
@@ -217,6 +224,12 @@ export type FontStyle =
 "Oblique"
 
 /**
+ * A font unit.
+ * https://fonts.google.com/knowledge/glossary/unit
+ */
+export type FontUnit = { type: "Abs"; value: Abs } | { type: "Em"; value: Em }
+
+/**
  * Properties that distinguish a font from other fonts in the same family.
  */
 export type FontVariant = { 
@@ -261,6 +274,8 @@ export type GradientVariant = { type: "Linear"; transform?: Mat3 } | { type: "Ra
 export type GroupNode = { translation?: Vec2; rotationDeg?: Angle; size: Size; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; children?: string[] }
 
 export type HandleSide = "Top" | "Bottom" | "Left" | "Right"
+
+export type HorizontalTextAlignment = "Start" | "End" | "Left" | "Right" | "Center"
 
 export type ImagePaint = { assetId: string; scaleMode?: ImageScaleMode }
 
@@ -472,13 +487,15 @@ export type SvgUnits = "UserSpaceOnUse" | "ObjectBoundingBox"
 
 export type TextAttributeInterval = { start: number; end: number; attributes: TextAttributes }
 
-export type TextAttributes = { fontFamily?: FontFamily | null; fontStyle?: FontStyle | null; fontStretch?: FontStretch | null; fontWeight?: FontWeight | null; fontSize?: Abs | null; smallCaps?: boolean | null; applyKerning?: boolean | null }
+export type TextAttributes = { fontFamily?: FontFamily | null; fontStyle?: FontStyle | null; fontStretch?: FontStretch | null; fontWeight?: FontWeight | null; fontSize?: Abs | null; smallCaps?: boolean | null; applyKerning?: boolean | null; letterSpacing?: FontUnit | null; wordSpacing?: FontUnit | null; lineHeight?: FontUnit | null }
 
-export type TextNode = { text: string; attributes: TextAttributeInterval[]; lineWrap?: LineWrap; translation?: Vec2; rotationDeg?: Angle; size: Size; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; styles?: Style[] }
+export type TextNode = { text: string; attributes: TextAttributeInterval[]; lineWrap?: LineWrap; horizontalTextAlignment?: HorizontalTextAlignment; verticalTextAlignment?: VerticalTextAlignment; translation?: Vec2; rotationDeg?: Angle; size: Size; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; styles?: Style[] }
 
 export type Vec2 = [number, number]
 
 export type VectorNode = { path: string; translation?: Vec2; rotationDeg?: Angle; size: Size; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; styles?: Style[] }
+
+export type VerticalTextAlignment = "Top" | "Bottom" | "Center"
 
 export type Viewport = { physicalPosition: Vec2; physicalSize: Size }
 

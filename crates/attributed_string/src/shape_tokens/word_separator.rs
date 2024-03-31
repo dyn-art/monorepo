@@ -1,7 +1,7 @@
 use super::{glyph::GlyphToken, ShapeBuffer, ShapeToken};
 use crate::{attrs::Attrs, shape::shape_text_with_fallback};
 use dyn_fonts_book::FontsBook;
-use dyn_utils::units::em::Em;
+use dyn_utils::units::{abs::Abs, em::Em};
 use std::ops::Range;
 
 /// Represents spaces or punctuation between words.
@@ -37,7 +37,11 @@ impl WordSeparatorToken {
                 fonts_book,
             );
             shape_buffer.buffer = Some(buffer);
-            tokens.extend(glyphs.into_iter().map(|glyph| GlyphToken::new(glyph)));
+            tokens.extend(
+                glyphs
+                    .into_iter()
+                    .map(|glyph| GlyphToken::new(glyph, attrs.get_font_size())),
+            );
         }
 
         return Self { range, tokens };
@@ -51,15 +55,29 @@ impl WordSeparatorToken {
         &mut self.tokens
     }
 
-    pub fn x_advance(&self) -> Em {
+    pub fn x_advance(&self) -> Abs {
         self.tokens
             .iter()
-            .fold(Em::zero(), |acc, token| acc + token.get_glyph().x_advance)
+            .fold(Abs::zero(), |acc, token| acc + token.x_advance)
+    }
+
+    pub fn y_advance(&self) -> Abs {
+        self.tokens
+            .iter()
+            .fold(Abs::zero(), |acc, token| acc + token.y_advance)
     }
 }
 
 impl ShapeToken for WordSeparatorToken {
     fn get_range(&self) -> &Range<usize> {
         &self.range
+    }
+
+    fn get_width(&self) -> Abs {
+        self.x_advance()
+    }
+
+    fn get_height(&self) -> Abs {
+        self.y_advance()
     }
 }

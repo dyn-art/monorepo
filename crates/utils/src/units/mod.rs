@@ -3,6 +3,7 @@ pub mod macros;
 pub mod abs;
 pub mod angle;
 pub mod em;
+pub mod font_unit;
 pub mod ratio;
 pub mod scalar;
 

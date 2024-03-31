@@ -16,8 +16,11 @@ use systems::{
         handle_entity_set_rotation_event,
     },
     outline::{
-        ellipse::outline_ellipse, polygon::outline_polygon, rectangle::outline_rectangle,
-        star::outline_star, text::outline_text,
+        ellipse::outline_ellipse,
+        polygon::outline_polygon,
+        rectangle::outline_rectangle,
+        star::outline_star,
+        text::{outline_text_from_scratch, outline_text_on_size_change},
     },
     stroke::stroke_path_system,
 };
@@ -99,7 +102,8 @@ impl Plugin for CompCorePlugin {
                 outline_ellipse.in_set(CompCoreSystemSet::Outline),
                 outline_star.in_set(CompCoreSystemSet::Outline),
                 outline_polygon.in_set(CompCoreSystemSet::Outline),
-                outline_text.in_set(CompCoreSystemSet::Outline),
+                outline_text_from_scratch.in_set(CompCoreSystemSet::Outline),
+                outline_text_on_size_change.in_set(CompCoreSystemSet::Outline),
                 stroke_path_system.in_set(CompCoreSystemSet::PostOutline),
             ),
         );

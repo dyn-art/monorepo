@@ -1,4 +1,5 @@
 use bevy_ecs::{component::Component, entity::Entity};
+use dyn_attributed_string::AttributedString;
 use dyn_comp_asset::asset_id::ImageId;
 use dyn_utils::properties::{corner_radii::CornerRadii, opacity::Opacity, size::Size};
 use smallvec::SmallVec;
@@ -74,3 +75,6 @@ pub struct PaintParentMixin(pub SmallVec<[Entity; 2]>);
 
 #[derive(Component, Debug, Default, Clone)]
 pub struct ImageAssetMixin(pub Option<ImageId>);
+
+#[derive(Component, Debug, Clone)]
+pub struct AttributedStringMixin(pub AttributedString);

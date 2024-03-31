@@ -1,4 +1,5 @@
 export * from './ContinuousId';
+export * from './calculate-bytes';
 export * from './define-config';
 export * from './extract-error-data';
 export * from './is-object';

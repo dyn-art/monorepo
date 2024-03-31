@@ -100,6 +100,10 @@ impl Font {
             .glyph_hor_advance(GlyphId(glyph))
             .map(|units| self.to_em(units))
     }
+
+    pub fn has_char(&self, _char: char) -> bool {
+        self.get_rustybuzz().glyph_index(_char).is_some()
+    }
 }
 
 impl Debug for Font {
