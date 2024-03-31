@@ -13,16 +13,16 @@ pub fn shape_text_with_fallback(
     let mut current_buffer = buffer;
 
     // Shape text
-    let (mut glyphs, missing, buffer) =
+    let (mut glyphs, missing_glyphs, buffer) =
         shape_text(text, range.clone(), current_buffer, font, fonts_book);
     current_buffer = buffer;
 
     // Remember all fonts used for shaping
     let mut used_fonts = vec![font.get_id()];
 
-    let mut resolved_set: HashSet<usize> = HashSet::new();
+    let mut resolved_glyphs_set: HashSet<usize> = HashSet::new();
     let text_bytes = text.as_bytes();
-    for &index in &missing {
+    for &index in &missing_glyphs {
         let fallback_font =
             match fonts_book.get_font_for_char(text_bytes[index] as char, &used_fonts) {
                 Some(font) => font,
@@ -30,7 +30,7 @@ pub fn shape_text_with_fallback(
             };
 
         // Shape text again, using a new font
-        let (mut fallback_glyphs, fallback_missing, buffer) = shape_text(
+        let (mut fallback_glyphs, fallback_missing_glyphs, buffer) = shape_text(
             text,
             range.clone(),
             current_buffer,
@@ -40,21 +40,21 @@ pub fn shape_text_with_fallback(
         current_buffer = buffer;
 
         // Identify resolved glyphs
-        let resolved: Vec<_> = missing
+        let resolved: Vec<_> = missing_glyphs
             .iter()
-            .filter(|item| !fallback_missing.contains(item))
+            .filter(|item| !fallback_missing_glyphs.contains(item))
             .collect();
 
         // Apply resolved glyphs
         for &i in resolved {
-            if resolved_set.contains(&i) {
+            if resolved_glyphs_set.contains(&i) {
                 glyphs[i] = fallback_glyphs.swap_remove(i);
-                resolved_set.insert(i);
+                resolved_glyphs_set.insert(i);
             }
         }
 
         // Chech whether all glyphs have been resolved already
-        if missing.len() == resolved_set.len() {
+        if missing_glyphs.len() == resolved_glyphs_set.len() {
             break;
         }
 
@@ -80,7 +80,7 @@ pub fn shape_text(
     buffer.push_str(run_text);
     buffer.guess_segment_properties();
 
-    let rtl = matches!(buffer.direction(), rustybuzz::Direction::RightToLeft);
+    let is_rtl = matches!(buffer.direction(), rustybuzz::Direction::RightToLeft);
 
     let shape_plan = fonts_book.get_shape_plan(font, &buffer);
     let glyph_buffer = rustybuzz::shape_with_plan(font.get_rustybuzz(), shape_plan, buffer);
@@ -116,7 +116,7 @@ pub fn shape_text(
         });
     }
 
-    adjust_glyph_ends(&mut glyphs, rtl);
+    adjust_glyph_ends(&mut glyphs, is_rtl);
 
     return (glyphs, missing_glyphs, glyph_buffer.clear());
 }

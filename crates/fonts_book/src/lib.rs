@@ -40,12 +40,6 @@ impl FontsBook {
 
     pub fn load_system_fonts(&mut self) {
         self.db.load_system_fonts();
-
-        self.db.set_serif_family("Times New Roman");
-        self.db.set_sans_serif_family("Arial");
-        self.db.set_cursive_family("Comic Sans MS");
-        self.db.set_fantasy_family("Impact");
-        self.db.set_monospace_family("Courier New");
     }
 
     pub fn get_font_by_id(&mut self, id: FontId) -> Option<Font> {
@@ -117,7 +111,11 @@ impl FontsBook {
                     style,
                 };
 
-                self.db.query(&query).map(|id| {
+                let maybe_id = self.db.query(&query);
+                if maybe_id.is_none() {
+                    log::warn!("Failed find font for query: {:?}", query);
+                }
+                maybe_id.map(|id| {
                     vac.insert(id);
                     id
                 })?

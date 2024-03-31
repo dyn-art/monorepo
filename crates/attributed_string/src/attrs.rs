@@ -152,26 +152,35 @@ impl Attrs {
     }
 
     pub fn merge(&mut self, to_merge_attrs: Attrs) {
-        if self.font_family.is_none() {
+        if self.font_family.is_none() && to_merge_attrs.font_family.is_some() {
             self.font_family = to_merge_attrs.font_family;
         }
-        if self.font_style.is_none() {
+        if self.font_style.is_none() && to_merge_attrs.font_style.is_some() {
             self.font_style = to_merge_attrs.font_style;
         }
-        if self.font_stretch.is_none() {
+        if self.font_stretch.is_none() && to_merge_attrs.font_stretch.is_some() {
             self.font_stretch = to_merge_attrs.font_stretch;
         }
-        if self.font_weight.is_none() {
+        if self.font_weight.is_none() && to_merge_attrs.font_weight.is_some() {
             self.font_weight = to_merge_attrs.font_weight;
         }
-        if self.font_size.is_none() {
+        if self.font_size.is_none() && to_merge_attrs.font_size.is_some() {
             self.font_size = to_merge_attrs.font_size;
         }
-        if self.small_caps.is_none() {
+        if self.small_caps.is_none() && to_merge_attrs.small_caps.is_some() {
             self.small_caps = to_merge_attrs.small_caps;
         }
-        if self.apply_kerning.is_none() {
+        if self.apply_kerning.is_none() && to_merge_attrs.apply_kerning.is_some() {
             self.apply_kerning = to_merge_attrs.apply_kerning;
+        }
+        if self.letter_spacing.is_none() && to_merge_attrs.letter_spacing.is_some() {
+            self.letter_spacing = to_merge_attrs.letter_spacing;
+        }
+        if self.word_spacing.is_none() && to_merge_attrs.word_spacing.is_some() {
+            self.word_spacing = to_merge_attrs.word_spacing;
+        }
+        if self.line_height.is_none() && to_merge_attrs.line_height.is_some() {
+            self.line_height = to_merge_attrs.line_height;
         }
     }
 }

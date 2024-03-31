@@ -206,6 +206,7 @@ impl Span {
             ));
         }
 
+        self.dirty = false;
         self.tokens = tokens;
     }
 
@@ -412,10 +413,10 @@ impl<'a> Iterator for GlyphClusterIterator<'a> {
             self.index += 1;
         }
 
-        if !cluster.is_empty() {
+        return if !cluster.is_empty() {
             Some((cluster, cluster_start))
         } else {
             None
-        }
+        };
     }
 }

@@ -9,6 +9,8 @@ use tiny_skia_path::Transform;
 pub struct GlyphToken {
     glyph: Glyph,
     /// Cached transform after applying the layout.
+    // TODO: Should a glyph have multipe transforms? Like one for layout on line level, ..
+    // which are then combined when outlining?
     pub transform: Transform,
     /// Cached advance in horizontal direction after applying layout.
     pub x_advance: Abs,

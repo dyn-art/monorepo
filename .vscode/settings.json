@@ -45,5 +45,9 @@
 	"[rust]": {
 		"editor.defaultFormatter": "rust-lang.rust-analyzer"
 	},
-	"rust-analyzer.rename.allowExternalItems": true
+	"rust-analyzer.rename.allowExternalItems": true,
+	"rust-analyzer.runnableEnv": {
+		"ENV_ROOT_DIR": "${workspaceFolder}",
+		"GENERATE_IMAGES": "true"
+	}
 }

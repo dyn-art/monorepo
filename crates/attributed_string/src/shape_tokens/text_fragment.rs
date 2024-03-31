@@ -1,14 +1,14 @@
 use super::{glyph::GlyphToken, ShapeBuffer, ShapeToken};
 use crate::{attrs::Attrs, shape::shape_text_with_fallback};
 use dyn_fonts_book::FontsBook;
-use dyn_utils::units::{abs::Abs, em::Em};
+use dyn_utils::units::abs::Abs;
 use std::ops::Range;
 
 /// Groups glyphs into a continuous fragment of text, typically a word or number.
 #[derive(Debug, Clone)]
 pub struct TextFragmentToken {
     range: Range<usize>,
-    /// Glyph tokens that make up the word.
+    /// Glyph tokens that make up the text fragment.
     tokens: Vec<GlyphToken>,
 }
 

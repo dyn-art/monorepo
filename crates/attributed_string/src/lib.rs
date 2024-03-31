@@ -10,7 +10,6 @@ pub mod shape_tokens;
 pub mod span;
 pub mod utils;
 
-use crate::outline::outline;
 use attrs::{Attrs, AttrsInterval};
 pub use dyn_fonts_book;
 use dyn_fonts_book::FontsBook;
@@ -70,6 +69,14 @@ impl AttributedString {
         };
     }
 
+    pub fn get_spans(&self) -> &SpanIntervals {
+        &self.spans
+    }
+
+    pub fn get_size(&self) -> &Size {
+        &self.config.size
+    }
+
     pub fn tokenize_text(&mut self, fonts_book: &mut FontsBook) {
         self.divide_overlapping_spans();
 
@@ -80,38 +87,9 @@ impl AttributedString {
         }
     }
 
-    pub fn divide_overlapping_spans(&mut self) {
-        if !self.spans.overlaps_merged {
-            self.spans
-                .divide_overlaps_with(|overlaps, range| match overlaps.len() {
-                    0 => panic!("Failed to devide overlapping spans!"), // Should never happen
-                    1 => {
-                        let mut overlap = overlaps[0].clone();
-                        if overlap.get_range().clone() != range {
-                            overlap.mark_dirty();
-                        }
-
-                        return overlap;
-                    }
-                    _ => {
-                        let mut merged_attrs = Attrs::new();
-                        for &span in overlaps.iter() {
-                            merged_attrs.merge(span.get_attrs().clone());
-                        }
-
-                        return Span::new(range, merged_attrs);
-                    }
-                });
-        }
-    }
-
-    pub fn compute_lines(&self) -> Vec<Line> {
-        let mut line_wrap_strategy: Box<dyn LineWrapStrategy> = match self.config.line_wrap {
-            LineWrap::None => Box::new(NoLineWrap),
-            LineWrap::Word => Box::new(WordWrap::new()),
-            _ => Box::new(NoLineWrap),
-        };
-        return line_wrap_strategy.compute_lines(&self.spans, &self.config.size, &self.text);
+    pub fn apply_size(&mut self, size: Size) {
+        self.config.size = size;
+        self.layout_lines();
     }
 
     pub fn layout(&mut self) {
@@ -181,9 +159,10 @@ impl AttributedString {
             for range in line.get_ranges().iter() {
                 for (span, ..) in self.spans.find_mut(range.start, range.end) {
                     for glyph_token in span.iter_glyphs_in_range_mut(&range) {
-                        glyph_token.transform = glyph_token
-                            .transform
-                            .pre_translate(curr_pos_x.to_pt(), curr_pos_y.to_pt());
+                        glyph_token.transform = tiny_skia_path::Transform::from_translate(
+                            curr_pos_x.to_pt(),
+                            curr_pos_y.to_pt(),
+                        );
 
                         curr_pos_x += glyph_token.x_advance;
                     }
@@ -194,88 +173,38 @@ impl AttributedString {
         self.lines = lines;
     }
 
-    pub fn to_path(&self, fonts_book: &mut FontsBook) -> Option<tiny_skia_path::Path> {
-        let mut text_builder = tiny_skia_path::PathBuilder::new();
+    pub fn compute_lines(&self) -> Vec<Line> {
+        let mut line_wrap_strategy: Box<dyn LineWrapStrategy> = match self.config.line_wrap {
+            LineWrap::None => Box::new(NoLineWrap),
+            LineWrap::Word => Box::new(WordWrap::new()),
+            _ => Box::new(NoLineWrap),
+        };
+        return line_wrap_strategy.compute_lines(&self.spans, &self.config.size, &self.text);
+    }
 
-        for Interval { val: span, .. } in self.spans.iter() {
-            let mut span_builder = tiny_skia_path::PathBuilder::new();
-
-            if let Some(font) = fonts_book.get_font_by_info(span.get_attrs().get_font_info()) {
-                let font_size = span.get_attrs().get_font_size();
-
-                for (cluster, _) in span.iter_glyph_clusters() {
-                    let mut cluster_builder = tiny_skia_path::PathBuilder::new();
-                    let mut width = Abs::zero();
-                    let mut x = Abs::zero();
-
-                    for glyph_token in cluster {
-                        let sx = font.get_scale_factor(font_size);
-
-                        if let Some(outline) = outline(glyph_token.get_glyph().glyph_id, &font) {
-                            // By default, glyphs are upside-down, so we have to mirror them
-                            let mut transform = tiny_skia_path::Transform::from_scale(1.0, -1.0);
-
-                            // Scale to font-size
-                            transform = transform.pre_scale(sx.to_pt(), sx.to_pt());
-
-                            // Apply offset and transform.
-                            //
-                            // The first glyph in the cluster will have an offset from 0x0,
-                            // but the later one will have an offset from the "current position".
-                            // So we have to keep an advance.
-                            transform.tx += (x + glyph_token.get_glyph().x_offset.at(font_size))
-                                .to_pt()
-                                + glyph_token.transform.tx;
-                            transform.ty += glyph_token.get_glyph().y_offset.at(font_size).to_pt()
-                                + glyph_token.transform.ty;
-
-                            if let Some(outline) = outline.transform(transform) {
-                                cluster_builder.push_path(&outline);
-                            }
+    fn divide_overlapping_spans(&mut self) {
+        if !self.spans.overlaps_merged {
+            self.spans
+                .divide_overlaps_with(|overlaps, range| match overlaps.len() {
+                    0 => panic!("Failed to devide overlapping spans!"), // Should never happen
+                    1 => {
+                        let mut overlap = overlaps[0].clone();
+                        if overlap.get_range().clone() != range {
+                            overlap.mark_dirty();
                         }
 
-                        x += glyph_token.x_advance;
-
-                        let glyph_width = glyph_token.x_advance;
-                        if glyph_width > width {
-                            width = glyph_width;
+                        return overlap;
+                    }
+                    _ => {
+                        let mut merged_attrs = Attrs::new();
+                        for &span in overlaps.iter() {
+                            merged_attrs.merge(span.get_attrs().clone());
                         }
-                    }
 
-                    if let Some(path) = cluster_builder.finish() {
-                        span_builder.push_path(&path);
+                        return Span::new(range, merged_attrs);
                     }
-                }
-            }
-
-            if let Some(path) = span_builder.finish() {
-                text_builder.push_path(&path);
-            }
+                });
         }
-
-        // Draw bounding box
-        // let rect_path = tiny_skia_path::PathBuilder::from_rect(
-        //     tiny_skia_path::Rect::from_xywh(
-        //         0.0,
-        //         0.0,
-        //         self.config.size.width(),
-        //         self.config.size.height(),
-        //     )
-        //     .unwrap(),
-        // );
-        // let stroked_rect_path = tiny_skia_path::PathStroker::new()
-        //     .stroke(
-        //         &rect_path,
-        //         &tiny_skia_path::Stroke {
-        //             width: 1.0,
-        //             ..Default::default()
-        //         },
-        //         1.0,
-        //     )
-        //     .unwrap();
-        // text_builder.push_path(&stroked_rect_path);
-
-        return text_builder.finish();
     }
 }
 
@@ -335,6 +264,7 @@ pub enum VerticalTextAlignment {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::outline::tiny_skia_path_builder::TinySkiaPathBuilder;
     use dyn_fonts_book::font::{info::FontFamily, variant::FontWeight};
     use dyn_utils::units::{em::Em, font_unit::FontUnit};
     use unicode_bidi::BidiInfo;
@@ -386,7 +316,7 @@ mod tests {
 
         attributed_string.tokenize_text(&mut fonts_book);
         attributed_string.layout();
-        let path = attributed_string.to_path(&mut fonts_book);
+        let path = TinySkiaPathBuilder::outline(&attributed_string, &mut fonts_book);
 
         // https://svg-path.com/
         log::info!("{:?}", path);

@@ -802,6 +802,7 @@ dependencies = [
  "serde",
  "smallvec",
  "specta",
+ "tiny-skia",
  "tiny-skia-path",
  "unicode-bidi",
  "unicode-linebreak",
