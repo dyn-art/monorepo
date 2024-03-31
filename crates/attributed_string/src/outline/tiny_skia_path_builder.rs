@@ -23,53 +23,55 @@ impl TinySkiaPathBuilder {
         for Interval { val: span, .. } in attributed_string.get_spans().iter() {
             let mut span_builder = tiny_skia_path::PathBuilder::new();
 
-            if let Some(font) = fonts_book.get_font_by_info(span.get_attrs().get_font_info()) {
-                let font_size = span.get_attrs().get_font_size();
+            let font_size = span.get_attrs().get_font_size();
 
-                for (cluster, _) in span.iter_glyph_clusters() {
-                    let mut cluster_builder = tiny_skia_path::PathBuilder::new();
-                    let mut width = Abs::zero();
-                    let mut x = Abs::zero();
+            for (cluster, _) in span.iter_glyph_clusters() {
+                let mut cluster_builder = tiny_skia_path::PathBuilder::new();
+                let mut width = Abs::zero();
+                let mut x = Abs::zero();
 
-                    for glyph_token in cluster {
-                        let sx = font.get_scale_factor(font_size);
+                for glyph_token in cluster {
+                    let font = match fonts_book.get_font_by_id(glyph_token.get_glyph().font_id) {
+                        Some(v) => v,
+                        None => continue,
+                    };
+                    let sx = font.get_scale_factor(font_size);
 
-                        if let Some(outline) =
-                            Self::outline_glyph(glyph_token.get_glyph().glyph_id, &font)
-                        {
-                            // By default, glyphs are upside-down, so we have to mirror them
-                            let mut transform = tiny_skia_path::Transform::from_scale(1.0, -1.0);
+                    if let Some(outline) =
+                        Self::outline_glyph(glyph_token.get_glyph().glyph_id, &font)
+                    {
+                        // By default, glyphs are upside-down, so we have to mirror them
+                        let mut transform = tiny_skia_path::Transform::from_scale(1.0, -1.0);
 
-                            // Scale to font-size
-                            transform = transform.pre_scale(sx.to_pt(), sx.to_pt());
+                        // Scale to font-size
+                        transform = transform.pre_scale(sx.to_pt(), sx.to_pt());
 
-                            // Apply offset and transform.
-                            //
-                            // The first glyph in the cluster will have an offset from 0x0,
-                            // but the later one will have an offset from the "current position".
-                            // So we have to keep an advance.
-                            transform.tx += (x + glyph_token.get_glyph().x_offset.at(font_size))
-                                .to_pt()
-                                + glyph_token.transform.tx;
-                            transform.ty += glyph_token.get_glyph().y_offset.at(font_size).to_pt()
-                                + glyph_token.transform.ty;
+                        // Apply offset and transform.
+                        //
+                        // The first glyph in the cluster will have an offset from 0x0,
+                        // but the later one will have an offset from the "current position".
+                        // So we have to keep an advance.
+                        transform.tx += (x + glyph_token.get_glyph().x_offset.at(font_size))
+                            .to_pt()
+                            + glyph_token.transform.tx;
+                        transform.ty += glyph_token.get_glyph().y_offset.at(font_size).to_pt()
+                            + glyph_token.transform.ty;
 
-                            if let Some(outline) = outline.transform(transform) {
-                                cluster_builder.push_path(&outline);
-                            }
-                        }
-
-                        x += glyph_token.x_advance;
-
-                        let glyph_width = glyph_token.x_advance;
-                        if glyph_width > width {
-                            width = glyph_width;
+                        if let Some(outline) = outline.transform(transform) {
+                            cluster_builder.push_path(&outline);
                         }
                     }
 
-                    if let Some(path) = cluster_builder.finish() {
-                        span_builder.push_path(&path);
+                    x += glyph_token.x_advance;
+
+                    let glyph_width = glyph_token.x_advance;
+                    if glyph_width > width {
+                        width = glyph_width;
                     }
+                }
+
+                if let Some(path) = cluster_builder.finish() {
+                    span_builder.push_path(&path);
                 }
             }
 

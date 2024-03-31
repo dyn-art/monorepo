@@ -22,8 +22,9 @@ pub fn shape_text_with_fallback(
 
     let mut resolved_glyphs_set: HashSet<MissingGlyph> = HashSet::new();
     for &missing_glyph in &missing_glyphs {
-        let _char = text[missing_glyph.byte_index..].chars().next().unwrap();
-        let fallback_font = match fonts_book.get_font_for_char(_char, &used_font_ids) {
+        let fallback_font = match fonts_book
+            .get_font_for_char(glyphs[missing_glyph.index].codepoint, &used_font_ids)
+        {
             Some(v) => v,
             None => continue,
         };

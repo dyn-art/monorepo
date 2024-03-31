@@ -11,8 +11,6 @@ use dyn_utils::{
     units::{abs::Abs, font_unit::FontUnit},
 };
 
-// TODO: Fix tests and add more tests
-
 #[test]
 fn test_hebrew_word() {
     let text = String::from("בדיקה");
@@ -20,7 +18,7 @@ fn test_hebrew_word() {
         start: 0,
         stop: text.len(),
         val: Attrs::new()
-            .font_family(FontFamily::Named(String::from("Noto Sans Hebrew")))
+            .font_family(FontFamily::Named(String::from("Noto Sans")))
             .font_size(Abs::pt(36.0))
             .line_height(FontUnit::abs(Abs::pt(40.0))),
     }];
@@ -41,7 +39,7 @@ fn test_hebrew_paragraph() {
         start: 0,
         stop: text.len(),
         val: Attrs::new()
-            .font_family(FontFamily::Named(String::from("Noto Sans Hebrew")))
+            .font_family(FontFamily::Named(String::from("Noto Sans")))
             .font_size(Abs::pt(36.0))
             .line_height(FontUnit::abs(Abs::pt(40.0))),
     }];
@@ -85,7 +83,7 @@ fn test_arabic_word() {
         start: 0,
         stop: text.len(),
         val: Attrs::new()
-            .font_family(FontFamily::Named(String::from("Noto Sans Arabic")))
+            .font_family(FontFamily::Named(String::from("Noto Sans")))
             .font_size(Abs::pt(36.0))
             .line_height(FontUnit::abs(Abs::pt(40.0))),
     }];
@@ -106,7 +104,7 @@ fn test_arabic_paragraph() {
         start: 0,
         stop: text.len(),
         val: Attrs::new()
-            .font_family(FontFamily::Named(String::from("Noto Sans Arabic")))
+            .font_family(FontFamily::Named(String::from("Noto Sans")))
             .font_size(Abs::pt(36.0))
             .line_height(FontUnit::abs(Abs::pt(40.0))),
     }];

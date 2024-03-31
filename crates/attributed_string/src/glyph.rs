@@ -8,6 +8,7 @@ pub struct Glyph {
     /// A font id this glyph belongs to.
     pub font_id: FontId,
     /// A glyph id.
+    /// If the glyph id equals 0, the glyph is missing.
     pub glyph_id: GlyphId,
     /// Codepoint in the orignal string.
     pub codepoint: char,
@@ -36,5 +37,9 @@ pub struct Glyph {
 impl Glyph {
     pub fn height(&self) -> Em {
         self.ascent - self.descent
+    }
+
+    pub fn is_missing(&self) -> bool {
+        self.glyph_id.0 == 0
     }
 }
