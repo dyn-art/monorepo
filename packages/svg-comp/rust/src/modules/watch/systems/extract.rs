@@ -9,7 +9,7 @@ use bevy_ecs::{
     query::Changed,
     system::{Query, Res, ResMut},
 };
-use bevy_transform::components::Transform;
+use bevy_transform::components::{GlobalTransform, Transform};
 use dyn_comp_bundles::components::mixins::SizeMixin;
 
 pub fn extract_changed_components(
@@ -17,6 +17,7 @@ pub fn extract_changed_components(
     mut changed_components_res: ResMut<ChangedComponentsRes>,
     query_size_mixin: Query<&SizeMixin, Changed<SizeMixin>>,
     query_transform: Query<&Transform, Changed<Transform>>,
+    query_global_transform: Query<&GlobalTransform, Changed<GlobalTransform>>,
 ) {
     for (entity, compopnent_variants) in watched_entities_res.get_watched_entities().iter() {
         for component_variant in compopnent_variants {
@@ -29,6 +30,12 @@ pub fn extract_changed_components(
                 }
                 WatchableComponentVariant::Transform => {
                     if let Ok(component) = query_transform.get(*entity) {
+                        changed_components_res
+                            .push_change(*entity, component.to_component_change());
+                    }
+                }
+                WatchableComponentVariant::GlobalTransform => {
+                    if let Ok(component) = query_global_transform.get(*entity) {
                         changed_components_res
                             .push_change(*entity, component.to_component_change());
                     }

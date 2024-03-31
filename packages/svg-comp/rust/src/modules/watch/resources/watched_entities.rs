@@ -33,4 +33,5 @@ impl WatchedEntitiesRes {
 pub enum WatchableComponentVariant {
     Size,
     Transform,
+    GlobalTransform,
 }

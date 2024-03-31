@@ -13,7 +13,7 @@ use bevy_ecs::{
     query::{With, Without},
     system::{Query, SystemState},
 };
-use bevy_transform::components::Transform;
+use bevy_transform::components::{GlobalTransform, Transform};
 use dyn_comp_bundles::{
     components::mixins::{Root, SizeMixin},
     events::InputEvent,
@@ -129,6 +129,11 @@ impl SvgCompHandle {
                     }
                     WatchableComponentVariant::Transform => {
                         if let Some(component) = self.app.world.get::<Transform>(entity) {
+                            changes.push(component.to_component_change())
+                        }
+                    }
+                    WatchableComponentVariant::GlobalTransform => {
+                        if let Some(component) = self.app.world.get::<GlobalTransform>(entity) {
                             changes.push(component.to_component_change())
                         }
                     }
