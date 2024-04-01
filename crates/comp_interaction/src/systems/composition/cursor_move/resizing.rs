@@ -28,17 +28,23 @@ pub fn handle_resizing(
     let cursor_position = transform_point_to_viewport(comp_res, cursor_position, true);
 
     for (mut transform, global_transform, mut size_mixin) in selected_nodes_query.iter_mut() {
-        let offset = global_transform.translation() - transform.translation;
+        let global_transform = global_transform.compute_transform();
         let SizeMixin(size) = size_mixin.as_mut();
+
+        let rotation = transform_to_z_rotation_rad(&transform);
+        let global_rotation = transform_to_z_rotation_rad(&global_transform);
+        let translation_offset = global_transform.translation - transform.translation;
+        let rotation_offset = global_rotation - rotation;
+
         let new_bounds = resize_bounds(
             &initial_bounds,
             corner,
             &cursor_position,
-            -transform_to_z_rotation_rad(&transform),
+            -rotation - rotation_offset,
         );
 
-        transform.translation.x = new_bounds.position.x - offset.x;
-        transform.translation.y = new_bounds.position.y - offset.y;
+        transform.translation.x = new_bounds.position.x - translation_offset.x;
+        transform.translation.y = new_bounds.position.y - translation_offset.y;
         *size = new_bounds.size;
     }
 }
