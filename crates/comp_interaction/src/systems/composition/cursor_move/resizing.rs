@@ -11,7 +11,6 @@ use dyn_comp_core::resources::composition::CompositionRes;
 use dyn_utils::units::abs::Abs;
 use glam::Vec2;
 
-// TODO: Doesn't work with nested
 pub fn handle_resizing(
     comp_res: &CompositionRes,
     selected_nodes_query: &mut Query<
@@ -29,17 +28,17 @@ pub fn handle_resizing(
     let cursor_position = transform_point_to_viewport(comp_res, cursor_position, true);
 
     for (mut transform, global_transform, mut size_mixin) in selected_nodes_query.iter_mut() {
-        let global_transform = global_transform.compute_transform();
+        let offset = global_transform.translation() - transform.translation;
         let SizeMixin(size) = size_mixin.as_mut();
         let new_bounds = resize_bounds(
             &initial_bounds,
             corner,
             &cursor_position,
-            -transform_to_z_rotation_rad(&global_transform),
+            -transform_to_z_rotation_rad(&transform),
         );
 
-        transform.translation.x = new_bounds.position.x;
-        transform.translation.y = new_bounds.position.y;
+        transform.translation.x = new_bounds.position.x - offset.x;
+        transform.translation.y = new_bounds.position.y - offset.y;
         *size = new_bounds.size;
     }
 }

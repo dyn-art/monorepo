@@ -27,10 +27,10 @@ pub fn handle_rotating(
     let cursor_position = transform_point_to_viewport(comp_res, cursor_position, true);
 
     for (mut transform, global_transform, SizeMixin(size)) in selected_nodes_query.iter_mut() {
-        let computed_global_transform = global_transform.compute_transform();
+        let global_transform = global_transform.compute_transform();
         let (width, height) = size.to_tuple();
         let pivot_point = Vec3::new(width / 2.0, height / 2.0, 0.0);
-        let global_pivot_point = computed_global_transform.transform_point(pivot_point);
+        let global_pivot_point = global_transform.transform_point(pivot_point);
 
         // Determine rotation offset based on corner
         let rotation_offset_rad: f32 = match corner {
