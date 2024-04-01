@@ -5,7 +5,7 @@ use crate::{
     utils::{rotate_point, transform_point_to_viewport},
 };
 use bevy_ecs::{query::With, system::Query};
-use bevy_transform::components::Transform;
+use bevy_transform::components::{GlobalTransform, Transform};
 use dyn_comp_bundles::{components::mixins::SizeMixin, utils::transform_to_z_rotation_rad};
 use dyn_comp_core::resources::composition::CompositionRes;
 use dyn_utils::units::abs::Abs;
@@ -13,7 +13,10 @@ use glam::Vec2;
 
 pub fn handle_resizing(
     comp_res: &CompositionRes,
-    selected_nodes_query: &mut Query<(&mut Transform, &mut SizeMixin), With<Selected>>,
+    selected_nodes_query: &mut Query<
+        (&mut Transform, &GlobalTransform, &mut SizeMixin),
+        With<Selected>,
+    >,
     event: &CursorMovedOnCompInputEvent,
     corner: u8,
     initial_bounds: &mut XYWH,
@@ -24,13 +27,14 @@ pub fn handle_resizing(
     } = event;
     let cursor_position = transform_point_to_viewport(comp_res, cursor_position, true);
 
-    for (mut transform, mut size_mixin) in selected_nodes_query.iter_mut() {
+    for (mut transform, global_transform, mut size_mixin) in selected_nodes_query.iter_mut() {
+        let global_transform = global_transform.compute_transform();
         let SizeMixin(size) = size_mixin.as_mut();
         let new_bounds = resize_bounds(
             &initial_bounds,
             corner,
             &cursor_position,
-            -transform_to_z_rotation_rad(&transform),
+            -transform_to_z_rotation_rad(&global_transform),
         );
 
         transform.translation.x = new_bounds.position.x;

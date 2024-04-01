@@ -30,7 +30,7 @@ pub fn handle_cursor_moved_on_comp_event(
         // Translating
         Query<&mut Transform, With<Selected>>,
         // Resizing
-        Query<(&mut Transform, &mut SizeMixin), With<Selected>>,
+        Query<(&mut Transform, &GlobalTransform, &mut SizeMixin), With<Selected>>,
         // Rotating
         Query<(&mut Transform, &GlobalTransform, &SizeMixin), With<Selected>>,
     )>,

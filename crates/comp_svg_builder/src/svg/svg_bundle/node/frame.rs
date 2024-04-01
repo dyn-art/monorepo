@@ -94,6 +94,9 @@ impl FrameNodeSvgBundle {
         root_g_element.append_child_in_bundle_context(&mut click_area_rect_element);
 
         let mut styles_wrapper_g_element = cx.create_element(SvgTag::Group);
+        styles_wrapper_g_element.set_style(SvgStyle::PointerEvents {
+            pointer_events: SvgPointerEventsStyle::None,
+        });
         root_g_element.append_child_in_bundle_context(&mut styles_wrapper_g_element);
 
         let mut children_wrapper_g_element = cx.create_element(SvgTag::Group);

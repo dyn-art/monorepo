@@ -1,5 +1,5 @@
 use crate::{
-    components::{Locked, Selected},
+    components::{Locked, Preselected, Selected},
     events::CursorDownOnEntityInputEvent,
     resources::comp_interaction::{CompInteractionRes, InteractionMode, MouseButton},
 };
@@ -9,43 +9,56 @@ use bevy_ecs::{
     query::{With, Without},
     system::{Commands, Query, ResMut},
 };
-use dyn_comp_bundles::components::{
-    mixins::Root,
-    nodes::{CompNode, FrameCompNode},
-};
+use bevy_hierarchy::Parent;
+use dyn_comp_bundles::components::{mixins::Root, nodes::CompNode};
 use glam::Vec2;
 
-// Logs:
-// INFO: Start: handle_cursor_down_on_entity_event
-// INFO: handle_cursor_down_on_entity_event: 1v0 -> Rectangle (click_area)
-// INFO: handle_cursor_down_on_entity_event: 0v0 -> Frame (click_area)
-// INFO: End: handle_cursor_down_on_entity_event
-//
-// Frame (0v0) -> Rectangle (1v0)
+static DOUBLE_CLICK_WINDOW: web_time::Duration = web_time::Duration::from_millis(500);
+
+// Selection Rules for Elements:
+// 1. Avoid selecting the top-level (root) frame directly; focus on its children for selection.
+//    This ensures actions are targeted towards elements within a frame, not the frame itself.
+// 2. In cases of nested frames, select the nested frame within the top-level frame,
+//    bypassing its children. This aligns with the principle of managing frames as whole units
+//    at the top level before diving into their contents (with the exception of root frames).
+// 3. For interacting with elements inside nested frames, a double-click on the desired item is required.
+// 4. When selecting items within nested frames, avoid propagating the selection to parent frames.
+//    This means selection stays on the most deeply nested item clicked, preserving the intent of the action.
+// 5. Locked or invisible nodes should never be selected.
+// 6. Selection should respect grouping hierarchies. If an item is part of a group,
+//    selecting the item should imply selection of the whole group, unless specifically
+//    targeting an item within the group through direct interaction (e.g., double-click), similar to rule 2.
+// 7. Prioritize selectable items based on cursor proximity and the z-index.
+//    In dense areas with overlapping elements, the item closest to the cursor and highest on the z-index
+//    should be selected first, with an option to cycle through overlapping items via repeated clicks
+//    or modifier key combinations.
+
+// Events received if clicked on nested Rectangle:
+// INFO: [handle_cursor_down_on_entity_event] Start
+// INFO: [handle_cursor_down_on_entity_event] Entity: 10v1 <- Rectangle (Clicked on)
+// INFO: [handle_cursor_down_on_entity_event] Entity: 8v1 <- Frame Nested
+// INFO: [handle_cursor_down_on_entity_event] Entity:6v1 <- Frame Nested
+// INFO: [handle_cursor_down_on_entity_event] Entity: 4v1 <- Frame (Root)
+// INFO: [handle_cursor_down_on_entity_event] End
 pub fn handle_cursor_down_on_entity_event(
     mut commands: Commands,
     mut event_reader: EventReader<CursorDownOnEntityInputEvent>,
     mut comp_interaction_res: ResMut<CompInteractionRes>,
-    selected_nodes_query: Query<Entity, With<Selected>>,
-    frame_query: Query<
-        Entity,
-        (
-            With<FrameCompNode>,
-            Without<Locked>,
-            Without<Root>,
-            Without<Selected>,
-        ),
-    >,
-    node_query: Query<
-        Entity,
+    unselected_node_query: Query<
+        &Parent,
         (
             With<CompNode>,
-            Without<Locked>,
-            Without<FrameCompNode>,
+            Without<Root>,
             Without<Selected>,
+            Without<Locked>,
         ),
     >,
-    selected_node_query: Query<Entity, (With<CompNode>, Without<Locked>, Without<Root>)>,
+    preselected_node_query: Query<
+        &Preselected,
+        (With<CompNode>, With<Preselected>, Without<Locked>),
+    >,
+    selected_node_query: Query<Entity, (With<CompNode>, With<Selected>)>,
+    root_node_query: Query<Entity, (With<CompNode>, With<Root>)>,
 ) {
     let raycast_entities: Vec<(Entity, Vec2)> = event_reader
         .read()
@@ -57,41 +70,124 @@ pub fn handle_cursor_down_on_entity_event(
             }
         })
         .collect();
+
     if raycast_entities.is_empty() {
         return;
     }
 
-    // Find the next best node to select
-    let selected_entity = select_next_node(
-        &raycast_entities,
-        &frame_query,
-        &node_query,
-        &selected_node_query,
-    );
+    let now = web_time::Instant::now();
 
-    // Select new node if it's not already selected
-    if let Some((entity, pos, is_new)) = selected_entity {
-        // Mark node as selected
-        if is_new {
-            commands.entity(entity).insert(Selected);
+    // Preselection of nodes that could be selected or preselected
+    // (entity, position, preselect)
+    let mut preselected_nodes: Vec<PreselectedNode> = Vec::new();
 
-            #[cfg(feature = "tracing")]
-            log::info!(
-                "[handle_cursor_down_on_entity_event] Selected Entity {:?} at {:?}",
-                entity,
-                pos
-            );
+    // Preselect nodes based on raycasted entities
+    for (entity, position) in raycast_entities.iter().copied() {
+        log::info!("[handle_cursor_down_on_entity_event] Entity: {:?}", entity);
+
+        if let Ok(parent) = unselected_node_query.get(entity) {
+            // Consider selecting preselected node
+            if let Ok(Preselected { timestamp }) = preselected_node_query.get(entity) {
+                if now.duration_since(*timestamp) <= DOUBLE_CLICK_WINDOW {
+                    preselected_nodes.push(PreselectedNode {
+                        entity,
+                        position,
+                        preselect: false,
+                        was_selected: false,
+                        was_preselected: true,
+                    });
+                    continue;
+                }
+            }
+
+            let parent_entity = parent.get();
+            let is_parent_root = root_node_query.get(parent_entity).is_ok();
+            let is_parent_selected = selected_node_query.get(parent_entity).is_ok();
+
+            // Consider selection node whose parent is the root
+            if is_parent_root {
+                preselected_nodes.push(PreselectedNode {
+                    entity,
+                    position,
+                    preselect: false,
+                    was_selected: false,
+                    was_preselected: false,
+                });
+            }
+            // Consider preselecting node whose parent is selected and not the root
+            else if is_parent_selected && !is_parent_root {
+                preselected_nodes.push(PreselectedNode {
+                    entity,
+                    position,
+                    preselect: true,
+                    was_selected: false,
+                    was_preselected: false,
+                });
+            }
+
+            continue;
         }
 
-        comp_interaction_res.interaction_mode = InteractionMode::Translating {
-            origin: pos,
-            current: pos,
-        };
+        // Consider selecting already selected node
+        if selected_node_query.get(entity).is_ok() {
+            preselected_nodes.push(PreselectedNode {
+                entity,
+                position,
+                preselect: false,
+                was_selected: true,
+                was_preselected: false,
+            });
+        }
+    }
+
+    log::info!(
+        "[handle_cursor_down_on_entity_event] Preselection: {:?}",
+        preselected_nodes
+    );
+
+    let preselected_node = preselected_nodes.first().copied();
+
+    // Select or preselect preselected node
+    if let Some(PreselectedNode {
+        entity,
+        position,
+        preselect,
+        was_selected,
+        was_preselected,
+    }) = preselected_node
+    {
+        if preselect {
+            commands
+                .entity(entity)
+                .insert(Preselected { timestamp: now });
+        } else {
+            if !was_selected {
+                let mut entiy_commands = commands.entity(entity);
+
+                entiy_commands.insert(Selected);
+
+                if was_preselected {
+                    entiy_commands.remove::<Preselected>();
+                }
+
+                #[cfg(feature = "tracing")]
+                log::info!(
+                    "[handle_cursor_down_on_entity_event] Selected Entity {:?} at {:?}",
+                    entity,
+                    position
+                );
+            }
+
+            comp_interaction_res.interaction_mode = InteractionMode::Translating {
+                origin: position,
+                current: position,
+            };
+        }
     }
 
     // Unselect previously selected nodes that are no longer selected
-    for entity in selected_nodes_query.iter() {
-        if selected_entity.map_or(true, |(selected, _, _)| selected != entity) {
+    for entity in selected_node_query.iter() {
+        if preselected_node.map_or(true, |pn| pn.entity != entity) {
             commands.entity(entity).remove::<Selected>();
             #[cfg(feature = "tracing")]
             log::info!(
@@ -102,58 +198,11 @@ pub fn handle_cursor_down_on_entity_event(
     }
 }
 
-fn select_next_node(
-    raycast_entities: &Vec<(Entity, Vec2)>,
-    frame_query: &Query<
-        Entity,
-        (
-            With<FrameCompNode>,
-            Without<Locked>,
-            Without<Root>,
-            Without<Selected>,
-        ),
-    >,
-    node_query: &Query<
-        Entity,
-        (
-            With<CompNode>,
-            Without<Locked>,
-            Without<FrameCompNode>,
-            Without<Selected>,
-        ),
-    >,
-    selected_node_query: &Query<Entity, (With<CompNode>, Without<Locked>, Without<Root>)>,
-) -> Option<(Entity, Vec2, bool)> {
-    // First, attempt to find a non-Frame, non-locked, non-selected node
-    raycast_entities
-        .iter()
-        .rev()
-        .find_map(|&(entity, pos)| {
-            if node_query.contains(entity) {
-                Some((entity, pos, true))
-            } else {
-                None
-            }
-        })
-        // If no such node is found, try to find a frame that is not a root,
-        // not selected and not locked
-        .or_else(|| {
-            raycast_entities.iter().rev().find_map(|&(entity, pos)| {
-                if frame_query.contains(entity) {
-                    Some((entity, pos, true))
-                } else {
-                    None
-                }
-            })
-        })
-        // If still no new node found, select already selected node
-        .or_else(|| {
-            raycast_entities.iter().rev().find_map(|&(entity, pos)| {
-                if selected_node_query.contains(entity) {
-                    Some((entity, pos, false))
-                } else {
-                    None
-                }
-            })
-        })
+#[derive(Debug, Clone, Copy)]
+struct PreselectedNode {
+    entity: Entity,
+    position: Vec2,
+    preselect: bool,
+    was_preselected: bool,
+    was_selected: bool,
 }
