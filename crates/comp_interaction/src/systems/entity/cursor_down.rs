@@ -57,7 +57,7 @@ pub fn handle_cursor_down_on_entity_event(
         &Preselected,
         (With<CompNode>, With<Preselected>, Without<Locked>),
     >,
-    selected_node_query: Query<Entity, (With<CompNode>, With<Selected>)>,
+    selected_node_query: Query<(Entity, &Selected), (With<CompNode>, With<Selected>)>,
     root_node_query: Query<Entity, (With<CompNode>, With<Root>)>,
 ) {
     let raycast_entities: Vec<(Entity, Vec2)> = event_reader
@@ -97,12 +97,13 @@ pub fn handle_cursor_down_on_entity_event(
                         was_preselected: true,
                     });
                     continue;
+                } else {
+                    commands.entity(entity).remove::<Preselected>();
                 }
             }
 
             let parent_entity = parent.get();
             let is_parent_root = root_node_query.get(parent_entity).is_ok();
-            let is_parent_selected = selected_node_query.get(parent_entity).is_ok();
 
             // Consider selection node whose parent is the root
             if is_parent_root {
@@ -113,19 +114,20 @@ pub fn handle_cursor_down_on_entity_event(
                     was_selected: false,
                     was_preselected: false,
                 });
+                continue;
             }
-            // Consider preselecting node whose parent is selected and not the root
-            else if is_parent_selected && !is_parent_root {
+
+            // Consider preselecting node whose parent is selected
+            if let Ok((_, Selected { timestamp })) = selected_node_query.get(parent_entity) {
                 preselected_nodes.push(PreselectedNode {
                     entity,
                     position,
-                    preselect: true,
+                    preselect: now.duration_since(*timestamp) > DOUBLE_CLICK_WINDOW,
                     was_selected: false,
                     was_preselected: false,
                 });
+                continue;
             }
-
-            continue;
         }
 
         // Consider selecting already selected node
@@ -145,7 +147,8 @@ pub fn handle_cursor_down_on_entity_event(
         preselected_nodes
     );
 
-    let preselected_node = preselected_nodes.first().copied();
+    let mut selected_node: Option<Entity> = None;
+    let mut unselect_prev_selected = false;
 
     // Select or preselect preselected node
     if let Some(PreselectedNode {
@@ -154,7 +157,7 @@ pub fn handle_cursor_down_on_entity_event(
         preselect,
         was_selected,
         was_preselected,
-    }) = preselected_node
+    }) = preselected_nodes.first().copied()
     {
         if preselect {
             commands
@@ -163,9 +166,7 @@ pub fn handle_cursor_down_on_entity_event(
         } else {
             if !was_selected {
                 let mut entiy_commands = commands.entity(entity);
-
-                entiy_commands.insert(Selected);
-
+                entiy_commands.insert(Selected { timestamp: now });
                 if was_preselected {
                     entiy_commands.remove::<Preselected>();
                 }
@@ -178,22 +179,29 @@ pub fn handle_cursor_down_on_entity_event(
                 );
             }
 
+            selected_node = Some(entity);
+            unselect_prev_selected = true;
+
             comp_interaction_res.interaction_mode = InteractionMode::Translating {
                 origin: position,
                 current: position,
             };
         }
+    } else {
+        unselect_prev_selected = true;
     }
 
     // Unselect previously selected nodes that are no longer selected
-    for entity in selected_node_query.iter() {
-        if preselected_node.map_or(true, |pn| pn.entity != entity) {
-            commands.entity(entity).remove::<Selected>();
-            #[cfg(feature = "tracing")]
-            log::info!(
-                "[handle_cursor_down_on_entity_event] Unselected Entity: {:?}",
-                entity
-            );
+    if unselect_prev_selected {
+        for (entity, _) in selected_node_query.iter() {
+            if selected_node.map_or(true, |e| e != entity) {
+                commands.entity(entity).remove::<Selected>();
+                #[cfg(feature = "tracing")]
+                log::info!(
+                    "[handle_cursor_down_on_entity_event] Unselected Entity: {:?}",
+                    entity
+                );
+            }
         }
     }
 }

@@ -11,6 +11,7 @@ use dyn_comp_core::resources::composition::CompositionRes;
 use dyn_utils::units::abs::Abs;
 use glam::Vec2;
 
+// TODO: Doesn't work with nested
 pub fn handle_resizing(
     comp_res: &CompositionRes,
     selected_nodes_query: &mut Query<
