@@ -5,8 +5,12 @@ use crate::{
     utils::{rotate_point, transform_point_to_viewport},
 };
 use bevy_ecs::{query::With, system::Query};
+use bevy_hierarchy::Parent;
 use bevy_transform::components::{GlobalTransform, Transform};
-use dyn_comp_bundles::{components::mixins::SizeMixin, utils::transform_to_z_rotation_rad};
+use dyn_comp_bundles::{
+    components::mixins::SizeMixin,
+    utils::{get_parent_global_transfrom, global_to_local_point3, transform_to_z_rotation_rad},
+};
 use dyn_comp_core::resources::composition::CompositionRes;
 use dyn_utils::units::abs::Abs;
 use glam::Vec2;
@@ -15,12 +19,13 @@ use glam::Vec2;
 pub fn handle_resizing(
     comp_res: &CompositionRes,
     selected_nodes_query: &mut Query<
-        (&mut Transform, &GlobalTransform, &mut SizeMixin),
+        (&mut Transform, &mut SizeMixin, Option<&Parent>),
         With<Selected>,
     >,
+    global_transform_query: &Query<&GlobalTransform>,
     event: &CursorMovedOnCompInputEvent,
     corner: u8,
-    initial_bounds: &mut XYWH,
+    initial_bounds: &XYWH,
 ) {
     let CursorMovedOnCompInputEvent {
         position: cursor_position,
@@ -28,17 +33,31 @@ pub fn handle_resizing(
     } = event;
     let cursor_position = transform_point_to_viewport(comp_res, cursor_position, true);
 
-    for (mut transform, global_transform, mut size_mixin) in selected_nodes_query.iter_mut() {
-        let global_transform = global_transform.compute_transform();
+    for (mut transform, mut size_mixin, maybe_parent) in selected_nodes_query.iter_mut() {
         let SizeMixin(size) = size_mixin.as_mut();
+        let maybe_parent_global_transform =
+            get_parent_global_transfrom(maybe_parent, global_transform_query);
+        let local_cursor_position =
+            global_to_local_point3(cursor_position.extend(0.0), maybe_parent_global_transform)
+                .truncate();
+        let local_initial_bounds = XYWH {
+            position: global_to_local_point3(
+                initial_bounds.position.extend(0.0),
+                maybe_parent_global_transform,
+            )
+            .truncate(),
+            size: initial_bounds.size,
+        };
 
-        let global_rotation = transform_to_z_rotation_rad(&global_transform);
-        let translation_offset = global_transform.translation - transform.translation;
+        let new_bounds = resize_bounds(
+            &local_initial_bounds,
+            corner,
+            &local_cursor_position,
+            -transform_to_z_rotation_rad(&transform),
+        );
 
-        let new_bounds = resize_bounds(&initial_bounds, corner, &cursor_position, -global_rotation);
-
-        transform.translation.x = new_bounds.position.x - translation_offset.x;
-        transform.translation.y = new_bounds.position.y - translation_offset.y;
+        transform.translation.x = new_bounds.position.x;
+        transform.translation.y = new_bounds.position.y;
         *size = new_bounds.size;
     }
 }
