@@ -78,3 +78,6 @@ pub struct ImageAssetMixin(pub Option<ImageId>);
 
 #[derive(Component, Debug, Clone)]
 pub struct AttributedStringMixin(pub AttributedString);
+
+#[derive(Component, Debug, Default, Clone, Copy)]
+pub struct HierarchyLevel(pub u8);

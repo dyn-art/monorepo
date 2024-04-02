@@ -10,7 +10,10 @@ use bevy_ecs::{
     system::{Commands, Query, ResMut},
 };
 use bevy_hierarchy::{Children, Parent};
-use dyn_comp_bundles::components::{mixins::Root, nodes::CompNode};
+use dyn_comp_bundles::components::{
+    mixins::{HierarchyLevel, Root},
+    nodes::CompNode,
+};
 use glam::Vec2;
 use std::collections::HashSet;
 
@@ -63,6 +66,7 @@ pub fn handle_cursor_down_on_entity_event(
         (With<CompNode>, With<Selected>),
     >,
     root_node_query: Query<Entity, (With<CompNode>, With<Root>)>,
+    hierarchy_level_query: Query<&HierarchyLevel>,
 ) {
     let raycast_entities: Vec<(Entity, Vec2)> = event_reader
         .read()
@@ -94,7 +98,11 @@ pub fn handle_cursor_down_on_entity_event(
 
     // Find nodes that could be selected or preselected
     for (entity, cursor_position) in raycast_entities.iter().copied() {
-        log::info!("[handle_cursor_down_on_entity_event] Entity: {:?}", entity);
+        log::info!(
+            "[handle_cursor_down_on_entity_event] Entity {:?} at level {:?}",
+            entity,
+            hierarchy_level_query.get(entity).ok()
+        );
 
         if let Ok((maybe_parent, maybe_children)) = unselected_node_query.get(entity) {
             // Consider selecting preselected node
