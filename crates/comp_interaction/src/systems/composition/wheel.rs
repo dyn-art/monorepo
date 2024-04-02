@@ -4,6 +4,8 @@ use dyn_comp_bundles::properties::Viewport;
 use dyn_comp_core::resources::composition::CompositionRes;
 use dyn_utils::{properties::size::Size, units::abs::Abs};
 
+static ZOOM_FACTOR: f32 = 0.9;
+
 pub fn handle_wheel_on_comp_event(
     mut event_reader: EventReader<WheeledOnCompInputEvent>,
     mut comp_res: ResMut<CompositionRes>,
@@ -24,13 +26,12 @@ pub fn handle_wheel_on_comp_event(
             ctrl_key_pressed,
             meta_key_pressed,
         } = &event;
-        let zoom_factor = 0.7;
 
         if *ctrl_key_pressed || *meta_key_pressed {
             let scale_factor = if delta.y < 0.0 {
-                1.0 / zoom_factor
+                1.0 / ZOOM_FACTOR
             } else {
-                zoom_factor
+                ZOOM_FACTOR
             };
 
             // Calculate relative cursor position within the composition
