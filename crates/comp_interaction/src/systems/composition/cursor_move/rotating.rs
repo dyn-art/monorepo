@@ -33,7 +33,7 @@ pub fn handle_rotating(
         let global_pivot_point = global_transform.transform_point(pivot_point);
 
         // Determine rotation offset based on corner
-        let rotation_offset_rad: f32 = match corner {
+        let rotation_offset_corner_rad: f32 = match corner {
             _ if corner == (HandleSide::Top as u8 | HandleSide::Left as u8) => {
                 f32::atan2(-height, -width)
             }
@@ -49,13 +49,19 @@ pub fn handle_rotating(
             _ => 0.0,
         };
 
+        // Determine rotation offset based on global rotation (necessary for nested node)
+        let rotation_offset_nested_rad = transform_to_z_rotation_rad(&global_transform)
+            - transform_to_z_rotation_rad(&transform);
+
+        let rotation_offset_rad = rotation_offset_corner_rad + rotation_offset_nested_rad;
+
         // Calculate rotation based on the corner
         let rotation_angle_rad =
             calculate_rotation_rad(initial_rotation_rad, &cursor_position, &global_pivot_point);
         let final_rotation_angle_rad =
             (-rotation_angle_rad + rotation_offset_rad - initial_rotation_rad) * -1.0;
 
-        // Apply rotation
+        // Apply rotation to transform
         let reset_rotation_transform_mat4 = rotate_around_point(
             transform.compute_matrix(),
             -transform_to_z_rotation_rad(&transform),

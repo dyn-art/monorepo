@@ -11,6 +11,7 @@ use dyn_comp_core::resources::composition::CompositionRes;
 use dyn_utils::units::abs::Abs;
 use glam::Vec2;
 
+// TODO: Improve - A bit laggy when nested
 pub fn handle_resizing(
     comp_res: &CompositionRes,
     selected_nodes_query: &mut Query<
@@ -31,17 +32,10 @@ pub fn handle_resizing(
         let global_transform = global_transform.compute_transform();
         let SizeMixin(size) = size_mixin.as_mut();
 
-        let rotation = transform_to_z_rotation_rad(&transform);
         let global_rotation = transform_to_z_rotation_rad(&global_transform);
         let translation_offset = global_transform.translation - transform.translation;
-        let rotation_offset = global_rotation - rotation;
 
-        let new_bounds = resize_bounds(
-            &initial_bounds,
-            corner,
-            &cursor_position,
-            -rotation - rotation_offset,
-        );
+        let new_bounds = resize_bounds(&initial_bounds, corner, &cursor_position, -global_rotation);
 
         transform.translation.x = new_bounds.position.x - translation_offset.x;
         transform.translation.y = new_bounds.position.y - translation_offset.y;

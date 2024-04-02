@@ -28,7 +28,7 @@ pub fn handle_cursor_moved_on_comp_event(
     // https://bevy-cheatbook.github.io/programming/paramset.html
     mut query_set: ParamSet<(
         // Translating
-        Query<&mut Transform, With<Selected>>,
+        Query<(&mut Transform, &GlobalTransform), With<Selected>>,
         // Resizing
         Query<(&mut Transform, &GlobalTransform, &mut SizeMixin), With<Selected>>,
         // Rotating

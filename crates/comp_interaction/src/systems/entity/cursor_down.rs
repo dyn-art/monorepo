@@ -82,7 +82,7 @@ pub fn handle_cursor_down_on_entity_event(
     let mut preselected_nodes: Vec<PreselectedNode> = Vec::new();
 
     // Preselect nodes based on raycasted entities
-    for (entity, position) in raycast_entities.iter().copied() {
+    for (entity, cursor_position) in raycast_entities.iter().copied() {
         log::info!("[handle_cursor_down_on_entity_event] Entity: {:?}", entity);
 
         if let Ok(parent) = unselected_node_query.get(entity) {
@@ -91,7 +91,7 @@ pub fn handle_cursor_down_on_entity_event(
                 if now.duration_since(*timestamp) <= DOUBLE_CLICK_WINDOW {
                     preselected_nodes.push(PreselectedNode {
                         entity,
-                        position,
+                        cursor_position,
                         preselect: false,
                         was_selected: false,
                         was_preselected: true,
@@ -109,7 +109,7 @@ pub fn handle_cursor_down_on_entity_event(
             if is_parent_root {
                 preselected_nodes.push(PreselectedNode {
                     entity,
-                    position,
+                    cursor_position,
                     preselect: false,
                     was_selected: false,
                     was_preselected: false,
@@ -121,7 +121,7 @@ pub fn handle_cursor_down_on_entity_event(
             if let Ok((_, Selected { timestamp })) = selected_node_query.get(parent_entity) {
                 preselected_nodes.push(PreselectedNode {
                     entity,
-                    position,
+                    cursor_position,
                     preselect: now.duration_since(*timestamp) > DOUBLE_CLICK_WINDOW,
                     was_selected: false,
                     was_preselected: false,
@@ -134,7 +134,7 @@ pub fn handle_cursor_down_on_entity_event(
         if selected_node_query.get(entity).is_ok() {
             preselected_nodes.push(PreselectedNode {
                 entity,
-                position,
+                cursor_position,
                 preselect: false,
                 was_selected: true,
                 was_preselected: false,
@@ -153,7 +153,7 @@ pub fn handle_cursor_down_on_entity_event(
     // Select or preselect preselected node
     if let Some(PreselectedNode {
         entity,
-        position,
+        cursor_position,
         preselect,
         was_selected,
         was_preselected,
@@ -183,8 +183,8 @@ pub fn handle_cursor_down_on_entity_event(
             unselect_prev_selected = true;
 
             comp_interaction_res.interaction_mode = InteractionMode::Translating {
-                origin: position,
-                current: position,
+                origin: cursor_position,
+                current: cursor_position,
             };
         }
     } else {
@@ -209,7 +209,7 @@ pub fn handle_cursor_down_on_entity_event(
 #[derive(Debug, Clone, Copy)]
 struct PreselectedNode {
     entity: Entity,
-    position: Vec2,
+    cursor_position: Vec2,
     preselect: bool,
     was_preselected: bool,
     was_selected: bool,
