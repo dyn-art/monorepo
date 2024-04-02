@@ -9,9 +9,10 @@ use bevy_ecs::{
     query::{With, Without},
     system::{Commands, Query, ResMut},
 };
-use bevy_hierarchy::Parent;
+use bevy_hierarchy::{Children, Parent};
 use dyn_comp_bundles::components::{mixins::Root, nodes::CompNode};
 use glam::Vec2;
+use std::collections::HashSet;
 
 static DOUBLE_CLICK_WINDOW: web_time::Duration = web_time::Duration::from_millis(500);
 
@@ -45,7 +46,7 @@ pub fn handle_cursor_down_on_entity_event(
     mut event_reader: EventReader<CursorDownOnEntityInputEvent>,
     mut comp_interaction_res: ResMut<CompInteractionRes>,
     unselected_node_query: Query<
-        &Parent,
+        (Option<&Parent>, Option<&Children>),
         (
             With<CompNode>,
             Without<Root>,
@@ -57,7 +58,10 @@ pub fn handle_cursor_down_on_entity_event(
         &Preselected,
         (With<CompNode>, With<Preselected>, Without<Locked>),
     >,
-    selected_node_query: Query<(Entity, &Selected), (With<CompNode>, With<Selected>)>,
+    selected_node_query: Query<
+        (Entity, &Selected, Option<&Parent>),
+        (With<CompNode>, With<Selected>),
+    >,
     root_node_query: Query<Entity, (With<CompNode>, With<Root>)>,
 ) {
     let raycast_entities: Vec<(Entity, Vec2)> = event_reader
@@ -76,20 +80,27 @@ pub fn handle_cursor_down_on_entity_event(
     }
 
     let now = web_time::Instant::now();
+    let selected_node_parents: HashSet<Option<Entity>> = selected_node_query
+        .iter()
+        .map(|(_, _, maybe_parent)| {
+            if let Some(parent) = maybe_parent {
+                Some(parent.get())
+            } else {
+                None
+            }
+        })
+        .collect();
+    let mut selection_candidates: Vec<SelectionCandidate> = Vec::new();
 
-    // Preselection of nodes that could be selected or preselected
-    // (entity, position, preselect)
-    let mut preselected_nodes: Vec<PreselectedNode> = Vec::new();
-
-    // Preselect nodes based on raycasted entities
+    // Find nodes that could be selected or preselected
     for (entity, cursor_position) in raycast_entities.iter().copied() {
         log::info!("[handle_cursor_down_on_entity_event] Entity: {:?}", entity);
 
-        if let Ok(parent) = unselected_node_query.get(entity) {
+        if let Ok((maybe_parent, maybe_children)) = unselected_node_query.get(entity) {
             // Consider selecting preselected node
             if let Ok(Preselected { timestamp }) = preselected_node_query.get(entity) {
                 if now.duration_since(*timestamp) <= DOUBLE_CLICK_WINDOW {
-                    preselected_nodes.push(PreselectedNode {
+                    selection_candidates.push(SelectionCandidate {
                         entity,
                         cursor_position,
                         preselect: false,
@@ -102,12 +113,38 @@ pub fn handle_cursor_down_on_entity_event(
                 }
             }
 
-            let parent_entity = parent.get();
-            let is_parent_root = root_node_query.get(parent_entity).is_ok();
+            if let Some(parent) = maybe_parent {
+                let parent_entity = parent.get();
+                let is_parent_root = root_node_query.get(parent_entity).is_ok();
 
-            // Consider selection node whose parent is the root
-            if is_parent_root {
-                preselected_nodes.push(PreselectedNode {
+                // Consider selecting node whose parent is the root
+                if is_parent_root {
+                    selection_candidates.push(SelectionCandidate {
+                        entity,
+                        cursor_position,
+                        preselect: false,
+                        was_selected: false,
+                        was_preselected: false,
+                    });
+                    continue;
+                }
+
+                // Consider preselecting node whose parent is selected
+                if let Ok((_, Selected { timestamp }, _)) = selected_node_query.get(parent_entity) {
+                    selection_candidates.push(SelectionCandidate {
+                        entity,
+                        cursor_position,
+                        preselect: now.duration_since(*timestamp) > DOUBLE_CLICK_WINDOW,
+                        was_selected: false,
+                        was_preselected: false,
+                    });
+                    continue;
+                }
+            }
+
+            // Consider selecting node whose sibling is selected
+            if selected_node_parents.contains(&maybe_parent.map(|p| p.get())) {
+                selection_candidates.push(SelectionCandidate {
                     entity,
                     cursor_position,
                     preselect: false,
@@ -117,22 +154,28 @@ pub fn handle_cursor_down_on_entity_event(
                 continue;
             }
 
-            // Consider preselecting node whose parent is selected
-            if let Ok((_, Selected { timestamp })) = selected_node_query.get(parent_entity) {
-                preselected_nodes.push(PreselectedNode {
-                    entity,
-                    cursor_position,
-                    preselect: now.duration_since(*timestamp) > DOUBLE_CLICK_WINDOW,
-                    was_selected: false,
-                    was_preselected: false,
-                });
-                continue;
+            // Consider selecting node whose child is selected
+            // TODO: Instead consider selecting node whose nested level is above the selected node
+            //       and not just the child node
+            if let Some(children) = maybe_children {
+                for child_entity in children.iter() {
+                    if selected_node_query.get(*child_entity).is_ok() {
+                        selection_candidates.push(SelectionCandidate {
+                            entity,
+                            cursor_position,
+                            preselect: false,
+                            was_selected: false,
+                            was_preselected: false,
+                        });
+                        continue;
+                    }
+                }
             }
         }
 
         // Consider selecting already selected node
         if selected_node_query.get(entity).is_ok() {
-            preselected_nodes.push(PreselectedNode {
+            selection_candidates.push(SelectionCandidate {
                 entity,
                 cursor_position,
                 preselect: false,
@@ -144,20 +187,21 @@ pub fn handle_cursor_down_on_entity_event(
 
     log::info!(
         "[handle_cursor_down_on_entity_event] Preselection: {:?}",
-        preselected_nodes
+        selection_candidates
     );
 
     let mut selected_node: Option<Entity> = None;
-    let mut unselect_prev_selected = false;
+    let mut unselect_prev_selected = selection_candidates.len() == 0;
 
-    // Select or preselect preselected node
-    if let Some(PreselectedNode {
+    // Go through selection candiates and preselect nodes
+    // until actually selectable node found
+    for SelectionCandidate {
         entity,
         cursor_position,
         preselect,
         was_selected,
         was_preselected,
-    }) = preselected_nodes.first().copied()
+    } in selection_candidates.iter().copied()
     {
         if preselect {
             commands
@@ -175,7 +219,7 @@ pub fn handle_cursor_down_on_entity_event(
                 log::info!(
                     "[handle_cursor_down_on_entity_event] Selected Entity {:?} at {:?}",
                     entity,
-                    position
+                    cursor_position
                 );
             }
 
@@ -186,14 +230,14 @@ pub fn handle_cursor_down_on_entity_event(
                 origin: cursor_position,
                 current: cursor_position,
             };
+
+            break;
         }
-    } else {
-        unselect_prev_selected = true;
     }
 
     // Unselect previously selected nodes that are no longer selected
     if unselect_prev_selected {
-        for (entity, _) in selected_node_query.iter() {
+        for (entity, _, _) in selected_node_query.iter() {
             if selected_node.map_or(true, |e| e != entity) {
                 commands.entity(entity).remove::<Selected>();
                 #[cfg(feature = "tracing")]
@@ -207,7 +251,7 @@ pub fn handle_cursor_down_on_entity_event(
 }
 
 #[derive(Debug, Clone, Copy)]
-struct PreselectedNode {
+struct SelectionCandidate {
     entity: Entity,
     cursor_position: Vec2,
     preselect: bool,
