@@ -20,24 +20,6 @@ use std::collections::HashSet;
 // https://stackoverflow.com/questions/29917287/what-is-the-max-delay-between-two-clicks-to-trigger-a-double-click-event
 static DOUBLE_CLICK_WINDOW: web_time::Duration = web_time::Duration::from_millis(500);
 
-// Selection Rules for Elements:
-// 1. Avoid selecting the top-level (root) frame directly; focus on its children for selection.
-//    This ensures actions are targeted towards elements within a frame, not the frame itself.
-// 2. In cases of nested frames, select the nested frame within the top-level frame,
-//    bypassing its children. This aligns with the principle of managing frames as whole units
-//    at the top level before diving into their contents (with the exception of root frames).
-// 3. For interacting with elements inside nested frames, a double-click on the desired item is required.
-// 4. When selecting items within nested frames, avoid propagating the selection to parent frames.
-//    This means selection stays on the most deeply nested item clicked, preserving the intent of the action.
-// 5. Locked or invisible nodes should never be selected.
-// 6. Selection should respect grouping hierarchies. If an item is part of a group,
-//    selecting the item should imply selection of the whole group, unless specifically
-//    targeting an item within the group through direct interaction (e.g., double-click), similar to rule 2.
-// 7. Prioritize selectable items based on cursor proximity and the z-index.
-//    In dense areas with overlapping elements, the item closest to the cursor and highest on the z-index
-//    should be selected first, with an option to cycle through overlapping items via repeated clicks
-//    or modifier key combinations.
-
 // Events received if clicked on nested Rectangle:
 // INFO: [handle_cursor_down_on_entity_event] Start
 // INFO: [handle_cursor_down_on_entity_event] Entity: 10v1 <- Rectangle (Clicked on)

@@ -15,7 +15,6 @@ use dyn_comp_core::resources::composition::CompositionRes;
 use dyn_utils::units::abs::Abs;
 use glam::Vec2;
 
-// TODO: Improve - A bit laggy when nested
 pub fn handle_resizing(
     comp_res: &CompositionRes,
     selected_nodes_query: &mut Query<
@@ -31,15 +30,17 @@ pub fn handle_resizing(
         position: cursor_position,
         ..
     } = event;
-    let cursor_position = transform_point_to_viewport(comp_res, cursor_position, true);
+    let global_cursor_position = transform_point_to_viewport(comp_res, cursor_position, true);
 
     for (mut transform, mut size_mixin, maybe_parent) in selected_nodes_query.iter_mut() {
         let SizeMixin(size) = size_mixin.as_mut();
         let maybe_parent_global_transform =
             get_parent_global_transfrom(maybe_parent, global_transform_query);
-        let local_cursor_position =
-            global_to_local_point3(cursor_position.extend(0.0), maybe_parent_global_transform)
-                .truncate();
+        let local_cursor_position = global_to_local_point3(
+            global_cursor_position.extend(0.0),
+            maybe_parent_global_transform,
+        )
+        .truncate();
         let local_initial_bounds = XYWH {
             position: global_to_local_point3(
                 initial_bounds.position.extend(0.0),
