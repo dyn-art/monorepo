@@ -63,7 +63,7 @@ pub fn handle_cursor_down_on_entity_event(
         (With<CompNode>, With<Preselected>, Without<Locked>),
     >,
     selected_node_query: Query<
-        (Entity, &Selected, Option<&Parent>, Option<&HierarchyLevel>),
+        (Entity, Option<&Parent>, Option<&HierarchyLevel>),
         (With<CompNode>, With<Selected>),
     >,
     root_node_query: Query<Entity, (With<CompNode>, With<Root>)>,
@@ -88,7 +88,7 @@ pub fn handle_cursor_down_on_entity_event(
 
     let selected_node_parents: HashSet<Option<Entity>> = selected_node_query
         .iter()
-        .map(|(_, _, maybe_parent, _)| {
+        .map(|(_, maybe_parent, _)| {
             if let Some(parent) = maybe_parent {
                 Some(parent.get())
             } else {
@@ -100,7 +100,7 @@ pub fn handle_cursor_down_on_entity_event(
     let shallowest_selected_hierarchy_level =
         selected_node_query
             .iter()
-            .fold(0, |acc, (_, _, _, maybe_level)| {
+            .fold(0, |acc, (_, _, maybe_level)| {
                 if let Some(level) = maybe_level {
                     acc.max(level.0)
                 } else {
@@ -146,13 +146,11 @@ pub fn handle_cursor_down_on_entity_event(
                 }
 
                 // Consider preselecting node whose parent is selected
-                if let Ok((_, Selected { timestamp }, _, _)) =
-                    selected_node_query.get(parent_entity)
-                {
+                if selected_node_query.get(parent_entity).is_ok() {
                     selection_candidates.push(SelectionCandidate {
                         entity,
                         cursor_position,
-                        preselect: now.duration_since(*timestamp) > DOUBLE_CLICK_WINDOW,
+                        preselect: true,
                         was_selected: false,
                         was_preselected: false,
                     });
@@ -244,7 +242,7 @@ pub fn handle_cursor_down_on_entity_event(
 
     // Unselect previously selected nodes that are no longer selected
     if unselect_prev_selected {
-        for (entity, _, _, _) in selected_node_query.iter() {
+        for (entity, _, _) in selected_node_query.iter() {
             if selected_node.map_or(true, |e| e != entity) {
                 commands.entity(entity).remove::<Selected>();
                 #[cfg(feature = "tracing")]
