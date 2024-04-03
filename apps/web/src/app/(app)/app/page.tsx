@@ -1,13 +1,11 @@
+'use client';
+
 import React from 'react';
 import type { COMP } from '@dyn/dtif-comp';
 import { Editor } from '@/components';
 
 const Page: React.FC = () => {
-	return (
-		<div>
-			<Editor dtif={DEFAULT_DTIF} height={HEIGHT} width={WIDTH} />
-		</div>
-	);
+	return <Editor dtif={DEFAULT_DTIF} />;
 };
 
 export default Page;

@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import type { Composition, TOutputEventTypeMap, TWatchedOutputEventCallback } from '@dyn/svg-comp';
 

@@ -6,7 +6,7 @@ import { applyCanvasDimensions, type COMP } from '@dyn/dtif-comp';
 import { createSvgComposition, type Composition } from '@dyn/svg-comp';
 import { cn, Skeleton } from '@dyn/ui';
 
-import { CanvasControl } from './CanvasControl';
+import { CanvasControl } from './components';
 
 export const Canvas: React.FC<TCanvasProps> = (props) => {
 	const { dtif, width, height, onLoadedComposition, ...other } = props;

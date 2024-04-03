@@ -2,51 +2,50 @@
 
 import React from 'react';
 import type { Composition } from '@dyn/svg-comp';
-import { Button, Skeleton } from '@dyn/ui';
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup, Skeleton, useSize } from '@dyn/ui';
 
+import { type TCanvasProps } from '../../Canvas';
 import { useDtifFromClipboard } from '../hooks';
-import { Canvas, type TCanvasProps } from './Canvas';
+import { Viewport } from './Viewport';
 
 export const InnerEditor: React.FC<TInnerEditorProps> = (props) => {
-	const { width, height, dtif: defaultDtif } = props;
+	const { dtif: defaultDtif } = props;
 	const [composition, setComposition] = React.useState<Composition | null>(null);
 	const { isLoading, data: dtif } = useDtifFromClipboard(defaultDtif);
-
-	if (isLoading || dtif == null) {
-		return <Skeleton className="h-full w-full" />;
-	}
+	const [viewportPanelRef, viewportSize] = useSize<HTMLDivElement>();
 
 	return (
-		<div className="flex flex-col items-center justify-center">
-			<Canvas dtif={dtif} height={height} onLoadedComposition={setComposition} width={width} />
-			<div className="flex w-full flex-row items-center justify-between ">
-				<Button
-					onClick={() => {
-						console.log(composition?.toString());
-					}}
-				>
-					To String
-				</Button>
-				<Button
-					onClick={() => {
-						if (composition != null) {
-							for (const selectedEntity of composition.selectedEntities) {
-								composition.emitInputEvent({
-									type: 'Composition',
-									event: { type: 'EntitySetRotation', entity: selectedEntity, rotationDeg: 45 }
-								});
-							}
-							composition.update();
-						}
-					}}
-				>
-					Rotate Selected
-				</Button>
-			</div>
-		</div>
+		<ResizablePanelGroup className="flex h-full min-h-full w-full" direction="horizontal">
+			<ResizablePanel defaultSize={20}>
+				<div className="flex h-full items-center justify-center p-6">
+					<span className="font-semibold">Layers</span>
+				</div>
+			</ResizablePanel>
+			<ResizableHandle withHandle />
+			<ResizablePanel defaultSize={60}>
+				<div className="flex h-full w-full" ref={viewportPanelRef}>
+					{!isLoading && dtif != null && viewportSize != null ? (
+						<Viewport
+							dtif={dtif}
+							height={viewportSize.height}
+							onLoadedComposition={setComposition}
+							width={viewportSize.width}
+						/>
+					) : (
+						<Skeleton className="h-full w-full" />
+					)}
+				</div>
+			</ResizablePanel>
+			<ResizableHandle withHandle />
+			<ResizablePanel defaultSize={20}>
+				<div className="flex h-full items-center justify-center p-6">
+					<span className="font-semibold">Design</span>
+				</div>
+			</ResizablePanel>
+		</ResizablePanelGroup>
 	);
 };
 
-export type TInnerEditorProps = {
-	// TODO:
-} & Omit<TCanvasProps, 'onLoadedComposition'>;
+export interface TInnerEditorProps {
+	dtif: TCanvasProps['dtif'];
+}
