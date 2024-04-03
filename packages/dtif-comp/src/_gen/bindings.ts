@@ -64,7 +64,7 @@ export type Color = [number, number, number]
 
 export type CompCoreInputEvent = ({ type: "EntityDeleted" } & EntityDeletedInputEvent) | ({ type: "CompositionResized" } & CompositionResizedInputEvent) | ({ type: "CompositionViewportChanged" } & CompositionViewportChangedInputEvent) | ({ type: "EntityMoved" } & EntityMovedInputEvent) | ({ type: "EntitySetPosition" } & EntitySetPositionInputEvent) | ({ type: "EntitySetRotation" } & EntitySetRotationInputEvent)
 
-export type ComponentChange = { type: "Size"; size: Size } | { type: "Transform"; rotationDeg: number; translation: Vec2 }
+export type ComponentChange = { type: "Size"; size: Size } | { type: "Transform"; rotationDeg: number; translation: Vec2 } | { type: "GlobalTransform"; rotationDeg: number; translation: Vec2 }
 
 export type CompositionChangeOutputEvent = { rootNodes: Entity[]; viewport: Viewport; size: Size }
 
@@ -499,7 +499,7 @@ export type VerticalTextAlignment = "Top" | "Bottom" | "Center"
 
 export type Viewport = { physicalPosition: Vec2; physicalSize: Size }
 
-export type WatchableComponentVariant = "Size" | "Transform"
+export type WatchableComponentVariant = "Size" | "Transform" | "GlobalTransform"
 
 export type WatchedEntityChangesOutputEvent = { entity: Entity; changes: ComponentChange[] }
 

@@ -11,7 +11,7 @@ pub fn handle_cursor_down_on_resize_handle_event(
     for event in event_reader.read() {
         comp_interaction_res.interaction_mode = InteractionMode::Resizing {
             corner: event.corner,
-            initial_bounds: event.initial_bounds.clone(),
+            initial_bounds: event.initial_bounds,
             rotation_deg: event.rotation_rad.to_degrees(),
         };
     }

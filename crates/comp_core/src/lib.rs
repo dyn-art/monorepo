@@ -1,7 +1,7 @@
 pub mod resources;
 mod systems;
 
-use bevy_app::{App, Plugin, Update};
+use bevy_app::{App, First, Plugin, Update};
 use bevy_ecs::schedule::{IntoSystemConfigs, IntoSystemSetConfigs, SystemSet};
 use bevy_transform::TransformPlugin;
 use dyn_comp_asset::CompAssetPlugin;
@@ -15,6 +15,7 @@ use systems::{
         handle_entity_deleted_event, handle_entity_moved_event, handle_entity_set_position_event,
         handle_entity_set_rotation_event,
     },
+    hierarchy::update_hierarchy_levels,
     outline::{
         ellipse::outline_ellipse,
         polygon::outline_polygon,
@@ -91,6 +92,7 @@ impl Plugin for CompCorePlugin {
         );
 
         // Register systems
+        app.add_systems(First, update_hierarchy_levels);
         app.add_systems(
             Update,
             (

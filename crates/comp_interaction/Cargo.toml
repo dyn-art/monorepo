@@ -19,8 +19,10 @@ dyn-comp-core = { path = "../comp_core" }
 dyn-utils = { path = "../utils" }
 bevy_app = { workspace = true }
 bevy_ecs = { workspace = true }
+bevy_hierarchy = { workspace = true }
 bevy_transform = { workspace = true }
 glam = { workspace = true }
+web-time = "1.1.0"
 
 # Logging
 log = { workspace = true }

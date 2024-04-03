@@ -27,13 +27,13 @@ pub fn handle_rotating(
     let cursor_position = transform_point_to_viewport(comp_res, cursor_position, true);
 
     for (mut transform, global_transform, SizeMixin(size)) in selected_nodes_query.iter_mut() {
-        let computed_global_transform = global_transform.compute_transform();
+        let global_transform = global_transform.compute_transform();
         let (width, height) = size.to_tuple();
         let pivot_point = Vec3::new(width / 2.0, height / 2.0, 0.0);
-        let global_pivot_point = computed_global_transform.transform_point(pivot_point);
+        let global_pivot_point = global_transform.transform_point(pivot_point);
 
         // Determine rotation offset based on corner
-        let rotation_offset_rad: f32 = match corner {
+        let rotation_offset_corner_rad: f32 = match corner {
             _ if corner == (HandleSide::Top as u8 | HandleSide::Left as u8) => {
                 f32::atan2(-height, -width)
             }
@@ -49,13 +49,19 @@ pub fn handle_rotating(
             _ => 0.0,
         };
 
+        // Determine rotation offset based on global rotation (necessary for nested node)
+        let rotation_offset_nested_rad = transform_to_z_rotation_rad(&global_transform)
+            - transform_to_z_rotation_rad(&transform);
+
+        let rotation_offset_rad = rotation_offset_corner_rad + rotation_offset_nested_rad;
+
         // Calculate rotation based on the corner
         let rotation_angle_rad =
             calculate_rotation_rad(initial_rotation_rad, &cursor_position, &global_pivot_point);
         let final_rotation_angle_rad =
             (-rotation_angle_rad + rotation_offset_rad - initial_rotation_rad) * -1.0;
 
-        // Apply rotation
+        // Apply rotation to transform
         let reset_rotation_transform_mat4 = rotate_around_point(
             transform.compute_matrix(),
             -transform_to_z_rotation_rad(&transform),

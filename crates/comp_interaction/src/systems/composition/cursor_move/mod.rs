@@ -17,6 +17,7 @@ use bevy_ecs::{
     query::With,
     system::{ParamSet, Query, ResMut},
 };
+use bevy_hierarchy::Parent;
 use bevy_transform::components::{GlobalTransform, Transform};
 use dyn_comp_bundles::components::mixins::SizeMixin;
 use dyn_comp_core::resources::composition::CompositionRes;
@@ -28,18 +29,23 @@ pub fn handle_cursor_moved_on_comp_event(
     // https://bevy-cheatbook.github.io/programming/paramset.html
     mut query_set: ParamSet<(
         // Translating
-        Query<&mut Transform, With<Selected>>,
+        Query<(&mut Transform, Option<&Parent>), With<Selected>>,
         // Resizing
-        Query<(&mut Transform, &mut SizeMixin), With<Selected>>,
+        Query<(&mut Transform, &mut SizeMixin, Option<&Parent>), With<Selected>>,
         // Rotating
         Query<(&mut Transform, &GlobalTransform, &SizeMixin), With<Selected>>,
     )>,
+    global_transfrom_query: Query<&GlobalTransform>,
 ) {
     for event in event_reader.read() {
         match &mut comp_interaction_res.interaction_mode {
-            InteractionMode::Translating { current, .. } => {
-                handle_translating(&comp_res, &mut query_set.p0(), event, current)
-            }
+            InteractionMode::Translating { current, .. } => handle_translating(
+                &comp_res,
+                &mut query_set.p0(),
+                &global_transfrom_query,
+                event,
+                current,
+            ),
             InteractionMode::Resizing {
                 corner,
                 initial_bounds,
@@ -47,6 +53,7 @@ pub fn handle_cursor_moved_on_comp_event(
             } => handle_resizing(
                 &comp_res,
                 &mut query_set.p1(),
+                &global_transfrom_query,
                 event,
                 *corner,
                 initial_bounds,

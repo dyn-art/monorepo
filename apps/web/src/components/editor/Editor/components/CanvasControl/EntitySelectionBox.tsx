@@ -16,9 +16,9 @@ export const EntitySelectionBox: React.FC<TProps> = (props) => {
 		onRotateHandlePointerDown,
 		onRotateHandlePointerUp
 	} = props;
-	const { Size: sizeData, Transform: transformData } = useEntity(composition, entity, [
+	const { Size: sizeData, GlobalTransform: globalTransformData } = useEntity(composition, entity, [
 		'Size',
-		'Transform'
+		'GlobalTransform'
 	]);
 	const factor = useViewportFactor(composition);
 	const factoredSizeData = React.useMemo<TComponent<'Size'> | null>(
@@ -30,16 +30,16 @@ export const EntitySelectionBox: React.FC<TProps> = (props) => {
 	);
 	const factoredTransformData = React.useMemo<TComponent<'Transform'> | null>(
 		() =>
-			transformData != null
+			globalTransformData != null
 				? {
 						translation: [
-							transformData.translation[0] * factor[0],
-							transformData.translation[1] * factor[1]
+							globalTransformData.translation[0] * factor[0],
+							globalTransformData.translation[1] * factor[1]
 						],
-						rotationDeg: transformData.rotationDeg
+						rotationDeg: globalTransformData.rotationDeg
 					}
 				: null,
-		[factor, transformData]
+		[factor, globalTransformData]
 	);
 	const interactionMode = useInteractionMode(composition);
 	const showHandles = React.useMemo(
@@ -58,11 +58,11 @@ export const EntitySelectionBox: React.FC<TProps> = (props) => {
 	const handleOnResizeHandlePointerEvent = React.useCallback(
 		(side: EHandleSide, eventType: 'Up' | 'Down', event: React.PointerEvent<SVGGElement>) => {
 			event.stopPropagation();
-			if (sizeData == null || transformData == null || composition.renderer == null) {
+			if (sizeData == null || globalTransformData == null || composition.renderer == null) {
 				return;
 			}
 			const { size } = sizeData;
-			const { translation, rotationDeg } = transformData;
+			const { translation, rotationDeg } = globalTransformData;
 
 			if (event.button === 0) {
 				switch (eventType) {
@@ -84,7 +84,7 @@ export const EntitySelectionBox: React.FC<TProps> = (props) => {
 		},
 		[
 			sizeData,
-			transformData,
+			globalTransformData,
 			composition.renderer,
 			onResizeHandlePointerUp,
 			onResizeHandlePointerDown
@@ -94,10 +94,10 @@ export const EntitySelectionBox: React.FC<TProps> = (props) => {
 	const handleOnRotateHandlePointerEvent = React.useCallback(
 		(side: EHandleSide, eventType: 'Up' | 'Down', event: React.PointerEvent<SVGGElement>) => {
 			event.stopPropagation();
-			if (transformData == null || composition.renderer == null) {
+			if (globalTransformData == null || composition.renderer == null) {
 				return;
 			}
-			const { rotationDeg } = transformData;
+			const { rotationDeg } = globalTransformData;
 
 			if (event.button === 0) {
 				switch (eventType) {
@@ -110,7 +110,7 @@ export const EntitySelectionBox: React.FC<TProps> = (props) => {
 				}
 			}
 		},
-		[transformData, composition.renderer, onRotateHandlePointerUp, onRotateHandlePointerDown]
+		[globalTransformData, composition.renderer, onRotateHandlePointerUp, onRotateHandlePointerDown]
 	);
 
 	// =========================================================================
@@ -120,7 +120,7 @@ export const EntitySelectionBox: React.FC<TProps> = (props) => {
 	if (
 		sizeData == null ||
 		factoredSizeData == null ||
-		transformData == null ||
+		globalTransformData == null ||
 		factoredTransformData == null
 	) {
 		return null;
@@ -128,14 +128,14 @@ export const EntitySelectionBox: React.FC<TProps> = (props) => {
 
 	const { size: factoredSize } = factoredSizeData;
 	const { size } = sizeData;
-	const { rotationDeg: rotation, translation: factoredTranslation } = factoredTransformData;
+	const { rotationDeg: factoredRotation, translation: factoredTranslation } = factoredTransformData;
 
 	return (
 		<g
 			style={{
 				transform: `translate(${factoredTranslation[0] - composition.viewport.physicalPosition[0] * factor[0]}px, ${
 					factoredTranslation[1] - composition.viewport.physicalPosition[1] * factor[0]
-				}px) rotate(${rotation}deg)`
+				}px) rotate(${factoredRotation}deg)`
 			}}
 		>
 			{/* Selection Border */}

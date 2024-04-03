@@ -571,7 +571,7 @@ dependencies = [
  "thiserror",
  "tracing",
  "uuid",
- "web-time",
+ "web-time 0.2.4",
 ]
 
 [[package]]
@@ -888,6 +888,7 @@ version = "0.0.1"
 dependencies = [
  "bevy_app",
  "bevy_ecs",
+ "bevy_hierarchy",
  "bevy_transform",
  "dyn-comp-bundles",
  "dyn-comp-core",
@@ -896,6 +897,7 @@ dependencies = [
  "log",
  "serde",
  "specta",
+ "web-time 1.1.0",
 ]
 
 [[package]]
@@ -3512,6 +3514,16 @@ name = "web-time"
 version = "0.2.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "aa30049b1c872b72c89866d458eae9f20380ab280ffd1b1e18df2d3e2d98cfe0"
+dependencies = [
+ "js-sys",
+ "wasm-bindgen",
+]
+
+[[package]]
+name = "web-time"
+version = "1.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5a6580f308b1fad9207618087a65c04e7a10bc77e02c8e84e9b00dd4b12fa0bb"
 dependencies = [
  "js-sys",
  "wasm-bindgen",
