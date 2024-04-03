@@ -9,7 +9,7 @@ use std::collections::HashSet;
 
 pub fn update_hierarchy_levels(
     mut commands: Commands,
-    changed_parents_query: Query<(Entity, Option<&Parent>), (With<CompNode>, Changed<Parent>)>,
+    changed_parents_query: Query<(Entity, &Parent), (With<CompNode>, Changed<Parent>)>,
     children_query: Query<&Children, With<CompNode>>,
     level_query: Query<&HierarchyLevel, With<CompNode>>,
     parent_query: Query<&Parent, With<CompNode>>,
@@ -18,26 +18,19 @@ pub fn update_hierarchy_levels(
     let mut updated_entities = HashSet::new();
 
     // Detect entities with changed parents and enqueue them for level updates
-    for (entity, maybe_parent) in changed_parents_query.iter() {
-        if let Some(parent) = maybe_parent {
-            let parent_entity = parent.get();
+    for (entity, parent) in changed_parents_query.iter() {
+        let parent_entity = parent.get();
 
-            // Parent level is known
-            if let Ok(level) = level_query.get(parent_entity) {
-                to_update.push((entity, *level));
-            }
-            // Calculate the initial level if parent's level is unknown
-            else {
-                let level = calculate_level_for_entity(parent_entity, &parent_query);
-                commands.entity(parent_entity).insert(HierarchyLevel(level));
-                updated_entities.insert(parent_entity);
-                to_update.push((entity, HierarchyLevel(level)));
-            }
+        // Parent level is known
+        if let Ok(level) = level_query.get(parent_entity) {
+            to_update.push((entity, *level));
         }
-        // Entity has no parent, consider as root entity
+        // Calculate the initial level if parent's level is unknown
         else {
-            commands.entity(entity).insert(HierarchyLevel(0));
-            updated_entities.insert(entity);
+            let level = calculate_level_for_entity(parent_entity, &parent_query);
+            commands.entity(parent_entity).insert(HierarchyLevel(level));
+            updated_entities.insert(parent_entity);
+            to_update.push((entity, HierarchyLevel(level)));
         }
     }
 

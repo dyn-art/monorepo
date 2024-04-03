@@ -9,7 +9,7 @@ use bevy_ecs::{
     query::{With, Without},
     system::{Commands, Query, ResMut},
 };
-use bevy_hierarchy::{Children, Parent};
+use bevy_hierarchy::Parent;
 use dyn_comp_bundles::components::{
     mixins::{HierarchyLevel, Root},
     nodes::CompNode,
@@ -17,6 +17,7 @@ use dyn_comp_bundles::components::{
 use glam::Vec2;
 use std::collections::HashSet;
 
+// https://stackoverflow.com/questions/29917287/what-is-the-max-delay-between-two-clicks-to-trigger-a-double-click-event
 static DOUBLE_CLICK_WINDOW: web_time::Duration = web_time::Duration::from_millis(500);
 
 // Selection Rules for Elements:
@@ -49,7 +50,7 @@ pub fn handle_cursor_down_on_entity_event(
     mut event_reader: EventReader<CursorDownOnEntityInputEvent>,
     mut comp_interaction_res: ResMut<CompInteractionRes>,
     unselected_node_query: Query<
-        (Option<&Parent>, Option<&Children>),
+        (Option<&Parent>, Option<&HierarchyLevel>),
         (
             With<CompNode>,
             Without<Root>,
@@ -62,11 +63,10 @@ pub fn handle_cursor_down_on_entity_event(
         (With<CompNode>, With<Preselected>, Without<Locked>),
     >,
     selected_node_query: Query<
-        (Entity, &Selected, Option<&Parent>),
+        (Entity, &Selected, Option<&Parent>, Option<&HierarchyLevel>),
         (With<CompNode>, With<Selected>),
     >,
     root_node_query: Query<Entity, (With<CompNode>, With<Root>)>,
-    hierarchy_level_query: Query<&HierarchyLevel>,
 ) {
     let raycast_entities: Vec<(Entity, Vec2)> = event_reader
         .read()
@@ -84,9 +84,11 @@ pub fn handle_cursor_down_on_entity_event(
     }
 
     let now = web_time::Instant::now();
+    let mut selection_candidates: Vec<SelectionCandidate> = Vec::new();
+
     let selected_node_parents: HashSet<Option<Entity>> = selected_node_query
         .iter()
-        .map(|(_, _, maybe_parent)| {
+        .map(|(_, _, maybe_parent, _)| {
             if let Some(parent) = maybe_parent {
                 Some(parent.get())
             } else {
@@ -94,17 +96,23 @@ pub fn handle_cursor_down_on_entity_event(
             }
         })
         .collect();
-    let mut selection_candidates: Vec<SelectionCandidate> = Vec::new();
+
+    let shallowest_selected_hierarchy_level =
+        selected_node_query
+            .iter()
+            .fold(0, |acc, (_, _, _, maybe_level)| {
+                if let Some(level) = maybe_level {
+                    acc.max(level.0)
+                } else {
+                    acc
+                }
+            });
 
     // Find nodes that could be selected or preselected
     for (entity, cursor_position) in raycast_entities.iter().copied() {
-        log::info!(
-            "[handle_cursor_down_on_entity_event] Entity {:?} at level {:?}",
-            entity,
-            hierarchy_level_query.get(entity).ok()
-        );
+        log::info!("[handle_cursor_down_on_entity_event] Entity {:?}", entity,);
 
-        if let Ok((maybe_parent, maybe_children)) = unselected_node_query.get(entity) {
+        if let Ok((maybe_parent, maybe_hierarchy_level)) = unselected_node_query.get(entity) {
             // Consider selecting preselected node
             if let Ok(Preselected { timestamp }) = preselected_node_query.get(entity) {
                 if now.duration_since(*timestamp) <= DOUBLE_CLICK_WINDOW {
@@ -138,7 +146,9 @@ pub fn handle_cursor_down_on_entity_event(
                 }
 
                 // Consider preselecting node whose parent is selected
-                if let Ok((_, Selected { timestamp }, _)) = selected_node_query.get(parent_entity) {
+                if let Ok((_, Selected { timestamp }, _, _)) =
+                    selected_node_query.get(parent_entity)
+                {
                     selection_candidates.push(SelectionCandidate {
                         entity,
                         cursor_position,
@@ -150,33 +160,22 @@ pub fn handle_cursor_down_on_entity_event(
                 }
             }
 
-            // Consider selecting node whose sibling is selected
-            if selected_node_parents.contains(&maybe_parent.map(|p| p.get())) {
-                selection_candidates.push(SelectionCandidate {
-                    entity,
-                    cursor_position,
-                    preselect: false,
-                    was_selected: false,
-                    was_preselected: false,
-                });
-                continue;
-            }
-
-            // Consider selecting node whose child is selected
-            // TODO: Instead consider selecting node whose nested level is above the selected node
-            //       and not just the child node
-            if let Some(children) = maybe_children {
-                for child_entity in children.iter() {
-                    if selected_node_query.get(*child_entity).is_ok() {
-                        selection_candidates.push(SelectionCandidate {
-                            entity,
-                            cursor_position,
-                            preselect: false,
-                            was_selected: false,
-                            was_preselected: false,
-                        });
-                        continue;
-                    }
+            // Consider selecting node whose hierarchy level is deeper
+            // than the shallowest/topmost selected node
+            // or whose hierarchy level is on the same level and has a shared parent (siblings)
+            if let Some(hierarchy_level) = maybe_hierarchy_level {
+                if hierarchy_level.0 < shallowest_selected_hierarchy_level
+                    || (hierarchy_level.0 == shallowest_selected_hierarchy_level
+                        && selected_node_parents.contains(&maybe_parent.map(|p| p.get())))
+                {
+                    selection_candidates.push(SelectionCandidate {
+                        entity,
+                        cursor_position,
+                        preselect: false,
+                        was_selected: false,
+                        was_preselected: false,
+                    });
+                    continue;
                 }
             }
         }
@@ -245,7 +244,7 @@ pub fn handle_cursor_down_on_entity_event(
 
     // Unselect previously selected nodes that are no longer selected
     if unselect_prev_selected {
-        for (entity, _, _) in selected_node_query.iter() {
+        for (entity, _, _, _) in selected_node_query.iter() {
             if selected_node.map_or(true, |e| e != entity) {
                 commands.entity(entity).remove::<Selected>();
                 #[cfg(feature = "tracing")]
