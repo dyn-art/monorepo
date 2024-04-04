@@ -14,9 +14,9 @@ pub trait InputEvent {
     serde(tag = "type")
 )]
 pub enum CompCoreInputEvent {
-    EntityDeleted(EntityDeletedInputEvent),
     CompositionResized(CompositionResizedInputEvent),
     CompositionViewportChanged(CompositionViewportChangedInputEvent),
+    EntityDeleted(EntityDeletedInputEvent),
     EntityMoved(EntityMovedInputEvent),
     EntitySetPosition(EntitySetPositionInputEvent),
     EntitySetRotation(EntitySetRotationInputEvent),

@@ -12,6 +12,7 @@ use dyn_comp_bundles::events::{
 use resources::composition::CompositionRes;
 use systems::{
     events::{
+        handle_composition_resized_event, handle_composition_viewport_changed_event,
         handle_entity_deleted_event, handle_entity_moved_event, handle_entity_set_position_event,
         handle_entity_set_rotation_event,
     },
@@ -96,6 +97,8 @@ impl Plugin for CompCorePlugin {
         app.add_systems(
             Update,
             (
+                handle_composition_resized_event.in_set(CompCoreSystemSet::InputEvents),
+                handle_composition_viewport_changed_event.in_set(CompCoreSystemSet::InputEvents),
                 handle_entity_deleted_event.in_set(CompCoreSystemSet::InputEvents),
                 handle_entity_moved_event.in_set(CompCoreSystemSet::InputEvents),
                 handle_entity_set_position_event.in_set(CompCoreSystemSet::InputEvents),

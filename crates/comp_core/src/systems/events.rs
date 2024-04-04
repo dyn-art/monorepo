@@ -1,12 +1,14 @@
+use crate::resources::composition::CompositionRes;
 use bevy_ecs::{
     event::EventReader,
-    system::{Commands, Query},
+    system::{Commands, Query, ResMut},
 };
 use bevy_hierarchy::DespawnRecursiveExt;
 use bevy_transform::components::Transform;
 use dyn_comp_bundles::{
     components::mixins::SizeMixin,
     events::{
+        CompositionResizedInputEvent, CompositionViewportChangedInputEvent,
         EntityDeletedInputEvent, EntityMovedInputEvent, EntitySetPositionInputEvent,
         EntitySetRotationInputEvent,
     },
@@ -14,6 +16,25 @@ use dyn_comp_bundles::{
 };
 use dyn_utils::math::matrix::rotate_around_point;
 use glam::Vec3;
+
+pub fn handle_composition_resized_event(
+    mut comp_res: ResMut<CompositionRes>,
+    mut event_reader: EventReader<CompositionResizedInputEvent>,
+) {
+    if let Some(event) = event_reader.read().last() {
+        comp_res.size = event.size;
+        comp_res.viewport.physical_size = event.size;
+    }
+}
+
+pub fn handle_composition_viewport_changed_event(
+    mut comp_res: ResMut<CompositionRes>,
+    mut event_reader: EventReader<CompositionViewportChangedInputEvent>,
+) {
+    if let Some(event) = event_reader.read().last() {
+        comp_res.viewport = event.viewport;
+    }
+}
 
 // https://bevy-cheatbook.github.io/fundamentals/hierarchy.html#despawning-child-entities
 // https://github.com/bevyengine/bevy/issues/5584

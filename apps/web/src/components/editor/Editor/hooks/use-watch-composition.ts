@@ -4,7 +4,7 @@ import type { Composition } from '@dyn/svg-comp';
 
 import { useOutputEvent } from './use-output-event';
 
-export function useComposition(composition: Composition): Composition {
+export function useWatchComposition(composition: Composition): Composition {
 	const [_, setCompositionContent] = React.useState<COMP.CompositionChangeOutputEvent | null>(null);
 	useOutputEvent(
 		composition,

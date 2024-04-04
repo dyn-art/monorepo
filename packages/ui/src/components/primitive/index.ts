@@ -5,5 +5,8 @@ export * from './Progress';
 export * from './Select';
 export * from './Separator';
 export * from './Skeleton';
+export * from './Tabs';
+export * from './Toggle';
+export * from './ToggleGroup';
 export * from './Tooltip';
 export * from './icons';

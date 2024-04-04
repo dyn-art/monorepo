@@ -3,11 +3,11 @@
 import React from 'react';
 import type { Composition } from '@dyn/svg-comp';
 
-import { useComposition, useSelectedEntities } from '../../hooks';
+import { useSelectedEntities, useWatchComposition } from '../../hooks';
 import { EntitySelectionBox } from './EntitySelectionBox';
 
 export const CanvasControl: React.FC<TProps> = (props) => {
-	const composition = useComposition(props.composition);
+	const composition = useWatchComposition(props.composition);
 	const selectedEntities = useSelectedEntities(composition);
 
 	return (
