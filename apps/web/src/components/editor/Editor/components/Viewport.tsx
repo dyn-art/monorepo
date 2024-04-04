@@ -3,6 +3,7 @@ import type { COMP } from '@dyn/dtif-comp';
 import type { Composition } from '@dyn/svg-comp';
 import { Skeleton } from '@dyn/ui';
 
+import { CURSOR } from '../cursor';
 import { useSvgComposition } from '../hooks';
 import { CanvasControl } from './CanvasControl';
 import { ToolsBar } from './ToolsBar';
@@ -19,7 +20,11 @@ export const Viewport: React.FC<TViewportProps> = (props) => {
 	}, [composition, onLoadedComposition]);
 
 	return (
-		<div className="relative h-full w-full bg-gray-100" ref={viewportRef}>
+		<div
+			className="relative h-full w-full bg-gray-100"
+			ref={viewportRef}
+			style={{ cursor: CURSOR.default() }}
+		>
 			{isWasmLoading ? <Skeleton className="h-full w-full" /> : null}
 			<div ref={svgContainerRef} />
 			{composition != null && <CanvasControl composition={composition} />}
