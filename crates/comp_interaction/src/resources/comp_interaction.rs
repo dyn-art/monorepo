@@ -4,7 +4,29 @@ use glam::Vec2;
 
 #[derive(Resource, Debug, Default)]
 pub struct CompInteractionRes {
+    pub interaction_tool: InteractionTool,
     pub interaction_mode: InteractionMode,
+}
+
+#[derive(Debug, Default, Copy, Clone)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Deserialize, specta::Type),
+    serde(tag = "type")
+)]
+pub enum InteractionTool {
+    #[default]
+    /// When the user wants to select nodes and move them around.
+    Select,
+    /// When the user wants to insert new shape nodes.
+    Shape { variant: ShapeVariant },
+}
+
+#[derive(Debug, Default, Copy, Clone)]
+#[cfg_attr(feature = "serde_support", derive(serde::Deserialize, specta::Type))]
+pub enum ShapeVariant {
+    #[default]
+    Rectangle,
 }
 
 #[derive(Debug, Default, Copy, Clone)]
@@ -35,6 +57,8 @@ pub enum InteractionMode {
         initial_rotation_rad: f32,
         rotation_deg: f32, // For cursor
     },
+    /// When the user plans to insert a new node.
+    Inserting { origin: Vec2 },
 }
 
 #[derive(Debug, Copy, Clone)]
