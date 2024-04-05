@@ -12,13 +12,18 @@ use bevy_transform::{components::Transform, TransformBundle};
 use dyn_comp_bundles::{
     components::{
         mixins::{
-            BlendModeMixin, CornerRadiiMixin, OpacityMixin, Root, SizeMixin, VisibilityMixin,
+            BlendModeMixin, CornerRadiiMixin, OpacityMixin, PaintChildMixin, PaintParentMixin,
+            Root, SizeMixin, StyleChildrenMixin, StyleParentMixin, VisibilityMixin,
         },
         nodes::{CompNode, CompNodeVariant, RectangleCompNode},
+        paints::{CompPaint, CompPaintVariant, SolidCompPaint},
+        styles::{CompStyle, CompStyleVariant, FillCompStyle},
     },
-    RectangleCompNodeBundle,
+    FillStyleBundle, RectangleCompNodeBundle, SolidPaintBundle,
 };
 use dyn_comp_core::resources::composition::CompositionRes;
+use dyn_utils::properties::color::Color;
+use smallvec::smallvec;
 
 pub fn handle_inserting(
     commands: &mut Commands,
@@ -29,14 +34,6 @@ pub fn handle_inserting(
     shape_variant: ShapeVariant,
     initial_bounds: &XYWH,
 ) {
-    log::info!(
-        "[handle_inserting] {:?} - {:?} - {:?} - {:?}",
-        event,
-        maybe_entity,
-        shape_variant,
-        initial_bounds
-    ); // TODO: REMOVE
-
     let CursorMovedOnCompInputEvent {
         position: cursor_position,
         ..
@@ -58,26 +55,65 @@ pub fn handle_inserting(
         transform.translation.y = new_bounds.position.y;
         *size = new_bounds.size;
     } else {
-        let mut entity_commands = match shape_variant {
-            ShapeVariant::Rectangle => commands.spawn(RectangleCompNodeBundle {
-                node: CompNode {
-                    variant: CompNodeVariant::Rectangle,
-                },
-                rectangle: RectangleCompNode::default(),
-                transform: TransformBundle::from_transform(Transform::from_translation(
-                    new_bounds.position.extend(0.0),
-                )),
-                size: SizeMixin(new_bounds.size),
-                corner_radii: CornerRadiiMixin::default(),
-                visibility: VisibilityMixin::default(),
-                blend_mode: BlendModeMixin::default(),
-                opacity: OpacityMixin::default(),
-            }),
+        // TODO: Streamline spawning nodes?
+
+        // Spawn node
+        let node_entity = match shape_variant {
+            ShapeVariant::Rectangle => commands
+                .spawn(RectangleCompNodeBundle {
+                    node: CompNode {
+                        variant: CompNodeVariant::Rectangle,
+                    },
+                    rectangle: RectangleCompNode::default(),
+                    transform: TransformBundle::from_transform(Transform::from_translation(
+                        new_bounds.position.extend(0.0),
+                    )),
+                    size: SizeMixin(new_bounds.size),
+                    corner_radii: CornerRadiiMixin::default(),
+                    visibility: VisibilityMixin::default(),
+                    blend_mode: BlendModeMixin::default(),
+                    opacity: OpacityMixin::default(),
+                })
+                .id(),
         };
 
-        // TODO: Append entity to parent? or root or based on where the cursor is
-        entity_commands.insert(Root);
+        // Spawn paint
+        let paint_entity = commands
+            .spawn(SolidPaintBundle {
+                paint: CompPaint {
+                    variant: CompPaintVariant::Solid,
+                },
+                solid: SolidCompPaint {
+                    color: Color::black(),
+                },
+            })
+            .id();
 
-        *maybe_entity = Some(entity_commands.id());
+        // Spawn style
+        let mut style_entity_commands = commands.spawn(FillStyleBundle {
+            style: CompStyle {
+                variant: CompStyleVariant::Fill,
+            },
+            fill: FillCompStyle,
+            paint: PaintChildMixin(Some(paint_entity)),
+            visibility: VisibilityMixin::default(),
+            blend_mode: BlendModeMixin::default(),
+            opacity: OpacityMixin::default(),
+        });
+        style_entity_commands.insert(StyleParentMixin(node_entity));
+        let style_entity = style_entity_commands.id();
+
+        // Reference style entity in paint
+        let mut paint_entity_commands = commands.entity(paint_entity);
+        paint_entity_commands.insert(PaintParentMixin(smallvec![style_entity]));
+
+        // Reference style entity in node
+        let mut node_entity_commands = commands.entity(node_entity);
+        node_entity_commands.insert(StyleChildrenMixin(smallvec![style_entity]));
+
+        // TODO
+        node_entity_commands.insert(Root); // TODO: Append to root instead of making it a root node
+
+        *maybe_entity = Some(node_entity);
     }
 }

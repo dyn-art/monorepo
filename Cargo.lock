@@ -896,6 +896,7 @@ dependencies = [
  "glam",
  "log",
  "serde",
+ "smallvec",
  "specta",
  "web-time 1.1.0",
 ]

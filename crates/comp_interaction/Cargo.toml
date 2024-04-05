@@ -23,6 +23,7 @@ bevy_hierarchy = { workspace = true }
 bevy_transform = { workspace = true }
 glam = { workspace = true }
 web-time = "1.1.0"
+smallvec = { workspace = true }
 
 # Logging
 log = { workspace = true }
