@@ -297,7 +297,7 @@ export type ImageScaleMode =
  */
 { type: "Tile"; rotation?: number; scalingFactor: number }
 
-export type InteractionInputEvent = ({ type: "CursorDownOnEntity" } & CursorDownOnEntityInputEvent) | ({ type: "CursorMovedOnComposition" } & CursorMovedOnCompInputEvent) | ({ type: "CursorEnteredComposition" }) | ({ type: "CursorExitedComposition" }) | ({ type: "CursorDownOnComposition" } & CursorDownOnCompInputEvent) | ({ type: "CursorUpOnComposition" } & CursorUpOnCompInputEvent) | ({ type: "WheeledOnComposition" } & WheeledOnCompInputEvent) | ({ type: "CursorDownOnResizeHandle" } & CursorDownOnResizeHandleInputEvent) | ({ type: "CursorDownOnRotateHandle" } & CursorDownOnRotateHandleInputEvent)
+export type InteractionInputEvent = ({ type: "CursorDownOnEntity" } & CursorDownOnEntityInputEvent) | ({ type: "CursorMovedOnComposition" } & CursorMovedOnCompInputEvent) | ({ type: "CursorEnteredComposition" }) | ({ type: "CursorExitedComposition" }) | ({ type: "CursorDownOnComposition" } & CursorDownOnCompInputEvent) | ({ type: "CursorUpOnComposition" } & CursorUpOnCompInputEvent) | ({ type: "WheeledOnComposition" } & WheeledOnCompInputEvent) | ({ type: "CursorDownOnResizeHandle" } & CursorDownOnResizeHandleInputEvent) | ({ type: "CursorDownOnRotateHandle" } & CursorDownOnRotateHandleInputEvent) | ({ type: "InteractionToolChanged" } & InteractionToolChangedInputEvent)
 
 export type InteractionMode = 
 /**
@@ -323,11 +323,29 @@ export type InteractionMode =
 /**
  * When the user is rotating the selected nodes.
  */
-{ type: "Rotating"; corner: number; initial_rotation_rad: number; rotation_deg: number }
+{ type: "Rotating"; corner: number; initial_rotation_rad: number; rotation_deg: number } | 
+/**
+ * When the user plans to insert a new node.
+ */
+{ type: "Inserting"; initial_bounds: XYWH; shape_variant: ShapeVariant; entity: Entity | null }
 
 export type InteractionModeChangeOutputEvent = { interactionMode: InteractionModeLabel }
 
-export type InteractionModeLabel = "None" | "Pressing" | "Translating" | "Resizing" | "Rotating" | "Dragging"
+export type InteractionModeLabel = "None" | "Pressing" | "Translating" | "Resizing" | "Rotating" | "Dragging" | "Inserting"
+
+export type InteractionTool = 
+/**
+ * When the user wants to select nodes and move them around.
+ */
+{ type: "Select" } | 
+/**
+ * When the user wants to insert new shape nodes.
+ */
+{ type: "Shape"; variant: ShapeVariant }
+
+export type InteractionToolChangeOutputEvent = { interactionTool: InteractionTool }
+
+export type InteractionToolChangedInputEvent = { tool: InteractionTool }
 
 export type LineWrap = 
 /**
@@ -380,6 +398,8 @@ export type Scalar = number
 
 export type SelectionChangeOutputEvent = { selectedEntities: Entity[] }
 
+export type ShapeVariant = "Rectangle"
+
 /**
  * An absolute size in 2D with a width and a height.
  */
@@ -425,7 +445,7 @@ export type SvgBuilderOutputEvent =
 
 export type SvgCompInputEvent = { type: "Composition"; event: CompCoreInputEvent } | { type: "Interaction"; event: InteractionInputEvent }
 
-export type SvgCompOutputEvent = ({ type: "SvgElementChange" } & SvgElementChangesOutputEvent) | ({ type: "CompositionChange" } & CompositionChangeOutputEvent) | ({ type: "WatchedEntityChange" } & WatchedEntityChangesOutputEvent) | ({ type: "SelectionChange" } & SelectionChangeOutputEvent) | ({ type: "InteractionModeChange" } & InteractionModeChangeOutputEvent)
+export type SvgCompOutputEvent = ({ type: "SvgElementChange" } & SvgElementChangesOutputEvent) | ({ type: "CompositionChange" } & CompositionChangeOutputEvent) | ({ type: "WatchedEntityChange" } & WatchedEntityChangesOutputEvent) | ({ type: "SelectionChange" } & SelectionChangeOutputEvent) | ({ type: "InteractionModeChange" } & InteractionModeChangeOutputEvent) | ({ type: "InteractionToolChange" } & InteractionToolChangeOutputEvent)
 
 export type SvgDisplayStyle = "Block" | "None"
 

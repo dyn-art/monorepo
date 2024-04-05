@@ -8,7 +8,7 @@ pub fn handle_cursor_exited_comp_event(
     mut event_reader: EventReader<CursorExitedCompInputEvent>,
     mut comp_interaction_res: ResMut<CompInteractionRes>,
 ) {
-    for event in event_reader.read() {
+    for _ in event_reader.read() {
         comp_interaction_res.interaction_mode = InteractionMode::None;
     }
 }

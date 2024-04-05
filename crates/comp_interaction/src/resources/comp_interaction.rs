@@ -1,4 +1,4 @@
-use bevy_ecs::system::Resource;
+use bevy_ecs::{entity::Entity, system::Resource};
 use dyn_utils::properties::size::Size;
 use glam::Vec2;
 
@@ -8,10 +8,10 @@ pub struct CompInteractionRes {
     pub interaction_mode: InteractionMode,
 }
 
-#[derive(Debug, Default, Copy, Clone)]
+#[derive(Debug, Default, PartialEq, Eq, Copy, Clone)]
 #[cfg_attr(
     feature = "serde_support",
-    derive(serde::Deserialize, specta::Type),
+    derive(serde::Serialize, serde::Deserialize, specta::Type),
     serde(tag = "type")
 )]
 pub enum InteractionTool {
@@ -22,8 +22,11 @@ pub enum InteractionTool {
     Shape { variant: ShapeVariant },
 }
 
-#[derive(Debug, Default, Copy, Clone)]
-#[cfg_attr(feature = "serde_support", derive(serde::Deserialize, specta::Type))]
+#[derive(Debug, Default, PartialEq, Eq, Copy, Clone)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type)
+)]
 pub enum ShapeVariant {
     #[default]
     Rectangle,
@@ -58,7 +61,11 @@ pub enum InteractionMode {
         rotation_deg: f32, // For cursor
     },
     /// When the user plans to insert a new node.
-    Inserting { origin: Vec2 },
+    Inserting {
+        initial_bounds: XYWH,
+        shape_variant: ShapeVariant,
+        entity: Option<Entity>,
+    },
 }
 
 #[derive(Debug, Copy, Clone)]

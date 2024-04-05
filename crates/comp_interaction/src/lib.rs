@@ -9,7 +9,8 @@ use bevy_ecs::schedule::{IntoSystemConfigs, IntoSystemSetConfigs, SystemSet};
 use events::{
     CursorDownOnCompInputEvent, CursorDownOnEntityInputEvent, CursorDownOnResizeHandleInputEvent,
     CursorDownOnRotateHandleInputEvent, CursorEnteredCompInputEvent, CursorExitedCompInputEvent,
-    CursorMovedOnCompInputEvent, CursorUpOnCompInputEvent, WheeledOnCompInputEvent,
+    CursorMovedOnCompInputEvent, CursorUpOnCompInputEvent, InteractionToolChangedInputEvent,
+    WheeledOnCompInputEvent,
 };
 use resources::comp_interaction::CompInteractionRes;
 use systems::{
@@ -22,6 +23,7 @@ use systems::{
     },
     entity::cursor_down::handle_cursor_down_on_entity_event,
     ui::{
+        interaction_tool::handle_interaction_tool_change_event,
         resize_handle::handle_cursor_down_on_resize_handle_event,
         rotate_handle::handle_cursor_down_on_rotate_handle_event,
     },
@@ -62,6 +64,7 @@ impl Plugin for CompInteractionPlugin {
         app.add_event::<WheeledOnCompInputEvent>();
         app.add_event::<CursorDownOnResizeHandleInputEvent>();
         app.add_event::<CursorDownOnRotateHandleInputEvent>();
+        app.add_event::<InteractionToolChangedInputEvent>();
 
         // Register resources
         app.world.init_resource::<CompInteractionRes>();
@@ -85,6 +88,7 @@ impl Plugin for CompInteractionPlugin {
             PreUpdate,
             (
                 handle_cursor_entered_comp_event.in_set(CompInteractionSystemSet::First),
+                handle_interaction_tool_change_event.in_set(CompInteractionSystemSet::First),
                 handle_cursor_down_on_comp_event.in_set(CompInteractionSystemSet::Activation),
                 handle_cursor_down_on_entity_event
                     .in_set(CompInteractionSystemSet::Activation)

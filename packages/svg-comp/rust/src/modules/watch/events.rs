@@ -1,7 +1,7 @@
 use super::component_change::ComponentChange;
 use bevy_ecs::entity::Entity;
 use dyn_comp_bundles::properties::Viewport;
-use dyn_comp_interaction::resources::comp_interaction::InteractionMode;
+use dyn_comp_interaction::resources::comp_interaction::{InteractionMode, InteractionTool};
 use dyn_utils::properties::size::Size;
 
 #[derive(Debug, Clone, serde::Serialize, specta::Type)]
@@ -26,6 +26,12 @@ pub struct CompositionChangeOutputEvent {
 
 #[derive(Debug, Clone, serde::Serialize, specta::Type)]
 #[serde(rename_all = "camelCase")]
+pub struct InteractionToolChangeOutputEvent {
+    pub interaction_tool: InteractionTool,
+}
+
+#[derive(Debug, Clone, serde::Serialize, specta::Type)]
+#[serde(rename_all = "camelCase")]
 pub struct InteractionModeChangeOutputEvent {
     pub interaction_mode: InteractionModeLabel,
 }
@@ -39,6 +45,7 @@ pub enum InteractionModeLabel {
     Resizing,
     Rotating,
     Dragging,
+    Inserting,
 }
 
 impl From<&InteractionMode> for InteractionModeLabel {
@@ -50,6 +57,7 @@ impl From<&InteractionMode> for InteractionModeLabel {
             InteractionMode::Resizing { .. } => Self::Resizing,
             InteractionMode::Rotating { .. } => Self::Rotating,
             InteractionMode::Dragging { .. } => Self::Dragging,
+            InteractionMode::Inserting { .. } => Self::Inserting,
         }
     }
 }

@@ -2,7 +2,7 @@ use bevy_ecs::{entity::Entity, event::Event, world::World};
 use dyn_comp_bundles::events::InputEvent;
 use glam::Vec2;
 
-use crate::resources::comp_interaction::{MouseButton, XYWH};
+use crate::resources::comp_interaction::{InteractionTool, MouseButton, XYWH};
 
 #[derive(Debug, Copy, Clone)]
 #[cfg_attr(
@@ -20,6 +20,7 @@ pub enum InteractionInputEvent {
     WheeledOnComposition(WheeledOnCompInputEvent),
     CursorDownOnResizeHandle(CursorDownOnResizeHandleInputEvent),
     CursorDownOnRotateHandle(CursorDownOnRotateHandleInputEvent),
+    InteractionToolChanged(InteractionToolChangedInputEvent),
 }
 
 impl InputEvent for InteractionInputEvent {
@@ -50,6 +51,9 @@ impl InputEvent for InteractionInputEvent {
                 world.send_event(event);
             }
             InteractionInputEvent::WheeledOnComposition(event) => {
+                world.send_event(event);
+            }
+            InteractionInputEvent::InteractionToolChanged(event) => {
                 world.send_event(event);
             }
         }
@@ -126,4 +130,10 @@ pub struct CursorDownOnResizeHandleInputEvent {
 pub struct CursorDownOnRotateHandleInputEvent {
     pub corner: u8,
     pub initial_rotation_rad: f32,
+}
+
+#[derive(Event, Debug, Copy, Clone)]
+#[cfg_attr(feature = "serde_support", derive(serde::Deserialize, specta::Type))]
+pub struct InteractionToolChangedInputEvent {
+    pub tool: InteractionTool,
 }

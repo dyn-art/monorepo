@@ -28,7 +28,7 @@ export const Viewport: React.FC<TViewportProps> = (props) => {
 			{isWasmLoading ? <Skeleton className="h-full w-full" /> : null}
 			<div ref={svgContainerRef} />
 			{composition != null && <CanvasControl composition={composition} />}
-			<ToolsBar />
+			{composition != null && <ToolsBar composition={composition} />}
 		</div>
 	);
 };

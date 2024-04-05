@@ -6,6 +6,7 @@ import type {
 	DtifComposition,
 	Entity,
 	InteractionModeChangeOutputEvent,
+	InteractionToolChangeOutputEvent,
 	SelectionChangeOutputEvent,
 	SvgCompInputEvent,
 	SvgCompOutputEvent,
@@ -222,6 +223,7 @@ export interface TOutputEventTypeMap {
 	SelectionChange: SelectionChangeOutputEvent;
 	CompositionChange: CompositionChangeOutputEvent;
 	InteractionModeChange: InteractionModeChangeOutputEvent;
+	InteractionToolChange: InteractionToolChangeOutputEvent;
 }
 
 export type TWatchedOutputEventCallback<GEventType extends keyof TOutputEventTypeMap> = (

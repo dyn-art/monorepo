@@ -1,7 +1,9 @@
 use crate::{
     components::{Locked, Preselected, Selected},
     events::CursorDownOnEntityInputEvent,
-    resources::comp_interaction::{CompInteractionRes, InteractionMode, MouseButton},
+    resources::comp_interaction::{
+        CompInteractionRes, InteractionMode, InteractionTool, MouseButton,
+    },
 };
 use bevy_ecs::{
     entity::Entity,
@@ -50,6 +52,11 @@ pub fn handle_cursor_down_on_entity_event(
     >,
     root_node_query: Query<Entity, (With<CompNode>, With<Root>)>,
 ) {
+    match comp_interaction_res.interaction_tool {
+        InteractionTool::Select => {}
+        _ => return,
+    };
+
     let raycast_entities: Vec<(Entity, Vec2)> = event_reader
         .read()
         .filter_map(|event| {

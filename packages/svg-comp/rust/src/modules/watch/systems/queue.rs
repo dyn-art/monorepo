@@ -3,7 +3,8 @@ use crate::{
     modules::watch::{
         events::{
             CompositionChangeOutputEvent, InteractionModeChangeOutputEvent, InteractionModeLabel,
-            SelectionChangeOutputEvent, WatchedEntityChangesOutputEvent,
+            InteractionToolChangeOutputEvent, SelectionChangeOutputEvent,
+            WatchedEntityChangesOutputEvent,
         },
         resources::{
             changed_components::ChangedComponentsRes, output_event_sender::OutputEventSenderRes,
@@ -17,7 +18,10 @@ use bevy_ecs::{
     system::{Local, Query, Res, ResMut},
 };
 use dyn_comp_core::resources::composition::CompositionRes;
-use dyn_comp_interaction::{components::Selected, resources::comp_interaction::CompInteractionRes};
+use dyn_comp_interaction::{
+    components::Selected,
+    resources::comp_interaction::{CompInteractionRes, InteractionTool},
+};
 use std::collections::HashSet;
 
 pub fn queue_changed_components(
@@ -84,6 +88,27 @@ pub fn queue_interaction_mode_changes(
             ));
 
             *last_interaction_mode = current_interaction_mode;
+        }
+    }
+}
+
+pub fn queue_interaction_tool_changes(
+    output_event_sender_res: ResMut<OutputEventSenderRes>,
+    comp_interaction_res: Res<CompInteractionRes>,
+    mut last_interaction_tool: Local<InteractionTool>,
+) {
+    if comp_interaction_res.is_changed() {
+        let current_interaction_tool = comp_interaction_res.interaction_tool;
+
+        // Check whether the interaction tool has changed
+        if *last_interaction_tool != current_interaction_tool {
+            output_event_sender_res.push_event(SvgCompOutputEvent::InteractionToolChange(
+                InteractionToolChangeOutputEvent {
+                    interaction_tool: current_interaction_tool,
+                },
+            ));
+
+            *last_interaction_tool = current_interaction_tool;
         }
     }
 }
