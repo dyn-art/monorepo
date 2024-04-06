@@ -14,13 +14,17 @@ use crate::{
     resources::comp_interaction::{CompInteractionRes, InteractionMode},
 };
 use bevy_ecs::{
+    entity::Entity,
     event::EventReader,
     query::With,
     system::{Commands, ParamSet, Query, ResMut},
 };
 use bevy_hierarchy::Parent;
 use bevy_transform::components::{GlobalTransform, Transform};
-use dyn_comp_bundles::components::mixins::SizeMixin;
+use dyn_comp_bundles::components::{
+    mixins::{Root, SizeMixin},
+    nodes::CompNode,
+};
 use dyn_comp_core::resources::composition::CompositionRes;
 
 pub fn handle_cursor_moved_on_comp_event(
@@ -40,6 +44,7 @@ pub fn handle_cursor_moved_on_comp_event(
         Query<(&mut Transform, &mut SizeMixin)>,
     )>,
     global_transfrom_query: Query<&GlobalTransform>,
+    root_node_query: Query<Entity, (With<CompNode>, With<Root>)>,
 ) {
     for event in event_reader.read() {
         match &mut comp_interaction_res.interaction_mode {
@@ -83,6 +88,7 @@ pub fn handle_cursor_moved_on_comp_event(
                 &mut commands,
                 &mut comp_res,
                 &mut query_set.p3(),
+                &root_node_query,
                 event,
                 entity,
                 *shape_variant,

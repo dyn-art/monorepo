@@ -37,7 +37,7 @@ pub fn handle_cursor_down_on_entity_event(
         (Option<&Parent>, Option<&HierarchyLevel>),
         (
             With<CompNode>,
-            Without<Root>,
+            Without<Root>, // TODO: Only entities Without<Root> and Without<FrameCompNode> (so root frames) should be excluded not all root or frame nodes
             Without<Selected>,
             Without<Locked>,
         ),

@@ -6,8 +6,10 @@ use crate::{
 };
 use bevy_ecs::{
     entity::Entity,
+    query::With,
     system::{Commands, Query},
 };
+use bevy_hierarchy::BuildChildren;
 use bevy_transform::{components::Transform, TransformBundle};
 use dyn_comp_bundles::{
     components::{
@@ -29,6 +31,7 @@ pub fn handle_inserting(
     commands: &mut Commands,
     comp_res: &CompositionRes,
     query: &mut Query<(&mut Transform, &mut SizeMixin)>,
+    root_node_query: &Query<Entity, (With<CompNode>, With<Root>)>,
     event: &CursorMovedOnCompInputEvent,
     maybe_entity: &mut Option<Entity>,
     shape_variant: ShapeVariant,
@@ -111,8 +114,12 @@ pub fn handle_inserting(
         let mut node_entity_commands = commands.entity(node_entity);
         node_entity_commands.insert(StyleChildrenMixin(smallvec![style_entity]));
 
-        // TODO
-        node_entity_commands.insert(Root); // TODO: Append to root instead of making it a root node
+        // TODO: More advanced logic to determine where to append the newly created node
+        if let Some(root_entity) = root_node_query.iter().next() {
+            commands.entity(root_entity).add_child(node_entity);
+        } else {
+            node_entity_commands.insert(Root);
+        }
 
         *maybe_entity = Some(node_entity);
     }
