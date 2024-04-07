@@ -1,10 +1,9 @@
 use crate::{
     events::CursorDownOnCompInputEvent,
-    resources::comp_interaction::{
-        CompInteractionRes, InteractionMode, InteractionTool, MouseButton, XYWH,
-    },
+    resources::comp_interaction::{CompInteractionRes, InteractionMode, InteractionTool, XYWH},
 };
 use bevy_ecs::{event::EventReader, system::ResMut};
+use bevy_input::mouse::MouseButton;
 use dyn_utils::properties::size::Size;
 
 pub fn handle_cursor_down_on_comp_event(

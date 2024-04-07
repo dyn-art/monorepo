@@ -1,9 +1,7 @@
 use crate::{
     components::{Locked, Preselected, Selected},
     events::CursorDownOnEntityInputEvent,
-    resources::comp_interaction::{
-        CompInteractionRes, InteractionMode, InteractionTool, MouseButton,
-    },
+    resources::comp_interaction::{CompInteractionRes, InteractionMode, InteractionTool},
 };
 use bevy_ecs::{
     entity::Entity,
@@ -12,6 +10,7 @@ use bevy_ecs::{
     system::{Commands, Query, ResMut},
 };
 use bevy_hierarchy::Parent;
+use bevy_input::mouse::MouseButton;
 use dyn_comp_bundles::components::{
     mixins::{HierarchyLevel, Root},
     nodes::CompNode,

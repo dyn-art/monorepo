@@ -9,6 +9,6 @@ export function intoMouseButton(button: number): COMP.MouseButton {
 		case 2:
 			return 'Right';
 		default:
-			return 'Unkown';
+			return { Other: button };
 	}
 }

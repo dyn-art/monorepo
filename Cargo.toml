@@ -12,14 +12,16 @@ authors = ["@bennoinbeta"]
 
 [workspace.dependencies]
 # Bevy
-bevy_app = "0.13.0"
-bevy_ecs = "0.13.0"
-bevy_hierarchy = "0.13.0"
-bevy_transform = "0.13.0"
-bevy_utils = "0.13.0"
+bevy_app = "0.13.2"
+bevy_ecs = "0.13.2"
+bevy_hierarchy = "0.13.2"
+bevy_input = "0.13.2"
+bevy_transform = "0.13.2"
+bevy_utils = "0.13.2"
 
 # Bindgen
-specta = { git = "https://github.com/oscartbeaumont/specta.git", rev = "5da3e56" }
+# specta = { git = "https://github.com/oscartbeaumont/specta.git", rev = "5da3e56" }
+specta = { path = "/Users/benno/Desktop/workspace/contribution/code/specta" }
 serde = "1.0.195"
 serde_json = "1.0.114"
 
@@ -28,7 +30,7 @@ log = "0.4.20"
 
 # Utilities
 glam = "0.25.0"
-smallvec = "1.13.1"
+smallvec = "1.13.2"
 tinyvec = "1.6.0"
 tiny-skia-path = "0.11.4"
 slotmap = "1.0.7"

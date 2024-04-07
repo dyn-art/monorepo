@@ -31,6 +31,7 @@ export class SvgRenderer extends Renderer {
 		this._svgElement.setAttribute('version', VERSION);
 		this._svgElement.setAttribute('id', 'svg-canvas');
 		this._svgElement.style.setProperty('overflow', 'hidden');
+		this._svgElement.setAttribute('tabindex', '1'); // https://stackoverflow.com/questions/18928116/javascript-keydown-event-listener-is-not-working
 		// this._svgElement.style.setProperty('pointer-events', 'none');
 		this._domElement.appendChild(this._svgElement);
 
@@ -54,10 +55,8 @@ export class SvgRenderer extends Renderer {
 				{
 					type: 'Interaction',
 					event: {
-						type: 'WheeledOnComposition',
+						type: 'WheelActionOnComposition',
 						position: this.clientWindowPointToCompPoint([e.clientX, e.clientY]),
-						ctrlKeyPressed: e.ctrlKey,
-						metaKeyPressed: e.metaKey,
 						delta: [e.deltaX, e.deltaY]
 					}
 				},
@@ -130,6 +129,34 @@ export class SvgRenderer extends Renderer {
 				);
 				this._cursorInCompBounds = false;
 			}
+		});
+		this._svgElement.addEventListener('keydown', (e) => {
+			console.log('keydown', { code: e.code });
+			e.preventDefault();
+			this.composition.emitInputEvent(
+				{
+					type: 'Interaction',
+					event: {
+						type: 'KeyDownOnComposition',
+						keyCode: e.code
+					}
+				},
+				true
+			);
+		});
+		this._svgElement.addEventListener('keyup', (e) => {
+			console.log('keyup', { code: e.code });
+			e.preventDefault();
+			this.composition.emitInputEvent(
+				{
+					type: 'Interaction',
+					event: {
+						type: 'KeyUpOnComposition',
+						keyCode: e.code
+					}
+				},
+				true
+			);
 		});
 	}
 

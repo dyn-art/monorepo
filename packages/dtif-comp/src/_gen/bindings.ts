@@ -297,7 +297,7 @@ export type ImageScaleMode =
  */
 { type: "Tile"; rotation?: number; scalingFactor: number }
 
-export type InteractionInputEvent = ({ type: "CursorDownOnEntity" } & CursorDownOnEntityInputEvent) | ({ type: "CursorMovedOnComposition" } & CursorMovedOnCompInputEvent) | ({ type: "CursorEnteredComposition" }) | ({ type: "CursorExitedComposition" }) | ({ type: "CursorDownOnComposition" } & CursorDownOnCompInputEvent) | ({ type: "CursorUpOnComposition" } & CursorUpOnCompInputEvent) | ({ type: "WheeledOnComposition" } & WheeledOnCompInputEvent) | ({ type: "CursorDownOnResizeHandle" } & CursorDownOnResizeHandleInputEvent) | ({ type: "CursorDownOnRotateHandle" } & CursorDownOnRotateHandleInputEvent) | ({ type: "InteractionToolChanged" } & InteractionToolChangedInputEvent)
+export type InteractionInputEvent = ({ type: "KeyDownOnComposition" } & KeyDownOnCompInputEvent) | ({ type: "KeyUpOnComposition" } & KeyUpOnCompInputEvent) | ({ type: "CursorEnteredComposition" }) | ({ type: "CursorExitedComposition" }) | ({ type: "CursorMovedOnComposition" } & CursorMovedOnCompInputEvent) | ({ type: "CursorDownOnComposition" } & CursorDownOnCompInputEvent) | ({ type: "CursorUpOnComposition" } & CursorUpOnCompInputEvent) | ({ type: "WheelActionOnComposition" } & WheelActionOnCompInputEvent) | ({ type: "CursorDownOnEntity" } & CursorDownOnEntityInputEvent) | ({ type: "CursorDownOnResizeHandle" } & CursorDownOnResizeHandleInputEvent) | ({ type: "CursorDownOnRotateHandle" } & CursorDownOnRotateHandleInputEvent) | ({ type: "InteractionToolChanged" } & InteractionToolChangedInputEvent)
 
 export type InteractionMode = 
 /**
@@ -347,6 +347,18 @@ export type InteractionToolChangeOutputEvent = { interactionTool: InteractionToo
 
 export type InteractionToolChangedInputEvent = { tool: InteractionTool }
 
+export type KeyDownOnCompInputEvent = { 
+/**
+ * The physical key code of the key.
+ */
+keyCode: string }
+
+export type KeyUpOnCompInputEvent = { 
+/**
+ * The physical key code of the key.
+ */
+keyCode: string }
+
 export type LineWrap = 
 /**
  * No wrapping
@@ -367,7 +379,31 @@ export type LineWrap =
 
 export type Mat3 = [number, number, number, number, number, number, number, number, number]
 
-export type MouseButton = "Left" | "Middle" | "Right" | "Unkown"
+export type MouseButton = 
+/**
+ * The left mouse button.
+ */
+"Left" | 
+/**
+ * The right mouse button.
+ */
+"Right" | 
+/**
+ * The middle mouse button.
+ */
+"Middle" | 
+/**
+ * The back mouse button.
+ */
+"Back" | 
+/**
+ * The forward mouse button.
+ */
+"Forward" | 
+/**
+ * Another mouse button with the associated number.
+ */
+{ Other: number }
 
 export type Node = ({ type: "Frame" } & FrameNode) | ({ type: "Group" } & GroupNode) | ({ type: "Rectangle" } & RectangleNode) | ({ type: "Ellipse" } & EllipseNode) | ({ type: "Star" } & StarNode) | ({ type: "Polygon" } & PolygonNode) | ({ type: "Text" } & TextNode) | ({ type: "Vector" } & VectorNode)
 
@@ -523,7 +559,7 @@ export type WatchableComponentVariant = "Size" | "Transform" | "GlobalTransform"
 
 export type WatchedEntityChangesOutputEvent = { entity: Entity; changes: ComponentChange[] }
 
-export type WheeledOnCompInputEvent = { position: Vec2; delta: Vec2; ctrlKeyPressed: boolean; metaKeyPressed: boolean }
+export type WheelActionOnCompInputEvent = { position: Vec2; delta: Vec2 }
 
 export type XYWH = { position: Vec2; size: Size }
 

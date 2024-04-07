@@ -207,6 +207,10 @@ export class Composition {
 		this._svgCompHandle.logEntityComponents(entity);
 	}
 
+	public tempDevLog(): void {
+		this._svgCompHandle.tempDevLog();
+	}
+
 	public toString(): string | null {
 		return this._svgCompHandle.toString() ?? null;
 	}

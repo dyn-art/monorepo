@@ -1,4 +1,5 @@
 use bevy_ecs::{entity::Entity, system::Resource};
+use bevy_input::mouse::MouseButton;
 use dyn_utils::properties::size::Size;
 use glam::Vec2;
 
@@ -82,14 +83,4 @@ pub enum HandleSide {
     Bottom = 2,
     Left = 4,
     Right = 8,
-}
-
-#[derive(Debug, Default, PartialEq, Eq, Copy, Clone)]
-#[cfg_attr(feature = "serde_support", derive(serde::Deserialize, specta::Type))]
-pub enum MouseButton {
-    Left,
-    Middle,
-    Right,
-    #[default]
-    Unkown,
 }

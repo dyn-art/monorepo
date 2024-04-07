@@ -1,14 +1,19 @@
-use crate::events::WheeledOnCompInputEvent;
-use bevy_ecs::{event::EventReader, system::ResMut};
+use crate::events::WheelActionOnCompInputEvent;
+use bevy_ecs::{
+    event::EventReader,
+    system::{Res, ResMut},
+};
+use bevy_input::{keyboard::KeyCode, ButtonInput};
 use dyn_comp_bundles::properties::Viewport;
 use dyn_comp_core::resources::composition::CompositionRes;
 use dyn_utils::{properties::size::Size, units::abs::Abs};
 
 static ZOOM_FACTOR: f32 = 0.9;
 
-pub fn handle_wheel_on_comp_event(
-    mut event_reader: EventReader<WheeledOnCompInputEvent>,
+pub fn handle_wheel_action_on_comp_event(
+    mut event_reader: EventReader<WheelActionOnCompInputEvent>,
     mut comp_res: ResMut<CompositionRes>,
+    keyboard_input_res: Res<ButtonInput<KeyCode>>,
 ) {
     for event in event_reader.read() {
         let CompositionRes {
@@ -20,14 +25,16 @@ pub fn handle_wheel_on_comp_event(
                 },
             ..
         } = comp_res.as_mut();
-        let WheeledOnCompInputEvent {
+        let WheelActionOnCompInputEvent {
             position: cursor_position,
             delta,
-            ctrl_key_pressed,
-            meta_key_pressed,
         } = &event;
 
-        if *ctrl_key_pressed || *meta_key_pressed {
+        let ctrl_key_pressed =
+            keyboard_input_res.any_pressed([KeyCode::ControlLeft, KeyCode::ControlRight]);
+        let meta_key_pressed = keyboard_input_res.any_pressed([KeyCode::Meta]);
+
+        if ctrl_key_pressed || meta_key_pressed {
             let scale_factor = if delta.y < 0.0 {
                 1.0 / ZOOM_FACTOR
             } else {
