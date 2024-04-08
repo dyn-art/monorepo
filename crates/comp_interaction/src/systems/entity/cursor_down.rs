@@ -1,11 +1,8 @@
 use crate::{
     components::{Locked, Preselected, Selected},
     events::CursorDownOnEntityInputEvent,
-    input::{
-        button_input::ButtonInput,
-        mouse::{
-            MouseButton, MouseButtonOnEntity, MouseButtonOnEntityButtonInput, MouseButtonValue,
-        },
+    input::mouse::{
+        MouseButton, MouseButtonOnEntity, MouseButtonOnEntityButtonInput, MouseButtonValue,
     },
     resources::comp_interaction::{CompInteractionRes, InteractionMode, InteractionTool},
 };

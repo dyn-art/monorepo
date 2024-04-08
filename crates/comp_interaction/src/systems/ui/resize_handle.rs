@@ -18,6 +18,10 @@ pub fn cursor_down_on_resize_handle_input_system(
 ) {
     mouse_button_input_res.bypass_change_detection().clear();
     for event in event_reader.read() {
+        log::info!(
+            "[cursor_down_on_resize_handle_input_system] {:?}",
+            event.corner,
+        );
         mouse_button_input_res.press(
             MouseButtonOnResizeHandle {
                 button: MouseButton::Left,

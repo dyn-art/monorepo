@@ -1,9 +1,6 @@
 use crate::{
     events::CursorUpOnEntityInputEvent,
-    input::{
-        button_input::ButtonInput,
-        mouse::{MouseButtonOnEntity, MouseButtonOnEntityButtonInput, MouseButtonValue},
-    },
+    input::mouse::{MouseButtonOnEntity, MouseButtonOnEntityButtonInput},
 };
 use bevy_ecs::{event::EventReader, system::ResMut};
 
