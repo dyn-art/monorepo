@@ -20,8 +20,7 @@ bevy_transform = "0.13.2"
 bevy_utils = "0.13.2"
 
 # Bindgen
-# specta = { git = "https://github.com/oscartbeaumont/specta.git", rev = "5da3e56" }
-specta = { path = "/Users/benno/Desktop/workspace/contribution/code/specta" }
+specta = { git = "https://github.com/oscartbeaumont/specta.git", rev = "5da3e56" }
 serde = "1.0.195"
 serde_json = "1.0.114"
 

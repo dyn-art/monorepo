@@ -47,6 +47,14 @@ pub struct MouseButtonOnEntity {
     pub entity: Entity,
 }
 
+#[derive(Debug, Hash, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
+#[cfg_attr(feature = "serde_support", derive(serde::Deserialize, specta::Type))]
+pub struct MouseButtonOnResizeHandle(pub MouseButton);
+
+#[derive(Debug, Hash, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
+#[cfg_attr(feature = "serde_support", derive(serde::Deserialize, specta::Type))]
+pub struct MouseButtonOnRotateHandle(pub MouseButton);
+
 #[derive(Debug, Clone, Copy)]
 #[cfg_attr(feature = "serde_support", derive(serde::Deserialize, specta::Type))]
 pub struct MouseButtonValue {

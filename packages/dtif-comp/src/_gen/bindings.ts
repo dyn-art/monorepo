@@ -1300,6 +1300,10 @@ export type MouseButton =
 
 export type MouseButtonOnEntity = { button: MouseButton; entity: Entity }
 
+export type MouseButtonOnResizeHandle = MouseButton
+
+export type MouseButtonOnRotateHandle = MouseButton
+
 export type MouseButtonValue = { position: Vec2 }
 
 export type MouseWheeledOnCompInputEvent = { position: Vec2; delta: Vec2 }

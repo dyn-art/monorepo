@@ -17,7 +17,10 @@ use events::{
 use input::{
     button_input::ButtonInput,
     keyboard::KeyCode,
-    mouse::{MouseButton, MouseButtonOnEntity, MouseButtonValue},
+    mouse::{
+        MouseButton, MouseButtonOnEntity, MouseButtonOnResizeHandle, MouseButtonOnRotateHandle,
+        MouseButtonValue,
+    },
 };
 use resources::comp_interaction::CompInteractionRes;
 use systems::{
@@ -87,6 +90,8 @@ impl Plugin for CompInteractionPlugin {
         app.init_resource::<ButtonInput<KeyCode, ()>>();
         app.init_resource::<ButtonInput<MouseButton, MouseButtonValue>>();
         app.init_resource::<ButtonInput<MouseButtonOnEntity, MouseButtonValue>>();
+        app.init_resource::<ButtonInput<MouseButtonOnResizeHandle, ()>>();
+        app.init_resource::<ButtonInput<MouseButtonOnRotateHandle, ()>>();
 
         // Configure system sets
         app.configure_sets(
