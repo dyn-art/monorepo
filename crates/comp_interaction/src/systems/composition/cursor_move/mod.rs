@@ -27,7 +27,7 @@ use dyn_comp_bundles::components::{
 };
 use dyn_comp_core::resources::composition::CompositionRes;
 
-pub fn handle_cursor_moved_on_comp_event(
+pub fn cursor_moved_on_comp_input_system(
     mut commands: Commands,
     mut event_reader: EventReader<CursorMovedOnCompInputEvent>,
     mut comp_interaction_res: ResMut<CompInteractionRes>,

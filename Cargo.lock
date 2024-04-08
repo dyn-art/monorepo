@@ -462,7 +462,6 @@ dependencies = [
  "bevy_math",
  "bevy_reflect",
  "bevy_utils",
- "serde",
  "smol_str",
  "thiserror",
 ]
@@ -905,7 +904,6 @@ dependencies = [
  "bevy_app",
  "bevy_ecs",
  "bevy_hierarchy",
- "bevy_input",
  "bevy_transform",
  "dyn-comp-bundles",
  "dyn-comp-core",

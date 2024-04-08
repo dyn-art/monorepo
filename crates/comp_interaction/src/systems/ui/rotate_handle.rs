@@ -1,11 +1,10 @@
-use bevy_ecs::{event::EventReader, system::ResMut};
-
 use crate::{
     events::CursorDownOnRotateHandleInputEvent,
     resources::comp_interaction::{CompInteractionRes, InteractionMode},
 };
+use bevy_ecs::{event::EventReader, system::ResMut};
 
-pub fn handle_cursor_down_on_rotate_handle_event(
+pub fn cursor_down_on_rotate_handle_input_system(
     mut event_reader: EventReader<CursorDownOnRotateHandleInputEvent>,
     mut comp_interaction_res: ResMut<CompInteractionRes>,
 ) {

@@ -11,7 +11,7 @@ use bevy_ecs::{
 };
 use dyn_comp_bundles::components::nodes::CompNode;
 
-pub fn handle_interaction_tool_change_event(
+pub fn interaction_tool_changed_input_system(
     mut commands: Commands,
     mut event_reader: EventReader<InteractionToolChangedInputEvent>,
     mut comp_interaction_res: ResMut<CompInteractionRes>,

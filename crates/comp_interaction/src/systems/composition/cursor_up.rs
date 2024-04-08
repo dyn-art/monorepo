@@ -1,6 +1,10 @@
 use crate::{
     components::Selected,
     events::CursorUpOnCompInputEvent,
+    input::{
+        button_input::ButtonInput,
+        mouse::{MouseButton, MouseButtonValue},
+    },
     resources::comp_interaction::{CompInteractionRes, InteractionMode, InteractionTool},
 };
 use bevy_ecs::{
@@ -8,12 +12,22 @@ use bevy_ecs::{
     system::{Commands, ResMut},
 };
 
-pub fn handle_cursor_up_on_comp_event(
-    mut commands: Commands,
+pub fn cursor_up_on_comp_input_system(
     mut event_reader: EventReader<CursorUpOnCompInputEvent>,
-    mut comp_interaction_res: ResMut<CompInteractionRes>,
+    mut mouse_button_input_res: ResMut<ButtonInput<MouseButton, MouseButtonValue>>,
 ) {
-    if event_reader.read().len() > 0 {
+    for event in event_reader.read() {
+        log::info!("[cursor_up_on_comp_input_system] {:?}", event.button);
+        mouse_button_input_res.release(event.button);
+    }
+}
+
+pub fn cursor_up_on_comp_system(
+    mut commands: Commands,
+    mut comp_interaction_res: ResMut<CompInteractionRes>,
+    mouse_button_input_res: ResMut<ButtonInput<MouseButton, MouseButtonValue>>,
+) {
+    if mouse_button_input_res.get_just_released().len() > 0 {
         match comp_interaction_res.interaction_mode {
             InteractionMode::Inserting {
                 entity: maybe_entity,

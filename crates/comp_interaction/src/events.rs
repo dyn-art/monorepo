@@ -1,6 +1,8 @@
-use crate::resources::comp_interaction::{InteractionTool, XYWH};
+use crate::{
+    input::{keyboard::KeyCode, mouse::MouseButton},
+    resources::comp_interaction::{InteractionTool, XYWH},
+};
 use bevy_ecs::{entity::Entity, event::Event, world::World};
-use bevy_input::{keyboard::KeyCode, mouse::MouseButton};
 use dyn_comp_bundles::events::InputEvent;
 use glam::Vec2;
 
@@ -19,10 +21,11 @@ pub enum InteractionInputEvent {
     CursorMovedOnComposition(CursorMovedOnCompInputEvent),
     CursorDownOnComposition(CursorDownOnCompInputEvent),
     CursorUpOnComposition(CursorUpOnCompInputEvent),
-    WheelActionOnComposition(WheelActionOnCompInputEvent),
+    MouseWheeledOnComposition(MouseWheeledOnCompInputEvent),
 
     // Entity
     CursorDownOnEntity(CursorDownOnEntityInputEvent),
+    CursorUpOnEntity(CursorUpOnEntityInputEvent),
 
     // UI
     CursorDownOnResizeHandle(CursorDownOnResizeHandleInputEvent),
@@ -49,7 +52,7 @@ impl InputEvent for InteractionInputEvent {
             Self::CursorUpOnComposition(event) => {
                 world.send_event(event);
             }
-            Self::WheelActionOnComposition(event) => {
+            Self::MouseWheeledOnComposition(event) => {
                 world.send_event(event);
             }
             Self::CursorEnteredComposition(event) => {
@@ -61,6 +64,9 @@ impl InputEvent for InteractionInputEvent {
 
             // Entity
             Self::CursorDownOnEntity(event) => {
+                world.send_event(event);
+            }
+            Self::CursorUpOnEntity(event) => {
                 world.send_event(event);
             }
 
@@ -128,6 +134,14 @@ pub struct CursorDownOnEntityInputEvent {
 
 #[derive(Event, Debug, Copy, Clone)]
 #[cfg_attr(feature = "serde_support", derive(serde::Deserialize, specta::Type))]
+pub struct CursorUpOnEntityInputEvent {
+    pub entity: Entity,
+    pub position: Vec2,
+    pub button: MouseButton,
+}
+
+#[derive(Event, Debug, Copy, Clone)]
+#[cfg_attr(feature = "serde_support", derive(serde::Deserialize, specta::Type))]
 pub struct CursorDownOnCompInputEvent {
     pub position: Vec2,
     pub button: MouseButton,
@@ -146,7 +160,7 @@ pub struct CursorUpOnCompInputEvent {
     derive(serde::Deserialize, specta::Type),
     serde(rename_all = "camelCase")
 )]
-pub struct WheelActionOnCompInputEvent {
+pub struct MouseWheeledOnCompInputEvent {
     pub position: Vec2,
     pub delta: Vec2,
 }
@@ -179,51 +193,3 @@ pub struct CursorDownOnRotateHandleInputEvent {
 pub struct InteractionToolChangedInputEvent {
     pub tool: InteractionTool,
 }
-
-// #[derive(Event, Debug, Clone)]
-// #[cfg_attr(feature = "serde_support", derive(serde::Deserialize, specta::Type))]
-// pub struct KeyboardActionOnCompInputEvent {
-//     /// The physical key code of the key.
-//     pub key_code: KeyCode,
-//     /// The logical key of the input
-//     pub logical_key: Key,
-//     /// The press state of the key.
-//     pub state: ButtonState,
-// }
-
-// #[derive(Event, Debug, Copy, Clone)]
-// #[cfg_attr(feature = "serde_support", derive(serde::Deserialize, specta::Type))]
-// pub struct MouseButtonActionOnCompInputEvent {
-//     /// The mouse button assigned to the event.
-//     pub button: MouseButton,
-//     /// The pressed state of the button.
-//     pub state: ButtonState,
-// }
-
-// #[derive(Event, Debug, Copy, Clone)]
-// #[cfg_attr(feature = "serde_support", derive(serde::Deserialize, specta::Type))]
-// pub struct MouseButtonActionOnEntityInputEvent {
-//     pub entity: Entity,
-//     /// The mouse button assigned to the event.
-//     pub button: MouseButton,
-//     /// The pressed state of the button.
-//     pub state: ButtonState,
-// }
-
-// #[derive(Event, Debug, Copy, Clone)]
-// #[cfg_attr(feature = "serde_support", derive(serde::Deserialize, specta::Type))]
-// pub struct MouseWheelActionOnCompInputEvent {
-//     /// The mouse scroll unit.
-//     pub unit: MouseScrollUnit,
-//     /// The horizontal scroll value.
-//     pub x: f32,
-//     /// The vertical scroll value.
-//     pub y: f32,
-// }
-
-// #[derive(Event, Debug, Copy, Clone)]
-// #[cfg_attr(feature = "serde_support", derive(serde::Deserialize, specta::Type))]
-// pub struct MouseMotionOnCompInputEvent {
-//     /// The change in the position of the pointing device since the last event was sent.
-//     pub delta: Vec2,
-// }

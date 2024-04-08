@@ -1,16 +1,20 @@
 use crate::{
     components::{Locked, Preselected, Selected},
     events::CursorDownOnEntityInputEvent,
+    input::{
+        button_input::ButtonInput,
+        mouse::{MouseButton, MouseButtonOnEntity, MouseButtonValue},
+    },
     resources::comp_interaction::{CompInteractionRes, InteractionMode, InteractionTool},
 };
 use bevy_ecs::{
+    change_detection::DetectChangesMut,
     entity::Entity,
     event::EventReader,
     query::{With, Without},
     system::{Commands, Query, ResMut},
 };
 use bevy_hierarchy::Parent;
-use bevy_input::mouse::MouseButton;
 use dyn_comp_bundles::components::{
     mixins::{HierarchyLevel, Root},
     nodes::CompNode,
@@ -21,17 +25,40 @@ use std::collections::HashSet;
 // https://stackoverflow.com/questions/29917287/what-is-the-max-delay-between-two-clicks-to-trigger-a-double-click-event
 static DOUBLE_CLICK_WINDOW: web_time::Duration = web_time::Duration::from_millis(500);
 
-// Events received if clicked on nested Rectangle:
-// INFO: [handle_cursor_down_on_entity_event] Start
-// INFO: [handle_cursor_down_on_entity_event] Entity: 10v1 <- Rectangle (Clicked on)
-// INFO: [handle_cursor_down_on_entity_event] Entity: 8v1 <- Frame Nested
-// INFO: [handle_cursor_down_on_entity_event] Entity:6v1 <- Frame Nested
-// INFO: [handle_cursor_down_on_entity_event] Entity: 4v1 <- Frame (Root)
-// INFO: [handle_cursor_down_on_entity_event] End
-pub fn handle_cursor_down_on_entity_event(
-    mut commands: Commands,
+pub fn cursor_down_on_entity_input_system(
     mut event_reader: EventReader<CursorDownOnEntityInputEvent>,
+    mut mouse_button_input_res: ResMut<ButtonInput<MouseButtonOnEntity, MouseButtonValue>>,
+) {
+    mouse_button_input_res.bypass_change_detection().clear();
+    for event in event_reader.read() {
+        log::info!(
+            "[cursor_down_on_entity_input_system] {:?} on {:?}",
+            event.button,
+            event.entity
+        );
+        mouse_button_input_res.press(
+            MouseButtonOnEntity {
+                entity: event.entity,
+                button: event.button,
+            },
+            MouseButtonValue {
+                position: event.position,
+            },
+        );
+    }
+}
+
+// Events received if clicked on nested Rectangle:
+// INFO: [cursor_down_on_entity_system] Start
+// INFO: [cursor_down_on_entity_system] Entity: 10v1 <- Rectangle (Clicked on)
+// INFO: [cursor_down_on_entity_system] Entity: 8v1 <- Frame Nested
+// INFO: [cursor_down_on_entity_system] Entity:6v1 <- Frame Nested
+// INFO: [cursor_down_on_entity_system] Entity: 4v1 <- Frame (Root)
+// INFO: [cursor_down_on_entity_system] End
+pub fn cursor_down_on_entity_system(
+    mut commands: Commands,
     mut comp_interaction_res: ResMut<CompInteractionRes>,
+    mouse_button_input_res: ResMut<ButtonInput<MouseButtonOnEntity, MouseButtonValue>>,
     unselected_node_query: Query<
         (Option<&Parent>, Option<&HierarchyLevel>),
         (
@@ -56,16 +83,18 @@ pub fn handle_cursor_down_on_entity_event(
         _ => return,
     };
 
-    let raycast_entities: Vec<(Entity, Vec2)> = event_reader
-        .read()
-        .filter_map(|event| {
-            if event.button == MouseButton::Left {
-                Some((event.entity, event.position))
+    let raycast_entities: Vec<(Entity, Vec2)> = mouse_button_input_res
+        .get_just_pressed()
+        .filter_map(|(key, value)| {
+            if key.button == MouseButton::Left {
+                Some((key.entity, value.position))
             } else {
                 None
             }
         })
         .collect();
+
+    log::info!("[cursor_down_on_entity_system] {:?}", raycast_entities);
 
     if raycast_entities.is_empty() {
         return;
@@ -98,7 +127,7 @@ pub fn handle_cursor_down_on_entity_event(
 
     // Find nodes that could be selected or preselected
     for (entity, cursor_position) in raycast_entities.iter().copied() {
-        log::info!("[handle_cursor_down_on_entity_event] Entity {:?}", entity,);
+        log::info!("[cursor_down_on_entity_system] Entity {:?}", entity,);
 
         if let Ok((maybe_parent, maybe_hierarchy_level)) = unselected_node_query.get(entity) {
             // Consider selecting preselected node
@@ -179,7 +208,7 @@ pub fn handle_cursor_down_on_entity_event(
     }
 
     log::info!(
-        "[handle_cursor_down_on_entity_event] Preselection: {:?}",
+        "[cursor_down_on_entity_system] Preselection: {:?}",
         selection_candidates
     );
 
@@ -210,7 +239,7 @@ pub fn handle_cursor_down_on_entity_event(
 
                 #[cfg(feature = "tracing")]
                 log::info!(
-                    "[handle_cursor_down_on_entity_event] Selected Entity {:?} at {:?}",
+                    "[cursor_down_on_entity_system] Selected Entity {:?} at {:?}",
                     entity,
                     cursor_position
                 );
@@ -235,7 +264,7 @@ pub fn handle_cursor_down_on_entity_event(
                 commands.entity(entity).remove::<Selected>();
                 #[cfg(feature = "tracing")]
                 log::info!(
-                    "[handle_cursor_down_on_entity_event] Unselected Entity: {:?}",
+                    "[cursor_down_on_entity_system] Unselected Entity: {:?}",
                     entity
                 );
             }

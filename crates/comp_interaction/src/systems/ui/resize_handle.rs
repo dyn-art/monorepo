@@ -4,7 +4,7 @@ use crate::{
 };
 use bevy_ecs::{event::EventReader, system::ResMut};
 
-pub fn handle_cursor_down_on_resize_handle_event(
+pub fn cursor_down_on_resize_handle_input_system(
     mut event_reader: EventReader<CursorDownOnResizeHandleInputEvent>,
     mut comp_interaction_res: ResMut<CompInteractionRes>,
 ) {

@@ -1,5 +1,5 @@
+use crate::input::mouse::MouseButton;
 use bevy_ecs::{entity::Entity, system::Resource};
-use bevy_input::mouse::MouseButton;
 use dyn_utils::properties::size::Size;
 use glam::Vec2;
 

@@ -1,33 +1,44 @@
 pub mod components;
 pub mod events;
+pub mod input;
 pub mod resources;
 mod systems;
 mod utils;
 
 use bevy_app::{App, Plugin, PreUpdate};
 use bevy_ecs::schedule::{IntoSystemConfigs, IntoSystemSetConfigs, SystemSet};
-use bevy_input::{keyboard::KeyCode, mouse::MouseButton, ButtonInput};
 use events::{
     CursorDownOnCompInputEvent, CursorDownOnEntityInputEvent, CursorDownOnResizeHandleInputEvent,
     CursorDownOnRotateHandleInputEvent, CursorEnteredCompInputEvent, CursorExitedCompInputEvent,
-    CursorMovedOnCompInputEvent, CursorUpOnCompInputEvent, InteractionToolChangedInputEvent,
-    KeyDownOnCompInputEvent, KeyUpOnCompInputEvent, WheelActionOnCompInputEvent,
+    CursorMovedOnCompInputEvent, CursorUpOnCompInputEvent, CursorUpOnEntityInputEvent,
+    InteractionToolChangedInputEvent, KeyDownOnCompInputEvent, KeyUpOnCompInputEvent,
+    MouseWheeledOnCompInputEvent,
+};
+use input::{
+    button_input::ButtonInput,
+    keyboard::KeyCode,
+    mouse::{MouseButton, MouseButtonOnEntity, MouseButtonValue},
 };
 use resources::comp_interaction::CompInteractionRes;
 use systems::{
     composition::{
-        cursor_down::handle_cursor_down_on_comp_event,
-        cursor_entered::handle_cursor_entered_comp_event,
-        cursor_exited::handle_cursor_exited_comp_event,
-        cursor_move::handle_cursor_moved_on_comp_event, cursor_up::handle_cursor_up_on_comp_event,
-        key_down::handle_key_down_event, key_up::handle_key_up_event,
-        wheel::handle_wheel_action_on_comp_event,
+        cursor_down::{cursor_down_on_comp_input_system, cursor_down_on_comp_system},
+        cursor_entered::cursor_entered_comp_input_system,
+        cursor_exited::cursor_exited_comp_input_system,
+        cursor_move::cursor_moved_on_comp_input_system,
+        cursor_up::{cursor_up_on_comp_input_system, cursor_up_on_comp_system},
+        key_down::key_down_input_system,
+        key_up::key_up_input_system,
+        wheel::mouse_wheeled_on_comp_input_system,
     },
-    entity::cursor_down::handle_cursor_down_on_entity_event,
+    entity::{
+        cursor_down::{cursor_down_on_entity_input_system, cursor_down_on_entity_system},
+        cursor_up::cursor_up_on_entity_input_system,
+    },
     ui::{
-        interaction_tool::handle_interaction_tool_change_event,
-        resize_handle::handle_cursor_down_on_resize_handle_event,
-        rotate_handle::handle_cursor_down_on_rotate_handle_event,
+        interaction_tool::interaction_tool_changed_input_system,
+        resize_handle::cursor_down_on_resize_handle_input_system,
+        rotate_handle::cursor_down_on_rotate_handle_input_system,
     },
 };
 
@@ -64,16 +75,18 @@ impl Plugin for CompInteractionPlugin {
         app.add_event::<CursorMovedOnCompInputEvent>();
         app.add_event::<CursorDownOnCompInputEvent>();
         app.add_event::<CursorUpOnCompInputEvent>();
-        app.add_event::<WheelActionOnCompInputEvent>();
+        app.add_event::<MouseWheeledOnCompInputEvent>();
         app.add_event::<CursorDownOnEntityInputEvent>();
+        app.add_event::<CursorUpOnEntityInputEvent>();
         app.add_event::<CursorDownOnResizeHandleInputEvent>();
         app.add_event::<CursorDownOnRotateHandleInputEvent>();
         app.add_event::<InteractionToolChangedInputEvent>();
 
         // Register resources
         app.init_resource::<CompInteractionRes>();
-        app.init_resource::<ButtonInput<KeyCode>>();
-        app.init_resource::<ButtonInput<MouseButton>>();
+        app.init_resource::<ButtonInput<KeyCode, ()>>();
+        app.init_resource::<ButtonInput<MouseButton, MouseButtonValue>>();
+        app.init_resource::<ButtonInput<MouseButtonOnEntity, MouseButtonValue>>();
 
         // Configure system sets
         app.configure_sets(
@@ -93,22 +106,32 @@ impl Plugin for CompInteractionPlugin {
         app.add_systems(
             PreUpdate,
             (
-                handle_cursor_entered_comp_event.in_set(CompInteractionSystemSet::First),
-                handle_key_down_event.in_set(CompInteractionSystemSet::First),
-                handle_key_up_event.in_set(CompInteractionSystemSet::First),
-                handle_interaction_tool_change_event.in_set(CompInteractionSystemSet::First),
-                handle_cursor_down_on_comp_event.in_set(CompInteractionSystemSet::Activation),
-                handle_cursor_down_on_entity_event
+                cursor_entered_comp_input_system.in_set(CompInteractionSystemSet::First),
+                key_down_input_system.in_set(CompInteractionSystemSet::First),
+                key_up_input_system
+                    .in_set(CompInteractionSystemSet::First)
+                    .after(key_down_input_system),
+                cursor_down_on_comp_input_system.in_set(CompInteractionSystemSet::First),
+                cursor_up_on_comp_input_system
+                    .in_set(CompInteractionSystemSet::First)
+                    .after(cursor_down_on_comp_input_system),
+                cursor_down_on_entity_input_system.in_set(CompInteractionSystemSet::First),
+                cursor_up_on_entity_input_system
+                    .in_set(CompInteractionSystemSet::First)
+                    .after(cursor_down_on_entity_input_system),
+                interaction_tool_changed_input_system.in_set(CompInteractionSystemSet::First),
+                cursor_down_on_comp_system.in_set(CompInteractionSystemSet::Activation),
+                cursor_down_on_entity_system
                     .in_set(CompInteractionSystemSet::Activation)
-                    .after(handle_cursor_down_on_comp_event),
-                handle_cursor_down_on_resize_handle_event
+                    .after(cursor_down_on_comp_system),
+                cursor_down_on_resize_handle_input_system
                     .in_set(CompInteractionSystemSet::Manipulation),
-                handle_cursor_down_on_rotate_handle_event
+                cursor_down_on_rotate_handle_input_system
                     .in_set(CompInteractionSystemSet::Manipulation),
-                handle_cursor_moved_on_comp_event.in_set(CompInteractionSystemSet::Continuous),
-                handle_wheel_action_on_comp_event.in_set(CompInteractionSystemSet::Continuous),
-                handle_cursor_up_on_comp_event.in_set(CompInteractionSystemSet::Continuous),
-                handle_cursor_exited_comp_event.in_set(CompInteractionSystemSet::Last),
+                cursor_moved_on_comp_input_system.in_set(CompInteractionSystemSet::Continuous),
+                mouse_wheeled_on_comp_input_system.in_set(CompInteractionSystemSet::Continuous),
+                cursor_up_on_comp_system.in_set(CompInteractionSystemSet::Continuous),
+                cursor_exited_comp_input_system.in_set(CompInteractionSystemSet::Last),
             ),
         );
     }

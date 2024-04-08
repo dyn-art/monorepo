@@ -1,6 +1,7 @@
 import { intoMouseButton } from '@dyn/dtif-comp';
 import type {
 	CompositionChangeOutputEvent,
+	KeyCode,
 	SvgElementChangesOutputEvent,
 	SvgElementId,
 	Vec2
@@ -31,7 +32,6 @@ export class SvgRenderer extends Renderer {
 		this._svgElement.setAttribute('version', VERSION);
 		this._svgElement.setAttribute('id', 'svg-canvas');
 		this._svgElement.style.setProperty('overflow', 'hidden');
-		this._svgElement.setAttribute('tabindex', '1'); // https://stackoverflow.com/questions/18928116/javascript-keydown-event-listener-is-not-working
 		// this._svgElement.style.setProperty('pointer-events', 'none');
 		this._domElement.appendChild(this._svgElement);
 
@@ -55,7 +55,7 @@ export class SvgRenderer extends Renderer {
 				{
 					type: 'Interaction',
 					event: {
-						type: 'WheelActionOnComposition',
+						type: 'MouseWheeledOnComposition',
 						position: this.clientWindowPointToCompPoint([e.clientX, e.clientY]),
 						delta: [e.deltaX, e.deltaY]
 					}
@@ -130,33 +130,35 @@ export class SvgRenderer extends Renderer {
 				this._cursorInCompBounds = false;
 			}
 		});
-		this._svgElement.addEventListener('keydown', (e) => {
-			console.log('keydown', { code: e.code });
-			e.preventDefault();
-			this.composition.emitInputEvent(
-				{
-					type: 'Interaction',
-					event: {
-						type: 'KeyDownOnComposition',
-						keyCode: e.code
-					}
-				},
-				true
-			);
+		window.addEventListener('keydown', (e) => {
+			if (this._cursorInCompBounds) {
+				e.preventDefault();
+				this.composition.emitInputEvent(
+					{
+						type: 'Interaction',
+						event: {
+							type: 'KeyDownOnComposition',
+							keyCode: e.code as KeyCode
+						}
+					},
+					true
+				);
+			}
 		});
-		this._svgElement.addEventListener('keyup', (e) => {
-			console.log('keyup', { code: e.code });
-			e.preventDefault();
-			this.composition.emitInputEvent(
-				{
-					type: 'Interaction',
-					event: {
-						type: 'KeyUpOnComposition',
-						keyCode: e.code
-					}
-				},
-				true
-			);
+		window.addEventListener('keyup', (e) => {
+			if (this._cursorInCompBounds) {
+				e.preventDefault();
+				this.composition.emitInputEvent(
+					{
+						type: 'Interaction',
+						event: {
+							type: 'KeyUpOnComposition',
+							keyCode: e.code as KeyCode
+						}
+					},
+					true
+				);
+			}
 		});
 	}
 
@@ -193,6 +195,18 @@ export class SvgRenderer extends Renderer {
 								type: 'Interaction',
 								event: {
 									type: 'CursorDownOnEntity',
+									entity,
+									position: this.pointerEventToCompPoint(e),
+									button: intoMouseButton(e.button)
+								}
+							});
+						});
+						newElement.addEventListener('pointerup', (e) => {
+							e.preventDefault();
+							this.composition.emitInputEvent({
+								type: 'Interaction',
+								event: {
+									type: 'CursorUpOnEntity',
 									entity,
 									position: this.pointerEventToCompPoint(e),
 									button: intoMouseButton(e.button)
