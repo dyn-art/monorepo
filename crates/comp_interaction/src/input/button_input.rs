@@ -88,7 +88,7 @@ use std::{collections::BTreeMap, hash::Hash};
 #[derive(Resource, Debug, Clone)]
 pub struct ButtonInput<
     T: Copy + Eq + Hash + Ord + Send + Sync + 'static,
-    U: Clone + Send + Sync + 'static,
+    U: Copy + Send + Sync + 'static,
 > {
     /// A collection of every button that is currently being pressed.
     pressed: BTreeMap<T, U>,
@@ -98,7 +98,7 @@ pub struct ButtonInput<
     just_released: BTreeMap<T, U>,
 }
 
-impl<T: Copy + Eq + Hash + Ord + Send + Sync + 'static, U: Clone + Send + Sync + 'static> Default
+impl<T: Copy + Eq + Hash + Ord + Send + Sync + 'static, U: Copy + Send + Sync + 'static> Default
     for ButtonInput<T, U>
 {
     fn default() -> Self {
@@ -113,12 +113,12 @@ impl<T: Copy + Eq + Hash + Ord + Send + Sync + 'static, U: Clone + Send + Sync +
 impl<T, U> ButtonInput<T, U>
 where
     T: Copy + Eq + Hash + Ord + Send + Sync + 'static,
-    U: Clone + Send + Sync + 'static,
+    U: Copy + Send + Sync + 'static,
 {
     /// Registers a press for the given `input`.
     pub fn press(&mut self, input: T, value: U) {
         // Returns `true` if the `input` wasn't pressed.
-        if self.pressed.insert(input, value.clone()).is_some() {
+        if self.pressed.insert(input, value).is_some() {
             self.just_pressed.insert(input, value);
         }
     }

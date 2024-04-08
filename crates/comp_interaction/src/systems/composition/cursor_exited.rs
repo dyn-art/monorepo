@@ -18,7 +18,8 @@ pub fn cursor_exited_comp_input_system(
         ButtonInput<MouseButtonOnEntity, MouseButtonValue>,
     >,
 ) {
-    if event_reader.read().next().is_some() {
+    if event_reader.read().len() > 0 {
+        log::info!("[cursor_exited_comp_input_system]");
         comp_interaction_res.interaction_mode = InteractionMode::None;
         keyboard_input_res.reset_all();
         mouse_button_on_comp_input_res.release_all();

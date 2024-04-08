@@ -12,7 +12,7 @@ use bevy_ecs::{
     entity::Entity,
     event::EventReader,
     query::{With, Without},
-    system::{Commands, Query, ResMut},
+    system::{Commands, Query, Res, ResMut},
 };
 use bevy_hierarchy::Parent;
 use dyn_comp_bundles::components::{
@@ -58,7 +58,7 @@ pub fn cursor_down_on_entity_input_system(
 pub fn cursor_down_on_entity_system(
     mut commands: Commands,
     mut comp_interaction_res: ResMut<CompInteractionRes>,
-    mouse_button_input_res: ResMut<ButtonInput<MouseButtonOnEntity, MouseButtonValue>>,
+    mouse_button_input_res: Res<ButtonInput<MouseButtonOnEntity, MouseButtonValue>>,
     unselected_node_query: Query<
         (Option<&Parent>, Option<&HierarchyLevel>),
         (
@@ -94,7 +94,13 @@ pub fn cursor_down_on_entity_system(
         })
         .collect();
 
-    log::info!("[cursor_down_on_entity_system] {:?}", raycast_entities);
+    log::info!(
+        "[cursor_down_on_entity_system] {:?} - {:?}",
+        raycast_entities,
+        mouse_button_input_res
+            .get_just_pressed()
+            .collect::<Vec<_>>()
+    );
 
     if raycast_entities.is_empty() {
         return;
