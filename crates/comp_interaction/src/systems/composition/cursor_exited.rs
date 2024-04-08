@@ -1,9 +1,8 @@
 use crate::{
     events::CursorExitedCompInputEvent,
     input::{
-        button_input::ButtonInput,
-        keyboard::KeyCode,
-        mouse::{MouseButton, MouseButtonOnEntity, MouseButtonValue},
+        keyboard::KeyCodeButtonInput,
+        mouse::{MouseButtonButtonInput, MouseButtonOnEntityButtonInput},
     },
     resources::comp_interaction::{CompInteractionRes, InteractionMode},
 };
@@ -12,11 +11,9 @@ use bevy_ecs::{event::EventReader, system::ResMut};
 pub fn cursor_exited_comp_input_system(
     mut event_reader: EventReader<CursorExitedCompInputEvent>,
     mut comp_interaction_res: ResMut<CompInteractionRes>,
-    mut keyboard_input_res: ResMut<ButtonInput<KeyCode, ()>>,
-    mut mouse_button_on_comp_input_res: ResMut<ButtonInput<MouseButton, MouseButtonValue>>,
-    mut mouse_button_on_entity_input_res: ResMut<
-        ButtonInput<MouseButtonOnEntity, MouseButtonValue>,
-    >,
+    mut keyboard_input_res: ResMut<KeyCodeButtonInput>,
+    mut mouse_button_on_comp_input_res: ResMut<MouseButtonButtonInput>,
+    mut mouse_button_on_entity_input_res: ResMut<MouseButtonOnEntityButtonInput>,
 ) {
     if event_reader.read().len() > 0 {
         log::info!("[cursor_exited_comp_input_system]");

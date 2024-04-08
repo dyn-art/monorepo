@@ -1,9 +1,6 @@
 use crate::{
     events::CursorDownOnCompInputEvent,
-    input::{
-        button_input::ButtonInput,
-        mouse::{MouseButton, MouseButtonValue},
-    },
+    input::mouse::{MouseButton, MouseButtonButtonInput, MouseButtonValue},
     resources::comp_interaction::{CompInteractionRes, InteractionMode, InteractionTool, XYWH},
 };
 use bevy_ecs::{
@@ -15,7 +12,7 @@ use dyn_utils::properties::size::Size;
 
 pub fn cursor_down_on_comp_input_system(
     mut event_reader: EventReader<CursorDownOnCompInputEvent>,
-    mut mouse_button_input_res: ResMut<ButtonInput<MouseButton, MouseButtonValue>>,
+    mut mouse_button_input_res: ResMut<MouseButtonButtonInput>,
 ) {
     mouse_button_input_res.bypass_change_detection().clear();
     for event in event_reader.read() {
@@ -31,7 +28,7 @@ pub fn cursor_down_on_comp_input_system(
 
 pub fn cursor_down_on_comp_system(
     mut comp_interaction_res: ResMut<CompInteractionRes>,
-    mouse_button_input_res: Res<ButtonInput<MouseButton, MouseButtonValue>>,
+    mouse_button_input_res: Res<MouseButtonButtonInput>,
 ) {
     for (mouse_button, mouse_button_value) in mouse_button_input_res.get_just_pressed() {
         match mouse_button {

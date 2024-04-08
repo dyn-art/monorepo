@@ -10,6 +10,7 @@
  * For the license text, see: https://github.com/bevyengine/bevy/blob/main/LICENSE-MIT
  * -----------------------------------------------------------------------------
  */
+use super::button_input::ButtonInput;
 
 /// Contains the platform-native physical key identifier
 ///
@@ -531,3 +532,5 @@ pub enum KeyCode {
     /// General-purpose function key.
     F35,
 }
+
+pub type KeyCodeButtonInput = ButtonInput<KeyCode, ()>;

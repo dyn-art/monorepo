@@ -15,11 +15,10 @@ use events::{
     MouseWheeledOnCompInputEvent,
 };
 use input::{
-    button_input::ButtonInput,
-    keyboard::KeyCode,
+    keyboard::KeyCodeButtonInput,
     mouse::{
-        MouseButton, MouseButtonOnEntity, MouseButtonOnResizeHandle, MouseButtonOnRotateHandle,
-        MouseButtonValue,
+        MouseButtonButtonInput, MouseButtonOnEntityButtonInput,
+        MouseButtonOnResizeHandleButtonInput, MouseButtonOnRotateHandleButtonInput,
     },
 };
 use resources::comp_interaction::CompInteractionRes;
@@ -40,8 +39,12 @@ use systems::{
     },
     ui::{
         interaction_tool::interaction_tool_changed_input_system,
-        resize_handle::cursor_down_on_resize_handle_input_system,
-        rotate_handle::cursor_down_on_rotate_handle_input_system,
+        resize_handle::{
+            cursor_down_on_resize_handle_input_system, cursor_down_on_resize_handle_system,
+        },
+        rotate_handle::{
+            cursor_down_on_rotate_handle_input_system, cursor_down_on_rotate_handle_system,
+        },
     },
 };
 
@@ -87,11 +90,11 @@ impl Plugin for CompInteractionPlugin {
 
         // Register resources
         app.init_resource::<CompInteractionRes>();
-        app.init_resource::<ButtonInput<KeyCode, ()>>();
-        app.init_resource::<ButtonInput<MouseButton, MouseButtonValue>>();
-        app.init_resource::<ButtonInput<MouseButtonOnEntity, MouseButtonValue>>();
-        app.init_resource::<ButtonInput<MouseButtonOnResizeHandle, ()>>();
-        app.init_resource::<ButtonInput<MouseButtonOnRotateHandle, ()>>();
+        app.init_resource::<KeyCodeButtonInput>();
+        app.init_resource::<MouseButtonButtonInput>();
+        app.init_resource::<MouseButtonOnEntityButtonInput>();
+        app.init_resource::<MouseButtonOnResizeHandleButtonInput>();
+        app.init_resource::<MouseButtonOnRotateHandleButtonInput>();
 
         // Configure system sets
         app.configure_sets(
@@ -124,15 +127,15 @@ impl Plugin for CompInteractionPlugin {
                 cursor_up_on_entity_input_system
                     .in_set(CompInteractionSystemSet::First)
                     .after(cursor_down_on_entity_input_system),
+                cursor_down_on_resize_handle_input_system.in_set(CompInteractionSystemSet::First),
+                cursor_down_on_rotate_handle_input_system.in_set(CompInteractionSystemSet::First),
                 interaction_tool_changed_input_system.in_set(CompInteractionSystemSet::First),
                 cursor_down_on_comp_system.in_set(CompInteractionSystemSet::Activation),
                 cursor_down_on_entity_system
                     .in_set(CompInteractionSystemSet::Activation)
                     .after(cursor_down_on_comp_system),
-                cursor_down_on_resize_handle_input_system
-                    .in_set(CompInteractionSystemSet::Manipulation),
-                cursor_down_on_rotate_handle_input_system
-                    .in_set(CompInteractionSystemSet::Manipulation),
+                cursor_down_on_resize_handle_system.in_set(CompInteractionSystemSet::Manipulation),
+                cursor_down_on_rotate_handle_system.in_set(CompInteractionSystemSet::Manipulation),
                 cursor_moved_on_comp_input_system.in_set(CompInteractionSystemSet::Continuous),
                 mouse_wheeled_on_comp_input_system.in_set(CompInteractionSystemSet::Continuous),
                 cursor_up_on_comp_system.in_set(CompInteractionSystemSet::Continuous),

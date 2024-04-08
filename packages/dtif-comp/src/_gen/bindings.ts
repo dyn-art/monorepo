@@ -1300,9 +1300,13 @@ export type MouseButton =
 
 export type MouseButtonOnEntity = { button: MouseButton; entity: Entity }
 
-export type MouseButtonOnResizeHandle = MouseButton
+export type MouseButtonOnResizeHandle = { button: MouseButton; corner: number }
 
-export type MouseButtonOnRotateHandle = MouseButton
+export type MouseButtonOnResizeHandleValue = { initial_bounds: XYWH; rotation_rad: number }
+
+export type MouseButtonOnRotateHandle = { button: MouseButton; corner: number }
+
+export type MouseButtonOnRotateHandleValue = { initial_rotation_rad: number }
 
 export type MouseButtonValue = { position: Vec2 }
 

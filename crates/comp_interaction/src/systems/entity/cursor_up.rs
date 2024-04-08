@@ -2,14 +2,14 @@ use crate::{
     events::CursorUpOnEntityInputEvent,
     input::{
         button_input::ButtonInput,
-        mouse::{MouseButtonOnEntity, MouseButtonValue},
+        mouse::{MouseButtonOnEntity, MouseButtonOnEntityButtonInput, MouseButtonValue},
     },
 };
 use bevy_ecs::{event::EventReader, system::ResMut};
 
 pub fn cursor_up_on_entity_input_system(
     mut event_reader: EventReader<CursorUpOnEntityInputEvent>,
-    mut mouse_button_input_res: ResMut<ButtonInput<MouseButtonOnEntity, MouseButtonValue>>,
+    mut mouse_button_input_res: ResMut<MouseButtonOnEntityButtonInput>,
 ) {
     for event in event_reader.read() {
         log::info!(

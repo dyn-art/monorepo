@@ -1,24 +1,52 @@
 use crate::{
     events::CursorDownOnResizeHandleInputEvent,
-    input::{
-        button_input::ButtonInput,
-        mouse::{MouseButton, MouseButtonOnResizeHandle},
+    input::mouse::{
+        MouseButton, MouseButtonOnResizeHandle, MouseButtonOnResizeHandleButtonInput,
+        MouseButtonOnResizeHandleValue,
     },
     resources::comp_interaction::{CompInteractionRes, InteractionMode},
 };
-use bevy_ecs::{event::EventReader, system::ResMut};
+use bevy_ecs::{
+    change_detection::DetectChangesMut,
+    event::EventReader,
+    system::{Res, ResMut},
+};
 
 pub fn cursor_down_on_resize_handle_input_system(
     mut event_reader: EventReader<CursorDownOnResizeHandleInputEvent>,
-    mut comp_interaction_res: ResMut<CompInteractionRes>,
-    mut mouse_button_input_res: ResMut<ButtonInput<MouseButtonOnResizeHandle, ()>>,
+    mut mouse_button_input_res: ResMut<MouseButtonOnResizeHandleButtonInput>,
 ) {
+    mouse_button_input_res.bypass_change_detection().clear();
     for event in event_reader.read() {
-        mouse_button_input_res.press(MouseButtonOnResizeHandle(MouseButton::Left), ());
+        mouse_button_input_res.press(
+            MouseButtonOnResizeHandle {
+                button: MouseButton::Left,
+                corner: event.corner,
+            },
+            MouseButtonOnResizeHandleValue {
+                initial_bounds: event.initial_bounds,
+                rotation_rad: event.rotation_rad,
+            },
+        );
+    }
+}
+
+pub fn cursor_down_on_resize_handle_system(
+    mut comp_interaction_res: ResMut<CompInteractionRes>,
+    mouse_button_input_res: Res<MouseButtonOnResizeHandleButtonInput>,
+) {
+    for (
+        MouseButtonOnResizeHandle { corner, .. },
+        MouseButtonOnResizeHandleValue {
+            initial_bounds,
+            rotation_rad,
+        },
+    ) in mouse_button_input_res.get_just_pressed()
+    {
         comp_interaction_res.interaction_mode = InteractionMode::Resizing {
-            corner: event.corner,
-            initial_bounds: event.initial_bounds,
-            rotation_deg: event.rotation_rad.to_degrees(),
+            corner: *corner,
+            initial_bounds: *initial_bounds,
+            rotation_deg: rotation_rad.to_degrees(),
         };
     }
 }

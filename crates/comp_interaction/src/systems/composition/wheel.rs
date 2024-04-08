@@ -1,6 +1,6 @@
 use crate::{
     events::MouseWheeledOnCompInputEvent,
-    input::{button_input::ButtonInput, keyboard::KeyCode},
+    input::keyboard::{KeyCode, KeyCodeButtonInput},
 };
 use bevy_ecs::{
     event::EventReader,
@@ -15,7 +15,7 @@ static ZOOM_FACTOR: f32 = 0.9;
 pub fn mouse_wheeled_on_comp_input_system(
     mut event_reader: EventReader<MouseWheeledOnCompInputEvent>,
     mut comp_res: ResMut<CompositionRes>,
-    keyboard_input_res: Res<ButtonInput<KeyCode, ()>>,
+    keyboard_input_res: Res<KeyCodeButtonInput>,
 ) {
     for event in event_reader.read() {
         let CompositionRes {

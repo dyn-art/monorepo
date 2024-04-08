@@ -1,3 +1,5 @@
+use super::button_input::ButtonInput;
+use crate::resources::comp_interaction::XYWH;
 /**
  * -----------------------------------------------------------------------------
  * This file includes code derived from the project bevyengine/bevy by @bevyengine.
@@ -40,6 +42,14 @@ pub enum MouseButton {
     Other(u16),
 }
 
+#[derive(Debug, Clone, Copy)]
+#[cfg_attr(feature = "serde_support", derive(serde::Deserialize, specta::Type))]
+pub struct MouseButtonValue {
+    pub position: Vec2,
+}
+
+pub type MouseButtonButtonInput = ButtonInput<MouseButton, MouseButtonValue>;
+
 #[derive(Debug, Hash, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
 #[cfg_attr(feature = "serde_support", derive(serde::Deserialize, specta::Type))]
 pub struct MouseButtonOnEntity {
@@ -47,16 +57,37 @@ pub struct MouseButtonOnEntity {
     pub entity: Entity,
 }
 
-#[derive(Debug, Hash, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
-#[cfg_attr(feature = "serde_support", derive(serde::Deserialize, specta::Type))]
-pub struct MouseButtonOnResizeHandle(pub MouseButton);
+pub type MouseButtonOnEntityButtonInput = ButtonInput<MouseButtonOnEntity, MouseButtonValue>;
 
 #[derive(Debug, Hash, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
 #[cfg_attr(feature = "serde_support", derive(serde::Deserialize, specta::Type))]
-pub struct MouseButtonOnRotateHandle(pub MouseButton);
+pub struct MouseButtonOnResizeHandle {
+    pub button: MouseButton,
+    pub corner: u8,
+}
 
 #[derive(Debug, Clone, Copy)]
 #[cfg_attr(feature = "serde_support", derive(serde::Deserialize, specta::Type))]
-pub struct MouseButtonValue {
-    pub position: Vec2,
+pub struct MouseButtonOnResizeHandleValue {
+    pub initial_bounds: XYWH,
+    pub rotation_rad: f32,
 }
+
+pub type MouseButtonOnResizeHandleButtonInput =
+    ButtonInput<MouseButtonOnResizeHandle, MouseButtonOnResizeHandleValue>;
+
+#[derive(Debug, Hash, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
+#[cfg_attr(feature = "serde_support", derive(serde::Deserialize, specta::Type))]
+pub struct MouseButtonOnRotateHandle {
+    pub button: MouseButton,
+    pub corner: u8,
+}
+
+#[derive(Debug, Clone, Copy)]
+#[cfg_attr(feature = "serde_support", derive(serde::Deserialize, specta::Type))]
+pub struct MouseButtonOnRotateHandleValue {
+    pub initial_rotation_rad: f32,
+}
+
+pub type MouseButtonOnRotateHandleButtonInput =
+    ButtonInput<MouseButtonOnRotateHandle, MouseButtonOnRotateHandleValue>;

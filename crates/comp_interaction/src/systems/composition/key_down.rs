@@ -1,12 +1,9 @@
-use crate::{
-    events::KeyDownOnCompInputEvent,
-    input::{button_input::ButtonInput, keyboard::KeyCode},
-};
+use crate::{events::KeyDownOnCompInputEvent, input::keyboard::KeyCodeButtonInput};
 use bevy_ecs::{change_detection::DetectChangesMut, event::EventReader, system::ResMut};
 
 pub fn key_down_input_system(
     mut event_reader: EventReader<KeyDownOnCompInputEvent>,
-    mut keyboard_input_res: ResMut<ButtonInput<KeyCode, ()>>,
+    mut keyboard_input_res: ResMut<KeyCodeButtonInput>,
 ) {
     keyboard_input_res.bypass_change_detection().clear();
     for event in event_reader.read() {
