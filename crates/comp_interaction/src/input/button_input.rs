@@ -117,8 +117,8 @@ where
 {
     /// Registers a press for the given `input`.
     pub fn press(&mut self, input: T, value: U) {
-        // Returns `true` if the `input` wasn't pressed.
-        if self.pressed.insert(input, value).is_some() {
+        // Returns `None` if the `input` wasn't pressed.
+        if self.pressed.insert(input, value).is_none() {
             self.just_pressed.insert(input, value);
         }
     }

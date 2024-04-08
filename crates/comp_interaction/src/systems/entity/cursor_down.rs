@@ -94,14 +94,6 @@ pub fn cursor_down_on_entity_system(
         })
         .collect();
 
-    log::info!(
-        "[cursor_down_on_entity_system] {:?} - {:?}",
-        raycast_entities,
-        mouse_button_input_res
-            .get_just_pressed()
-            .collect::<Vec<_>>()
-    );
-
     if raycast_entities.is_empty() {
         return;
     }
