@@ -54,6 +54,12 @@ pub fn cursor_down_on_entity_input_system(
 // INFO: [cursor_down_on_entity_system] Entity:6v1 <- Frame Nested
 // INFO: [cursor_down_on_entity_system] Entity: 4v1 <- Frame (Root)
 // INFO: [cursor_down_on_entity_system] End
+//
+// Becomes in just_pressed:
+// [(4v1, Vec2(284.48438, 285.9297)),
+// (6v1, Vec2(284.48438, 285.9297)),
+// (8v1, Vec2(284.48438, 285.9297)),
+// (10v1, Vec2(284.48438, 285.9297))]
 pub fn cursor_down_on_entity_system(
     mut commands: Commands,
     mut comp_interaction_res: ResMut<CompInteractionRes>,
@@ -123,7 +129,7 @@ pub fn cursor_down_on_entity_system(
             });
 
     // Find nodes that could be selected or preselected
-    for (entity, cursor_position) in raycast_entities.iter().copied() {
+    for (entity, cursor_position) in raycast_entities.iter().rev().copied() {
         log::info!("[cursor_down_on_entity_system] Entity {:?}", entity,);
 
         if let Ok((maybe_parent, maybe_hierarchy_level)) = unselected_node_query.get(entity) {
