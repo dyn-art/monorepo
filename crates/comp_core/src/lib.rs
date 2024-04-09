@@ -1,7 +1,7 @@
 pub mod resources;
 mod systems;
 
-use bevy_app::{App, First, Plugin, Update};
+use bevy_app::{App, First, Last, Plugin, Update};
 use bevy_ecs::schedule::{IntoSystemConfigs, IntoSystemSetConfigs, SystemSet};
 use bevy_transform::TransformPlugin;
 use dyn_comp_asset::CompAssetPlugin;
@@ -12,9 +12,9 @@ use dyn_comp_bundles::events::{
 use resources::composition::CompositionRes;
 use systems::{
     events::{
-        handle_composition_resized_event, handle_composition_viewport_changed_event,
-        handle_entity_deleted_event, handle_entity_moved_event, handle_entity_set_position_event,
-        handle_entity_set_rotation_event,
+        composition_resized_input_system, composition_viewport_input_system,
+        despawn_removed_entities_system, entity_deleted_input_system, entity_moved_input_system,
+        entity_set_position_input_system, entity_set_rotation_input_system,
     },
     hierarchy::update_hierarchy_levels,
     outline::{
@@ -97,12 +97,12 @@ impl Plugin for CompCorePlugin {
         app.add_systems(
             Update,
             (
-                handle_composition_resized_event.in_set(CompCoreSystemSet::InputEvents),
-                handle_composition_viewport_changed_event.in_set(CompCoreSystemSet::InputEvents),
-                handle_entity_deleted_event.in_set(CompCoreSystemSet::InputEvents),
-                handle_entity_moved_event.in_set(CompCoreSystemSet::InputEvents),
-                handle_entity_set_position_event.in_set(CompCoreSystemSet::InputEvents),
-                handle_entity_set_rotation_event.in_set(CompCoreSystemSet::InputEvents),
+                composition_resized_input_system.in_set(CompCoreSystemSet::InputEvents),
+                composition_viewport_input_system.in_set(CompCoreSystemSet::InputEvents),
+                entity_deleted_input_system.in_set(CompCoreSystemSet::InputEvents),
+                entity_moved_input_system.in_set(CompCoreSystemSet::InputEvents),
+                entity_set_position_input_system.in_set(CompCoreSystemSet::InputEvents),
+                entity_set_rotation_input_system.in_set(CompCoreSystemSet::InputEvents),
                 outline_rectangle.in_set(CompCoreSystemSet::Outline),
                 outline_ellipse.in_set(CompCoreSystemSet::Outline),
                 outline_star.in_set(CompCoreSystemSet::Outline),
@@ -112,6 +112,7 @@ impl Plugin for CompCorePlugin {
                 stroke_path_system.in_set(CompCoreSystemSet::PostOutline),
             ),
         );
+        app.add_systems(Last, despawn_removed_entities_system);
 
         #[cfg(feature = "dtif")]
         inject_dtif_into_ecs(&mut app.world, &self.dtif)

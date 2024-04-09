@@ -72,7 +72,7 @@ pub fn cursor_down_on_entity_system(
                 (Without<Root>, With<FrameCompNode>),
                 (With<Root>, Without<FrameCompNode>),
                 (Without<Root>, Without<FrameCompNode>),
-            )>, // Exclude root frame nodes
+            )>, // Exclude root frame nodes (Note: AND with tuple didn't work out for whatever reason: https://discord.com/channels/691052431525675048/1226056118019690568)
             Without<Selected>,
             Without<Locked>,
         ),

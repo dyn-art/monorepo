@@ -1,12 +1,14 @@
 use crate::resources::composition::CompositionRes;
 use bevy_ecs::{
+    entity::Entity,
     event::EventReader,
+    query::With,
     system::{Commands, Query, ResMut},
 };
-use bevy_hierarchy::DespawnRecursiveExt;
+use bevy_hierarchy::{BuildChildren, Children, DespawnRecursiveExt};
 use bevy_transform::components::Transform;
 use dyn_comp_bundles::{
-    components::mixins::SizeMixin,
+    components::{marker::Removed, mixins::SizeMixin},
     events::{
         CompositionResizedInputEvent, CompositionViewportChangedInputEvent,
         EntityDeletedInputEvent, EntityMovedInputEvent, EntitySetPositionInputEvent,
@@ -17,7 +19,7 @@ use dyn_comp_bundles::{
 use dyn_utils::math::matrix::rotate_around_point;
 use glam::Vec3;
 
-pub fn handle_composition_resized_event(
+pub fn composition_resized_input_system(
     mut comp_res: ResMut<CompositionRes>,
     mut event_reader: EventReader<CompositionResizedInputEvent>,
 ) {
@@ -27,7 +29,7 @@ pub fn handle_composition_resized_event(
     }
 }
 
-pub fn handle_composition_viewport_changed_event(
+pub fn composition_viewport_input_system(
     mut comp_res: ResMut<CompositionRes>,
     mut event_reader: EventReader<CompositionViewportChangedInputEvent>,
 ) {
@@ -38,16 +40,35 @@ pub fn handle_composition_viewport_changed_event(
 
 // https://bevy-cheatbook.github.io/fundamentals/hierarchy.html#despawning-child-entities
 // https://github.com/bevyengine/bevy/issues/5584
-pub fn handle_entity_deleted_event(
+pub fn entity_deleted_input_system(
     mut commands: Commands,
     mut event_reader: EventReader<EntityDeletedInputEvent>,
+    children_query: Query<&Children>,
 ) {
     for event in event_reader.read() {
-        commands.entity(event.entity).despawn_recursive();
+        commands
+            .entity(event.entity)
+            .insert(Removed)
+            .remove_parent();
+
+        if let Ok(children) = children_query.get(event.entity) {
+            for child in children.iter() {
+                commands.entity(*child).insert(Removed);
+            }
+        }
     }
 }
 
-pub fn handle_entity_moved_event(
+pub fn despawn_removed_entities_system(
+    mut commands: Commands,
+    query: Query<Entity, With<Removed>>,
+) {
+    for entity in query.iter() {
+        commands.entity(entity).despawn_recursive();
+    }
+}
+
+pub fn entity_moved_input_system(
     mut event_reader: EventReader<EntityMovedInputEvent>,
     mut query: Query<&mut Transform>,
 ) {
@@ -58,7 +79,7 @@ pub fn handle_entity_moved_event(
     }
 }
 
-pub fn handle_entity_set_position_event(
+pub fn entity_set_position_input_system(
     mut event_reader: EventReader<EntitySetPositionInputEvent>,
     mut query: Query<&mut Transform>,
 ) {
@@ -70,7 +91,7 @@ pub fn handle_entity_set_position_event(
     }
 }
 
-pub fn handle_entity_set_rotation_event(
+pub fn entity_set_rotation_input_system(
     mut event_reader: EventReader<EntitySetRotationInputEvent>,
     mut query: Query<(&mut Transform, &SizeMixin)>,
 ) {

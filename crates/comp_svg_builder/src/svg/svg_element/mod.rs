@@ -182,17 +182,14 @@ impl SvgElement {
         );
     }
 
-    pub fn remove_child(&mut self, id: SvgElementId) {
-        self.children.retain(|child| child.id != id);
-    }
-
-    pub fn remove_children(&mut self, ids: &[SvgElementId]) {
-        let ids_set = ids.iter().collect::<HashSet<_>>();
-        self.children.retain(|child| !ids_set.contains(&child.id));
+    pub fn remove_child_element(&mut self, element: &mut SvgElement) {
+        self.children.retain(|child| child.id != element.get_id());
+        #[cfg(feature = "output_svg_element_changes")]
+        element.destroy();
     }
 
     pub fn clear_children(&mut self) {
-        self.children.clear()
+        self.children.clear();
     }
 
     pub fn reorder_children_mut<F>(&mut self, reorder_operation: F)

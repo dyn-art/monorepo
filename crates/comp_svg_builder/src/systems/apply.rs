@@ -101,19 +101,19 @@ pub fn apply_node_children_changes(
                 &change.removed_entities,
                 &mut node_bundle_variant_query,
             )
-            .unwrap();
+            .expect("Failed to process removed node children!");
             process_added_node_children(
                 change.parent_entity,
                 &change.added_entities,
                 &mut node_bundle_variant_query,
             )
-            .unwrap();
+            .expect("Failed to process added node children!");
             reorder_node_children(
                 change.parent_entity,
                 &change.new_entities_order,
                 &mut node_bundle_variant_query,
             )
-            .unwrap();
+            .expect("Failed to reorder node children!");
         }
     }
 }
@@ -124,17 +124,16 @@ fn process_removed_node_children(
     node_bundle_variant_query: &mut Query<&mut SvgBundleVariant, With<CompNode>>,
 ) -> Result<(), Box<dyn Error>> {
     for entity in removed_entities {
-        let [mut node_bundle_variant, child_node_bundle_variant] =
+        let [mut node_bundle_variant, mut child_node_bundle_variant] =
             node_bundle_variant_query.get_many_mut([parent_entity, *entity])?;
 
         if let Some(children_wrapper_element) =
             node_bundle_variant.get_children_wrapper_element_mut()
         {
-            children_wrapper_element.remove_child(
+            children_wrapper_element.remove_child_element(
                 child_node_bundle_variant
-                    .get_svg_bundle()
-                    .get_root_element()
-                    .get_id(),
+                    .get_svg_bundle_mut()
+                    .get_root_element_mut(),
             );
         }
 
@@ -251,19 +250,19 @@ pub fn apply_node_styles_changes(
                 &mut removed_entities,
                 &mut style_bundle_variant_query,
             )
-            .unwrap();
+            .expect("Failed to process removed node styles!");
             process_added_node_styles(
                 node_bundle_variant.as_mut(),
                 &mut added_entities,
                 &mut style_bundle_variant_query,
             )
-            .unwrap();
+            .expect("Failed to process added node styles!");
             reorder_node_styles(
                 node_bundle_variant.as_mut(),
                 &new_style_entities,
                 &mut style_bundle_variant_query,
             )
-            .unwrap();
+            .expect("Failed to reorder node styles!");
         }
     }
 }
@@ -277,14 +276,13 @@ fn process_removed_node_styles(
     >,
 ) -> Result<(), Box<dyn Error>> {
     for entity in removed_entities {
-        let style_bundle_variant = style_bundle_variant_query.get_mut(*entity)?;
+        let mut style_bundle_variant = style_bundle_variant_query.get_mut(*entity)?;
 
         if let Some(styles_wrapper_element) = node_bundle_variant.get_styles_wrapper_element_mut() {
-            styles_wrapper_element.remove_child(
+            styles_wrapper_element.remove_child_element(
                 style_bundle_variant
-                    .get_svg_bundle()
-                    .get_root_element()
-                    .get_id(),
+                    .get_svg_bundle_mut()
+                    .get_root_element_mut(),
             );
         }
 
