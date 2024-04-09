@@ -59,7 +59,7 @@ specta = { workspace = true, features = [
     "typescript",
     "serde",
     "glam",
-    "bevy",
+    "bevy_ecs",
 ] }
 
 # Logging

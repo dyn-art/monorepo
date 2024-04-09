@@ -37,6 +37,6 @@ log = { workspace = true }
 specta = { workspace = true, features = [
     "serde",
     "glam",
-    "bevy",
+    "bevy_ecs",
 ], optional = true }
 serde = { workspace = true, features = ["derive"], optional = true }

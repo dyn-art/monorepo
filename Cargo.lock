@@ -452,21 +452,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "bevy_input"
-version = "0.13.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "47f2b2b3df168c6ef661d25e09abf5bd4fecaacd400f27e5db650df1c3fa3a3b"
-dependencies = [
- "bevy_app",
- "bevy_ecs",
- "bevy_math",
- "bevy_reflect",
- "bevy_utils",
- "smol_str",
- "thiserror",
-]
-
-[[package]]
 name = "bevy_log"
 version = "0.13.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2686,9 +2671,9 @@ dependencies = [
 [[package]]
 name = "specta"
 version = "2.0.0-rc.9"
+source = "git+https://github.com/bennoinbeta/specta.git?rev=a265e2b#a265e2b843e3e0f7ad88839001057509c83770e0"
 dependencies = [
  "bevy_ecs",
- "bevy_input",
  "ctor",
  "glam",
  "once_cell",
@@ -2701,6 +2686,7 @@ dependencies = [
 [[package]]
 name = "specta-macros"
 version = "2.0.0-rc.9"
+source = "git+https://github.com/bennoinbeta/specta.git?rev=a265e2b#a265e2b843e3e0f7ad88839001057509c83770e0"
 dependencies = [
  "Inflector",
  "proc-macro2",
