@@ -260,6 +260,7 @@ impl SvgCompHandle {
         #[cfg(feature = "tracing")]
         {
             use crate::logging::log_entity_components;
+            use bevy_ecs::query::{Or, With, Without};
             use dyn_comp_bundles::components::{
                 mixins::Root,
                 nodes::{CompNode, FrameCompNode},
@@ -271,8 +272,11 @@ impl SvgCompHandle {
                     Entity,
                     (
                         With<CompNode>,
-                        Without<Root>, // TODO: Only entities Without<Root> and Without<FrameCompNode> (so root frames) should be excluded not all root or frame nodes
-                        Without<FrameCompNode>,
+                        Or<(
+                            (Without<Root>, With<FrameCompNode>),
+                            (With<Root>, Without<FrameCompNode>),
+                            (Without<Root>, Without<FrameCompNode>),
+                        )>,
                         Without<Selected>,
                         Without<Locked>,
                     ),

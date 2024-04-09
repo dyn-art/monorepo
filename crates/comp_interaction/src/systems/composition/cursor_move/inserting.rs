@@ -115,6 +115,8 @@ pub fn handle_inserting(
         node_entity_commands.insert(StyleChildrenMixin(smallvec![style_entity]));
 
         // TODO: More advanced logic to determine where to append the newly created node
+        // TODO: Child is pushed as last element to the children array
+        //       which causes it to be on the bottom although it should be the top most node?
         if let Some(root_entity) = root_node_query.iter().next() {
             commands.entity(root_entity).add_child(node_entity);
         } else {

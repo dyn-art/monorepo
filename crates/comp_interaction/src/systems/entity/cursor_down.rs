@@ -10,13 +10,13 @@ use bevy_ecs::{
     change_detection::DetectChangesMut,
     entity::Entity,
     event::EventReader,
-    query::{With, Without},
+    query::{Or, With, Without},
     system::{Commands, Query, Res, ResMut},
 };
 use bevy_hierarchy::Parent;
 use dyn_comp_bundles::components::{
     mixins::{HierarchyLevel, Root},
-    nodes::CompNode,
+    nodes::{CompNode, FrameCompNode},
 };
 use glam::Vec2;
 use std::collections::HashSet;
@@ -68,7 +68,11 @@ pub fn cursor_down_on_entity_system(
         (Option<&Parent>, Option<&HierarchyLevel>),
         (
             With<CompNode>,
-            Without<Root>, // TODO: Only entities Without<Root> and Without<FrameCompNode> (so root frames) should be excluded not all root or frame nodes
+            Or<(
+                (Without<Root>, With<FrameCompNode>),
+                (With<Root>, Without<FrameCompNode>),
+                (Without<Root>, Without<FrameCompNode>),
+            )>, // Exclude root frame nodes
             Without<Selected>,
             Without<Locked>,
         ),
