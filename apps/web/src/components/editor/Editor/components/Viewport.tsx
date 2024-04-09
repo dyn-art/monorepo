@@ -1,7 +1,7 @@
 import React from 'react';
 import type { COMP } from '@dyn/dtif-comp';
 import type { Composition } from '@dyn/svg-comp';
-import { Skeleton } from '@dyn/ui';
+import { Button, Skeleton } from '@dyn/ui';
 
 import { CURSOR } from '../cursor';
 import { useSvgComposition } from '../hooks';
@@ -29,6 +29,16 @@ export const Viewport: React.FC<TViewportProps> = (props) => {
 			<div ref={svgContainerRef} />
 			{composition != null && <CanvasControl composition={composition} />}
 			{composition != null && <ToolsBar composition={composition} />}
+			{composition != null && (
+				<Button
+					className="absolute bottom-2 right-2"
+					onClick={() => {
+						composition.tempDevLog();
+					}}
+				>
+					Log
+				</Button>
+			)}
 		</div>
 	);
 };

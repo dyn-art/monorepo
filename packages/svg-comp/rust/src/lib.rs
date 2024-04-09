@@ -189,9 +189,9 @@ impl SvgCompHandle {
             system_state.get(&mut self.app.world);
 
         // Construct SVG string starting from root nodes
-        root_bundle_variant_query.iter().for_each(|bundle_variant| {
-            result.push_str(&bundle_variant.to_string(&bundle_variant_query))
-        });
+        for root_bundle_variant in root_bundle_variant_query.iter() {
+            result.push_str(&root_bundle_variant.to_string(&bundle_variant_query))
+        }
 
         // Close the SVG tag
         result.push_str("</svg>");
@@ -223,7 +223,7 @@ impl SvgCompHandle {
 
         #[cfg(not(feature = "tracing"))]
         log::warn!(
-            "[log_entity_components_raw] Log entity components not supported in this build! Build with feature 'tracing'."
+            "[log_entity_components_raw] Not supported in this build! Build with feature 'tracing'."
         );
     }
 
@@ -250,7 +250,44 @@ impl SvgCompHandle {
 
         #[cfg(not(feature = "tracing"))]
         log::warn!(
-            "[log_entity_components] Log entity components not supported in this build! Build with feature 'tracing'."
+            "[log_entity_components] Not supported in this build! Build with feature 'tracing'."
         );
+    }
+
+    // TODO: Remove at some point
+    #[wasm_bindgen(js_name = tempDevLog)]
+    pub fn temp_dev_log(&mut self) {
+        #[cfg(feature = "tracing")]
+        {
+            use crate::logging::log_entity_components;
+            use dyn_comp_bundles::components::{
+                mixins::Root,
+                nodes::{CompNode, FrameCompNode},
+            };
+            use dyn_comp_interaction::components::{Locked, Selected};
+
+            let mut system_state: SystemState<
+                Query<
+                    Entity,
+                    (
+                        With<CompNode>,
+                        Without<Root>, // TODO: Only entities Without<Root> and Without<FrameCompNode> (so root frames) should be excluded not all root or frame nodes
+                        Without<FrameCompNode>,
+                        Without<Selected>,
+                        Without<Locked>,
+                    ),
+                >,
+            > = SystemState::new(&mut self.app.world);
+            let query = system_state.get(&mut self.app.world);
+
+            let entities: Vec<Entity> = query.iter().collect();
+
+            for entity in entities.iter() {
+                log_entity_components(&self.app.world, *entity);
+            }
+        }
+
+        #[cfg(not(feature = "tracing"))]
+        log::warn!("[temp_dev_log] Not supported in this build! Build with feature 'tracing'.");
     }
 }

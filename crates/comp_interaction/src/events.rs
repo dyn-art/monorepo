@@ -1,23 +1,32 @@
+use crate::{
+    input::{keyboard::KeyCode, mouse::MouseButton},
+    resources::comp_interaction::{InteractionTool, XYWH},
+};
 use bevy_ecs::{entity::Entity, event::Event, world::World};
 use dyn_comp_bundles::events::InputEvent;
 use glam::Vec2;
 
-use crate::resources::comp_interaction::{InteractionTool, MouseButton, XYWH};
-
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Clone)]
 #[cfg_attr(
     feature = "serde_support",
     derive(serde::Deserialize, specta::Type),
     serde(tag = "type")
 )]
 pub enum InteractionInputEvent {
-    CursorDownOnEntity(CursorDownOnEntityInputEvent),
-    CursorMovedOnComposition(CursorMovedOnCompInputEvent),
+    // Composition
+    KeyDownOnComposition(KeyDownOnCompInputEvent),
+    KeyUpOnComposition(KeyUpOnCompInputEvent),
     CursorEnteredComposition(CursorEnteredCompInputEvent),
     CursorExitedComposition(CursorExitedCompInputEvent),
+    CursorMovedOnComposition(CursorMovedOnCompInputEvent),
     CursorDownOnComposition(CursorDownOnCompInputEvent),
     CursorUpOnComposition(CursorUpOnCompInputEvent),
-    WheeledOnComposition(WheeledOnCompInputEvent),
+    MouseWheeledOnComposition(MouseWheeledOnCompInputEvent),
+
+    // Entity
+    CursorDownOnEntity(CursorDownOnEntityInputEvent),
+
+    // UI
     CursorDownOnResizeHandle(CursorDownOnResizeHandleInputEvent),
     CursorDownOnRotateHandle(CursorDownOnRotateHandleInputEvent),
     InteractionToolChanged(InteractionToolChangedInputEvent),
@@ -26,38 +35,75 @@ pub enum InteractionInputEvent {
 impl InputEvent for InteractionInputEvent {
     fn send_into_ecs(self, world: &mut World) {
         match self {
-            InteractionInputEvent::CursorMovedOnComposition(event) => {
+            // Composition
+            Self::KeyDownOnComposition(event) => {
                 world.send_event(event);
             }
-            InteractionInputEvent::CursorEnteredComposition(event) => {
+            Self::KeyUpOnComposition(event) => {
                 world.send_event(event);
             }
-            InteractionInputEvent::CursorExitedComposition(event) => {
+            Self::CursorMovedOnComposition(event) => {
                 world.send_event(event);
             }
-            InteractionInputEvent::CursorDownOnEntity(event) => {
+            Self::CursorDownOnComposition(event) => {
                 world.send_event(event);
             }
-            InteractionInputEvent::CursorDownOnComposition(event) => {
+            Self::CursorUpOnComposition(event) => {
                 world.send_event(event);
             }
-            InteractionInputEvent::CursorUpOnComposition(event) => {
+            Self::MouseWheeledOnComposition(event) => {
                 world.send_event(event);
             }
-            InteractionInputEvent::CursorDownOnResizeHandle(event) => {
+            Self::CursorEnteredComposition(event) => {
                 world.send_event(event);
             }
-            InteractionInputEvent::CursorDownOnRotateHandle(event) => {
+            Self::CursorExitedComposition(event) => {
                 world.send_event(event);
             }
-            InteractionInputEvent::WheeledOnComposition(event) => {
+
+            // Entity
+            Self::CursorDownOnEntity(event) => {
                 world.send_event(event);
             }
-            InteractionInputEvent::InteractionToolChanged(event) => {
+
+            // UI
+            Self::CursorDownOnResizeHandle(event) => {
+                world.send_event(event);
+            }
+            Self::CursorDownOnRotateHandle(event) => {
+                world.send_event(event);
+            }
+            Self::InteractionToolChanged(event) => {
                 world.send_event(event);
             }
         }
     }
+}
+
+#[derive(Event, Debug, Clone)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Deserialize, specta::Type),
+    serde(rename_all = "camelCase")
+)]
+pub struct KeyDownOnCompInputEvent {
+    /// The physical key code of the key.
+    pub key_code: KeyCode,
+    // /// The logical key of the input
+    // pub logical_key: Key,
+}
+
+#[derive(Event, Debug, Clone)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Deserialize, specta::Type),
+    serde(rename_all = "camelCase")
+)]
+pub struct KeyUpOnCompInputEvent {
+    /// The physical key code of the key.
+    pub key_code: KeyCode,
+    // /// The logical key of the input
+    // pub logical_key: Key,
 }
 
 #[derive(Event, Debug, Copy, Clone)]
@@ -102,11 +148,9 @@ pub struct CursorUpOnCompInputEvent {
     derive(serde::Deserialize, specta::Type),
     serde(rename_all = "camelCase")
 )]
-pub struct WheeledOnCompInputEvent {
+pub struct MouseWheeledOnCompInputEvent {
     pub position: Vec2,
     pub delta: Vec2,
-    pub ctrl_key_pressed: bool,
-    pub meta_key_pressed: bool,
 }
 
 #[derive(Event, Debug, Copy, Clone)]

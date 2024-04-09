@@ -1,6 +1,7 @@
 import { intoMouseButton } from '@dyn/dtif-comp';
 import type {
 	CompositionChangeOutputEvent,
+	KeyCode,
 	SvgElementChangesOutputEvent,
 	SvgElementId,
 	Vec2
@@ -54,10 +55,8 @@ export class SvgRenderer extends Renderer {
 				{
 					type: 'Interaction',
 					event: {
-						type: 'WheeledOnComposition',
+						type: 'MouseWheeledOnComposition',
 						position: this.clientWindowPointToCompPoint([e.clientX, e.clientY]),
-						ctrlKeyPressed: e.ctrlKey,
-						metaKeyPressed: e.metaKey,
 						delta: [e.deltaX, e.deltaY]
 					}
 				},
@@ -129,6 +128,36 @@ export class SvgRenderer extends Renderer {
 					false
 				);
 				this._cursorInCompBounds = false;
+			}
+		});
+		window.addEventListener('keydown', (e) => {
+			if (this._cursorInCompBounds) {
+				e.preventDefault();
+				this.composition.emitInputEvent(
+					{
+						type: 'Interaction',
+						event: {
+							type: 'KeyDownOnComposition',
+							keyCode: e.code as KeyCode
+						}
+					},
+					true
+				);
+			}
+		});
+		window.addEventListener('keyup', (e) => {
+			if (this._cursorInCompBounds) {
+				e.preventDefault();
+				this.composition.emitInputEvent(
+					{
+						type: 'Interaction',
+						event: {
+							type: 'KeyUpOnComposition',
+							keyCode: e.code as KeyCode
+						}
+					},
+					true
+				);
 			}
 		});
 	}
