@@ -87,19 +87,19 @@ use std::{collections::BTreeMap, hash::Hash};
 ///[`DetectChangesMut::bypass_change_detection`]: bevy_ecs::change_detection::DetectChangesMut::bypass_change_detection
 #[derive(Resource, Debug, Clone)]
 pub struct ButtonInput<
-    T: Copy + Eq + Hash + Ord + Send + Sync + 'static,
-    U: Copy + Send + Sync + 'static,
+    K: Copy + Eq + Hash + Ord + Send + Sync + 'static,
+    V: Copy + Send + Sync + 'static,
 > {
     /// A collection of every button that is currently being pressed.
-    pressed: BTreeMap<T, U>,
+    pressed: BTreeMap<K, V>,
     /// A collection of every button that has just been pressed.
-    just_pressed: BTreeMap<T, U>,
+    just_pressed: BTreeMap<K, V>,
     /// A collection of every button that has just been released.
-    just_released: BTreeMap<T, U>,
+    just_released: BTreeMap<K, V>,
 }
 
-impl<T: Copy + Eq + Hash + Ord + Send + Sync + 'static, U: Copy + Send + Sync + 'static> Default
-    for ButtonInput<T, U>
+impl<K: Copy + Eq + Hash + Ord + Send + Sync + 'static, V: Copy + Send + Sync + 'static> Default
+    for ButtonInput<K, V>
 {
     fn default() -> Self {
         Self {
@@ -110,13 +110,13 @@ impl<T: Copy + Eq + Hash + Ord + Send + Sync + 'static, U: Copy + Send + Sync + 
     }
 }
 
-impl<T, U> ButtonInput<T, U>
+impl<K, V> ButtonInput<K, V>
 where
-    T: Copy + Eq + Hash + Ord + Send + Sync + 'static,
-    U: Copy + Send + Sync + 'static,
+    K: Copy + Eq + Hash + Ord + Send + Sync + 'static,
+    V: Copy + Send + Sync + 'static,
 {
     /// Registers a press for the given `input`.
-    pub fn press(&mut self, input: T, value: U) {
+    pub fn press(&mut self, input: K, value: V) {
         // Returns `None` if the `input` wasn't pressed.
         if self.pressed.insert(input, value).is_none() {
             self.just_pressed.insert(input, value);
@@ -124,26 +124,39 @@ where
     }
 
     /// Returns `true` if the `input` has been pressed.
-    pub fn pressed(&self, input: T) -> bool {
+    pub fn pressed(&self, input: K) -> bool {
         self.pressed.contains_key(&input)
     }
 
     /// Returns `true` if any item in `inputs` has been pressed.
-    pub fn any_pressed(&self, inputs: impl IntoIterator<Item = T>) -> bool {
+    pub fn any_pressed(&self, inputs: impl IntoIterator<Item = K>) -> bool {
         inputs.into_iter().any(|it| self.pressed(it))
     }
 
     /// Returns `true` if all items in `inputs` have been pressed.
-    pub fn all_pressed(&self, inputs: impl IntoIterator<Item = T>) -> bool {
+    pub fn all_pressed(&self, inputs: impl IntoIterator<Item = K>) -> bool {
         inputs.into_iter().all(|it| self.pressed(it))
     }
 
     /// Registers a release for the given `input`.
-    pub fn release(&mut self, input: T) {
+    pub fn release(&mut self, input: K) {
         // Returns `true` if the `input` was pressed.
         if let Some((_input, value)) = self.pressed.remove_entry(&input) {
             self.just_released.insert(_input, value);
         }
+    }
+
+    pub fn release_unretained<F>(&mut self, mut callback: F)
+    where
+        F: FnMut(&K, &mut V) -> bool,
+    {
+        self.pressed.retain(|key, value| {
+            let retain = callback(key, value);
+            if !retain {
+                self.just_released.insert(*key, value.clone());
+            }
+            retain
+        });
     }
 
     /// Registers a release for all currently pressed inputs.
@@ -155,43 +168,43 @@ where
     /// Returns `true` if the `input` has been pressed during the current frame.
     ///
     /// Note: This function does not imply information regarding the current state of [`ButtonInput::pressed`] or [`ButtonInput::just_released`].
-    pub fn just_pressed(&self, input: T) -> bool {
+    pub fn just_pressed(&self, input: K) -> bool {
         self.just_pressed.contains_key(&input)
     }
 
     /// Returns `true` if any item in `inputs` has been pressed during the current frame.
-    pub fn any_just_pressed(&self, inputs: impl IntoIterator<Item = T>) -> bool {
+    pub fn any_just_pressed(&self, inputs: impl IntoIterator<Item = K>) -> bool {
         inputs.into_iter().any(|it| self.just_pressed(it))
     }
 
     /// Clears the `just_pressed` state of the `input` and returns `true` if the `input` has just been pressed.
     ///
     /// Future calls to [`ButtonInput::just_pressed`] for the given input will return false until a new press event occurs.
-    pub fn clear_just_pressed(&mut self, input: T) -> bool {
+    pub fn clear_just_pressed(&mut self, input: K) -> bool {
         self.just_pressed.remove_entry(&input).is_some()
     }
 
     /// Returns `true` if the `input` has been released during the current frame.
     ///
     /// Note: This function does not imply information regarding the current state of [`ButtonInput::pressed`] or [`ButtonInput::just_pressed`].
-    pub fn just_released(&self, input: T) -> bool {
+    pub fn just_released(&self, input: K) -> bool {
         self.just_released.contains_key(&input)
     }
 
     /// Returns `true` if any item in `inputs` has just been released.
-    pub fn any_just_released(&self, inputs: impl IntoIterator<Item = T>) -> bool {
+    pub fn any_just_released(&self, inputs: impl IntoIterator<Item = K>) -> bool {
         inputs.into_iter().any(|it| self.just_released(it))
     }
 
     /// Clears the `just_released` state of the `input` and returns `true` if the `input` has just been released.
     ///
     /// Future calls to [`ButtonInput::just_released`] for the given input will return false until a new release event occurs.
-    pub fn clear_just_released(&mut self, input: T) -> bool {
+    pub fn clear_just_released(&mut self, input: K) -> bool {
         self.just_released.remove_entry(&input).is_some()
     }
 
     /// Clears the `pressed`, `just_pressed` and `just_released` data of the `input`.
-    pub fn reset(&mut self, input: T) {
+    pub fn reset(&mut self, input: K) {
         self.pressed.remove(&input);
         self.just_pressed.remove(&input);
         self.just_released.remove(&input);
@@ -214,22 +227,26 @@ where
         self.just_released.clear();
     }
 
-    /// An iterator visiting every pressed input in arbitrary order.
-    pub fn get_pressed(&self) -> impl ExactSizeIterator<Item = (&T, &U)> {
+    /// An iterator visiting every pressed input in ordinal order.
+    pub fn get_pressed(&self) -> impl ExactSizeIterator<Item = (&K, &V)> {
         self.pressed.iter()
     }
 
-    /// An iterator visiting every just pressed input in arbitrary order.
+    /// An iterator visiting every just pressed input in ordinal order.
     ///
     /// Note: Returned elements do not imply information regarding the current state of [`ButtonInput::pressed`] or [`ButtonInput::just_released`].
-    pub fn get_just_pressed(&self) -> impl ExactSizeIterator<Item = (&T, &U)> {
+    pub fn get_just_pressed(&self) -> impl ExactSizeIterator<Item = (&K, &V)> {
         self.just_pressed.iter()
     }
 
-    /// An iterator visiting every just released input in arbitrary order.
+    /// An iterator visiting every just released input in ordinal order.
     ///
     /// Note: Returned elements do not imply information regarding the current state of [`ButtonInput::pressed`] or [`ButtonInput::just_pressed`].
-    pub fn get_just_released(&self) -> impl ExactSizeIterator<Item = (&T, &U)> {
+    pub fn get_just_released(&self) -> impl ExactSizeIterator<Item = (&K, &V)> {
         self.just_released.iter()
+    }
+
+    pub fn was_any_just_released(&self) -> bool {
+        self.just_released.len() > 0
     }
 }

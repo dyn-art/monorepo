@@ -10,15 +10,14 @@ use bevy_ecs::schedule::{IntoSystemConfigs, IntoSystemSetConfigs, SystemSet};
 use events::{
     CursorDownOnCompInputEvent, CursorDownOnEntityInputEvent, CursorDownOnResizeHandleInputEvent,
     CursorDownOnRotateHandleInputEvent, CursorEnteredCompInputEvent, CursorExitedCompInputEvent,
-    CursorMovedOnCompInputEvent, CursorUpOnCompInputEvent, CursorUpOnEntityInputEvent,
-    InteractionToolChangedInputEvent, KeyDownOnCompInputEvent, KeyUpOnCompInputEvent,
-    MouseWheeledOnCompInputEvent,
+    CursorMovedOnCompInputEvent, CursorUpOnCompInputEvent, InteractionToolChangedInputEvent,
+    KeyDownOnCompInputEvent, KeyUpOnCompInputEvent, MouseWheeledOnCompInputEvent,
 };
 use input::{
     keyboard::KeyCodeButtonInput,
     mouse::{
-        MouseButtonButtonInput, MouseButtonOnEntityButtonInput,
-        MouseButtonOnResizeHandleButtonInput, MouseButtonOnRotateHandleButtonInput,
+        MouseButtonButtonInputRes, MouseButtonOnEntityButtonInputRes,
+        MouseButtonOnResizeHandleButtonInputRes, MouseButtonOnRotateHandleButtonInputRes,
     },
 };
 use resources::comp_interaction::CompInteractionRes;
@@ -33,10 +32,7 @@ use systems::{
         key_up::key_up_input_system,
         wheel::mouse_wheeled_on_comp_input_system,
     },
-    entity::{
-        cursor_down::{cursor_down_on_entity_input_system, cursor_down_on_entity_system},
-        cursor_up::cursor_up_on_entity_input_system,
-    },
+    entity::cursor_down::{cursor_down_on_entity_input_system, cursor_down_on_entity_system},
     ui::{
         interaction_tool::interaction_tool_changed_input_system,
         resize_handle::{
@@ -83,7 +79,6 @@ impl Plugin for CompInteractionPlugin {
         app.add_event::<CursorUpOnCompInputEvent>();
         app.add_event::<MouseWheeledOnCompInputEvent>();
         app.add_event::<CursorDownOnEntityInputEvent>();
-        app.add_event::<CursorUpOnEntityInputEvent>();
         app.add_event::<CursorDownOnResizeHandleInputEvent>();
         app.add_event::<CursorDownOnRotateHandleInputEvent>();
         app.add_event::<InteractionToolChangedInputEvent>();
@@ -91,10 +86,10 @@ impl Plugin for CompInteractionPlugin {
         // Register resources
         app.init_resource::<CompInteractionRes>();
         app.init_resource::<KeyCodeButtonInput>();
-        app.init_resource::<MouseButtonButtonInput>();
-        app.init_resource::<MouseButtonOnEntityButtonInput>();
-        app.init_resource::<MouseButtonOnResizeHandleButtonInput>();
-        app.init_resource::<MouseButtonOnRotateHandleButtonInput>();
+        app.init_resource::<MouseButtonButtonInputRes>();
+        app.init_resource::<MouseButtonOnEntityButtonInputRes>();
+        app.init_resource::<MouseButtonOnResizeHandleButtonInputRes>();
+        app.init_resource::<MouseButtonOnRotateHandleButtonInputRes>();
 
         // Configure system sets
         app.configure_sets(
@@ -120,15 +115,15 @@ impl Plugin for CompInteractionPlugin {
                     .in_set(CompInteractionSystemSet::First)
                     .after(key_down_input_system),
                 cursor_down_on_comp_input_system.in_set(CompInteractionSystemSet::First),
-                cursor_up_on_comp_input_system
-                    .in_set(CompInteractionSystemSet::First)
-                    .after(cursor_down_on_comp_input_system),
                 cursor_down_on_entity_input_system.in_set(CompInteractionSystemSet::First),
-                cursor_up_on_entity_input_system
-                    .in_set(CompInteractionSystemSet::First)
-                    .after(cursor_down_on_entity_input_system),
                 cursor_down_on_resize_handle_input_system.in_set(CompInteractionSystemSet::First),
                 cursor_down_on_rotate_handle_input_system.in_set(CompInteractionSystemSet::First),
+                cursor_up_on_comp_input_system
+                    .in_set(CompInteractionSystemSet::First)
+                    .after(cursor_down_on_comp_input_system)
+                    .after(cursor_down_on_entity_input_system)
+                    .after(cursor_down_on_resize_handle_input_system)
+                    .after(cursor_down_on_rotate_handle_input_system),
                 interaction_tool_changed_input_system.in_set(CompInteractionSystemSet::First),
                 cursor_down_on_comp_system.in_set(CompInteractionSystemSet::Activation),
                 cursor_down_on_entity_system
@@ -138,7 +133,7 @@ impl Plugin for CompInteractionPlugin {
                 cursor_down_on_rotate_handle_system.in_set(CompInteractionSystemSet::Manipulation),
                 cursor_moved_on_comp_input_system.in_set(CompInteractionSystemSet::Continuous),
                 mouse_wheeled_on_comp_input_system.in_set(CompInteractionSystemSet::Continuous),
-                cursor_up_on_comp_system.in_set(CompInteractionSystemSet::Continuous),
+                cursor_up_on_comp_system.in_set(CompInteractionSystemSet::Last),
                 cursor_exited_comp_input_system.in_set(CompInteractionSystemSet::Last),
             ),
         );

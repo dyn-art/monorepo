@@ -1,5 +1,3 @@
-use super::button_input::ButtonInput;
-use crate::resources::comp_interaction::XYWH;
 /**
  * -----------------------------------------------------------------------------
  * This file includes code derived from the project bevyengine/bevy by @bevyengine.
@@ -12,6 +10,8 @@ use crate::resources::comp_interaction::XYWH;
  * For the license text, see: https://github.com/bevyengine/bevy/blob/main/LICENSE-MIT
  * -----------------------------------------------------------------------------
  */
+use super::button_input::ButtonInput;
+use crate::resources::comp_interaction::XYWH;
 use bevy_ecs::entity::Entity;
 use glam::Vec2;
 
@@ -48,7 +48,7 @@ pub struct MouseButtonValue {
     pub position: Vec2,
 }
 
-pub type MouseButtonButtonInput = ButtonInput<MouseButton, MouseButtonValue>;
+pub type MouseButtonButtonInputRes = ButtonInput<MouseButton, MouseButtonValue>;
 
 #[derive(Debug, Hash, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
 #[cfg_attr(feature = "serde_support", derive(serde::Deserialize, specta::Type))]
@@ -57,7 +57,7 @@ pub struct MouseButtonOnEntity {
     pub entity: Entity,
 }
 
-pub type MouseButtonOnEntityButtonInput = ButtonInput<MouseButtonOnEntity, MouseButtonValue>;
+pub type MouseButtonOnEntityButtonInputRes = ButtonInput<MouseButtonOnEntity, MouseButtonValue>;
 
 #[derive(Debug, Hash, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
 #[cfg_attr(feature = "serde_support", derive(serde::Deserialize, specta::Type))]
@@ -73,7 +73,7 @@ pub struct MouseButtonOnResizeHandleValue {
     pub rotation_rad: f32,
 }
 
-pub type MouseButtonOnResizeHandleButtonInput =
+pub type MouseButtonOnResizeHandleButtonInputRes =
     ButtonInput<MouseButtonOnResizeHandle, MouseButtonOnResizeHandleValue>;
 
 #[derive(Debug, Hash, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
@@ -89,5 +89,5 @@ pub struct MouseButtonOnRotateHandleValue {
     pub initial_rotation_rad: f32,
 }
 
-pub type MouseButtonOnRotateHandleButtonInput =
+pub type MouseButtonOnRotateHandleButtonInputRes =
     ButtonInput<MouseButtonOnRotateHandle, MouseButtonOnRotateHandleValue>;

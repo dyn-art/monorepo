@@ -1,7 +1,7 @@
 use crate::{
     events::CursorDownOnResizeHandleInputEvent,
     input::mouse::{
-        MouseButton, MouseButtonOnResizeHandle, MouseButtonOnResizeHandleButtonInput,
+        MouseButton, MouseButtonOnResizeHandle, MouseButtonOnResizeHandleButtonInputRes,
         MouseButtonOnResizeHandleValue,
     },
     resources::comp_interaction::{CompInteractionRes, InteractionMode},
@@ -14,7 +14,7 @@ use bevy_ecs::{
 
 pub fn cursor_down_on_resize_handle_input_system(
     mut event_reader: EventReader<CursorDownOnResizeHandleInputEvent>,
-    mut mouse_button_input_res: ResMut<MouseButtonOnResizeHandleButtonInput>,
+    mut mouse_button_input_res: ResMut<MouseButtonOnResizeHandleButtonInputRes>,
 ) {
     mouse_button_input_res.bypass_change_detection().clear();
     for event in event_reader.read() {
@@ -37,7 +37,7 @@ pub fn cursor_down_on_resize_handle_input_system(
 
 pub fn cursor_down_on_resize_handle_system(
     mut comp_interaction_res: ResMut<CompInteractionRes>,
-    mouse_button_input_res: Res<MouseButtonOnResizeHandleButtonInput>,
+    mouse_button_input_res: Res<MouseButtonOnResizeHandleButtonInputRes>,
 ) {
     for (
         MouseButtonOnResizeHandle { corner, .. },

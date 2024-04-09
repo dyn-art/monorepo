@@ -2,7 +2,7 @@ use crate::{
     events::CursorExitedCompInputEvent,
     input::{
         keyboard::KeyCodeButtonInput,
-        mouse::{MouseButtonButtonInput, MouseButtonOnEntityButtonInput},
+        mouse::{MouseButtonButtonInputRes, MouseButtonOnEntityButtonInputRes},
     },
     resources::comp_interaction::{CompInteractionRes, InteractionMode},
 };
@@ -12,8 +12,8 @@ pub fn cursor_exited_comp_input_system(
     mut event_reader: EventReader<CursorExitedCompInputEvent>,
     mut comp_interaction_res: ResMut<CompInteractionRes>,
     mut keyboard_input_res: ResMut<KeyCodeButtonInput>,
-    mut mouse_button_on_comp_input_res: ResMut<MouseButtonButtonInput>,
-    mut mouse_button_on_entity_input_res: ResMut<MouseButtonOnEntityButtonInput>,
+    mut mouse_button_on_comp_input_res: ResMut<MouseButtonButtonInputRes>,
+    mut mouse_button_on_entity_input_res: ResMut<MouseButtonOnEntityButtonInputRes>,
 ) {
     if event_reader.read().len() > 0 {
         log::info!("[cursor_exited_comp_input_system]");

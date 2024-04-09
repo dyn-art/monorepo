@@ -90,8 +90,6 @@ export type CursorMovedOnCompInputEvent = { position: Vec2 }
 
 export type CursorUpOnCompInputEvent = { position: Vec2; button: MouseButton }
 
-export type CursorUpOnEntityInputEvent = { entity: Entity; position: Vec2; button: MouseButton }
-
 /**
  * DTIF (Design Tree Interchange Format) utilizes a flat structure for easy readability
  * and efficient access & manipulation of design elements (Nodes, Paints, ..).
@@ -299,7 +297,7 @@ export type ImageScaleMode =
  */
 { type: "Tile"; rotation?: number; scalingFactor: number }
 
-export type InteractionInputEvent = ({ type: "KeyDownOnComposition" } & KeyDownOnCompInputEvent) | ({ type: "KeyUpOnComposition" } & KeyUpOnCompInputEvent) | ({ type: "CursorEnteredComposition" }) | ({ type: "CursorExitedComposition" }) | ({ type: "CursorMovedOnComposition" } & CursorMovedOnCompInputEvent) | ({ type: "CursorDownOnComposition" } & CursorDownOnCompInputEvent) | ({ type: "CursorUpOnComposition" } & CursorUpOnCompInputEvent) | ({ type: "MouseWheeledOnComposition" } & MouseWheeledOnCompInputEvent) | ({ type: "CursorDownOnEntity" } & CursorDownOnEntityInputEvent) | ({ type: "CursorUpOnEntity" } & CursorUpOnEntityInputEvent) | ({ type: "CursorDownOnResizeHandle" } & CursorDownOnResizeHandleInputEvent) | ({ type: "CursorDownOnRotateHandle" } & CursorDownOnRotateHandleInputEvent) | ({ type: "InteractionToolChanged" } & InteractionToolChangedInputEvent)
+export type InteractionInputEvent = ({ type: "KeyDownOnComposition" } & KeyDownOnCompInputEvent) | ({ type: "KeyUpOnComposition" } & KeyUpOnCompInputEvent) | ({ type: "CursorEnteredComposition" }) | ({ type: "CursorExitedComposition" }) | ({ type: "CursorMovedOnComposition" } & CursorMovedOnCompInputEvent) | ({ type: "CursorDownOnComposition" } & CursorDownOnCompInputEvent) | ({ type: "CursorUpOnComposition" } & CursorUpOnCompInputEvent) | ({ type: "MouseWheeledOnComposition" } & MouseWheeledOnCompInputEvent) | ({ type: "CursorDownOnEntity" } & CursorDownOnEntityInputEvent) | ({ type: "CursorDownOnResizeHandle" } & CursorDownOnResizeHandleInputEvent) | ({ type: "CursorDownOnRotateHandle" } & CursorDownOnRotateHandleInputEvent) | ({ type: "InteractionToolChanged" } & InteractionToolChangedInputEvent)
 
 export type InteractionMode = 
 /**
@@ -1313,18 +1311,6 @@ export type MouseButtonValue = { position: Vec2 }
 export type MouseWheeledOnCompInputEvent = { position: Vec2; delta: Vec2 }
 
 /**
- * 
- * * -----------------------------------------------------------------------------
- * * This file includes code derived from the project bevyengine/bevy by @bevyengine.
- * * Project Repository: https://github.com/bevyengine/bevy/blob/main/crates/bevy_input/src/keyboard.rs
- * *
- * * Date of Import: 08 April 2024
- * * -----------------------------------------------------------------------------
- * * The code included in this file is licensed under the MIT License,
- * * as per the original project by @bevyengine.
- * * For the license text, see: https://github.com/bevyengine/bevy/blob/main/LICENSE-MIT
- * * -----------------------------------------------------------------------------
- * 
  * Contains the platform-native physical key identifier
  * 
  * The exact values vary from platform to platform (which is part of why this is a per-platform

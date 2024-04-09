@@ -25,7 +25,6 @@ pub enum InteractionInputEvent {
 
     // Entity
     CursorDownOnEntity(CursorDownOnEntityInputEvent),
-    CursorUpOnEntity(CursorUpOnEntityInputEvent),
 
     // UI
     CursorDownOnResizeHandle(CursorDownOnResizeHandleInputEvent),
@@ -64,9 +63,6 @@ impl InputEvent for InteractionInputEvent {
 
             // Entity
             Self::CursorDownOnEntity(event) => {
-                world.send_event(event);
-            }
-            Self::CursorUpOnEntity(event) => {
                 world.send_event(event);
             }
 
@@ -127,14 +123,6 @@ pub struct CursorExitedCompInputEvent;
 #[derive(Event, Debug, Copy, Clone)]
 #[cfg_attr(feature = "serde_support", derive(serde::Deserialize, specta::Type))]
 pub struct CursorDownOnEntityInputEvent {
-    pub entity: Entity,
-    pub position: Vec2,
-    pub button: MouseButton,
-}
-
-#[derive(Event, Debug, Copy, Clone)]
-#[cfg_attr(feature = "serde_support", derive(serde::Deserialize, specta::Type))]
-pub struct CursorUpOnEntityInputEvent {
     pub entity: Entity,
     pub position: Vec2,
     pub button: MouseButton,

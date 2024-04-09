@@ -1,7 +1,7 @@
 use crate::{
     events::CursorDownOnRotateHandleInputEvent,
     input::mouse::{
-        MouseButton, MouseButtonOnRotateHandle, MouseButtonOnRotateHandleButtonInput,
+        MouseButton, MouseButtonOnRotateHandle, MouseButtonOnRotateHandleButtonInputRes,
         MouseButtonOnRotateHandleValue,
     },
     resources::comp_interaction::{CompInteractionRes, InteractionMode},
@@ -14,7 +14,7 @@ use bevy_ecs::{
 
 pub fn cursor_down_on_rotate_handle_input_system(
     mut event_reader: EventReader<CursorDownOnRotateHandleInputEvent>,
-    mut mouse_button_input_res: ResMut<MouseButtonOnRotateHandleButtonInput>,
+    mut mouse_button_input_res: ResMut<MouseButtonOnRotateHandleButtonInputRes>,
 ) {
     mouse_button_input_res.bypass_change_detection().clear();
     for event in event_reader.read() {
@@ -36,7 +36,7 @@ pub fn cursor_down_on_rotate_handle_input_system(
 
 pub fn cursor_down_on_rotate_handle_system(
     mut comp_interaction_res: ResMut<CompInteractionRes>,
-    mouse_button_input_res: Res<MouseButtonOnRotateHandleButtonInput>,
+    mouse_button_input_res: Res<MouseButtonOnRotateHandleButtonInputRes>,
 ) {
     for (
         MouseButtonOnRotateHandle { corner, .. },

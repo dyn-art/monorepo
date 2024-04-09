@@ -201,18 +201,6 @@ export class SvgRenderer extends Renderer {
 								}
 							});
 						});
-						newElement.addEventListener('pointerup', (e) => {
-							e.preventDefault();
-							this.composition.emitInputEvent({
-								type: 'Interaction',
-								event: {
-									type: 'CursorUpOnEntity',
-									entity,
-									position: this.pointerEventToCompPoint(e),
-									button: intoMouseButton(e.button)
-								}
-							});
-						});
 					}
 
 					// Append element to parent

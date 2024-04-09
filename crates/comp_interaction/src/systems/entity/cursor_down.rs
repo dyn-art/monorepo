@@ -2,7 +2,7 @@ use crate::{
     components::{Locked, Preselected, Selected},
     events::CursorDownOnEntityInputEvent,
     input::mouse::{
-        MouseButton, MouseButtonOnEntity, MouseButtonOnEntityButtonInput, MouseButtonValue,
+        MouseButton, MouseButtonOnEntity, MouseButtonOnEntityButtonInputRes, MouseButtonValue,
     },
     resources::comp_interaction::{CompInteractionRes, InteractionMode, InteractionTool},
 };
@@ -26,7 +26,7 @@ static DOUBLE_CLICK_WINDOW: web_time::Duration = web_time::Duration::from_millis
 
 pub fn cursor_down_on_entity_input_system(
     mut event_reader: EventReader<CursorDownOnEntityInputEvent>,
-    mut mouse_button_input_res: ResMut<MouseButtonOnEntityButtonInput>,
+    mut mouse_button_input_res: ResMut<MouseButtonOnEntityButtonInputRes>,
 ) {
     mouse_button_input_res.bypass_change_detection().clear();
     for event in event_reader.read() {
@@ -57,7 +57,7 @@ pub fn cursor_down_on_entity_input_system(
 pub fn cursor_down_on_entity_system(
     mut commands: Commands,
     mut comp_interaction_res: ResMut<CompInteractionRes>,
-    mouse_button_input_res: Res<MouseButtonOnEntityButtonInput>,
+    mouse_button_input_res: Res<MouseButtonOnEntityButtonInputRes>,
     unselected_node_query: Query<
         (Option<&Parent>, Option<&HierarchyLevel>),
         (
