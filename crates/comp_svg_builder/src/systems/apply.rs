@@ -16,6 +16,7 @@ use base64::prelude::*;
 use bevy_ecs::{
     entity::Entity,
     query::{Changed, With, Without},
+    removal_detection::RemovedComponents,
     system::{ParamSet, Query, Res, ResMut},
 };
 use bevy_hierarchy::Children;
@@ -54,7 +55,9 @@ pub fn apply_node_children_changes(
     mut query_set: ParamSet<(
         Query<(Entity, &Children, &mut SvgBundleVariant), (With<CompNode>, Changed<Children>)>,
         Query<&mut SvgBundleVariant, With<CompNode>>,
+        Query<&mut SvgBundleVariant, With<CompNode>>,
     )>,
+    mut removals: RemovedComponents<Children>,
 ) {
     let mut changes: SmallVec<[SvgBundleChildrenChange; 2]> = SmallVec::new();
 
@@ -88,6 +91,36 @@ pub fn apply_node_children_changes(
                     removed_entities,
                     new_entities_order: new_child_node_entities,
                 });
+            }
+        }
+
+        // Query changes for special case where parent got leaf (has no children anymore)
+        // https://github.com/bevyengine/bevy/issues/6010
+        let mut bundle_variant_query = query_set.p2();
+        for entity in removals.read() {
+            if let Ok(node_bundle_variant) = bundle_variant_query.get_mut(entity) {
+                if let Some(child_node_entities) = node_bundle_variant.get_child_node_entities() {
+                    // Note: Reverse the order because in a SVG, the top-most element appears last in the children "array",
+                    // contrary to the DtifComposition convention where the first element (index = 0) is at the top
+                    let new_child_node_entities: SmallVec<[Entity; 2]> = SmallVec::new();
+
+                    // Identify removed node entities
+                    let current_entities_set: HashSet<Entity> =
+                        child_node_entities.iter().copied().collect();
+                    let new_entities_set: HashSet<Entity> =
+                        new_child_node_entities.iter().copied().collect();
+                    let removed_entities: SmallVec<[Entity; 2]> = current_entities_set
+                        .difference(&new_entities_set)
+                        .copied()
+                        .collect();
+
+                    changes.push(SvgBundleChildrenChange {
+                        parent_entity: entity,
+                        added_entities: SmallVec::new(),
+                        removed_entities,
+                        new_entities_order: new_child_node_entities,
+                    });
+                }
             }
         }
     }

@@ -10,10 +10,7 @@ use super::svg_bundle::{SvgBundle, SvgBundleVariant};
 use bevy_ecs::{component::Component, entity::Entity, query::Without, system::Query};
 use dyn_comp_bundles::components::mixins::Root;
 use smallvec::SmallVec;
-use std::{
-    collections::{HashMap, HashSet},
-    fmt::Display,
-};
+use std::{collections::HashMap, fmt::Display};
 
 #[cfg(feature = "output_svg_element_changes")]
 use self::element_changes::{
