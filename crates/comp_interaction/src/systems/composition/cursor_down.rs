@@ -1,14 +1,13 @@
 use crate::{
     events::CursorDownOnCompInputEvent,
     input::mouse::{MouseButton, MouseButtonButtonInputRes, MouseButtonValue},
-    resources::comp_interaction::{CompInteractionRes, InteractionMode, InteractionTool, XYWH},
+    resources::comp_interaction::{CompInteractionRes, InteractionMode, InteractionTool},
 };
 use bevy_ecs::{
     change_detection::DetectChangesMut,
     event::EventReader,
     system::{Res, ResMut},
 };
-use dyn_utils::properties::size::Size;
 
 pub fn cursor_down_on_comp_input_system(
     mut event_reader: EventReader<CursorDownOnCompInputEvent>,
@@ -35,10 +34,7 @@ pub fn cursor_down_on_comp_system(
             MouseButton::Left => match comp_interaction_res.interaction_tool {
                 InteractionTool::Shape { variant } => {
                     comp_interaction_res.interaction_mode = InteractionMode::Inserting {
-                        initial_bounds: XYWH {
-                            position: mouse_button_value.position,
-                            size: Size::zero(),
-                        },
+                        origin: mouse_button_value.position,
                         shape_variant: variant,
                         entity: None,
                     };

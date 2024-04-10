@@ -41,7 +41,7 @@ pub fn cursor_moved_on_comp_input_system(
         // Rotating
         Query<(&mut Transform, &GlobalTransform, &SizeMixin), With<Selected>>,
         // Inserting
-        Query<(&mut Transform, &mut SizeMixin)>,
+        Query<(&mut Transform, &mut SizeMixin, Option<&Parent>)>,
     )>,
     global_transfrom_query: Query<&GlobalTransform>,
     root_node_query: Query<Entity, (With<CompNode>, With<Root>)>,
@@ -82,17 +82,18 @@ pub fn cursor_moved_on_comp_input_system(
             InteractionMode::Dragging { current } => handle_dragging(&mut comp_res, event, current),
             InteractionMode::Inserting {
                 entity,
-                initial_bounds,
+                origin,
                 shape_variant,
             } => handle_inserting(
                 &mut commands,
                 &mut comp_res,
                 &mut query_set.p3(),
                 &root_node_query,
+                &global_transfrom_query,
                 event,
                 entity,
                 *shape_variant,
-                initial_bounds,
+                origin,
             ),
             _ => {}
         }

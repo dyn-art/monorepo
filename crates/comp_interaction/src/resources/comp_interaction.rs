@@ -63,7 +63,7 @@ pub enum InteractionMode {
     },
     /// When the user plans to insert a new node.
     Inserting {
-        initial_bounds: XYWH,
+        origin: Vec2,
         shape_variant: ShapeVariant,
         entity: Option<Entity>,
     },

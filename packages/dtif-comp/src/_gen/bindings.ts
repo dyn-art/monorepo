@@ -327,7 +327,7 @@ export type InteractionMode =
 /**
  * When the user plans to insert a new node.
  */
-{ type: "Inserting"; initial_bounds: XYWH; shape_variant: ShapeVariant; entity: Entity | null }
+{ type: "Inserting"; origin: Vec2; shape_variant: ShapeVariant; entity: Entity | null }
 
 export type InteractionModeChangeOutputEvent = { interactionMode: InteractionModeLabel }
 

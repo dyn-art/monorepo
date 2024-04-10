@@ -9,8 +9,11 @@ use bevy_ecs::{
     query::With,
     system::{Commands, Query},
 };
-use bevy_hierarchy::BuildChildren;
-use bevy_transform::{components::Transform, TransformBundle};
+use bevy_hierarchy::{BuildChildren, Parent};
+use bevy_transform::{
+    components::{GlobalTransform, Transform},
+    TransformBundle,
+};
 use dyn_comp_bundles::{
     components::{
         mixins::{
@@ -21,43 +24,89 @@ use dyn_comp_bundles::{
         paints::{CompPaint, CompPaintVariant, SolidCompPaint},
         styles::{CompStyle, CompStyleVariant, FillCompStyle},
     },
+    utils::{get_parent_global_transfrom, global_to_local_point3},
     FillStyleBundle, RectangleCompNodeBundle, SolidPaintBundle,
 };
 use dyn_comp_core::resources::composition::CompositionRes;
-use dyn_utils::properties::color::Color;
+use dyn_utils::properties::{color::Color, size::Size};
+use glam::Vec2;
 use smallvec::smallvec;
 
 pub fn handle_inserting(
     commands: &mut Commands,
     comp_res: &CompositionRes,
-    query: &mut Query<(&mut Transform, &mut SizeMixin)>,
+    query: &mut Query<(&mut Transform, &mut SizeMixin, Option<&Parent>)>,
     root_node_query: &Query<Entity, (With<CompNode>, With<Root>)>,
+    global_transform_query: &Query<&GlobalTransform>,
     event: &CursorMovedOnCompInputEvent,
     maybe_entity: &mut Option<Entity>,
     shape_variant: ShapeVariant,
-    initial_bounds: &XYWH,
+    origin: &Vec2,
 ) {
     let CursorMovedOnCompInputEvent {
         position: cursor_position,
         ..
     } = event;
-    let cursor_position = transform_point_to_viewport(comp_res, cursor_position, true);
+    let global_cursor_position = transform_point_to_viewport(comp_res, cursor_position, true);
+    let global_origin = transform_point_to_viewport(comp_res, origin, true);
 
-    let new_bounds = resize_bounds(
-        initial_bounds,
-        HandleSide::Right as u8 + HandleSide::Bottom as u8,
-        &cursor_position,
-        0.0,
-    );
-
-    if let Some((mut transform, mut size_mixin)) =
+    if let Some((mut transform, mut size_mixin, maybe_parent)) =
         maybe_entity.and_then(|entity| query.get_mut(entity).ok())
     {
         let SizeMixin(size) = size_mixin.as_mut();
+        let maybe_parent_global_transform =
+            get_parent_global_transfrom(maybe_parent, global_transform_query);
+        let local_cursor_position = global_to_local_point3(
+            global_cursor_position.extend(0.0),
+            maybe_parent_global_transform,
+        )
+        .truncate();
+        let local_initial_bounds = XYWH {
+            position: global_to_local_point3(
+                global_origin.extend(0.0),
+                maybe_parent_global_transform,
+            )
+            .truncate(),
+            size: Size::zero(),
+        };
+
+        let new_bounds = resize_bounds(
+            &local_initial_bounds,
+            HandleSide::Right as u8 + HandleSide::Bottom as u8,
+            &local_cursor_position,
+            0.0,
+        );
+
         transform.translation.x = new_bounds.position.x;
         transform.translation.y = new_bounds.position.y;
         *size = new_bounds.size;
     } else {
+        // TODO: More advanced logic to determine parent of new node
+        let maybe_parent = root_node_query.iter().next();
+
+        let maybe_parent_global_transform =
+            maybe_parent.and_then(|parent| global_transform_query.get(parent).ok());
+        let local_cursor_position = global_to_local_point3(
+            global_cursor_position.extend(0.0),
+            maybe_parent_global_transform,
+        )
+        .truncate();
+        let local_initial_bounds = XYWH {
+            position: global_to_local_point3(
+                global_origin.extend(0.0),
+                maybe_parent_global_transform,
+            )
+            .truncate(),
+            size: Size::zero(),
+        };
+
+        let new_bounds = resize_bounds(
+            &local_initial_bounds,
+            HandleSide::Right as u8 + HandleSide::Bottom as u8,
+            &local_cursor_position,
+            0.0,
+        );
+
         // TODO: Streamline spawning nodes?
 
         // Spawn node
@@ -114,11 +163,10 @@ pub fn handle_inserting(
         let mut node_entity_commands = commands.entity(node_entity);
         node_entity_commands.insert(StyleChildrenMixin(smallvec![style_entity]));
 
-        // TODO: More advanced logic to determine where to append the newly created node
         // TODO: Child is pushed as last element to the children array
         //       which causes it to be on the bottom although it should be the top most node?
-        if let Some(root_entity) = root_node_query.iter().next() {
-            commands.entity(root_entity).add_child(node_entity);
+        if let Some(parent) = maybe_parent {
+            commands.entity(parent).add_child(node_entity);
         } else {
             node_entity_commands.insert(Root);
         }

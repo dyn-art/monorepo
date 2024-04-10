@@ -43,7 +43,10 @@ export const EntitySelectionBox: React.FC<TProps> = (props) => {
 	);
 	const interactionMode = useInteractionMode(composition);
 	const showHandles = React.useMemo(
-		() => interactionMode !== 'Translating' && interactionMode !== 'Rotating',
+		() =>
+			interactionMode !== 'Translating' &&
+			interactionMode !== 'Rotating' &&
+			interactionMode !== 'Dragging',
 		[interactionMode]
 	);
 	const handlePointerEvents = React.useMemo(
