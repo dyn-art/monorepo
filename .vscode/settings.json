@@ -24,7 +24,7 @@
 		"*.ts": "${capture}.js, ${capture}.test.ts",
 		"*.js": "${capture}.js.map, ${capture}.min.js, ${capture}.d.ts, ${capture}.test.js",
 		"*.jsx": "${capture}.js",
-		"*.tsx": "${capture}.ts",
+		"*.tsx": "${capture}.ts, ${capture}.stories.tsx",
 		".npmrc": ".nvmrc, .yarnrc.yml",
 		".gitignore": ".eslintignore, .prettierignore, .dockerignore",
 		"README.md": "CONTRIBUTING.md, CODE_OF_CONDUCT.md",
