@@ -25,7 +25,7 @@ export const Viewport: React.FC<TViewportProps> = (props) => {
 			ref={viewportRef}
 			style={{ cursor: CURSOR.default() }}
 		>
-			{isWasmLoading ? <Skeleton className="h-full w-full" /> : null}
+			{isWasmLoading ? <Skeleton className="h-full w-full rounded-none" /> : null}
 			<div ref={svgContainerRef} />
 			{composition != null && <CanvasControl composition={composition} />}
 			{composition != null && <ToolsBar composition={composition} />}

@@ -1,7 +1,20 @@
 import React from 'react';
 import type { COMP } from '@dyn/dtif-comp';
 import type { Composition } from '@dyn/svg-comp';
-import { BoxIcon, CursorArrowIcon, ToggleGroup, ToggleGroupItem } from '@dyn/ui';
+import {
+	CircleIcon,
+	CursorArrowIcon,
+	IconSelectTrigger,
+	Select,
+	SelectContent,
+	SelectGroup,
+	SelectItem,
+	SquareIcon,
+	StarIcon,
+	ToggleGroup,
+	ToggleGroupItem,
+	VercelLogoIcon
+} from '@dyn/ui';
 
 import { useInteractionTool } from '../hooks';
 
@@ -37,11 +50,43 @@ export const ToolsBar: React.FC<TProps> = (props) => {
 				type="single"
 				value={interactionTool.type}
 			>
-				<ToggleGroupItem aria-label="Toggle bold" value="Select">
+				<ToggleGroupItem aria-label="Toggle select" value="Select">
 					<CursorArrowIcon className="h-4 w-4" />
 				</ToggleGroupItem>
-				<ToggleGroupItem aria-label="Toggle italic" value="Shape">
-					<BoxIcon className="h-4 w-4" />
+				<ToggleGroupItem aria-label="Toggle shape" className="px-0" value="Shape">
+					<Select>
+						<IconSelectTrigger className="gap-1 border-none px-2 shadow-none">
+							<SquareIcon className="h-4 w-4" />
+						</IconSelectTrigger>
+						<SelectContent>
+							<SelectGroup>
+								<SelectItem value="rectangle">
+									<div className="flex items-center gap-2">
+										<SquareIcon className="h-4 w-4" />
+										Rectangle
+									</div>
+								</SelectItem>
+								<SelectItem value="ellipse">
+									<div className="flex items-center gap-2">
+										<CircleIcon className="h-4 w-4" />
+										Circle
+									</div>
+								</SelectItem>
+								<SelectItem value="ellipse">
+									<div className="flex items-center gap-2">
+										<StarIcon className="h-4 w-4" />
+										Star
+									</div>
+								</SelectItem>
+								<SelectItem value="ellipse">
+									<div className="flex items-center gap-2">
+										<VercelLogoIcon className="h-4 w-4" />
+										Polygon
+									</div>
+								</SelectItem>
+							</SelectGroup>
+						</SelectContent>
+					</Select>
 				</ToggleGroupItem>
 			</ToggleGroup>
 		</aside>

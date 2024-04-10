@@ -34,4 +34,5 @@ const Progress = React.forwardRef<
 ));
 Progress.displayName = ProgressPrimitive.Root.displayName;
 
+// export * as ProgressPrimitive from '@radix-ui/react-progress';
 export { Progress };

@@ -56,4 +56,5 @@ const AvatarFallback = React.forwardRef<
 ));
 AvatarFallback.displayName = AvatarPrimitive.Fallback.displayName;
 
+// export * as AvatarPrimitive from '@radix-ui/react-avatar';
 export { Avatar, AvatarFallback, AvatarImage };

@@ -150,6 +150,7 @@ const SelectSeparator = React.forwardRef<
 ));
 SelectSeparator.displayName = SelectPrimitive.Separator.displayName;
 
+// export * as SelectPrimitive from '@radix-ui/react-select';
 export {
 	Select,
 	SelectContent,

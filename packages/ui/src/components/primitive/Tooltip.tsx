@@ -39,4 +39,5 @@ const TooltipContent = React.forwardRef<
 ));
 TooltipContent.displayName = TooltipPrimitive.Content.displayName;
 
+// export * as TooltipPrimitive from '@radix-ui/react-tooltip';
 export { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger };

@@ -181,6 +181,7 @@ function DropdownMenuShortcut({ className, ...props }: React.HTMLAttributes<HTML
 }
 DropdownMenuShortcut.displayName = 'DropdownMenuShortcut';
 
+// export * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
 export {
 	DropdownMenu,
 	DropdownMenuCheckboxItem,

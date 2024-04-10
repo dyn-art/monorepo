@@ -35,4 +35,5 @@ const Separator = React.forwardRef<
 ));
 Separator.displayName = SeparatorPrimitive.Root.displayName;
 
+// export * as SeparatorPrimitive from '@radix-ui/react-separator';
 export { Separator };
