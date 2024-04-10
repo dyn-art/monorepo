@@ -1,5 +1,5 @@
-import { EnvelopeClosedIcon, SymbolIcon } from '@radix-ui/react-icons';
 import type { Meta, StoryObj } from '@storybook/react';
+import { Loader2, Mail } from 'lucide-react';
 
 import { Button } from './Button';
 
@@ -91,7 +91,7 @@ export const Link: Story = {
 export const Loading: Story = {
 	render: (args) => (
 		<Button {...args}>
-			<SymbolIcon className="mr-2 h-4 w-4 animate-spin" />
+			<Loader2 className="mr-2 h-4 w-4 animate-spin" />
 			Button
 		</Button>
 	),
@@ -108,7 +108,7 @@ export const Loading: Story = {
 export const WithIcon: Story = {
 	render: (args) => (
 		<Button {...args}>
-			<EnvelopeClosedIcon className="mr-2 h-4 w-4" /> Login with Email Button
+			<Mail className="mr-2 h-4 w-4" /> Login with Email Button
 		</Button>
 	),
 	args: {
@@ -143,7 +143,7 @@ export const Icon: Story = {
 	args: {
 		...Secondary.args,
 		size: 'icon',
-		children: <EnvelopeClosedIcon />
+		children: <Mail />
 	}
 };
 

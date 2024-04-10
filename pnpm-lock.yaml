@@ -572,6 +572,9 @@ importers:
       clsx:
         specifier: ^2.1.0
         version: 2.1.0
+      lucide-react:
+        specifier: ^0.367.0
+        version: 0.367.0(react@18.2.0)
       react-resizable-panels:
         specifier: ^2.0.16
         version: 2.0.16(react-dom@18.2.0)(react@18.2.0)
@@ -10641,6 +10644,14 @@ packages:
     engines: {node: '>=10'}
     dependencies:
       yallist: 4.0.0
+
+  /lucide-react@0.367.0(react@18.2.0):
+    resolution: {integrity: sha512-3FWiBaJiqMrx5a1sjH3CVdPqWnw/Z/PTVeeTDmOeILSs+8Ah+VhCd4FQMeHo6Z0WxHcm9piIOtilQwvceiCCKQ==}
+    peerDependencies:
+      react: ^16.5.1 || ^17.0.0 || ^18.0.0
+    dependencies:
+      react: 18.2.0
+    dev: false
 
   /lz-string@1.5.0:
     resolution: {integrity: sha512-h5bgJWpxJNswbU7qCrV0tIKQCaS3blPDrqKWx+QxzuzL1zGUzij9XCWLrSLsJPu5t+eWA/ycetzYAO5IOMcWAQ==}
