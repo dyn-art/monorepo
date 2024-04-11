@@ -1,18 +1,22 @@
 use crate::{
     components::{Locked, Preselected, Selected},
     events::CursorDownOnEntityInputEvent,
-    resources::comp_interaction::{CompInteractionRes, InteractionMode, MouseButton},
+    input::mouse::{
+        MouseButton, MouseButtonOnEntity, MouseButtonOnEntityButtonInputRes, MouseButtonValue,
+    },
+    resources::comp_interaction::{CompInteractionRes, InteractionMode, InteractionTool},
 };
 use bevy_ecs::{
+    change_detection::DetectChangesMut,
     entity::Entity,
     event::EventReader,
-    query::{With, Without},
-    system::{Commands, Query, ResMut},
+    query::{Or, With, Without},
+    system::{Commands, Query, Res, ResMut},
 };
 use bevy_hierarchy::Parent;
 use dyn_comp_bundles::components::{
     mixins::{HierarchyLevel, Root},
-    nodes::CompNode,
+    nodes::{CompNode, FrameCompNode},
 };
 use glam::Vec2;
 use std::collections::HashSet;
@@ -20,22 +24,55 @@ use std::collections::HashSet;
 // https://stackoverflow.com/questions/29917287/what-is-the-max-delay-between-two-clicks-to-trigger-a-double-click-event
 static DOUBLE_CLICK_WINDOW: web_time::Duration = web_time::Duration::from_millis(500);
 
-// Events received if clicked on nested Rectangle:
-// INFO: [handle_cursor_down_on_entity_event] Start
-// INFO: [handle_cursor_down_on_entity_event] Entity: 10v1 <- Rectangle (Clicked on)
-// INFO: [handle_cursor_down_on_entity_event] Entity: 8v1 <- Frame Nested
-// INFO: [handle_cursor_down_on_entity_event] Entity:6v1 <- Frame Nested
-// INFO: [handle_cursor_down_on_entity_event] Entity: 4v1 <- Frame (Root)
-// INFO: [handle_cursor_down_on_entity_event] End
-pub fn handle_cursor_down_on_entity_event(
-    mut commands: Commands,
+pub fn cursor_down_on_entity_input_system(
     mut event_reader: EventReader<CursorDownOnEntityInputEvent>,
+    mut mouse_button_input_res: ResMut<MouseButtonOnEntityButtonInputRes>,
+) {
+    mouse_button_input_res.bypass_change_detection().clear();
+    for event in event_reader.read() {
+        log::info!(
+            "[cursor_down_on_entity_input_system] {:?} on {:?}",
+            event.button,
+            event.entity
+        );
+        mouse_button_input_res.press(
+            MouseButtonOnEntity {
+                entity: event.entity,
+                button: event.button,
+            },
+            MouseButtonValue {
+                position: event.position,
+            },
+        );
+    }
+}
+
+// Events received if clicked on nested Rectangle:
+// INFO: [cursor_down_on_entity_system] Start
+// INFO: [cursor_down_on_entity_system] Entity: 10v1 <- Rectangle (Clicked on)
+// INFO: [cursor_down_on_entity_system] Entity: 8v1 <- Frame Nested
+// INFO: [cursor_down_on_entity_system] Entity:6v1 <- Frame Nested
+// INFO: [cursor_down_on_entity_system] Entity: 4v1 <- Frame (Root)
+// INFO: [cursor_down_on_entity_system] End
+//
+// Becomes in just_pressed:
+// [(4v1, Vec2(284.48438, 285.9297)),
+// (6v1, Vec2(284.48438, 285.9297)),
+// (8v1, Vec2(284.48438, 285.9297)),
+// (10v1, Vec2(284.48438, 285.9297))]
+pub fn cursor_down_on_entity_system(
+    mut commands: Commands,
     mut comp_interaction_res: ResMut<CompInteractionRes>,
+    mouse_button_input_res: Res<MouseButtonOnEntityButtonInputRes>,
     unselected_node_query: Query<
         (Option<&Parent>, Option<&HierarchyLevel>),
         (
             With<CompNode>,
-            Without<Root>,
+            Or<(
+                (Without<Root>, With<FrameCompNode>),
+                (With<Root>, Without<FrameCompNode>),
+                (Without<Root>, Without<FrameCompNode>),
+            )>, // Exclude root frame nodes (Note: AND with tuple didn't work out for whatever reason: https://discord.com/channels/691052431525675048/1226056118019690568)
             Without<Selected>,
             Without<Locked>,
         ),
@@ -50,11 +87,16 @@ pub fn handle_cursor_down_on_entity_event(
     >,
     root_node_query: Query<Entity, (With<CompNode>, With<Root>)>,
 ) {
-    let raycast_entities: Vec<(Entity, Vec2)> = event_reader
-        .read()
-        .filter_map(|event| {
-            if event.button == MouseButton::Left {
-                Some((event.entity, event.position))
+    match comp_interaction_res.interaction_tool {
+        InteractionTool::Select => {}
+        _ => return,
+    };
+
+    let raycast_entities: Vec<(Entity, Vec2)> = mouse_button_input_res
+        .get_just_pressed()
+        .filter_map(|(key, value)| {
+            if key.button == MouseButton::Left {
+                Some((key.entity, value.position))
             } else {
                 None
             }
@@ -91,8 +133,8 @@ pub fn handle_cursor_down_on_entity_event(
             });
 
     // Find nodes that could be selected or preselected
-    for (entity, cursor_position) in raycast_entities.iter().copied() {
-        log::info!("[handle_cursor_down_on_entity_event] Entity {:?}", entity,);
+    for (entity, cursor_position) in raycast_entities.iter().rev().copied() {
+        log::info!("[cursor_down_on_entity_system] Entity {:?}", entity,);
 
         if let Ok((maybe_parent, maybe_hierarchy_level)) = unselected_node_query.get(entity) {
             // Consider selecting preselected node
@@ -173,7 +215,7 @@ pub fn handle_cursor_down_on_entity_event(
     }
 
     log::info!(
-        "[handle_cursor_down_on_entity_event] Preselection: {:?}",
+        "[cursor_down_on_entity_system] Preselection: {:?}",
         selection_candidates
     );
 
@@ -204,7 +246,7 @@ pub fn handle_cursor_down_on_entity_event(
 
                 #[cfg(feature = "tracing")]
                 log::info!(
-                    "[handle_cursor_down_on_entity_event] Selected Entity {:?} at {:?}",
+                    "[cursor_down_on_entity_system] Selected Entity {:?} at {:?}",
                     entity,
                     cursor_position
                 );
@@ -229,7 +271,7 @@ pub fn handle_cursor_down_on_entity_event(
                 commands.entity(entity).remove::<Selected>();
                 #[cfg(feature = "tracing")]
                 log::info!(
-                    "[handle_cursor_down_on_entity_event] Unselected Entity: {:?}",
+                    "[cursor_down_on_entity_system] Unselected Entity: {:?}",
                     entity
                 );
             }

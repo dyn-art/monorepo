@@ -11,7 +11,8 @@ use self::{
     systems::{
         extract::extract_changed_components,
         queue::{
-            queue_changed_components, queue_composition_changes, queue_interaction_mode_changes,
+            queue_changed_components, queue_composition_changes, queue_cursor_changes,
+            queue_interaction_mode_changes, queue_interaction_tool_changes,
             queue_selected_entities_changes,
         },
     },
@@ -60,7 +61,11 @@ impl Plugin for CompWatchPlugin {
         if self.interactive {
             app.add_systems(
                 Last,
-                (queue_interaction_mode_changes.in_set(CompWatchSystemSet::Queue),),
+                (
+                    queue_interaction_mode_changes.in_set(CompWatchSystemSet::Queue),
+                    queue_interaction_tool_changes.in_set(CompWatchSystemSet::Queue),
+                    queue_cursor_changes.in_set(CompWatchSystemSet::Queue),
+                ),
             );
         }
     }

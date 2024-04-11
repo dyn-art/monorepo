@@ -28,6 +28,7 @@
 		"@dyn/svg-comp": "workspace:*",
 		"@dyn/ui": "workspace:*",
 		"@tanstack/react-query": "^5.28.9",
+		"@vercel/analytics": "^1.2.2",
 		"clsx": "^2.1.0",
 		"next": "14.0.4",
 		"react": "^18.2.0",

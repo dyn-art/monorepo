@@ -21,7 +21,7 @@ export const ResizeEdgeHandle: React.FC<TProps> = (props) => {
 	return (
 		<g id={`resize-edge-${position}`} {...other}>
 			<rect
-				className="stroke-yellow-500 stroke-2"
+				// className="stroke-yellow-500 stroke-2"
 				fill="transparent"
 				height={height}
 				width={width}

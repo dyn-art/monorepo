@@ -3,7 +3,7 @@ mod resources;
 pub mod svg;
 mod systems;
 
-use bevy_app::{App, Last, Plugin};
+use bevy_app::{App, Plugin, PostUpdate};
 use bevy_ecs::schedule::{IntoSystemConfigs, IntoSystemSetConfigs, SystemSet};
 use resources::svg_context::SvgContextRes;
 use systems::{
@@ -42,7 +42,7 @@ impl Plugin for CompSvgBuilderPlugin {
 
         // Configure system set
         app.configure_sets(
-            Last,
+            PostUpdate,
             (
                 CompSvgBuilderSystemSet::Prepare,
                 CompSvgBuilderSystemSet::PreApply,
@@ -55,7 +55,7 @@ impl Plugin for CompSvgBuilderPlugin {
 
         // Register systems
         app.add_systems(
-            Last,
+            PostUpdate,
             (
                 sync_node_size_with_style.in_set(CompSvgBuilderSystemSet::Prepare),
                 insert_node_svg_bundle.in_set(CompSvgBuilderSystemSet::Prepare),
@@ -102,7 +102,7 @@ impl Plugin for CompSvgBuilderPlugin {
 
             // Register systems
             app.add_systems(
-                Last,
+                PostUpdate,
                 (
                     extract_node_bundles.in_set(CompSvgBuilderSystemSet::Extract),
                     extract_style_bundles.in_set(CompSvgBuilderSystemSet::Extract),

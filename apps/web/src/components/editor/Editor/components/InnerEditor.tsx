@@ -1,52 +1,58 @@
-'use client';
-
 import React from 'react';
+import type { COMP } from '@dyn/dtif-comp';
 import type { Composition } from '@dyn/svg-comp';
-import { Button, Skeleton } from '@dyn/ui';
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup, useSizeCallback } from '@dyn/ui';
 
 import { useDtifFromClipboard } from '../hooks';
-import { Canvas, type TCanvasProps } from './Canvas';
+import { Viewport } from './Viewport';
 
 export const InnerEditor: React.FC<TInnerEditorProps> = (props) => {
-	const { width, height, dtif: defaultDtif } = props;
+	const { dtif: defaultDtif } = props;
 	const [composition, setComposition] = React.useState<Composition | null>(null);
-	const { isLoading, data: dtif } = useDtifFromClipboard(defaultDtif);
+	const { isLoading: isDtifLoading, data: dtif } = useDtifFromClipboard(defaultDtif);
+	const viewportRef = React.useRef<HTMLDivElement>(null);
 
-	if (isLoading || dtif == null) {
-		return <Skeleton className="h-full w-full" />;
-	}
+	useSizeCallback(
+		viewportRef,
+		// Not passing the viewport size as prop to the Canvas or in the DTIF
+		// because React is kinda slow updating their states
+		(size) => {
+			composition?.emitInputEvent({
+				type: 'Composition',
+				event: { type: 'CompositionResized', size: [size.width, size.height] }
+			});
+			composition?.update();
+			// applyCanvasDimensions(dtif, { width, height });
+		},
+		[composition]
+	);
 
 	return (
-		<div className="flex flex-col items-center justify-center">
-			<Canvas dtif={dtif} height={height} onLoadedComposition={setComposition} width={width} />
-			<div className="flex w-full flex-row items-center justify-between ">
-				<Button
-					onClick={() => {
-						console.log(composition?.toString());
-					}}
-				>
-					To String
-				</Button>
-				<Button
-					onClick={() => {
-						if (composition != null) {
-							for (const selectedEntity of composition.selectedEntities) {
-								composition.emitInputEvent({
-									type: 'Composition',
-									event: { type: 'EntitySetRotation', entity: selectedEntity, rotationDeg: 45 }
-								});
-							}
-							composition.update();
-						}
-					}}
-				>
-					Rotate Selected
-				</Button>
-			</div>
-		</div>
+		<ResizablePanelGroup className="flex h-full min-h-full w-full" direction="horizontal">
+			<ResizablePanel defaultSize={20} maxSize={25} minSize={15}>
+				<div className="flex h-full items-center justify-center p-6">
+					<span className="font-semibold">Layers</span>
+				</div>
+			</ResizablePanel>
+			<ResizableHandle />
+			<ResizablePanel defaultSize={60}>
+				<Viewport
+					dtif={dtif ?? defaultDtif}
+					isDtifLoading={isDtifLoading}
+					onLoadedComposition={setComposition}
+					viewportRef={viewportRef}
+				/>
+			</ResizablePanel>
+			<ResizableHandle />
+			<ResizablePanel defaultSize={20} maxSize={25} minSize={15}>
+				<div className="flex h-full items-center justify-center p-6">
+					<span className="font-semibold">Design</span>
+				</div>
+			</ResizablePanel>
+		</ResizablePanelGroup>
 	);
 };
 
-export type TInnerEditorProps = {
-	// TODO:
-} & Omit<TCanvasProps, 'onLoadedComposition'>;
+export interface TInnerEditorProps {
+	dtif: COMP.DtifComposition;
+}

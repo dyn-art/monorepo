@@ -1,4 +1,4 @@
-import { intoMouseButton } from '@dyn/dtif-comp';
+import { toKeyCode, toMouseButton } from '@dyn/dtif-comp';
 import type {
 	CompositionChangeOutputEvent,
 	SvgElementChangesOutputEvent,
@@ -54,10 +54,8 @@ export class SvgRenderer extends Renderer {
 				{
 					type: 'Interaction',
 					event: {
-						type: 'WheeledOnComposition',
+						type: 'MouseWheeledOnComposition',
 						position: this.clientWindowPointToCompPoint([e.clientX, e.clientY]),
-						ctrlKeyPressed: e.ctrlKey,
-						metaKeyPressed: e.metaKey,
 						delta: [e.deltaX, e.deltaY]
 					}
 				},
@@ -72,7 +70,7 @@ export class SvgRenderer extends Renderer {
 					event: {
 						type: 'CursorDownOnComposition',
 						position: this.pointerEventToCompPoint(e),
-						button: intoMouseButton(e.button)
+						button: toMouseButton(e.button)
 					}
 				},
 				true
@@ -86,7 +84,7 @@ export class SvgRenderer extends Renderer {
 					event: {
 						type: 'CursorUpOnComposition',
 						position: this.pointerEventToCompPoint(e),
-						button: intoMouseButton(e.button)
+						button: toMouseButton(e.button)
 					}
 				},
 				true
@@ -131,6 +129,36 @@ export class SvgRenderer extends Renderer {
 				this._cursorInCompBounds = false;
 			}
 		});
+		window.addEventListener('keydown', (e) => {
+			if (this._cursorInCompBounds) {
+				e.preventDefault();
+				this.composition.emitInputEvent(
+					{
+						type: 'Interaction',
+						event: {
+							type: 'KeyDownOnComposition',
+							keyCode: toKeyCode(e.code)
+						}
+					},
+					true
+				);
+			}
+		});
+		window.addEventListener('keyup', (e) => {
+			if (this._cursorInCompBounds) {
+				e.preventDefault();
+				this.composition.emitInputEvent(
+					{
+						type: 'Interaction',
+						event: {
+							type: 'KeyUpOnComposition',
+							keyCode: toKeyCode(e.code)
+						}
+					},
+					true
+				);
+			}
+		});
 	}
 
 	public applyElementChanges(event: SvgElementChangesOutputEvent): void {
@@ -168,7 +196,7 @@ export class SvgRenderer extends Renderer {
 									type: 'CursorDownOnEntity',
 									entity,
 									position: this.pointerEventToCompPoint(e),
-									button: intoMouseButton(e.button)
+									button: toMouseButton(e.button)
 								}
 							});
 						});

@@ -1,11 +1,12 @@
 mod dragging;
+mod inserting;
 mod resizing;
 mod rotating;
 mod translating;
 
 use self::{
-    dragging::handle_dragging, resizing::handle_resizing, rotating::handle_rotating,
-    translating::handle_translating,
+    dragging::handle_dragging, inserting::handle_inserting, resizing::handle_resizing,
+    rotating::handle_rotating, translating::handle_translating,
 };
 use crate::{
     components::Selected,
@@ -13,16 +14,21 @@ use crate::{
     resources::comp_interaction::{CompInteractionRes, InteractionMode},
 };
 use bevy_ecs::{
+    entity::Entity,
     event::EventReader,
     query::With,
-    system::{ParamSet, Query, ResMut},
+    system::{Commands, ParamSet, Query, ResMut},
 };
 use bevy_hierarchy::Parent;
 use bevy_transform::components::{GlobalTransform, Transform};
-use dyn_comp_bundles::components::mixins::SizeMixin;
+use dyn_comp_bundles::components::{
+    mixins::{Root, SizeMixin},
+    nodes::CompNode,
+};
 use dyn_comp_core::resources::composition::CompositionRes;
 
-pub fn handle_cursor_moved_on_comp_event(
+pub fn cursor_moved_on_comp_input_system(
+    mut commands: Commands,
     mut event_reader: EventReader<CursorMovedOnCompInputEvent>,
     mut comp_interaction_res: ResMut<CompInteractionRes>,
     mut comp_res: ResMut<CompositionRes>,
@@ -34,8 +40,11 @@ pub fn handle_cursor_moved_on_comp_event(
         Query<(&mut Transform, &mut SizeMixin, Option<&Parent>), With<Selected>>,
         // Rotating
         Query<(&mut Transform, &GlobalTransform, &SizeMixin), With<Selected>>,
+        // Inserting
+        Query<(&mut Transform, &mut SizeMixin, Option<&Parent>)>,
     )>,
     global_transfrom_query: Query<&GlobalTransform>,
+    root_node_query: Query<Entity, (With<CompNode>, With<Root>)>,
 ) {
     for event in event_reader.read() {
         match &mut comp_interaction_res.interaction_mode {
@@ -71,6 +80,21 @@ pub fn handle_cursor_moved_on_comp_event(
                 rotation_deg,
             ),
             InteractionMode::Dragging { current } => handle_dragging(&mut comp_res, event, current),
+            InteractionMode::Inserting {
+                entity,
+                origin,
+                shape_variant,
+            } => handle_inserting(
+                &mut commands,
+                &mut comp_res,
+                &mut query_set.p3(),
+                &root_node_query,
+                &global_transfrom_query,
+                event,
+                entity,
+                *shape_variant,
+                origin,
+            ),
             _ => {}
         }
     }

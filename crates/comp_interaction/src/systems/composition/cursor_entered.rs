@@ -1,10 +1,10 @@
 use crate::events::CursorEnteredCompInputEvent;
 use bevy_ecs::event::EventReader;
 
-pub fn handle_cursor_entered_comp_event(
+pub fn cursor_entered_comp_input_system(
     mut event_reader: EventReader<CursorEnteredCompInputEvent>,
 ) {
-    for event in event_reader.read() {
-        // do nothing as of right now
+    if event_reader.read().len() > 0 {
+        log::info!("[cursor_entered_comp_input_system]");
     }
 }

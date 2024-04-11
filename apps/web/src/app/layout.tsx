@@ -1,3 +1,4 @@
+import { Analytics } from '@vercel/analytics/react';
 import type { Metadata, Viewport } from 'next';
 import { Inter as FontSans } from 'next/font/google';
 import { cn } from '@dyn/ui';
@@ -38,6 +39,7 @@ const RootLayout: React.FC<TProps> = (props) => {
 		<html lang="en">
 			<body className={cn('bg-background min-h-screen font-sans antialiased', fontSans.variable)}>
 				{children}
+				<Analytics />
 			</body>
 		</html>
 	);

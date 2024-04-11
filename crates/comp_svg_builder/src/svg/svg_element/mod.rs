@@ -10,10 +10,7 @@ use super::svg_bundle::{SvgBundle, SvgBundleVariant};
 use bevy_ecs::{component::Component, entity::Entity, query::Without, system::Query};
 use dyn_comp_bundles::components::mixins::Root;
 use smallvec::SmallVec;
-use std::{
-    collections::{HashMap, HashSet},
-    fmt::Display,
-};
+use std::{collections::HashMap, fmt::Display};
 
 #[cfg(feature = "output_svg_element_changes")]
 use self::element_changes::{
@@ -182,17 +179,14 @@ impl SvgElement {
         );
     }
 
-    pub fn remove_child(&mut self, id: SvgElementId) {
-        self.children.retain(|child| child.id != id);
-    }
-
-    pub fn remove_children(&mut self, ids: &[SvgElementId]) {
-        let ids_set = ids.iter().collect::<HashSet<_>>();
-        self.children.retain(|child| !ids_set.contains(&child.id));
+    pub fn remove_child_element(&mut self, element: &mut SvgElement) {
+        self.children.retain(|child| child.id != element.get_id());
+        #[cfg(feature = "output_svg_element_changes")]
+        element.destroy();
     }
 
     pub fn clear_children(&mut self) {
-        self.children.clear()
+        self.children.clear();
     }
 
     pub fn reorder_children_mut<F>(&mut self, reorder_operation: F)

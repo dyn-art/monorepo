@@ -3,9 +3,11 @@ import { SvgCompHandle } from '@/rust/dyn-svg-comp-api';
 import type {
 	ComponentChange,
 	CompositionChangeOutputEvent,
+	CursorChangeOutputEvent,
 	DtifComposition,
 	Entity,
 	InteractionModeChangeOutputEvent,
+	InteractionToolChangeOutputEvent,
 	SelectionChangeOutputEvent,
 	SvgCompInputEvent,
 	SvgCompOutputEvent,
@@ -206,6 +208,10 @@ export class Composition {
 		this._svgCompHandle.logEntityComponents(entity);
 	}
 
+	public tempDevLog(): void {
+		this._svgCompHandle.tempDevLog();
+	}
+
 	public toString(): string | null {
 		return this._svgCompHandle.toString() ?? null;
 	}
@@ -222,6 +228,8 @@ export interface TOutputEventTypeMap {
 	SelectionChange: SelectionChangeOutputEvent;
 	CompositionChange: CompositionChangeOutputEvent;
 	InteractionModeChange: InteractionModeChangeOutputEvent;
+	InteractionToolChange: InteractionToolChangeOutputEvent;
+	CursorChange: CursorChangeOutputEvent;
 }
 
 export type TWatchedOutputEventCallback<GEventType extends keyof TOutputEventTypeMap> = (

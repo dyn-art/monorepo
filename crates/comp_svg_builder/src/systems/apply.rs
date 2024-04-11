@@ -16,6 +16,7 @@ use base64::prelude::*;
 use bevy_ecs::{
     entity::Entity,
     query::{Changed, With, Without},
+    removal_detection::RemovedComponents,
     system::{ParamSet, Query, Res, ResMut},
 };
 use bevy_hierarchy::Children;
@@ -54,7 +55,9 @@ pub fn apply_node_children_changes(
     mut query_set: ParamSet<(
         Query<(Entity, &Children, &mut SvgBundleVariant), (With<CompNode>, Changed<Children>)>,
         Query<&mut SvgBundleVariant, With<CompNode>>,
+        Query<&mut SvgBundleVariant, With<CompNode>>,
     )>,
+    mut removals: RemovedComponents<Children>,
 ) {
     let mut changes: SmallVec<[SvgBundleChildrenChange; 2]> = SmallVec::new();
 
@@ -90,6 +93,36 @@ pub fn apply_node_children_changes(
                 });
             }
         }
+
+        // Query changes for special case where parent got leaf (has no children anymore)
+        // https://github.com/bevyengine/bevy/issues/6010
+        let mut bundle_variant_query = query_set.p2();
+        for entity in removals.read() {
+            if let Ok(node_bundle_variant) = bundle_variant_query.get_mut(entity) {
+                if let Some(child_node_entities) = node_bundle_variant.get_child_node_entities() {
+                    // Note: Reverse the order because in a SVG, the top-most element appears last in the children "array",
+                    // contrary to the DtifComposition convention where the first element (index = 0) is at the top
+                    let new_child_node_entities: SmallVec<[Entity; 2]> = SmallVec::new();
+
+                    // Identify removed node entities
+                    let current_entities_set: HashSet<Entity> =
+                        child_node_entities.iter().copied().collect();
+                    let new_entities_set: HashSet<Entity> =
+                        new_child_node_entities.iter().copied().collect();
+                    let removed_entities: SmallVec<[Entity; 2]> = current_entities_set
+                        .difference(&new_entities_set)
+                        .copied()
+                        .collect();
+
+                    changes.push(SvgBundleChildrenChange {
+                        parent_entity: entity,
+                        added_entities: SmallVec::new(),
+                        removed_entities,
+                        new_entities_order: new_child_node_entities,
+                    });
+                }
+            }
+        }
     }
 
     // Apply detected changes (Deferred to avoid query conflicts)
@@ -101,19 +134,19 @@ pub fn apply_node_children_changes(
                 &change.removed_entities,
                 &mut node_bundle_variant_query,
             )
-            .unwrap();
+            .expect("Failed to process removed node children!");
             process_added_node_children(
                 change.parent_entity,
                 &change.added_entities,
                 &mut node_bundle_variant_query,
             )
-            .unwrap();
+            .expect("Failed to process added node children!");
             reorder_node_children(
                 change.parent_entity,
                 &change.new_entities_order,
                 &mut node_bundle_variant_query,
             )
-            .unwrap();
+            .expect("Failed to reorder node children!");
         }
     }
 }
@@ -124,17 +157,16 @@ fn process_removed_node_children(
     node_bundle_variant_query: &mut Query<&mut SvgBundleVariant, With<CompNode>>,
 ) -> Result<(), Box<dyn Error>> {
     for entity in removed_entities {
-        let [mut node_bundle_variant, child_node_bundle_variant] =
+        let [mut node_bundle_variant, mut child_node_bundle_variant] =
             node_bundle_variant_query.get_many_mut([parent_entity, *entity])?;
 
         if let Some(children_wrapper_element) =
             node_bundle_variant.get_children_wrapper_element_mut()
         {
-            children_wrapper_element.remove_child(
+            children_wrapper_element.remove_child_element(
                 child_node_bundle_variant
-                    .get_svg_bundle()
-                    .get_root_element()
-                    .get_id(),
+                    .get_svg_bundle_mut()
+                    .get_root_element_mut(),
             );
         }
 
@@ -251,19 +283,19 @@ pub fn apply_node_styles_changes(
                 &mut removed_entities,
                 &mut style_bundle_variant_query,
             )
-            .unwrap();
+            .expect("Failed to process removed node styles!");
             process_added_node_styles(
                 node_bundle_variant.as_mut(),
                 &mut added_entities,
                 &mut style_bundle_variant_query,
             )
-            .unwrap();
+            .expect("Failed to process added node styles!");
             reorder_node_styles(
                 node_bundle_variant.as_mut(),
                 &new_style_entities,
                 &mut style_bundle_variant_query,
             )
-            .unwrap();
+            .expect("Failed to reorder node styles!");
         }
     }
 }
@@ -277,14 +309,13 @@ fn process_removed_node_styles(
     >,
 ) -> Result<(), Box<dyn Error>> {
     for entity in removed_entities {
-        let style_bundle_variant = style_bundle_variant_query.get_mut(*entity)?;
+        let mut style_bundle_variant = style_bundle_variant_query.get_mut(*entity)?;
 
         if let Some(styles_wrapper_element) = node_bundle_variant.get_styles_wrapper_element_mut() {
-            styles_wrapper_element.remove_child(
+            styles_wrapper_element.remove_child_element(
                 style_bundle_variant
-                    .get_svg_bundle()
-                    .get_root_element()
-                    .get_id(),
+                    .get_svg_bundle_mut()
+                    .get_root_element_mut(),
             );
         }
 

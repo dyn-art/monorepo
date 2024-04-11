@@ -1,3 +1,4 @@
+pub mod marker;
 pub mod mixins;
 pub mod nodes;
 pub mod paints;

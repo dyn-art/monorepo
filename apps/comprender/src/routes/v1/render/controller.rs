@@ -136,7 +136,12 @@ fn build_svg_string(dtif: DtifComposition) -> Result<String, AppError> {
     let mut app = App::new();
 
     // Register plugins
-    app.add_plugins((CompCorePlugin { dtif }, CompSvgBuilderPlugin {}));
+    app.add_plugins((
+        CompCorePlugin { dtif },
+        CompSvgBuilderPlugin {
+            output_event_sender: todo!(),
+        },
+    ));
 
     // Update app once
     app.update();

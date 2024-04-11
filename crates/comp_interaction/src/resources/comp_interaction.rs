@@ -1,10 +1,39 @@
-use bevy_ecs::system::Resource;
+use crate::input::mouse::MouseButton;
+use bevy_ecs::{entity::Entity, system::Resource};
 use dyn_utils::properties::size::Size;
 use glam::Vec2;
 
 #[derive(Resource, Debug, Default)]
 pub struct CompInteractionRes {
+    pub interaction_tool: InteractionTool,
     pub interaction_mode: InteractionMode,
+}
+
+#[derive(Debug, Default, PartialEq, Eq, Copy, Clone)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type),
+    serde(tag = "type")
+)]
+pub enum InteractionTool {
+    #[default]
+    /// When the user wants to select nodes and move them around.
+    Select,
+    /// When the user wants to insert new shape nodes.
+    Shape { variant: ShapeVariant },
+}
+
+#[derive(Debug, Default, PartialEq, Eq, Copy, Clone)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type)
+)]
+pub enum ShapeVariant {
+    #[default]
+    Rectangle,
+    Ellipse,
+    Star,
+    Polygon,
 }
 
 #[derive(Debug, Default, Copy, Clone)]
@@ -35,6 +64,12 @@ pub enum InteractionMode {
         initial_rotation_rad: f32,
         rotation_deg: f32, // For cursor
     },
+    /// When the user plans to insert a new node.
+    Inserting {
+        origin: Vec2,
+        shape_variant: ShapeVariant,
+        entity: Option<Entity>,
+    },
 }
 
 #[derive(Debug, Copy, Clone)]
@@ -51,14 +86,4 @@ pub enum HandleSide {
     Bottom = 2,
     Left = 4,
     Right = 8,
-}
-
-#[derive(Debug, Default, PartialEq, Eq, Copy, Clone)]
-#[cfg_attr(feature = "serde_support", derive(serde::Deserialize, specta::Type))]
-pub enum MouseButton {
-    Left,
-    Middle,
-    Right,
-    #[default]
-    Unkown,
 }

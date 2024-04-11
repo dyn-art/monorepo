@@ -140,7 +140,7 @@ impl DtifInjector {
             .filter_map(|style| self.process_style(style, node_entity, world))
             .collect();
 
-        // Establish Bevy parent-child relationship
+        // Establish Bevy parent-child relationship between node and style
         if !style_entities.is_empty() {
             world
                 .entity_mut(node_entity)

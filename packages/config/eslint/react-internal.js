@@ -25,6 +25,12 @@ module.exports = {
 		JSX: true
 	},
 	rules: {
-		// Add specific rules configurations here
+		// React
+		'react/function-component-definition': [
+			'error',
+			{
+				namedComponents: 'arrow-function'
+			}
+		]
 	}
 };

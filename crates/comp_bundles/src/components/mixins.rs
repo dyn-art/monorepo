@@ -46,8 +46,14 @@ pub enum BlendMode {
 }
 
 /// Controls an entity's visibility state.
-#[derive(Component, Debug, Default, Copy, Clone)]
+#[derive(Component, Debug, Copy, Clone)]
 pub struct VisibilityMixin(pub bool);
+
+impl Default for VisibilityMixin {
+    fn default() -> Self {
+        Self(true)
+    }
+}
 
 /// Controls the opacity of an entity, ranging from 0.0 (fully transparent) to 1.0 (fully opaque).
 #[derive(Component, Debug, Default, Copy, Clone)]

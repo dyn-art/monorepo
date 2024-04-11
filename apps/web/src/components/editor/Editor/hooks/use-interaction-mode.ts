@@ -5,14 +5,15 @@ import type { Composition } from '@dyn/svg-comp';
 import { useOutputEvent } from './use-output-event';
 
 export function useInteractionMode(composition: Composition): COMP.InteractionModeLabel {
-	const [selectedEntities, setSelectedEntities] = React.useState<COMP.InteractionModeLabel>('None');
+	const [interactionModeLabel, setInteractionModeLabel] =
+		React.useState<COMP.InteractionModeLabel>('None');
 	useOutputEvent(
 		composition,
 		'InteractionModeChange',
 		(event) => {
-			setSelectedEntities(event.interactionMode);
+			setInteractionModeLabel(event.interactionMode);
 		},
 		[]
 	);
-	return selectedEntities;
+	return interactionModeLabel;
 }
