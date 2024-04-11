@@ -4,15 +4,18 @@ import React from 'react';
 import type { Composition, TOutputEventTypeMap, TWatchedOutputEventCallback } from '@dyn/svg-comp';
 
 export function useOutputEvent<GEventType extends keyof TOutputEventTypeMap>(
-	composition: Composition,
+	composition: Composition | null | undefined,
 	eventType: GEventType,
 	callback: TWatchedOutputEventCallback<GEventType>,
 	callbackDeps: unknown[] = []
 ): void {
 	React.useEffect(() => {
-		const unregister = composition.watchOutputEvent(eventType, callback);
+		let unregister: (() => void) | null;
+		if (composition != null) {
+			unregister = composition.watchOutputEvent(eventType, callback);
+		}
 		return () => {
-			unregister();
+			unregister?.();
 		};
 	}, [composition, eventType, ...callbackDeps]);
 }

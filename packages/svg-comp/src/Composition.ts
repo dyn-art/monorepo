@@ -3,6 +3,7 @@ import { SvgCompHandle } from '@/rust/dyn-svg-comp-api';
 import type {
 	ComponentChange,
 	CompositionChangeOutputEvent,
+	CursorChangeOutputEvent,
 	DtifComposition,
 	Entity,
 	InteractionModeChangeOutputEvent,
@@ -228,6 +229,7 @@ export interface TOutputEventTypeMap {
 	CompositionChange: CompositionChangeOutputEvent;
 	InteractionModeChange: InteractionModeChangeOutputEvent;
 	InteractionToolChange: InteractionToolChangeOutputEvent;
+	CursorChange: CursorChangeOutputEvent;
 }
 
 export type TWatchedOutputEventCallback<GEventType extends keyof TOutputEventTypeMap> = (

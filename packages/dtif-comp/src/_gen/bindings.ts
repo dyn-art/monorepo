@@ -74,6 +74,10 @@ export type CompositionViewportChangedInputEvent = { viewport: Viewport }
 
 export type CornerRadii = [Angle, Angle, Angle, Angle]
 
+export type Cursor = { type: "Default" } | { type: "Resize"; rotationDeg: number } | { type: "Rotate"; rotationDeg: number }
+
+export type CursorChangeOutputEvent = { cursor: Cursor }
+
 export type CursorDownOnCompInputEvent = { position: Vec2; button: MouseButton }
 
 export type CursorDownOnEntityInputEvent = { entity: Entity; position: Vec2; button: MouseButton }
@@ -1421,7 +1425,7 @@ export type SvgBuilderOutputEvent =
 
 export type SvgCompInputEvent = { type: "Composition"; event: CompCoreInputEvent } | { type: "Interaction"; event: InteractionInputEvent }
 
-export type SvgCompOutputEvent = ({ type: "SvgElementChange" } & SvgElementChangesOutputEvent) | ({ type: "CompositionChange" } & CompositionChangeOutputEvent) | ({ type: "WatchedEntityChange" } & WatchedEntityChangesOutputEvent) | ({ type: "SelectionChange" } & SelectionChangeOutputEvent) | ({ type: "InteractionModeChange" } & InteractionModeChangeOutputEvent) | ({ type: "InteractionToolChange" } & InteractionToolChangeOutputEvent)
+export type SvgCompOutputEvent = ({ type: "SvgElementChange" } & SvgElementChangesOutputEvent) | ({ type: "CompositionChange" } & CompositionChangeOutputEvent) | ({ type: "WatchedEntityChange" } & WatchedEntityChangesOutputEvent) | ({ type: "SelectionChange" } & SelectionChangeOutputEvent) | ({ type: "InteractionModeChange" } & InteractionModeChangeOutputEvent) | ({ type: "InteractionToolChange" } & InteractionToolChangeOutputEvent) | ({ type: "CursorChange" } & CursorChangeOutputEvent)
 
 export type SvgDisplayStyle = "Block" | "None"
 

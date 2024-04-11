@@ -1,3 +1,5 @@
+export * from './use-cursor';
+export * from './use-cursor-style';
 export * from './use-dtif-from-clipboard';
 export * from './use-entity';
 export * from './use-interaction-mode';

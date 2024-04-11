@@ -3,8 +3,7 @@ import type { COMP } from '@dyn/dtif-comp';
 import type { Composition } from '@dyn/svg-comp';
 import { Button, Skeleton } from '@dyn/ui';
 
-import { CURSOR } from '../cursor';
-import { useSvgComposition } from '../hooks';
+import { useCursorStyle, useSvgComposition } from '../hooks';
 import { CanvasControl } from './CanvasControl';
 import { ToolsBar } from './ToolsBar';
 
@@ -12,6 +11,7 @@ export const Viewport: React.FC<TViewportProps> = (props) => {
 	const { viewportRef, dtif, onLoadedComposition } = props;
 	const svgContainerRef = React.useRef<HTMLDivElement>(null);
 	const { composition, isWasmLoading } = useSvgComposition({ svgContainerRef, dtif });
+	const cursor = useCursorStyle(composition ?? undefined);
 
 	React.useEffect(() => {
 		if (composition != null) {
@@ -20,11 +20,7 @@ export const Viewport: React.FC<TViewportProps> = (props) => {
 	}, [composition, onLoadedComposition]);
 
 	return (
-		<div
-			className="relative h-full w-full bg-gray-100"
-			ref={viewportRef}
-			style={{ cursor: CURSOR.default() }}
-		>
+		<div className="relative h-full w-full bg-gray-100" ref={viewportRef} style={{ cursor }}>
 			{isWasmLoading ? <Skeleton className="h-full w-full rounded-none" /> : null}
 			<div ref={svgContainerRef} />
 			{composition != null && <CanvasControl composition={composition} />}
@@ -33,10 +29,10 @@ export const Viewport: React.FC<TViewportProps> = (props) => {
 				<Button
 					className="absolute bottom-2 right-2"
 					onClick={() => {
-						composition.tempDevLog();
+						console.log(composition.toString());
 					}}
 				>
-					Log
+					To String
 				</Button>
 			)}
 		</div>

@@ -1,5 +1,5 @@
 use crate::modules::watch::events::{
-    CompositionChangeOutputEvent, InteractionModeChangeOutputEvent,
+    CompositionChangeOutputEvent, CursorChangeOutputEvent, InteractionModeChangeOutputEvent,
     InteractionToolChangeOutputEvent, SelectionChangeOutputEvent, WatchedEntityChangesOutputEvent,
 };
 use dyn_comp_bundles::events::CompCoreInputEvent;
@@ -15,6 +15,7 @@ pub enum SvgCompOutputEvent {
     SelectionChange(SelectionChangeOutputEvent),
     InteractionModeChange(InteractionModeChangeOutputEvent),
     InteractionToolChange(InteractionToolChangeOutputEvent),
+    CursorChange(CursorChangeOutputEvent),
 }
 
 #[derive(Debug, Clone, serde::Deserialize, specta::Type)]

@@ -1,7 +1,6 @@
-import { intoMouseButton } from '@dyn/dtif-comp';
+import { toKeyCode, toMouseButton } from '@dyn/dtif-comp';
 import type {
 	CompositionChangeOutputEvent,
-	KeyCode,
 	SvgElementChangesOutputEvent,
 	SvgElementId,
 	Vec2
@@ -71,7 +70,7 @@ export class SvgRenderer extends Renderer {
 					event: {
 						type: 'CursorDownOnComposition',
 						position: this.pointerEventToCompPoint(e),
-						button: intoMouseButton(e.button)
+						button: toMouseButton(e.button)
 					}
 				},
 				true
@@ -85,7 +84,7 @@ export class SvgRenderer extends Renderer {
 					event: {
 						type: 'CursorUpOnComposition',
 						position: this.pointerEventToCompPoint(e),
-						button: intoMouseButton(e.button)
+						button: toMouseButton(e.button)
 					}
 				},
 				true
@@ -138,7 +137,7 @@ export class SvgRenderer extends Renderer {
 						type: 'Interaction',
 						event: {
 							type: 'KeyDownOnComposition',
-							keyCode: e.code as KeyCode
+							keyCode: toKeyCode(e.code)
 						}
 					},
 					true
@@ -153,7 +152,7 @@ export class SvgRenderer extends Renderer {
 						type: 'Interaction',
 						event: {
 							type: 'KeyUpOnComposition',
-							keyCode: e.code as KeyCode
+							keyCode: toKeyCode(e.code)
 						}
 					},
 					true
@@ -197,7 +196,7 @@ export class SvgRenderer extends Renderer {
 									type: 'CursorDownOnEntity',
 									entity,
 									position: this.pointerEventToCompPoint(e),
-									button: intoMouseButton(e.button)
+									button: toMouseButton(e.button)
 								}
 							});
 						});

@@ -2,7 +2,8 @@ use crate::{
     events::SvgCompOutputEvent,
     modules::watch::{
         events::{
-            CompositionChangeOutputEvent, InteractionModeChangeOutputEvent, InteractionModeLabel,
+            CompositionChangeOutputEvent, Cursor, CursorChangeOutputEvent,
+            InteractionModeChangeOutputEvent, InteractionModeLabel,
             InteractionToolChangeOutputEvent, SelectionChangeOutputEvent,
             WatchedEntityChangesOutputEvent,
         },
@@ -20,7 +21,9 @@ use bevy_ecs::{
 use dyn_comp_core::resources::composition::CompositionRes;
 use dyn_comp_interaction::{
     components::Selected,
-    resources::comp_interaction::{CompInteractionRes, InteractionTool},
+    resources::comp_interaction::{
+        CompInteractionRes, HandleSide, InteractionMode, InteractionTool,
+    },
 };
 use std::collections::HashSet;
 
@@ -109,6 +112,100 @@ pub fn queue_interaction_tool_changes(
             ));
 
             *last_interaction_tool = current_interaction_tool;
+        }
+    }
+}
+
+pub fn queue_cursor_changes(
+    output_event_sender_res: ResMut<OutputEventSenderRes>,
+    comp_interaction_res: Res<CompInteractionRes>,
+    mut last_cursor: Local<Cursor>,
+) {
+    if comp_interaction_res.is_changed() {
+        let current_cursor = match comp_interaction_res.interaction_mode {
+            InteractionMode::Resizing {
+                corner,
+                rotation_deg,
+                ..
+            } => {
+                let mut cursor_rotation = 0.0;
+
+                match corner {
+                    _ if corner == (HandleSide::Top as u8 | HandleSide::Left as u8) => {
+                        cursor_rotation = 135.0;
+                    }
+                    _ if corner == HandleSide::Top as u8 => {
+                        cursor_rotation = 0.0;
+                    }
+                    _ if corner == (HandleSide::Top as u8 | HandleSide::Right as u8) => {
+                        cursor_rotation = -135.0;
+                    }
+                    _ if corner == HandleSide::Right as u8 => {
+                        cursor_rotation = 90.0;
+                    }
+                    _ if corner == (HandleSide::Bottom as u8 | HandleSide::Right as u8) => {
+                        cursor_rotation = 135.0;
+                    }
+                    _ if corner == HandleSide::Bottom as u8 => {
+                        cursor_rotation = 0.0;
+                    }
+                    _ if corner == (HandleSide::Bottom as u8 | HandleSide::Left as u8) => {
+                        cursor_rotation = -135.0;
+                    }
+                    _ if corner == HandleSide::Left as u8 => {
+                        cursor_rotation = 90.0;
+                    }
+                    _ => {}
+                }
+
+                cursor_rotation += rotation_deg;
+
+                Cursor::Resize {
+                    rotation_deg: cursor_rotation,
+                }
+            }
+            InteractionMode::Rotating {
+                corner,
+                rotation_deg,
+                ..
+            } => {
+                let mut cursor_rotation = 0.0;
+
+                match corner {
+                    _ if corner == (HandleSide::Top as u8 | HandleSide::Left as u8) => {
+                        cursor_rotation = 0.0;
+                    }
+                    _ if corner == (HandleSide::Top as u8 | HandleSide::Right as u8) => {
+                        cursor_rotation = 90.0;
+                    }
+                    _ if corner == (HandleSide::Bottom as u8 | HandleSide::Right as u8) => {
+                        cursor_rotation = 180.0;
+                    }
+                    _ if corner == (HandleSide::Bottom as u8 | HandleSide::Left as u8) => {
+                        cursor_rotation = -90.0;
+                    }
+                    _ => {}
+                }
+
+                cursor_rotation += rotation_deg;
+
+                Cursor::Rotate {
+                    rotation_deg: cursor_rotation,
+                }
+            }
+            _ => Cursor::Default,
+        };
+
+        // Check whether the cursor has changed
+        if *last_cursor != current_cursor {
+            output_event_sender_res.push_event(SvgCompOutputEvent::CursorChange(
+                CursorChangeOutputEvent {
+                    cursor: current_cursor,
+                },
+            ));
+
+            // Update the local tracking of the cursor
+            *last_cursor = current_cursor;
         }
     }
 }

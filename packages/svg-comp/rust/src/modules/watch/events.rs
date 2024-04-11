@@ -61,3 +61,19 @@ impl From<&InteractionMode> for InteractionModeLabel {
         }
     }
 }
+
+#[derive(Debug, Default, PartialEq, Copy, Clone, serde::Serialize, specta::Type)]
+pub struct CursorChangeOutputEvent {
+    pub cursor: Cursor,
+}
+
+#[derive(Debug, Default, PartialEq, Copy, Clone, serde::Serialize, specta::Type)]
+#[serde(tag = "type")]
+pub enum Cursor {
+    #[default]
+    Default,
+    #[serde(rename_all = "camelCase")]
+    Resize { rotation_deg: f32 },
+    #[serde(rename_all = "camelCase")]
+    Rotate { rotation_deg: f32 },
+}
