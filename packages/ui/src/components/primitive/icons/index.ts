@@ -7,10 +7,22 @@ export * from './SpinnerIcon';
 export * from './TwitterIcon';
 
 export {
+	CheckIcon,
+	ChevronDownIcon,
+	ChevronLeftIcon,
+	ChevronUpIcon,
 	CircleIcon,
+	ClipboardCopyIcon,
+	CopyIcon,
 	CursorArrowIcon,
+	DiscordLogoIcon,
+	ExternalLinkIcon,
+	FrameIcon,
+	GearIcon,
+	InfoCircledIcon,
 	SquareIcon,
 	StarIcon,
+	TwitterLogoIcon,
 	VercelLogoIcon
 } from '@radix-ui/react-icons';
 export {} from 'lucide-react';
