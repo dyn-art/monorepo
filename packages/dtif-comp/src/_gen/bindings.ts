@@ -74,7 +74,7 @@ export type CompositionViewportChangedInputEvent = { viewport: Viewport }
 
 export type CornerRadii = [Angle, Angle, Angle, Angle]
 
-export type Cursor = { type: "Default" } | { type: "Resize"; rotationDeg: number } | { type: "Rotate"; rotationDeg: number }
+export type Cursor = { type: "Default" } | { type: "Grabbing" } | { type: "Crosshair" } | { type: "Resize"; rotationDeg: number } | { type: "Rotate"; rotationDeg: number }
 
 export type CursorChangeOutputEvent = { cursor: Cursor }
 

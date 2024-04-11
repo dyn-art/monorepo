@@ -122,12 +122,18 @@ pub fn queue_cursor_changes(
     mut last_cursor: Local<Cursor>,
 ) {
     if comp_interaction_res.is_changed() {
-        let current_cursor = match comp_interaction_res.interaction_mode {
-            InteractionMode::Resizing {
-                corner,
-                rotation_deg,
-                ..
-            } => {
+        let current_cursor = match (
+            comp_interaction_res.interaction_mode,
+            comp_interaction_res.interaction_tool,
+        ) {
+            (
+                InteractionMode::Resizing {
+                    corner,
+                    rotation_deg,
+                    ..
+                },
+                _,
+            ) => {
                 let mut cursor_rotation = 0.0;
 
                 match corner {
@@ -164,11 +170,14 @@ pub fn queue_cursor_changes(
                     rotation_deg: cursor_rotation,
                 }
             }
-            InteractionMode::Rotating {
-                corner,
-                rotation_deg,
-                ..
-            } => {
+            (
+                InteractionMode::Rotating {
+                    corner,
+                    rotation_deg,
+                    ..
+                },
+                _,
+            ) => {
                 let mut cursor_rotation = 0.0;
 
                 match corner {
@@ -193,7 +202,9 @@ pub fn queue_cursor_changes(
                     rotation_deg: cursor_rotation,
                 }
             }
-            _ => Cursor::Default,
+            (InteractionMode::Dragging { .. }, _) => Cursor::Grabbing,
+            (_, InteractionTool::Shape { .. }) => Cursor::Crosshair,
+            (_, InteractionTool::Select) => Cursor::Default,
         };
 
         // Check whether the cursor has changed

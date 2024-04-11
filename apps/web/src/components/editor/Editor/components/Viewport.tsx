@@ -5,7 +5,7 @@ import { Button, Skeleton } from '@dyn/ui';
 
 import { useCursorStyle, useSvgComposition } from '../hooks';
 import { CanvasControl } from './CanvasControl';
-import { ToolsBar } from './ToolsBar';
+import { Toolbar } from './Toolbar';
 
 export const Viewport: React.FC<TViewportProps> = (props) => {
 	const { viewportRef, dtif, onLoadedComposition } = props;
@@ -20,11 +20,11 @@ export const Viewport: React.FC<TViewportProps> = (props) => {
 	}, [composition, onLoadedComposition]);
 
 	return (
-		<div className="relative h-full w-full bg-gray-100" ref={viewportRef} style={{ cursor }}>
+		<div className="relative h-full w-full bg-gray-100" ref={viewportRef}>
 			{isWasmLoading ? <Skeleton className="h-full w-full rounded-none" /> : null}
-			<div ref={svgContainerRef} />
+			<div ref={svgContainerRef} style={{ cursor }} />
 			{composition != null && <CanvasControl composition={composition} />}
-			{composition != null && <ToolsBar composition={composition} />}
+			{composition != null && <Toolbar composition={composition} />}
 			{composition != null && (
 				<Button
 					className="absolute bottom-2 right-2"

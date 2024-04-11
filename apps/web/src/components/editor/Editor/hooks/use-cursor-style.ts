@@ -9,12 +9,16 @@ export function useCursorStyle(composition?: Composition): string {
 
 	return React.useMemo(() => {
 		switch (cursor.type) {
+			case 'Default':
+				return CURSOR.default();
+			case 'Grabbing':
+				return CURSOR.grabbing();
+			case 'Crosshair':
+				return CURSOR.crosshair();
 			case 'Resize':
 				return CURSOR.resize(cursor.rotationDeg);
 			case 'Rotate':
 				return CURSOR.rotate(cursor.rotationDeg);
-			case 'Default':
-				return CURSOR.default();
 		}
 	}, [cursor]);
 }
