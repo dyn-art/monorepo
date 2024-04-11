@@ -23,7 +23,7 @@ export const ResizeCornerHandle: React.FC<ResizeCornerHandleProps> = (props) => 
 				y={y}
 			/>
 			<rect
-				className="stroke-green-500 stroke-2"
+				// className="stroke-green-500 stroke-2"
 				fill="transparent"
 				height={INTERACTION_AREA_SIZE}
 				width={INTERACTION_AREA_SIZE}

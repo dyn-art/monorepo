@@ -14,7 +14,7 @@ export const RotateCornerHandle: React.FC<RotateHandleProps> = (props) => {
 	return (
 		<g id={`rotate-handle-${position}`} {...other}>
 			<rect
-				className="stroke-red-500 stroke-2"
+				// className="stroke-red-500 stroke-2"
 				fill="transparent"
 				height={INTERACTION_AREA_SIZE}
 				width={INTERACTION_AREA_SIZE}
