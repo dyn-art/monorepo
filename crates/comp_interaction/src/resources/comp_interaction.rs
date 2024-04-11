@@ -31,6 +31,9 @@ pub enum InteractionTool {
 pub enum ShapeVariant {
     #[default]
     Rectangle,
+    Ellipse,
+    Star,
+    Polygon,
 }
 
 #[derive(Debug, Default, Copy, Clone)]

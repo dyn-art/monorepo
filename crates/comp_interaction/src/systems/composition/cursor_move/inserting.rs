@@ -20,12 +20,16 @@ use dyn_comp_bundles::{
             BlendModeMixin, CornerRadiiMixin, OpacityMixin, PaintChildMixin, PaintParentMixin,
             Root, SizeMixin, StyleChildrenMixin, StyleParentMixin, VisibilityMixin,
         },
-        nodes::{CompNode, CompNodeVariant, RectangleCompNode},
+        nodes::{
+            CompNode, CompNodeVariant, EllipseCompNode, PolygonCompNode, RectangleCompNode,
+            StarCompNode,
+        },
         paints::{CompPaint, CompPaintVariant, SolidCompPaint},
         styles::{CompStyle, CompStyleVariant, FillCompStyle},
     },
     utils::{get_parent_global_transfrom, global_to_local_point3},
-    FillStyleBundle, RectangleCompNodeBundle, SolidPaintBundle,
+    EllipseCompNodeBundle, FillStyleBundle, PolygonCompNodeBundle, RectangleCompNodeBundle,
+    SolidPaintBundle, StarCompNodeBundle,
 };
 use dyn_comp_core::resources::composition::CompositionRes;
 use dyn_utils::properties::{color::Color, size::Size};
@@ -122,6 +126,51 @@ pub fn handle_inserting(
                     )),
                     size: SizeMixin(new_bounds.size),
                     corner_radii: CornerRadiiMixin::default(),
+                    visibility: VisibilityMixin::default(),
+                    blend_mode: BlendModeMixin::default(),
+                    opacity: OpacityMixin::default(),
+                })
+                .id(),
+            ShapeVariant::Ellipse => commands
+                .spawn(EllipseCompNodeBundle {
+                    node: CompNode {
+                        variant: CompNodeVariant::Ellipse,
+                    },
+                    ellipse: EllipseCompNode::default(),
+                    transform: TransformBundle::from_transform(Transform::from_translation(
+                        new_bounds.position.extend(0.0),
+                    )),
+                    size: SizeMixin(new_bounds.size),
+                    visibility: VisibilityMixin::default(),
+                    blend_mode: BlendModeMixin::default(),
+                    opacity: OpacityMixin::default(),
+                })
+                .id(),
+            ShapeVariant::Star => commands
+                .spawn(StarCompNodeBundle {
+                    node: CompNode {
+                        variant: CompNodeVariant::Star,
+                    },
+                    star: StarCompNode::default(),
+                    transform: TransformBundle::from_transform(Transform::from_translation(
+                        new_bounds.position.extend(0.0),
+                    )),
+                    size: SizeMixin(new_bounds.size),
+                    visibility: VisibilityMixin::default(),
+                    blend_mode: BlendModeMixin::default(),
+                    opacity: OpacityMixin::default(),
+                })
+                .id(),
+            ShapeVariant::Polygon => commands
+                .spawn(PolygonCompNodeBundle {
+                    node: CompNode {
+                        variant: CompNodeVariant::Polygon,
+                    },
+                    polygon: PolygonCompNode::default(),
+                    transform: TransformBundle::from_transform(Transform::from_translation(
+                        new_bounds.position.extend(0.0),
+                    )),
+                    size: SizeMixin(new_bounds.size),
                     visibility: VisibilityMixin::default(),
                     blend_mode: BlendModeMixin::default(),
                     opacity: OpacityMixin::default(),

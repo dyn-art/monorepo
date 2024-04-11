@@ -1374,7 +1374,7 @@ export type Scalar = number
 
 export type SelectionChangeOutputEvent = { selectedEntities: Entity[] }
 
-export type ShapeVariant = "Rectangle"
+export type ShapeVariant = "Rectangle" | "Ellipse" | "Star" | "Polygon"
 
 /**
  * An absolute size in 2D with a width and a height.
