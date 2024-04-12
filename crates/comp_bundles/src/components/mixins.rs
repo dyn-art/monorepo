@@ -2,6 +2,7 @@ use bevy_ecs::{component::Component, entity::Entity};
 use dyn_attributed_string::AttributedString;
 use dyn_comp_asset::asset_id::ImageId;
 use dyn_utils::properties::{corner_radii::CornerRadii, opacity::Opacity, size::Size};
+use glam::Vec2;
 use smallvec::SmallVec;
 
 #[derive(Component, Debug, Default, Clone, Copy)]
@@ -93,8 +94,8 @@ pub struct ConstraintsMixin(pub Constraints);
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
 pub struct Constraints {
-    horizontal: Constraint,
-    vertical: Constraint,
+    pub horizontal: Constraint,
+    pub vertical: Constraint,
 }
 
 #[derive(Debug, Default, PartialEq, Eq, Copy, Clone)]
@@ -110,3 +111,6 @@ pub enum Constraint {
     Stretch,
     Scale,
 }
+
+#[derive(Component, Debug, Default, Clone, Copy)]
+pub struct ConstraintsOffset(pub Vec2);

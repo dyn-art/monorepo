@@ -11,6 +11,7 @@ use dyn_comp_bundles::events::{
 };
 use resources::composition::CompositionRes;
 use systems::{
+    constraints::{apply_constraints, apply_constraints_offset},
     events::{
         composition_resized_input_system, composition_viewport_input_system,
         despawn_removed_entities_system, entity_deleted_input_system, entity_moved_input_system,
@@ -103,6 +104,10 @@ impl Plugin for CompCorePlugin {
                 entity_moved_input_system.in_set(CompCoreSystemSet::InputEvents),
                 entity_set_position_input_system.in_set(CompCoreSystemSet::InputEvents),
                 entity_set_rotation_input_system.in_set(CompCoreSystemSet::InputEvents),
+                apply_constraints_offset.in_set(CompCoreSystemSet::Layout),
+                apply_constraints
+                    .in_set(CompCoreSystemSet::Layout)
+                    .after(apply_constraints_offset),
                 outline_rectangle.in_set(CompCoreSystemSet::Outline),
                 outline_ellipse.in_set(CompCoreSystemSet::Outline),
                 outline_star.in_set(CompCoreSystemSet::Outline),
