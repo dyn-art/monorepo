@@ -38,7 +38,7 @@ export function mapFigmaBlendModeToDtif(figmaBlendMode?: BlendMode): COMP.BlendM
 			return 'Luminosity';
 		case 'PASS_THROUGH':
 		default:
-			// Fallback for unmatched or undefined blend modes
+			// Fallback for unmatched or undefined blend mode
 			return 'Normal';
 	}
 }

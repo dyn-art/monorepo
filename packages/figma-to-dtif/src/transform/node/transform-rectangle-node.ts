@@ -4,6 +4,7 @@ import type { TToTransformFill, TToTransformStroke } from '../../FigmaNodeTreePr
 import {
 	createDtifStyles,
 	mapFigmaBlendModeToDtif,
+	mapFigmaConstraintsToDtif,
 	mapFigmaTransformToRotation,
 	mapFigmaTransformToTranslation
 } from '../../utils';
@@ -28,6 +29,7 @@ export function transformRectangleNode(
 		],
 		blendMode: mapFigmaBlendModeToDtif(node.blendMode),
 		opacity: node.opacity,
+		constraints: mapFigmaConstraintsToDtif(node.constraints),
 		styles: createDtifStyles(fills, strokes)
 	};
 }

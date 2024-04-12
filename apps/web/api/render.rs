@@ -1,7 +1,7 @@
 use bevy_app::App;
 use bevy_ecs::query::{With, Without};
 use dyn_comp_asset::asset::AssetContent;
-use dyn_comp_bundles::components::mixins::Root;
+use dyn_comp_bundles::components::marker::Root;
 use dyn_comp_core::{resources::composition::CompositionRes, CompCorePlugin};
 use dyn_comp_dtif::DtifComposition;
 use dyn_comp_svg_builder::{svg::svg_bundle::SvgBundleVariant, CompSvgBuilderPlugin};

@@ -72,6 +72,10 @@ export type CompositionResizedInputEvent = { size: Size }
 
 export type CompositionViewportChangedInputEvent = { viewport: Viewport }
 
+export type Constraint = "Start" | "Center" | "End" | "Stretch" | "Scale"
+
+export type Constraints = { horizontal: Constraint; vertical: Constraint }
+
 export type CornerRadii = [Angle, Angle, Angle, Angle]
 
 export type Cursor = { type: "Default" } | { type: "Grabbing" } | { type: "Crosshair" } | { type: "Resize"; rotationDeg: number } | { type: "Rotate"; rotationDeg: number }
@@ -141,7 +145,7 @@ export type DtifEntitySetPositionEvent = { entity: string; x: number; y: number 
 
 export type DtifInputEvent = ({ type: "CompositionResized" } & DtifCompositionResizedEvent) | ({ type: "CompositionViewportChanged" } & DtifCompositionViewportChangedEvent) | ({ type: "EntityMoved" } & DtifEntityMovedEvent) | ({ type: "EntitySetPosition" } & DtifEntitySetPositionEvent) | ({ type: "EntityDeleted" } & DtifEntityDeletedEvent)
 
-export type EllipseNode = { startingAngle?: number; endingAngle?: number; innerRadiusRatio?: number; translation?: Vec2; rotationDeg?: Angle; size: Size; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; styles?: Style[] }
+export type EllipseNode = { startingAngle?: number; endingAngle?: number; innerRadiusRatio?: number; translation?: Vec2; rotationDeg?: Angle; size: Size; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; constraints?: Constraints; styles?: Style[] }
 
 /**
  * A length that is relative to the font size.
@@ -255,7 +259,7 @@ stretch: FontStretch }
  */
 export type FontWeight = number
 
-export type FrameNode = { clipContent?: boolean; translation?: Vec2; rotationDeg?: Angle; size: Size; cornerRadii?: CornerRadii; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; styles?: Style[]; children?: string[] }
+export type FrameNode = { clipContent?: boolean; translation?: Vec2; rotationDeg?: Angle; size: Size; cornerRadii?: CornerRadii; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; constraints?: Constraints; styles?: Style[]; children?: string[] }
 
 export type GradientColorStop = { 
 /**
@@ -1358,7 +1362,7 @@ export type Opacity = Ratio
 
 export type Paint = ({ type: "Solid" } & SolidPaint) | ({ type: "Image" } & ImagePaint) | ({ type: "Gradient" } & GradientPaint)
 
-export type PolygonNode = { pointCount?: number; translation?: Vec2; rotationDeg?: Angle; size: Size; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; styles?: Style[] }
+export type PolygonNode = { pointCount?: number; translation?: Vec2; rotationDeg?: Angle; size: Size; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; constraints?: Constraints; styles?: Style[] }
 
 /**
  * A ratio of a whole.
@@ -1367,7 +1371,7 @@ export type PolygonNode = { pointCount?: number; translation?: Vec2; rotationDeg
  */
 export type Ratio = Scalar
 
-export type RectangleNode = { translation?: Vec2; rotationDeg?: Angle; size: Size; cornerRadii?: CornerRadii; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; styles?: Style[] }
+export type RectangleNode = { translation?: Vec2; rotationDeg?: Angle; size: Size; cornerRadii?: CornerRadii; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; constraints?: Constraints; styles?: Style[] }
 
 /**
  * A 32-bit float that implements `Eq`, `Ord` and `Hash`.
@@ -1389,7 +1393,7 @@ export type SolidPaint = { color: Color }
 
 export type SpectaExport = { comp_dtif: DtifComposition; svg_comp_input_event: SvgCompInputEvent; svg_comp_output_event: SvgCompOutputEvent }
 
-export type StarNode = { innerRadiusRatio?: number; pointCount?: number; translation?: Vec2; rotationDeg?: Angle; size: Size; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; styles?: Style[] }
+export type StarNode = { innerRadiusRatio?: number; pointCount?: number; translation?: Vec2; rotationDeg?: Angle; size: Size; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; constraints?: Constraints; styles?: Style[] }
 
 export type StrokeStyle = { width: number; paintId: string; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity }
 
@@ -1489,11 +1493,11 @@ export type TextAttributeInterval = { start: number; end: number; attributes: Te
 
 export type TextAttributes = { fontFamily?: FontFamily | null; fontStyle?: FontStyle | null; fontStretch?: FontStretch | null; fontWeight?: FontWeight | null; fontSize?: Abs | null; smallCaps?: boolean | null; applyKerning?: boolean | null; letterSpacing?: FontUnit | null; wordSpacing?: FontUnit | null; lineHeight?: FontUnit | null }
 
-export type TextNode = { text: string; attributes: TextAttributeInterval[]; lineWrap?: LineWrap; horizontalTextAlignment?: HorizontalTextAlignment; verticalTextAlignment?: VerticalTextAlignment; translation?: Vec2; rotationDeg?: Angle; size: Size; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; styles?: Style[] }
+export type TextNode = { text: string; attributes: TextAttributeInterval[]; lineWrap?: LineWrap; horizontalTextAlignment?: HorizontalTextAlignment; verticalTextAlignment?: VerticalTextAlignment; translation?: Vec2; rotationDeg?: Angle; size: Size; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; constraints?: Constraints; styles?: Style[] }
 
 export type Vec2 = [number, number]
 
-export type VectorNode = { path: string; translation?: Vec2; rotationDeg?: Angle; size: Size; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; styles?: Style[] }
+export type VectorNode = { path: string; translation?: Vec2; rotationDeg?: Angle; size: Size; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; constraints?: Constraints; styles?: Style[] }
 
 export type VerticalTextAlignment = "Top" | "Bottom" | "Center"
 

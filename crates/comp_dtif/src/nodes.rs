@@ -7,8 +7,8 @@ use dyn_attributed_string::{HorizontalTextAlignment, LineWrap, VerticalTextAlign
 use dyn_comp_bundles::{
     components::{
         mixins::{
-            BlendMode, BlendModeMixin, CornerRadiiMixin, OpacityMixin, PathMixin, SizeMixin,
-            VisibilityMixin,
+            BlendMode, BlendModeMixin, Constraints, ConstraintsMixin, CornerRadiiMixin,
+            OpacityMixin, PathMixin, SizeMixin, VisibilityMixin,
         },
         nodes::{
             CompNode, CompNodeVariant, EllipseArcData, EllipseCompNode, FrameCompNode,
@@ -59,6 +59,8 @@ pub struct FrameNode {
     #[serde(default)]
     pub opacity: Opacity,
     #[serde(default)]
+    pub constraints: Constraints,
+    #[serde(default)]
     pub styles: Vec<Style>,
     #[serde(default)]
     pub children: Vec<String>,
@@ -85,6 +87,7 @@ impl ToEcsBundleImpl for FrameNode {
             visibility: VisibilityMixin(self.visible),
             blend_mode: BlendModeMixin(self.blend_mode),
             opacity: OpacityMixin(self.opacity),
+            constraints: ConstraintsMixin(self.constraints),
         }
     }
 }
@@ -145,6 +148,8 @@ pub struct RectangleNode {
     #[serde(default)]
     pub opacity: Opacity,
     #[serde(default)]
+    pub constraints: Constraints,
+    #[serde(default)]
     pub styles: Vec<Style>,
 }
 
@@ -167,6 +172,7 @@ impl ToEcsBundleImpl for RectangleNode {
             visibility: VisibilityMixin(self.visible),
             blend_mode: BlendModeMixin(self.blend_mode),
             opacity: OpacityMixin(self.opacity),
+            constraints: ConstraintsMixin(self.constraints),
         }
     }
 }
@@ -191,6 +197,8 @@ pub struct EllipseNode {
     pub blend_mode: BlendMode,
     #[serde(default)]
     pub opacity: Opacity,
+    #[serde(default)]
+    pub constraints: Constraints,
     #[serde(default)]
     pub styles: Vec<Style>,
 }
@@ -219,6 +227,7 @@ impl ToEcsBundleImpl for EllipseNode {
             visibility: VisibilityMixin(self.visible),
             blend_mode: BlendModeMixin(self.blend_mode),
             opacity: OpacityMixin(self.opacity),
+            constraints: ConstraintsMixin(self.constraints),
         }
     }
 }
@@ -241,6 +250,8 @@ pub struct StarNode {
     pub blend_mode: BlendMode,
     #[serde(default)]
     pub opacity: Opacity,
+    #[serde(default)]
+    pub constraints: Constraints,
     #[serde(default)]
     pub styles: Vec<Style>,
 }
@@ -266,6 +277,7 @@ impl ToEcsBundleImpl for StarNode {
             visibility: VisibilityMixin(self.visible),
             blend_mode: BlendModeMixin(self.blend_mode),
             opacity: OpacityMixin(self.opacity),
+            constraints: ConstraintsMixin(self.constraints),
         }
     }
 }
@@ -292,6 +304,8 @@ pub struct PolygonNode {
     #[serde(default)]
     pub opacity: Opacity,
     #[serde(default)]
+    pub constraints: Constraints,
+    #[serde(default)]
     pub styles: Vec<Style>,
 }
 
@@ -315,6 +329,7 @@ impl ToEcsBundleImpl for PolygonNode {
             visibility: VisibilityMixin(self.visible),
             blend_mode: BlendModeMixin(self.blend_mode),
             opacity: OpacityMixin(self.opacity),
+            constraints: ConstraintsMixin(self.constraints),
         }
     }
 }
@@ -347,6 +362,8 @@ pub struct TextNode {
     #[serde(default)]
     pub opacity: Opacity,
     #[serde(default)]
+    pub constraints: Constraints,
+    #[serde(default)]
     pub styles: Vec<Style>,
 }
 
@@ -374,6 +391,7 @@ impl ToEcsBundleImpl for TextNode {
             visibility: VisibilityMixin(self.visible),
             blend_mode: BlendModeMixin(self.blend_mode),
             opacity: OpacityMixin(self.opacity),
+            constraints: ConstraintsMixin(self.constraints),
         }
     }
 }
@@ -393,6 +411,8 @@ pub struct VectorNode {
     pub blend_mode: BlendMode,
     #[serde(default)]
     pub opacity: Opacity,
+    #[serde(default)]
+    pub constraints: Constraints,
     #[serde(default)]
     pub styles: Vec<Style>,
 }
@@ -416,6 +436,7 @@ impl ToEcsBundleImpl for VectorNode {
             visibility: VisibilityMixin(self.visible),
             blend_mode: BlendModeMixin(self.blend_mode),
             opacity: OpacityMixin(self.opacity),
+            constraints: ConstraintsMixin(self.constraints),
         }
     }
 }

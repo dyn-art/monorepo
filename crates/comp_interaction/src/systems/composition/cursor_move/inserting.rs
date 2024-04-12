@@ -16,9 +16,10 @@ use bevy_transform::{
 };
 use dyn_comp_bundles::{
     components::{
+        marker::Root,
         mixins::{
-            BlendModeMixin, CornerRadiiMixin, OpacityMixin, PaintChildMixin, PaintParentMixin,
-            Root, SizeMixin, StyleChildrenMixin, StyleParentMixin, VisibilityMixin,
+            BlendModeMixin, ConstraintsMixin, CornerRadiiMixin, OpacityMixin, PaintChildMixin,
+            PaintParentMixin, SizeMixin, StyleChildrenMixin, StyleParentMixin, VisibilityMixin,
         },
         nodes::{
             CompNode, CompNodeVariant, EllipseCompNode, PolygonCompNode, RectangleCompNode,
@@ -129,6 +130,7 @@ pub fn handle_inserting(
                     visibility: VisibilityMixin::default(),
                     blend_mode: BlendModeMixin::default(),
                     opacity: OpacityMixin::default(),
+                    constraints: ConstraintsMixin::default(),
                 })
                 .id(),
             ShapeVariant::Ellipse => commands
@@ -144,6 +146,7 @@ pub fn handle_inserting(
                     visibility: VisibilityMixin::default(),
                     blend_mode: BlendModeMixin::default(),
                     opacity: OpacityMixin::default(),
+                    constraints: ConstraintsMixin::default(),
                 })
                 .id(),
             ShapeVariant::Star => commands
@@ -159,6 +162,7 @@ pub fn handle_inserting(
                     visibility: VisibilityMixin::default(),
                     blend_mode: BlendModeMixin::default(),
                     opacity: OpacityMixin::default(),
+                    constraints: ConstraintsMixin::default(),
                 })
                 .id(),
             ShapeVariant::Polygon => commands
@@ -174,6 +178,7 @@ pub fn handle_inserting(
                     visibility: VisibilityMixin::default(),
                     blend_mode: BlendModeMixin::default(),
                     opacity: OpacityMixin::default(),
+                    constraints: ConstraintsMixin::default(),
                 })
                 .id(),
         };
