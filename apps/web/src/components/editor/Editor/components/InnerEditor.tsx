@@ -4,6 +4,7 @@ import type { Composition } from '@dyn/svg-comp';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup, useSizeCallback } from '@dyn/ui';
 
 import { useDtifFromClipboard } from '../hooks';
+import { DesignPanel } from './DesignPanel';
 import { Viewport } from './Viewport';
 
 export const InnerEditor: React.FC<TInnerEditorProps> = (props) => {
@@ -29,7 +30,7 @@ export const InnerEditor: React.FC<TInnerEditorProps> = (props) => {
 
 	return (
 		<ResizablePanelGroup className="flex h-full min-h-full w-full" direction="horizontal">
-			<ResizablePanel defaultSize={20} maxSize={25} minSize={15}>
+			<ResizablePanel defaultSize={15} maxSize={25} minSize={15}>
 				<div className="flex h-full items-center justify-center p-6">
 					<span className="font-semibold">Layers</span>
 				</div>
@@ -44,10 +45,8 @@ export const InnerEditor: React.FC<TInnerEditorProps> = (props) => {
 				/>
 			</ResizablePanel>
 			<ResizableHandle />
-			<ResizablePanel defaultSize={20} maxSize={25} minSize={15}>
-				<div className="flex h-full items-center justify-center p-6">
-					<span className="font-semibold">Design</span>
-				</div>
+			<ResizablePanel defaultSize={15} maxSize={25} minSize={15}>
+				<DesignPanel />
 			</ResizablePanel>
 		</ResizablePanelGroup>
 	);

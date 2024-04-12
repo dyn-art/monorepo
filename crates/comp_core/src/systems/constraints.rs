@@ -1,3 +1,7 @@
+use crate::resources::tick::TickRes;
+use bevy_ecs::change_detection::DetectChanges;
+use bevy_ecs::system::{Res, SystemChangeTick};
+use bevy_ecs::world::Ref;
 use bevy_ecs::{
     entity::Entity,
     query::Changed,
@@ -17,19 +21,51 @@ use dyn_utils::properties::size::Size;
 
 pub fn apply_constraints_offset(
     mut commands: Commands,
-    mut query: Query<(Entity, &Transform, Option<&mut ConstraintsOffset>), Changed<Transform>>,
+    system_change_tick: SystemChangeTick,
+    tick_res: Res<TickRes>,
+    mut query: Query<(Entity, Ref<Transform>, Option<&mut ConstraintsOffset>), Changed<Transform>>,
 ) {
     for (entity, transform, maybe_offset) in query.iter_mut() {
         log::info!(
-            "[apply_constraints_offset] {:?} -> {:?}/{:?} | {:?}",
+            "[apply_constraints_offset] {:?}: {:?}",
             entity,
-            transform.translation.truncate(),
-            maybe_offset,
-            transform
+            if transform.last_changed().get() >= system_change_tick.last_run().get() {
+                (transform.last_changed().get() - system_change_tick.last_run().get()).to_string()
+            } else {
+                String::from("NaN")
+            }
         );
+        log::info!(
+            "[apply_constraints_offset] {}/{}",
+            tick_res.first_in_cycle.get(),
+            transform.last_changed().get()
+        );
+
         match maybe_offset {
+            // TODO: Solve with storing first system Tick
+            //
+            // The Component Tick is in my case likely higher
+            // due to potential mutable references (e.g., dereferencing Mut<> as &mut).
+            // Significant changes, such as those to Transform,
+            // produce noticeably larger differences, making them detectable.
+            //
+            // https://discord.com/channels/691052431525675048/1228316069207216130
+            //
+            // Component Tick | Last System Tick | This System Tick
+            // 21268 | 21267 | 21355 // Updated in last cycle (after this system)
+            // 21356 | 21355 | 21444 // Updated in last cycle (after this system)
+            // 29457 | 29376 | 29466 // Updated in current cycle (before this system)
+            // 29547 | 29466 | 29556 // Updated in current cycle (before this system)
             Some(mut offset) => {
-                // offset.0 = transform.translation.truncate();
+                if transform.last_changed().get() >= system_change_tick.last_run().get()
+                    && transform.last_changed().get() - system_change_tick.last_run().get() > 10
+                {
+                    log::info!(
+                        "[apply_constraints_offset] Update Offset: {:?}",
+                        transform.translation.truncate()
+                    );
+                    offset.0 = transform.translation.truncate();
+                }
             }
             None => {
                 let initial_offset = transform.translation.truncate();

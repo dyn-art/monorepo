@@ -41,6 +41,13 @@
 		}
 	],
 
+	// Tailwind
+	// https://cva.style/docs/getting-started/installation#intellisense
+	"tailwindCSS.experimental.classRegex": [
+		["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"],
+		["cx\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)"]
+	],
+
 	// Rust
 	"[rust]": {
 		"editor.defaultFormatter": "rust-lang.rust-analyzer"
