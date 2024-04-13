@@ -2,11 +2,11 @@ use bevy_ecs::{component::Component, entity::Entity};
 use dyn_attributed_string::AttributedString;
 use dyn_comp_asset::asset_id::ImageId;
 use dyn_utils::properties::{corner_radii::CornerRadii, opacity::Opacity, size::Size};
+use glam::Vec3;
 use smallvec::SmallVec;
 
-/// Marks an entity as the root or top-level entity.
-#[derive(Component, Debug, Default, Copy, Clone)]
-pub struct Root;
+#[derive(Component, Debug, Default, Clone, Copy)]
+pub struct HierarchyLevel(pub u8);
 
 /// Represents an entity's dimensions with width and height.
 #[derive(Component, Debug, Default, Copy, Clone)]
@@ -86,4 +86,35 @@ pub struct ImageAssetMixin(pub Option<ImageId>);
 pub struct AttributedStringMixin(pub AttributedString);
 
 #[derive(Component, Debug, Default, Clone, Copy)]
-pub struct HierarchyLevel(pub u8);
+pub struct ConstraintsMixin(pub Constraints);
+
+#[derive(Debug, Default, Copy, Clone)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type)
+)]
+pub struct Constraints {
+    pub horizontal: Constraint,
+    pub vertical: Constraint,
+}
+
+#[derive(Debug, Default, PartialEq, Eq, Copy, Clone)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type)
+)]
+pub enum Constraint {
+    #[default]
+    Start,
+    Center,
+    End,
+    Stretch,
+    Scale,
+}
+
+#[derive(Component, Debug, Default, Clone, Copy)]
+pub struct ConstraintsLayoutMetricsMixin {
+    pub pos: Vec3,
+    pub size: Size,
+    pub parent_size: Size,
+}

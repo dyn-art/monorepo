@@ -9,8 +9,9 @@ use bevy_ecs::{
 use bevy_hierarchy::BuildWorldChildren;
 use dyn_comp_asset::{asset_id::AssetId, resources::AssetsRes};
 use dyn_comp_bundles::{
-    components::mixins::{
-        PaintChildMixin, PaintParentMixin, Root, StyleChildrenMixin, StyleParentMixin,
+    components::{
+        marker::Root,
+        mixins::{PaintChildMixin, PaintParentMixin, StyleChildrenMixin, StyleParentMixin},
     },
     events::InputEvent,
 };

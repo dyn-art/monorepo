@@ -15,7 +15,7 @@ use bevy_ecs::{
 };
 use bevy_transform::components::{GlobalTransform, Transform};
 use dyn_comp_bundles::{
-    components::mixins::{Root, SizeMixin},
+    components::{marker::Root, mixins::SizeMixin},
     events::InputEvent,
 };
 use dyn_comp_core::{resources::composition::CompositionRes, CompCorePlugin};
@@ -262,7 +262,7 @@ impl SvgCompHandle {
             use crate::logging::log_entity_components;
             use bevy_ecs::query::{Or, With, Without};
             use dyn_comp_bundles::components::{
-                mixins::Root,
+                marker::Root,
                 nodes::{CompNode, FrameCompNode},
             };
             use dyn_comp_interaction::components::{Locked, Selected};

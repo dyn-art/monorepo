@@ -21,10 +21,7 @@ use bevy_ecs::{
 };
 use bevy_hierarchy::Parent;
 use bevy_transform::components::{GlobalTransform, Transform};
-use dyn_comp_bundles::components::{
-    mixins::{Root, SizeMixin},
-    nodes::CompNode,
-};
+use dyn_comp_bundles::components::{marker::Root, mixins::SizeMixin, nodes::CompNode};
 use dyn_comp_core::resources::composition::CompositionRes;
 
 pub fn cursor_moved_on_comp_input_system(

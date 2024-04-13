@@ -15,7 +15,8 @@ use bevy_ecs::{
 };
 use bevy_hierarchy::Parent;
 use dyn_comp_bundles::components::{
-    mixins::{HierarchyLevel, Root},
+    marker::Root,
+    mixins::HierarchyLevel,
     nodes::{CompNode, FrameCompNode},
 };
 use glam::Vec2;

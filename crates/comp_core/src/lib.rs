@@ -2,15 +2,19 @@ pub mod resources;
 mod systems;
 
 use bevy_app::{App, First, Last, Plugin, Update};
-use bevy_ecs::schedule::{IntoSystemConfigs, IntoSystemSetConfigs, SystemSet};
+use bevy_ecs::{
+    component::Tick,
+    schedule::{IntoSystemConfigs, IntoSystemSetConfigs, SystemSet},
+};
 use bevy_transform::TransformPlugin;
 use dyn_comp_asset::CompAssetPlugin;
 use dyn_comp_bundles::events::{
     CompositionResizedInputEvent, CompositionViewportChangedInputEvent, EntityDeletedInputEvent,
     EntityMovedInputEvent, EntitySetPositionInputEvent, EntitySetRotationInputEvent,
 };
-use resources::composition::CompositionRes;
+use resources::{composition::CompositionRes, tick::TickRes};
 use systems::{
+    constraints::{apply_constraints, apply_constraints_offset},
     events::{
         composition_resized_input_system, composition_viewport_input_system,
         despawn_removed_entities_system, entity_deleted_input_system, entity_moved_input_system,
@@ -25,6 +29,7 @@ use systems::{
         text::{outline_text_from_scratch, outline_text_on_size_change},
     },
     stroke::stroke_path_system,
+    tick::collect_first_tick,
 };
 
 pub struct CompCorePlugin {
@@ -44,6 +49,7 @@ enum CompCoreSystemSet {
     InputEvents,
 
     /// After this label, the system has applied layout calculations to the composition's nodes.
+    PreLayout,
     Layout,
 
     // After this label, the system has prepared the nodes for visual outlining.
@@ -72,6 +78,9 @@ impl Plugin for CompCorePlugin {
         app.add_event::<EntitySetRotationInputEvent>();
 
         // Register resources
+        app.insert_resource(TickRes {
+            first_in_cycle: Tick::new(0),
+        });
         #[cfg(not(feature = "dtif"))]
         app.insert_resource(CompositionRes {
             root_nodes: self.root_nodes.clone(),
@@ -84,6 +93,7 @@ impl Plugin for CompCorePlugin {
             Update,
             (
                 CompCoreSystemSet::InputEvents,
+                CompCoreSystemSet::PreLayout,
                 CompCoreSystemSet::Layout,
                 CompCoreSystemSet::Prepare,
                 CompCoreSystemSet::Outline,
@@ -93,7 +103,13 @@ impl Plugin for CompCorePlugin {
         );
 
         // Register systems
-        app.add_systems(First, update_hierarchy_levels);
+        app.add_systems(
+            First,
+            (
+                collect_first_tick,
+                update_hierarchy_levels.after(collect_first_tick),
+            ),
+        );
         app.add_systems(
             Update,
             (
@@ -103,6 +119,8 @@ impl Plugin for CompCorePlugin {
                 entity_moved_input_system.in_set(CompCoreSystemSet::InputEvents),
                 entity_set_position_input_system.in_set(CompCoreSystemSet::InputEvents),
                 entity_set_rotation_input_system.in_set(CompCoreSystemSet::InputEvents),
+                apply_constraints_offset.in_set(CompCoreSystemSet::PreLayout),
+                apply_constraints.in_set(CompCoreSystemSet::Layout),
                 outline_rectangle.in_set(CompCoreSystemSet::Outline),
                 outline_ellipse.in_set(CompCoreSystemSet::Outline),
                 outline_star.in_set(CompCoreSystemSet::Outline),

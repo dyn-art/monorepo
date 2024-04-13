@@ -9,10 +9,10 @@ import type {
 	InteractionModeChangeOutputEvent,
 	InteractionToolChangeOutputEvent,
 	SelectionChangeOutputEvent,
+	Size,
 	SvgCompInputEvent,
 	SvgCompOutputEvent,
 	SvgElementChangesOutputEvent,
-	Vec2,
 	Viewport,
 	WatchableComponentVariant,
 	WatchedEntityChangesOutputEvent
@@ -24,7 +24,7 @@ export class Composition {
 	private readonly _svgCompHandle: SvgCompHandle;
 	private _renderer: Renderer | null = null;
 
-	private _size: Vec2;
+	private _size: Size;
 	private _viewport: Viewport;
 	private _selectedEntities: Entity[];
 
@@ -51,7 +51,7 @@ export class Composition {
 	// Getter & Setter
 	// =========================================================================
 
-	public get size(): Readonly<Vec2> {
+	public get size(): Readonly<Size> {
 		return this._size;
 	}
 

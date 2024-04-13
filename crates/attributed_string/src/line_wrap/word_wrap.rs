@@ -112,7 +112,7 @@ impl LineWrapStrategy for WordWrap {
 
                 let range = span_range_start..token_range_end;
                 self.in_overflow =
-                    self.current_line_width + self.current_word_width + token_width > size.rwidth();
+                    self.current_line_width + self.current_word_width + token_width > size.width;
                 let is_word_part = matches!(
                     token_variant,
                     ShapeTokenVariant::Glyph(_)

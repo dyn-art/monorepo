@@ -9,6 +9,7 @@ import type {
 import {
 	createDtifStyles,
 	mapFigmaBlendModeToDtif,
+	mapFigmaConstraintsToDtif,
 	mapFigmaTextAlignHorizontalToDtif,
 	mapFigmaTextAlignVerticalToDtif,
 	mapFigmaTransformToRotation,
@@ -75,6 +76,7 @@ export function transformTextNode(
 		rotationDeg: mapFigmaTransformToRotation(node.relativeTransform),
 		blendMode: mapFigmaBlendModeToDtif(node.blendMode),
 		opacity: node.opacity,
+		constraints: mapFigmaConstraintsToDtif(node.constraints),
 		styles: createDtifStyles(fills, strokes)
 	};
 }
