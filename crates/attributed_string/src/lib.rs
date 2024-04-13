@@ -103,8 +103,8 @@ impl AttributedString {
     pub fn layout_lines(&mut self) {
         let lines = self.compute_lines();
 
-        let container_width = self.config.size.rwidth();
-        let container_height = self.config.size.rheight();
+        let container_width = self.config.size.width;
+        let container_height = self.config.size.height;
 
         let total_text_height = lines
             .iter()

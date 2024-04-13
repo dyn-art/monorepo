@@ -17,7 +17,11 @@ tracing = []
 glam = { workspace = true }
 
 # serde_support (feature)
-specta = { workspace = true, features = ["serde", "glam"], optional = true }
+specta = { workspace = true, features = [
+    "serde",
+    "glam",
+    "function",
+], optional = true }
 serde = { workspace = true, features = ["derive"], optional = true }
 
 # Logging

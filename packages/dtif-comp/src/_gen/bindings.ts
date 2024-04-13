@@ -1384,9 +1384,6 @@ export type SelectionChangeOutputEvent = { selectedEntities: Entity[] }
 
 export type ShapeVariant = "Rectangle" | "Ellipse" | "Star" | "Polygon"
 
-/**
- * An absolute size in 2D with a width and a height.
- */
 export type Size = [Abs, Abs]
 
 export type SolidPaint = { color: Color }

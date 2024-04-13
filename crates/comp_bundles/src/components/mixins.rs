@@ -115,5 +115,6 @@ pub enum Constraint {
 #[derive(Component, Debug, Default, Clone, Copy)]
 pub struct ConstraintsLayoutMetricsMixin {
     pub pos: Vec3,
+    pub size: Size,
     pub parent_size: Size,
 }
