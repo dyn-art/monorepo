@@ -2,7 +2,7 @@ use bevy_ecs::{component::Component, entity::Entity};
 use dyn_attributed_string::AttributedString;
 use dyn_comp_asset::asset_id::ImageId;
 use dyn_utils::properties::{corner_radii::CornerRadii, opacity::Opacity, size::Size};
-use glam::Vec2;
+use glam::Vec3;
 use smallvec::SmallVec;
 
 #[derive(Component, Debug, Default, Clone, Copy)]
@@ -113,4 +113,7 @@ pub enum Constraint {
 }
 
 #[derive(Component, Debug, Default, Clone, Copy)]
-pub struct ConstraintsOffset(pub Vec2);
+pub struct ConstraintsLayoutMetricsMixin {
+    pub pos: Vec3,
+    pub parent_size: Size,
+}
