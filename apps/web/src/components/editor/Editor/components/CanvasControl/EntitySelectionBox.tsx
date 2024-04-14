@@ -17,10 +17,12 @@ export const EntitySelectionBox: React.FC<TProps> = (props) => {
 		onRotateHandlePointerDown,
 		onRotateHandlePointerUp
 	} = props;
-	const { Size: sizeData, GlobalTransform: globalTransformData } = useEntity(composition, entity, [
-		'Size',
-		'GlobalTransform'
-	]);
+	const { Size: sizeData, GlobalTransform: globalTransformData } = useEntity(
+		composition,
+		entity,
+		['Size', 'GlobalTransform'],
+		true
+	);
 	const factor = useViewportFactor(composition);
 	const factoredSizeData = React.useMemo<TComponent<'Size'> | null>(
 		() =>
