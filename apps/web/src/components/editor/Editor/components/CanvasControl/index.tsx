@@ -7,7 +7,7 @@ import { useSelectedEntities, useWatchComposition } from '../../hooks';
 import { EntitySelectionBox } from './EntitySelectionBox';
 
 export const CanvasControl: React.FC<TProps> = (props) => {
-	const composition = useWatchComposition(props.composition);
+	const composition = useWatchComposition(props.composition, true);
 	const selectedEntities = useSelectedEntities(composition);
 
 	return (

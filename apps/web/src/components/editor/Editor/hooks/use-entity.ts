@@ -18,7 +18,7 @@ export function useEntity<GComponentVariants extends COMP.WatchableComponentVari
 				toWatchComponents,
 				(_, changesArray) => {
 					if (flush) {
-						// TODO: Doesn't seem to make SelectionBox more aligned with actual shape
+						// TODO: Validate that flushSync() is a good idea here
 						// setTimeout(() => {
 						flushSync(() => {
 							for (const change of changesArray) {
