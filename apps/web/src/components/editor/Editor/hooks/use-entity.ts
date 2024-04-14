@@ -1,11 +1,13 @@
 import React from 'react';
+import { flushSync } from 'react-dom';
 import type { COMP } from '@dyn/dtif-comp';
 import type { Composition } from '@dyn/svg-comp';
 
 export function useEntity<GComponentVariants extends COMP.WatchableComponentVariant[]>(
 	composition: Composition,
 	entity: COMP.Entity,
-	toWatchComponents: COMP.WatchableComponentVariant[]
+	toWatchComponents: COMP.WatchableComponentVariant[],
+	flush = false
 ): TCombinedComponent<GComponentVariants> {
 	const [changes, dispatch] = React.useReducer(changesReducer<GComponentVariants>, {});
 
@@ -15,8 +17,19 @@ export function useEntity<GComponentVariants extends COMP.WatchableComponentVari
 				entity,
 				toWatchComponents,
 				(_, changesArray) => {
-					for (const change of changesArray) {
-						dispatch(change);
+					if (flush) {
+						// TODO: Doesn't seem to make SelectionBox more aligned with actual shape
+						setTimeout(() => {
+							flushSync(() => {
+								for (const change of changesArray) {
+									dispatch(change);
+								}
+							});
+						});
+					} else {
+						for (const change of changesArray) {
+							dispatch(change);
+						}
 					}
 				},
 				true
