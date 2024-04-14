@@ -2,7 +2,7 @@ pub mod node;
 pub mod style;
 
 use self::{
-    node::{frame::FrameNodeSvgBundle, shape::ShapeNodeSvgBundle},
+    node::{frame::FrameNodeSvgBundle, group::GroupNodeSvgBundle, shape::ShapeNodeSvgBundle},
     style::{
         gradient_fill::GradientFillStyleSvgBundle, image_fill::ImageFillStyleSvgBundle,
         solid_fill::SolidFillStyleSvgBundle,
@@ -72,6 +72,7 @@ pub trait SvgBundle: Debug {
 pub enum SvgBundleVariant {
     // Nodes
     FrameNode(FrameNodeSvgBundle),
+    GroupNode(GroupNodeSvgBundle),
     ShapeNode(ShapeNodeSvgBundle),
     // Styles
     SolidFill(SolidFillStyleSvgBundle),
@@ -84,6 +85,7 @@ impl SvgBundleVariant {
     pub fn get_svg_bundle(&self) -> &dyn SvgBundle {
         match self {
             SvgBundleVariant::FrameNode(bundle) => bundle,
+            SvgBundleVariant::GroupNode(bundle) => bundle,
             SvgBundleVariant::ShapeNode(bundle) => bundle,
             SvgBundleVariant::SolidFill(bundle) => bundle,
             SvgBundleVariant::GradientFill(bundle) => bundle,
@@ -94,6 +96,7 @@ impl SvgBundleVariant {
     pub fn get_svg_bundle_mut(&mut self) -> &mut dyn SvgBundle {
         match self {
             SvgBundleVariant::FrameNode(bundle) => bundle,
+            SvgBundleVariant::GroupNode(bundle) => bundle,
             SvgBundleVariant::ShapeNode(bundle) => bundle,
             SvgBundleVariant::SolidFill(bundle) => bundle,
             SvgBundleVariant::GradientFill(bundle) => bundle,
@@ -120,6 +123,7 @@ impl SvgBundleVariant {
     pub fn get_child_node_entities(&self) -> Option<&SmallVec<[Entity; 2]>> {
         match self {
             SvgBundleVariant::FrameNode(bundle) => Some(&bundle.child_node_entities),
+            SvgBundleVariant::GroupNode(bundle) => Some(&bundle.child_node_entities),
             _ => None,
         }
     }
@@ -134,6 +138,7 @@ impl SvgBundleVariant {
     pub fn get_root_element(&self) -> &SvgElement {
         match self {
             SvgBundleVariant::FrameNode(bundle) => &bundle.root_g,
+            SvgBundleVariant::GroupNode(bundle) => &bundle.root_g,
             SvgBundleVariant::ShapeNode(bundle) => &bundle.root_g,
             SvgBundleVariant::SolidFill(bundle) => &bundle.root_g,
             SvgBundleVariant::GradientFill(bundle) => &bundle.root_g,
@@ -144,6 +149,7 @@ impl SvgBundleVariant {
     pub fn get_root_element_mut(&mut self) -> &mut SvgElement {
         match self {
             SvgBundleVariant::FrameNode(bundle) => &mut bundle.root_g,
+            SvgBundleVariant::GroupNode(bundle) => &mut bundle.root_g,
             SvgBundleVariant::ShapeNode(bundle) => &mut bundle.root_g,
             SvgBundleVariant::SolidFill(bundle) => &mut bundle.root_g,
             SvgBundleVariant::GradientFill(bundle) => &mut bundle.root_g,
@@ -203,6 +209,9 @@ impl SvgBundleVariant {
     ) -> String {
         match self {
             SvgBundleVariant::FrameNode(bundle) => bundle
+                .get_root_element()
+                .to_string(bundle, Some(bundle_variant_query)),
+            SvgBundleVariant::GroupNode(bundle) => bundle
                 .get_root_element()
                 .to_string(bundle, Some(bundle_variant_query)),
             SvgBundleVariant::ShapeNode(bundle) => bundle

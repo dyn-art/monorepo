@@ -8,7 +8,8 @@ use dyn_comp_bundles::{
     components::{
         mixins::{
             BlendMode, BlendModeMixin, Constraints, ConstraintsMixin, CornerRadiiMixin,
-            OpacityMixin, PathMixin, SizeMixin, VisibilityMixin,
+            GroupConstraints, GroupConstraintsMixin, OpacityMixin, PathMixin, SizeMixin,
+            VisibilityMixin,
         },
         nodes::{
             CompNode, CompNodeVariant, EllipseArcData, EllipseCompNode, FrameCompNode,
@@ -78,7 +79,7 @@ impl ToEcsBundleImpl for FrameNode {
                 clip_content: self.clip_content,
             },
             transform: TransformBundle::from_transform(Transform {
-                translation: Vec3::new(self.translation.x, self.translation.y, 0.0),
+                translation: self.translation.extend(0.0),
                 rotation: Quat::from_rotation_z(self.rotation_deg.to_rad()),
                 scale: Vec3::ONE,
             }),
@@ -96,10 +97,11 @@ impl ToEcsBundleImpl for FrameNode {
 #[serde(rename_all = "camelCase")]
 pub struct GroupNode {
     #[serde(default)]
-    pub translation: Vec2,
+    pub translation: Option<Vec2>,
     #[serde(default)]
-    pub rotation_deg: Angle,
-    pub size: Size,
+    pub rotation_deg: Option<Angle>,
+    #[serde(default)]
+    pub size: Option<Size>,
     #[serde(default = "default_as_true")]
     pub visible: bool,
     #[serde(default)]
@@ -107,12 +109,24 @@ pub struct GroupNode {
     #[serde(default)]
     pub opacity: Opacity,
     #[serde(default)]
+    pub constraints: Option<Constraints>,
+    #[serde(default)]
     pub children: Vec<String>,
 }
 
 impl ToEcsBundleImpl for GroupNode {
     type Bundle = GroupCompNodeBundle;
 
+    // TODO: Either I create custom Components for each Group component
+    // like Transform where I've three states:
+    // -> Derived from Children
+    // -> Explicitly set
+    // -> Not set (yet)
+    //
+    // or I add additional component like GroupTransformStatus
+    // which then hold the above mentioned states
+    // I feel like the approach with separate component is better,
+    // because then I don't have to create own Transform component and stuff
     fn to_ecs_bundle(&self, _: &DtifInjector) -> Self::Bundle {
         Self::Bundle {
             node: CompNode {
@@ -120,13 +134,24 @@ impl ToEcsBundleImpl for GroupNode {
             },
             group: GroupCompNode,
             transform: TransformBundle::from_transform(Transform {
-                translation: Vec3::new(self.translation.x, self.translation.y, 0.0),
-                rotation: Quat::from_rotation_z(self.rotation_deg.to_rad()),
+                translation: self
+                    .translation
+                    .map(|translation| translation.extend(0.0))
+                    .unwrap_or_default(),
+                rotation: self
+                    .rotation_deg
+                    .map(|rotation_deg| Quat::from_rotation_z(rotation_deg.to_rad()))
+                    .unwrap_or_default(),
                 scale: Vec3::ONE,
             }),
+            size: SizeMixin(self.size.unwrap_or_default()),
             visibility: VisibilityMixin(self.visible),
             blend_mode: BlendModeMixin(self.blend_mode),
             opacity: OpacityMixin(self.opacity),
+            constraints: GroupConstraintsMixin(match self.constraints {
+                Some(constraints) => GroupConstraints::Constraints(constraints),
+                None => GroupConstraints::Mixed,
+            }),
         }
     }
 }
@@ -163,7 +188,7 @@ impl ToEcsBundleImpl for RectangleNode {
             },
             rectangle: RectangleCompNode::default(),
             transform: TransformBundle::from_transform(Transform {
-                translation: Vec3::new(self.translation.x, self.translation.y, 0.0),
+                translation: self.translation.extend(0.0),
                 rotation: Quat::from_rotation_z(self.rotation_deg.to_rad()),
                 scale: Vec3::ONE,
             }),
@@ -219,7 +244,7 @@ impl ToEcsBundleImpl for EllipseNode {
                 },
             },
             transform: TransformBundle::from_transform(Transform {
-                translation: Vec3::new(self.translation.x, self.translation.y, 0.0),
+                translation: self.translation.extend(0.0),
                 rotation: Quat::from_rotation_z(self.rotation_deg.to_rad()),
                 scale: Vec3::ONE,
             }),
@@ -269,7 +294,7 @@ impl ToEcsBundleImpl for StarNode {
                 point_count: self.point_count,
             },
             transform: TransformBundle::from_transform(Transform {
-                translation: Vec3::new(self.translation.x, self.translation.y, 0.0),
+                translation: self.translation.extend(0.0),
                 rotation: Quat::from_rotation_z(self.rotation_deg.to_rad()),
                 scale: Vec3::ONE,
             }),
@@ -321,7 +346,7 @@ impl ToEcsBundleImpl for PolygonNode {
                 point_count: self.point_count,
             },
             transform: TransformBundle::from_transform(Transform {
-                translation: Vec3::new(self.translation.x, self.translation.y, 0.0),
+                translation: self.translation.extend(0.0),
                 rotation: Quat::from_rotation_z(self.rotation_deg.to_rad()),
                 scale: Vec3::ONE,
             }),
@@ -383,7 +408,7 @@ impl ToEcsBundleImpl for TextNode {
                 vertical_text_alignment: self.vertical_text_alignment,
             },
             transform: TransformBundle::from_transform(Transform {
-                translation: Vec3::new(self.translation.x, self.translation.y, 0.0),
+                translation: self.translation.extend(0.0),
                 rotation: Quat::from_rotation_z(self.rotation_deg.to_rad()),
                 scale: Vec3::ONE,
             }),
@@ -428,7 +453,7 @@ impl ToEcsBundleImpl for VectorNode {
             path: PathMixin(string_to_tiny_skia_path(&self.path).unwrap()),
             vector: VectorCompNode,
             transform: TransformBundle::from_transform(Transform {
-                translation: Vec3::new(self.translation.x, self.translation.y, 0.0),
+                translation: self.translation.extend(0.0),
                 rotation: Quat::from_rotation_z(self.rotation_deg.to_rad()),
                 scale: Vec3::ONE,
             }),

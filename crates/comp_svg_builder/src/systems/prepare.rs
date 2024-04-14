@@ -1,7 +1,7 @@
 use crate::{
     resources::svg_context::SvgContextRes,
     svg::svg_bundle::{
-        node::{frame::FrameNodeSvgBundle, shape::ShapeNodeSvgBundle},
+        node::{frame::FrameNodeSvgBundle, group::GroupNodeSvgBundle, shape::ShapeNodeSvgBundle},
         style::{
             gradient_fill::GradientFillStyleSvgBundle, image_fill::ImageFillStyleSvgBundle,
             solid_fill::SolidFillStyleSvgBundle,
@@ -27,21 +27,23 @@ pub fn insert_node_svg_bundle(
     query: Query<(Entity, &CompNode), (With<CompNode>, Without<SvgBundleVariant>)>,
 ) {
     for (entity, CompNode { variant }) in query.iter() {
-        let bundle_variant = match variant {
-            CompNodeVariant::Frame => Some(SvgBundleVariant::FrameNode(FrameNodeSvgBundle::new(
-                entity,
-                &mut svg_context_res,
-            ))),
-            CompNodeVariant::Rectangle
-            | CompNodeVariant::Ellipse
-            | CompNodeVariant::Polygon
-            | CompNodeVariant::Star
-            | CompNodeVariant::Text
-            | CompNodeVariant::Vector => Some(SvgBundleVariant::ShapeNode(
-                ShapeNodeSvgBundle::new(entity, &mut svg_context_res),
-            )),
-            _ => None,
-        };
+        let bundle_variant =
+            match variant {
+                CompNodeVariant::Frame => Some(SvgBundleVariant::FrameNode(
+                    FrameNodeSvgBundle::new(entity, &mut svg_context_res),
+                )),
+                CompNodeVariant::Rectangle
+                | CompNodeVariant::Ellipse
+                | CompNodeVariant::Polygon
+                | CompNodeVariant::Star
+                | CompNodeVariant::Text
+                | CompNodeVariant::Vector => Some(SvgBundleVariant::ShapeNode(
+                    ShapeNodeSvgBundle::new(entity, &mut svg_context_res),
+                )),
+                CompNodeVariant::Group => Some(SvgBundleVariant::GroupNode(
+                    GroupNodeSvgBundle::new(entity, &mut svg_context_res),
+                )),
+            };
 
         if let Some(bundle_variant) = bundle_variant {
             commands.entity(entity).insert(bundle_variant);
