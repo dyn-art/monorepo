@@ -1,6 +1,6 @@
 use crate::{
     events::DtifInputEvent, nodes::Node, paints::Paint, styles::Style, DtifComposition,
-    ToEcsBundleImpl,
+    SpawnBundleImpl,
 };
 use bevy_ecs::{
     entity::Entity,
@@ -87,14 +87,14 @@ impl DtifInjector {
 
     fn spawn_node<'a>(&self, node: &Node, world: &'a mut World) -> EntityWorldMut<'a> {
         match node {
-            Node::Frame(node) => world.spawn(node.to_ecs_bundle(&self)),
-            Node::Group(node) => world.spawn(node.to_ecs_bundle(&self)),
-            Node::Rectangle(node) => world.spawn(node.to_ecs_bundle(&self)),
-            Node::Ellipse(node) => world.spawn(node.to_ecs_bundle(&self)),
-            Node::Star(node) => world.spawn(node.to_ecs_bundle(&self)),
-            Node::Polygon(node) => world.spawn(node.to_ecs_bundle(&self)),
-            Node::Text(node) => world.spawn(node.to_ecs_bundle(&self)),
-            Node::Vector(node) => world.spawn(node.to_ecs_bundle(&self)),
+            Node::Frame(node) => node.spawn(&self, world),
+            Node::Group(node) => node.spawn(&self, world),
+            Node::Rectangle(node) => node.spawn(&self, world),
+            Node::Ellipse(node) => node.spawn(&self, world),
+            Node::Star(node) => node.spawn(&self, world),
+            Node::Polygon(node) => node.spawn(&self, world),
+            Node::Text(node) => node.spawn(&self, world),
+            Node::Vector(node) => node.spawn(&self, world),
         }
     }
 
@@ -174,8 +174,8 @@ impl DtifInjector {
 
     fn spawn_style<'a>(&self, style: &Style, world: &'a mut World) -> EntityWorldMut<'a> {
         match style {
-            Style::Fill(style) => world.spawn(style.to_ecs_bundle(&self)),
-            Style::Stroke(style) => world.spawn(style.to_ecs_bundle(&self)),
+            Style::Fill(style) => style.spawn(&self, world),
+            Style::Stroke(style) => style.spawn(&self, world),
         }
     }
 
@@ -188,9 +188,9 @@ impl DtifInjector {
 
     fn spawn_paint<'a>(&self, paint: &Paint, world: &'a mut World) -> EntityWorldMut<'a> {
         match paint {
-            Paint::Solid(paint) => world.spawn(paint.to_ecs_bundle(&self)),
-            Paint::Image(paint) => world.spawn(paint.to_ecs_bundle(&self)),
-            Paint::Gradient(paint) => world.spawn(paint.to_ecs_bundle(&self)),
+            Paint::Solid(paint) => paint.spawn(&self, world),
+            Paint::Image(paint) => paint.spawn(&self, world),
+            Paint::Gradient(paint) => paint.spawn(&self, world),
         }
     }
 

@@ -8,6 +8,7 @@ use self::{
         solid_fill::SolidFillStyleSvgBundle,
     },
 };
+use super::svg_element::{SvgElement, SvgElementId};
 use bevy_ecs::{component::Component, entity::Entity, query::Without, system::Query};
 use dyn_comp_bundles::components::marker::Root;
 use smallvec::SmallVec;
@@ -15,7 +16,6 @@ use std::{collections::HashMap, fmt::Debug};
 
 #[cfg(feature = "output_svg_element_changes")]
 use super::svg_element::element_changes::SvgElementChanges;
-use super::svg_element::{SvgElement, SvgElementId};
 
 pub trait SvgBundle: Debug {
     fn elements_iter<'a>(&'a self) -> Box<dyn Iterator<Item = &'a SvgElement> + 'a>;
@@ -131,6 +131,7 @@ impl SvgBundleVariant {
     pub fn get_child_node_entities_mut(&mut self) -> Option<&mut SmallVec<[Entity; 2]>> {
         match self {
             SvgBundleVariant::FrameNode(bundle) => Some(&mut bundle.child_node_entities),
+            SvgBundleVariant::GroupNode(bundle) => Some(&mut bundle.child_node_entities),
             _ => None,
         }
     }
@@ -160,6 +161,7 @@ impl SvgBundleVariant {
     pub fn get_click_area_element(&self) -> Option<&SvgElement> {
         match self {
             SvgBundleVariant::FrameNode(bundle) => Some(&bundle.click_area_rect),
+            SvgBundleVariant::GroupNode(bundle) => Some(&bundle.click_area_rect),
             SvgBundleVariant::ShapeNode(bundle) => Some(&bundle.click_area_rect),
             _ => None,
         }
@@ -168,6 +170,7 @@ impl SvgBundleVariant {
     pub fn get_click_area_element_mut(&mut self) -> Option<&mut SvgElement> {
         match self {
             SvgBundleVariant::FrameNode(bundle) => Some(&mut bundle.click_area_rect),
+            SvgBundleVariant::GroupNode(bundle) => Some(&mut bundle.click_area_rect),
             SvgBundleVariant::ShapeNode(bundle) => Some(&mut bundle.click_area_rect),
             _ => None,
         }
@@ -176,6 +179,7 @@ impl SvgBundleVariant {
     pub fn get_children_wrapper_element(&self) -> Option<&SvgElement> {
         match self {
             SvgBundleVariant::FrameNode(bundle) => Some(&bundle.children_wrapper_g),
+            SvgBundleVariant::GroupNode(bundle) => Some(&bundle.children_wrapper_g),
             _ => None,
         }
     }
@@ -183,6 +187,7 @@ impl SvgBundleVariant {
     pub fn get_children_wrapper_element_mut(&mut self) -> Option<&mut SvgElement> {
         match self {
             SvgBundleVariant::FrameNode(bundle) => Some(&mut bundle.children_wrapper_g),
+            SvgBundleVariant::GroupNode(bundle) => Some(&mut bundle.children_wrapper_g),
             _ => None,
         }
     }

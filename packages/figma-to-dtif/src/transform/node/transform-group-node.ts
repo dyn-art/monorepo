@@ -1,10 +1,6 @@
 import type { COMP } from '@dyn/dtif-comp';
 
-import {
-	mapFigmaBlendModeToDtif,
-	mapFigmaTransformToRotation,
-	mapFigmaTransformToTranslation
-} from '../../utils';
+import { mapFigmaBlendModeToDtif } from '../../utils';
 
 export function transformGroupNode(
 	node: GroupNode,
@@ -16,9 +12,6 @@ export function transformGroupNode(
 		type: 'Group',
 		visible: node.visible,
 		children: childrenIds.map((childId) => childId.toString()),
-		size: [node.width, node.height],
-		translation: mapFigmaTransformToTranslation(node.relativeTransform),
-		rotationDeg: mapFigmaTransformToRotation(node.relativeTransform),
 		blendMode: mapFigmaBlendModeToDtif(node.blendMode),
 		opacity: node.opacity
 	};

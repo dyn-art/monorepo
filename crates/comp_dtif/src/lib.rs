@@ -6,6 +6,7 @@ pub mod paints;
 pub mod styles;
 
 use crate::nodes::Node;
+use bevy_ecs::world::{EntityWorldMut, World};
 use dtif_injector::DtifInjector;
 use dyn_comp_asset::asset::Asset;
 use dyn_comp_bundles::properties::Viewport;
@@ -43,7 +44,6 @@ pub struct DtifComposition {
     pub events: Vec<DtifInputEvent>,
 }
 
-pub trait ToEcsBundleImpl {
-    type Bundle: bevy_ecs::bundle::Bundle;
-    fn to_ecs_bundle(&self, dtif_injector: &DtifInjector) -> Self::Bundle;
+pub trait SpawnBundleImpl {
+    fn spawn<'a>(&self, dtif_injector: &DtifInjector, world: &'a mut World) -> EntityWorldMut<'a>;
 }

@@ -1,4 +1,5 @@
-use crate::{dtif_injector::DtifInjector, ToEcsBundleImpl};
+use crate::{dtif_injector::DtifInjector, SpawnBundleImpl};
+use bevy_ecs::world::{EntityWorldMut, World};
 use dyn_comp_bundles::{
     components::{
         mixins::{BlendMode, BlendModeMixin, OpacityMixin, PaintChildMixin, VisibilityMixin},
@@ -27,11 +28,9 @@ pub struct FillStyle {
     pub opacity: Opacity,
 }
 
-impl ToEcsBundleImpl for FillStyle {
-    type Bundle = FillStyleBundle;
-
-    fn to_ecs_bundle(&self, dtif_injector: &DtifInjector) -> Self::Bundle {
-        Self::Bundle {
+impl FillStyle {
+    fn to_ecs_bundle(&self, dtif_injector: &DtifInjector) -> FillStyleBundle {
+        FillStyleBundle {
             style: CompStyle {
                 variant: CompStyleVariant::Fill,
             },
@@ -49,6 +48,12 @@ impl ToEcsBundleImpl for FillStyle {
     }
 }
 
+impl SpawnBundleImpl for FillStyle {
+    fn spawn<'a>(&self, dtif_injector: &DtifInjector, world: &'a mut World) -> EntityWorldMut<'a> {
+        world.spawn(self.to_ecs_bundle(dtif_injector))
+    }
+}
+
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
 #[serde(rename_all = "camelCase")]
 pub struct StrokeStyle {
@@ -62,11 +67,9 @@ pub struct StrokeStyle {
     pub opacity: Opacity,
 }
 
-impl ToEcsBundleImpl for StrokeStyle {
-    type Bundle = StrokeStyleBundle;
-
-    fn to_ecs_bundle(&self, dtif_injector: &DtifInjector) -> Self::Bundle {
-        Self::Bundle {
+impl StrokeStyle {
+    fn to_ecs_bundle(&self, dtif_injector: &DtifInjector) -> StrokeStyleBundle {
+        StrokeStyleBundle {
             style: CompStyle {
                 variant: CompStyleVariant::Stroke,
             },
@@ -86,5 +89,11 @@ impl ToEcsBundleImpl for StrokeStyle {
             blend_mode: BlendModeMixin(self.blend_mode),
             opacity: OpacityMixin(self.opacity),
         }
+    }
+}
+
+impl SpawnBundleImpl for StrokeStyle {
+    fn spawn<'a>(&self, dtif_injector: &DtifInjector, world: &'a mut World) -> EntityWorldMut<'a> {
+        world.spawn(self.to_ecs_bundle(dtif_injector))
     }
 }

@@ -279,7 +279,9 @@ export type GradientPaint = { variant: GradientVariant; stops: GradientColorStop
 
 export type GradientVariant = { type: "Linear"; transform?: Mat3 } | { type: "Radial"; transform?: Mat3 }
 
-export type GroupNode = { translation?: Vec2; rotationDeg?: Angle; size: Size; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; children?: string[] }
+export type GroupConstraints = "Mixed" | { Constraints: Constraints }
+
+export type GroupNode = { translation?: Vec2 | null; rotationDeg?: Angle | null; size?: Size | null; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; constraints?: Constraints | null; children?: string[] }
 
 export type HandleSide = "Top" | "Bottom" | "Left" | "Right"
 

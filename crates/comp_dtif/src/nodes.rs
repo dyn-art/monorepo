@@ -1,11 +1,13 @@
 use crate::{
     conversion::string_to_tiny_skia_path, dtif_injector::DtifInjector, styles::Style,
-    ToEcsBundleImpl,
+    SpawnBundleImpl,
 };
+use bevy_ecs::world::{EntityWorldMut, World};
 use bevy_transform::{components::Transform, TransformBundle};
 use dyn_attributed_string::{HorizontalTextAlignment, LineWrap, VerticalTextAlignment};
 use dyn_comp_bundles::{
     components::{
+        marker::{StaleSize, StaleTransform},
         mixins::{
             BlendMode, BlendModeMixin, Constraints, ConstraintsMixin, CornerRadiiMixin,
             GroupConstraints, GroupConstraintsMixin, OpacityMixin, PathMixin, SizeMixin,
@@ -67,11 +69,9 @@ pub struct FrameNode {
     pub children: Vec<String>,
 }
 
-impl ToEcsBundleImpl for FrameNode {
-    type Bundle = FrameCompNodeBundle;
-
-    fn to_ecs_bundle(&self, _: &DtifInjector) -> Self::Bundle {
-        Self::Bundle {
+impl FrameNode {
+    fn to_ecs_bundle(&self) -> FrameCompNodeBundle {
+        FrameCompNodeBundle {
             node: CompNode {
                 variant: CompNodeVariant::Frame,
             },
@@ -90,6 +90,12 @@ impl ToEcsBundleImpl for FrameNode {
             opacity: OpacityMixin(self.opacity),
             constraints: ConstraintsMixin(self.constraints),
         }
+    }
+}
+
+impl SpawnBundleImpl for FrameNode {
+    fn spawn<'a>(&self, _: &DtifInjector, world: &'a mut World) -> EntityWorldMut<'a> {
+        world.spawn(self.to_ecs_bundle())
     }
 }
 
@@ -114,21 +120,9 @@ pub struct GroupNode {
     pub children: Vec<String>,
 }
 
-impl ToEcsBundleImpl for GroupNode {
-    type Bundle = GroupCompNodeBundle;
-
-    // TODO: Either I create custom Components for each Group component
-    // like Transform where I've three states:
-    // -> Derived from Children
-    // -> Explicitly set
-    // -> Not set (yet)
-    //
-    // or I add additional component like GroupTransformStatus
-    // which then hold the above mentioned states
-    // I feel like the approach with separate component is better,
-    // because then I don't have to create own Transform component and stuff
-    fn to_ecs_bundle(&self, _: &DtifInjector) -> Self::Bundle {
-        Self::Bundle {
+impl GroupNode {
+    fn to_ecs_bundle(&self) -> GroupCompNodeBundle {
+        GroupCompNodeBundle {
             node: CompNode {
                 variant: CompNodeVariant::Group,
             },
@@ -156,6 +150,15 @@ impl ToEcsBundleImpl for GroupNode {
     }
 }
 
+impl SpawnBundleImpl for GroupNode {
+    fn spawn<'a>(&self, _: &DtifInjector, world: &'a mut World) -> EntityWorldMut<'a> {
+        let mut entity_world = world.spawn(self.to_ecs_bundle());
+        entity_world.insert(StaleTransform);
+        entity_world.insert(StaleSize);
+        return entity_world;
+    }
+}
+
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
 #[serde(rename_all = "camelCase")]
 pub struct RectangleNode {
@@ -178,11 +181,9 @@ pub struct RectangleNode {
     pub styles: Vec<Style>,
 }
 
-impl ToEcsBundleImpl for RectangleNode {
-    type Bundle = RectangleCompNodeBundle;
-
-    fn to_ecs_bundle(&self, _: &DtifInjector) -> Self::Bundle {
-        Self::Bundle {
+impl RectangleNode {
+    fn to_ecs_bundle(&self) -> RectangleCompNodeBundle {
+        RectangleCompNodeBundle {
             node: CompNode {
                 variant: CompNodeVariant::Rectangle,
             },
@@ -199,6 +200,12 @@ impl ToEcsBundleImpl for RectangleNode {
             opacity: OpacityMixin(self.opacity),
             constraints: ConstraintsMixin(self.constraints),
         }
+    }
+}
+
+impl SpawnBundleImpl for RectangleNode {
+    fn spawn<'a>(&self, _: &DtifInjector, world: &'a mut World) -> EntityWorldMut<'a> {
+        world.spawn(self.to_ecs_bundle())
     }
 }
 
@@ -228,11 +235,9 @@ pub struct EllipseNode {
     pub styles: Vec<Style>,
 }
 
-impl ToEcsBundleImpl for EllipseNode {
-    type Bundle = EllipseCompNodeBundle;
-
-    fn to_ecs_bundle(&self, _: &DtifInjector) -> Self::Bundle {
-        Self::Bundle {
+impl EllipseNode {
+    fn to_ecs_bundle(&self) -> EllipseCompNodeBundle {
+        EllipseCompNodeBundle {
             node: CompNode {
                 variant: CompNodeVariant::Ellipse,
             },
@@ -254,6 +259,12 @@ impl ToEcsBundleImpl for EllipseNode {
             opacity: OpacityMixin(self.opacity),
             constraints: ConstraintsMixin(self.constraints),
         }
+    }
+}
+
+impl SpawnBundleImpl for EllipseNode {
+    fn spawn<'a>(&self, _: &DtifInjector, world: &'a mut World) -> EntityWorldMut<'a> {
+        world.spawn(self.to_ecs_bundle())
     }
 }
 
@@ -281,11 +292,9 @@ pub struct StarNode {
     pub styles: Vec<Style>,
 }
 
-impl ToEcsBundleImpl for StarNode {
-    type Bundle = StarCompNodeBundle;
-
-    fn to_ecs_bundle(&self, _: &DtifInjector) -> Self::Bundle {
-        Self::Bundle {
+impl StarNode {
+    fn to_ecs_bundle(&self) -> StarCompNodeBundle {
+        StarCompNodeBundle {
             node: CompNode {
                 variant: CompNodeVariant::Star,
             },
@@ -304,6 +313,12 @@ impl ToEcsBundleImpl for StarNode {
             opacity: OpacityMixin(self.opacity),
             constraints: ConstraintsMixin(self.constraints),
         }
+    }
+}
+
+impl SpawnBundleImpl for StarNode {
+    fn spawn<'a>(&self, _: &DtifInjector, world: &'a mut World) -> EntityWorldMut<'a> {
+        world.spawn(self.to_ecs_bundle())
     }
 }
 
@@ -334,11 +349,9 @@ pub struct PolygonNode {
     pub styles: Vec<Style>,
 }
 
-impl ToEcsBundleImpl for PolygonNode {
-    type Bundle = PolygonCompNodeBundle;
-
-    fn to_ecs_bundle(&self, _: &DtifInjector) -> Self::Bundle {
-        Self::Bundle {
+impl PolygonNode {
+    fn to_ecs_bundle(&self) -> PolygonCompNodeBundle {
+        PolygonCompNodeBundle {
             node: CompNode {
                 variant: CompNodeVariant::Polygon,
             },
@@ -356,6 +369,12 @@ impl ToEcsBundleImpl for PolygonNode {
             opacity: OpacityMixin(self.opacity),
             constraints: ConstraintsMixin(self.constraints),
         }
+    }
+}
+
+impl SpawnBundleImpl for PolygonNode {
+    fn spawn<'a>(&self, _: &DtifInjector, world: &'a mut World) -> EntityWorldMut<'a> {
+        world.spawn(self.to_ecs_bundle())
     }
 }
 
@@ -392,11 +411,9 @@ pub struct TextNode {
     pub styles: Vec<Style>,
 }
 
-impl ToEcsBundleImpl for TextNode {
-    type Bundle = TextCompNodeBundle;
-
-    fn to_ecs_bundle(&self, _: &DtifInjector) -> Self::Bundle {
-        Self::Bundle {
+impl TextNode {
+    fn to_ecs_bundle(&self) -> TextCompNodeBundle {
+        TextCompNodeBundle {
             node: CompNode {
                 variant: CompNodeVariant::Text,
             },
@@ -421,6 +438,12 @@ impl ToEcsBundleImpl for TextNode {
     }
 }
 
+impl SpawnBundleImpl for TextNode {
+    fn spawn<'a>(&self, _: &DtifInjector, world: &'a mut World) -> EntityWorldMut<'a> {
+        world.spawn(self.to_ecs_bundle())
+    }
+}
+
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
 #[serde(rename_all = "camelCase")]
 pub struct VectorNode {
@@ -442,11 +465,9 @@ pub struct VectorNode {
     pub styles: Vec<Style>,
 }
 
-impl ToEcsBundleImpl for VectorNode {
-    type Bundle = VectorNodeBundle;
-
-    fn to_ecs_bundle(&self, _: &DtifInjector) -> Self::Bundle {
-        Self::Bundle {
+impl VectorNode {
+    fn to_ecs_bundle(&self) -> VectorNodeBundle {
+        VectorNodeBundle {
             node: CompNode {
                 variant: CompNodeVariant::Vector,
             },
@@ -463,5 +484,11 @@ impl ToEcsBundleImpl for VectorNode {
             opacity: OpacityMixin(self.opacity),
             constraints: ConstraintsMixin(self.constraints),
         }
+    }
+}
+
+impl SpawnBundleImpl for VectorNode {
+    fn spawn<'a>(&self, _: &DtifInjector, world: &'a mut World) -> EntityWorldMut<'a> {
+        world.spawn(self.to_ecs_bundle())
     }
 }
