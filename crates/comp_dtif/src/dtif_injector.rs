@@ -88,7 +88,7 @@ impl DtifInjector {
     fn spawn_node<'a>(&self, node: &Node, world: &'a mut World) -> EntityWorldMut<'a> {
         match node {
             Node::Frame(node) => node.spawn(&self, world),
-            Node::Group(node) => node.spawn(&self, world),
+            // Node::Group(node) => node.spawn(&self, world),
             Node::Rectangle(node) => node.spawn(&self, world),
             Node::Ellipse(node) => node.spawn(&self, world),
             Node::Star(node) => node.spawn(&self, world),
@@ -107,7 +107,7 @@ impl DtifInjector {
     ) {
         let dtif_children = match node {
             Node::Frame(node) => &node.children,
-            Node::Group(node) => &node.children,
+            // Node::Group(node) => &node.children,
             _ => return,
         };
 

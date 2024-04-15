@@ -14,9 +14,13 @@ use dyn_comp_bundles::components::{
 };
 use dyn_utils::units::abs::Abs;
 
-// TODO: The current implementation is temporary and not well designed
+// TODO: The current implementation is temporary and requires a redesign!
 
 // TODO: Destory Group if no Children component (which is removed by Bevy when the last child was removed)
+
+// TODO: Group children GlobalTransform is not absolute and instead based on Group's Transform
+// https://github.com/bevyengine/bevy/issues/1780
+// https://discord.com/channels/691052431525675048/1186696829140738141
 
 pub fn compute_group_children_size(
     tick_res: Res<TickRes>,
@@ -39,7 +43,7 @@ pub fn compute_group_children_transform(
 pub fn mark_group_transform_as_stale(
     mut commands: Commands,
     query: Query<&Parent, Changed<Transform>>,
-    group_query: Query<Entity, Without<StaleTransform>>,
+    group_query: Query<Entity, (With<GroupCompNode>, Without<StaleTransform>)>,
 ) {
     for parent in query.iter() {
         if let Ok(entity) = group_query.get(parent.get()) {
@@ -51,7 +55,7 @@ pub fn mark_group_transform_as_stale(
 pub fn mark_group_size_as_stale(
     mut commands: Commands,
     query: Query<&Parent, Changed<SizeMixin>>,
-    group_query: Query<Entity, Without<StaleSize>>,
+    group_query: Query<Entity, (With<GroupCompNode>, Without<StaleSize>)>,
 ) {
     for parent in query.iter() {
         if let Ok(entity) = group_query.get(parent.get()) {

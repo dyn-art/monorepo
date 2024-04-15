@@ -34,7 +34,7 @@ use glam::{Quat, Vec2, Vec3};
 #[serde(tag = "type")]
 pub enum Node {
     Frame(FrameNode),
-    Group(GroupNode),
+    // Group(GroupNode), // TODO: Implement properly first
     Rectangle(RectangleNode),
     Ellipse(EllipseNode),
     Star(StarNode),

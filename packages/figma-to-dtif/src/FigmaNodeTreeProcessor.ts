@@ -70,7 +70,7 @@ export class FigmaNodeTreeProcessor {
 				type: 'Group',
 				id: nodeId,
 				node,
-				childrenIds: this.processChildren(node)
+				childrenIds: [] // this.processChildren(node) // TODO
 			});
 		} else if (isFigmaTextNode(node)) {
 			this._toTransformNodes.push({

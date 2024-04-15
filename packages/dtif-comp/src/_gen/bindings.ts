@@ -1355,7 +1355,7 @@ export type NativeKeyCode =
  */
 { xkb: number }
 
-export type Node = ({ type: "Frame" } & FrameNode) | ({ type: "Group" } & GroupNode) | ({ type: "Rectangle" } & RectangleNode) | ({ type: "Ellipse" } & EllipseNode) | ({ type: "Star" } & StarNode) | ({ type: "Polygon" } & PolygonNode) | ({ type: "Text" } & TextNode) | ({ type: "Vector" } & VectorNode)
+export type Node = ({ type: "Frame" } & FrameNode) | ({ type: "Rectangle" } & RectangleNode) | ({ type: "Ellipse" } & EllipseNode) | ({ type: "Star" } & StarNode) | ({ type: "Polygon" } & PolygonNode) | ({ type: "Text" } & TextNode) | ({ type: "Vector" } & VectorNode)
 
 /**
  * An opacity.
