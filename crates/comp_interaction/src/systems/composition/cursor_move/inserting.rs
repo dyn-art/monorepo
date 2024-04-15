@@ -220,7 +220,7 @@ pub fn handle_inserting(
         // TODO: Child is pushed as last element to the children array
         //       which causes it to be on the bottom although it should be the top most node?
         if let Some(parent) = maybe_parent {
-            commands.entity(parent).add_child(node_entity);
+            commands.entity(parent).insert_children(0, &[node_entity]);
         } else {
             node_entity_commands.insert(Root);
         }

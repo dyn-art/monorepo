@@ -74,7 +74,8 @@ const DEFAULT_DTIF: COMP.DtifComposition = {
 				}
 			],
 			size: [100, 100],
-			translation: [(WIDTH - 100) / 2, (HEIGHT - 100) / 2]
+			translation: [(WIDTH - 100) / 2, (HEIGHT - 100) / 2],
+			cornerRadii: [0, 10, 20, 30]
 		},
 		n4: {
 			type: 'Rectangle',

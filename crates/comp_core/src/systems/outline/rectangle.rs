@@ -6,6 +6,7 @@ use bevy_ecs::{
 use dyn_comp_bundles::components::mixins::{CornerRadiiMixin, PathMixin, SizeMixin};
 use tiny_skia_path::PathBuilder;
 
+// TODO: Doesn't seem to work
 pub fn outline_rectangle(
     mut commands: Commands,
     query: Query<
@@ -18,10 +19,10 @@ pub fn outline_rectangle(
         let max_radius = (width.min(height)) / 2.0;
         let min_radius = |radius: f32| -> f32 { radius.min(max_radius) };
 
-        let tl_radius = min_radius(corner_radii.tl().to_rad());
-        let tr_radius = min_radius(corner_radii.tr().to_rad());
-        let br_radius = min_radius(corner_radii.br().to_rad());
-        let bl_radius = min_radius(corner_radii.bl().to_rad());
+        let tl_radius = min_radius(corner_radii.tl().to_deg());
+        let tr_radius = min_radius(corner_radii.tr().to_deg());
+        let br_radius = min_radius(corner_radii.br().to_deg());
+        let bl_radius = min_radius(corner_radii.bl().to_deg());
 
         let mut path_builder = PathBuilder::new();
 
