@@ -20,6 +20,10 @@ use systems::{
         despawn_removed_entities_system, entity_deleted_input_system, entity_moved_input_system,
         entity_set_position_input_system, entity_set_rotation_input_system,
     },
+    group::{
+        compute_group_size, compute_group_transform, mark_group_size_as_stale,
+        mark_group_transform_as_stale,
+    },
     hierarchy::update_hierarchy_levels,
     outline::{
         ellipse::outline_ellipse,
@@ -47,6 +51,9 @@ pub struct CompCorePlugin {
 enum CompCoreSystemSet {
     /// After this label, the system has processed input events.
     InputEvents,
+
+    PreCompute,
+    Compute,
 
     /// After this label, the system has applied layout calculations to the composition's nodes.
     PreLayout,
@@ -93,6 +100,8 @@ impl Plugin for CompCorePlugin {
             Update,
             (
                 CompCoreSystemSet::InputEvents,
+                CompCoreSystemSet::PreCompute,
+                CompCoreSystemSet::Compute,
                 CompCoreSystemSet::PreLayout,
                 CompCoreSystemSet::Layout,
                 CompCoreSystemSet::Prepare,
@@ -119,6 +128,10 @@ impl Plugin for CompCorePlugin {
                 entity_moved_input_system.in_set(CompCoreSystemSet::InputEvents),
                 entity_set_position_input_system.in_set(CompCoreSystemSet::InputEvents),
                 entity_set_rotation_input_system.in_set(CompCoreSystemSet::InputEvents),
+                mark_group_size_as_stale.in_set(CompCoreSystemSet::PreCompute),
+                mark_group_transform_as_stale.in_set(CompCoreSystemSet::PreCompute),
+                compute_group_size.in_set(CompCoreSystemSet::Compute),
+                compute_group_transform.in_set(CompCoreSystemSet::Compute),
                 apply_constraints_offset.in_set(CompCoreSystemSet::PreLayout),
                 apply_constraints.in_set(CompCoreSystemSet::Layout),
                 outline_rectangle.in_set(CompCoreSystemSet::Outline),

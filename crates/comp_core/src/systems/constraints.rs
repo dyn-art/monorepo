@@ -54,6 +54,7 @@ pub fn apply_constraints_offset(
     }
 }
 
+// TODO: Won't work with nested constraints
 pub fn apply_constraints(
     mut query_set: ParamSet<(
         Query<(&Children, &SizeMixin), Changed<SizeMixin>>,

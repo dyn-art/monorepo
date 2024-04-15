@@ -94,8 +94,6 @@ impl ImageFillStyleSvgBundle {
 
         #[cfg(feature = "tracing")]
         {
-            use crate::svg::svg_element::attributes::SvgAttribute;
-
             root_g_element.set_attribute(SvgAttribute::Class {
                 class: Self::create_element_name(
                     root_g_element.get_id(),

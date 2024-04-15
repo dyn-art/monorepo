@@ -3,7 +3,6 @@ use crate::{
     svg::{
         svg_bundle::SvgBundle,
         svg_element::{
-            attributes::SvgAttribute,
             styles::{SvgPointerEventsStyle, SvgStyle, SvgStyleColor},
             SvgElement, SvgTag,
         },
@@ -13,21 +12,16 @@ use bevy_ecs::entity::Entity;
 use smallvec::SmallVec;
 
 #[derive(Debug, Clone)]
-pub struct FrameNodeSvgBundle {
+pub struct GroupNodeSvgBundle {
     pub entity: Entity,
 
     pub root_g: SvgElement,
-    /**/ pub defs: SvgElement,
-    /**//**/ pub children_clip_path: SvgElement,
-    /**//**//**/ pub children_clipped_path: SvgElement,
     /**/ pub click_area_rect: SvgElement,
-    /**/ pub styles_wrapper_g: SvgElement,
-    /**//**/ pub style_entities: SmallVec<[Entity; 2]>,
     /**/ pub children_wrapper_g: SvgElement,
     /**//**/ pub child_node_entities: SmallVec<[Entity; 2]>,
 }
 
-impl SvgBundle for FrameNodeSvgBundle {
+impl SvgBundle for GroupNodeSvgBundle {
     fn get_entity(&self) -> &Entity {
         &self.entity
     }
@@ -43,11 +37,7 @@ impl SvgBundle for FrameNodeSvgBundle {
     fn elements_iter<'a>(&'a self) -> Box<dyn Iterator<Item = &'a SvgElement> + 'a> {
         Box::new(
             std::iter::once(&self.root_g)
-                .chain(std::iter::once(&self.defs))
-                .chain(std::iter::once(&self.children_clip_path))
-                .chain(std::iter::once(&self.children_clipped_path))
                 .chain(std::iter::once(&self.click_area_rect))
-                .chain(std::iter::once(&self.styles_wrapper_g))
                 .chain(std::iter::once(&self.children_wrapper_g)),
         )
     }
@@ -55,31 +45,17 @@ impl SvgBundle for FrameNodeSvgBundle {
     fn elements_iter_mut<'a>(&'a mut self) -> Box<dyn Iterator<Item = &'a mut SvgElement> + 'a> {
         Box::new(
             std::iter::once(&mut self.root_g)
-                .chain(std::iter::once(&mut self.defs))
-                .chain(std::iter::once(&mut self.children_clip_path))
-                .chain(std::iter::once(&mut self.children_clipped_path))
                 .chain(std::iter::once(&mut self.click_area_rect))
-                .chain(std::iter::once(&mut self.styles_wrapper_g))
                 .chain(std::iter::once(&mut self.children_wrapper_g)),
         )
     }
 }
 
-impl FrameNodeSvgBundle {
+impl GroupNodeSvgBundle {
     pub fn new(entity: Entity, cx: &mut SvgContextRes) -> Self {
-        log::info!("[FrameNodeSvgBundle::new] {:?}", entity);
+        log::info!("[GroupNodeSvgBundle::new] {:?}", entity);
 
         let mut root_g_element = cx.create_bundle_root_element(SvgTag::Group, entity);
-
-        let mut defs_element = cx.create_element(SvgTag::Defs);
-        root_g_element.append_child_in_bundle_context(&mut defs_element);
-
-        let mut children_clip_path_element = cx.create_element(SvgTag::ClipPath);
-        defs_element.append_child_in_bundle_context(&mut children_clip_path_element);
-
-        let mut children_clipped_path_element = cx.create_element(SvgTag::Path);
-        children_clip_path_element
-            .append_child_in_bundle_context(&mut children_clipped_path_element);
 
         let mut click_area_rect_element = cx.create_element(SvgTag::Rect);
         click_area_rect_element.set_styles(vec![
@@ -92,39 +68,17 @@ impl FrameNodeSvgBundle {
         ]);
         root_g_element.append_child_in_bundle_context(&mut click_area_rect_element);
 
-        let mut styles_wrapper_g_element = cx.create_element(SvgTag::Group);
-        styles_wrapper_g_element.set_style(SvgStyle::PointerEvents {
-            pointer_events: SvgPointerEventsStyle::None,
-        });
-        root_g_element.append_child_in_bundle_context(&mut styles_wrapper_g_element);
-
         let mut children_wrapper_g_element = cx.create_element(SvgTag::Group);
-        children_wrapper_g_element.set_attribute(SvgAttribute::ClipPath {
-            clip_path: children_clip_path_element.get_id(),
-        });
         root_g_element.append_child_in_bundle_context(&mut children_wrapper_g_element);
 
         #[cfg(feature = "tracing")]
         {
+            use crate::svg::svg_element::attributes::SvgAttribute;
+
             root_g_element.set_attribute(SvgAttribute::Class {
                 class: Self::create_element_name(
                     root_g_element.get_id(),
                     &format!("root-{:?}", entity),
-                ),
-            });
-            defs_element.set_attribute(SvgAttribute::Class {
-                class: Self::create_element_name(defs_element.get_id(), "defs"),
-            });
-            children_clip_path_element.set_attribute(SvgAttribute::Class {
-                class: Self::create_element_name(
-                    children_clip_path_element.get_id(),
-                    "children-clip-path",
-                ),
-            });
-            children_clipped_path_element.set_attribute(SvgAttribute::Class {
-                class: Self::create_element_name(
-                    children_clipped_path_element.get_id(),
-                    "children-clipped-path",
                 ),
             });
             click_area_rect_element.set_attribute(SvgAttribute::Class {
@@ -141,9 +95,6 @@ impl FrameNodeSvgBundle {
                     alpha: 0.5,
                 },
             });
-            styles_wrapper_g_element.set_attribute(SvgAttribute::Class {
-                class: Self::create_element_name(styles_wrapper_g_element.get_id(), "styles"),
-            });
             children_wrapper_g_element.set_attribute(SvgAttribute::Class {
                 class: Self::create_element_name(children_wrapper_g_element.get_id(), "children"),
             });
@@ -153,12 +104,7 @@ impl FrameNodeSvgBundle {
             entity,
 
             root_g: root_g_element,
-            defs: defs_element,
-            children_clip_path: children_clip_path_element,
-            children_clipped_path: children_clipped_path_element,
             click_area_rect: click_area_rect_element,
-            styles_wrapper_g: styles_wrapper_g_element,
-            style_entities: SmallVec::new(),
             children_wrapper_g: children_wrapper_g_element,
             child_node_entities: SmallVec::new(),
         }
@@ -167,6 +113,6 @@ impl FrameNodeSvgBundle {
     #[cfg(feature = "tracing")]
     #[inline]
     fn create_element_name(id: crate::svg::svg_element::SvgElementId, category: &str) -> String {
-        format!("frame-node_{}_{}", category, id)
+        format!("group-node_{}_{}", category, id)
     }
 }

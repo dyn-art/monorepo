@@ -1,4 +1,8 @@
-use crate::{dtif_injector::DtifInjector, ToEcsBundleImpl};
+use crate::{
+    dtif_injector::{self, DtifInjector},
+    SpawnBundleImpl,
+};
+use bevy_ecs::world::{EntityWorldMut, World};
 use dyn_comp_asset::asset_id::AssetId;
 use dyn_comp_bundles::{
     components::{
@@ -26,16 +30,20 @@ pub struct SolidPaint {
     pub color: Color,
 }
 
-impl ToEcsBundleImpl for SolidPaint {
-    type Bundle = SolidPaintBundle;
-
-    fn to_ecs_bundle(&self, _: &DtifInjector) -> Self::Bundle {
-        Self::Bundle {
+impl SolidPaint {
+    fn to_ecs_bundle(&self) -> SolidPaintBundle {
+        SolidPaintBundle {
             paint: CompPaint {
                 variant: CompPaintVariant::Solid,
             },
             solid: SolidCompPaint { color: self.color },
         }
+    }
+}
+
+impl SpawnBundleImpl for SolidPaint {
+    fn spawn<'a>(&self, _: &DtifInjector, world: &'a mut World) -> EntityWorldMut<'a> {
+        world.spawn(self.to_ecs_bundle())
     }
 }
 
@@ -47,11 +55,9 @@ pub struct ImagePaint {
     pub scale_mode: ImageScaleMode,
 }
 
-impl ToEcsBundleImpl for ImagePaint {
-    type Bundle = ImagePaintBundle;
-
-    fn to_ecs_bundle(&self, dtif_injector: &DtifInjector) -> Self::Bundle {
-        Self::Bundle {
+impl ImagePaint {
+    fn to_ecs_bundle(&self, dtif_injector: &DtifInjector) -> ImagePaintBundle {
+        ImagePaintBundle {
             paint: CompPaint {
                 variant: CompPaintVariant::Image,
             },
@@ -72,6 +78,12 @@ impl ToEcsBundleImpl for ImagePaint {
     }
 }
 
+impl SpawnBundleImpl for ImagePaint {
+    fn spawn<'a>(&self, dtif_injector: &DtifInjector, world: &'a mut World) -> EntityWorldMut<'a> {
+        world.spawn(self.to_ecs_bundle(dtif_injector))
+    }
+}
+
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
 #[serde(rename_all = "camelCase")]
 pub struct GradientPaint {
@@ -79,11 +91,9 @@ pub struct GradientPaint {
     pub stops: Vec<GradientColorStop>,
 }
 
-impl ToEcsBundleImpl for GradientPaint {
-    type Bundle = GradientPaintBundle;
-
-    fn to_ecs_bundle(&self, _: &DtifInjector) -> Self::Bundle {
-        Self::Bundle {
+impl GradientPaint {
+    fn to_ecs_bundle(&self) -> GradientPaintBundle {
+        GradientPaintBundle {
             paint: CompPaint {
                 variant: CompPaintVariant::Gradient,
             },
@@ -92,5 +102,11 @@ impl ToEcsBundleImpl for GradientPaint {
                 stops: self.stops.iter().copied().collect(),
             },
         }
+    }
+}
+
+impl SpawnBundleImpl for GradientPaint {
+    fn spawn<'a>(&self, _: &DtifInjector, world: &'a mut World) -> EntityWorldMut<'a> {
+        world.spawn(self.to_ecs_bundle())
     }
 }

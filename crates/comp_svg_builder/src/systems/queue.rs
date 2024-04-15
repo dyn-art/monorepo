@@ -11,6 +11,11 @@ use crate::{
 use bevy_ecs::{entity::Entity, system::ResMut};
 use std::collections::{HashMap, HashSet, VecDeque};
 
+// TODO: Improve using HierarchyLevel component
+// by just sorting based on hierarchy level and the index,
+// which should also enure the right order and should be more performant
+// and easier to read
+
 pub fn queue_svg_bundle_changes(
     mut changed_svg_bundles_res: ResMut<ChangedSvgBundlesRes>,
     mut output_event_sender_res: ResMut<OutputEventSenderRes>,

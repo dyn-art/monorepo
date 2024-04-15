@@ -1,14 +1,17 @@
 use crate::{
     conversion::string_to_tiny_skia_path, dtif_injector::DtifInjector, styles::Style,
-    ToEcsBundleImpl,
+    SpawnBundleImpl,
 };
+use bevy_ecs::world::{EntityWorldMut, World};
 use bevy_transform::{components::Transform, TransformBundle};
 use dyn_attributed_string::{HorizontalTextAlignment, LineWrap, VerticalTextAlignment};
 use dyn_comp_bundles::{
     components::{
+        marker::{StaleSize, StaleTransform},
         mixins::{
             BlendMode, BlendModeMixin, Constraints, ConstraintsMixin, CornerRadiiMixin,
-            OpacityMixin, PathMixin, SizeMixin, VisibilityMixin,
+            GroupConstraints, GroupConstraintsMixin, OpacityMixin, PathMixin, SizeMixin,
+            VisibilityMixin,
         },
         nodes::{
             CompNode, CompNodeVariant, EllipseArcData, EllipseCompNode, FrameCompNode,
@@ -31,7 +34,7 @@ use glam::{Quat, Vec2, Vec3};
 #[serde(tag = "type")]
 pub enum Node {
     Frame(FrameNode),
-    Group(GroupNode),
+    // Group(GroupNode), // TODO: Implement properly first
     Rectangle(RectangleNode),
     Ellipse(EllipseNode),
     Star(StarNode),
@@ -66,11 +69,9 @@ pub struct FrameNode {
     pub children: Vec<String>,
 }
 
-impl ToEcsBundleImpl for FrameNode {
-    type Bundle = FrameCompNodeBundle;
-
-    fn to_ecs_bundle(&self, _: &DtifInjector) -> Self::Bundle {
-        Self::Bundle {
+impl FrameNode {
+    fn to_ecs_bundle(&self) -> FrameCompNodeBundle {
+        FrameCompNodeBundle {
             node: CompNode {
                 variant: CompNodeVariant::Frame,
             },
@@ -78,7 +79,7 @@ impl ToEcsBundleImpl for FrameNode {
                 clip_content: self.clip_content,
             },
             transform: TransformBundle::from_transform(Transform {
-                translation: Vec3::new(self.translation.x, self.translation.y, 0.0),
+                translation: self.translation.extend(0.0),
                 rotation: Quat::from_rotation_z(self.rotation_deg.to_rad()),
                 scale: Vec3::ONE,
             }),
@@ -92,14 +93,21 @@ impl ToEcsBundleImpl for FrameNode {
     }
 }
 
+impl SpawnBundleImpl for FrameNode {
+    fn spawn<'a>(&self, _: &DtifInjector, world: &'a mut World) -> EntityWorldMut<'a> {
+        world.spawn(self.to_ecs_bundle())
+    }
+}
+
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
 #[serde(rename_all = "camelCase")]
 pub struct GroupNode {
     #[serde(default)]
-    pub translation: Vec2,
+    pub translation: Option<Vec2>,
     #[serde(default)]
-    pub rotation_deg: Angle,
-    pub size: Size,
+    pub rotation_deg: Option<Angle>,
+    #[serde(default)]
+    pub size: Option<Size>,
     #[serde(default = "default_as_true")]
     pub visible: bool,
     #[serde(default)]
@@ -107,27 +115,47 @@ pub struct GroupNode {
     #[serde(default)]
     pub opacity: Opacity,
     #[serde(default)]
+    pub constraints: Option<Constraints>,
+    #[serde(default)]
     pub children: Vec<String>,
 }
 
-impl ToEcsBundleImpl for GroupNode {
-    type Bundle = GroupCompNodeBundle;
-
-    fn to_ecs_bundle(&self, _: &DtifInjector) -> Self::Bundle {
-        Self::Bundle {
+impl GroupNode {
+    fn to_ecs_bundle(&self) -> GroupCompNodeBundle {
+        GroupCompNodeBundle {
             node: CompNode {
                 variant: CompNodeVariant::Group,
             },
             group: GroupCompNode,
             transform: TransformBundle::from_transform(Transform {
-                translation: Vec3::new(self.translation.x, self.translation.y, 0.0),
-                rotation: Quat::from_rotation_z(self.rotation_deg.to_rad()),
+                translation: self
+                    .translation
+                    .map(|translation| translation.extend(0.0))
+                    .unwrap_or_default(),
+                rotation: self
+                    .rotation_deg
+                    .map(|rotation_deg| Quat::from_rotation_z(rotation_deg.to_rad()))
+                    .unwrap_or_default(),
                 scale: Vec3::ONE,
             }),
+            size: SizeMixin(self.size.unwrap_or_default()),
             visibility: VisibilityMixin(self.visible),
             blend_mode: BlendModeMixin(self.blend_mode),
             opacity: OpacityMixin(self.opacity),
+            constraints: GroupConstraintsMixin(match self.constraints {
+                Some(constraints) => GroupConstraints::Constraints(constraints),
+                None => GroupConstraints::Mixed,
+            }),
         }
+    }
+}
+
+impl SpawnBundleImpl for GroupNode {
+    fn spawn<'a>(&self, _: &DtifInjector, world: &'a mut World) -> EntityWorldMut<'a> {
+        let mut entity_world = world.spawn(self.to_ecs_bundle());
+        entity_world.insert(StaleTransform);
+        entity_world.insert(StaleSize);
+        return entity_world;
     }
 }
 
@@ -153,17 +181,15 @@ pub struct RectangleNode {
     pub styles: Vec<Style>,
 }
 
-impl ToEcsBundleImpl for RectangleNode {
-    type Bundle = RectangleCompNodeBundle;
-
-    fn to_ecs_bundle(&self, _: &DtifInjector) -> Self::Bundle {
-        Self::Bundle {
+impl RectangleNode {
+    fn to_ecs_bundle(&self) -> RectangleCompNodeBundle {
+        RectangleCompNodeBundle {
             node: CompNode {
                 variant: CompNodeVariant::Rectangle,
             },
             rectangle: RectangleCompNode::default(),
             transform: TransformBundle::from_transform(Transform {
-                translation: Vec3::new(self.translation.x, self.translation.y, 0.0),
+                translation: self.translation.extend(0.0),
                 rotation: Quat::from_rotation_z(self.rotation_deg.to_rad()),
                 scale: Vec3::ONE,
             }),
@@ -174,6 +200,12 @@ impl ToEcsBundleImpl for RectangleNode {
             opacity: OpacityMixin(self.opacity),
             constraints: ConstraintsMixin(self.constraints),
         }
+    }
+}
+
+impl SpawnBundleImpl for RectangleNode {
+    fn spawn<'a>(&self, _: &DtifInjector, world: &'a mut World) -> EntityWorldMut<'a> {
+        world.spawn(self.to_ecs_bundle())
     }
 }
 
@@ -203,11 +235,9 @@ pub struct EllipseNode {
     pub styles: Vec<Style>,
 }
 
-impl ToEcsBundleImpl for EllipseNode {
-    type Bundle = EllipseCompNodeBundle;
-
-    fn to_ecs_bundle(&self, _: &DtifInjector) -> Self::Bundle {
-        Self::Bundle {
+impl EllipseNode {
+    fn to_ecs_bundle(&self) -> EllipseCompNodeBundle {
+        EllipseCompNodeBundle {
             node: CompNode {
                 variant: CompNodeVariant::Ellipse,
             },
@@ -219,7 +249,7 @@ impl ToEcsBundleImpl for EllipseNode {
                 },
             },
             transform: TransformBundle::from_transform(Transform {
-                translation: Vec3::new(self.translation.x, self.translation.y, 0.0),
+                translation: self.translation.extend(0.0),
                 rotation: Quat::from_rotation_z(self.rotation_deg.to_rad()),
                 scale: Vec3::ONE,
             }),
@@ -229,6 +259,12 @@ impl ToEcsBundleImpl for EllipseNode {
             opacity: OpacityMixin(self.opacity),
             constraints: ConstraintsMixin(self.constraints),
         }
+    }
+}
+
+impl SpawnBundleImpl for EllipseNode {
+    fn spawn<'a>(&self, _: &DtifInjector, world: &'a mut World) -> EntityWorldMut<'a> {
+        world.spawn(self.to_ecs_bundle())
     }
 }
 
@@ -256,11 +292,9 @@ pub struct StarNode {
     pub styles: Vec<Style>,
 }
 
-impl ToEcsBundleImpl for StarNode {
-    type Bundle = StarCompNodeBundle;
-
-    fn to_ecs_bundle(&self, _: &DtifInjector) -> Self::Bundle {
-        Self::Bundle {
+impl StarNode {
+    fn to_ecs_bundle(&self) -> StarCompNodeBundle {
+        StarCompNodeBundle {
             node: CompNode {
                 variant: CompNodeVariant::Star,
             },
@@ -269,7 +303,7 @@ impl ToEcsBundleImpl for StarNode {
                 point_count: self.point_count,
             },
             transform: TransformBundle::from_transform(Transform {
-                translation: Vec3::new(self.translation.x, self.translation.y, 0.0),
+                translation: self.translation.extend(0.0),
                 rotation: Quat::from_rotation_z(self.rotation_deg.to_rad()),
                 scale: Vec3::ONE,
             }),
@@ -279,6 +313,12 @@ impl ToEcsBundleImpl for StarNode {
             opacity: OpacityMixin(self.opacity),
             constraints: ConstraintsMixin(self.constraints),
         }
+    }
+}
+
+impl SpawnBundleImpl for StarNode {
+    fn spawn<'a>(&self, _: &DtifInjector, world: &'a mut World) -> EntityWorldMut<'a> {
+        world.spawn(self.to_ecs_bundle())
     }
 }
 
@@ -309,11 +349,9 @@ pub struct PolygonNode {
     pub styles: Vec<Style>,
 }
 
-impl ToEcsBundleImpl for PolygonNode {
-    type Bundle = PolygonCompNodeBundle;
-
-    fn to_ecs_bundle(&self, _: &DtifInjector) -> Self::Bundle {
-        Self::Bundle {
+impl PolygonNode {
+    fn to_ecs_bundle(&self) -> PolygonCompNodeBundle {
+        PolygonCompNodeBundle {
             node: CompNode {
                 variant: CompNodeVariant::Polygon,
             },
@@ -321,7 +359,7 @@ impl ToEcsBundleImpl for PolygonNode {
                 point_count: self.point_count,
             },
             transform: TransformBundle::from_transform(Transform {
-                translation: Vec3::new(self.translation.x, self.translation.y, 0.0),
+                translation: self.translation.extend(0.0),
                 rotation: Quat::from_rotation_z(self.rotation_deg.to_rad()),
                 scale: Vec3::ONE,
             }),
@@ -331,6 +369,12 @@ impl ToEcsBundleImpl for PolygonNode {
             opacity: OpacityMixin(self.opacity),
             constraints: ConstraintsMixin(self.constraints),
         }
+    }
+}
+
+impl SpawnBundleImpl for PolygonNode {
+    fn spawn<'a>(&self, _: &DtifInjector, world: &'a mut World) -> EntityWorldMut<'a> {
+        world.spawn(self.to_ecs_bundle())
     }
 }
 
@@ -367,11 +411,9 @@ pub struct TextNode {
     pub styles: Vec<Style>,
 }
 
-impl ToEcsBundleImpl for TextNode {
-    type Bundle = TextCompNodeBundle;
-
-    fn to_ecs_bundle(&self, _: &DtifInjector) -> Self::Bundle {
-        Self::Bundle {
+impl TextNode {
+    fn to_ecs_bundle(&self) -> TextCompNodeBundle {
+        TextCompNodeBundle {
             node: CompNode {
                 variant: CompNodeVariant::Text,
             },
@@ -383,7 +425,7 @@ impl ToEcsBundleImpl for TextNode {
                 vertical_text_alignment: self.vertical_text_alignment,
             },
             transform: TransformBundle::from_transform(Transform {
-                translation: Vec3::new(self.translation.x, self.translation.y, 0.0),
+                translation: self.translation.extend(0.0),
                 rotation: Quat::from_rotation_z(self.rotation_deg.to_rad()),
                 scale: Vec3::ONE,
             }),
@@ -393,6 +435,12 @@ impl ToEcsBundleImpl for TextNode {
             opacity: OpacityMixin(self.opacity),
             constraints: ConstraintsMixin(self.constraints),
         }
+    }
+}
+
+impl SpawnBundleImpl for TextNode {
+    fn spawn<'a>(&self, _: &DtifInjector, world: &'a mut World) -> EntityWorldMut<'a> {
+        world.spawn(self.to_ecs_bundle())
     }
 }
 
@@ -417,18 +465,16 @@ pub struct VectorNode {
     pub styles: Vec<Style>,
 }
 
-impl ToEcsBundleImpl for VectorNode {
-    type Bundle = VectorNodeBundle;
-
-    fn to_ecs_bundle(&self, _: &DtifInjector) -> Self::Bundle {
-        Self::Bundle {
+impl VectorNode {
+    fn to_ecs_bundle(&self) -> VectorNodeBundle {
+        VectorNodeBundle {
             node: CompNode {
                 variant: CompNodeVariant::Vector,
             },
             path: PathMixin(string_to_tiny_skia_path(&self.path).unwrap()),
             vector: VectorCompNode,
             transform: TransformBundle::from_transform(Transform {
-                translation: Vec3::new(self.translation.x, self.translation.y, 0.0),
+                translation: self.translation.extend(0.0),
                 rotation: Quat::from_rotation_z(self.rotation_deg.to_rad()),
                 scale: Vec3::ONE,
             }),
@@ -438,5 +484,11 @@ impl ToEcsBundleImpl for VectorNode {
             opacity: OpacityMixin(self.opacity),
             constraints: ConstraintsMixin(self.constraints),
         }
+    }
+}
+
+impl SpawnBundleImpl for VectorNode {
+    fn spawn<'a>(&self, _: &DtifInjector, world: &'a mut World) -> EntityWorldMut<'a> {
+        world.spawn(self.to_ecs_bundle())
     }
 }

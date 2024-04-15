@@ -37,11 +37,10 @@ impl SvgBundle for ShapeNodeSvgBundle {
 
     fn elements_iter<'a>(&'a self) -> Box<dyn Iterator<Item = &'a SvgElement> + 'a> {
         Box::new(
-            std::iter::once(&self.root_g).chain(
-                std::iter::once(&self.defs)
-                    .chain(std::iter::once(&self.click_area_rect))
-                    .chain(std::iter::once(&self.styles_wrapper_g)),
-            ),
+            std::iter::once(&self.root_g)
+                .chain(std::iter::once(&self.defs))
+                .chain(std::iter::once(&self.click_area_rect))
+                .chain(std::iter::once(&self.styles_wrapper_g)),
         )
     }
 
