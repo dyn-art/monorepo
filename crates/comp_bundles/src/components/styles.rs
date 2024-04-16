@@ -9,6 +9,7 @@ pub struct CompStyle {
 pub enum CompStyleVariant {
     Fill,
     Stroke,
+    Shadow,
 }
 
 #[derive(Component, Debug, Default, Copy, Clone)]

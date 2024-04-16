@@ -3,6 +3,7 @@ use crate::{
     svg::svg_bundle::{
         node::{frame::FrameNodeSvgBundle, group::GroupNodeSvgBundle, shape::ShapeNodeSvgBundle},
         style::{
+            drop_shadow_effect::DropShadowEffectStyleSvgBundle,
             gradient_fill::GradientFillStyleSvgBundle, image_fill::ImageFillStyleSvgBundle,
             solid_fill::SolidFillStyleSvgBundle,
         },
@@ -98,6 +99,9 @@ pub fn insert_style_svg_bundle(
                         maybe_image_paint.unwrap().scale_mode,
                         &mut svg_context_res,
                     ))),
+                    (CompStyleVariant::Shadow, _) => Some(SvgBundleVariant::DropShadowEffect(
+                        DropShadowEffectStyleSvgBundle::new(entity, &mut svg_context_res),
+                    )),
                 };
 
                 if let Some(bundle_variant) = bundle_variant {

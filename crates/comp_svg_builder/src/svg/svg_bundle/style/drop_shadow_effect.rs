@@ -40,14 +40,18 @@
 
 use crate::{
     resources::svg_context::SvgContextRes,
-    svg::svg_element::{
-        attributes::{SvgAttribute, SvgMeasurementUnit},
-        styles::{SvgStyle, SvgStyleColor},
-        SvgElement, SvgTag,
+    svg::{
+        svg_bundle::SvgBundle,
+        svg_element::{
+            attributes::{SvgAttribute, SvgMeasurementUnit},
+            styles::{SvgStyle, SvgStyleColor},
+            SvgElement, SvgTag,
+        },
     },
 };
 use bevy_ecs::entity::Entity;
 
+#[derive(Debug, Clone)]
 pub struct DropShadowEffectStyleSvgBundle {
     pub entity: Entity,
 
@@ -70,6 +74,66 @@ pub struct DropShadowEffectStyleSvgBundle {
     /**//**//**//**/ pub source_graphic_fe_merge_node: SvgElement,
 
     /**/ pub shape_path: SvgElement,
+}
+
+impl SvgBundle for DropShadowEffectStyleSvgBundle {
+    fn get_entity(&self) -> &Entity {
+        &self.entity
+    }
+
+    fn get_root_element(&self) -> &SvgElement {
+        &self.root_g
+    }
+
+    fn get_root_element_mut(&mut self) -> &mut SvgElement {
+        &mut self.root_g
+    }
+
+    fn elements_iter<'a>(&'a self) -> Box<dyn Iterator<Item = &'a SvgElement> + 'a> {
+        Box::new(
+            std::iter::once(&self.root_g)
+                .chain(std::iter::once(&self.defs))
+                .chain(std::iter::once(&self.filter))
+                .chain(std::iter::once(&self.fe_offset))
+                .chain(std::iter::once(&self.fe_gaussian_blur))
+                .chain(std::iter::once(&self.contour_fe_component_transfer))
+                .chain(std::iter::once(&self.contour_fe_func_a))
+                .chain(std::iter::once(&self.fe_composite))
+                .chain(std::iter::once(&self.spread_fe_component_transfer))
+                .chain(std::iter::once(&self.spread_fe_func_a))
+                .chain(std::iter::once(&self.color_fe_color_matrix))
+                .chain(std::iter::once(&self.noise_fe_turbulence))
+                .chain(std::iter::once(&self.noise_fe_color_matrix))
+                .chain(std::iter::once(&self.noise_fe_composite))
+                .chain(std::iter::once(&self.fe_merge))
+                .chain(std::iter::once(&self.mix_fe_merge_node))
+                .chain(std::iter::once(&self.source_graphic_fe_merge_node))
+                .chain(std::iter::once(&self.shape_path)),
+        )
+    }
+
+    fn elements_iter_mut<'a>(&'a mut self) -> Box<dyn Iterator<Item = &'a mut SvgElement> + 'a> {
+        Box::new(
+            std::iter::once(&mut self.root_g)
+                .chain(std::iter::once(&mut self.defs))
+                .chain(std::iter::once(&mut self.filter))
+                .chain(std::iter::once(&mut self.fe_offset))
+                .chain(std::iter::once(&mut self.fe_gaussian_blur))
+                .chain(std::iter::once(&mut self.contour_fe_component_transfer))
+                .chain(std::iter::once(&mut self.contour_fe_func_a))
+                .chain(std::iter::once(&mut self.fe_composite))
+                .chain(std::iter::once(&mut self.spread_fe_component_transfer))
+                .chain(std::iter::once(&mut self.spread_fe_func_a))
+                .chain(std::iter::once(&mut self.color_fe_color_matrix))
+                .chain(std::iter::once(&mut self.noise_fe_turbulence))
+                .chain(std::iter::once(&mut self.noise_fe_color_matrix))
+                .chain(std::iter::once(&mut self.noise_fe_composite))
+                .chain(std::iter::once(&mut self.fe_merge))
+                .chain(std::iter::once(&mut self.mix_fe_merge_node))
+                .chain(std::iter::once(&mut self.source_graphic_fe_merge_node))
+                .chain(std::iter::once(&mut self.shape_path)),
+        )
+    }
 }
 
 impl DropShadowEffectStyleSvgBundle {
