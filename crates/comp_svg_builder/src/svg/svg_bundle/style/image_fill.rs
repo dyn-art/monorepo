@@ -20,7 +20,7 @@ pub struct ImageFillStyleSvgBundle {
     pub root_g: SvgElement,
     /**/ pub defs: SvgElement,
     /**//**/ pub pattern: SvgElement,
-    /**//**/ pub image: SvgElement,
+    /**//**//**/ pub image: SvgElement,
     /**/ pub shape_path: SvgElement,
 }
 
