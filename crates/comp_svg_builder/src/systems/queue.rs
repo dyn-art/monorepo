@@ -29,7 +29,9 @@ fn queue_changed_bundles(
     changed_bundles.sort_by(|a, b| {
         a.hierarchy_level
             .cmp(&b.hierarchy_level)
-            .then(a.child_index.cmp(&b.child_index))
+            // Note: Reverse the order because in a SVG, the top-most element appears last in the children "array",
+            // contrary to the DtifComposition convention where the first element (index = 0) is at the top
+            .then(b.child_index.cmp(&a.child_index))
     });
 
     // Send output events
