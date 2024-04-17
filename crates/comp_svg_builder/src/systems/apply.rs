@@ -517,10 +517,7 @@ pub fn apply_path_mixin_changes(
         (&PathMixin, &mut SvgBundleVariant),
         (With<CompNode>, Without<CompStyle>, Changed<PathMixin>),
     >,
-    mut style_bundle_query: Query<
-        &mut SvgBundleVariant,
-        (With<CompStyle>, Without<CompNode>, With<FillCompStyle>),
-    >,
+    mut style_bundle_query: Query<&mut SvgBundleVariant, (With<CompStyle>, Without<CompNode>)>,
 ) {
     for (PathMixin(path), mut node_bundle_variant) in query.iter_mut() {
         // Apply path to node bundle

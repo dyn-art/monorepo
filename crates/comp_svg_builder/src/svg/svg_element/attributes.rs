@@ -67,6 +67,9 @@ pub enum SvgAttribute {
     Fill {
         fill: SvgAttributeColor,
     },
+    Filter {
+        filter: SvgAttributeFilter,
+    },
     D {
         d: SvgPathAttribute,
     },
@@ -170,6 +173,7 @@ impl SvgAttribute {
             Self::PatternTransform { .. } => "patternTransform",
 
             Self::Fill { .. } => "fill",
+            Self::Filter { .. } => "filter",
             Self::D { .. } => "d",
             Self::ClipPath { .. } => "clip-path",
             Self::PatternUnits { .. } => "patternUnits",
@@ -250,6 +254,10 @@ impl SvgAttribute {
                 }
                 SvgAttributeColor::Reference { id } => format!("url(#{id})"),
                 SvgAttributeColor::None => String::from("none"),
+            },
+            Self::Filter { filter } => match filter {
+                SvgAttributeFilter::Reference { id } => format!("url(#{id})"),
+                SvgAttributeFilter::None => String::from("none"),
             },
             Self::D { d } => d.0.clone(),
             Self::ClipPath { clip_path } => format!("url(#{clip_path})"),
@@ -402,5 +410,15 @@ pub enum SvgAttributeColor {
     Reference {
         id: SvgElementId,
     },
+    None,
+}
+
+#[derive(Debug, PartialEq, Copy, Clone)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type)
+)]
+pub enum SvgAttributeFilter {
+    Reference { id: SvgElementId },
     None,
 }

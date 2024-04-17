@@ -43,7 +43,7 @@ use crate::{
     svg::{
         svg_bundle::SvgBundle,
         svg_element::{
-            attributes::{SvgAttribute, SvgMeasurementUnit},
+            attributes::{SvgAttribute, SvgAttributeFilter, SvgMeasurementUnit},
             styles::{SvgStyle, SvgStyleColor},
             SvgElement, SvgTag,
         },
@@ -343,8 +343,8 @@ impl DropShadowEffectStyleSvgBundle {
         fe_merge_element.append_child_in_bundle_context(&mut source_graphic_fe_merge_node_element);
 
         let mut shape_path_element = cx.create_element(SvgTag::Path);
-        shape_path_element.set_style(SvgStyle::Fill {
-            fill: SvgStyleColor::Reference {
+        shape_path_element.set_attribute(SvgAttribute::Filter {
+            filter: SvgAttributeFilter::Reference {
                 id: filter_element.get_id(),
             },
         });

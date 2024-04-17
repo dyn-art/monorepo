@@ -88,7 +88,7 @@ impl DtifInjector {
     fn spawn_node<'a>(&self, node: &Node, world: &'a mut World) -> EntityWorldMut<'a> {
         match node {
             Node::Frame(node) => node.spawn(&self, world),
-            // Node::Group(node) => node.spawn(&self, world),
+            // Node::Group(node) => node.spawn(&self, world), // TODO: Group
             Node::Rectangle(node) => node.spawn(&self, world),
             Node::Ellipse(node) => node.spawn(&self, world),
             Node::Star(node) => node.spawn(&self, world),
@@ -107,7 +107,7 @@ impl DtifInjector {
     ) {
         let dtif_children = match node {
             Node::Frame(node) => &node.children,
-            // Node::Group(node) => &node.children,
+            // Node::Group(node) => &node.children, // TODO: Group
             _ => return,
         };
 
@@ -158,15 +158,21 @@ impl DtifInjector {
         // Spawn style
         let mut style_entity_world_mut = self.spawn_style(style, world);
         style_entity_world_mut.insert(StyleParentMixin(node_entity));
-        let paint_entity = style_entity_world_mut.get::<PaintChildMixin>()?.0?;
         let style_entity = style_entity_world_mut.id();
 
         // Reference style entity in paint
-        let mut paint_entity_world_mut = world.get_entity_mut(paint_entity)?;
-        if let Some(mut paint_parent_mixin) = paint_entity_world_mut.get_mut::<PaintParentMixin>() {
-            paint_parent_mixin.0.push(style_entity);
-        } else {
-            paint_entity_world_mut.insert(PaintParentMixin(smallvec![style_entity]));
+        if let Some(paint_entity) = style_entity_world_mut
+            .get::<PaintChildMixin>()
+            .and_then(|paint| paint.0)
+        {
+            let mut paint_entity_world_mut = world.get_entity_mut(paint_entity)?;
+            if let Some(mut paint_parent_mixin) =
+                paint_entity_world_mut.get_mut::<PaintParentMixin>()
+            {
+                paint_parent_mixin.0.push(style_entity);
+            } else {
+                paint_entity_world_mut.insert(PaintParentMixin(smallvec![style_entity]));
+            }
         }
 
         return Some(style_entity);
