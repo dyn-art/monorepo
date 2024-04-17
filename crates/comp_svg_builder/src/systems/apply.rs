@@ -545,6 +545,9 @@ pub fn apply_path_mixin_changes(
                         SvgBundleVariant::ImageFill(bundle) => bundle
                             .shape_path
                             .set_attribute(SvgAttribute::D { d: path.into() }),
+                        SvgBundleVariant::DropShadowEffect(bundle) => bundle
+                            .shape_path
+                            .set_attribute(SvgAttribute::D { d: path.into() }),
                         _ => {}
                     }
                 }
@@ -795,12 +798,6 @@ fn calculate_cropped_image_transform(
 ) -> (f32, f32, Mat3) {
     let (parent_width, parent_height) = parent_size.to_tuple();
     let (image_width, image_height) = image_size;
-
-    log::info!(
-        "[calculate_cropped_image_transform] {:?} - {:?}",
-        parent_size,
-        image_size
-    );
 
     // Calculate aspect ratios for container and image
     let container_ratio = parent_width / parent_height;

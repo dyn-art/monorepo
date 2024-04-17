@@ -14,7 +14,7 @@ use systems::{
         apply_size_mixin_changes, apply_solid_paint_changes, apply_stroke_path_mixin_changes,
         apply_transform_changes, apply_visibility_mixin_changes,
     },
-    prepare::{insert_node_svg_bundle, insert_style_svg_bundle, sync_node_size_with_style},
+    prepare::{insert_node_svg_bundle, insert_style_svg_bundle, propagate_size_mixin_to_style},
 };
 
 pub struct CompSvgBuilderPlugin {
@@ -57,7 +57,7 @@ impl Plugin for CompSvgBuilderPlugin {
         app.add_systems(
             PostUpdate,
             (
-                sync_node_size_with_style.in_set(CompSvgBuilderSystemSet::Prepare),
+                propagate_size_mixin_to_style.in_set(CompSvgBuilderSystemSet::Prepare),
                 insert_node_svg_bundle.in_set(CompSvgBuilderSystemSet::Prepare),
                 insert_style_svg_bundle
                     .in_set(CompSvgBuilderSystemSet::Prepare)

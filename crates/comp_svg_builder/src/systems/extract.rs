@@ -11,7 +11,7 @@ use bevy_ecs::{
 };
 use bevy_hierarchy::{Children, Parent};
 use dyn_comp_bundles::components::{
-    mixins::{StyleChildrenMixin, StyleParentMixin},
+    mixins::{HierarchyLevel, StyleChildrenMixin, StyleParentMixin},
     nodes::CompNode,
     styles::CompStyle,
 };
@@ -19,41 +19,50 @@ use dyn_comp_bundles::components::{
 pub fn extract_node_bundles(
     mut changed_svg_bundles_res: ResMut<ChangedSvgBundlesRes>,
     mut query: Query<
-        (Entity, &mut SvgBundleVariant, Option<&Parent>),
+        (
+            Entity,
+            &mut SvgBundleVariant,
+            Option<&Parent>,
+            Option<&HierarchyLevel>,
+        ),
         (With<CompNode>, Changed<SvgBundleVariant>),
     >,
-    child_query: Query<&Children>,
+    children_query: Query<&Children>,
 ) {
-    for (entity, mut bundle_variant, maybe_parent) in query.iter_mut() {
+    let default_hierarchy_level = 0;
+    let default_child_index = 0;
+
+    for (entity, mut bundle_variant, maybe_parent, maybe_hierarchy_level) in query.iter_mut() {
         let (elements_changes, deferred_elements_changes) =
             bundle_variant.get_svg_bundle_mut().drain_changes();
 
         if !elements_changes.is_empty() {
             // Try to get parent entity and the current entity's position in the parent's children array
-            let (parent_entity, index) =
-                if let Some(parent_entity) = maybe_parent.map(|parent| parent.get()) {
-                    if let Ok(children) = child_query.get(parent_entity) {
-                        children
-                            .iter()
-                            .position(|&child| child == entity)
-                            .map(|index| (Some(parent_entity), index))
-                            .unwrap_or((Some(parent_entity), 0))
-                    }
-                    // No children found, default index to 0
-                    else {
-                        (Some(parent_entity), 0)
-                    }
+            let child_index = if let Some(parent_entity) = maybe_parent.map(|parent| parent.get()) {
+                if let Ok(children) = children_query.get(parent_entity) {
+                    children
+                        .iter()
+                        .position(|&child| child == entity)
+                        .map(|index| index)
+                        .unwrap_or(default_child_index)
                 }
-                // No parent, so no index
+                // No children found, default index to 0
                 else {
-                    (None, 0)
-                };
+                    default_child_index
+                }
+            }
+            // No parent, so no index
+            else {
+                default_child_index
+            };
 
             changed_svg_bundles_res.push_change(ChangedSvgBundle {
                 entity,
-                parent_entity,
                 elements_changes,
-                index,
+                child_index,
+                hierarchy_level: maybe_hierarchy_level
+                    .map(|level| level.0)
+                    .unwrap_or(default_hierarchy_level),
             });
         }
 
@@ -71,32 +80,41 @@ pub fn extract_style_bundles(
         (Entity, &mut SvgBundleVariant, &StyleParentMixin),
         (With<CompStyle>, Changed<SvgBundleVariant>),
     >,
-    child_query: Query<&StyleChildrenMixin>,
+    children_query: Query<(&StyleChildrenMixin, Option<&HierarchyLevel>)>,
 ) {
+    let default_hierarchy_level = 1;
+    let default_child_index = 0;
+
     for (entity, mut bundle_variant, StyleParentMixin(parent_entity)) in query.iter_mut() {
         let (elements_changes, deferred_elements_changes) =
             bundle_variant.get_svg_bundle_mut().drain_changes();
 
         if !elements_changes.is_empty() {
             // Try to get parent entity and the current entity's position in the parent's children array
-            let (parent_entity, index) =
-                if let Ok(StyleChildrenMixin(children)) = child_query.get(*parent_entity) {
+            let (hierarchy_level, child_index) =
+                if let Ok((StyleChildrenMixin(children), maybe_hierarchy_level)) =
+                    children_query.get(*parent_entity)
+                {
+                    // Increment hierarchy level by 1 because the queried hierarchy level is from the parent
+                    let hierarchy_level = maybe_hierarchy_level
+                        .map(|level| level.0 + 1)
+                        .unwrap_or(default_hierarchy_level);
                     children
                         .iter()
                         .position(|&child| child == entity)
-                        .map(|index| (parent_entity, index))
-                        .unwrap_or((parent_entity, 0))
+                        .map(|index| (hierarchy_level, index))
+                        .unwrap_or((hierarchy_level, default_child_index))
                 }
                 // No children found, default index to 0
                 else {
-                    (parent_entity, 0)
+                    (default_hierarchy_level, default_child_index)
                 };
 
             changed_svg_bundles_res.push_change(ChangedSvgBundle {
                 entity,
-                parent_entity: Some(*parent_entity),
                 elements_changes,
-                index,
+                child_index,
+                hierarchy_level,
             });
         }
 

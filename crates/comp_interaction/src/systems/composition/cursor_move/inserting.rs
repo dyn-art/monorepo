@@ -217,8 +217,6 @@ pub fn handle_inserting(
         let mut node_entity_commands = commands.entity(node_entity);
         node_entity_commands.insert(StyleChildrenMixin(smallvec![style_entity]));
 
-        // TODO: Child is pushed as last element to the children array
-        //       which causes it to be on the bottom although it should be the top most node?
         if let Some(parent) = maybe_parent {
             commands.entity(parent).insert_children(0, &[node_entity]);
         } else {
