@@ -3,17 +3,25 @@ use bevy_ecs::world::{EntityWorldMut, World};
 use dyn_comp_bundles::{
     components::{
         mixins::{BlendMode, BlendModeMixin, OpacityMixin, PaintChildMixin, VisibilityMixin},
-        styles::{CompStyle, CompStyleVariant, FillCompStyle, StrokeCompStyle},
+        styles::{
+            CompStyle, CompStyleVariant, DropShadowCompStyle, FillCompStyle, StrokeCompStyle,
+        },
     },
-    FillStyleBundle, StrokeStyleBundle,
+    DropShadowStyleBundle, FillStyleBundle, StrokeStyleBundle,
 };
-use dyn_utils::{properties::opacity::Opacity, serde::default_as_true};
+use dyn_utils::{
+    properties::{color::Color, opacity::Opacity},
+    serde::default_as_true,
+    units::{abs::Abs, ratio::Ratio},
+};
+use glam::Vec2;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
 #[serde(tag = "type")]
 pub enum Style {
     Fill(FillStyle),
     Stroke(StrokeStyle),
+    DropShadow(DropShadowStyle),
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
@@ -93,6 +101,53 @@ impl StrokeStyle {
 }
 
 impl SpawnBundleImpl for StrokeStyle {
+    fn spawn<'a>(&self, dtif_injector: &DtifInjector, world: &'a mut World) -> EntityWorldMut<'a> {
+        world.spawn(self.to_ecs_bundle(dtif_injector))
+    }
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
+#[serde(rename_all = "camelCase")]
+pub struct DropShadowStyle {
+    #[serde(default)]
+    pub color: Color,
+    pub position: Vec2, // (4, 4)
+    #[serde(default)]
+    pub spread: Abs,
+    pub blur: Abs,         // 3
+    pub contour: Vec<Abs>, // [0, 1]
+    #[serde(default)]
+    pub noise: Ratio,
+    #[serde(default = "default_as_true")]
+    pub visible: bool,
+    #[serde(default)]
+    pub blend_mode: BlendMode,
+    #[serde(default)]
+    pub opacity: Opacity,
+}
+
+impl DropShadowStyle {
+    fn to_ecs_bundle(&self, _: &DtifInjector) -> DropShadowStyleBundle {
+        DropShadowStyleBundle {
+            style: CompStyle {
+                variant: CompStyleVariant::DropShadow,
+            },
+            dorp_shadow: DropShadowCompStyle {
+                color: self.color,
+                position: self.position,
+                spread: self.spread,
+                blur: self.blur,
+                contour: self.contour.clone(),
+                noise: self.noise,
+            },
+            visibility: VisibilityMixin(self.visible),
+            blend_mode: BlendModeMixin(self.blend_mode),
+            opacity: OpacityMixin(self.opacity),
+        }
+    }
+}
+
+impl SpawnBundleImpl for DropShadowStyle {
     fn spawn<'a>(&self, dtif_injector: &DtifInjector, world: &'a mut World) -> EntityWorldMut<'a> {
         world.spawn(self.to_ecs_bundle(dtif_injector))
     }

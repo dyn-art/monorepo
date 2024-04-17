@@ -185,9 +185,12 @@ pub struct StrokeStyleBundle {
 }
 
 #[derive(Bundle, Debug)]
-pub struct DropShadowEffectStyleBundle {
+pub struct DropShadowStyleBundle {
     pub style: CompStyle,
     pub dorp_shadow: DropShadowCompStyle,
+    pub visibility: VisibilityMixin,
+    pub blend_mode: BlendModeMixin,
+    pub opacity: OpacityMixin,
     // https://github.com/Nilirad/bevy_prototype_lyon/issues/207
     // pub parent: StyleParentMixin,
 }

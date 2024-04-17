@@ -96,9 +96,13 @@ pub fn insert_style_svg_bundle(
             )),
         };
 
-        // let bundle_variant =
         if let Some(bundle_variant) = maybe_bundle_variant {
             commands.entity(entity).insert(bundle_variant);
+        } else {
+            log::warn!(
+                "Failed to create bundle for style variant: {:?}",
+                style.variant
+            );
         }
     }
 }

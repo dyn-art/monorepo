@@ -176,6 +176,7 @@ impl DtifInjector {
         match style {
             Style::Fill(style) => style.spawn(&self, world),
             Style::Stroke(style) => style.spawn(&self, world),
+            Style::DropShadow(style) => style.spawn(&self, world),
         }
     }
 

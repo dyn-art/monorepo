@@ -98,6 +98,8 @@ export type CursorMovedOnCompInputEvent = { position: Vec2 }
 
 export type CursorUpOnCompInputEvent = { position: Vec2; button: MouseButton }
 
+export type DropShadowStyle = { color?: Color; position: Vec2; spread?: Abs; blur: Abs; contour: Abs[]; noise?: Ratio; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity }
+
 /**
  * DTIF (Design Tree Interchange Format) utilizes a flat structure for easy readability
  * and efficient access & manipulation of design elements (Nodes, Paints, ..).
@@ -1396,7 +1398,7 @@ export type StarNode = { innerRadiusRatio?: number; pointCount?: number; transla
 
 export type StrokeStyle = { width: number; paintId: string; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity }
 
-export type Style = ({ type: "Fill" } & FillStyle) | ({ type: "Stroke" } & StrokeStyle)
+export type Style = ({ type: "Fill" } & FillStyle) | ({ type: "Stroke" } & StrokeStyle) | ({ type: "DropShadow" } & DropShadowStyle)
 
 export type SvgAttribute = { type: "Id"; id: SvgElementId } | { type: "Class"; class: string } | { type: "Href"; href: SvgHrefAttribute } | { type: "Width"; width: number; unit: SvgMeasurementUnit } | { type: "Height"; height: number; unit: SvgMeasurementUnit } | { type: "X"; x: number; unit: SvgMeasurementUnit } | { type: "Y"; y: number; unit: SvgMeasurementUnit } | { type: "DX"; dx: number } | { type: "DY"; dy: number } | { type: "X1"; x1: number } | { type: "Y1"; y1: number } | { type: "X2"; x2: number } | { type: "Y2"; y2: number } | { type: "Transform"; transform: SvgTransformAttribute } | { type: "PatternTransform"; patternTransform: SvgTransformAttribute } | { type: "Fill"; fill: SvgAttributeColor } | { type: "D"; d: SvgPathAttribute } | { type: "ClipPath"; clipPath: SvgElementId } | { type: "PatternUnits"; patternUnits: SvgUnits } | { type: "GradientUnits"; gradientUnits: SvgUnits } | { type: "PreserveAspectRatio"; preserveAspectRatio: string } | { type: "StopColor"; stopColor: SvgAttributeColor } | { type: "StopOpacity"; stopOpacity: number } | { type: "ColorInterpolationFilters"; colorInterpolationFilters: string } | { type: "NumOctaves"; numOctaves: number } | { type: "BaseFrequency"; baseFrequency: number } | { type: "K1"; k1: number } | { type: "K2"; k2: number } | { type: "Offset"; offset: number } | { type: "Slope"; slope: number } | { type: "StdDeviation"; stdDeviation: number } | { type: "TableValues"; tableValues: number[] } | { type: "In"; value: string } | { type: "In2"; value: string } | { type: "Type"; value: string } | { type: "Result"; result: string } | { type: "Values"; values: string } | { type: "Operator"; operator: string }
 

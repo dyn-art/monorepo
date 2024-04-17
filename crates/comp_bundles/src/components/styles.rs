@@ -1,8 +1,9 @@
 use bevy_ecs::component::Component;
 use dyn_utils::{
-    properties::{color::Color, opacity::Opacity},
-    units::{abs::Abs, angle::Angle, ratio::Ratio},
+    properties::color::Color,
+    units::{abs::Abs, ratio::Ratio},
 };
+use glam::Vec2;
 
 #[derive(Component, Debug, Copy, Clone)]
 pub struct CompStyle {
@@ -27,11 +28,9 @@ pub struct StrokeCompStyle {
 #[derive(Component, Debug, Default, Clone)]
 pub struct DropShadowCompStyle {
     pub color: Color,
-    pub opacity: Opacity,
-    pub angle_deg: Angle,
-    pub distance: Abs,
+    pub position: Vec2,
     pub spread: Abs,
-    pub size: Abs,
+    pub blur: Abs,
     pub contour: Vec<Abs>,
     pub noise: Ratio,
 }
