@@ -74,10 +74,9 @@ const DEFAULT_DTIF: COMP.DtifComposition = {
 				},
 				{
 					type: 'DropShadow',
-					opacity: 0.8,
 					position: [4, 4],
 					blur: 3,
-					contour: [0, 1]
+					opacity: 0.3
 				}
 			],
 			size: [100, 100],

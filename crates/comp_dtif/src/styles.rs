@@ -12,7 +12,7 @@ use dyn_comp_bundles::{
 use dyn_utils::{
     properties::{color::Color, opacity::Opacity},
     serde::default_as_true,
-    units::{abs::Abs, ratio::Ratio},
+    units::abs::Abs,
 };
 use glam::Vec2;
 
@@ -111,13 +111,10 @@ impl SpawnBundleImpl for StrokeStyle {
 pub struct DropShadowStyle {
     #[serde(default)]
     pub color: Color,
-    pub position: Vec2, // (4, 4)
+    pub position: Vec2,
     #[serde(default)]
     pub spread: Abs,
-    pub blur: Abs,         // 3
-    pub contour: Vec<Abs>, // [0, 1]
-    #[serde(default)]
-    pub noise: Ratio,
+    pub blur: Abs,
     #[serde(default = "default_as_true")]
     pub visible: bool,
     #[serde(default)]
@@ -137,8 +134,6 @@ impl DropShadowStyle {
                 position: self.position,
                 spread: self.spread,
                 blur: self.blur,
-                contour: self.contour.clone(),
-                noise: self.noise,
             },
             visibility: VisibilityMixin(self.visible),
             blend_mode: BlendModeMixin(self.blend_mode),

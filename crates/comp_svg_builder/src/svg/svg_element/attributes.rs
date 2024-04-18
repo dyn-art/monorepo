@@ -1,4 +1,5 @@
 use super::SvgElementId;
+use glam::{Mat4, Vec4};
 
 #[derive(Debug, PartialEq, Clone)]
 #[cfg_attr(
@@ -53,6 +54,9 @@ pub enum SvgAttribute {
     Y2 {
         y2: f32,
     },
+    Radius {
+        radius: f32,
+    },
 
     // Transformations and Positioning
     Transform {
@@ -98,6 +102,10 @@ pub enum SvgAttribute {
         stop_opacity: f32,
     },
     #[cfg_attr(feature = "serde_support", serde(rename_all = "camelCase"))]
+    FloodOpacity {
+        flood_opacity: f32,
+    },
+    #[cfg_attr(feature = "serde_support", serde(rename_all = "camelCase"))]
     ColorInterpolationFilters {
         color_interpolation_filters: String,
     },
@@ -108,6 +116,9 @@ pub enum SvgAttribute {
     #[cfg_attr(feature = "serde_support", serde(rename_all = "camelCase"))]
     BaseFrequency {
         base_frequency: f32,
+    },
+    Mode {
+        mode: SvgAttributeMode,
     },
 
     // Functional and Miscellaneous Attributes
@@ -132,22 +143,22 @@ pub enum SvgAttribute {
         table_values: Vec<f32>,
     },
     In {
-        value: String,
+        value: SvgAttributeIn,
     },
     In2 {
-        value: String,
+        value: SvgAttributeIn,
     },
     Type {
-        value: String,
+        value: SvgAttributeType,
     },
     Result {
         result: String,
     },
     Values {
-        values: String,
+        values: SvgAttributeValues,
     },
     Operator {
-        operator: String,
+        operator: SvgAttributeOperator,
     },
 }
 
@@ -168,6 +179,7 @@ impl SvgAttribute {
             Self::Y1 { .. } => "y1",
             Self::X2 { .. } => "x2",
             Self::Y2 { .. } => "y2",
+            Self::Radius { .. } => "radius",
 
             Self::Transform { .. } => "transform",
             Self::PatternTransform { .. } => "patternTransform",
@@ -181,9 +193,11 @@ impl SvgAttribute {
             Self::PreserveAspectRatio { .. } => "preserveAspectRatio",
             Self::StopColor { .. } => "stop-color",
             Self::StopOpacity { .. } => "stop-opacity",
+            Self::FloodOpacity { .. } => "flood-opacity",
             Self::ColorInterpolationFilters { .. } => "color-interpolation-filters",
             Self::NumOctaves { .. } => "numOctaves",
             Self::BaseFrequency { .. } => "baseFrequency",
+            Self::Mode { .. } => "mode",
 
             Self::K1 { .. } => "k1",
             Self::K2 { .. } => "k2",
@@ -227,6 +241,7 @@ impl SvgAttribute {
             Self::Y1 { y1 } => y1.to_string(),
             Self::X2 { x2 } => x2.to_string(),
             Self::Y2 { y2 } => y2.to_string(),
+            Self::Radius { radius } => radius.to_string(),
 
             Self::Transform { transform }
             | Self::PatternTransform {
@@ -273,12 +288,21 @@ impl SvgAttribute {
             Self::PreserveAspectRatio {
                 preserve_aspect_ratio,
             } => preserve_aspect_ratio.clone(),
-            Self::StopOpacity { stop_opacity } => stop_opacity.to_string(),
+            Self::StopOpacity {
+                stop_opacity: opacity,
+            }
+            | Self::FloodOpacity {
+                flood_opacity: opacity,
+            } => opacity.to_string(),
             Self::ColorInterpolationFilters {
                 color_interpolation_filters,
             } => color_interpolation_filters.to_string(),
             Self::NumOctaves { num_octaves } => num_octaves.to_string(),
             Self::BaseFrequency { base_frequency } => base_frequency.to_string(),
+            Self::Mode { mode } => match mode {
+                SvgAttributeMode::Normal => String::from("normal"),
+                SvgAttributeMode::Other(other) => other.clone(),
+            },
 
             Self::K1 { k1 } => k1.to_string(),
             Self::K2 { k2 } => k2.to_string(),
@@ -290,12 +314,23 @@ impl SvgAttribute {
             Self::TableValues {
                 table_values: values,
             } => values.iter().map(|&id| id.to_string() + " ").collect(),
-            Self::In { value } => value.clone(),
-            Self::In2 { value } => value.clone(),
-            Self::Type { value } => value.clone(),
+            Self::In { value } | Self::In2 { value } => match value {
+                SvgAttributeIn::SourceAlpha => String::from("SourceAlpha"),
+                SvgAttributeIn::SourceGraphic => String::from("SourceGraphic"),
+                SvgAttributeIn::Other(other) => other.clone(),
+            },
+            Self::Type { value } => match value {
+                SvgAttributeType::Matrix => String::from("matrix"),
+                SvgAttributeType::Other(other) => other.clone(),
+            },
             Self::Result { result } => result.clone(),
-            Self::Values { values } => values.clone(),
-            Self::Operator { operator } => operator.clone(),
+            Self::Values { values } => match values {
+                SvgAttributeValues::ColorMatrix(matrix) => matrix.to_string(),
+            },
+            Self::Operator { operator } => match operator {
+                SvgAttributeOperator::Dilate => String::from("dilate"),
+                SvgAttributeOperator::Other(other) => other.clone(),
+            },
         }
     }
 
@@ -421,4 +456,99 @@ pub enum SvgAttributeColor {
 pub enum SvgAttributeFilter {
     Reference { id: SvgElementId },
     None,
+}
+
+#[derive(Debug, PartialEq, Copy, Clone)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type)
+)]
+pub enum SvgAttributeValues {
+    ColorMatrix(ColorMatrix),
+}
+
+#[derive(Debug, PartialEq, Clone)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type)
+)]
+pub enum SvgAttributeIn {
+    SourceAlpha,
+    SourceGraphic,
+    Other(String),
+}
+
+#[derive(Debug, PartialEq, Clone)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type)
+)]
+pub enum SvgAttributeOperator {
+    Dilate,
+    Other(String),
+}
+
+#[derive(Debug, PartialEq, Clone)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type)
+)]
+pub enum SvgAttributeType {
+    Matrix,
+    Other(String),
+}
+
+#[derive(Debug, PartialEq, Clone)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type)
+)]
+pub enum SvgAttributeMode {
+    Normal,
+    Other(String),
+}
+
+// https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feColorMatrix
+// [r,0,0,0], // red
+// [0,g,0,0], // green
+// [0,0,b,0], // blue
+// [0,0,0,1], // multiplyer
+#[derive(Debug, PartialEq, Copy, Clone)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type)
+)]
+pub struct ColorMatrix(pub Mat4);
+
+impl ColorMatrix {
+    pub fn from_rgba(r: u8, g: u8, b: u8, a: f32) -> Self {
+        Self(Mat4::from_cols(
+            Vec4::new(f32::from(r) / 255.0, 0.0, 0.0, 0.0),
+            Vec4::new(0.0, f32::from(g) / 255.0, 0.0, 0.0),
+            Vec4::new(0.0, 0.0, f32::from(b) / 255.0, 0.0),
+            Vec4::new(0.0, 0.0, 0.0, a),
+        ))
+    }
+
+    pub fn to_string(&self) -> String {
+        format!(
+            "{} {} {} {} 0 {} {} {} {} 0 {} {} {} {} 0 {} {} {} {} 0",
+            self.0.row(0).x,
+            self.0.row(0).y,
+            self.0.row(0).z,
+            self.0.row(0).w,
+            self.0.row(1).x,
+            self.0.row(1).y,
+            self.0.row(1).z,
+            self.0.row(1).w,
+            self.0.row(2).x,
+            self.0.row(2).y,
+            self.0.row(2).z,
+            self.0.row(2).w,
+            self.0.row(3).x,
+            self.0.row(3).y,
+            self.0.row(3).z,
+            self.0.row(3).w
+        )
+    }
 }

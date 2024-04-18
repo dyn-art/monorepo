@@ -423,6 +423,9 @@ pub enum SvgTag {
     FeTurbulence,
     FeMerge,
     FeMergeNode,
+    FeFlood,
+    FeBlend,
+    FeMorphology,
 }
 
 impl SvgTag {
@@ -458,6 +461,9 @@ impl SvgTag {
             SvgTag::FeTurbulence => "feTurbulence",
             SvgTag::FeMerge => "feMerge",
             SvgTag::FeMergeNode => "feMergeNode",
+            SvgTag::FeFlood => "feFlood",
+            SvgTag::FeBlend => "feBlend",
+            SvgTag::FeMorphology => "feMorphology",
         }
     }
 }

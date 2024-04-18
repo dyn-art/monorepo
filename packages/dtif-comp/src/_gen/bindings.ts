@@ -62,6 +62,8 @@ export type BlendMode = "Normal" | "Multiply" | "Screen" | "Overlay" | "Darken" 
 
 export type Color = [number, number, number]
 
+export type ColorMatrix = Mat4
+
 export type CompCoreInputEvent = ({ type: "CompositionResized" } & CompositionResizedInputEvent) | ({ type: "CompositionViewportChanged" } & CompositionViewportChangedInputEvent) | ({ type: "EntityDeleted" } & EntityDeletedInputEvent) | ({ type: "EntityMoved" } & EntityMovedInputEvent) | ({ type: "EntitySetPosition" } & EntitySetPositionInputEvent) | ({ type: "EntitySetRotation" } & EntitySetRotationInputEvent)
 
 export type ComponentChange = { type: "Size"; size: Size } | { type: "Transform"; rotationDeg: number; translation: Vec2 } | { type: "GlobalTransform"; rotationDeg: number; translation: Vec2 }
@@ -98,7 +100,7 @@ export type CursorMovedOnCompInputEvent = { position: Vec2 }
 
 export type CursorUpOnCompInputEvent = { position: Vec2; button: MouseButton }
 
-export type DropShadowStyle = { color?: Color; position: Vec2; spread?: Abs; blur: Abs; contour: Abs[]; noise?: Ratio; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity }
+export type DropShadowStyle = { color?: Color; position: Vec2; spread?: Abs; blur: Abs; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity }
 
 /**
  * DTIF (Design Tree Interchange Format) utilizes a flat structure for easy readability
@@ -1270,6 +1272,8 @@ export type LineWrap =
 
 export type Mat3 = [number, number, number, number, number, number, number, number, number]
 
+export type Mat4 = [number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number]
+
 /**
  * A button on a mouse device.
  * 
@@ -1400,21 +1404,31 @@ export type StrokeStyle = { width: number; paintId: string; visible?: boolean; b
 
 export type Style = ({ type: "Fill" } & FillStyle) | ({ type: "Stroke" } & StrokeStyle) | ({ type: "DropShadow" } & DropShadowStyle)
 
-export type SvgAttribute = { type: "Id"; id: SvgElementId } | { type: "Class"; class: string } | { type: "Href"; href: SvgHrefAttribute } | { type: "Width"; width: number; unit: SvgMeasurementUnit } | { type: "Height"; height: number; unit: SvgMeasurementUnit } | { type: "X"; x: number; unit: SvgMeasurementUnit } | { type: "Y"; y: number; unit: SvgMeasurementUnit } | { type: "DX"; dx: number } | { type: "DY"; dy: number } | { type: "X1"; x1: number } | { type: "Y1"; y1: number } | { type: "X2"; x2: number } | { type: "Y2"; y2: number } | { type: "Transform"; transform: SvgTransformAttribute } | { type: "PatternTransform"; patternTransform: SvgTransformAttribute } | { type: "Fill"; fill: SvgAttributeColor } | { type: "Filter"; filter: SvgAttributeFilter } | { type: "D"; d: SvgPathAttribute } | { type: "ClipPath"; clipPath: SvgElementId } | { type: "PatternUnits"; patternUnits: SvgUnits } | { type: "GradientUnits"; gradientUnits: SvgUnits } | { type: "PreserveAspectRatio"; preserveAspectRatio: string } | { type: "StopColor"; stopColor: SvgAttributeColor } | { type: "StopOpacity"; stopOpacity: number } | { type: "ColorInterpolationFilters"; colorInterpolationFilters: string } | { type: "NumOctaves"; numOctaves: number } | { type: "BaseFrequency"; baseFrequency: number } | { type: "K1"; k1: number } | { type: "K2"; k2: number } | { type: "Offset"; offset: number } | { type: "Slope"; slope: number } | { type: "StdDeviation"; stdDeviation: number } | { type: "TableValues"; tableValues: number[] } | { type: "In"; value: string } | { type: "In2"; value: string } | { type: "Type"; value: string } | { type: "Result"; result: string } | { type: "Values"; values: string } | { type: "Operator"; operator: string }
+export type SvgAttribute = { type: "Id"; id: SvgElementId } | { type: "Class"; class: string } | { type: "Href"; href: SvgHrefAttribute } | { type: "Width"; width: number; unit: SvgMeasurementUnit } | { type: "Height"; height: number; unit: SvgMeasurementUnit } | { type: "X"; x: number; unit: SvgMeasurementUnit } | { type: "Y"; y: number; unit: SvgMeasurementUnit } | { type: "DX"; dx: number } | { type: "DY"; dy: number } | { type: "X1"; x1: number } | { type: "Y1"; y1: number } | { type: "X2"; x2: number } | { type: "Y2"; y2: number } | { type: "Radius"; radius: number } | { type: "Transform"; transform: SvgTransformAttribute } | { type: "PatternTransform"; patternTransform: SvgTransformAttribute } | { type: "Fill"; fill: SvgAttributeColor } | { type: "Filter"; filter: SvgAttributeFilter } | { type: "D"; d: SvgPathAttribute } | { type: "ClipPath"; clipPath: SvgElementId } | { type: "PatternUnits"; patternUnits: SvgUnits } | { type: "GradientUnits"; gradientUnits: SvgUnits } | { type: "PreserveAspectRatio"; preserveAspectRatio: string } | { type: "StopColor"; stopColor: SvgAttributeColor } | { type: "StopOpacity"; stopOpacity: number } | { type: "FloodOpacity"; floodOpacity: number } | { type: "ColorInterpolationFilters"; colorInterpolationFilters: string } | { type: "NumOctaves"; numOctaves: number } | { type: "BaseFrequency"; baseFrequency: number } | { type: "Mode"; mode: SvgAttributeMode } | { type: "K1"; k1: number } | { type: "K2"; k2: number } | { type: "Offset"; offset: number } | { type: "Slope"; slope: number } | { type: "StdDeviation"; stdDeviation: number } | { type: "TableValues"; tableValues: number[] } | { type: "In"; value: SvgAttributeIn } | { type: "In2"; value: SvgAttributeIn } | { type: "Type"; value: SvgAttributeType } | { type: "Result"; result: string } | { type: "Values"; values: SvgAttributeValues } | { type: "Operator"; operator: SvgAttributeOperator }
 
 export type SvgAttributeColor = { RGB: { red: number; green: number; blue: number } } | { RGBA: { red: number; green: number; blue: number; alpha: number } } | { Reference: { id: SvgElementId } } | "None"
 
 export type SvgAttributeFilter = { Reference: { id: SvgElementId } } | "None"
+
+export type SvgAttributeIn = "SourceAlpha" | "SourceGraphic" | { Other: string }
+
+export type SvgAttributeMode = "Normal" | { Other: string }
+
+export type SvgAttributeOperator = "Dilate" | { Other: string }
 
 /**
  * Emitted when an attribute of a SvgElement is removed.
  */
 export type SvgAttributeRemovedChange = { key: string }
 
+export type SvgAttributeType = "Matrix" | { Other: string }
+
 /**
  * Emitted when an attribute of an SvgElement is updated.
  */
 export type SvgAttributeUpdatedChange = { key: string; newValue: string }
+
+export type SvgAttributeValues = { ColorMatrix: ColorMatrix }
 
 export type SvgBlendModeStyle = "Normal" | "Multiply" | "Screen" | "Overlay" | "Darken" | "Lighten" | "ColorDodge" | "ColorBurn" | "HardLight" | "SoftLight" | "Difference" | "Exclusion" | "Hue" | "Saturation" | "Color" | "Luminosity"
 

@@ -4,8 +4,8 @@ use crate::{
         svg_bundle::{style::image_fill::ImageFillStyleVariant, SvgBundleVariant},
         svg_element::{
             attributes::{
-                SvgAttribute, SvgHrefAttribute, SvgHrefContentType, SvgMeasurementUnit,
-                SvgTransformAttribute,
+                ColorMatrix, SvgAttribute, SvgAttributeValues, SvgHrefAttribute,
+                SvgHrefContentType, SvgMeasurementUnit, SvgTransformAttribute,
             },
             styles::{SvgDisplayStyle, SvgStyle},
             SvgElementId, SvgTag,
@@ -15,7 +15,7 @@ use crate::{
 use base64::prelude::*;
 use bevy_ecs::{
     entity::Entity,
-    query::{Changed, With, Without},
+    query::{Changed, Or, With, Without},
     removal_detection::RemovedComponents,
     system::{ParamSet, Query, Res, ResMut},
 };
@@ -32,7 +32,7 @@ use dyn_comp_bundles::components::{
         CompPaint, GradientCompPaint, GradientVariant, ImageCompPaint, ImageScaleMode,
         SolidCompPaint,
     },
-    styles::{CompStyle, FillCompStyle, StrokeCompStyle},
+    styles::{CompStyle, DropShadowCompStyle, StrokeCompStyle},
 };
 use dyn_utils::{error::NoneErr, properties::size::Size};
 use glam::{Mat3, Vec2};
@@ -870,6 +870,56 @@ pub fn apply_image_asset_mixin_changes(
         } else {
             // TODO: Show placeholder image or so?
             log::warn!("Couldn't find image at {:?}", maybe_image_id);
+        }
+    }
+}
+
+pub fn apply_drop_shadow_changes(
+    mut query: Query<
+        (&DropShadowCompStyle, &OpacityMixin, &mut SvgBundleVariant),
+        (
+            With<DropShadowCompStyle>,
+            Or<(Changed<DropShadowCompStyle>, Changed<OpacityMixin>)>,
+        ),
+    >,
+) {
+    for (
+        DropShadowCompStyle {
+            color,
+            position,
+            spread,
+            blur,
+        },
+        OpacityMixin(opacity),
+        mut bundle_variant,
+    ) in query.iter_mut()
+    {
+        match bundle_variant.as_mut() {
+            SvgBundleVariant::DropShadowEffect(bundle) => {
+                bundle.fe_color_matrix.set_attribute(SvgAttribute::Values {
+                    values: SvgAttributeValues::ColorMatrix(ColorMatrix::from_rgba(
+                        color.get_red(),
+                        color.get_green(),
+                        color.get_blue(),
+                        opacity.get(),
+                    )),
+                });
+                bundle.fe_offset.set_attributes(vec![
+                    SvgAttribute::DX { dx: position.x },
+                    SvgAttribute::DY { dy: position.y },
+                ]);
+                bundle
+                    .source_alpha_fe_morphology
+                    .set_attribute(SvgAttribute::Radius {
+                        radius: spread.to_pt(),
+                    });
+                bundle
+                    .fe_gaussian_blur
+                    .set_attributes(vec![SvgAttribute::StdDeviation {
+                        std_deviation: blur.to_pt() / 2.0,
+                    }]);
+            }
+            _ => {}
         }
     }
 }

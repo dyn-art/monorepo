@@ -1,8 +1,5 @@
 use bevy_ecs::component::Component;
-use dyn_utils::{
-    properties::color::Color,
-    units::{abs::Abs, ratio::Ratio},
-};
+use dyn_utils::{properties::color::Color, units::abs::Abs};
 use glam::Vec2;
 
 #[derive(Component, Debug, Copy, Clone)]
@@ -31,6 +28,4 @@ pub struct DropShadowCompStyle {
     pub position: Vec2,
     pub spread: Abs,
     pub blur: Abs,
-    pub contour: Vec<Abs>,
-    pub noise: Ratio,
 }
