@@ -876,7 +876,7 @@ pub fn apply_image_asset_mixin_changes(
 
 pub fn apply_drop_shadow_changes(
     mut query: Query<
-        (&DropShadowCompStyle, &mut SvgBundleVariant),
+        (&DropShadowCompStyle, &mut SvgBundleVariant, &SizeMixin),
         (With<DropShadowCompStyle>, Changed<DropShadowCompStyle>),
     >,
 ) {
@@ -888,16 +888,51 @@ pub fn apply_drop_shadow_changes(
             blur,
         },
         mut bundle_variant,
+        SizeMixin(size),
     ) in query.iter_mut()
     {
         match bundle_variant.as_mut() {
             SvgBundleVariant::DropShadowEffect(bundle) => {
+                // Those values are based on penpot.app's shadow factors
+                // Note: Didn't match them 1 to 1 but close enough for now
+                let base_pos = Vec2::new(-15.0, -15.0);
+                let base_size = Vec2::new(30.0, 30.0);
+                let blur_pos_factor = blur.to_pt() * -3.0;
+                let blur_size_factor = blur.to_pt() * 6.0;
+                let spread_pos_factor = spread.to_pt() * -3.0;
+                let spread_size_factor = spread.to_pt() * 6.0;
+                let position_size_factor = *position * 3.0;
+
+                let new_pos = (base_pos + blur_pos_factor + spread_pos_factor) / size.to_vec2();
+                let new_size =
+                    (base_size + blur_size_factor + spread_size_factor + position_size_factor)
+                        / size.to_vec2()
+                        + 1.0;
+
+                bundle.filter.set_attributes(vec![
+                    SvgAttribute::X {
+                        x: new_pos.x * 100.0,
+                        unit: SvgMeasurementUnit::Percent,
+                    },
+                    SvgAttribute::Y {
+                        y: new_pos.y * 100.0,
+                        unit: SvgMeasurementUnit::Percent,
+                    },
+                    SvgAttribute::Width {
+                        width: new_size.x * 100.0,
+                        unit: SvgMeasurementUnit::Percent,
+                    },
+                    SvgAttribute::Height {
+                        height: new_size.y * 100.0,
+                        unit: SvgMeasurementUnit::Percent,
+                    },
+                ]);
                 bundle.fe_color_matrix.set_attribute(SvgAttribute::Values {
                     values: SvgAttributeValues::ColorMatrix(ColorMatrix::from_rgba(
                         color.get_red(),
                         color.get_green(),
                         color.get_blue(),
-                        1.0, // Opacity is applied at wrapping group tag
+                        1.0, // Opacity is applied on wrapping group tag
                     )),
                 });
                 bundle.fe_offset.set_attributes(vec![
@@ -917,5 +952,33 @@ pub fn apply_drop_shadow_changes(
             }
             _ => {}
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use glam::Vec2;
+
+    #[test]
+    fn it_works() {
+        let size = Vec2::new(1.0, 1.0);
+        let blur = 0.0;
+        let spread = 0.0;
+        let position = Vec2::new(0.0, 0.0);
+
+        let base_pos = Vec2::new(-15.0, -15.0);
+        let base_size = Vec2::new(30.0, 30.0);
+        let blur_pos_factor = blur * -3.0;
+        let blur_size_factor = blur * 6.0;
+        let spread_pos_factor = spread * -3.0;
+        let spread_size_factor = spread * 6.0;
+        let position_size_factor = position * 3.0;
+
+        let new_pos = (base_pos + blur_pos_factor + spread_pos_factor) / size;
+        let new_size =
+            (base_size + blur_size_factor + spread_size_factor + position_size_factor) / size + 1.0;
+
+        assert_eq!(new_pos, Vec2::new(-15.0, -15.0));
+        assert_eq!(new_size, Vec2::new(31.0, 31.0));
     }
 }

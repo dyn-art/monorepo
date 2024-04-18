@@ -104,24 +104,6 @@ impl DropShadowEffectStyleSvgBundle {
             SvgAttribute::FilterUnits {
                 filter_units: SvgUnits::ObjectBoundingBox,
             },
-            // TODO: Need to calculate x & y and width & height somehow,
-            // so that the shadow is not cut off
-            SvgAttribute::X {
-                x: -50.0,
-                unit: SvgMeasurementUnit::Percent,
-            },
-            SvgAttribute::Y {
-                y: -50.0,
-                unit: SvgMeasurementUnit::Percent,
-            },
-            SvgAttribute::Width {
-                width: 200.0,
-                unit: SvgMeasurementUnit::Percent,
-            },
-            SvgAttribute::Height {
-                height: 200.0,
-                unit: SvgMeasurementUnit::Percent,
-            },
         ]);
         defs_element.append_child_in_bundle_context(&mut filter_element);
 

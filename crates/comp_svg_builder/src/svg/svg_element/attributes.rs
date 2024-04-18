@@ -370,7 +370,7 @@ pub enum SvgTransformAttribute {
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
 pub enum SvgHrefAttribute {
-    #[serde(rename_all = "camelCase")]
+    #[cfg_attr(feature = "serde_support", serde(rename_all = "camelCase"))]
     Base64 {
         content: String,
         content_type: SvgHrefContentType,

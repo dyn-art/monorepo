@@ -49,7 +49,7 @@ pub enum ImageScaleMode {
     },
 
     /// Tiles the image within the area.
-    #[serde(rename_all = "camelCase")]
+    #[cfg_attr(feature = "serde_support", serde(rename_all = "camelCase"))]
     Tile {
         #[cfg_attr(feature = "serde_support", serde(default))]
         rotation: f32,
@@ -71,11 +71,11 @@ pub struct GradientCompPaint {
 )]
 pub enum GradientVariant {
     Linear {
-        #[serde(default)]
+        #[cfg_attr(feature = "serde_support", serde(default))]
         transform: Mat3,
     },
     Radial {
-        #[serde(default)]
+        #[cfg_attr(feature = "serde_support", serde(default))]
         transform: Mat3,
     },
 }
@@ -93,6 +93,6 @@ pub struct GradientColorStop {
     pub color: Color,
 
     /// The opacity of the stop.
-    #[serde(default)]
+    #[cfg_attr(feature = "serde_support", serde(default))]
     pub opacity: Opacity,
 }
