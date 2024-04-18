@@ -388,6 +388,7 @@ impl Display for SvgElementId {
 
 #[derive(Debug, Copy, Clone)]
 pub enum SvgTag {
+    // Basic Shapes
     Circle,
     Rect,
     Path,
@@ -395,15 +396,36 @@ pub enum SvgTag {
     Ellipse,
     Polygon,
     Polyline,
+
+    // Text
     Text,
+
+    // Container Elements
     Group,
     Defs,
+
+    // Definitions and Reusable Configurations
     ClipPath,
     Pattern,
-    Image,
     LinearGradient,
     RadialGradient,
     Stop,
+    Image,
+
+    // Filters and Effects
+    Filter,
+    FeOffset,
+    FeGaussianBlur,
+    FeComponentTransfer,
+    FeFuncA,
+    FeComposite,
+    FeColorMatrix,
+    FeTurbulence,
+    FeMerge,
+    FeMergeNode,
+    FeFlood,
+    FeBlend,
+    FeMorphology,
 }
 
 impl SvgTag {
@@ -416,15 +438,32 @@ impl SvgTag {
             SvgTag::Ellipse => "ellipse",
             SvgTag::Polygon => "polygon",
             SvgTag::Polyline => "polyline",
+
             SvgTag::Text => "text",
+
             SvgTag::Group => "g",
             SvgTag::Defs => "defs",
+
             SvgTag::ClipPath => "clipPath",
             SvgTag::Pattern => "pattern",
-            SvgTag::Image => "image",
             SvgTag::LinearGradient => "linearGradient",
             SvgTag::RadialGradient => "radialGradient",
             SvgTag::Stop => "stop",
+            SvgTag::Image => "image",
+
+            SvgTag::Filter => "filter",
+            SvgTag::FeOffset => "feOffset",
+            SvgTag::FeGaussianBlur => "feGaussianBlur",
+            SvgTag::FeComponentTransfer => "feComponentTransfer",
+            SvgTag::FeFuncA => "feFuncA",
+            SvgTag::FeComposite => "feComposite",
+            SvgTag::FeColorMatrix => "feColorMatrix",
+            SvgTag::FeTurbulence => "feTurbulence",
+            SvgTag::FeMerge => "feMerge",
+            SvgTag::FeMergeNode => "feMergeNode",
+            SvgTag::FeFlood => "feFlood",
+            SvgTag::FeBlend => "feBlend",
+            SvgTag::FeMorphology => "feMorphology",
         }
     }
 }

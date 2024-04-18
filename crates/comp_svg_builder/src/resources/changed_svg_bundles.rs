@@ -27,8 +27,8 @@ impl ChangedSvgBundlesRes {
 
 #[derive(Debug, Clone)]
 pub struct ChangedSvgBundle {
-    pub parent_entity: Option<Entity>,
     pub entity: Entity,
     pub elements_changes: Vec<SvgElementChanges>,
-    pub index: usize,
+    pub child_index: usize,
+    pub hierarchy_level: u8,
 }

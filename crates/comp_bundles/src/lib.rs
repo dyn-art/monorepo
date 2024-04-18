@@ -15,7 +15,7 @@ use components::{
         RectangleCompNode, StarCompNode, TextCompNode, VectorCompNode,
     },
     paints::{CompPaint, GradientCompPaint, ImageCompPaint, SolidCompPaint},
-    styles::{CompStyle, FillCompStyle, StrokeCompStyle},
+    styles::{CompStyle, DropShadowCompStyle, FillCompStyle, StrokeCompStyle},
 };
 
 #[derive(Bundle, Debug)]
@@ -181,5 +181,16 @@ pub struct StrokeStyleBundle {
     pub opacity: OpacityMixin,
     // https://github.com/Nilirad/bevy_prototype_lyon/issues/207
     // pub stroke_path: StrokePathMixin,
+    // pub parent: StyleParentMixin,
+}
+
+#[derive(Bundle, Debug)]
+pub struct DropShadowStyleBundle {
+    pub style: CompStyle,
+    pub dorp_shadow: DropShadowCompStyle,
+    pub visibility: VisibilityMixin,
+    pub blend_mode: BlendModeMixin,
+    pub opacity: OpacityMixin,
+    // https://github.com/Nilirad/bevy_prototype_lyon/issues/207
     // pub parent: StyleParentMixin,
 }

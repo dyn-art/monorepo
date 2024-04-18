@@ -71,10 +71,16 @@ const DEFAULT_DTIF: COMP.DtifComposition = {
 					blendMode: 'Normal',
 					opacity: 1,
 					paintId: 'p3'
+				},
+				{
+					type: 'DropShadow',
+					position: [4, 4],
+					blur: 3,
+					opacity: 0.3
 				}
 			],
 			size: [100, 100],
-			translation: [(WIDTH - 100) / 2, (HEIGHT - 100) / 2],
+			translation: [WIDTH / 2 - 200, HEIGHT / 2 + 100],
 			cornerRadii: [0, 10, 20, 30]
 		},
 		n4: {

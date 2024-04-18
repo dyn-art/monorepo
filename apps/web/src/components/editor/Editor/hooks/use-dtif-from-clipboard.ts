@@ -20,7 +20,7 @@ export function useDtifFromClipboard(defaultDtif: COMP.DtifComposition): {
 					loadedFromClipboard = true;
 				}
 			} catch (e) {
-				console.warn('Failed to load DTIF from Clipboard!');
+				console.warn('Failed to load DTIF from Clipboard by exception: ', e);
 			}
 
 			// Prepare DTIF by loading assets, ..

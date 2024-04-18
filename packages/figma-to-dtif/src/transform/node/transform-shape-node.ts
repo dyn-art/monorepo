@@ -15,27 +15,32 @@ export async function transformShapeNode(
 		case 'RECTANGLE':
 			return transformRectangleNode(toTransformNode.node, {
 				fills: toTransformNode.fills,
-				strokes: toTransformNode.strokes
+				strokes: toTransformNode.strokes,
+				effects: toTransformNode.effects
 			});
 		case 'ELLIPSE':
 			return transformEllipseNode(toTransformNode.node, {
 				fills: toTransformNode.fills,
-				strokes: toTransformNode.strokes
+				strokes: toTransformNode.strokes,
+				effects: toTransformNode.effects
 			});
 		case 'POLYGON':
 			return transformPolygonNode(toTransformNode.node, {
 				fills: toTransformNode.fills,
-				strokes: toTransformNode.strokes
+				strokes: toTransformNode.strokes,
+				effects: toTransformNode.effects
 			});
 		case 'STAR':
 			return transformStarNode(toTransformNode.node, {
 				fills: toTransformNode.fills,
-				strokes: toTransformNode.strokes
+				strokes: toTransformNode.strokes,
+				effects: toTransformNode.effects
 			});
 		case 'VECTOR':
 			return transformVectorNode(toTransformNode.node, {
 				fills: toTransformNode.fills,
-				strokes: toTransformNode.strokes
+				strokes: toTransformNode.strokes,
+				effects: toTransformNode.effects
 			});
 		// case 'LINE':
 		default:

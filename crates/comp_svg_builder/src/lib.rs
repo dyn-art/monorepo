@@ -8,13 +8,13 @@ use bevy_ecs::schedule::{IntoSystemConfigs, IntoSystemSetConfigs, SystemSet};
 use resources::svg_context::SvgContextRes;
 use systems::{
     apply::{
-        apply_blend_mode_mixin_changes, apply_gradient_paint_changes,
+        apply_blend_mode_mixin_changes, apply_drop_shadow_changes, apply_gradient_paint_changes,
         apply_image_asset_mixin_changes, apply_image_paint_changes, apply_node_children_changes,
         apply_node_styles_changes, apply_opacity_mixin_changes, apply_path_mixin_changes,
         apply_size_mixin_changes, apply_solid_paint_changes, apply_stroke_path_mixin_changes,
         apply_transform_changes, apply_visibility_mixin_changes,
     },
-    prepare::{insert_node_svg_bundle, insert_style_svg_bundle, sync_node_size_with_style},
+    prepare::{insert_node_svg_bundle, insert_style_svg_bundle, propagate_size_mixin_to_style},
 };
 
 pub struct CompSvgBuilderPlugin {
@@ -57,7 +57,7 @@ impl Plugin for CompSvgBuilderPlugin {
         app.add_systems(
             PostUpdate,
             (
-                sync_node_size_with_style.in_set(CompSvgBuilderSystemSet::Prepare),
+                propagate_size_mixin_to_style.in_set(CompSvgBuilderSystemSet::Prepare),
                 insert_node_svg_bundle.in_set(CompSvgBuilderSystemSet::Prepare),
                 insert_style_svg_bundle
                     .in_set(CompSvgBuilderSystemSet::Prepare)
@@ -77,6 +77,7 @@ impl Plugin for CompSvgBuilderPlugin {
                 apply_gradient_paint_changes.in_set(CompSvgBuilderSystemSet::Apply),
                 apply_image_paint_changes.in_set(CompSvgBuilderSystemSet::Apply),
                 apply_image_asset_mixin_changes.in_set(CompSvgBuilderSystemSet::Apply),
+                apply_drop_shadow_changes.in_set(CompSvgBuilderSystemSet::Apply),
             ),
         );
 

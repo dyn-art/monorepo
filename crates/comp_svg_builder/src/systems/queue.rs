@@ -8,13 +8,7 @@ use crate::{
     },
     svg::svg_element::element_changes::SvgElementChanges,
 };
-use bevy_ecs::{entity::Entity, system::ResMut};
-use std::collections::{HashMap, HashSet, VecDeque};
-
-// TODO: Improve using HierarchyLevel component
-// by just sorting based on hierarchy level and the index,
-// which should also enure the right order and should be more performant
-// and easier to read
+use bevy_ecs::system::ResMut;
 
 pub fn queue_svg_bundle_changes(
     mut changed_svg_bundles_res: ResMut<ChangedSvgBundlesRes>,
@@ -28,24 +22,20 @@ pub fn queue_svg_bundle_changes(
 }
 
 fn queue_changed_bundles(
-    changed_bundles: Vec<ChangedSvgBundle>,
+    mut changed_bundles: Vec<ChangedSvgBundle>,
     output_event_sender_res: &mut OutputEventSenderRes,
 ) {
-    let changes_length = changed_bundles.len();
-
-    // Map children to their parents
-    let mut parent_to_children_map = create_parent_to_children_map(changed_bundles);
-
-    // Sort children within their parent grouping by their index
-    for children in parent_to_children_map.values_mut() {
-        children.sort_by(|a, b| a.index.cmp(&b.index));
-    }
-
-    // Process root bundles in depth-first order
-    let sorted_changed_bundles = process_root_bundles(&mut parent_to_children_map, changes_length);
+    // Sort changed bundles by hierarchy level first, then by child index
+    changed_bundles.sort_by(|a, b| {
+        a.hierarchy_level
+            .cmp(&b.hierarchy_level)
+            // Note: Reverse the order because in a SVG, the top-most element appears last in the children "array",
+            // contrary to the DtifComposition convention where the first element (index = 0) is at the top
+            .then(b.child_index.cmp(&a.child_index))
+    });
 
     // Send output events
-    for changed_bundle in sorted_changed_bundles {
+    for changed_bundle in changed_bundles {
         for element_changes in changed_bundle.elements_changes {
             let event = SvgBuilderOutputEvent::SvgElementChanges(SvgElementChangesOutputEvent {
                 id: element_changes.id,
@@ -56,68 +46,10 @@ fn queue_changed_bundles(
     }
 }
 
-fn create_parent_to_children_map(
-    changed_bundles: Vec<ChangedSvgBundle>,
-) -> HashMap<Option<Entity>, Vec<ChangedSvgBundle>> {
-    let changed_entities_set: HashSet<Entity> =
-        changed_bundles.iter().map(|bundle| bundle.entity).collect();
-    let mut parent_to_children_map: HashMap<Option<Entity>, Vec<ChangedSvgBundle>> = HashMap::new();
-
-    // Separate changes into roots (None, that have no parent in the current changes)
-    // and children grouped by parent entities
-    for changed_bundle in changed_bundles {
-        let is_orphan = changed_bundle
-            .parent_entity
-            .map_or(true, |parent| !changed_entities_set.contains(&parent));
-
-        if is_orphan {
-            parent_to_children_map
-                .entry(None)
-                .or_default()
-                .push(changed_bundle);
-        } else {
-            parent_to_children_map
-                .entry(changed_bundle.parent_entity)
-                .or_default()
-                .push(changed_bundle);
-        }
-    }
-
-    return parent_to_children_map;
-}
-
-fn process_root_bundles(
-    parent_to_children: &mut HashMap<Option<Entity>, Vec<ChangedSvgBundle>>,
-    capacity: usize,
-) -> Vec<ChangedSvgBundle> {
-    let mut sorted_changed_bundles: Vec<ChangedSvgBundle> = Vec::with_capacity(capacity);
-    let mut root_bundles: VecDeque<ChangedSvgBundle> = parent_to_children
-        .remove(&None)
-        .unwrap_or_else(Vec::new)
-        .into_iter()
-        .collect();
-
-    // Process root bundles in depth-first order
-    while let Some(change) = root_bundles.pop_front() {
-        if let Some(children) = parent_to_children.remove(&Some(change.entity)) {
-            // Note: Reverse the order because in a SVG, the top-most element appears last in the children "array",
-            // contrary to the DtifComposition convention where the first element (index = 0) is at the top
-            children
-                .into_iter()
-                .rev()
-                .for_each(|child| root_bundles.push_back(child));
-        }
-        sorted_changed_bundles.push(change);
-    }
-
-    return sorted_changed_bundles;
-}
-
 fn queue_deferred_elements_changes(
     deferred_elements_changes: Vec<SvgElementChanges>,
     output_event_sender_res: &mut OutputEventSenderRes,
 ) {
-    // Send output events
     for deferred_elements_change in deferred_elements_changes {
         let event = SvgBuilderOutputEvent::SvgElementChanges(SvgElementChangesOutputEvent {
             id: deferred_elements_change.id,

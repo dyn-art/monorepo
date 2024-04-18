@@ -4,6 +4,7 @@ pub mod style;
 use self::{
     node::{frame::FrameNodeSvgBundle, group::GroupNodeSvgBundle, shape::ShapeNodeSvgBundle},
     style::{
+        drop_shadow_effect::DropShadowEffectStyleSvgBundle,
         gradient_fill::GradientFillStyleSvgBundle, image_fill::ImageFillStyleSvgBundle,
         solid_fill::SolidFillStyleSvgBundle,
     },
@@ -78,7 +79,7 @@ pub enum SvgBundleVariant {
     SolidFill(SolidFillStyleSvgBundle),
     GradientFill(GradientFillStyleSvgBundle),
     ImageFill(ImageFillStyleSvgBundle),
-    // TODO: "Drop Shadow" style
+    DropShadowEffect(DropShadowEffectStyleSvgBundle),
 }
 
 impl SvgBundleVariant {
@@ -90,6 +91,7 @@ impl SvgBundleVariant {
             SvgBundleVariant::SolidFill(bundle) => bundle,
             SvgBundleVariant::GradientFill(bundle) => bundle,
             SvgBundleVariant::ImageFill(bundle) => bundle,
+            SvgBundleVariant::DropShadowEffect(bundle) => bundle,
         }
     }
 
@@ -101,6 +103,7 @@ impl SvgBundleVariant {
             SvgBundleVariant::SolidFill(bundle) => bundle,
             SvgBundleVariant::GradientFill(bundle) => bundle,
             SvgBundleVariant::ImageFill(bundle) => bundle,
+            SvgBundleVariant::DropShadowEffect(bundle) => bundle,
         }
     }
 
@@ -144,6 +147,7 @@ impl SvgBundleVariant {
             SvgBundleVariant::SolidFill(bundle) => &bundle.root_g,
             SvgBundleVariant::GradientFill(bundle) => &bundle.root_g,
             SvgBundleVariant::ImageFill(bundle) => &bundle.root_g,
+            SvgBundleVariant::DropShadowEffect(bundle) => &bundle.root_g,
         }
     }
 
@@ -155,6 +159,7 @@ impl SvgBundleVariant {
             SvgBundleVariant::SolidFill(bundle) => &mut bundle.root_g,
             SvgBundleVariant::GradientFill(bundle) => &mut bundle.root_g,
             SvgBundleVariant::ImageFill(bundle) => &mut bundle.root_g,
+            SvgBundleVariant::DropShadowEffect(bundle) => &mut bundle.root_g,
         }
     }
 
@@ -229,6 +234,9 @@ impl SvgBundleVariant {
                 bundle.get_root_element().to_string(bundle, None)
             }
             SvgBundleVariant::ImageFill(bundle) => {
+                bundle.get_root_element().to_string(bundle, None)
+            }
+            SvgBundleVariant::DropShadowEffect(bundle) => {
                 bundle.get_root_element().to_string(bundle, None)
             }
         }

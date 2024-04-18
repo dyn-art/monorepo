@@ -4,8 +4,8 @@ use crate::{
         svg_bundle::{style::image_fill::ImageFillStyleVariant, SvgBundleVariant},
         svg_element::{
             attributes::{
-                SvgAttribute, SvgHrefAttribute, SvgHrefContentType, SvgMeasurementUnit,
-                SvgTransformAttribute,
+                ColorMatrix, SvgAttribute, SvgAttributeValues, SvgHrefAttribute,
+                SvgHrefContentType, SvgMeasurementUnit, SvgTransformAttribute,
             },
             styles::{SvgDisplayStyle, SvgStyle},
             SvgElementId, SvgTag,
@@ -32,7 +32,7 @@ use dyn_comp_bundles::components::{
         CompPaint, GradientCompPaint, GradientVariant, ImageCompPaint, ImageScaleMode,
         SolidCompPaint,
     },
-    styles::{CompStyle, FillCompStyle, StrokeCompStyle},
+    styles::{CompStyle, DropShadowCompStyle, StrokeCompStyle},
 };
 use dyn_utils::{error::NoneErr, properties::size::Size};
 use glam::{Mat3, Vec2};
@@ -517,10 +517,7 @@ pub fn apply_path_mixin_changes(
         (&PathMixin, &mut SvgBundleVariant),
         (With<CompNode>, Without<CompStyle>, Changed<PathMixin>),
     >,
-    mut style_bundle_query: Query<
-        &mut SvgBundleVariant,
-        (With<CompStyle>, Without<CompNode>, With<FillCompStyle>),
-    >,
+    mut style_bundle_query: Query<&mut SvgBundleVariant, (With<CompStyle>, Without<CompNode>)>,
 ) {
     for (PathMixin(path), mut node_bundle_variant) in query.iter_mut() {
         // Apply path to node bundle
@@ -543,6 +540,9 @@ pub fn apply_path_mixin_changes(
                             .shape_path
                             .set_attribute(SvgAttribute::D { d: path.into() }),
                         SvgBundleVariant::ImageFill(bundle) => bundle
+                            .shape_path
+                            .set_attribute(SvgAttribute::D { d: path.into() }),
+                        SvgBundleVariant::DropShadowEffect(bundle) => bundle
                             .shape_path
                             .set_attribute(SvgAttribute::D { d: path.into() }),
                         _ => {}
@@ -796,12 +796,6 @@ fn calculate_cropped_image_transform(
     let (parent_width, parent_height) = parent_size.to_tuple();
     let (image_width, image_height) = image_size;
 
-    log::info!(
-        "[calculate_cropped_image_transform] {:?} - {:?}",
-        parent_size,
-        image_size
-    );
-
     // Calculate aspect ratios for container and image
     let container_ratio = parent_width / parent_height;
     let image_ratio = image_width / image_height;
@@ -877,5 +871,114 @@ pub fn apply_image_asset_mixin_changes(
             // TODO: Show placeholder image or so?
             log::warn!("Couldn't find image at {:?}", maybe_image_id);
         }
+    }
+}
+
+pub fn apply_drop_shadow_changes(
+    mut query: Query<
+        (&DropShadowCompStyle, &mut SvgBundleVariant, &SizeMixin),
+        (With<DropShadowCompStyle>, Changed<DropShadowCompStyle>),
+    >,
+) {
+    for (
+        DropShadowCompStyle {
+            color,
+            position,
+            spread,
+            blur,
+        },
+        mut bundle_variant,
+        SizeMixin(size),
+    ) in query.iter_mut()
+    {
+        match bundle_variant.as_mut() {
+            SvgBundleVariant::DropShadowEffect(bundle) => {
+                // Those values are based on penpot.app's shadow factors
+                // Note: Didn't match them 1 to 1 but close enough for now
+                let base_pos = Vec2::new(-15.0, -15.0);
+                let base_size = Vec2::new(30.0, 30.0);
+                let blur_pos_factor = blur.to_pt() * -3.0;
+                let blur_size_factor = blur.to_pt() * 6.0;
+                let spread_pos_factor = spread.to_pt() * -3.0;
+                let spread_size_factor = spread.to_pt() * 6.0;
+                let position_size_factor = *position * 3.0;
+
+                let new_pos = (base_pos + blur_pos_factor + spread_pos_factor) / size.to_vec2();
+                let new_size =
+                    (base_size + blur_size_factor + spread_size_factor + position_size_factor)
+                        / size.to_vec2()
+                        + 1.0;
+
+                bundle.filter.set_attributes(vec![
+                    SvgAttribute::X {
+                        x: new_pos.x * 100.0,
+                        unit: SvgMeasurementUnit::Percent,
+                    },
+                    SvgAttribute::Y {
+                        y: new_pos.y * 100.0,
+                        unit: SvgMeasurementUnit::Percent,
+                    },
+                    SvgAttribute::Width {
+                        width: new_size.x * 100.0,
+                        unit: SvgMeasurementUnit::Percent,
+                    },
+                    SvgAttribute::Height {
+                        height: new_size.y * 100.0,
+                        unit: SvgMeasurementUnit::Percent,
+                    },
+                ]);
+                bundle.fe_color_matrix.set_attribute(SvgAttribute::Values {
+                    values: SvgAttributeValues::ColorMatrix(ColorMatrix::from_rgba(
+                        color.get_red(),
+                        color.get_green(),
+                        color.get_blue(),
+                        1.0, // Opacity is applied on wrapping group tag
+                    )),
+                });
+                bundle.fe_offset.set_attributes(vec![
+                    SvgAttribute::DX { dx: position.x },
+                    SvgAttribute::DY { dy: position.y },
+                ]);
+                bundle
+                    .source_alpha_fe_morphology
+                    .set_attribute(SvgAttribute::Radius {
+                        radius: spread.to_pt(),
+                    });
+                bundle
+                    .fe_gaussian_blur
+                    .set_attributes(vec![SvgAttribute::StdDeviation {
+                        std_deviation: blur.to_pt() / 2.0,
+                    }]);
+            }
+            _ => {}
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use glam::Vec2;
+
+    #[test]
+    fn it_works() {
+        let size = Vec2::new(1.0, 1.0);
+        let blur = 0.0;
+        let spread = 0.0;
+        let position = Vec2::new(0.0, 0.0);
+
+        let base_pos = Vec2::new(-15.0, -15.0);
+        let base_size = Vec2::new(30.0, 30.0);
+        let blur_pos_factor = blur * -3.0;
+        let blur_size_factor = blur * 6.0;
+        let spread_pos_factor = spread * -3.0;
+        let spread_size_factor = spread * 6.0;
+        let position_size_factor = position * 3.0;
+
+        let new_pos = (base_pos + blur_pos_factor + spread_pos_factor) / size;
+        let new_size =
+            (base_size + blur_size_factor + spread_size_factor + position_size_factor) / size + 1.0;
+
+        assert_eq!(new_pos, Vec2::new(-15.0, -15.0));
+        assert_eq!(new_size, Vec2::new(31.0, 31.0));
     }
 }

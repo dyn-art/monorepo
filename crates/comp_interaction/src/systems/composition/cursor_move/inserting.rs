@@ -190,13 +190,13 @@ pub fn handle_inserting(
                     variant: CompPaintVariant::Solid,
                 },
                 solid: SolidCompPaint {
-                    color: Color::black(),
+                    color: Color::new_rgb(184, 185, 188),
                 },
             })
             .id();
 
-        // Spawn style
-        let mut style_entity_commands = commands.spawn(FillStyleBundle {
+        // Spawn fill style
+        let mut fill_style_entity_commands = commands.spawn(FillStyleBundle {
             style: CompStyle {
                 variant: CompStyleVariant::Fill,
             },
@@ -206,19 +206,17 @@ pub fn handle_inserting(
             blend_mode: BlendModeMixin::default(),
             opacity: OpacityMixin::default(),
         });
-        style_entity_commands.insert(StyleParentMixin(node_entity));
-        let style_entity = style_entity_commands.id();
+        fill_style_entity_commands.insert(StyleParentMixin(node_entity));
+        let fill_style_entity = fill_style_entity_commands.id();
 
         // Reference style entity in paint
         let mut paint_entity_commands = commands.entity(paint_entity);
-        paint_entity_commands.insert(PaintParentMixin(smallvec![style_entity]));
+        paint_entity_commands.insert(PaintParentMixin(smallvec![fill_style_entity]));
 
         // Reference style entity in node
         let mut node_entity_commands = commands.entity(node_entity);
-        node_entity_commands.insert(StyleChildrenMixin(smallvec![style_entity]));
+        node_entity_commands.insert(StyleChildrenMixin(smallvec![fill_style_entity]));
 
-        // TODO: Child is pushed as last element to the children array
-        //       which causes it to be on the bottom although it should be the top most node?
         if let Some(parent) = maybe_parent {
             commands.entity(parent).insert_children(0, &[node_entity]);
         } else {

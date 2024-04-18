@@ -1,6 +1,10 @@
 import type { COMP } from '@dyn/dtif-comp';
 
-import type { TToTransformFill, TToTransformStroke } from '../../FigmaNodeTreeProcessor';
+import type {
+	TToTransformEffect,
+	TToTransformFill,
+	TToTransformStroke
+} from '../../FigmaNodeTreeProcessor';
 import {
 	createDtifStyles,
 	mapFigmaBlendModeToDtif,
@@ -13,7 +17,7 @@ export function transformVectorNode(
 	node: VectorNode,
 	config: TTransformVectorNodeConfig
 ): { type: 'Vector' } & COMP.VectorNode {
-	const { fills, strokes } = config;
+	const { fills, strokes, effects } = config;
 
 	return {
 		type: 'Vector',
@@ -25,11 +29,12 @@ export function transformVectorNode(
 		blendMode: mapFigmaBlendModeToDtif(node.blendMode),
 		opacity: node.opacity,
 		constraints: mapFigmaConstraintsToDtif(node.constraints),
-		styles: createDtifStyles(fills, strokes)
+		styles: createDtifStyles(fills, strokes, effects)
 	};
 }
 
 interface TTransformVectorNodeConfig {
 	fills: TToTransformFill[];
 	strokes: TToTransformStroke[];
+	effects: TToTransformEffect[];
 }

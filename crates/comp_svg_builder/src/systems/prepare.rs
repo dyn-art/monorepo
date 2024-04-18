@@ -3,6 +3,7 @@ use crate::{
     svg::svg_bundle::{
         node::{frame::FrameNodeSvgBundle, group::GroupNodeSvgBundle, shape::ShapeNodeSvgBundle},
         style::{
+            drop_shadow_effect::DropShadowEffectStyleSvgBundle,
             gradient_fill::GradientFillStyleSvgBundle, image_fill::ImageFillStyleSvgBundle,
             solid_fill::SolidFillStyleSvgBundle,
         },
@@ -68,56 +69,75 @@ pub fn insert_style_svg_bundle(
     )>,
 ) {
     for (entity, style, maybe_paint_mixin) in query.iter() {
-        if let Some(paint_entity) = maybe_paint_mixin.and_then(|paint_mixin| paint_mixin.0) {
-            if let Ok((paint, maybe_gradient_paint, maybe_image_paint)) =
-                paint_query.get(paint_entity)
-            {
-                let bundle_variant = match (style.variant, paint.variant) {
-                    (
-                        CompStyleVariant::Fill | CompStyleVariant::Stroke,
-                        CompPaintVariant::Solid,
-                    ) => Some(SvgBundleVariant::SolidFill(SolidFillStyleSvgBundle::new(
-                        entity,
-                        &mut svg_context_res,
-                    ))),
-                    (
-                        CompStyleVariant::Fill | CompStyleVariant::Stroke,
-                        CompPaintVariant::Gradient,
-                    ) => Some(SvgBundleVariant::GradientFill(
-                        GradientFillStyleSvgBundle::new(
+        let maybe_bundle_variant: Option<SvgBundleVariant> = match style.variant {
+            CompStyleVariant::Fill | CompStyleVariant::Stroke => {
+                if let Some(paint_entity) = maybe_paint_mixin.and_then(|paint_mixin| paint_mixin.0)
+                {
+                    if let Ok((paint, maybe_gradient_paint, maybe_image_paint)) =
+                        paint_query.get(paint_entity)
+                    {
+                        get_fill_style_bundle_variant(
                             entity,
-                            maybe_gradient_paint.unwrap().variant,
                             &mut svg_context_res,
-                        ),
-                    )),
-                    (
-                        CompStyleVariant::Fill | CompStyleVariant::Stroke,
-                        CompPaintVariant::Image,
-                    ) => Some(SvgBundleVariant::ImageFill(ImageFillStyleSvgBundle::new(
-                        entity,
-                        maybe_image_paint.unwrap().scale_mode,
-                        &mut svg_context_res,
-                    ))),
-                };
-
-                if let Some(bundle_variant) = bundle_variant {
-                    commands.entity(entity).insert(bundle_variant);
+                            style.variant,
+                            paint.variant,
+                            maybe_gradient_paint,
+                            maybe_image_paint,
+                        )
+                    } else {
+                        None
+                    }
+                } else {
+                    None
                 }
             }
+            CompStyleVariant::DropShadow => Some(SvgBundleVariant::DropShadowEffect(
+                DropShadowEffectStyleSvgBundle::new(entity, &mut svg_context_res),
+            )),
+        };
+
+        if let Some(bundle_variant) = maybe_bundle_variant {
+            commands.entity(entity).insert(bundle_variant);
+        } else {
+            log::warn!(
+                "Failed to create bundle for style variant: {:?}",
+                style.variant
+            );
         }
     }
 }
 
-// Note: To avoid Bevy's ECS conflict between mutable and immutable references of the same component
-// (`SizeMixin` in this case), we explicitly specify `Without` in the queries.
-// This is necessary because Bevy ensures safe access to components, and having both mutable and
-// immutable references to the same component type in different queries can lead to runtime errors.
-// In our system, `With<CompNode>` and `With<CompStyle>` could potentially conflict, as they might coexist on the same entity.
-// Adding `Without<CompStyle>` and `Without<CompNode>` to the respective queries resolves this conflict by ensuring
-// that entities in one query cannot be present in the other, thereby upholding Rust's borrowing rules.
-// https://discord.com/channels/691052431525675048/1199265475155202108
-// https://github.com/bevyengine/bevy/blob/main/errors/B0002.md
-pub fn sync_node_size_with_style(
+pub fn get_fill_style_bundle_variant(
+    entity: Entity,
+    mut svg_context_res: &mut ResMut<SvgContextRes>,
+    style_variant: CompStyleVariant,
+    paint_variant: CompPaintVariant,
+    maybe_gradient_paint: Option<&GradientCompPaint>,
+    maybe_image_paint: Option<&ImageCompPaint>,
+) -> Option<SvgBundleVariant> {
+    match (style_variant, paint_variant) {
+        (CompStyleVariant::Fill | CompStyleVariant::Stroke, CompPaintVariant::Solid) => Some(
+            SvgBundleVariant::SolidFill(SolidFillStyleSvgBundle::new(entity, &mut svg_context_res)),
+        ),
+        (CompStyleVariant::Fill | CompStyleVariant::Stroke, CompPaintVariant::Gradient) => Some(
+            SvgBundleVariant::GradientFill(GradientFillStyleSvgBundle::new(
+                entity,
+                maybe_gradient_paint.unwrap().variant,
+                &mut svg_context_res,
+            )),
+        ),
+        (CompStyleVariant::Fill | CompStyleVariant::Stroke, CompPaintVariant::Image) => {
+            Some(SvgBundleVariant::ImageFill(ImageFillStyleSvgBundle::new(
+                entity,
+                maybe_image_paint.unwrap().scale_mode,
+                &mut svg_context_res,
+            )))
+        }
+        _ => None,
+    }
+}
+
+pub fn propagate_size_mixin_to_style(
     mut commands: Commands,
     node_query: Query<
         (Entity, &SizeMixin, &StyleChildrenMixin),
@@ -133,7 +153,7 @@ pub fn sync_node_size_with_style(
     >,
 ) {
     for (node_entity, SizeMixin(size), StyleChildrenMixin(children)) in node_query.iter() {
-        // Update existing DimensionMixin for children with Paint and DimensionMixin
+        // Update existing DimensionMixin for children with DimensionMixin
         for (paint_entity, StyleParentMixin(parent), mut size_mixin) in
             style_with_size_query.iter_mut()
         {
@@ -142,7 +162,7 @@ pub fn sync_node_size_with_style(
             }
         }
 
-        // Add DimensionMixin for children with Paint but without DimensionMixin
+        // Add DimensionMixin for children without DimensionMixin
         for (paint_entity, StyleParentMixin(parent)) in style_without_size_query.iter() {
             if children.contains(&paint_entity) && *parent == node_entity {
                 commands.entity(paint_entity).insert(SizeMixin(*size));

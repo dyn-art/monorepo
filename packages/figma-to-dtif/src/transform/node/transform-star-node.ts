@@ -1,6 +1,10 @@
 import type { COMP } from '@dyn/dtif-comp';
 
-import type { TToTransformFill, TToTransformStroke } from '../../FigmaNodeTreeProcessor';
+import type {
+	TToTransformEffect,
+	TToTransformFill,
+	TToTransformStroke
+} from '../../FigmaNodeTreeProcessor';
 import {
 	createDtifStyles,
 	mapFigmaBlendModeToDtif,
@@ -13,7 +17,7 @@ export function transformStarNode(
 	node: StarNode,
 	config: TTransformStarNodeConfig
 ): { type: 'Star' } & COMP.StarNode {
-	const { fills, strokes } = config;
+	const { fills, strokes, effects } = config;
 
 	return {
 		type: 'Star',
@@ -26,11 +30,12 @@ export function transformStarNode(
 		blendMode: mapFigmaBlendModeToDtif(node.blendMode),
 		opacity: node.opacity,
 		constraints: mapFigmaConstraintsToDtif(node.constraints),
-		styles: createDtifStyles(fills, strokes)
+		styles: createDtifStyles(fills, strokes, effects)
 	};
 }
 
 interface TTransformStarNodeConfig {
 	fills: TToTransformFill[];
 	strokes: TToTransformStroke[];
+	effects: TToTransformEffect[];
 }

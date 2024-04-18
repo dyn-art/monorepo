@@ -1,6 +1,10 @@
 import type { COMP } from '@dyn/dtif-comp';
 
-import type { TToTransformFill, TToTransformStroke } from '../../FigmaNodeTreeProcessor';
+import type {
+	TToTransformEffect,
+	TToTransformFill,
+	TToTransformStroke
+} from '../../FigmaNodeTreeProcessor';
 import {
 	createDtifStyles,
 	mapFigmaBlendModeToDtif,
@@ -13,7 +17,7 @@ export function transformEllipseNode(
 	node: EllipseNode,
 	config: TTransformEllipseNodeConfig
 ): { type: 'Ellipse' } & COMP.EllipseNode {
-	const { fills, strokes } = config;
+	const { fills, strokes, effects } = config;
 
 	return {
 		type: 'Ellipse',
@@ -27,11 +31,12 @@ export function transformEllipseNode(
 		blendMode: mapFigmaBlendModeToDtif(node.blendMode),
 		opacity: node.opacity,
 		constraints: mapFigmaConstraintsToDtif(node.constraints),
-		styles: createDtifStyles(fills, strokes)
+		styles: createDtifStyles(fills, strokes, effects)
 	};
 }
 
 interface TTransformEllipseNodeConfig {
 	fills: TToTransformFill[];
 	strokes: TToTransformStroke[];
+	effects: TToTransformEffect[];
 }

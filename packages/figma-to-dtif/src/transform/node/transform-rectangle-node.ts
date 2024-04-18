@@ -1,6 +1,10 @@
 import type { COMP } from '@dyn/dtif-comp';
 
-import type { TToTransformFill, TToTransformStroke } from '../../FigmaNodeTreeProcessor';
+import type {
+	TToTransformEffect,
+	TToTransformFill,
+	TToTransformStroke
+} from '../../FigmaNodeTreeProcessor';
 import {
 	createDtifStyles,
 	mapFigmaBlendModeToDtif,
@@ -13,7 +17,7 @@ export function transformRectangleNode(
 	node: RectangleNode,
 	config: TTransformRectangleNodeConfig
 ): { type: 'Rectangle' } & COMP.RectangleNode {
-	const { fills, strokes } = config;
+	const { fills, strokes, effects } = config;
 
 	return {
 		type: 'Rectangle',
@@ -30,11 +34,12 @@ export function transformRectangleNode(
 		blendMode: mapFigmaBlendModeToDtif(node.blendMode),
 		opacity: node.opacity,
 		constraints: mapFigmaConstraintsToDtif(node.constraints),
-		styles: createDtifStyles(fills, strokes)
+		styles: createDtifStyles(fills, strokes, effects)
 	};
 }
 
 interface TTransformRectangleNodeConfig {
 	fills: TToTransformFill[];
 	strokes: TToTransformStroke[];
+	effects: TToTransformEffect[];
 }
