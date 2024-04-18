@@ -1,5 +1,4 @@
 use super::SvgElementId;
-use glam::{Mat4, Vec4};
 
 #[derive(Debug, PartialEq, Clone)]
 #[cfg_attr(
@@ -524,42 +523,53 @@ pub enum SvgAttributeMode {
     feature = "serde_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
-pub struct ColorMatrix(pub Mat4);
+pub struct ColorMatrix {
+    x_axis: (f32, f32, f32, f32),
+    y_axis: (f32, f32, f32, f32),
+    z_axis: (f32, f32, f32, f32),
+    w_axis: (f32, f32, f32, f32),
+    v_axis: (f32, f32, f32, f32),
+}
 
 impl ColorMatrix {
     pub fn from_rgba(r: u8, g: u8, b: u8, a: f32) -> Self {
-        Self(Mat4::from_cols(
-            Vec4::new(0.0, 0.0, 0.0, 0.0),
-            Vec4::new(0.0, 0.0, 0.0, 0.0),
-            Vec4::new(0.0, 0.0, 0.0, 0.0),
-            Vec4::new(
+        Self {
+            x_axis: (0.0, 0.0, 0.0, 0.0),
+            y_axis: (0.0, 0.0, 0.0, 0.0),
+            z_axis: (0.0, 0.0, 0.0, 0.0),
+            w_axis: (0.0, 0.0, 0.0, a),
+            v_axis: (
                 f32::from(r) / 255.0,
                 f32::from(g) / 255.0,
                 f32::from(b) / 255.0,
-                a,
+                0.0,
             ),
-        ))
+        }
     }
 
     pub fn to_string(&self) -> String {
         format!(
-            "{} {} {} {} 0 {} {} {} {} 0 {} {} {} {} 0 {} {} {} {} 0",
-            self.0.row(0).x,
-            self.0.row(0).y,
-            self.0.row(0).z,
-            self.0.row(0).w,
-            self.0.row(1).x,
-            self.0.row(1).y,
-            self.0.row(1).z,
-            self.0.row(1).w,
-            self.0.row(2).x,
-            self.0.row(2).y,
-            self.0.row(2).z,
-            self.0.row(2).w,
-            self.0.row(3).x,
-            self.0.row(3).y,
-            self.0.row(3).z,
-            self.0.row(3).w
+            "{} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {}",
+            self.x_axis.0,
+            self.y_axis.0,
+            self.z_axis.0,
+            self.w_axis.0,
+            self.v_axis.0,
+            self.x_axis.1,
+            self.y_axis.1,
+            self.z_axis.1,
+            self.w_axis.1,
+            self.v_axis.1,
+            self.x_axis.2,
+            self.y_axis.2,
+            self.z_axis.2,
+            self.w_axis.2,
+            self.v_axis.2,
+            self.x_axis.3,
+            self.y_axis.3,
+            self.z_axis.3,
+            self.w_axis.3,
+            self.v_axis.3,
         )
     }
 }

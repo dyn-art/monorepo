@@ -62,7 +62,7 @@ export type BlendMode = "Normal" | "Multiply" | "Screen" | "Overlay" | "Darken" 
 
 export type Color = [number, number, number]
 
-export type ColorMatrix = Mat4
+export type ColorMatrix = { x_axis: [number, number, number, number]; y_axis: [number, number, number, number]; z_axis: [number, number, number, number]; w_axis: [number, number, number, number]; v_axis: [number, number, number, number] }
 
 export type CompCoreInputEvent = ({ type: "CompositionResized" } & CompositionResizedInputEvent) | ({ type: "CompositionViewportChanged" } & CompositionViewportChangedInputEvent) | ({ type: "EntityDeleted" } & EntityDeletedInputEvent) | ({ type: "EntityMoved" } & EntityMovedInputEvent) | ({ type: "EntitySetPosition" } & EntitySetPositionInputEvent) | ({ type: "EntitySetRotation" } & EntitySetRotationInputEvent)
 
@@ -1271,8 +1271,6 @@ export type LineWrap =
 "WordOrGlyph"
 
 export type Mat3 = [number, number, number, number, number, number, number, number, number]
-
-export type Mat4 = [number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number]
 
 /**
  * A button on a mouse device.
