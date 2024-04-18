@@ -12,8 +12,7 @@ use crate::{
         svg_element::{
             attributes::{
                 ColorMatrix, SvgAttribute, SvgAttributeFilter, SvgAttributeIn, SvgAttributeMode,
-                SvgAttributeOperator, SvgAttributeType, SvgAttributeValues, SvgMeasurementUnit,
-                SvgUnits,
+                SvgAttributeOperator, SvgAttributeType, SvgAttributeValues, SvgUnits,
             },
             SvgElement, SvgTag,
         },
@@ -146,27 +145,15 @@ impl DropShadowEffectStyleSvgBundle {
         filter_element.append_child_in_bundle_context(&mut source_alpha_fe_morphology_element);
 
         let mut fe_offset_element = cx.create_element(SvgTag::FeOffset);
-        // fe_offset_element.set_attributes(vec![
-        //     SvgAttribute::DX { dx: 4.0 },
-        //     SvgAttribute::DY { dy: 4.0 },
-        // ]);
         filter_element.append_child_in_bundle_context(&mut fe_offset_element);
 
         let mut fe_gaussian_blur_element = cx.create_element(SvgTag::FeGaussianBlur);
-        // fe_gaussian_blur_element.set_attributes(vec![
-        //     SvgAttribute::StdDeviation { std_deviation: 5.0 },
-        // ]);
         filter_element.append_child_in_bundle_context(&mut fe_gaussian_blur_element);
 
         let mut fe_color_matrix_element = cx.create_element(SvgTag::FeColorMatrix);
-        fe_color_matrix_element.set_attributes(vec![
-            SvgAttribute::Type {
-                value: SvgAttributeType::Matrix,
-            },
-            // SvgAttribute::Values {
-            //     values: SvgAttributeValues::ColorMatrix(ColorMatrix::from_rgba(0, 0, 0, 0.3)),
-            // },
-        ]);
+        fe_color_matrix_element.set_attribute(SvgAttribute::Type {
+            value: SvgAttributeType::Matrix,
+        });
         filter_element.append_child_in_bundle_context(&mut fe_color_matrix_element);
 
         let mut shadow_fe_blend_element = cx.create_element(SvgTag::FeBlend);

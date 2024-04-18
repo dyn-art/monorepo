@@ -15,7 +15,7 @@ use crate::{
 use base64::prelude::*;
 use bevy_ecs::{
     entity::Entity,
-    query::{Changed, Or, With, Without},
+    query::{Changed, With, Without},
     removal_detection::RemovedComponents,
     system::{ParamSet, Query, Res, ResMut},
 };
