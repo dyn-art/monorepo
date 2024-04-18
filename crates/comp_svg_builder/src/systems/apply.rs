@@ -876,11 +876,8 @@ pub fn apply_image_asset_mixin_changes(
 
 pub fn apply_drop_shadow_changes(
     mut query: Query<
-        (&DropShadowCompStyle, &OpacityMixin, &mut SvgBundleVariant),
-        (
-            With<DropShadowCompStyle>,
-            Or<(Changed<DropShadowCompStyle>, Changed<OpacityMixin>)>,
-        ),
+        (&DropShadowCompStyle, &mut SvgBundleVariant),
+        (With<DropShadowCompStyle>, Changed<DropShadowCompStyle>),
     >,
 ) {
     for (
@@ -890,7 +887,6 @@ pub fn apply_drop_shadow_changes(
             spread,
             blur,
         },
-        OpacityMixin(opacity),
         mut bundle_variant,
     ) in query.iter_mut()
     {
@@ -901,7 +897,7 @@ pub fn apply_drop_shadow_changes(
                         color.get_red(),
                         color.get_green(),
                         color.get_blue(),
-                        opacity.get(),
+                        1.0, // Opacity is applied at wrapping group tag
                     )),
                 });
                 bundle.fe_offset.set_attributes(vec![

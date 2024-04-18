@@ -2,6 +2,7 @@ import type { COMP } from '@dyn/dtif-comp';
 import { calculateBytes } from '@dyn/utils';
 
 import type {
+	TToTransformEffect,
 	TToTransformFill,
 	TToTransformStroke,
 	TToTransformTextNode
@@ -21,7 +22,7 @@ export function transformTextNode(
 	attributes: TToTransformTextNode['attributes'],
 	config: TTransformTextNodeNodeConfig
 ): { type: 'Text' } & COMP.TextNode {
-	const { fills, strokes } = config;
+	const { fills, strokes, effects } = config;
 
 	let nextStart = 0;
 
@@ -77,11 +78,12 @@ export function transformTextNode(
 		blendMode: mapFigmaBlendModeToDtif(node.blendMode),
 		opacity: node.opacity,
 		constraints: mapFigmaConstraintsToDtif(node.constraints),
-		styles: createDtifStyles(fills, strokes)
+		styles: createDtifStyles(fills, strokes, effects)
 	};
 }
 
 interface TTransformTextNodeNodeConfig {
 	fills: TToTransformFill[];
 	strokes: TToTransformStroke[];
+	effects: TToTransformEffect[];
 }

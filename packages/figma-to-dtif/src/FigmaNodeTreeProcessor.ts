@@ -5,6 +5,7 @@ import { ContinuousId, notEmpty, type TContinuousId } from '@dyn/utils';
 import { UnsupportedFigmaNodeException } from './exceptions';
 import type {
 	TFigmaNodeWithChildren,
+	TFigmaNodeWithEffects,
 	TFigmaNodeWithFills,
 	TFigmaNodeWithStrokes,
 	TFigmaShapeNode
@@ -63,6 +64,7 @@ export class FigmaNodeTreeProcessor {
 				childrenIds: this.processChildren(node),
 				fills: this.processFills(node),
 				strokes: this.processStrokes(node),
+				effects: this.processEffects(node),
 				isRoot
 			});
 		} else if (isFigmaGroupNode(node)) {
@@ -78,8 +80,9 @@ export class FigmaNodeTreeProcessor {
 				id: nodeId,
 				node,
 				attributes: this.processTextSegments(node),
+				fills: this.processFills(node),
 				strokes: this.processStrokes(node),
-				fills: this.processFills(node)
+				effects: this.processEffects(node)
 			});
 		} else if (isFigmaShapeNode(node)) {
 			this._toTransformNodes.push({
@@ -87,7 +90,8 @@ export class FigmaNodeTreeProcessor {
 				id: nodeId,
 				node,
 				fills: this.processFills(node),
-				strokes: this.processStrokes(node)
+				strokes: this.processStrokes(node),
+				effects: this.processEffects(node)
 			});
 		} else if (isFigmaSceneNode(node)) {
 			this._toTransformNodes.push({
@@ -199,6 +203,13 @@ export class FigmaNodeTreeProcessor {
 			.reverse(); // Reverse so that the most top stroke is the first item in the array
 	}
 
+	// Processes effects of a node
+	private processEffects(node: TFigmaNodeWithEffects): TToTransformEffect[] {
+		return node.effects.map((effect) => ({
+			variant: effect
+		}));
+	}
+
 	// Processes text segments of a text node
 	private processTextSegments(node: TextNode): TTextNodeAttributeInterval[] {
 		const segments = node.getStyledTextSegments([
@@ -267,6 +278,7 @@ export interface TToTransformTextNode extends TToTransformBaseNode {
 	attributes: TTextNodeAttributeInterval[];
 	fills: TToTransformFill[];
 	strokes: TToTransformStroke[];
+	effects: TToTransformEffect[];
 }
 
 export type TTextNodeAttributeInterval = Pick<
@@ -287,6 +299,7 @@ export interface TToTransformFrameNode extends TToTransformBaseNode {
 	childrenIds: TContinuousId[];
 	fills: TToTransformFill[];
 	strokes: TToTransformStroke[];
+	effects: TToTransformEffect[];
 	isRoot: boolean;
 }
 
@@ -301,6 +314,7 @@ export interface TToTransformShapeNode extends TToTransformBaseNode {
 	node: TFigmaShapeNode;
 	fills: TToTransformFill[];
 	strokes: TToTransformStroke[];
+	effects: TToTransformEffect[];
 }
 
 export interface TToTransformUncategorizedSceneNode extends TToTransformBaseNode {
@@ -356,6 +370,12 @@ export interface TToTransformStroke {
 	opacity: number;
 	width: number;
 }
+
+export interface TToTransformEffect {
+	variant: TToTransformEffectVariant;
+}
+
+export type TToTransformEffectVariant = DropShadowEffect | InnerShadowEffect | BlurEffect;
 
 interface TToTransformHashmapItem {
 	id: TContinuousId;

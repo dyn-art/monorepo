@@ -1,6 +1,10 @@
 import type { COMP } from '@dyn/dtif-comp';
 
-import type { TToTransformFill, TToTransformStroke } from '../../FigmaNodeTreeProcessor';
+import type {
+	TToTransformEffect,
+	TToTransformFill,
+	TToTransformStroke
+} from '../../FigmaNodeTreeProcessor';
 import {
 	createDtifStyles,
 	mapFigmaBlendModeToDtif,
@@ -13,7 +17,7 @@ export function transformFrameNode(
 	node: FrameNode | ComponentNode | InstanceNode,
 	config: TTransformFrameNodeConfig
 ): { type: 'Frame' } & COMP.FrameNode {
-	const { childrenIds, fills, strokes } = config;
+	const { childrenIds, fills, strokes, effects } = config;
 
 	return {
 		type: 'Frame',
@@ -32,7 +36,7 @@ export function transformFrameNode(
 		blendMode: mapFigmaBlendModeToDtif(node.blendMode),
 		opacity: node.opacity,
 		constraints: mapFigmaConstraintsToDtif(node.constraints),
-		styles: createDtifStyles(fills, strokes)
+		styles: createDtifStyles(fills, strokes, effects)
 	};
 }
 
@@ -40,4 +44,5 @@ interface TTransformFrameNodeConfig {
 	childrenIds: number[];
 	fills: TToTransformFill[];
 	strokes: TToTransformStroke[];
+	effects: TToTransformEffect[];
 }

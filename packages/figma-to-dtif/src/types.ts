@@ -40,4 +40,12 @@ export type TFigmaNodeWithStrokes =
 	| TextNode
 	| VectorNode;
 
+export type TFigmaNodeWithEffects =
+	| FrameNode
+	| InstanceNode
+	| ComponentNode
+	| TFigmaShapeNode
+	| TextNode
+	| VectorNode;
+
 export type TFigmaFormat = 'JPG' | 'PNG' | 'SVG' | 'PDF';

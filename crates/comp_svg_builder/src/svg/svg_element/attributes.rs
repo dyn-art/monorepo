@@ -90,6 +90,10 @@ pub enum SvgAttribute {
         gradient_units: SvgUnits,
     },
     #[cfg_attr(feature = "serde_support", serde(rename_all = "camelCase"))]
+    FilterUnits {
+        filter_units: SvgUnits,
+    },
+    #[cfg_attr(feature = "serde_support", serde(rename_all = "camelCase"))]
     PreserveAspectRatio {
         preserve_aspect_ratio: String,
     },
@@ -190,6 +194,7 @@ impl SvgAttribute {
             Self::ClipPath { .. } => "clip-path",
             Self::PatternUnits { .. } => "patternUnits",
             Self::GradientUnits { .. } => "gradientUnits",
+            Self::FilterUnits { .. } => "filterUnits",
             Self::PreserveAspectRatio { .. } => "preserveAspectRatio",
             Self::StopColor { .. } => "stop-color",
             Self::StopOpacity { .. } => "stop-opacity",
@@ -281,7 +286,8 @@ impl SvgAttribute {
             }
             | Self::GradientUnits {
                 gradient_units: unit,
-            } => match unit {
+            }
+            | Self::FilterUnits { filter_units: unit } => match unit {
                 SvgUnits::ObjectBoundingBox => String::from("objectBoundingBox"),
                 SvgUnits::UserSpaceOnUse => String::from("userSpaceOnUse"),
             },
@@ -523,10 +529,15 @@ pub struct ColorMatrix(pub Mat4);
 impl ColorMatrix {
     pub fn from_rgba(r: u8, g: u8, b: u8, a: f32) -> Self {
         Self(Mat4::from_cols(
-            Vec4::new(f32::from(r) / 255.0, 0.0, 0.0, 0.0),
-            Vec4::new(0.0, f32::from(g) / 255.0, 0.0, 0.0),
-            Vec4::new(0.0, 0.0, f32::from(b) / 255.0, 0.0),
-            Vec4::new(0.0, 0.0, 0.0, a),
+            Vec4::new(0.0, 0.0, 0.0, 0.0),
+            Vec4::new(0.0, 0.0, 0.0, 0.0),
+            Vec4::new(0.0, 0.0, 0.0, 0.0),
+            Vec4::new(
+                f32::from(r) / 255.0,
+                f32::from(g) / 255.0,
+                f32::from(b) / 255.0,
+                a,
+            ),
         ))
     }
 

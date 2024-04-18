@@ -27,7 +27,8 @@ export async function transformNode(
 				return transformFrameNode(toTransformNode.node, {
 					childrenIds: toTransformNode.childrenIds,
 					fills: toTransformNode.fills,
-					strokes: toTransformNode.strokes
+					strokes: toTransformNode.strokes,
+					effects: toTransformNode.effects
 				});
 			}
 			return transformNodeToImage(toTransformNode.node, cx, {
@@ -46,7 +47,8 @@ export async function transformNode(
 		case 'Text':
 			return transformTextNode(toTransformNode.node, toTransformNode.attributes, {
 				fills: toTransformNode.fills,
-				strokes: toTransformNode.strokes
+				strokes: toTransformNode.strokes,
+				effects: toTransformNode.effects
 			});
 		case 'Shape':
 			return transformShapeNode(toTransformNode);

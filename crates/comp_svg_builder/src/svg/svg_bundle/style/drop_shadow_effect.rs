@@ -1,7 +1,7 @@
+// Resources:
 // https://observablehq.com/@bumbeishvili/svg-drop-shadows
 // https://vanseodesign.com/web-design/svg-filter-primitives-input-output/
 // https://www.xanthir.com/b4Yv0
-//
 // https://codepen.io/mullany/pen/xxPOoX
 // https://tympanus.net/codrops/2019/01/15/svg-filters-101/
 
@@ -13,6 +13,7 @@ use crate::{
             attributes::{
                 ColorMatrix, SvgAttribute, SvgAttributeFilter, SvgAttributeIn, SvgAttributeMode,
                 SvgAttributeOperator, SvgAttributeType, SvgAttributeValues, SvgMeasurementUnit,
+                SvgUnits,
             },
             SvgElement, SvgTag,
         },
@@ -100,6 +101,11 @@ impl DropShadowEffectStyleSvgBundle {
             SvgAttribute::ColorInterpolationFilters {
                 color_interpolation_filters: String::from("sRGB"),
             },
+            SvgAttribute::FilterUnits {
+                filter_units: SvgUnits::ObjectBoundingBox,
+            },
+            // TODO: Need to calculate x & y and width & height somehow,
+            // so that the shadow is not cut off
             SvgAttribute::X {
                 x: -50.0,
                 unit: SvgMeasurementUnit::Percent,
@@ -152,7 +158,7 @@ impl DropShadowEffectStyleSvgBundle {
                 value: SvgAttributeIn::SourceAlpha,
             },
             SvgAttribute::Result {
-                result: String::from("expandedOutline"),
+                result: String::from("shadow"),
             },
         ]);
         filter_element.append_child_in_bundle_context(&mut source_alpha_fe_morphology_element);
