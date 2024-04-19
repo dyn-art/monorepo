@@ -142,7 +142,7 @@ const DEFAULT_DTIF: COMP.DtifComposition = {
 	events: [
 		// {
 		// 	type: 'EntityMoved',
-		// 	entity: 1,
+		// 	entity: 'n1',
 		// 	dx: 100,
 		// 	dy: -300
 		// }
