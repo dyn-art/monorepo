@@ -1,8 +1,12 @@
 import * as jsonLogic from 'json-logic-js';
 import { describe, expect, it } from 'vitest';
 
-import { createField } from './create-field';
-import { processField, type TResolvedField, type TUnresolvedField } from './process-field';
+import {
+	applyModifications,
+	type TResolvedField,
+	type TUnresolvedField
+} from './apply-modifications';
+import { createModificationField } from './create-modification-field';
 
 describe('processField function', () => {
 	it('json logic playground', () => {
@@ -11,8 +15,8 @@ describe('processField function', () => {
 		expect(result).toBeTruthy();
 	});
 
-	it('processes a field correctly when all conditions are met', () => {
-		const field = createField({
+	it('applies modifications to a field correctly when all conditions are met', () => {
+		const field = createModificationField({
 			key: 'moveX',
 			displayName: 'Move X',
 			inputType: { type: 'NUMBER', default: 0 },
@@ -29,7 +33,7 @@ describe('processField function', () => {
 			]
 		});
 
-		const results = processField(field, { moveX: 30 });
+		const results = applyModifications(field, { moveX: 30 });
 		const firstResult = results[0] as TResolvedField;
 
 		expect(firstResult).not.toBeNull();
@@ -38,7 +42,7 @@ describe('processField function', () => {
 	});
 
 	it('handles not met conditions by returning the appropriate messages', () => {
-		const field = createField({
+		const field = createModificationField({
 			key: 'moveX',
 			displayName: 'Move X',
 			inputType: { type: 'NUMBER', default: 10 },
@@ -55,7 +59,7 @@ describe('processField function', () => {
 			]
 		});
 
-		const results = processField(field, { moveX: -10 });
+		const results = applyModifications(field, { moveX: -10 });
 		const firstResult = results[0] as TUnresolvedField;
 
 		expect(firstResult).not.toBeNull();
@@ -66,8 +70,8 @@ describe('processField function', () => {
 		});
 	});
 
-	it('processes an array field correctly when all conditions are met', () => {
-		const field = createField({
+	it('applies modifications to an array field correctly when all conditions are met', () => {
+		const field = createModificationField({
 			key: 'pos',
 			displayName: 'Set Position',
 			inputType: { type: 'POSITION', default: [0, 0] },
@@ -95,7 +99,7 @@ describe('processField function', () => {
 			]
 		});
 
-		const results = processField(field, { pos: [20, 10] });
+		const results = applyModifications(field, { pos: [20, 10] });
 		const firstResult = results[0] as TResolvedField;
 
 		expect(firstResult).not.toBeNull();
@@ -109,7 +113,7 @@ describe('processField function', () => {
 	});
 
 	it('handles not met conditions by returning the appropriate messages for an array field', () => {
-		const field = createField({
+		const field = createModificationField({
 			key: 'pos',
 			displayName: 'Set Position',
 			inputType: { type: 'POSITION', default: [0, 0] },
@@ -137,7 +141,7 @@ describe('processField function', () => {
 			]
 		});
 
-		const results = processField(field, { pos: [-10, 10] });
+		const results = applyModifications(field, { pos: [-10, 10] });
 		const firstResult = results[0] as TUnresolvedField;
 
 		expect(firstResult).not.toBeNull();
@@ -148,8 +152,8 @@ describe('processField function', () => {
 		});
 	});
 
-	it('processes a object field correctly when all conditions are met', () => {
-		const field = createField({
+	it('applies modifications to a object field correctly when all conditions are met', () => {
+		const field = createModificationField({
 			key: 'color',
 			displayName: 'Set Position',
 			inputType: { type: 'COLOR', default: { r: 0, g: 0, b: 0 } },
@@ -193,7 +197,7 @@ describe('processField function', () => {
 			]
 		});
 
-		const results = processField(field, { color: { r: 10, g: 20, b: 30 } });
+		const results = applyModifications(field, { color: { r: 10, g: 20, b: 30 } });
 		const firstResult = results[0] as TResolvedField;
 
 		expect(firstResult).not.toBeNull();

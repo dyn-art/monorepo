@@ -3,16 +3,16 @@ import { deepReplaceVar } from '@dyn/utils';
 
 import type { COMP } from '../comp';
 import type {
-	EditableDtifInputEvent,
-	TField,
-	TFieldData,
-	TInputType,
-	TMapInputType
+	ModifiableDtifInputEvent,
+	TFieldData as TFieldModifications,
+	TMapToDefaultType,
+	TModificationField,
+	TModificationInputType
 } from './types';
 
-export function processField<GKey extends string, GInputType extends TInputType>(
-	field: TField<GKey, GInputType>,
-	data: TFieldData<GKey, GInputType>
+export function applyModifications<GKey extends string, GInputType extends TModificationInputType>(
+	field: TModificationField<GKey, GInputType>,
+	modifications: TFieldModifications<GKey, GInputType>
 ): TProcessedFieldResult[] {
 	const { actions } = field;
 	const results: TProcessedFieldResult[] = [];
@@ -23,7 +23,7 @@ export function processField<GKey extends string, GInputType extends TInputType>
 		// Check whether data matches conditions for action
 		const notMetConditions: TNotMetCondition[] = [];
 		for (const [index, condition] of conditions.entries()) {
-			const metCondition = apply(condition.condition, data);
+			const metCondition = apply(condition.condition, modifications);
 			if (!metCondition) {
 				notMetConditions.push({ index, message: condition.notMetMessage });
 			}
@@ -34,7 +34,9 @@ export function processField<GKey extends string, GInputType extends TInputType>
 		} else {
 			results.push({
 				resolved: true,
-				events: events.map((event) => prepareEvent<GKey, TMapInputType<GInputType>>(event, data))
+				events: events.map((event) =>
+					prepareEvent<GKey, TMapToDefaultType<GInputType>>(event, modifications)
+				)
 			});
 		}
 	}
@@ -44,7 +46,7 @@ export function processField<GKey extends string, GInputType extends TInputType>
 
 // TODO: Make safer?
 function prepareEvent<GKey extends string, GValue>(
-	event: COMP.DtifInputEvent | EditableDtifInputEvent<GKey, GValue>,
+	event: COMP.DtifInputEvent | ModifiableDtifInputEvent<GKey, GValue>,
 	data: Record<string, any>
 ): COMP.DtifInputEvent {
 	if (event.type.startsWith('Editable')) {
