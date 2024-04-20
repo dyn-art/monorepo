@@ -12,31 +12,44 @@
  * const newData = deepReplaceVar(originalData, placeholders); // returns { name: 'Alice', details: { age: 25, city: 'New York' }, tags: [25, 'student'] }
  * ```
  */
-export function deepReplaceVar<T>(data: T, placeholders: Record<string, any>): T {
-	const cloneAndReplace = (item: any): any => {
-		// Replace the placeholder with the new value
-		if (
-			typeof item === 'object' &&
-			item?.var != null &&
-			Object.prototype.hasOwnProperty.call(placeholders, item.var)
-		) {
-			return placeholders[item.var];
-		} else if (typeof item === 'object' && item != null) {
-			// Clone and process each element of the array
-			if (Array.isArray(item)) {
-				return item.map(cloneAndReplace);
-			}
+export function deepReplaceVar<T>(data: T, placeholders: Record<string, unknown>): T {
+	return cloneAndReplace(data, placeholders);
+}
 
-			// Clone and process each property of the object
-			return Object.keys(item).reduce<Record<string, any>>((acc, key) => {
-				acc[key] = cloneAndReplace(item[key]);
-				return acc;
-			}, {});
+function cloneAndReplace<T>(item: T, placeholders: Record<string, any>): T {
+	if (typeof item === 'object' && item != null) {
+		// Check if the item is an object with the `var` key, and replace it
+		if (isVarObject(item)) {
+			return resolvePlaceholder(item.var, placeholders) as T;
 		}
+		// Recursively clone and process array elements
+		else if (Array.isArray(item)) {
+			return item.map((subItem) => cloneAndReplace(subItem, placeholders)) as T;
+		}
+		// Recursively clone and process object properties
+		return Object.keys(item).reduce<Record<string, any>>((acc, key) => {
+			acc[key] = cloneAndReplace((item as Record<string, any>)[key], placeholders);
+			return acc;
+		}, {}) as T;
+	}
 
-		// Return the item unchanged if it's not an object or the target string
-		return item;
-	};
+	// Return primitive and non-targeted object types unchanged
+	return item;
+}
 
-	return cloneAndReplace(data);
+function isVarObject(value: unknown): value is { var: string } {
+	return typeof value === 'object' && value != null && 'var' in value;
+}
+
+function resolvePlaceholder(path: string, source: Record<string, any>): any {
+	const segments = path.split('.');
+	let result = source;
+	for (const segment of segments) {
+		if (Object.prototype.hasOwnProperty.call(result, segment)) {
+			result = result[segment];
+		} else {
+			return undefined;
+		}
+	}
+	return result;
 }

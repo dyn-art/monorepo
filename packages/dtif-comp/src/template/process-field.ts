@@ -2,7 +2,13 @@ import { apply } from 'json-logic-js';
 import { deepReplaceVar } from '@dyn/utils';
 
 import type { COMP } from '../comp';
-import type { EditableDtifInputEvent, TField, TFieldData, TInputType } from './types';
+import type {
+	EditableDtifInputEvent,
+	TField,
+	TFieldData,
+	TInputType,
+	TMapInputType
+} from './types';
 
 export function processField<GKey extends string, GInputType extends TInputType>(
 	field: TField<GKey, GInputType>,
@@ -14,6 +20,7 @@ export function processField<GKey extends string, GInputType extends TInputType>
 	for (const action of actions) {
 		const { conditions, events } = action;
 
+		// Check whether data matches conditions for action
 		const notMetConditions: TNotMetCondition[] = [];
 		for (const [index, condition] of conditions.entries()) {
 			const metCondition = apply(condition.condition, data);
@@ -27,7 +34,7 @@ export function processField<GKey extends string, GInputType extends TInputType>
 		} else {
 			results.push({
 				resolved: true,
-				events: events.map((event) => prepareEvent<GKey>(event, data))
+				events: events.map((event) => prepareEvent<GKey, TMapInputType<GInputType>>(event, data))
 			});
 		}
 	}
@@ -36,8 +43,8 @@ export function processField<GKey extends string, GInputType extends TInputType>
 }
 
 // TODO: Make safer?
-function prepareEvent<GKey extends string>(
-	event: COMP.DtifInputEvent | EditableDtifInputEvent<GKey>,
+function prepareEvent<GKey extends string, GValue>(
+	event: COMP.DtifInputEvent | EditableDtifInputEvent<GKey, GValue>,
 	data: Record<string, any>
 ): COMP.DtifInputEvent {
 	if (event.type.startsWith('Editable')) {

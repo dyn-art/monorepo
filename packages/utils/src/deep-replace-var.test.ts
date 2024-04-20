@@ -73,4 +73,36 @@ describe('deepReplaceVar function', () => {
 
 		expect(newData).toEqual(expectedData);
 	});
+
+	it('should correctly replace values using dot notation for array indices', () => {
+		const originalData = {
+			list: [{ var: 'items.0' }, { var: 'items.1' }]
+		};
+		const expectedData = {
+			list: ['apple', 'banana']
+		};
+		const newData = deepReplaceVar(originalData, {
+			items: ['apple', 'banana']
+		});
+
+		expect(newData).toEqual(expectedData);
+	});
+
+	it('should correctly replace values using dot notation for nested object properties', () => {
+		const originalData = {
+			user: {
+				details: { name: { var: 'user.details.name' }, age: { var: 'user.details.age' } }
+			}
+		};
+		const expectedData = {
+			user: {
+				details: { name: 'Alice', age: 25 }
+			}
+		};
+		const newData = deepReplaceVar(originalData, {
+			user: { details: { name: 'Alice', age: 25 } }
+		});
+
+		expect(newData).toEqual(expectedData);
+	});
 });
