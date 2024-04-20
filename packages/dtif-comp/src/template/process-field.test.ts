@@ -66,7 +66,7 @@ describe('processField function', () => {
 		});
 	});
 
-	it('processes a array field correctly when all conditions are met', () => {
+	it('processes an array field correctly when all conditions are met', () => {
 		const field = createField({
 			key: 'pos',
 			displayName: 'Set Position',
@@ -108,7 +108,7 @@ describe('processField function', () => {
 		});
 	});
 
-	it('handles not met conditions by returning the appropriate messages for array field', () => {
+	it('handles not met conditions by returning the appropriate messages for an array field', () => {
 		const field = createField({
 			key: 'pos',
 			displayName: 'Set Position',
@@ -145,6 +145,70 @@ describe('processField function', () => {
 		expect(firstResult.notMetConditions[0]).toEqual({
 			index: 0,
 			message: 'x can not be negative!'
+		});
+	});
+
+	it('processes a object field correctly when all conditions are met', () => {
+		const field = createField({
+			key: 'color',
+			displayName: 'Set Position',
+			inputType: { type: 'COLOR', default: { r: 0, g: 0, b: 0 } },
+			actions: [
+				{
+					conditions: [
+						{
+							condition: {
+								and: [{ '>': [{ var: 'color.r' }, 0] }, { '<=': [{ var: 'color.r' }, 255] }]
+							},
+							notMetMessage: 'Red is out of spectrum!'
+						},
+						{
+							condition: {
+								and: [{ '>': [{ var: 'color.g' }, 0] }, { '<=': [{ var: 'color.g' }, 255] }]
+							},
+							notMetMessage: 'Green is out of spectrum!'
+						},
+						{
+							condition: {
+								and: [{ '>': [{ var: 'color.b' }, 0] }, { '<=': [{ var: 'color.b' }, 255] }]
+							},
+							notMetMessage: 'Blue is out of spectrum!'
+						}
+					],
+					events: [
+						{
+							type: 'EditableEntitySetPosition',
+							entity: 'n1',
+							x: { var: 'color.r' },
+							y: { var: 'color.g' }
+						},
+						{
+							type: 'EditableEntitySetPosition',
+							entity: 'n1',
+							x: { var: 'color.g' },
+							y: { var: 'color.b' }
+						}
+					]
+				}
+			]
+		});
+
+		const results = processField(field, { color: { r: 10, g: 20, b: 30 } });
+		const firstResult = results[0] as TResolvedField;
+
+		expect(firstResult).not.toBeNull();
+		expect(firstResult.resolved).toBeTruthy();
+		expect(firstResult.events[0]).toEqual({
+			type: 'EntitySetPosition',
+			entity: 'n1',
+			x: 10,
+			y: 20
+		});
+		expect(firstResult.events[1]).toEqual({
+			type: 'EntitySetPosition',
+			entity: 'n1',
+			x: 20,
+			y: 30
 		});
 	});
 });

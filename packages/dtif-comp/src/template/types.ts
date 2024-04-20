@@ -47,12 +47,6 @@ export type EditableDtifInputEvent<GKey extends string, GValue> =
 			GValue
 	  >);
 
-type TExpandKey<GKey extends string, GValue> = GValue extends any[]
-	? `${GKey}.${number}`
-	: GValue extends object
-		? { [P in keyof GValue]: `${GKey}.${P & string}` }[keyof GValue]
-		: GKey;
-
 export type TInputType =
 	| { type: 'NUMBER'; default: number }
 	| { type: 'STRING'; default: string }
@@ -62,6 +56,12 @@ export type TInputType =
 	| { type: 'POSITION'; default: [number, number] };
 
 export type TMapInputType<T> = T extends { default: infer U } ? U : never;
+
+type TExpandKey<GKey extends string, GValue> = GValue extends any[]
+	? `${GKey}.${number}`
+	: GValue extends object
+		? { [P in keyof GValue]: `${GKey}.${P & string}` }[keyof GValue]
+		: GKey;
 
 export type TFieldData<GKey extends string, GInputType extends TInputType> = {
 	[key in GKey]: TMapInputType<GInputType>;
