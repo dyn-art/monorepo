@@ -196,7 +196,11 @@ export class FigmaNodeTreeProcessor {
 					visible: stroke.visible ?? true,
 					opacity: stroke.opacity ?? 1,
 					blendMode: stroke.blendMode ?? 'PASS_THROUGH',
-					width: dropMixed(node, 'strokeWeight')
+					width: dropMixed(node, 'strokeWeight'),
+					strokeMiterLimit: dropMixed(node, 'strokeMiterLimit'),
+					strokeCap: dropMixed(node, 'strokeCap'),
+					strokeJoin: dropMixed(node, 'strokeJoin'),
+					strokeAlign: dropMixed(node, 'strokeAlign')
 				};
 			})
 			.filter(notEmpty)
@@ -369,6 +373,10 @@ export interface TToTransformStroke {
 	blendMode: BlendMode;
 	opacity: number;
 	width: number;
+	strokeMiterLimit: number;
+	strokeCap: StrokeCap;
+	strokeJoin: StrokeJoin;
+	strokeAlign: 'CENTER' | 'INSIDE' | 'OUTSIDE';
 }
 
 export interface TToTransformEffect {

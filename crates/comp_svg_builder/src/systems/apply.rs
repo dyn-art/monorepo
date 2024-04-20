@@ -27,7 +27,7 @@ use dyn_comp_bundles::components::{
         BlendModeMixin, ImageAssetMixin, OpacityMixin, PaintParentMixin, PathMixin, SizeMixin,
         StrokePathMixin, StyleChildrenMixin, VisibilityMixin,
     },
-    nodes::{CompNode, GroupCompNode},
+    nodes::{CompNode, FrameCompNode, GroupCompNode},
     paints::{
         CompPaint, GradientCompPaint, GradientVariant, ImageCompPaint, ImageScaleMode,
         SolidCompPaint,
@@ -509,6 +509,28 @@ pub fn apply_blend_mode_mixin_changes(
             .set_style(SvgStyle::BlendMode {
                 blend_mode: blend_mode.into(),
             });
+    }
+}
+
+// TODO: Improve like remove also clip path, ..
+pub fn apply_clip_content_changes(
+    mut query: Query<(&FrameCompNode, &mut SvgBundleVariant), Changed<FrameCompNode>>,
+) {
+    for (FrameCompNode { clip_content }, mut bundle_variant) in query.iter_mut() {
+        match bundle_variant.as_mut() {
+            SvgBundleVariant::FrameNode(bundle) => {
+                if *clip_content {
+                    bundle
+                        .children_wrapper_g
+                        .set_attribute(SvgAttribute::ClipPath {
+                            clip_path: bundle.children_clip_path.get_id(),
+                        });
+                } else {
+                    bundle.children_wrapper_g.remove_attribute("clip-path");
+                }
+            }
+            _ => {}
+        }
     }
 }
 

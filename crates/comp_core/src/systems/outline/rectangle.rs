@@ -6,7 +6,10 @@ use bevy_ecs::{
 use dyn_comp_bundles::components::mixins::{CornerRadiiMixin, PathMixin, SizeMixin};
 use tiny_skia_path::PathBuilder;
 
-// TODO: Doesn't seem to work
+// TODO: Round corner for all shapes
+// https://plnkr.co/edit/kGnGGyoOCKil02k04snu
+
+// https://stackoverflow.com/questions/10177985/svg-rounded-corner
 pub fn outline_rectangle(
     mut commands: Commands,
     query: Query<

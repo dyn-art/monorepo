@@ -17,7 +17,8 @@ export function useSvgComposition(config: TUseCanvasConfig): {
 			const { initWasm } = await import('@dyn/svg-comp');
 			await initWasm();
 			return true;
-		}
+		},
+		refetchOnWindowFocus: false
 	});
 
 	React.useEffect(() => {

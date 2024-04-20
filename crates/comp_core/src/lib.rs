@@ -34,6 +34,7 @@ use systems::{
     },
     stroke::stroke_path_system,
     tick::collect_first_tick,
+    vector::resize_vector_node,
 };
 
 pub struct CompCorePlugin {
@@ -134,6 +135,7 @@ impl Plugin for CompCorePlugin {
                 compute_group_transform.in_set(CompCoreSystemSet::Compute),
                 apply_constraints_offset.in_set(CompCoreSystemSet::PreLayout),
                 apply_constraints.in_set(CompCoreSystemSet::Layout),
+                resize_vector_node.in_set(CompCoreSystemSet::Outline),
                 outline_rectangle.in_set(CompCoreSystemSet::Outline),
                 outline_ellipse.in_set(CompCoreSystemSet::Outline),
                 outline_star.in_set(CompCoreSystemSet::Outline),

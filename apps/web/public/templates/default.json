@@ -1,0 +1,533 @@
+{
+	"version": "1.0",
+	"size": [1920, 1080],
+	"rootNodeId": "1",
+	"nodes": {
+		"1": {
+			"type": "Frame",
+			"clipContent": true,
+			"visible": true,
+			"children": ["41", "39", "37", "36", "35", "33", "30", "15", "2"],
+			"size": [1920, 1080],
+			"translation": [0, 0],
+			"rotationDeg": 0,
+			"cornerRadii": [0, 0, 0, 0],
+			"blendMode": "Normal",
+			"opacity": 1,
+			"constraints": { "horizontal": "Start", "vertical": "Start" },
+			"styles": [
+				{ "type": "Fill", "paintId": "42", "blendMode": "Normal", "opacity": 1, "visible": true }
+			]
+		},
+		"2": {
+			"type": "Frame",
+			"clipContent": false,
+			"visible": true,
+			"children": ["13", "10", "9", "8", "7", "5", "3"],
+			"size": [639, 276],
+			"translation": [151, 452],
+			"rotationDeg": 0,
+			"cornerRadii": [0, 0, 0, 0],
+			"blendMode": "Normal",
+			"opacity": 1,
+			"constraints": { "horizontal": "Start", "vertical": "Start" },
+			"styles": []
+		},
+		"3": {
+			"type": "Vector",
+			"path": "M 0 0 L 625 0 L 625 262 L 0 262 L 0 0 Z",
+			"visible": true,
+			"size": [625, 262],
+			"translation": [7, 7],
+			"rotationDeg": 0,
+			"blendMode": "Normal",
+			"opacity": 1,
+			"constraints": { "horizontal": "Scale", "vertical": "Scale" },
+			"styles": [
+				{
+					"type": "Stroke",
+					"width": 2,
+					"paintId": "4",
+					"blendMode": "Normal",
+					"opacity": 1,
+					"visible": true
+				}
+			]
+		},
+		"5": {
+			"type": "Rectangle",
+			"visible": true,
+			"size": [14, 14],
+			"translation": [625, 0],
+			"rotationDeg": 0,
+			"cornerRadii": [0, 0, 0, 0],
+			"blendMode": "Normal",
+			"opacity": 1,
+			"constraints": { "horizontal": "End", "vertical": "Start" },
+			"styles": [
+				{
+					"type": "Stroke",
+					"width": 2,
+					"paintId": "4",
+					"blendMode": "Normal",
+					"opacity": 1,
+					"visible": true
+				},
+				{ "type": "Fill", "paintId": "6", "blendMode": "Normal", "opacity": 1, "visible": true }
+			]
+		},
+		"7": {
+			"type": "Rectangle",
+			"visible": true,
+			"size": [14, 14],
+			"translation": [625, 262],
+			"rotationDeg": 0,
+			"cornerRadii": [0, 0, 0, 0],
+			"blendMode": "Normal",
+			"opacity": 1,
+			"constraints": { "horizontal": "End", "vertical": "End" },
+			"styles": [
+				{
+					"type": "Stroke",
+					"width": 2,
+					"paintId": "4",
+					"blendMode": "Normal",
+					"opacity": 1,
+					"visible": true
+				},
+				{ "type": "Fill", "paintId": "6", "blendMode": "Normal", "opacity": 1, "visible": true }
+			]
+		},
+		"8": {
+			"type": "Rectangle",
+			"visible": true,
+			"size": [14, 14],
+			"translation": [0, 262],
+			"rotationDeg": 0,
+			"cornerRadii": [0, 0, 0, 0],
+			"blendMode": "Normal",
+			"opacity": 1,
+			"constraints": { "horizontal": "Start", "vertical": "End" },
+			"styles": [
+				{
+					"type": "Stroke",
+					"width": 2,
+					"paintId": "4",
+					"blendMode": "Normal",
+					"opacity": 1,
+					"visible": true
+				},
+				{ "type": "Fill", "paintId": "6", "blendMode": "Normal", "opacity": 1, "visible": true }
+			]
+		},
+		"9": {
+			"type": "Rectangle",
+			"visible": true,
+			"size": [14, 14],
+			"translation": [0, 0],
+			"rotationDeg": 0,
+			"cornerRadii": [0, 0, 0, 0],
+			"blendMode": "Normal",
+			"opacity": 1,
+			"constraints": { "horizontal": "Start", "vertical": "Start" },
+			"styles": [
+				{
+					"type": "Stroke",
+					"width": 2,
+					"paintId": "4",
+					"blendMode": "Normal",
+					"opacity": 1,
+					"visible": true
+				},
+				{ "type": "Fill", "paintId": "6", "blendMode": "Normal", "opacity": 1, "visible": true }
+			]
+		},
+		"10": {
+			"type": "Text",
+			"text": "dyn.art",
+			"attributes": [
+				{
+					"start": 0,
+					"end": 7,
+					"attributes": {
+						"fontFamily": { "Named": "Alegreya Sans" },
+						"fontStretch": 1,
+						"fontStyle": "Normal",
+						"fontWeight": 700,
+						"fontSize": 128,
+						"letterSpacing": { "type": "Em", "value": 0 }
+					}
+				}
+			],
+			"lineWrap": "Word",
+			"horizontalTextAlignment": "Left",
+			"verticalTextAlignment": "Top",
+			"visible": true,
+			"size": [371, 154],
+			"translation": [11, 23],
+			"rotationDeg": 0,
+			"blendMode": "Normal",
+			"opacity": 1,
+			"constraints": { "horizontal": "Start", "vertical": "Start" },
+			"styles": [
+				{ "type": "Fill", "paintId": "12", "blendMode": "Normal", "opacity": 1, "visible": true }
+			]
+		},
+		"13": {
+			"type": "Text",
+			"text": "Demo File",
+			"attributes": [
+				{
+					"start": 0,
+					"end": 9,
+					"attributes": {
+						"fontFamily": { "Named": "Lato" },
+						"fontStretch": 1,
+						"fontStyle": "Normal",
+						"fontWeight": 400,
+						"fontSize": 64,
+						"letterSpacing": { "type": "Em", "value": 0 }
+					}
+				}
+			],
+			"lineWrap": "Word",
+			"horizontalTextAlignment": "Left",
+			"verticalTextAlignment": "Top",
+			"visible": true,
+			"size": [288, 76],
+			"translation": [14, 177],
+			"rotationDeg": 0,
+			"blendMode": "Normal",
+			"opacity": 1,
+			"constraints": { "horizontal": "Start", "vertical": "Start" },
+			"styles": [
+				{ "type": "Fill", "paintId": "12", "blendMode": "Normal", "opacity": 1, "visible": true }
+			]
+		},
+		"15": {
+			"type": "Frame",
+			"clipContent": false,
+			"visible": true,
+			"children": ["26", "21", "16"],
+			"size": [244.95555114746094, 73],
+			"translation": [1519, 548],
+			"rotationDeg": 0,
+			"cornerRadii": [0, 0, 0, 0],
+			"blendMode": "Normal",
+			"opacity": 1,
+			"constraints": { "horizontal": "Start", "vertical": "Start" },
+			"styles": []
+		},
+		"16": {
+			"type": "Frame",
+			"clipContent": false,
+			"visible": true,
+			"children": ["17"],
+			"size": [73, 73],
+			"translation": [0, 0],
+			"rotationDeg": 0,
+			"cornerRadii": [
+				3.2444443702697754, 3.2444443702697754, 3.2444443702697754, 3.2444443702697754
+			],
+			"blendMode": "Normal",
+			"opacity": 1,
+			"constraints": { "horizontal": "Start", "vertical": "Start" },
+			"styles": [
+				{ "type": "Fill", "paintId": "19", "blendMode": "Normal", "opacity": 1, "visible": true },
+				{
+					"type": "Stroke",
+					"width": 3.2444443702697754,
+					"paintId": "20",
+					"blendMode": "Normal",
+					"opacity": 1,
+					"visible": true
+				}
+			]
+		},
+		"17": {
+			"type": "Vector",
+			"path": "M 15.306863658370636 30.613723754882812 L 0 15.306863424513095 L 15.306863658370636 0 L 17.9377302695012 2.596699492704297 L 7.1067585691211415 13.42766948053759 L 47.9022753545577 13.42766948053759 L 37.07130674832107 2.596699492704297 L 39.70217335945163 0 L 55.009037017822266 15.306863424513095 L 39.70217335945163 30.613723754882812 L 37.07130674832107 27.982857183946507 L 47.9022753545577 17.186054274345224 L 7.1067585691211415 17.186054274345224 L 17.9377302695012 27.982857183946507 L 15.306863658370636 30.613723754882812 Z",
+			"visible": true,
+			"size": [55.009037017822266, 30.613723754882812],
+			"translation": [8.995491981506348, 21.19313621520996],
+			"rotationDeg": 0,
+			"blendMode": "Normal",
+			"opacity": 1,
+			"constraints": { "horizontal": "Start", "vertical": "Start" },
+			"styles": [
+				{ "type": "Fill", "paintId": "18", "blendMode": "Normal", "opacity": 1, "visible": true }
+			]
+		},
+		"21": {
+			"type": "Frame",
+			"clipContent": false,
+			"visible": true,
+			"children": ["23", "22"],
+			"size": [73, 73],
+			"translation": [85.97777557373047, 0],
+			"rotationDeg": 0,
+			"cornerRadii": [
+				3.2444443702697754, 3.2444443702697754, 3.2444443702697754, 3.2444443702697754
+			],
+			"blendMode": "Normal",
+			"opacity": 1,
+			"constraints": { "horizontal": "Start", "vertical": "Start" },
+			"styles": [
+				{ "type": "Fill", "paintId": "24", "blendMode": "Normal", "opacity": 1, "visible": true },
+				{
+					"type": "Stroke",
+					"width": 3.2444443702697754,
+					"paintId": "25",
+					"blendMode": "Normal",
+					"opacity": 1,
+					"visible": true
+				}
+			]
+		},
+		"22": {
+			"type": "Vector",
+			"path": "M 0 13.940177074377084 L 0 11.206810840661978 L 22.003610610961914 0 L 22.003610610961914 4.373389068087517 L 5.125064794699681 12.505159801676655 L 5.261733106714517 12.231823178305143 L 5.261733106714517 12.91516473673392 L 5.125064794699681 12.64182811336241 L 22.003610610961914 20.773598846951547 L 22.003610610961914 25.146987915039062 L 0 13.940177074377084 Z",
+			"visible": true,
+			"size": [22.003610610961914, 25.146987915039062],
+			"translation": [41.35376739501953, 23.926502227783203],
+			"rotationDeg": 0,
+			"blendMode": "Normal",
+			"opacity": 1,
+			"constraints": { "horizontal": "Start", "vertical": "Start" },
+			"styles": [
+				{ "type": "Fill", "paintId": "18", "blendMode": "Normal", "opacity": 1, "visible": true }
+			]
+		},
+		"23": {
+			"type": "Vector",
+			"path": "M 22.00361442565918 13.940177074377084 L 0 25.146987915039062 L 0 20.773598846951547 L 16.878549463128635 12.64182811336241 L 16.741881146638313 12.91516473673392 L 16.741881146638313 12.231823178305143 L 16.878549463128635 12.505159801676655 L 0 4.373389068087517 L 0 0 L 22.00361442565918 11.206810840661978 L 22.00361442565918 13.940177074377084 Z",
+			"visible": true,
+			"size": [22.00361442565918, 25.146987915039062],
+			"translation": [9.642434120178223, 23.926502227783203],
+			"rotationDeg": 0,
+			"blendMode": "Normal",
+			"opacity": 1,
+			"constraints": { "horizontal": "Start", "vertical": "Start" },
+			"styles": [
+				{ "type": "Fill", "paintId": "18", "blendMode": "Normal", "opacity": 1, "visible": true }
+			]
+		},
+		"26": {
+			"type": "Frame",
+			"clipContent": false,
+			"visible": true,
+			"children": ["29", "28", "27"],
+			"size": [73, 73],
+			"translation": [171.95555114746094, 0],
+			"rotationDeg": 0,
+			"cornerRadii": [
+				3.2444443702697754, 3.2444443702697754, 3.2444443702697754, 3.2444443702697754
+			],
+			"blendMode": "Normal",
+			"opacity": 1,
+			"constraints": { "horizontal": "Start", "vertical": "Start" },
+			"styles": [
+				{ "type": "Fill", "paintId": "24", "blendMode": "Normal", "opacity": 1, "visible": true },
+				{
+					"type": "Stroke",
+					"width": 3.2444443702697754,
+					"paintId": "25",
+					"blendMode": "Normal",
+					"opacity": 1,
+					"visible": true
+				}
+			]
+		},
+		"27": {
+			"type": "Vector",
+			"path": "M 24.053640365600586 0 L 24.053640365600586 3.7583816051483154 L 0 3.7583816051483154 L 0 0 L 24.053640365600586 0 Z",
+			"visible": true,
+			"size": [24.053640365600586, 3.7583816051483154],
+			"translation": [12.446267127990723, 24.473176956176758],
+			"rotationDeg": 90.00000250447808,
+			"blendMode": "Normal",
+			"opacity": 1,
+			"constraints": { "horizontal": "Start", "vertical": "Start" },
+			"styles": [
+				{ "type": "Fill", "paintId": "18", "blendMode": "Normal", "opacity": 1, "visible": true }
+			]
+		},
+		"28": {
+			"type": "Vector",
+			"path": "M 48.10728073120117 0 L 48.10728073120117 3.7583816051483154 L 0 3.7583816051483154 L 0 0 L 48.10728073120117 0 Z",
+			"visible": true,
+			"size": [48.10728073120117, 3.7583816051483154],
+			"translation": [12.446267127990723, 34.62081527709961],
+			"rotationDeg": 0,
+			"blendMode": "Normal",
+			"opacity": 1,
+			"constraints": { "horizontal": "Start", "vertical": "Start" },
+			"styles": [
+				{ "type": "Fill", "paintId": "18", "blendMode": "Normal", "opacity": 1, "visible": true }
+			]
+		},
+		"29": {
+			"type": "Vector",
+			"path": "M 24.053640365600586 0 L 24.053640365600586 3.7583816051483154 L 0 3.7583816051483154 L 0 0 L 24.053640365600586 0 Z",
+			"visible": true,
+			"size": [24.053640365600586, 3.7583816051483154],
+			"translation": [64.31202697753906, 24.473176956176758],
+			"rotationDeg": 90.00000250447808,
+			"blendMode": "Normal",
+			"opacity": 1,
+			"constraints": { "horizontal": "Start", "vertical": "Start" },
+			"styles": [
+				{ "type": "Fill", "paintId": "18", "blendMode": "Normal", "opacity": 1, "visible": true }
+			]
+		},
+		"30": {
+			"type": "Vector",
+			"path": "M 2.9522137097432695 0 L 269.53597885958527 0 C 269.53597885958527 0 284.2376594709085 76.92359556474358 246.01389443689433 114.61837055096808 C 223.91170158506145 136.41468294903947 195.04933329500096 138.15606147839108 195.04933329500096 138.15606147839108 C 195.04933329500096 138.15606147839108 220.53162321859966 138.15606724934153 246.01389443689433 161.6937677950153 C 285.2177500629148 197.90594713591662 269.53597885958527 278.35888671875 269.53597885958527 278.35888671875 L 2.9522137097432695 278.35888671875 C 2.9522137097432695 278.35888671875 -14.688773951543453 188.30141200037488 36.27554776245835 153.50674352554634 C 61.75789380196914 136.10928232722202 78.41895688082286 138.15606147839108 78.41895688082286 138.15606147839108 C 78.41895688082286 138.15606147839108 50.97686549088341 136.1093111819743 25.494564344102294 111.54823260261692 C -8.254794698680094 79.01896227145758 2.9522137097432695 0 2.9522137097432695 0 Z",
+			"visible": true,
+			"size": [272.6336669921875, 278.35888671875],
+			"translation": [68.86474609375, 875.0025634765625],
+			"rotationDeg": -22.455778621841993,
+			"blendMode": "Normal",
+			"opacity": 1,
+			"constraints": { "horizontal": "Scale", "vertical": "Scale" },
+			"styles": [
+				{ "type": "Fill", "paintId": "31", "blendMode": "Normal", "opacity": 1, "visible": true }
+			]
+		},
+		"33": {
+			"type": "Rectangle",
+			"visible": true,
+			"size": [179.28941345214844, 495.7595520019531],
+			"translation": [1646.488037109375, -96.1968002319336],
+			"rotationDeg": 46.40957840930685,
+			"cornerRadii": [0, 0, 0, 0],
+			"blendMode": "Normal",
+			"opacity": 1,
+			"constraints": { "horizontal": "Scale", "vertical": "Scale" },
+			"styles": [
+				{ "type": "Fill", "paintId": "34", "blendMode": "Normal", "opacity": 1, "visible": true }
+			]
+		},
+		"35": {
+			"type": "Rectangle",
+			"visible": true,
+			"size": [179.28941345214844, 486.15008544921875],
+			"translation": [1298.6419677734375, 31.467273712158203],
+			"rotationDeg": -43.59042641890465,
+			"cornerRadii": [0, 0, 0, 0],
+			"blendMode": "Normal",
+			"opacity": 1,
+			"constraints": { "horizontal": "Scale", "vertical": "Scale" },
+			"styles": [
+				{ "type": "Fill", "paintId": "34", "blendMode": "Normal", "opacity": 1, "visible": true }
+			]
+		},
+		"36": {
+			"type": "Vector",
+			"path": "M 20.05406191516481 0 L 39.974430084228516 45.85695266723632 L 20.05406191516481 36.231003419303335 L 0 45.85695266723632 L 20.05406191516481 0 Z",
+			"visible": true,
+			"size": [39.974430084228516, 45.85695266723633],
+			"translation": [1555, 629.669677734375],
+			"rotationDeg": -38.10736459038443,
+			"blendMode": "Normal",
+			"opacity": 1,
+			"constraints": { "horizontal": "Start", "vertical": "Start" },
+			"styles": [
+				{
+					"type": "Stroke",
+					"width": 4,
+					"paintId": "18",
+					"blendMode": "Normal",
+					"opacity": 1,
+					"visible": true
+				},
+				{ "type": "Fill", "paintId": "6", "blendMode": "Normal", "opacity": 1, "visible": true }
+			]
+		},
+		"37": {
+			"type": "Vector",
+			"path": "M 367.5635986328125 0 L 245.04239908854166 0 L 245.04239908854166 122.52119954427083 L 122.52119954427083 122.52119954427083 L 122.52119954427083 245.04239908854166 L 0 245.04239908854166 L 0 367.5635986328125 L 367.5635986328125 367.5635986328125 L 367.5635986328125 0 Z",
+			"visible": true,
+			"size": [367.5635986328125, 367.5635986328125],
+			"translation": [340, -142.95045471191406],
+			"rotationDeg": -14.664123708561684,
+			"blendMode": "Normal",
+			"opacity": 1,
+			"constraints": { "horizontal": "Start", "vertical": "Start" },
+			"styles": [
+				{ "type": "Fill", "paintId": "38", "blendMode": "Normal", "opacity": 1, "visible": true }
+			]
+		},
+		"39": {
+			"type": "Vector",
+			"path": "M 102.59526464444721 245.4342041015625 L 0 187.1172780028136 L 75.61854633363461 58.317132843238205 L 178.27349515936393 116.53325623598784 L 178.3314190589732 0 L 329.57028382188616 0 L 329.6281959075245 116.53325623598784 L 432.2822704994029 58.317132843238205 L 507.9017028808594 187.1172780028136 L 405.30554037461934 245.4342041015625 L 507.9017028808594 303.75110657236974 L 432.2822704994029 432.5514821043761 L 329.6281959075245 374.3353764325827 L 329.57028382188616 490.868408203125 L 178.3314190589732 490.868408203125 L 178.27349515936393 374.3353764325827 L 75.61854633363461 432.5514821043761 L 0 303.75110657236974 L 102.59526464444721 245.4342041015625 Z",
+			"visible": true,
+			"size": [507.9017028808594, 490.868408203125],
+			"translation": [1161.134765625, 627.4954833984375],
+			"rotationDeg": 15.416816892626981,
+			"blendMode": "Normal",
+			"opacity": 1,
+			"constraints": { "horizontal": "Start", "vertical": "Start" },
+			"styles": [
+				{ "type": "Fill", "paintId": "40", "blendMode": "Normal", "opacity": 1, "visible": true }
+			]
+		},
+		"41": {
+			"type": "Vector",
+			"path": "M 20.054061889648438 0 L 39.974430084228516 45.85695266723633 L 20.054061889648438 36.23100280761719 L 0 45.85695266723633 L 20.054061889648438 0 Z",
+			"visible": true,
+			"size": [39.974430084228516, 45.85695266723633],
+			"translation": [783.46533203125, 430.5117492675781],
+			"rotationDeg": 147.12149315120814,
+			"blendMode": "Normal",
+			"opacity": 1,
+			"constraints": { "horizontal": "Start", "vertical": "Start" },
+			"styles": [
+				{
+					"type": "Stroke",
+					"width": 4,
+					"paintId": "18",
+					"blendMode": "Normal",
+					"opacity": 1,
+					"visible": true
+				},
+				{ "type": "Fill", "paintId": "6", "blendMode": "Normal", "opacity": 1, "visible": true }
+			]
+		}
+	},
+	"paints": {
+		"4": { "type": "Solid", "color": [49, 110, 255] },
+		"6": { "type": "Solid", "color": [255, 255, 255] },
+		"12": { "type": "Solid", "color": [11, 29, 51] },
+		"18": { "type": "Solid", "color": [0, 0, 0] },
+		"19": { "type": "Solid", "color": [253, 253, 253] },
+		"20": { "type": "Solid", "color": [223, 223, 223] },
+		"24": { "type": "Solid", "color": [178, 178, 178] },
+		"25": { "type": "Solid", "color": [132, 132, 132] },
+		"31": { "type": "Solid", "color": [1, 211, 177] },
+		"32": { "type": "Solid", "color": [0, 0, 0] },
+		"34": { "type": "Solid", "color": [252, 182, 0] },
+		"38": { "type": "Solid", "color": [104, 61, 253] },
+		"40": { "type": "Solid", "color": [254, 56, 99] },
+		"42": { "type": "Solid", "color": [252, 250, 244] }
+	},
+	"assets": {
+		"11": {
+			"content": {
+				"type": "Url",
+				"url": "https://fonts.gstatic.com/s/alegreyasans/v24/5aUu9_-1phKLFgshYDvh6Vwt5eFImE18imdCqxI.ttf",
+				"contentType": { "mimeType": "font/ttf" }
+			},
+			"contentType": { "type": "Ttf" }
+		},
+		"14": {
+			"content": {
+				"type": "Url",
+				"url": "https://fonts.gstatic.com/s/lato/v24/S6uyw4BMUTPHvxk6XweuBCY.ttf",
+				"contentType": { "mimeType": "font/ttf" }
+			},
+			"contentType": { "type": "Ttf" }
+		}
+	},
+	"viewport": { "physicalPosition": [0, 0], "physicalSize": [1920, 1080] }
+}

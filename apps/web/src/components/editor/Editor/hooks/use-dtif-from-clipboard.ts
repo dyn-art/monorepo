@@ -31,7 +31,8 @@ export function useDtifFromClipboard(defaultDtif: COMP.DtifComposition): {
 			);
 
 			return preparedDtif;
-		}
+		},
+		refetchOnWindowFocus: false
 	});
 
 	return { data, isLoading };
