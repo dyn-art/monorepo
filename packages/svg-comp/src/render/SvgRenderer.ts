@@ -14,7 +14,7 @@ export const NS = 'http://www.w3.org/2000/svg';
 export const XLINK = 'http://www.w3.org/1999/xlink';
 
 export class SvgRenderer extends Renderer {
-	private _domElement: Element;
+	private _domElement: HTMLElement;
 	private _svgElement: SVGElement;
 
 	private _svgElementMap = new Map<SvgElementId, SVGElement>();
@@ -31,11 +31,15 @@ export class SvgRenderer extends Renderer {
 		this._svgElement.setAttribute('version', VERSION);
 		this._svgElement.setAttribute('id', 'svg-canvas');
 		this._svgElement.style.setProperty('overflow', 'hidden');
-		// this._svgElement.style.setProperty('pointer-events', 'none');
+		this._svgElement.style.setProperty('pointer-events', 'none');
 		this._domElement.appendChild(this._svgElement);
 
-		// Register SVG root callbacks
-		this._svgElement.addEventListener('pointermove', (e) => {
+		// Register callbacks
+		// Note: To prevent blocking composition events, non-blocking elements
+		// like SelectionBox should be direct children of _domElement.
+		// We attach event listeners to the parent, not the SVG directly, to allow
+		// event propagation from sibling nodes (like the SelectionBox).
+		this._domElement.addEventListener('pointermove', (e) => {
 			e.preventDefault();
 			this.composition.emitInputEvent(
 				'Interaction',
@@ -46,23 +50,18 @@ export class SvgRenderer extends Renderer {
 				false
 			);
 		});
-		// Wheel event is registered on window level so that it doen't get caught
-		// in scene overlaying UI elements like the handles, ..
-		window.addEventListener('wheel', (e) => {
-			if (this._cursorInCompBounds) {
-				e.preventDefault();
-				this.composition.emitInputEvent(
-					'Interaction',
-					{
-						type: 'MouseWheeledOnComposition',
-						position: this.clientWindowPointToCompPoint([e.clientX, e.clientY]),
-						delta: [e.deltaX, e.deltaY]
-					},
-					false
-				);
-			}
+		this._domElement.addEventListener('wheel', (e) => {
+			this.composition.emitInputEvent(
+				'Interaction',
+				{
+					type: 'MouseWheeledOnComposition',
+					position: this.clientWindowPointToCompPoint([e.clientX, e.clientY]),
+					delta: [e.deltaX, e.deltaY]
+				},
+				false
+			);
 		});
-		this._svgElement.addEventListener('pointerdown', (e) => {
+		this._domElement.addEventListener('pointerdown', (e) => {
 			e.preventDefault();
 			this.composition.emitInputEvent(
 				'Interaction',
@@ -74,7 +73,7 @@ export class SvgRenderer extends Renderer {
 				true
 			);
 		});
-		this._svgElement.addEventListener('pointerup', (e) => {
+		this._domElement.addEventListener('pointerup', (e) => {
 			e.preventDefault();
 			this.composition.emitInputEvent(
 				'Interaction',
@@ -86,7 +85,7 @@ export class SvgRenderer extends Renderer {
 				true
 			);
 		});
-		this._svgElement.addEventListener('pointerenter', (e) => {
+		this._domElement.addEventListener('pointerenter', (e) => {
 			e.preventDefault();
 			if (!this._cursorInCompBounds) {
 				this.composition.emitInputEvent(
@@ -99,7 +98,7 @@ export class SvgRenderer extends Renderer {
 				this._cursorInCompBounds = true;
 			}
 		});
-		this._svgElement.addEventListener('pointerleave', (e) => {
+		this._domElement.addEventListener('pointerleave', (e) => {
 			e.preventDefault();
 			const compPoint = this.pointerEventToCompPoint(e);
 			// Check whether cursor actually left composition
@@ -318,6 +317,6 @@ export class SvgRenderer extends Renderer {
 }
 
 export interface TsvgRendererOptions {
-	domElement?: Element;
+	domElement?: HTMLElement;
 	callbackBased?: boolean;
 }

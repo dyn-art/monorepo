@@ -22,8 +22,9 @@ export const Viewport: React.FC<TViewportProps> = (props) => {
 	return (
 		<div className="relative h-full w-full bg-gray-100" ref={viewportRef}>
 			{isWasmLoading ? <Skeleton className="h-full w-full rounded-none" /> : null}
-			<div ref={svgContainerRef} style={{ cursor }} />
-			{composition != null && <CanvasControl composition={composition} />}
+			<div ref={svgContainerRef} style={{ cursor }}>
+				{composition != null && <CanvasControl composition={composition} />}
+			</div>
 			{composition != null && <Toolbar composition={composition} />}
 			{composition != null && (
 				<div className="absolute bottom-2 right-2 flex flex-row justify-center gap-2">
@@ -45,6 +46,7 @@ export const Viewport: React.FC<TViewportProps> = (props) => {
 					<Button
 						onClick={() => {
 							// TODO: A Viewport size that is not devidable by the actual size doesn't work..
+							// The problem here is to 90% that we don't update the selection box viewport
 							composition.emitInputEvent('Composition', {
 								type: 'CompositionViewportChanged',
 								viewport: { physicalPosition: [0, 0], physicalSize: [500, 500] }
