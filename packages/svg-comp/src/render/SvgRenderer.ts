@@ -38,12 +38,10 @@ export class SvgRenderer extends Renderer {
 		this._svgElement.addEventListener('pointermove', (e) => {
 			e.preventDefault();
 			this.composition.emitInputEvent(
+				'Interaction',
 				{
-					type: 'Interaction',
-					event: {
-						type: 'CursorMovedOnComposition',
-						position: this.pointerEventToCompPoint(e)
-					}
+					type: 'CursorMovedOnComposition',
+					position: this.pointerEventToCompPoint(e)
 				},
 				false
 			);
@@ -52,15 +50,12 @@ export class SvgRenderer extends Renderer {
 		// in scene overlaying UI elements like the handles, ..
 		window.addEventListener('wheel', (e) => {
 			if (this._cursorInCompBounds) {
-				e.preventDefault();
 				this.composition.emitInputEvent(
+					'Interaction',
 					{
-						type: 'Interaction',
-						event: {
-							type: 'MouseWheeledOnComposition',
-							position: this.clientWindowPointToCompPoint([e.clientX, e.clientY]),
-							delta: [e.deltaX, e.deltaY]
-						}
+						type: 'MouseWheeledOnComposition',
+						position: this.clientWindowPointToCompPoint([e.clientX, e.clientY]),
+						delta: [e.deltaX, e.deltaY]
 					},
 					false
 				);
@@ -69,13 +64,11 @@ export class SvgRenderer extends Renderer {
 		this._svgElement.addEventListener('pointerdown', (e) => {
 			e.preventDefault();
 			this.composition.emitInputEvent(
+				'Interaction',
 				{
-					type: 'Interaction',
-					event: {
-						type: 'CursorDownOnComposition',
-						position: this.pointerEventToCompPoint(e),
-						button: toMouseButton(e.button)
-					}
+					type: 'CursorDownOnComposition',
+					position: this.pointerEventToCompPoint(e),
+					button: toMouseButton(e.button)
 				},
 				true
 			);
@@ -83,13 +76,11 @@ export class SvgRenderer extends Renderer {
 		this._svgElement.addEventListener('pointerup', (e) => {
 			e.preventDefault();
 			this.composition.emitInputEvent(
+				'Interaction',
 				{
-					type: 'Interaction',
-					event: {
-						type: 'CursorUpOnComposition',
-						position: this.pointerEventToCompPoint(e),
-						button: toMouseButton(e.button)
-					}
+					type: 'CursorUpOnComposition',
+					position: this.pointerEventToCompPoint(e),
+					button: toMouseButton(e.button)
 				},
 				true
 			);
@@ -98,11 +89,9 @@ export class SvgRenderer extends Renderer {
 			e.preventDefault();
 			if (!this._cursorInCompBounds) {
 				this.composition.emitInputEvent(
+					'Interaction',
 					{
-						type: 'Interaction',
-						event: {
-							type: 'CursorEnteredComposition'
-						}
+						type: 'CursorEnteredComposition'
 					},
 					false
 				);
@@ -122,11 +111,9 @@ export class SvgRenderer extends Renderer {
 					compPoint[1] > this.composition.size[1])
 			) {
 				this.composition.emitInputEvent(
+					'Interaction',
 					{
-						type: 'Interaction',
-						event: {
-							type: 'CursorExitedComposition'
-						}
+						type: 'CursorExitedComposition'
 					},
 					false
 				);
@@ -137,12 +124,10 @@ export class SvgRenderer extends Renderer {
 			if (this._cursorInCompBounds) {
 				e.preventDefault();
 				this.composition.emitInputEvent(
+					'Interaction',
 					{
-						type: 'Interaction',
-						event: {
-							type: 'KeyDownOnComposition',
-							keyCode: toKeyCode(e.code)
-						}
+						type: 'KeyDownOnComposition',
+						keyCode: toKeyCode(e.code)
 					},
 					true
 				);
@@ -152,12 +137,10 @@ export class SvgRenderer extends Renderer {
 			if (this._cursorInCompBounds) {
 				e.preventDefault();
 				this.composition.emitInputEvent(
+					'Interaction',
 					{
-						type: 'Interaction',
-						event: {
-							type: 'KeyUpOnComposition',
-							keyCode: toKeyCode(e.code)
-						}
+						type: 'KeyUpOnComposition',
+						keyCode: toKeyCode(e.code)
 					},
 					true
 				);
@@ -194,14 +177,11 @@ export class SvgRenderer extends Renderer {
 					if (entity != null) {
 						newElement.addEventListener('pointerdown', (e) => {
 							e.preventDefault();
-							this.composition.emitInputEvent({
-								type: 'Interaction',
-								event: {
-									type: 'CursorDownOnEntity',
-									entity,
-									position: this.pointerEventToCompPoint(e),
-									button: toMouseButton(e.button)
-								}
+							this.composition.emitInputEvent('Interaction', {
+								type: 'CursorDownOnEntity',
+								entity,
+								position: this.pointerEventToCompPoint(e),
+								button: toMouseButton(e.button)
 							});
 						});
 					}
