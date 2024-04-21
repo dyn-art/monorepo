@@ -16,6 +16,7 @@ pub trait InputEvent {
 pub enum CompCoreInputEvent {
     CompositionResized(CompositionResizedInputEvent),
     CompositionViewportChanged(CompositionViewportChangedInputEvent),
+    FocusRootNodes(FocusRootNodesInputEvent),
     EntityDeleted(EntityDeletedInputEvent),
     EntityMoved(EntityMovedInputEvent),
     EntitySetPosition(EntitySetPositionInputEvent),
@@ -29,6 +30,9 @@ impl InputEvent for CompCoreInputEvent {
                 world.send_event(event);
             }
             CompCoreInputEvent::CompositionViewportChanged(event) => {
+                world.send_event(event);
+            }
+            CompCoreInputEvent::FocusRootNodes(event) => {
                 world.send_event(event);
             }
             CompCoreInputEvent::EntityMoved(event) => {
@@ -64,6 +68,14 @@ pub struct CompositionResizedInputEvent {
 pub struct CompositionViewportChangedInputEvent {
     pub viewport: Viewport,
 }
+
+#[derive(Event, Debug, Copy, Clone)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type),
+    serde(rename_all = "camelCase")
+)]
+pub struct FocusRootNodesInputEvent;
 
 #[derive(Event, Debug, Copy, Clone)]
 #[cfg_attr(

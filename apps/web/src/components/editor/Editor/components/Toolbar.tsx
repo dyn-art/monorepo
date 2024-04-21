@@ -57,10 +57,7 @@ export const Toolbar: React.FC<TProps> = (props) => {
 					}
 
 					if (tool != null) {
-						composition.emitInputEvent({
-							type: 'Interaction',
-							event: { type: 'InteractionToolChanged', tool }
-						});
+						composition.emitInputEvent('Interaction', { type: 'InteractionToolChanged', tool });
 						composition.update();
 					}
 				}}
@@ -78,12 +75,9 @@ export const Toolbar: React.FC<TProps> = (props) => {
 							onValueChange={(value) => {
 								if (value != shapeToolItem) {
 									setShapeToolItem(value);
-									composition.emitInputEvent({
-										type: 'Interaction',
-										event: {
-											type: 'InteractionToolChanged',
-											tool: { type: 'Shape', variant: value as COMP.ShapeVariant }
-										}
+									composition.emitInputEvent('Interaction', {
+										type: 'InteractionToolChanged',
+										tool: { type: 'Shape', variant: value as COMP.ShapeVariant }
 									});
 								}
 							}}

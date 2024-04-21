@@ -26,14 +26,23 @@ export const Viewport: React.FC<TViewportProps> = (props) => {
 			{composition != null && <CanvasControl composition={composition} />}
 			{composition != null && <Toolbar composition={composition} />}
 			{composition != null && (
-				<Button
-					className="absolute bottom-2 right-2"
-					onClick={() => {
-						console.log(composition.toString());
-					}}
-				>
-					To String
-				</Button>
+				<div className="absolute bottom-2 right-2 flex flex-row justify-center gap-2">
+					<Button
+						onClick={() => {
+							console.log(composition.toString());
+						}}
+					>
+						To String
+					</Button>
+					<Button
+						onClick={() => {
+							composition.emitInputEvent('Composition', { type: 'FocusRootNodes' });
+							composition.update();
+						}}
+					>
+						Focus
+					</Button>
+				</div>
 			)}
 		</div>
 	);

@@ -8,16 +8,21 @@ use bevy_ecs::{
 use bevy_hierarchy::{BuildChildren, Children, DespawnRecursiveExt};
 use bevy_transform::components::Transform;
 use dyn_comp_bundles::{
-    components::{marker::Removed, mixins::SizeMixin},
+    components::{
+        marker::{Removed, Root},
+        mixins::SizeMixin,
+        nodes::CompNode,
+    },
     events::{
         CompositionResizedInputEvent, CompositionViewportChangedInputEvent,
         EntityDeletedInputEvent, EntityMovedInputEvent, EntitySetPositionInputEvent,
-        EntitySetRotationInputEvent,
+        EntitySetRotationInputEvent, FocusRootNodesInputEvent,
     },
+    properties::Viewport,
     utils::transform_to_z_rotation_rad,
 };
-use dyn_utils::math::matrix::rotate_around_point;
-use glam::Vec3;
+use dyn_utils::{math::matrix::rotate_around_point, properties::size::Size, units::abs::Abs};
+use glam::{Vec2, Vec3};
 
 pub fn composition_resized_input_system(
     mut comp_res: ResMut<CompositionRes>,
@@ -113,6 +118,44 @@ pub fn entity_set_rotation_input_system(
                 pivot_point,
             );
             *transform = Transform::from_matrix(rotation_transform_mat4);
+        }
+    }
+}
+
+pub fn focus_root_nodes_input_system(
+    mut comp_res: ResMut<CompositionRes>,
+    mut event_reader: EventReader<FocusRootNodesInputEvent>,
+    query: Query<(&SizeMixin, &Transform), (With<Root>, With<CompNode>)>,
+) {
+    if event_reader.read().len() > 0 {
+        let mut min_x = f32::INFINITY;
+        let mut max_x = f32::NEG_INFINITY;
+        let mut min_y = f32::INFINITY;
+        let mut max_y = f32::NEG_INFINITY;
+
+        // Calculate bounding box
+        for (SizeMixin(size), transform) in query.iter() {
+            let corners = [
+                transform.translation.truncate(), // Bottom left
+                transform.translation.truncate() + Vec2::new(size.width(), 0.0), // Bottom right
+                transform.translation.truncate() + Vec2::new(0.0, size.height()), // Top left
+                transform.translation.truncate() + Vec2::new(size.width(), size.height()), // Top right
+            ];
+
+            for corner in corners.iter() {
+                min_x = min_x.min(corner.x);
+                max_x = max_x.max(corner.x);
+                min_y = min_y.min(corner.y);
+                max_y = max_y.max(corner.y);
+            }
+        }
+
+        let new_width = max_x - min_x;
+        let new_height = max_y - min_y;
+
+        comp_res.viewport = Viewport {
+            physical_position: Vec2::new(min_x, min_y),
+            physical_size: Size::new(Abs::pt(new_width), Abs::pt(new_height)),
         }
     }
 }

@@ -11,6 +11,7 @@ use dyn_comp_asset::CompAssetPlugin;
 use dyn_comp_bundles::events::{
     CompositionResizedInputEvent, CompositionViewportChangedInputEvent, EntityDeletedInputEvent,
     EntityMovedInputEvent, EntitySetPositionInputEvent, EntitySetRotationInputEvent,
+    FocusRootNodesInputEvent,
 };
 use resources::{composition::CompositionRes, tick::TickRes};
 use systems::{
@@ -19,6 +20,7 @@ use systems::{
         composition_resized_input_system, composition_viewport_input_system,
         despawn_removed_entities_system, entity_deleted_input_system, entity_moved_input_system,
         entity_set_position_input_system, entity_set_rotation_input_system,
+        focus_root_nodes_input_system,
     },
     group::{
         compute_group_size, compute_group_transform, mark_group_size_as_stale,
@@ -79,6 +81,7 @@ impl Plugin for CompCorePlugin {
         // Register events
         app.add_event::<CompositionResizedInputEvent>();
         app.add_event::<CompositionViewportChangedInputEvent>();
+        app.add_event::<FocusRootNodesInputEvent>();
         app.add_event::<EntityDeletedInputEvent>();
         app.add_event::<EntityMovedInputEvent>();
         app.add_event::<EntitySetPositionInputEvent>();
@@ -125,10 +128,16 @@ impl Plugin for CompCorePlugin {
             (
                 composition_resized_input_system.in_set(CompCoreSystemSet::InputEvents),
                 composition_viewport_input_system.in_set(CompCoreSystemSet::InputEvents),
+                focus_root_nodes_input_system.in_set(CompCoreSystemSet::InputEvents),
                 entity_deleted_input_system.in_set(CompCoreSystemSet::InputEvents),
                 entity_moved_input_system.in_set(CompCoreSystemSet::InputEvents),
                 entity_set_position_input_system.in_set(CompCoreSystemSet::InputEvents),
                 entity_set_rotation_input_system.in_set(CompCoreSystemSet::InputEvents),
+            ),
+        );
+        app.add_systems(
+            Update,
+            (
                 mark_group_size_as_stale.in_set(CompCoreSystemSet::PreCompute),
                 mark_group_transform_as_stale.in_set(CompCoreSystemSet::PreCompute),
                 compute_group_size.in_set(CompCoreSystemSet::Compute),

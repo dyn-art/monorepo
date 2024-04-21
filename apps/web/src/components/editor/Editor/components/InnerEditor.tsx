@@ -18,12 +18,14 @@ export const InnerEditor: React.FC<TInnerEditorProps> = (props) => {
 		// Not passing the viewport size as prop to the Canvas or in the DTIF
 		// because React is kinda slow updating their states
 		(size) => {
-			composition?.emitInputEvent({
-				type: 'Composition',
-				event: { type: 'CompositionResized', size: [size.width, size.height] }
-			});
+			composition?.emitInputEvents('Composition', [
+				{
+					type: 'CompositionResized',
+					size: [size.width, size.height]
+				}
+				// { type: 'FocusRootNodes' }
+			]);
 			composition?.update();
-			// applyCanvasDimensions(dtif, { width, height });
 		},
 		[composition]
 	);
