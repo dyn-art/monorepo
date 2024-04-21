@@ -42,6 +42,18 @@ export const Viewport: React.FC<TViewportProps> = (props) => {
 					>
 						Focus
 					</Button>
+					<Button
+						onClick={() => {
+							// TODO: A Viewport size that is not devidable by the actual size doesn't work..
+							composition.emitInputEvent('Composition', {
+								type: 'CompositionViewportChanged',
+								viewport: { physicalPosition: [0, 0], physicalSize: [500, 500] }
+							});
+							composition.update();
+						}}
+					>
+						0 x 0
+					</Button>
 				</div>
 			)}
 		</div>

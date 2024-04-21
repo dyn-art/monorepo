@@ -50,6 +50,7 @@ export class SvgRenderer extends Renderer {
 		// in scene overlaying UI elements like the handles, ..
 		window.addEventListener('wheel', (e) => {
 			if (this._cursorInCompBounds) {
+				e.preventDefault();
 				this.composition.emitInputEvent(
 					'Interaction',
 					{
