@@ -29,8 +29,8 @@ pub fn resize_vector_node(
             };
 
             // Apply the transformation to the path
-            if let Some(transformed_path) = path_mixin.0.clone().transform(transform) {
-                path_mixin.0 = transformed_path;
+            if let Some(transformed_path) = path_mixin.path.clone().transform(transform) {
+                path_mixin.path = transformed_path;
             }
         }
 

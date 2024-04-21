@@ -4,7 +4,7 @@ use bevy_ecs::{
     system::{Commands, Query},
 };
 use dyn_comp_bundles::components::{
-    mixins::{PathMixin, SizeMixin},
+    mixins::{PathMixin, SizeMixin, WindingRule},
     nodes::EllipseCompNode,
 };
 use tiny_skia_path::{PathBuilder, Rect};
@@ -32,7 +32,10 @@ pub fn outline_ellipse(
 
         // Insert or update the PathMixin component for the entity
         if let Some(path) = path_builder.finish() {
-            commands.entity(entity).insert(PathMixin(path));
+            commands.entity(entity).insert(PathMixin {
+                path,
+                winding_rule: WindingRule::Nonzero,
+            });
         }
     }
 }

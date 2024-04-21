@@ -48,19 +48,23 @@ export class SvgRenderer extends Renderer {
 				false
 			);
 		});
-		this._svgElement.addEventListener('wheel', (e) => {
-			e.preventDefault();
-			this.composition.emitInputEvent(
-				{
-					type: 'Interaction',
-					event: {
-						type: 'MouseWheeledOnComposition',
-						position: this.clientWindowPointToCompPoint([e.clientX, e.clientY]),
-						delta: [e.deltaX, e.deltaY]
-					}
-				},
-				false
-			);
+		// Wheel event is registered on window level so that it doen't get caught
+		// in scene overlaying UI elements like the handles, ..
+		window.addEventListener('wheel', (e) => {
+			if (this._cursorInCompBounds) {
+				e.preventDefault();
+				this.composition.emitInputEvent(
+					{
+						type: 'Interaction',
+						event: {
+							type: 'MouseWheeledOnComposition',
+							position: this.clientWindowPointToCompPoint([e.clientX, e.clientY]),
+							delta: [e.deltaX, e.deltaY]
+						}
+					},
+					false
+				);
+			}
 		});
 		this._svgElement.addEventListener('pointerdown', (e) => {
 			e.preventDefault();

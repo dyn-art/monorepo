@@ -541,12 +541,17 @@ pub fn apply_path_mixin_changes(
     >,
     mut style_bundle_query: Query<&mut SvgBundleVariant, (With<CompStyle>, Without<CompNode>)>,
 ) {
-    for (PathMixin(path), mut node_bundle_variant) in query.iter_mut() {
+    for (PathMixin { path, winding_rule }, mut node_bundle_variant) in query.iter_mut() {
         // Apply path to node bundle
         match node_bundle_variant.as_mut() {
-            SvgBundleVariant::FrameNode(bundle) => bundle
-                .children_clipped_path
-                .set_attribute(SvgAttribute::D { d: path.into() }),
+            SvgBundleVariant::FrameNode(bundle) => {
+                bundle.children_clipped_path.set_attributes(vec![
+                    SvgAttribute::D { d: path.into() },
+                    SvgAttribute::FillRule {
+                        fill_rule: *winding_rule,
+                    },
+                ])
+            }
             _ => {}
         }
 
@@ -555,18 +560,38 @@ pub fn apply_path_mixin_changes(
             for style_entity in style_entities {
                 if let Ok(mut style_bundle_variant) = style_bundle_query.get_mut(*style_entity) {
                     match style_bundle_variant.as_mut() {
-                        SvgBundleVariant::SolidFill(bundle) => bundle
-                            .shape_path
-                            .set_attribute(SvgAttribute::D { d: path.into() }),
-                        SvgBundleVariant::GradientFill(bundle) => bundle
-                            .shape_path
-                            .set_attribute(SvgAttribute::D { d: path.into() }),
-                        SvgBundleVariant::ImageFill(bundle) => bundle
-                            .shape_path
-                            .set_attribute(SvgAttribute::D { d: path.into() }),
-                        SvgBundleVariant::DropShadowEffect(bundle) => bundle
-                            .shape_path
-                            .set_attribute(SvgAttribute::D { d: path.into() }),
+                        SvgBundleVariant::SolidFill(bundle) => {
+                            bundle.shape_path.set_attributes(vec![
+                                SvgAttribute::D { d: path.into() },
+                                SvgAttribute::FillRule {
+                                    fill_rule: *winding_rule,
+                                },
+                            ])
+                        }
+                        SvgBundleVariant::GradientFill(bundle) => {
+                            bundle.shape_path.set_attributes(vec![
+                                SvgAttribute::D { d: path.into() },
+                                SvgAttribute::FillRule {
+                                    fill_rule: *winding_rule,
+                                },
+                            ])
+                        }
+                        SvgBundleVariant::ImageFill(bundle) => {
+                            bundle.shape_path.set_attributes(vec![
+                                SvgAttribute::D { d: path.into() },
+                                SvgAttribute::FillRule {
+                                    fill_rule: *winding_rule,
+                                },
+                            ])
+                        }
+                        SvgBundleVariant::DropShadowEffect(bundle) => {
+                            bundle.shape_path.set_attributes(vec![
+                                SvgAttribute::D { d: path.into() },
+                                SvgAttribute::FillRule {
+                                    fill_rule: *winding_rule,
+                                },
+                            ])
+                        }
                         _ => {}
                     }
                 }
@@ -581,24 +606,27 @@ pub fn apply_stroke_path_mixin_changes(
         (With<StrokeCompStyle>, Changed<StrokePathMixin>),
     >,
 ) {
-    for (StrokePathMixin(stroke_path), mut bundle_variant) in query.iter_mut() {
+    for (StrokePathMixin { path, winding_rule }, mut bundle_variant) in query.iter_mut() {
         // Apply stroke path to styles
         match bundle_variant.as_mut() {
-            SvgBundleVariant::SolidFill(bundle) => {
-                bundle.shape_path.set_attribute(SvgAttribute::D {
-                    d: stroke_path.into(),
-                })
-            }
-            SvgBundleVariant::GradientFill(bundle) => {
-                bundle.shape_path.set_attribute(SvgAttribute::D {
-                    d: stroke_path.into(),
-                })
-            }
-            SvgBundleVariant::ImageFill(bundle) => {
-                bundle.shape_path.set_attribute(SvgAttribute::D {
-                    d: stroke_path.into(),
-                })
-            }
+            SvgBundleVariant::SolidFill(bundle) => bundle.shape_path.set_attributes(vec![
+                SvgAttribute::D { d: path.into() },
+                SvgAttribute::FillRule {
+                    fill_rule: *winding_rule,
+                },
+            ]),
+            SvgBundleVariant::GradientFill(bundle) => bundle.shape_path.set_attributes(vec![
+                SvgAttribute::D { d: path.into() },
+                SvgAttribute::FillRule {
+                    fill_rule: *winding_rule,
+                },
+            ]),
+            SvgBundleVariant::ImageFill(bundle) => bundle.shape_path.set_attributes(vec![
+                SvgAttribute::D { d: path.into() },
+                SvgAttribute::FillRule {
+                    fill_rule: *winding_rule,
+                },
+            ]),
             _ => {}
         }
     }

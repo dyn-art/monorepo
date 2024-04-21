@@ -3,7 +3,7 @@ use bevy_ecs::{
     query::{Changed, Or},
     system::{Commands, Query},
 };
-use dyn_comp_bundles::components::mixins::{CornerRadiiMixin, PathMixin, SizeMixin};
+use dyn_comp_bundles::components::mixins::{CornerRadiiMixin, PathMixin, SizeMixin, WindingRule};
 use tiny_skia_path::PathBuilder;
 
 // TODO: Round corner for all shapes
@@ -71,7 +71,10 @@ pub fn outline_rectangle(
 
         // Insert or update the PathMixin component for the entity
         if let Some(path) = path_builder.finish() {
-            commands.entity(entity).insert(PathMixin(path));
+            commands.entity(entity).insert(PathMixin {
+                path,
+                winding_rule: WindingRule::Nonzero,
+            });
         }
     }
 }

@@ -61,11 +61,28 @@ pub struct OpacityMixin(pub Opacity);
 
 /// Represents a Bezier path for drawing shape.
 #[derive(Component, Debug, Clone)]
-pub struct PathMixin(pub tiny_skia_path::Path);
+pub struct PathMixin {
+    pub path: tiny_skia_path::Path,
+    pub winding_rule: WindingRule,
+}
+
+#[derive(Debug, Default, PartialEq, Eq, Clone, Copy)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type)
+)]
+pub enum WindingRule {
+    #[default]
+    Nonzero,
+    Evenodd,
+}
 
 /// Configures stroke properties for drawing paths.
 #[derive(Component, Debug, Clone)]
-pub struct StrokePathMixin(pub tiny_skia_path::Path);
+pub struct StrokePathMixin {
+    pub path: tiny_skia_path::Path,
+    pub winding_rule: WindingRule,
+}
 
 #[derive(Component, Debug, Default, Clone)]
 pub struct StyleChildrenMixin(pub SmallVec<[Entity; 2]>);

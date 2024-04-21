@@ -11,7 +11,7 @@ use dyn_comp_bundles::{
         mixins::{
             BlendMode, BlendModeMixin, Constraints, ConstraintsMixin, CornerRadiiMixin,
             GroupConstraints, GroupConstraintsMixin, OpacityMixin, PathMixin, SizeMixin,
-            VisibilityMixin,
+            VisibilityMixin, WindingRule,
         },
         nodes::{
             CompNode, CompNodeVariant, EllipseArcData, EllipseCompNode, FrameCompNode,
@@ -449,6 +449,8 @@ impl SpawnBundleImpl for TextNode {
 pub struct VectorNode {
     path: String,
     #[serde(default)]
+    winding_rule: WindingRule,
+    #[serde(default)]
     pub translation: Vec2,
     #[serde(default)]
     pub rotation_deg: Angle,
@@ -471,7 +473,10 @@ impl VectorNode {
             node: CompNode {
                 variant: CompNodeVariant::Vector,
             },
-            path: PathMixin(string_to_tiny_skia_path(&self.path).unwrap()),
+            path: PathMixin {
+                path: string_to_tiny_skia_path(&self.path).unwrap(),
+                winding_rule: self.winding_rule,
+            },
             vector: VectorCompNode,
             transform: TransformBundle::from_transform(Transform {
                 translation: self.translation.extend(0.0),

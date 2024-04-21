@@ -22,6 +22,7 @@ export function transformVectorNode(
 	return {
 		type: 'Vector',
 		path: node.vectorPaths[0]?.data ?? '', // TODO: Support multi path nodes
+		windingRule: node.vectorPaths[0]?.windingRule === 'EVENODD' ? 'Evenodd' : 'Nonzero',
 		visible: node.visible,
 		size: [node.width, node.height],
 		translation: mapFigmaTransformToTranslation(node.relativeTransform),
