@@ -30,7 +30,7 @@ use systems::{
         cursor_up::{cursor_up_on_comp_input_system, cursor_up_on_comp_system},
         key_down::{key_down_input_system, remove_selected_entity_system},
         key_up::key_up_input_system,
-        wheel::mouse_wheeled_on_comp_input_system,
+        mouse_wheel::mouse_wheeled_on_comp_input_system,
     },
     entity::cursor_down::{cursor_down_on_entity_input_system, cursor_down_on_entity_system},
     ui::{

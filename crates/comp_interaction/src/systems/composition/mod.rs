@@ -5,4 +5,4 @@ pub mod cursor_move;
 pub mod cursor_up;
 pub mod key_down;
 pub mod key_up;
-pub mod wheel;
+pub mod mouse_wheel;

@@ -18,7 +18,6 @@ use dyn_comp_bundles::{
         EntityDeletedInputEvent, EntityMovedInputEvent, EntitySetPositionInputEvent,
         EntitySetRotationInputEvent, FocusRootNodesInputEvent,
     },
-    properties::Viewport,
     utils::transform_to_z_rotation_rad,
 };
 use dyn_utils::{math::matrix::rotate_around_point, properties::size::Size, units::abs::Abs};
@@ -123,8 +122,8 @@ pub fn entity_set_rotation_input_system(
 }
 
 pub fn focus_root_nodes_input_system(
-    mut comp_res: ResMut<CompositionRes>,
     mut event_reader: EventReader<FocusRootNodesInputEvent>,
+    mut comp_res: ResMut<CompositionRes>,
     query: Query<(&SizeMixin, &Transform), (With<Root>, With<CompNode>)>,
 ) {
     if event_reader.read().len() > 0 {
@@ -153,9 +152,7 @@ pub fn focus_root_nodes_input_system(
         let new_width = max_x - min_x;
         let new_height = max_y - min_y;
 
-        comp_res.viewport = Viewport {
-            physical_position: Vec2::new(min_x, min_y),
-            physical_size: Size::new(Abs::pt(new_width), Abs::pt(new_height)),
-        }
+        comp_res.viewport.physical_position = Vec2::new(min_x, min_y);
+        comp_res.viewport.physical_size = Size::new(Abs::pt(new_width), Abs::pt(new_height));
     }
 }

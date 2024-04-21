@@ -26,7 +26,7 @@ pub fn mouse_wheeled_on_comp_input_system(
                     physical_size,
                 },
             ..
-        } = comp_res.as_mut();
+        } = comp_res.as_ref();
         let MouseWheeledOnCompInputEvent {
             position: cursor_position,
             delta,
@@ -55,10 +55,10 @@ pub fn mouse_wheeled_on_comp_input_system(
                 relative_cursor - (*cursor_position / size.to_vec2()) * new_physical_size.to_vec2();
 
             // Update the composition's viewport
-            *physical_position = new_physical_position;
-            *physical_size = new_physical_size;
+            comp_res.viewport.physical_position = new_physical_position;
+            comp_res.viewport.physical_size = new_physical_size;
         } else {
-            *physical_position += *delta;
+            comp_res.viewport.physical_position += *delta;
         }
     }
 }
