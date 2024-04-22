@@ -1,4 +1,5 @@
 import { toKeyCode, toMouseButton } from '@dyn/dtif-comp';
+import { shortId } from '@dyn/utils';
 import type {
 	CompositionChangeOutputEvent,
 	SvgElementChangesOutputEvent,
@@ -16,6 +17,7 @@ export const XLINK = 'http://www.w3.org/1999/xlink';
 export class SvgRenderer extends Renderer {
 	private _domElement: HTMLElement;
 	private _svgElement: SVGElement;
+	private _svgElementId: string;
 
 	private _svgElementMap = new Map<SvgElementId, SVGElement>();
 
@@ -25,11 +27,12 @@ export class SvgRenderer extends Renderer {
 		super(composition, options.callbackBased ?? true);
 		const { domElement = document.body } = options;
 		this._domElement = domElement;
+		this._svgElementId = `svg-canvas_${shortId()}`;
 
 		// Create SVG root
 		this._svgElement = document.createElementNS(NS, 'svg');
 		this._svgElement.setAttribute('version', VERSION);
-		this._svgElement.setAttribute('id', 'svg-canvas');
+		this._svgElement.setAttribute('id', this._svgElementId);
 		this._svgElement.style.setProperty('overflow', 'hidden');
 		this._svgElement.style.setProperty('pointer-events', 'none');
 		this._domElement.appendChild(this._svgElement);
@@ -301,8 +304,9 @@ export class SvgRenderer extends Renderer {
 
 	public clear(): void {
 		this._svgElementMap.clear();
-		while (this._domElement.firstChild) {
-			this._domElement.removeChild(this._domElement.firstChild);
+		const svgElement = document.getElementById(this._svgElementId);
+		if (svgElement != null) {
+			this._domElement.removeChild(svgElement);
 		}
 	}
 

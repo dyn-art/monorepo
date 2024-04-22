@@ -17,6 +17,10 @@ export const CanvasControl: React.FC<TProps> = (props) => {
 			id="canvas-control"
 			overflow="visible"
 			viewBox={`0 0 ${composition.size[0]} ${composition.size[1]}`}
+			// Note: Not applying the viewport of the canvas
+			// because we wan't the canvas control elements
+			// remain a consistent size no matter the zoom
+			// viewBox={`${composition.viewport.physicalPosition[0]} ${composition.viewport.physicalPosition[1]} ${composition.viewport.physicalSize[0]} ${composition.viewport.physicalSize[1]}`}
 			width={composition.size[0]}
 		>
 			<defs>

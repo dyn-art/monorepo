@@ -30,7 +30,7 @@ export function useSvgComposition(config: TUseCanvasConfig): {
 		const newComposition = createSvgComposition({
 			dtif,
 			renderer: {
-				domElement: target as Element
+				domElement: target as HTMLElement
 			},
 			interactive: true
 		});
