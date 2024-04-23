@@ -18,6 +18,7 @@ use dyn_comp_bundles::{
         EntityDeletedInputEvent, EntityMovedInputEvent, EntitySetPositionInputEvent,
         EntitySetRotationInputEvent, FocusRootNodesInputEvent,
     },
+    properties::Viewport,
     utils::transform_to_z_rotation_rad,
 };
 use dyn_utils::{math::matrix::rotate_around_point, properties::size::Size, units::abs::Abs};
@@ -127,6 +128,11 @@ pub fn focus_root_nodes_input_system(
     query: Query<(&SizeMixin, &Transform), (With<Root>, With<CompNode>)>,
 ) {
     if event_reader.read().len() > 0 {
+        let CompositionRes {
+            viewport: Viewport { physical_size, .. },
+            ..
+        } = comp_res.as_ref();
+
         let mut min_x = f32::INFINITY;
         let mut max_x = f32::NEG_INFINITY;
         let mut min_y = f32::INFINITY;
@@ -151,8 +157,30 @@ pub fn focus_root_nodes_input_system(
 
         let new_width = max_x - min_x;
         let new_height = max_y - min_y;
+        let padding_factor = 1.1;
 
-        comp_res.viewport.physical_position = Vec2::new(min_x, min_y);
-        comp_res.viewport.physical_size = Size::new(Abs::pt(new_width), Abs::pt(new_height));
+        // Calculate the new physical size while keeping its aspect ratio
+        let new_physical_size = if new_height > new_width {
+            let aspect_ratio = physical_size.width() / physical_size.height();
+            let height = new_height * padding_factor;
+            let width = height * aspect_ratio;
+            Size::new(Abs::pt(width), Abs::pt(height))
+        } else {
+            let aspect_ratio = physical_size.height() / physical_size.width();
+            let width = new_width * padding_factor;
+            let height = width * aspect_ratio;
+            Size::new(Abs::pt(width), Abs::pt(height))
+        };
+
+        // Calculate the new physica position
+        let center_x = min_x + new_width / 2.0;
+        let center_y = min_y + new_height / 2.0;
+        let new_physical_position = Vec2::new(
+            center_x - new_physical_size.width() / 2.0,
+            center_y - new_physical_size.height() / 2.0,
+        );
+
+        comp_res.viewport.physical_position = new_physical_position;
+        comp_res.viewport.physical_size = new_physical_size;
     }
 }
