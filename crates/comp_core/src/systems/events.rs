@@ -157,7 +157,7 @@ pub fn focus_root_nodes_input_system(
 
         let new_width = max_x - min_x;
         let new_height = max_y - min_y;
-        let padding_factor = 1.1;
+        let padding_factor = 1.05;
 
         // Calculate the new physical size while keeping its aspect ratio
         let new_physical_size = if new_height > new_width {

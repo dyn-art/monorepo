@@ -128,7 +128,9 @@ impl Plugin for CompCorePlugin {
             (
                 composition_resized_input_system.in_set(CompCoreSystemSet::InputEvents),
                 composition_viewport_input_system.in_set(CompCoreSystemSet::InputEvents),
-                focus_root_nodes_input_system.in_set(CompCoreSystemSet::InputEvents),
+                focus_root_nodes_input_system
+                    .in_set(CompCoreSystemSet::InputEvents)
+                    .after(composition_resized_input_system),
                 entity_deleted_input_system.in_set(CompCoreSystemSet::InputEvents),
                 entity_moved_input_system.in_set(CompCoreSystemSet::InputEvents),
                 entity_set_position_input_system.in_set(CompCoreSystemSet::InputEvents),

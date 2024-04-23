@@ -22,8 +22,8 @@ export const InnerEditor: React.FC<TInnerEditorProps> = (props) => {
 				{
 					type: 'CompositionResized',
 					size: [size.width, size.height]
-				}
-				// { type: 'FocusRootNodes' }
+				},
+				{ type: 'FocusRootNodes' }
 			]);
 			composition?.update();
 		},
