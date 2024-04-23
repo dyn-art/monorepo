@@ -1,9 +1,8 @@
-import { promises as fs } from 'node:fs';
-import { redirect } from 'next/navigation';
 import React from 'react';
-import { isDtifComposition, isMdtifComposition, type COMP } from '@dyn/dtif-comp';
-import { Container } from '@dyn/ui';
-import { Editor } from '@/components';
+import { isDtifComposition, isMdtifComposition, prepareDtifComposition } from '@dyn/dtif-comp';
+
+import { UniversalEditor } from '../_components/UniversalEditor';
+import { getStaticDtif } from './_helper/get-static-dtif';
 
 const Page = async (props: TProps): Promise<React.ReactNode> => {
 	const {
@@ -11,40 +10,29 @@ const Page = async (props: TProps): Promise<React.ReactNode> => {
 	} = props;
 	const dtif = await getStaticDtif(id);
 
+	console.log('Loaded static DTIF: ', dtif);
+
 	if (isDtifComposition(dtif)) {
-		return (
-			<Container className="h-screen" size="full" tag="main">
-				<Editor dtif={dtif} />
-			</Container>
-		);
+		const preparedDtif = await prepareDtifComposition(dtif);
+		return <UniversalEditor dtif={preparedDtif} />;
 	}
 
 	if (isMdtifComposition(dtif)) {
+		const preparedDtif = await prepareDtifComposition(dtif.template);
 		return (
-			<Container size="default" tag="main">
-				<p>Hello World</p>
-			</Container>
+			<UniversalEditor
+				dtif={{
+					...dtif,
+					template: preparedDtif
+				}}
+			/>
 		);
 	}
 
-	return (
-		<Container size="default" tag="main">
-			<p>Not found</p>
-		</Container>
-	);
+	return null;
 };
 
 export default Page;
-
-async function getStaticDtif(id: string): Promise<unknown> {
-	try {
-		return JSON.parse(
-			await fs.readFile(`${process.cwd()}/public/templates/dtif/${id}.json`, 'utf8')
-		) as COMP.DtifComposition;
-	} catch (e) {
-		redirect('/editor/default');
-	}
-}
 
 interface TProps {
 	params: { id: string };

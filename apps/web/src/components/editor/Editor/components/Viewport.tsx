@@ -50,7 +50,6 @@ export const Viewport: React.FC<TViewportProps> = (props) => {
 };
 
 export interface TViewportProps {
-	isDtifLoading: boolean;
 	viewportRef: React.RefObject<HTMLDivElement>;
 	dtif: COMP.DtifComposition;
 	onLoadedComposition?: (composition: Composition) => void;
