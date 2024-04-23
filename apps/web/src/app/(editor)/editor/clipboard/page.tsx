@@ -1,19 +1,36 @@
 'use client';
 
 import React from 'react';
-import { Skeleton } from '@dyn/ui';
+import { isDtifComposition, isMdtifComposition } from '@dyn/dtif-comp';
+import { Container, Skeleton } from '@dyn/ui';
+import { Editor } from '@/components';
 
-import { UniversalEditor } from '../_components/UniversalEditor';
 import { useDtifFromClipboard } from './_hooks';
 
 const Page: React.FC = () => {
-	const { data: dtif } = useDtifFromClipboard(); // TODO: No query client set yet
+	const { data: dtif } = useDtifFromClipboard();
 
 	if (dtif == null) {
 		return <Skeleton className="h-full w-full rounded-none" />;
 	}
 
-	return <UniversalEditor dtif={dtif} />;
+	if (isDtifComposition(dtif)) {
+		return (
+			<Container className="h-screen" size="full" tag="main">
+				<Editor dtif={dtif} />
+			</Container>
+		);
+	}
+
+	if (isMdtifComposition(dtif)) {
+		return (
+			<Container size="default" tag="main">
+				<p>Hello World</p>
+			</Container>
+		);
+	}
+
+	return null;
 };
 
 export default Page;

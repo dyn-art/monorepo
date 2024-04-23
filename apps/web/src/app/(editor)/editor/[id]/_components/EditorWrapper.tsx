@@ -13,7 +13,7 @@ import { Editor } from '@/components';
 
 const queryClient = new QueryClient();
 
-export const UniversalEditor: React.FC<TProps> = (props) => {
+export const EditorWrapper: React.FC<TProps> = (props) => {
 	const { dtif } = props;
 
 	if (isDtifComposition(dtif)) {

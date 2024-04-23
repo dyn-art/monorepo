@@ -1,8 +1,8 @@
 import React from 'react';
 import { isDtifComposition, isMdtifComposition, prepareDtifComposition } from '@dyn/dtif-comp';
 
-import { UniversalEditor } from '../_components/UniversalEditor';
-import { getStaticDtif } from './_helper/get-static-dtif';
+import { EditorWrapper } from './_components';
+import { getStaticDtif } from './_helper';
 
 const Page = async (props: TProps): Promise<React.ReactNode> => {
 	const {
@@ -10,17 +10,15 @@ const Page = async (props: TProps): Promise<React.ReactNode> => {
 	} = props;
 	const dtif = await getStaticDtif(id);
 
-	console.log('Loaded static DTIF: ', dtif);
-
 	if (isDtifComposition(dtif)) {
 		const preparedDtif = await prepareDtifComposition(dtif);
-		return <UniversalEditor dtif={preparedDtif} />;
+		return <EditorWrapper dtif={preparedDtif} />;
 	}
 
 	if (isMdtifComposition(dtif)) {
 		const preparedDtif = await prepareDtifComposition(dtif.template);
 		return (
-			<UniversalEditor
+			<EditorWrapper
 				dtif={{
 					...dtif,
 					template: preparedDtif
