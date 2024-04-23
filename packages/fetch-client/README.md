@@ -4,6 +4,12 @@
   which then sets the get set and stuff methods.. however they are not typesafe or
   or well I can make them typesafe indeed if I've like feature 'api' and 'openapi'
 
+### TODO
+Add middlewares like: https://github.com/elbywan/wretch?tab=readme-ov-file#middlewares,
+that can be added as features? so in the feature we just add the middleware
+- withRetry
+- with Dedupe
+
 ### Features
 
 - `core`

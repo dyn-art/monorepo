@@ -1,4 +1,4 @@
 export * from './comp';
-export * from './helper';
-export * from './modifiable-comp';
+export * from './dtif';
+export * from './mdtif';
 export * from './utils';

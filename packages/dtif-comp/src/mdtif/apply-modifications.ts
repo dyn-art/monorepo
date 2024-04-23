@@ -3,9 +3,10 @@ import { deepReplaceVar } from '@dyn/utils';
 
 import type { COMP } from '../comp';
 import type {
-	ModifiableDtifInputEvent,
 	TFieldData as TFieldModifications,
 	TMapToDefaultType,
+	TMdtifInputEvent,
+	TMdtifInputEventType,
 	TModificationField,
 	TModificationInputType
 } from './types';
@@ -46,15 +47,19 @@ export function applyModifications<GKey extends string, GInputType extends TModi
 
 // TODO: Make safer?
 function prepareEvent<GKey extends string, GValue>(
-	event: COMP.DtifInputEvent | ModifiableDtifInputEvent<GKey, GValue>,
+	event: COMP.DtifInputEvent | TMdtifInputEvent<GKey, GValue>,
 	data: Record<string, any>
 ): COMP.DtifInputEvent {
-	if (event.type.startsWith('Editable')) {
+	if (isMdtifInputEvent(event.type)) {
 		const result = deepReplaceVar(event, data);
-		result.type = result.type.replace('Editable', '') as any;
+		result.type = result.type.replace('Editable', '') as COMP.DtifInputEvent['type'];
 		return result as COMP.DtifInputEvent;
 	}
 	return event as COMP.DtifInputEvent;
+}
+
+function isMdtifInputEvent(value: unknown): value is TMdtifInputEventType {
+	return typeof value === 'string' && value.startsWith('Editable');
 }
 
 export type TProcessedFieldResult = TResolvedField | TUnresolvedField;

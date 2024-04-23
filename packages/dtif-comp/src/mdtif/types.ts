@@ -2,9 +2,9 @@ import type { AdditionalOperation, RulesLogic } from 'json-logic-js';
 
 import type { COMP } from '../comp';
 
-export interface TModifiableDtifComposition {
+export interface TMdtifComposition {
 	template: COMP.DtifComposition;
-	fields: TModificationField[];
+	modificationFields: TModificationField[];
 }
 
 export interface TModificationField<
@@ -21,7 +21,7 @@ export interface TModificationField<
 export interface TModificationAction<GKey extends string, GValue> {
 	conditions: TModificationCondition[];
 	// compute?: TJsonFunction;
-	events: (COMP.DtifInputEvent | ModifiableDtifInputEvent<GKey, GValue>)[];
+	events: (COMP.DtifInputEvent | TMdtifInputEvent<GKey, GValue>)[];
 }
 
 export interface TModificationCondition {
@@ -33,7 +33,7 @@ type TMakeEventModifiable<T, K extends keyof T, GKey extends string, GValue> = {
 	[P in keyof T]: P extends K ? T[P] | { var: TExpandKey<GKey, GValue> } : T[P];
 };
 
-export type ModifiableDtifInputEvent<GKey extends string, GValue> =
+export type TMdtifInputEvent<GKey extends string, GValue> =
 	| ({ type: 'EditableEntityMoved' } & TMakeEventModifiable<
 			COMP.DtifEntityMovedEvent,
 			'dx' | 'dy',
@@ -46,6 +46,8 @@ export type ModifiableDtifInputEvent<GKey extends string, GValue> =
 			GKey,
 			GValue
 	  >);
+
+export type TMdtifInputEventType = `Editable${COMP.DtifInputEvent['type']}`;
 
 export type TModificationInputType =
 	| { type: 'NUMBER'; default: number }

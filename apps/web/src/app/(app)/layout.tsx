@@ -4,7 +4,7 @@ const Layout: React.FC<TProps> = (props) => {
 	const { children } = props;
 
 	return (
-		<Container className="h-screen" size="full" tag="main">
+		<Container size="default" tag="main">
 			{children as any}
 		</Container>
 	);
