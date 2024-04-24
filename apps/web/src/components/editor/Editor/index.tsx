@@ -10,9 +10,9 @@ import {
 	Skeleton,
 	useSizeCallback
 } from '@dyn/ui';
+import { usePreparedDtif } from '@/hooks';
 
 import { DesignPanel, Viewport } from './components';
-import { usePreparedDtif } from './hooks';
 
 export const Editor: React.FC<TEditorProps> = (props) => {
 	const { dtif } = props;

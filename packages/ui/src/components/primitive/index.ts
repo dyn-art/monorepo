@@ -1,4 +1,6 @@
 export * from './Avatar';
+export * from './Badge';
+export * from './Label';
 export * from './Progress';
 export * from './Separator';
 export * from './Skeleton';

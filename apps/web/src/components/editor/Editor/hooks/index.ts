@@ -4,8 +4,6 @@ export * from './use-entity';
 export * from './use-interaction-mode';
 export * from './use-interaction-tool';
 export * from './use-output-event';
-export * from './use-prepared-dtif';
 export * from './use-selected-entities';
-export * from './use-svg-composition';
 export * from './use-viewport-factor';
 export * from './use-watch-composition';

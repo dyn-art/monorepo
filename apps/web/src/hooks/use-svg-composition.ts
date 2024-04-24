@@ -7,7 +7,7 @@ export function useSvgComposition(config: TUseCanvasConfig): {
 	composition: Composition | null;
 	isWasmLoading: boolean;
 } {
-	const { dtif, svgContainerRef } = config;
+	const { dtif, svgContainerRef, interactive = true } = config;
 	const [composition, setComposition] = React.useState<Composition | null>(null);
 
 	// https://www.youtube.com/watch?v=vxkbf5QMA2g
@@ -32,7 +32,7 @@ export function useSvgComposition(config: TUseCanvasConfig): {
 			renderer: {
 				domElement: target as HTMLElement
 			},
-			interactive: true
+			interactive
 		});
 		setComposition(newComposition);
 
@@ -47,4 +47,5 @@ export function useSvgComposition(config: TUseCanvasConfig): {
 export interface TUseCanvasConfig {
 	dtif: COMP.DtifComposition;
 	svgContainerRef: React.RefObject<HTMLDivElement>;
+	interactive?: boolean;
 }

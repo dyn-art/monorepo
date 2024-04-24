@@ -4,5 +4,6 @@ export * from './IconSelect';
 export * from './Input';
 export * from './Select';
 export * from './Tabs';
+export * from './Textarea';
 export * from './Toggle';
 export * from './ToggleGroup';

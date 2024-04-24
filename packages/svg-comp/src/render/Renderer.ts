@@ -8,11 +8,13 @@ import type { Composition } from '../Composition';
 
 export abstract class Renderer {
 	private readonly _isCallbackBased: boolean;
+	private readonly _isInteractive: boolean;
 	private readonly _comp: () => Composition; // TODO: Bad practice?
 
-	constructor(composition: Composition, isCallbackBased: boolean) {
+	constructor(composition: Composition, isCallbackBased: boolean, isInteractive: boolean) {
 		this._comp = () => composition;
 		this._isCallbackBased = isCallbackBased;
+		this._isInteractive = isInteractive;
 
 		composition.watchOutputEvent('SvgElementChange', (event) => {
 			this.applyElementChanges(event);
@@ -28,6 +30,10 @@ export abstract class Renderer {
 
 	public get isCallbackBased(): boolean {
 		return this._isCallbackBased;
+	}
+
+	public get isInteractive(): boolean {
+		return this._isInteractive;
 	}
 
 	public abstract applyElementChanges(event: SvgElementChangesOutputEvent): void;

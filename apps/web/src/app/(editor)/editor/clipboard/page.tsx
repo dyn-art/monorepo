@@ -3,7 +3,7 @@
 import React from 'react';
 import { isDtifComposition, isMdtifComposition } from '@dyn/dtif-comp';
 import { Container, Skeleton } from '@dyn/ui';
-import { Editor } from '@/components';
+import { Editor, FieldBasedEditor } from '@/components';
 
 import { useDtifFromClipboard } from './_hooks';
 
@@ -25,7 +25,7 @@ const Page: React.FC = () => {
 	if (isMdtifComposition(dtif)) {
 		return (
 			<Container size="default" tag="main">
-				<p>Hello World</p>
+				<FieldBasedEditor mdtif={dtif} />
 			</Container>
 		);
 	}

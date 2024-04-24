@@ -9,7 +9,7 @@ import {
 	type TMdtifComposition
 } from '@dyn/dtif-comp';
 import { Container } from '@dyn/ui';
-import { Editor } from '@/components';
+import { Editor, FieldBasedEditor } from '@/components';
 
 const queryClient = new QueryClient();
 
@@ -30,7 +30,7 @@ export const EditorWrapper: React.FC<TProps> = (props) => {
 		return (
 			<Container size="default" tag="main">
 				<QueryClientProvider client={queryClient}>
-					<p>Hello World</p>
+					<FieldBasedEditor mdtif={dtif} />
 				</QueryClientProvider>
 			</Container>
 		);
