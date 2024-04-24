@@ -21,7 +21,7 @@ export interface TModificationField<
 export interface TModificationAction<GKey extends string, GValue> {
 	conditions: TModificationCondition[];
 	// compute?: TJsonFunction;
-	events: (COMP.DtifInputEvent | TMdtifInputEvent<GKey, GValue>)[];
+	events: TMdtifInputEvent<GKey, GValue>[];
 }
 
 export interface TModificationCondition {
@@ -34,28 +34,62 @@ type TMakeEventModifiable<T, K extends keyof T, GKey extends string, GValue> = {
 };
 
 export type TMdtifInputEvent<GKey extends string, GValue> =
-	| ({ type: 'EditableEntityMoved' } & TMakeEventModifiable<
+	| ({ type: 'EntityMoved' } & TMakeEventModifiable<
 			COMP.DtifEntityMovedEvent,
 			'dx' | 'dy',
 			GKey,
 			GValue
 	  >)
-	| ({ type: 'EditableEntitySetPosition' } & TMakeEventModifiable<
+	| ({ type: 'EntitySetPosition' } & TMakeEventModifiable<
 			COMP.DtifEntitySetPositionEvent,
 			'x' | 'y',
 			GKey,
 			GValue
 	  >);
 
-export type TMdtifInputEventType = `Editable${COMP.DtifInputEvent['type']}`;
-
 export type TModificationInputType =
-	| { type: 'NUMBER'; default: number }
-	| { type: 'STRING'; default: string }
-	| { type: 'BOOLEAN'; default: boolean }
-	| { type: 'RANGE'; default: number; start: number; stop: number }
-	| { type: 'COLOR'; default: { r: number; g: number; b: number } }
-	| { type: 'POSITION'; default: [number, number] };
+	| TNumberModificationInput
+	| TStringModificationInput
+	| TBooleanModificationInput
+	| TRangeModificationInput
+	| TColorModificationInput
+	| TPositionModificationInput;
+
+export interface TNumberModificationInput {
+	type: 'NUMBER';
+	default: number;
+	max?: number;
+	min?: number;
+}
+
+export interface TStringModificationInput {
+	type: 'STRING';
+	default: string;
+}
+
+export interface TBooleanModificationInput {
+	type: 'BOOLEAN';
+	default: boolean;
+}
+
+export interface TRangeModificationInput {
+	type: 'RANGE';
+	default: number;
+	start: number;
+	stop: number;
+}
+
+export interface TColorModificationInput {
+	type: 'COLOR';
+	default: { r: number; g: number; b: number };
+}
+
+export interface TPositionModificationInput {
+	type: 'POSITION';
+	default: [number, number];
+	max?: [number, number];
+	min?: [number, number];
+}
 
 export type TMapToDefaultType<T> = T extends { default: infer U } ? U : never;
 

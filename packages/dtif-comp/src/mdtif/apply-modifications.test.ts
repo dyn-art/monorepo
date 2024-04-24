@@ -3,8 +3,8 @@ import { describe, expect, it } from 'vitest';
 
 import {
 	applyModifications,
-	type TResolvedField,
-	type TUnresolvedField
+	type TResolvedFieldAction,
+	type TUnresolvedFieldAction
 } from './apply-modifications';
 import { createModificationField } from './create-modification-field';
 
@@ -28,13 +28,13 @@ describe('processField function', () => {
 							notMetMessage: "'moveX' can not be negative!"
 						}
 					],
-					events: [{ type: 'EditableEntityMoved', entity: 'n1', dx: { var: 'moveX' }, dy: 0 }]
+					events: [{ type: 'EntityMoved', entity: 'n1', dx: { var: 'moveX' }, dy: 0 }]
 				}
 			]
 		});
 
 		const results = applyModifications(field, { moveX: 30 });
-		const firstResult = results[0] as TResolvedField;
+		const firstResult = results[0] as TResolvedFieldAction;
 
 		expect(firstResult).not.toBeNull();
 		expect(firstResult.resolved).toBeTruthy();
@@ -54,13 +54,13 @@ describe('processField function', () => {
 							notMetMessage: "'moveX' can not be negative!"
 						}
 					],
-					events: [{ type: 'EditableEntityMoved', entity: 'n1', dx: { var: 'moveX' }, dy: 0 }]
+					events: [{ type: 'EntityMoved', entity: 'n1', dx: { var: 'moveX' }, dy: 0 }]
 				}
 			]
 		});
 
 		const results = applyModifications(field, { moveX: -10 });
-		const firstResult = results[0] as TUnresolvedField;
+		const firstResult = results[0] as TUnresolvedFieldAction;
 
 		expect(firstResult).not.toBeNull();
 		expect(firstResult.resolved).toBeFalsy();
@@ -89,7 +89,7 @@ describe('processField function', () => {
 					],
 					events: [
 						{
-							type: 'EditableEntitySetPosition',
+							type: 'EntitySetPosition',
 							entity: 'n1',
 							x: { var: 'pos.0' },
 							y: { var: 'pos.1' }
@@ -100,7 +100,7 @@ describe('processField function', () => {
 		});
 
 		const results = applyModifications(field, { pos: [20, 10] });
-		const firstResult = results[0] as TResolvedField;
+		const firstResult = results[0] as TResolvedFieldAction;
 
 		expect(firstResult).not.toBeNull();
 		expect(firstResult.resolved).toBeTruthy();
@@ -131,7 +131,7 @@ describe('processField function', () => {
 					],
 					events: [
 						{
-							type: 'EditableEntitySetPosition',
+							type: 'EntitySetPosition',
 							entity: 'n1',
 							x: { var: 'pos.0' },
 							y: { var: 'pos.1' }
@@ -142,7 +142,7 @@ describe('processField function', () => {
 		});
 
 		const results = applyModifications(field, { pos: [-10, 10] });
-		const firstResult = results[0] as TUnresolvedField;
+		const firstResult = results[0] as TUnresolvedFieldAction;
 
 		expect(firstResult).not.toBeNull();
 		expect(firstResult.resolved).toBeFalsy();
@@ -181,13 +181,13 @@ describe('processField function', () => {
 					],
 					events: [
 						{
-							type: 'EditableEntitySetPosition',
+							type: 'EntitySetPosition',
 							entity: 'n1',
 							x: { var: 'color.r' },
 							y: { var: 'color.g' }
 						},
 						{
-							type: 'EditableEntitySetPosition',
+							type: 'EntitySetPosition',
 							entity: 'n1',
 							x: { var: 'color.g' },
 							y: { var: 'color.b' }
@@ -198,7 +198,7 @@ describe('processField function', () => {
 		});
 
 		const results = applyModifications(field, { color: { r: 10, g: 20, b: 30 } });
-		const firstResult = results[0] as TResolvedField;
+		const firstResult = results[0] as TResolvedFieldAction;
 
 		expect(firstResult).not.toBeNull();
 		expect(firstResult.resolved).toBeTruthy();

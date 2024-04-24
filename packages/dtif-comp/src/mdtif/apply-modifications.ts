@@ -6,7 +6,6 @@ import type {
 	TFieldData as TFieldModifications,
 	TMapToDefaultType,
 	TMdtifInputEvent,
-	TMdtifInputEventType,
 	TModificationField,
 	TModificationInputType
 } from './types';
@@ -14,9 +13,9 @@ import type {
 export function applyModifications<GKey extends string, GInputType extends TModificationInputType>(
 	field: TModificationField<GKey, GInputType>,
 	modifications: TFieldModifications<GKey, GInputType>
-): TProcessedFieldResult[] {
+): TProcessedFieldAction[] {
 	const { actions } = field;
-	const results: TProcessedFieldResult[] = [];
+	const processedActions: TProcessedFieldAction[] = [];
 
 	for (const action of actions) {
 		const { conditions, events } = action;
@@ -31,45 +30,36 @@ export function applyModifications<GKey extends string, GInputType extends TModi
 		}
 
 		if (notMetConditions.length > 0) {
-			results.push({ resolved: false, notMetConditions });
+			processedActions.push({ resolved: false, notMetConditions });
 		} else {
-			results.push({
+			processedActions.push({
 				resolved: true,
 				events: events.map((event) =>
-					prepareEvent<GKey, TMapToDefaultType<GInputType>>(event, modifications)
+					toDtifInputEvent<GKey, TMapToDefaultType<GInputType>>(event, modifications)
 				)
 			});
 		}
 	}
 
-	return results;
+	return processedActions;
 }
 
-// TODO: Make safer?
-function prepareEvent<GKey extends string, GValue>(
-	event: COMP.DtifInputEvent | TMdtifInputEvent<GKey, GValue>,
+function toDtifInputEvent<GKey extends string, GValue>(
+	event: TMdtifInputEvent<GKey, GValue>,
 	data: Record<string, any>
 ): COMP.DtifInputEvent {
-	if (isMdtifInputEvent(event.type)) {
-		const result = deepReplaceVar(event, data);
-		result.type = result.type.replace('Editable', '') as COMP.DtifInputEvent['type'];
-		return result as COMP.DtifInputEvent;
-	}
-	return event as COMP.DtifInputEvent;
+	const result = deepReplaceVar(event, data);
+	return result as COMP.DtifInputEvent;
 }
 
-function isMdtifInputEvent(value: unknown): value is TMdtifInputEventType {
-	return typeof value === 'string' && value.startsWith('Editable');
-}
+export type TProcessedFieldAction = TResolvedFieldAction | TUnresolvedFieldAction;
 
-export type TProcessedFieldResult = TResolvedField | TUnresolvedField;
-
-export interface TResolvedField {
+export interface TResolvedFieldAction {
 	resolved: true;
 	events: COMP.DtifInputEvent[];
 }
 
-export interface TUnresolvedField {
+export interface TUnresolvedFieldAction {
 	resolved: false;
 	notMetConditions: TNotMetCondition[];
 }

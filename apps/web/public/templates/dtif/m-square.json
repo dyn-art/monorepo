@@ -51,5 +51,33 @@
 		"assets": {},
 		"viewport": { "physicalPosition": [0, 0], "physicalSize": [500, 500] }
 	},
-	"modificationFields": []
+	"modificationFields": [
+		{
+			"key": "pos",
+			"displayName": "Set Position",
+			"inputType": { "type": "POSITION", "default": [0, 0] },
+			"actions": [
+				{
+					"conditions": [
+						{
+							"condition": { ">=": [{ "var": "pos.0" }, 0] },
+							"notMetMessage": "x can not be negative!"
+						},
+						{
+							"condition": { ">=": [{ "var": "pos.1" }, 0] },
+							"notMetMessage": "y can not be negative!"
+						}
+					],
+					"events": [
+						{
+							"type": "EntitySetPosition",
+							"entity": "1",
+							"x": { "var": "pos.0" },
+							"y": { "var": "pos.1" }
+						}
+					]
+				}
+			]
+		}
+	]
 }
