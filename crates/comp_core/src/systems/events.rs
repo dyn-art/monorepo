@@ -159,7 +159,7 @@ pub fn focus_root_nodes_input_system(
 
         let bounding_size = max - min;
 
-        let padding_factor = 1.05;
+        let padding_factor = 1.0;
         let adjusted_bounding_size = bounding_size * padding_factor;
 
         let aspect_ratio = original_physical_size.width / original_physical_size.height;

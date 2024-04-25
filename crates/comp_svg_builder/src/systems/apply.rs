@@ -15,7 +15,7 @@ use crate::{
 use base64::prelude::*;
 use bevy_ecs::{
     entity::Entity,
-    query::{Changed, With, Without},
+    query::{Changed, Or, With, Without},
     removal_detection::RemovedComponents,
     system::{ParamSet, Query, Res, ResMut},
 };
@@ -32,7 +32,7 @@ use dyn_comp_bundles::components::{
         CompPaint, GradientCompPaint, GradientVariant, ImageCompPaint, ImageScaleMode,
         SolidCompPaint,
     },
-    styles::{CompStyle, DropShadowCompStyle, StrokeCompStyle},
+    styles::{CompStyle, DropShadowCompStyle, FillCompStyle, StrokeCompStyle},
 };
 use dyn_utils::{error::NoneErr, properties::size::Size};
 use glam::{Mat3, Vec2};
@@ -539,7 +539,13 @@ pub fn apply_path_mixin_changes(
         (&PathMixin, &mut SvgBundleVariant),
         (With<CompNode>, Without<CompStyle>, Changed<PathMixin>),
     >,
-    mut style_bundle_query: Query<&mut SvgBundleVariant, (With<CompStyle>, Without<CompNode>)>,
+    mut style_bundle_query: Query<
+        &mut SvgBundleVariant,
+        (
+            Or<(With<FillCompStyle>, With<DropShadowCompStyle>)>,
+            Without<CompNode>,
+        ),
+    >,
 ) {
     for (PathMixin { path, winding_rule }, mut node_bundle_variant) in query.iter_mut() {
         // Apply path to node bundle

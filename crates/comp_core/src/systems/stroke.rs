@@ -24,10 +24,11 @@ pub fn stroke_path_system(
 
     // Handle stroke style changes
     for (entity, stroke_style, maybe_style_parent_mixin) in stroke_query.iter() {
-        if let Some(StyleParentMixin(parent_entity)) = maybe_style_parent_mixin {
-            if let Ok((PathMixin { path, .. }, _)) = path_query.get(*parent_entity) {
-                stroke_path(&mut commands, entity, path, stroke_style);
-                processed_entities.insert(entity);
+        if processed_entities.insert(entity) {
+            if let Some(StyleParentMixin(parent_entity)) = maybe_style_parent_mixin {
+                if let Ok((PathMixin { path, .. }, _)) = path_query.get(*parent_entity) {
+                    stroke_path(&mut commands, entity, path, stroke_style);
+                }
             }
         }
     }
