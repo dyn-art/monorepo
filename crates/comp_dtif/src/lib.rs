@@ -1,5 +1,5 @@
 pub mod conversion;
-pub mod dtif_injector;
+pub mod dtif_handler;
 pub mod events;
 pub mod nodes;
 pub mod paints;
@@ -7,7 +7,7 @@ pub mod styles;
 
 use crate::nodes::Node;
 use bevy_ecs::world::{EntityWorldMut, World};
-use dtif_injector::DtifInjector;
+use dtif_handler::DtifHandler;
 use dyn_comp_asset::asset::Asset;
 use dyn_comp_bundles::properties::Viewport;
 use dyn_utils::properties::size::Size;
@@ -45,5 +45,5 @@ pub struct DtifComposition {
 }
 
 pub trait SpawnBundleImpl {
-    fn spawn<'a>(&self, dtif_injector: &DtifInjector, world: &'a mut World) -> EntityWorldMut<'a>;
+    fn spawn<'a>(&self, dtif_injector: &DtifHandler, world: &'a mut World) -> EntityWorldMut<'a>;
 }

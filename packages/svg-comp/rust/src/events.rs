@@ -3,6 +3,7 @@ use crate::modules::watch::events::{
     InteractionToolChangeOutputEvent, SelectionChangeOutputEvent, WatchedEntityChangesOutputEvent,
 };
 use dyn_comp_bundles::events::CompCoreInputEvent;
+use dyn_comp_dtif::events::DtifInputEvent;
 use dyn_comp_interaction::events::InteractionInputEvent;
 use dyn_comp_svg_builder::events::SvgElementChangesOutputEvent;
 
@@ -23,4 +24,5 @@ pub enum SvgCompOutputEvent {
 pub enum SvgCompInputEvent {
     Composition { event: CompCoreInputEvent },
     Interaction { event: InteractionInputEvent },
+    Dtif { event: DtifInputEvent },
 }

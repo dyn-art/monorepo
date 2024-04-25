@@ -46,7 +46,7 @@
 		"paints": {
 			"3": { "type": "Solid", "color": [217, 217, 217] },
 			"4": { "type": "Solid", "color": [0, 0, 0] },
-			"5": { "type": "Solid", "color": [255, 255, 255] }
+			"5": { "type": "Solid", "color": [252, 250, 244] }
 		},
 		"assets": {},
 		"viewport": { "physicalPosition": [0, 0], "physicalSize": [500, 500] }
@@ -55,7 +55,7 @@
 		{
 			"key": "pos",
 			"displayName": "Set Position",
-			"inputType": { "type": "POSITION", "default": [0, 0] },
+			"inputType": { "type": "POSITION", "default": [200, 200] },
 			"actions": [
 				{
 					"conditions": [
@@ -71,7 +71,7 @@
 					"events": [
 						{
 							"type": "EntitySetPosition",
-							"entity": "1",
+							"entity": "2",
 							"x": { "var": "pos.0" },
 							"y": { "var": "pos.1" }
 						}

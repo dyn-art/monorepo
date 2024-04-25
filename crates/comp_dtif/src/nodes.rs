@@ -1,6 +1,5 @@
 use crate::{
-    conversion::string_to_tiny_skia_path, dtif_injector::DtifInjector, styles::Style,
-    SpawnBundleImpl,
+    conversion::string_to_tiny_skia_path, dtif_handler::DtifHandler, styles::Style, SpawnBundleImpl,
 };
 use bevy_ecs::world::{EntityWorldMut, World};
 use bevy_transform::{components::Transform, TransformBundle};
@@ -94,7 +93,7 @@ impl FrameNode {
 }
 
 impl SpawnBundleImpl for FrameNode {
-    fn spawn<'a>(&self, _: &DtifInjector, world: &'a mut World) -> EntityWorldMut<'a> {
+    fn spawn<'a>(&self, _: &DtifHandler, world: &'a mut World) -> EntityWorldMut<'a> {
         world.spawn(self.to_ecs_bundle())
     }
 }
@@ -151,7 +150,7 @@ impl GroupNode {
 }
 
 impl SpawnBundleImpl for GroupNode {
-    fn spawn<'a>(&self, _: &DtifInjector, world: &'a mut World) -> EntityWorldMut<'a> {
+    fn spawn<'a>(&self, _: &DtifHandler, world: &'a mut World) -> EntityWorldMut<'a> {
         let mut entity_world = world.spawn(self.to_ecs_bundle());
         entity_world.insert(StaleTransform);
         entity_world.insert(StaleSize);
@@ -204,7 +203,7 @@ impl RectangleNode {
 }
 
 impl SpawnBundleImpl for RectangleNode {
-    fn spawn<'a>(&self, _: &DtifInjector, world: &'a mut World) -> EntityWorldMut<'a> {
+    fn spawn<'a>(&self, _: &DtifHandler, world: &'a mut World) -> EntityWorldMut<'a> {
         world.spawn(self.to_ecs_bundle())
     }
 }
@@ -263,7 +262,7 @@ impl EllipseNode {
 }
 
 impl SpawnBundleImpl for EllipseNode {
-    fn spawn<'a>(&self, _: &DtifInjector, world: &'a mut World) -> EntityWorldMut<'a> {
+    fn spawn<'a>(&self, _: &DtifHandler, world: &'a mut World) -> EntityWorldMut<'a> {
         world.spawn(self.to_ecs_bundle())
     }
 }
@@ -317,7 +316,7 @@ impl StarNode {
 }
 
 impl SpawnBundleImpl for StarNode {
-    fn spawn<'a>(&self, _: &DtifInjector, world: &'a mut World) -> EntityWorldMut<'a> {
+    fn spawn<'a>(&self, _: &DtifHandler, world: &'a mut World) -> EntityWorldMut<'a> {
         world.spawn(self.to_ecs_bundle())
     }
 }
@@ -373,7 +372,7 @@ impl PolygonNode {
 }
 
 impl SpawnBundleImpl for PolygonNode {
-    fn spawn<'a>(&self, _: &DtifInjector, world: &'a mut World) -> EntityWorldMut<'a> {
+    fn spawn<'a>(&self, _: &DtifHandler, world: &'a mut World) -> EntityWorldMut<'a> {
         world.spawn(self.to_ecs_bundle())
     }
 }
@@ -439,7 +438,7 @@ impl TextNode {
 }
 
 impl SpawnBundleImpl for TextNode {
-    fn spawn<'a>(&self, _: &DtifInjector, world: &'a mut World) -> EntityWorldMut<'a> {
+    fn spawn<'a>(&self, _: &DtifHandler, world: &'a mut World) -> EntityWorldMut<'a> {
         world.spawn(self.to_ecs_bundle())
     }
 }
@@ -493,7 +492,7 @@ impl VectorNode {
 }
 
 impl SpawnBundleImpl for VectorNode {
-    fn spawn<'a>(&self, _: &DtifInjector, world: &'a mut World) -> EntityWorldMut<'a> {
+    fn spawn<'a>(&self, _: &DtifHandler, world: &'a mut World) -> EntityWorldMut<'a> {
         world.spawn(self.to_ecs_bundle())
     }
 }

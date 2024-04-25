@@ -1,7 +1,4 @@
-use crate::{
-    dtif_injector::{self, DtifInjector},
-    SpawnBundleImpl,
-};
+use crate::{dtif_handler::DtifHandler, SpawnBundleImpl};
 use bevy_ecs::world::{EntityWorldMut, World};
 use dyn_comp_asset::asset_id::AssetId;
 use dyn_comp_bundles::{
@@ -42,7 +39,7 @@ impl SolidPaint {
 }
 
 impl SpawnBundleImpl for SolidPaint {
-    fn spawn<'a>(&self, _: &DtifInjector, world: &'a mut World) -> EntityWorldMut<'a> {
+    fn spawn<'a>(&self, _: &DtifHandler, world: &'a mut World) -> EntityWorldMut<'a> {
         world.spawn(self.to_ecs_bundle())
     }
 }
@@ -56,7 +53,7 @@ pub struct ImagePaint {
 }
 
 impl ImagePaint {
-    fn to_ecs_bundle(&self, dtif_injector: &DtifInjector) -> ImagePaintBundle {
+    fn to_ecs_bundle(&self, dtif_injector: &DtifHandler) -> ImagePaintBundle {
         ImagePaintBundle {
             paint: CompPaint {
                 variant: CompPaintVariant::Image,
@@ -79,7 +76,7 @@ impl ImagePaint {
 }
 
 impl SpawnBundleImpl for ImagePaint {
-    fn spawn<'a>(&self, dtif_injector: &DtifInjector, world: &'a mut World) -> EntityWorldMut<'a> {
+    fn spawn<'a>(&self, dtif_injector: &DtifHandler, world: &'a mut World) -> EntityWorldMut<'a> {
         world.spawn(self.to_ecs_bundle(dtif_injector))
     }
 }
@@ -106,7 +103,7 @@ impl GradientPaint {
 }
 
 impl SpawnBundleImpl for GradientPaint {
-    fn spawn<'a>(&self, _: &DtifInjector, world: &'a mut World) -> EntityWorldMut<'a> {
+    fn spawn<'a>(&self, _: &DtifHandler, world: &'a mut World) -> EntityWorldMut<'a> {
         world.spawn(self.to_ecs_bundle())
     }
 }

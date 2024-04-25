@@ -129,56 +129,58 @@ pub fn focus_root_nodes_input_system(
 ) {
     if event_reader.read().len() > 0 {
         let CompositionRes {
-            viewport: Viewport { physical_size, .. },
+            viewport:
+                Viewport {
+                    physical_size: original_physical_size,
+                    ..
+                },
             ..
         } = comp_res.as_ref();
 
-        let mut min_x = f32::INFINITY;
-        let mut max_x = f32::NEG_INFINITY;
-        let mut min_y = f32::INFINITY;
-        let mut max_y = f32::NEG_INFINITY;
+        let mut min = Vec2::new(f32::INFINITY, f32::INFINITY);
+        let mut max = Vec2::new(f32::NEG_INFINITY, f32::NEG_INFINITY);
 
         // Calculate bounding box
         for (SizeMixin(size), transform) in query.iter() {
             let corners = [
-                transform.translation.truncate(), // Bottom left
-                transform.translation.truncate() + Vec2::new(size.width(), 0.0), // Bottom right
-                transform.translation.truncate() + Vec2::new(0.0, size.height()), // Top left
-                transform.translation.truncate() + Vec2::new(size.width(), size.height()), // Top right
+                transform.translation.truncate(), // Top left
+                transform.translation.truncate() + Vec2::new(size.width(), 0.0), // Top right
+                transform.translation.truncate() + Vec2::new(0.0, size.height()), // Bottom left
+                transform.translation.truncate() + Vec2::new(size.width(), size.height()), // Bottom right
             ];
 
             for corner in corners.iter() {
-                min_x = min_x.min(corner.x);
-                max_x = max_x.max(corner.x);
-                min_y = min_y.min(corner.y);
-                max_y = max_y.max(corner.y);
+                min.x = min.x.min(corner.x);
+                max.x = max.x.max(corner.x);
+                min.y = min.y.min(corner.y);
+                max.y = max.y.max(corner.y);
             }
         }
 
-        let new_width = max_x - min_x;
-        let new_height = max_y - min_y;
-        let padding_factor = 1.0;
+        let bounding_size = max - min;
 
-        // Calculate the new physical size while keeping its aspect ratio
-        let new_physical_size = if new_height > new_width {
-            let aspect_ratio = physical_size.width() / physical_size.height();
-            let height = new_height * padding_factor;
-            let width = height * aspect_ratio;
-            Size::new(Abs::pt(width), Abs::pt(height))
+        let padding_factor = 1.05;
+        let adjusted_bounding_size = bounding_size * padding_factor;
+
+        let aspect_ratio = original_physical_size.width / original_physical_size.height;
+        let focused_aspect_ratio = adjusted_bounding_size.x / adjusted_bounding_size.y;
+
+        // Adjust the new physical_size to maintain the original aspect ratio
+        let new_physical_size = if focused_aspect_ratio > aspect_ratio {
+            Size::new(
+                Abs::pt(adjusted_bounding_size.x),
+                Abs::pt(adjusted_bounding_size.x / aspect_ratio),
+            )
         } else {
-            let aspect_ratio = physical_size.height() / physical_size.width();
-            let width = new_width * padding_factor;
-            let height = width * aspect_ratio;
-            Size::new(Abs::pt(width), Abs::pt(height))
+            Size::new(
+                Abs::pt(adjusted_bounding_size.y * aspect_ratio),
+                Abs::pt(adjusted_bounding_size.y),
+            )
         };
 
         // Calculate the new physica position
-        let center_x = min_x + new_width / 2.0;
-        let center_y = min_y + new_height / 2.0;
-        let new_physical_position = Vec2::new(
-            center_x - new_physical_size.width() / 2.0,
-            center_y - new_physical_size.height() / 2.0,
-        );
+        let center = min + bounding_size / 2.0;
+        let new_physical_position = center - new_physical_size.to_vec2() / 2.0;
 
         comp_res.viewport.physical_position = new_physical_position;
         comp_res.viewport.physical_size = new_physical_size;

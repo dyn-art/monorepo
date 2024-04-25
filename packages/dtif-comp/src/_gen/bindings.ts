@@ -1444,7 +1444,7 @@ export type SvgBuilderOutputEvent =
  */
 ({ type: "SvgString" } & SvgStringOutputEvent)
 
-export type SvgCompInputEvent = { type: "Composition"; event: CompCoreInputEvent } | { type: "Interaction"; event: InteractionInputEvent }
+export type SvgCompInputEvent = { type: "Composition"; event: CompCoreInputEvent } | { type: "Interaction"; event: InteractionInputEvent } | { type: "Dtif"; event: DtifInputEvent }
 
 export type SvgCompOutputEvent = ({ type: "SvgElementChange" } & SvgElementChangesOutputEvent) | ({ type: "CompositionChange" } & CompositionChangeOutputEvent) | ({ type: "WatchedEntityChange" } & WatchedEntityChangesOutputEvent) | ({ type: "SelectionChange" } & SelectionChangeOutputEvent) | ({ type: "InteractionModeChange" } & InteractionModeChangeOutputEvent) | ({ type: "InteractionToolChange" } & InteractionToolChangeOutputEvent) | ({ type: "CursorChange" } & CursorChangeOutputEvent)
 

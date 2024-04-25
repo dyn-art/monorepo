@@ -6,6 +6,7 @@ import type {
 	CompositionChangeOutputEvent,
 	CursorChangeOutputEvent,
 	DtifComposition,
+	DtifInputEvent,
 	Entity,
 	InteractionInputEvent,
 	InteractionModeChangeOutputEvent,
@@ -235,6 +236,7 @@ export interface TCompositionConfig {
 export interface TInputEventTypeMap {
 	Composition: CompCoreInputEvent;
 	Interaction: InteractionInputEvent;
+	Dtif: DtifInputEvent;
 }
 
 export interface TOutputEventTypeMap {

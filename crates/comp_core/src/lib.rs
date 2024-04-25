@@ -40,8 +40,6 @@ use systems::{
 };
 
 pub struct CompCorePlugin {
-    #[cfg(feature = "dtif")]
-    pub dtif: dyn_comp_dtif::DtifComposition,
     #[cfg(not(feature = "dtif"))]
     pub size: Size,
     #[cfg(not(feature = "dtif"))]
@@ -157,35 +155,35 @@ impl Plugin for CompCorePlugin {
             ),
         );
         app.add_systems(Last, despawn_removed_entities_system);
-
-        #[cfg(feature = "dtif")]
-        inject_dtif_into_ecs(&mut app.world, &self.dtif)
     }
 }
 
 #[cfg(feature = "dtif")]
-fn inject_dtif_into_ecs(world: &mut bevy_ecs::world::World, dtif: &dyn_comp_dtif::DtifComposition) {
+pub fn insert_dtif_into_world(
+    world: &mut bevy_ecs::world::World,
+    dtif_handler: &mut dyn_comp_dtif::dtif_handler::DtifHandler,
+) {
     use dyn_comp_asset::resources::AssetsRes;
     use dyn_comp_bundles::properties::Viewport;
     use glam::Vec2;
 
-    let mut dtif_injector = dyn_comp_dtif::dtif_injector::DtifInjector::new();
-
     // Load assets
     if let Some(mut asset_db) = world.get_resource_mut::<AssetsRes>() {
-        dtif_injector.load_assets(dtif, asset_db.as_mut());
+        dtif_handler.load_assets(asset_db.as_mut());
     }
 
     // Spawn nodes recursively
-    let maybe_root_node_entity = dtif_injector.inject_from_root(dtif, world);
+    let maybe_root_node_entity = dtif_handler.insert_into_world(world);
     if let Some(root_node_entity) = maybe_root_node_entity {
-        world.insert_resource(CompositionRes {
-            root_nodes: vec![root_node_entity],
-            viewport: dtif.viewport.unwrap_or(Viewport {
-                physical_position: Vec2::default(),
-                physical_size: dtif.size,
-            }),
-            size: dtif.size,
-        })
+        if let Some(dtif) = dtif_handler.get_dtif() {
+            world.insert_resource(CompositionRes {
+                root_nodes: vec![root_node_entity],
+                viewport: dtif.viewport.unwrap_or(Viewport {
+                    physical_position: Vec2::default(),
+                    physical_size: dtif.size,
+                }),
+                size: dtif.size,
+            });
+        }
     }
 }

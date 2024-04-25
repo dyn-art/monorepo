@@ -18,16 +18,18 @@ use dyn_comp_bundles::{
 use smallvec::{smallvec, SmallVec};
 use std::collections::HashMap;
 
-pub struct DtifInjector {
+pub struct DtifHandler {
+    dtif: Option<DtifComposition>,
     /// Maps Ids of type String (sid) from the DTIF to actual spawned Bevy entities.
     sid_to_entity: HashMap<String, Entity>,
     /// Maps Ids of type String (sid) from the DTIF to actual asset id.
     sid_to_asset_id: HashMap<String, AssetId>,
 }
 
-impl DtifInjector {
-    pub fn new() -> Self {
+impl DtifHandler {
+    pub fn new(dtif: DtifComposition) -> Self {
         Self {
+            dtif: Some(dtif),
             sid_to_entity: HashMap::default(),
             sid_to_asset_id: HashMap::default(),
         }
@@ -41,34 +43,43 @@ impl DtifInjector {
         &self.sid_to_asset_id
     }
 
-    pub fn load_assets(&mut self, dtif: &DtifComposition, asset_db: &mut AssetsRes) {
-        for (sid, asset) in &dtif.assets {
-            if let Some(asset_id) = asset_db.insert_asset(asset.clone()) {
-                self.sid_to_asset_id.insert(sid.clone(), asset_id);
+    pub fn get_dtif(&self) -> &Option<DtifComposition> {
+        &self.dtif
+    }
+
+    pub fn load_assets(&mut self, asset_db: &mut AssetsRes) {
+        if let Some(dtif) = &self.dtif {
+            for (sid, asset) in &dtif.assets {
+                if let Some(asset_id) = asset_db.insert_asset(asset.clone()) {
+                    self.sid_to_asset_id.insert(sid.clone(), asset_id);
+                }
             }
         }
     }
 
-    pub fn inject_from_root(
-        &mut self,
-        dtif: &DtifComposition,
-        world: &mut World,
-    ) -> Option<Entity> {
-        // Process paints (before nodes as nodes can reference paint sid's)
-        self.process_paints(dtif, world);
+    pub fn insert_into_world(&mut self, world: &mut World) -> Option<Entity> {
+        // Temporarily take dtif to adhere to Rust's borrowing rules
+        if let Some(dtif) = self.dtif.take() {
+            // Insert paints (before nodes as nodes can reference paint sid's)
+            self.insert_paints(&dtif, world);
 
-        // Process nodes starting from the root
-        let maybe_root_node_entity = self.process_node(dtif.root_node_id.clone(), dtif, world);
+            // Recursively insert nodes starting from the root
+            let maybe_root_node_entity =
+                self.insert_node_recursive(dtif.root_node_id.clone(), &dtif, world);
+            if let Some(root_node_entity) = maybe_root_node_entity {
+                world.entity_mut(root_node_entity).insert(Root);
+            }
 
-        if let Some(root_node_entity) = maybe_root_node_entity {
-            world.entity_mut(root_node_entity).insert(Root);
-            self.inject_input_events(&dtif.events, world);
+            // Insert events
+            self.send_input_events_into_world(&dtif.events, world);
+
+            self.dtif = Some(dtif);
+            return maybe_root_node_entity;
         }
-
-        return maybe_root_node_entity;
+        return None;
     }
 
-    fn process_node(
+    fn insert_node_recursive(
         &mut self,
         node_sid: String,
         dtif: &DtifComposition,
@@ -78,8 +89,8 @@ impl DtifInjector {
             let node_entity = self.spawn_node(node, world).id();
             self.sid_to_entity.insert(node_sid, node_entity);
 
-            self.process_node_styles(node_entity, node, world);
-            self.process_node_children(node_entity, node, dtif, world);
+            self.insert_node_styles(node_entity, node, world);
+            self.insert_node_children(node_entity, node, dtif, world);
 
             return node_entity;
         })
@@ -98,7 +109,7 @@ impl DtifInjector {
         }
     }
 
-    fn process_node_children(
+    fn insert_node_children(
         &mut self,
         node_entity: Entity,
         node: &Node,
@@ -114,7 +125,7 @@ impl DtifInjector {
         // Process child nodes and collect their Bevy entity ids
         let child_entities: Vec<Entity> = dtif_children
             .iter()
-            .filter_map(|child_sid| self.process_node(child_sid.clone(), dtif, world))
+            .filter_map(|child_sid| self.insert_node_recursive(child_sid.clone(), dtif, world))
             .collect();
 
         // Establish Bevy parent-child relationships
@@ -123,7 +134,7 @@ impl DtifInjector {
         }
     }
 
-    fn process_node_styles(&mut self, node_entity: Entity, node: &Node, world: &mut World) {
+    fn insert_node_styles(&mut self, node_entity: Entity, node: &Node, world: &mut World) {
         let dtif_styles = match node {
             Node::Frame(node) => &node.styles,
             Node::Rectangle(node) => &node.styles,
@@ -138,7 +149,7 @@ impl DtifInjector {
         // Process styles and collect their Bevy entity ids
         let style_entities: SmallVec<[Entity; 2]> = dtif_styles
             .iter()
-            .filter_map(|style| self.process_style(style, node_entity, world))
+            .filter_map(|style| self.insert_style(style, node_entity, world))
             .collect();
 
         // Establish Bevy parent-child relationship between node and style
@@ -149,7 +160,7 @@ impl DtifInjector {
         }
     }
 
-    fn process_style(
+    fn insert_style(
         &self,
         style: &Style,
         node_entity: Entity,
@@ -186,7 +197,7 @@ impl DtifInjector {
         }
     }
 
-    fn process_paints(&mut self, dtif: &DtifComposition, world: &mut World) {
+    fn insert_paints(&mut self, dtif: &DtifComposition, world: &mut World) {
         for (id, paint) in dtif.paints.iter() {
             let paint_entity = self.spawn_paint(&paint, world).id();
             self.sid_to_entity.insert(id.clone(), paint_entity);
@@ -201,7 +212,7 @@ impl DtifInjector {
         }
     }
 
-    fn inject_input_events(&self, events: &Vec<DtifInputEvent>, world: &mut World) {
+    fn send_input_events_into_world(&self, events: &Vec<DtifInputEvent>, world: &mut World) {
         events
             .iter()
             .cloned()

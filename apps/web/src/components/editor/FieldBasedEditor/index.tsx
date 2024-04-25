@@ -48,7 +48,8 @@ export const FieldBasedEditor: React.FC<TFieldBasedEditorProps> = (props) => {
 
 											for (const processedAction of processedActions) {
 												if (processedAction.resolved) {
-													// composition.emitInputEvents('Composition', processedAction.events);
+													composition.emitInputEvents('Dtif', processedAction.events);
+													composition.update();
 												}
 											}
 										}}
