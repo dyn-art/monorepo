@@ -1,6 +1,5 @@
 use crate::{
-    conversion::string_to_tiny_skia_path, dtif_injector::DtifInjector, styles::Style,
-    SpawnBundleImpl,
+    conversion::string_to_tiny_skia_path, dtif_handler::DtifHandler, styles::Style, SpawnBundleImpl,
 };
 use bevy_ecs::world::{EntityWorldMut, World};
 use bevy_transform::{components::Transform, TransformBundle};
@@ -11,7 +10,7 @@ use dyn_comp_bundles::{
         mixins::{
             BlendMode, BlendModeMixin, Constraints, ConstraintsMixin, CornerRadiiMixin,
             GroupConstraints, GroupConstraintsMixin, OpacityMixin, PathMixin, SizeMixin,
-            VisibilityMixin,
+            VisibilityMixin, WindingRule,
         },
         nodes::{
             CompNode, CompNodeVariant, EllipseArcData, EllipseCompNode, FrameCompNode,
@@ -94,7 +93,7 @@ impl FrameNode {
 }
 
 impl SpawnBundleImpl for FrameNode {
-    fn spawn<'a>(&self, _: &DtifInjector, world: &'a mut World) -> EntityWorldMut<'a> {
+    fn spawn<'a>(&self, _: &DtifHandler, world: &'a mut World) -> EntityWorldMut<'a> {
         world.spawn(self.to_ecs_bundle())
     }
 }
@@ -151,7 +150,7 @@ impl GroupNode {
 }
 
 impl SpawnBundleImpl for GroupNode {
-    fn spawn<'a>(&self, _: &DtifInjector, world: &'a mut World) -> EntityWorldMut<'a> {
+    fn spawn<'a>(&self, _: &DtifHandler, world: &'a mut World) -> EntityWorldMut<'a> {
         let mut entity_world = world.spawn(self.to_ecs_bundle());
         entity_world.insert(StaleTransform);
         entity_world.insert(StaleSize);
@@ -204,7 +203,7 @@ impl RectangleNode {
 }
 
 impl SpawnBundleImpl for RectangleNode {
-    fn spawn<'a>(&self, _: &DtifInjector, world: &'a mut World) -> EntityWorldMut<'a> {
+    fn spawn<'a>(&self, _: &DtifHandler, world: &'a mut World) -> EntityWorldMut<'a> {
         world.spawn(self.to_ecs_bundle())
     }
 }
@@ -263,7 +262,7 @@ impl EllipseNode {
 }
 
 impl SpawnBundleImpl for EllipseNode {
-    fn spawn<'a>(&self, _: &DtifInjector, world: &'a mut World) -> EntityWorldMut<'a> {
+    fn spawn<'a>(&self, _: &DtifHandler, world: &'a mut World) -> EntityWorldMut<'a> {
         world.spawn(self.to_ecs_bundle())
     }
 }
@@ -317,7 +316,7 @@ impl StarNode {
 }
 
 impl SpawnBundleImpl for StarNode {
-    fn spawn<'a>(&self, _: &DtifInjector, world: &'a mut World) -> EntityWorldMut<'a> {
+    fn spawn<'a>(&self, _: &DtifHandler, world: &'a mut World) -> EntityWorldMut<'a> {
         world.spawn(self.to_ecs_bundle())
     }
 }
@@ -373,7 +372,7 @@ impl PolygonNode {
 }
 
 impl SpawnBundleImpl for PolygonNode {
-    fn spawn<'a>(&self, _: &DtifInjector, world: &'a mut World) -> EntityWorldMut<'a> {
+    fn spawn<'a>(&self, _: &DtifHandler, world: &'a mut World) -> EntityWorldMut<'a> {
         world.spawn(self.to_ecs_bundle())
     }
 }
@@ -439,7 +438,7 @@ impl TextNode {
 }
 
 impl SpawnBundleImpl for TextNode {
-    fn spawn<'a>(&self, _: &DtifInjector, world: &'a mut World) -> EntityWorldMut<'a> {
+    fn spawn<'a>(&self, _: &DtifHandler, world: &'a mut World) -> EntityWorldMut<'a> {
         world.spawn(self.to_ecs_bundle())
     }
 }
@@ -448,6 +447,8 @@ impl SpawnBundleImpl for TextNode {
 #[serde(rename_all = "camelCase")]
 pub struct VectorNode {
     path: String,
+    #[serde(default)]
+    winding_rule: WindingRule,
     #[serde(default)]
     pub translation: Vec2,
     #[serde(default)]
@@ -471,7 +472,10 @@ impl VectorNode {
             node: CompNode {
                 variant: CompNodeVariant::Vector,
             },
-            path: PathMixin(string_to_tiny_skia_path(&self.path).unwrap()),
+            path: PathMixin {
+                path: string_to_tiny_skia_path(&self.path).unwrap(),
+                winding_rule: self.winding_rule,
+            },
             vector: VectorCompNode,
             transform: TransformBundle::from_transform(Transform {
                 translation: self.translation.extend(0.0),
@@ -488,7 +492,7 @@ impl VectorNode {
 }
 
 impl SpawnBundleImpl for VectorNode {
-    fn spawn<'a>(&self, _: &DtifInjector, world: &'a mut World) -> EntityWorldMut<'a> {
+    fn spawn<'a>(&self, _: &DtifHandler, world: &'a mut World) -> EntityWorldMut<'a> {
         world.spawn(self.to_ecs_bundle())
     }
 }

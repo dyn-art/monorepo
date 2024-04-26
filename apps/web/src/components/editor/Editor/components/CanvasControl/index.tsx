@@ -17,6 +17,10 @@ export const CanvasControl: React.FC<TProps> = (props) => {
 			id="canvas-control"
 			overflow="visible"
 			viewBox={`0 0 ${composition.size[0]} ${composition.size[1]}`}
+			// Note: Not applying the viewbox of the canvas
+			// because we wan't the canvas control elements
+			// remain a consistent size no matter the zoom
+			// viewBox={`${composition.viewport.physicalPosition[0]} ${composition.viewport.physicalPosition[1]} ${composition.viewport.physicalSize[0]} ${composition.viewport.physicalSize[1]}`}
 			width={composition.size[0]}
 		>
 			<defs>
@@ -32,36 +36,32 @@ export const CanvasControl: React.FC<TProps> = (props) => {
 							entity={selectedEntity}
 							key={selectedEntity}
 							onResizeHandlePointerDown={(corner, initialBounds, rotationDeg) => {
-								composition.emitInputEvent({
-									type: 'Interaction',
-									event: {
-										type: 'CursorDownOnResizeHandle',
-										corner,
-										initialBounds,
-										rotationRad: rotationDeg * (Math.PI / 180)
-									}
+								composition.emitInputEvent('Interaction', {
+									type: 'CursorDownOnResizeHandle',
+									corner,
+									initialBounds,
+									rotationRad: rotationDeg * (Math.PI / 180)
 								});
 							}}
 							onResizeHandlePointerUp={(position) => {
-								composition.emitInputEvent({
-									type: 'Interaction',
-									event: { type: 'CursorUpOnComposition', position, button: 'Left' }
+								composition.emitInputEvent('Interaction', {
+									type: 'CursorUpOnComposition',
+									position,
+									button: 'Left'
 								});
 							}}
 							onRotateHandlePointerDown={(corner, rotationDeg) => {
-								composition.emitInputEvent({
-									type: 'Interaction',
-									event: {
-										type: 'CursorDownOnRotateHandle',
-										corner,
-										initialRotationRad: rotationDeg * (Math.PI / 180)
-									}
+								composition.emitInputEvent('Interaction', {
+									type: 'CursorDownOnRotateHandle',
+									corner,
+									initialRotationRad: rotationDeg * (Math.PI / 180)
 								});
 							}}
 							onRotateHandlePointerUp={(position) => {
-								composition.emitInputEvent({
-									type: 'Interaction',
-									event: { type: 'CursorUpOnComposition', position, button: 'Left' }
+								composition.emitInputEvent('Interaction', {
+									type: 'CursorUpOnComposition',
+									position,
+									button: 'Left'
 								});
 							}}
 						/>

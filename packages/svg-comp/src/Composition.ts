@@ -1,11 +1,14 @@
 import { shortId } from '@dyn/utils';
 import { SvgCompHandle } from '@/rust/dyn-svg-comp-api';
 import type {
+	CompCoreInputEvent,
 	ComponentChange,
 	CompositionChangeOutputEvent,
 	CursorChangeOutputEvent,
 	DtifComposition,
+	DtifInputEvent,
 	Entity,
+	InteractionInputEvent,
 	InteractionModeChangeOutputEvent,
 	InteractionToolChangeOutputEvent,
 	SelectionChangeOutputEvent,
@@ -172,11 +175,15 @@ export class Composition {
 		};
 	}
 
-	public emitInputEvent(event: SvgCompInputEvent, debounce = true): void {
-		this._inputEventQueue.push(event);
+	public emitInputEvent<GEventType extends keyof TInputEventTypeMap>(
+		eventType: GEventType,
+		event: TInputEventTypeMap[GEventType],
+		debounce = true
+	): void {
+		this._inputEventQueue.push({ type: eventType, event } as SvgCompInputEvent);
 
 		// Delay update call, resetting timer on new events within debounceDelay
-		if (event.type === 'Interaction' && this.renderer?.isCallbackBased) {
+		if (eventType === 'Interaction' && this.renderer?.isCallbackBased) {
 			if (this.debounceTimeout != null) {
 				clearTimeout(this.debounceTimeout);
 			}
@@ -190,9 +197,13 @@ export class Composition {
 		}
 	}
 
-	public emitInputEvents(events: SvgCompInputEvent[], debounce = true): void {
+	public emitInputEvents<GEventType extends keyof TInputEventTypeMap>(
+		eventType: GEventType,
+		events: TInputEventTypeMap[GEventType][],
+		debounce = true
+	): void {
 		for (const event of events) {
-			this.emitInputEvent(event, debounce);
+			this.emitInputEvent(eventType, event, debounce);
 		}
 	}
 
@@ -220,6 +231,12 @@ export class Composition {
 export interface TCompositionConfig {
 	dtif: DtifComposition;
 	interactive?: boolean;
+}
+
+export interface TInputEventTypeMap {
+	Composition: CompCoreInputEvent;
+	Interaction: InteractionInputEvent;
+	Dtif: DtifInputEvent;
 }
 
 export interface TOutputEventTypeMap {

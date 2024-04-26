@@ -4,7 +4,7 @@ use bevy_ecs::{
     system::{Commands, Query},
 };
 use dyn_comp_bundles::components::{
-    mixins::{PathMixin, SizeMixin},
+    mixins::{PathMixin, SizeMixin, WindingRule},
     nodes::PolygonCompNode,
 };
 use std::f32::consts::PI;
@@ -46,7 +46,10 @@ pub fn outline_polygon(
 
         // Insert or update the PathMixin component for the entity
         if let Some(path) = path_builder.finish() {
-            commands.entity(entity).insert(PathMixin(path));
+            commands.entity(entity).insert(PathMixin {
+                path,
+                winding_rule: WindingRule::Nonzero,
+            });
         }
     }
 }

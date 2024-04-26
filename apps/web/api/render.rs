@@ -2,8 +2,10 @@ use bevy_app::App;
 use bevy_ecs::query::{With, Without};
 use dyn_comp_asset::asset::AssetContent;
 use dyn_comp_bundles::components::marker::Root;
-use dyn_comp_core::{resources::composition::CompositionRes, CompCorePlugin};
-use dyn_comp_dtif::DtifComposition;
+use dyn_comp_core::{
+    insert_dtif_into_world, resources::composition::CompositionRes, CompCorePlugin,
+};
+use dyn_comp_dtif::{dtif_handler::DtifHandler, DtifComposition};
 use dyn_comp_svg_builder::{svg::svg_bundle::SvgBundleVariant, CompSvgBuilderPlugin};
 use dyn_web_api::{
     app_error,
@@ -134,9 +136,11 @@ async fn prepare_dtif_composition(
 
 fn build_svg_string(dtif: DtifComposition) -> Result<String, AppError> {
     let mut app = App::new();
+    let mut dtif_handler = DtifHandler::new(dtif);
 
     // Register plugins
-    app.add_plugins((CompCorePlugin { dtif }, CompSvgBuilderPlugin {}));
+    app.add_plugins((CompCorePlugin {}, CompSvgBuilderPlugin {}));
+    insert_dtif_into_world(&mut app.world, &mut dtif_handler);
 
     // Update app once
     app.update();

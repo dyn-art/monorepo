@@ -1,3 +1,4 @@
 export * from './comp';
-export * from './helper';
+export * from './dtif';
+export * from './mdtif';
 export * from './utils';

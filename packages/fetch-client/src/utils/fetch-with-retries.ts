@@ -1,5 +1,6 @@
 import { sleep } from '@dyn/utils';
 
+// TODO: Resolve retries with middleware! so make them optional
 export async function fetchWithRetries(
 	url: URL | string,
 	options: {

@@ -8,11 +8,11 @@ use bevy_ecs::schedule::{IntoSystemConfigs, IntoSystemSetConfigs, SystemSet};
 use resources::svg_context::SvgContextRes;
 use systems::{
     apply::{
-        apply_blend_mode_mixin_changes, apply_drop_shadow_changes, apply_gradient_paint_changes,
-        apply_image_asset_mixin_changes, apply_image_paint_changes, apply_node_children_changes,
-        apply_node_styles_changes, apply_opacity_mixin_changes, apply_path_mixin_changes,
-        apply_size_mixin_changes, apply_solid_paint_changes, apply_stroke_path_mixin_changes,
-        apply_transform_changes, apply_visibility_mixin_changes,
+        apply_blend_mode_mixin_changes, apply_clip_content_changes, apply_drop_shadow_changes,
+        apply_gradient_paint_changes, apply_image_asset_mixin_changes, apply_image_paint_changes,
+        apply_node_children_changes, apply_node_styles_changes, apply_opacity_mixin_changes,
+        apply_path_mixin_changes, apply_size_mixin_changes, apply_solid_paint_changes,
+        apply_stroke_path_mixin_changes, apply_transform_changes, apply_visibility_mixin_changes,
     },
     prepare::{insert_node_svg_bundle, insert_style_svg_bundle, propagate_size_mixin_to_style},
 };
@@ -71,6 +71,7 @@ impl Plugin for CompSvgBuilderPlugin {
                 apply_transform_changes.in_set(CompSvgBuilderSystemSet::Apply),
                 apply_opacity_mixin_changes.in_set(CompSvgBuilderSystemSet::Apply),
                 apply_blend_mode_mixin_changes.in_set(CompSvgBuilderSystemSet::Apply),
+                apply_clip_content_changes.in_set(CompSvgBuilderSystemSet::Apply),
                 apply_path_mixin_changes.in_set(CompSvgBuilderSystemSet::Apply),
                 apply_stroke_path_mixin_changes.in_set(CompSvgBuilderSystemSet::Apply),
                 apply_solid_paint_changes.in_set(CompSvgBuilderSystemSet::Apply),

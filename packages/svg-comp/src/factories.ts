@@ -10,11 +10,14 @@ export function createComposition(config: TCompositionConfig): Composition {
 export function createSvgComposition(config: TSvgCompositionConfig): Composition {
 	const { renderer: renderOptions = {}, ...compositionConfig } = config;
 	const composition = new Composition(compositionConfig);
-	composition.renderer = new SvgRenderer(composition, renderOptions);
+	composition.renderer = new SvgRenderer(composition, {
+		...renderOptions,
+		interactive: compositionConfig.interactive
+	});
 	composition.update(); // Inital update to sync viewport, ..
 	return composition;
 }
 
 type TSvgCompositionConfig = {
-	renderer?: TsvgRendererOptions;
+	renderer?: Omit<TsvgRendererOptions, 'interactive'>;
 } & TCompositionConfig;

@@ -1,4 +1,4 @@
-use crate::{dtif_injector::DtifInjector, SpawnBundleImpl};
+use crate::{dtif_handler::DtifHandler, SpawnBundleImpl};
 use bevy_ecs::world::{EntityWorldMut, World};
 use dyn_comp_bundles::{
     components::{
@@ -37,7 +37,7 @@ pub struct FillStyle {
 }
 
 impl FillStyle {
-    fn to_ecs_bundle(&self, dtif_injector: &DtifInjector) -> FillStyleBundle {
+    fn to_ecs_bundle(&self, dtif_injector: &DtifHandler) -> FillStyleBundle {
         FillStyleBundle {
             style: CompStyle {
                 variant: CompStyleVariant::Fill,
@@ -57,7 +57,7 @@ impl FillStyle {
 }
 
 impl SpawnBundleImpl for FillStyle {
-    fn spawn<'a>(&self, dtif_injector: &DtifInjector, world: &'a mut World) -> EntityWorldMut<'a> {
+    fn spawn<'a>(&self, dtif_injector: &DtifHandler, world: &'a mut World) -> EntityWorldMut<'a> {
         world.spawn(self.to_ecs_bundle(dtif_injector))
     }
 }
@@ -76,7 +76,7 @@ pub struct StrokeStyle {
 }
 
 impl StrokeStyle {
-    fn to_ecs_bundle(&self, dtif_injector: &DtifInjector) -> StrokeStyleBundle {
+    fn to_ecs_bundle(&self, dtif_injector: &DtifHandler) -> StrokeStyleBundle {
         StrokeStyleBundle {
             style: CompStyle {
                 variant: CompStyleVariant::Stroke,
@@ -101,7 +101,7 @@ impl StrokeStyle {
 }
 
 impl SpawnBundleImpl for StrokeStyle {
-    fn spawn<'a>(&self, dtif_injector: &DtifInjector, world: &'a mut World) -> EntityWorldMut<'a> {
+    fn spawn<'a>(&self, dtif_injector: &DtifHandler, world: &'a mut World) -> EntityWorldMut<'a> {
         world.spawn(self.to_ecs_bundle(dtif_injector))
     }
 }
@@ -124,7 +124,7 @@ pub struct DropShadowStyle {
 }
 
 impl DropShadowStyle {
-    fn to_ecs_bundle(&self, _: &DtifInjector) -> DropShadowStyleBundle {
+    fn to_ecs_bundle(&self, _: &DtifHandler) -> DropShadowStyleBundle {
         DropShadowStyleBundle {
             style: CompStyle {
                 variant: CompStyleVariant::DropShadow,
@@ -143,7 +143,7 @@ impl DropShadowStyle {
 }
 
 impl SpawnBundleImpl for DropShadowStyle {
-    fn spawn<'a>(&self, dtif_injector: &DtifInjector, world: &'a mut World) -> EntityWorldMut<'a> {
+    fn spawn<'a>(&self, dtif_injector: &DtifHandler, world: &'a mut World) -> EntityWorldMut<'a> {
         world.spawn(self.to_ecs_bundle(dtif_injector))
     }
 }

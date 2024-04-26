@@ -8,7 +8,7 @@ use dyn_attributed_string::{
 };
 use dyn_comp_asset::resources::AssetsRes;
 use dyn_comp_bundles::components::{
-    mixins::{AttributedStringMixin, PathMixin, SizeMixin},
+    mixins::{AttributedStringMixin, PathMixin, SizeMixin, WindingRule},
     nodes::TextCompNode,
 };
 
@@ -46,7 +46,10 @@ pub fn outline_text_from_scratch(
         // Insert or update the PathMixin and AttributedStringMixin component for the entity
         let mut entity_commands = commands.entity(entity);
         if let Some(path) = maybe_path {
-            entity_commands.insert(PathMixin(path));
+            entity_commands.insert(PathMixin {
+                path,
+                winding_rule: WindingRule::Nonzero,
+            });
         }
         entity_commands.insert(AttributedStringMixin(attributed_string));
     }
@@ -66,7 +69,10 @@ pub fn outline_text_on_size_change(
 
         // Insert or update the PathMixin component for the entity
         if let Some(path) = maybe_path {
-            commands.entity(entity).insert(PathMixin(path));
+            commands.entity(entity).insert(PathMixin {
+                path,
+                winding_rule: WindingRule::Nonzero,
+            });
         }
     }
 }
@@ -88,7 +94,10 @@ pub fn outline_text_on_node_change(
 
         // Insert or update the PathMixin component for the entity
         if let Some(path) = maybe_path {
-            commands.entity(entity).insert(PathMixin(path));
+            commands.entity(entity).insert(PathMixin {
+                path,
+                winding_rule: WindingRule::Nonzero,
+            });
         }
     }
 }

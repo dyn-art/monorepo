@@ -6,7 +6,7 @@ use bevy_ecs::{
     system::{Commands, Query},
 };
 use dyn_comp_bundles::components::{
-    mixins::{PathMixin, StrokePathMixin, StyleChildrenMixin, StyleParentMixin},
+    mixins::{PathMixin, StrokePathMixin, StyleChildrenMixin, StyleParentMixin, WindingRule},
     styles::StrokeCompStyle,
 };
 use tiny_skia_path::PathStroker;
@@ -17,27 +17,28 @@ pub fn stroke_path_system(
         (Entity, &StrokeCompStyle, Option<&StyleParentMixin>),
         Changed<StrokeCompStyle>,
     >,
-    path_query: Query<(Entity, &PathMixin, Option<&StyleChildrenMixin>), Changed<PathMixin>>,
+    path_query: Query<(&PathMixin, Option<&StyleChildrenMixin>), Changed<PathMixin>>,
     stroke_style_query: Query<&StrokeCompStyle>,
 ) {
     let mut processed_entities: HashSet<Entity> = HashSet::new();
 
     // Handle stroke style changes
     for (entity, stroke_style, maybe_style_parent_mixin) in stroke_query.iter() {
-        if let Some(StyleParentMixin(parent_entity)) = maybe_style_parent_mixin {
-            if let Ok((_, PathMixin(path), _)) = path_query.get(*parent_entity) {
-                stroke_path(&mut commands, entity, path, stroke_style);
+        if processed_entities.insert(entity) {
+            if let Some(StyleParentMixin(parent_entity)) = maybe_style_parent_mixin {
+                if let Ok((PathMixin { path, .. }, _)) = path_query.get(*parent_entity) {
+                    stroke_path(&mut commands, entity, path, stroke_style);
+                }
             }
         }
     }
 
     // Handle path changes
-    for (entity, PathMixin(path), maybe_style_children_mixin) in path_query.iter() {
+    for (PathMixin { path, .. }, maybe_style_children_mixin) in path_query.iter() {
         if let Some(StyleChildrenMixin(style_entities)) = maybe_style_children_mixin {
             for style_entity in style_entities.iter() {
-                if let Ok(stroke_style) = stroke_style_query.get(*style_entity) {
-                    // Check if entity has not been processed before
-                    if processed_entities.insert(*style_entity) {
+                if processed_entities.insert(*style_entity) {
+                    if let Ok(stroke_style) = stroke_style_query.get(*style_entity) {
                         stroke_path(&mut commands, *style_entity, path, stroke_style);
                     }
                 }
@@ -54,6 +55,9 @@ fn stroke_path(
 ) {
     let mut stroker = PathStroker::new();
     if let Some(stroke_path) = stroker.stroke(path, &stroke_style.stroke, 1.0) {
-        commands.entity(entity).insert(StrokePathMixin(stroke_path));
+        commands.entity(entity).insert(StrokePathMixin {
+            path: stroke_path,
+            winding_rule: WindingRule::Nonzero,
+        });
     }
 }

@@ -1,4 +1,5 @@
 import { toKeyCode, toMouseButton } from '@dyn/dtif-comp';
+import { shortId } from '@dyn/utils';
 import type {
 	CompositionChangeOutputEvent,
 	SvgElementChangesOutputEvent,
@@ -14,151 +15,142 @@ export const NS = 'http://www.w3.org/2000/svg';
 export const XLINK = 'http://www.w3.org/1999/xlink';
 
 export class SvgRenderer extends Renderer {
-	private _domElement: Element;
+	private _domElement: HTMLElement;
 	private _svgElement: SVGElement;
+	private _svgElementId: string;
 
 	private _svgElementMap = new Map<SvgElementId, SVGElement>();
 
 	private _cursorInCompBounds = false;
 
 	constructor(composition: Composition, options: TsvgRendererOptions = {}) {
-		super(composition, options.callbackBased ?? true);
+		super(composition, options.callbackBased ?? true, options.interactive ?? false);
 		const { domElement = document.body } = options;
 		this._domElement = domElement;
+		this._svgElementId = `svg-canvas_${shortId()}`;
 
 		// Create SVG root
 		this._svgElement = document.createElementNS(NS, 'svg');
 		this._svgElement.setAttribute('version', VERSION);
-		this._svgElement.setAttribute('id', 'svg-canvas');
+		this._svgElement.setAttribute('id', this._svgElementId);
 		this._svgElement.style.setProperty('overflow', 'hidden');
-		// this._svgElement.style.setProperty('pointer-events', 'none');
+		this._svgElement.style.setProperty('pointer-events', 'none');
 		this._domElement.appendChild(this._svgElement);
 
-		// Register SVG root callbacks
-		this._svgElement.addEventListener('pointermove', (e) => {
-			e.preventDefault();
-			this.composition.emitInputEvent(
-				{
-					type: 'Interaction',
-					event: {
+		// Register callbacks
+		// Note: To prevent blocking composition events, non-blocking elements
+		// like SelectionBox should be direct children of _domElement.
+		// We attach event listeners to the parent, not the SVG directly, to allow
+		// event propagation from sibling nodes (like the SelectionBox).
+		if (this.isInteractive) {
+			this._domElement.addEventListener('pointermove', (e) => {
+				e.preventDefault();
+				this.composition.emitInputEvent(
+					'Interaction',
+					{
 						type: 'CursorMovedOnComposition',
 						position: this.pointerEventToCompPoint(e)
-					}
-				},
-				false
-			);
-		});
-		this._svgElement.addEventListener('wheel', (e) => {
-			e.preventDefault();
-			this.composition.emitInputEvent(
-				{
-					type: 'Interaction',
-					event: {
+					},
+					false
+				);
+			});
+			this._domElement.addEventListener('wheel', (e) => {
+				this.composition.emitInputEvent(
+					'Interaction',
+					{
 						type: 'MouseWheeledOnComposition',
 						position: this.clientWindowPointToCompPoint([e.clientX, e.clientY]),
 						delta: [e.deltaX, e.deltaY]
-					}
-				},
-				false
-			);
-		});
-		this._svgElement.addEventListener('pointerdown', (e) => {
-			e.preventDefault();
-			this.composition.emitInputEvent(
-				{
-					type: 'Interaction',
-					event: {
+					},
+					false
+				);
+			});
+			this._domElement.addEventListener('pointerdown', (e) => {
+				e.preventDefault();
+				this.composition.emitInputEvent(
+					'Interaction',
+					{
 						type: 'CursorDownOnComposition',
 						position: this.pointerEventToCompPoint(e),
 						button: toMouseButton(e.button)
-					}
-				},
-				true
-			);
-		});
-		this._svgElement.addEventListener('pointerup', (e) => {
-			e.preventDefault();
-			this.composition.emitInputEvent(
-				{
-					type: 'Interaction',
-					event: {
+					},
+					true
+				);
+			});
+			this._domElement.addEventListener('pointerup', (e) => {
+				e.preventDefault();
+				this.composition.emitInputEvent(
+					'Interaction',
+					{
 						type: 'CursorUpOnComposition',
 						position: this.pointerEventToCompPoint(e),
 						button: toMouseButton(e.button)
-					}
-				},
-				true
-			);
-		});
-		this._svgElement.addEventListener('pointerenter', (e) => {
-			e.preventDefault();
-			if (!this._cursorInCompBounds) {
-				this.composition.emitInputEvent(
-					{
-						type: 'Interaction',
-						event: {
-							type: 'CursorEnteredComposition'
-						}
 					},
-					false
+					true
 				);
-				this._cursorInCompBounds = true;
-			}
-		});
-		this._svgElement.addEventListener('pointerleave', (e) => {
-			e.preventDefault();
-			const compPoint = this.pointerEventToCompPoint(e);
-			// Check whether cursor actually left composition
-			// or whether its just on some UI layer like the selection box
-			if (
-				this._cursorInCompBounds &&
-				(compPoint[0] < 0 ||
-					compPoint[0] > this.composition.size[0] ||
-					compPoint[1] < 0 ||
-					compPoint[1] > this.composition.size[1])
-			) {
-				this.composition.emitInputEvent(
-					{
-						type: 'Interaction',
-						event: {
-							type: 'CursorExitedComposition'
-						}
-					},
-					false
-				);
-				this._cursorInCompBounds = false;
-			}
-		});
-		window.addEventListener('keydown', (e) => {
-			if (this._cursorInCompBounds) {
+			});
+			this._domElement.addEventListener('pointerenter', (e) => {
 				e.preventDefault();
-				this.composition.emitInputEvent(
-					{
-						type: 'Interaction',
-						event: {
+				if (!this._cursorInCompBounds) {
+					this.composition.emitInputEvent(
+						'Interaction',
+						{
+							type: 'CursorEnteredComposition'
+						},
+						false
+					);
+					this._cursorInCompBounds = true;
+				}
+			});
+			this._domElement.addEventListener('pointerleave', (e) => {
+				e.preventDefault();
+				const compPoint = this.pointerEventToCompPoint(e);
+				// Check whether cursor actually left composition
+				// or whether its just on some UI layer like the selection box
+				if (
+					this._cursorInCompBounds &&
+					(compPoint[0] < 0 ||
+						compPoint[0] > this.composition.size[0] ||
+						compPoint[1] < 0 ||
+						compPoint[1] > this.composition.size[1])
+				) {
+					this.composition.emitInputEvent(
+						'Interaction',
+						{
+							type: 'CursorExitedComposition'
+						},
+						false
+					);
+					this._cursorInCompBounds = false;
+				}
+			});
+			window.addEventListener('keydown', (e) => {
+				if (this._cursorInCompBounds) {
+					e.preventDefault();
+					this.composition.emitInputEvent(
+						'Interaction',
+						{
 							type: 'KeyDownOnComposition',
 							keyCode: toKeyCode(e.code)
-						}
-					},
-					true
-				);
-			}
-		});
-		window.addEventListener('keyup', (e) => {
-			if (this._cursorInCompBounds) {
-				e.preventDefault();
-				this.composition.emitInputEvent(
-					{
-						type: 'Interaction',
-						event: {
+						},
+						true
+					);
+				}
+			});
+			window.addEventListener('keyup', (e) => {
+				if (this._cursorInCompBounds) {
+					e.preventDefault();
+					this.composition.emitInputEvent(
+						'Interaction',
+						{
 							type: 'KeyUpOnComposition',
 							keyCode: toKeyCode(e.code)
-						}
-					},
-					true
-				);
-			}
-		});
+						},
+						true
+					);
+				}
+			});
+		}
 	}
 
 	public applyElementChanges(event: SvgElementChangesOutputEvent): void {
@@ -186,20 +178,19 @@ export class SvgRenderer extends Renderer {
 					}
 
 					// Register callbacks
-					const entity = change.entity;
-					if (entity != null) {
-						newElement.addEventListener('pointerdown', (e) => {
-							e.preventDefault();
-							this.composition.emitInputEvent({
-								type: 'Interaction',
-								event: {
+					if (this.isInteractive) {
+						const entity = change.entity;
+						if (entity != null) {
+							newElement.addEventListener('pointerdown', (e) => {
+								e.preventDefault();
+								this.composition.emitInputEvent('Interaction', {
 									type: 'CursorDownOnEntity',
 									entity,
 									position: this.pointerEventToCompPoint(e),
 									button: toMouseButton(e.button)
-								}
+								});
 							});
-						});
+						}
 					}
 
 					// Append element to parent
@@ -317,8 +308,9 @@ export class SvgRenderer extends Renderer {
 
 	public clear(): void {
 		this._svgElementMap.clear();
-		while (this._domElement.firstChild) {
-			this._domElement.removeChild(this._domElement.firstChild);
+		const svgElement = document.getElementById(this._svgElementId);
+		if (svgElement != null) {
+			this._domElement.removeChild(svgElement);
 		}
 	}
 
@@ -333,6 +325,7 @@ export class SvgRenderer extends Renderer {
 }
 
 export interface TsvgRendererOptions {
-	domElement?: Element;
+	domElement?: HTMLElement;
 	callbackBased?: boolean;
+	interactive?: boolean;
 }

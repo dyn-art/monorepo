@@ -3,10 +3,13 @@ use bevy_ecs::{
     query::{Changed, Or},
     system::{Commands, Query},
 };
-use dyn_comp_bundles::components::mixins::{CornerRadiiMixin, PathMixin, SizeMixin};
+use dyn_comp_bundles::components::mixins::{CornerRadiiMixin, PathMixin, SizeMixin, WindingRule};
 use tiny_skia_path::PathBuilder;
 
-// TODO: Doesn't seem to work
+// TODO: Round corner for all shapes
+// https://plnkr.co/edit/kGnGGyoOCKil02k04snu
+
+// https://stackoverflow.com/questions/10177985/svg-rounded-corner
 pub fn outline_rectangle(
     mut commands: Commands,
     query: Query<
@@ -68,7 +71,10 @@ pub fn outline_rectangle(
 
         // Insert or update the PathMixin component for the entity
         if let Some(path) = path_builder.finish() {
-            commands.entity(entity).insert(PathMixin(path));
+            commands.entity(entity).insert(PathMixin {
+                path,
+                winding_rule: WindingRule::Nonzero,
+            });
         }
     }
 }

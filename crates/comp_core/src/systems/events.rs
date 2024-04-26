@@ -8,16 +8,21 @@ use bevy_ecs::{
 use bevy_hierarchy::{BuildChildren, Children, DespawnRecursiveExt};
 use bevy_transform::components::Transform;
 use dyn_comp_bundles::{
-    components::{marker::Removed, mixins::SizeMixin},
+    components::{
+        marker::{Removed, Root},
+        mixins::SizeMixin,
+        nodes::CompNode,
+    },
     events::{
         CompositionResizedInputEvent, CompositionViewportChangedInputEvent,
         EntityDeletedInputEvent, EntityMovedInputEvent, EntitySetPositionInputEvent,
-        EntitySetRotationInputEvent,
+        EntitySetRotationInputEvent, FocusRootNodesInputEvent,
     },
+    properties::Viewport,
     utils::transform_to_z_rotation_rad,
 };
-use dyn_utils::math::matrix::rotate_around_point;
-use glam::Vec3;
+use dyn_utils::{math::matrix::rotate_around_point, properties::size::Size, units::abs::Abs};
+use glam::{Vec2, Vec3};
 
 pub fn composition_resized_input_system(
     mut comp_res: ResMut<CompositionRes>,
@@ -114,5 +119,70 @@ pub fn entity_set_rotation_input_system(
             );
             *transform = Transform::from_matrix(rotation_transform_mat4);
         }
+    }
+}
+
+pub fn focus_root_nodes_input_system(
+    mut event_reader: EventReader<FocusRootNodesInputEvent>,
+    mut comp_res: ResMut<CompositionRes>,
+    query: Query<(&SizeMixin, &Transform), (With<Root>, With<CompNode>)>,
+) {
+    if event_reader.read().len() > 0 {
+        let CompositionRes {
+            viewport:
+                Viewport {
+                    physical_size: original_physical_size,
+                    ..
+                },
+            ..
+        } = comp_res.as_ref();
+
+        let mut min = Vec2::new(f32::INFINITY, f32::INFINITY);
+        let mut max = Vec2::new(f32::NEG_INFINITY, f32::NEG_INFINITY);
+
+        // Calculate bounding box
+        for (SizeMixin(size), transform) in query.iter() {
+            let corners = [
+                transform.translation.truncate(), // Top left
+                transform.translation.truncate() + Vec2::new(size.width(), 0.0), // Top right
+                transform.translation.truncate() + Vec2::new(0.0, size.height()), // Bottom left
+                transform.translation.truncate() + Vec2::new(size.width(), size.height()), // Bottom right
+            ];
+
+            for corner in corners.iter() {
+                min.x = min.x.min(corner.x);
+                max.x = max.x.max(corner.x);
+                min.y = min.y.min(corner.y);
+                max.y = max.y.max(corner.y);
+            }
+        }
+
+        let bounding_size = max - min;
+
+        let padding_factor = 1.0;
+        let adjusted_bounding_size = bounding_size * padding_factor;
+
+        let aspect_ratio = original_physical_size.width / original_physical_size.height;
+        let focused_aspect_ratio = adjusted_bounding_size.x / adjusted_bounding_size.y;
+
+        // Adjust the new physical_size to maintain the original aspect ratio
+        let new_physical_size = if focused_aspect_ratio > aspect_ratio {
+            Size::new(
+                Abs::pt(adjusted_bounding_size.x),
+                Abs::pt(adjusted_bounding_size.x / aspect_ratio),
+            )
+        } else {
+            Size::new(
+                Abs::pt(adjusted_bounding_size.y * aspect_ratio),
+                Abs::pt(adjusted_bounding_size.y),
+            )
+        };
+
+        // Calculate the new physica position
+        let center = min + bounding_size / 2.0;
+        let new_physical_position = center - new_physical_size.to_vec2() / 2.0;
+
+        comp_res.viewport.physical_position = new_physical_position;
+        comp_res.viewport.physical_size = new_physical_size;
     }
 }

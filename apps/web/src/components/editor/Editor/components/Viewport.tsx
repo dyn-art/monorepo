@@ -2,8 +2,9 @@ import React from 'react';
 import type { COMP } from '@dyn/dtif-comp';
 import type { Composition } from '@dyn/svg-comp';
 import { Button, Skeleton } from '@dyn/ui';
+import { useSvgComposition } from '@/hooks';
 
-import { useCursorStyle, useSvgComposition } from '../hooks';
+import { useCursorStyle } from '../hooks';
 import { CanvasControl } from './CanvasControl';
 import { Toolbar } from './Toolbar';
 
@@ -20,27 +21,36 @@ export const Viewport: React.FC<TViewportProps> = (props) => {
 	}, [composition, onLoadedComposition]);
 
 	return (
-		<div className="relative h-full w-full bg-gray-100" ref={viewportRef}>
+		<div className="bg-muted/50 relative h-full w-full" ref={viewportRef}>
 			{isWasmLoading ? <Skeleton className="h-full w-full rounded-none" /> : null}
-			<div ref={svgContainerRef} style={{ cursor }} />
-			{composition != null && <CanvasControl composition={composition} />}
+			<div ref={svgContainerRef} style={{ cursor }}>
+				{composition != null && <CanvasControl composition={composition} />}
+			</div>
 			{composition != null && <Toolbar composition={composition} />}
 			{composition != null && (
-				<Button
-					className="absolute bottom-2 right-2"
-					onClick={() => {
-						console.log(composition.toString());
-					}}
-				>
-					To String
-				</Button>
+				<div className="absolute bottom-2 right-2 flex flex-row justify-center gap-2">
+					<Button
+						onClick={() => {
+							console.log(composition.toString());
+						}}
+					>
+						To String
+					</Button>
+					<Button
+						onClick={() => {
+							composition.emitInputEvent('Composition', { type: 'FocusRootNodes' });
+							composition.update();
+						}}
+					>
+						Focus
+					</Button>
+				</div>
 			)}
 		</div>
 	);
 };
 
 export interface TViewportProps {
-	isDtifLoading: boolean;
 	viewportRef: React.RefObject<HTMLDivElement>;
 	dtif: COMP.DtifComposition;
 	onLoadedComposition?: (composition: Composition) => void;

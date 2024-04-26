@@ -1,4 +1,5 @@
 use super::SvgElementId;
+use dyn_comp_bundles::components::mixins::WindingRule;
 
 #[derive(Debug, PartialEq, Clone)]
 #[cfg_attr(
@@ -69,6 +70,10 @@ pub enum SvgAttribute {
     // Styling and Appearance
     Fill {
         fill: SvgAttributeColor,
+    },
+    #[cfg_attr(feature = "serde_support", serde(rename_all = "camelCase"))]
+    FillRule {
+        fill_rule: WindingRule,
     },
     Filter {
         filter: SvgAttributeFilter,
@@ -188,6 +193,7 @@ impl SvgAttribute {
             Self::PatternTransform { .. } => "patternTransform",
 
             Self::Fill { .. } => "fill",
+            Self::FillRule { .. } => "fill-rule",
             Self::Filter { .. } => "filter",
             Self::D { .. } => "d",
             Self::ClipPath { .. } => "clip-path",
@@ -273,6 +279,10 @@ impl SvgAttribute {
                 }
                 SvgAttributeColor::Reference { id } => format!("url(#{id})"),
                 SvgAttributeColor::None => String::from("none"),
+            },
+            Self::FillRule { fill_rule } => match fill_rule {
+                WindingRule::Nonzero => String::from("nonzero"),
+                WindingRule::Evenodd => String::from("evenodd"),
             },
             Self::Filter { filter } => match filter {
                 SvgAttributeFilter::Reference { id } => format!("url(#{id})"),

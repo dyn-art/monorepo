@@ -64,7 +64,7 @@ export type Color = [number, number, number]
 
 export type ColorMatrix = { x_axis: [number, number, number, number]; y_axis: [number, number, number, number]; z_axis: [number, number, number, number]; w_axis: [number, number, number, number]; v_axis: [number, number, number, number] }
 
-export type CompCoreInputEvent = ({ type: "CompositionResized" } & CompositionResizedInputEvent) | ({ type: "CompositionViewportChanged" } & CompositionViewportChangedInputEvent) | ({ type: "EntityDeleted" } & EntityDeletedInputEvent) | ({ type: "EntityMoved" } & EntityMovedInputEvent) | ({ type: "EntitySetPosition" } & EntitySetPositionInputEvent) | ({ type: "EntitySetRotation" } & EntitySetRotationInputEvent)
+export type CompCoreInputEvent = ({ type: "CompositionResized" } & CompositionResizedInputEvent) | ({ type: "CompositionViewportChanged" } & CompositionViewportChangedInputEvent) | ({ type: "FocusRootNodes" }) | ({ type: "EntityDeleted" } & EntityDeletedInputEvent) | ({ type: "EntityMoved" } & EntityMovedInputEvent) | ({ type: "EntitySetPosition" } & EntitySetPositionInputEvent) | ({ type: "EntitySetRotation" } & EntitySetRotationInputEvent)
 
 export type ComponentChange = { type: "Size"; size: Size } | { type: "Transform"; rotationDeg: number; translation: Vec2 } | { type: "GlobalTransform"; rotationDeg: number; translation: Vec2 }
 
@@ -169,6 +169,8 @@ export type EntitySetPositionInputEvent = { entity: Entity; x: number; y: number
 export type EntitySetRotationInputEvent = { entity: Entity; rotationDeg: Angle }
 
 export type FillStyle = { paintId: string; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity }
+
+export type FocusRootNodesInputEvent = null
 
 /**
  * A typographic font family.
@@ -1402,7 +1404,7 @@ export type StrokeStyle = { width: number; paintId: string; visible?: boolean; b
 
 export type Style = ({ type: "Fill" } & FillStyle) | ({ type: "Stroke" } & StrokeStyle) | ({ type: "DropShadow" } & DropShadowStyle)
 
-export type SvgAttribute = { type: "Id"; id: SvgElementId } | { type: "Class"; class: string } | { type: "Href"; href: SvgHrefAttribute } | { type: "Width"; width: number; unit: SvgMeasurementUnit } | { type: "Height"; height: number; unit: SvgMeasurementUnit } | { type: "X"; x: number; unit: SvgMeasurementUnit } | { type: "Y"; y: number; unit: SvgMeasurementUnit } | { type: "DX"; dx: number } | { type: "DY"; dy: number } | { type: "X1"; x1: number } | { type: "Y1"; y1: number } | { type: "X2"; x2: number } | { type: "Y2"; y2: number } | { type: "Radius"; radius: number } | { type: "Transform"; transform: SvgTransformAttribute } | { type: "PatternTransform"; patternTransform: SvgTransformAttribute } | { type: "Fill"; fill: SvgAttributeColor } | { type: "Filter"; filter: SvgAttributeFilter } | { type: "D"; d: SvgPathAttribute } | { type: "ClipPath"; clipPath: SvgElementId } | { type: "PatternUnits"; patternUnits: SvgUnits } | { type: "GradientUnits"; gradientUnits: SvgUnits } | { type: "FilterUnits"; filterUnits: SvgUnits } | { type: "PreserveAspectRatio"; preserveAspectRatio: string } | { type: "StopColor"; stopColor: SvgAttributeColor } | { type: "StopOpacity"; stopOpacity: number } | { type: "FloodOpacity"; floodOpacity: number } | { type: "ColorInterpolationFilters"; colorInterpolationFilters: string } | { type: "NumOctaves"; numOctaves: number } | { type: "BaseFrequency"; baseFrequency: number } | { type: "Mode"; mode: SvgAttributeMode } | { type: "K1"; k1: number } | { type: "K2"; k2: number } | { type: "Offset"; offset: number } | { type: "Slope"; slope: number } | { type: "StdDeviation"; stdDeviation: number } | { type: "TableValues"; tableValues: number[] } | { type: "In"; value: SvgAttributeIn } | { type: "In2"; value: SvgAttributeIn } | { type: "Type"; value: SvgAttributeType } | { type: "Result"; result: string } | { type: "Values"; values: SvgAttributeValues } | { type: "Operator"; operator: SvgAttributeOperator }
+export type SvgAttribute = { type: "Id"; id: SvgElementId } | { type: "Class"; class: string } | { type: "Href"; href: SvgHrefAttribute } | { type: "Width"; width: number; unit: SvgMeasurementUnit } | { type: "Height"; height: number; unit: SvgMeasurementUnit } | { type: "X"; x: number; unit: SvgMeasurementUnit } | { type: "Y"; y: number; unit: SvgMeasurementUnit } | { type: "DX"; dx: number } | { type: "DY"; dy: number } | { type: "X1"; x1: number } | { type: "Y1"; y1: number } | { type: "X2"; x2: number } | { type: "Y2"; y2: number } | { type: "Radius"; radius: number } | { type: "Transform"; transform: SvgTransformAttribute } | { type: "PatternTransform"; patternTransform: SvgTransformAttribute } | { type: "Fill"; fill: SvgAttributeColor } | { type: "FillRule"; fillRule: WindingRule } | { type: "Filter"; filter: SvgAttributeFilter } | { type: "D"; d: SvgPathAttribute } | { type: "ClipPath"; clipPath: SvgElementId } | { type: "PatternUnits"; patternUnits: SvgUnits } | { type: "GradientUnits"; gradientUnits: SvgUnits } | { type: "FilterUnits"; filterUnits: SvgUnits } | { type: "PreserveAspectRatio"; preserveAspectRatio: string } | { type: "StopColor"; stopColor: SvgAttributeColor } | { type: "StopOpacity"; stopOpacity: number } | { type: "FloodOpacity"; floodOpacity: number } | { type: "ColorInterpolationFilters"; colorInterpolationFilters: string } | { type: "NumOctaves"; numOctaves: number } | { type: "BaseFrequency"; baseFrequency: number } | { type: "Mode"; mode: SvgAttributeMode } | { type: "K1"; k1: number } | { type: "K2"; k2: number } | { type: "Offset"; offset: number } | { type: "Slope"; slope: number } | { type: "StdDeviation"; stdDeviation: number } | { type: "TableValues"; tableValues: number[] } | { type: "In"; value: SvgAttributeIn } | { type: "In2"; value: SvgAttributeIn } | { type: "Type"; value: SvgAttributeType } | { type: "Result"; result: string } | { type: "Values"; values: SvgAttributeValues } | { type: "Operator"; operator: SvgAttributeOperator }
 
 export type SvgAttributeColor = { RGB: { red: number; green: number; blue: number } } | { RGBA: { red: number; green: number; blue: number; alpha: number } } | { Reference: { id: SvgElementId } } | "None"
 
@@ -1442,7 +1444,7 @@ export type SvgBuilderOutputEvent =
  */
 ({ type: "SvgString" } & SvgStringOutputEvent)
 
-export type SvgCompInputEvent = { type: "Composition"; event: CompCoreInputEvent } | { type: "Interaction"; event: InteractionInputEvent }
+export type SvgCompInputEvent = { type: "Composition"; event: CompCoreInputEvent } | { type: "Interaction"; event: InteractionInputEvent } | { type: "Dtif"; event: DtifInputEvent }
 
 export type SvgCompOutputEvent = ({ type: "SvgElementChange" } & SvgElementChangesOutputEvent) | ({ type: "CompositionChange" } & CompositionChangeOutputEvent) | ({ type: "WatchedEntityChange" } & WatchedEntityChangesOutputEvent) | ({ type: "SelectionChange" } & SelectionChangeOutputEvent) | ({ type: "InteractionModeChange" } & InteractionModeChangeOutputEvent) | ({ type: "InteractionToolChange" } & InteractionToolChangeOutputEvent) | ({ type: "CursorChange" } & CursorChangeOutputEvent)
 
@@ -1512,7 +1514,7 @@ export type TextNode = { text: string; attributes: TextAttributeInterval[]; line
 
 export type Vec2 = [number, number]
 
-export type VectorNode = { path: string; translation?: Vec2; rotationDeg?: Angle; size: Size; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; constraints?: Constraints; styles?: Style[] }
+export type VectorNode = { path: string; windingRule?: WindingRule; translation?: Vec2; rotationDeg?: Angle; size: Size; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; constraints?: Constraints; styles?: Style[] }
 
 export type VerticalTextAlignment = "Top" | "Bottom" | "Center"
 
@@ -1521,6 +1523,8 @@ export type Viewport = { physicalPosition: Vec2; physicalSize: Size }
 export type WatchableComponentVariant = "Size" | "Transform" | "GlobalTransform"
 
 export type WatchedEntityChangesOutputEvent = { entity: Entity; changes: ComponentChange[] }
+
+export type WindingRule = "Nonzero" | "Evenodd"
 
 export type XYWH = { position: Vec2; size: Size }
 

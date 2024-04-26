@@ -1,5 +1,4 @@
 import type { COMP } from '@dyn/dtif-comp';
-import { notEmpty } from '@dyn/utils';
 
 import type {
 	TToTransformEffect,
@@ -14,54 +13,61 @@ export function createDtifStyles(
 	strokes: TToTransformStroke[],
 	effects: TToTransformEffect[]
 ): COMP.Style[] {
-	return fills
-		.map(
-			(fill) =>
-				({
-					type: 'Fill',
-					paintId: fill.paintId.toString(),
-					blendMode: mapFigmaBlendModeToDtif(fill.blendMode),
-					opacity: fill.opacity,
-					visible: fill.visible
-				}) as COMP.Style
-		)
-		.concat(
-			strokes.map(
-				(stroke) =>
-					({
-						type: 'Stroke',
-						width: stroke.width,
-						paintId: stroke.paintId.toString(),
-						blendMode: mapFigmaBlendModeToDtif(stroke.blendMode),
-						opacity: stroke.opacity,
-						visible: stroke.visible
-					}) as COMP.Style
-			)
-		)
-		.concat(
-			effects
-				// eslint-disable-next-line array-callback-return -- All cases handled in switch
-				.map((effect) => {
-					switch (effect.variant.type) {
-						case 'DROP_SHADOW': {
-							const dropShadow = effect.variant;
-							return {
-								type: 'DropShadow',
-								color: mapFigmaRGBToDtif(dropShadow.color),
-								position: [dropShadow.offset.x, dropShadow.offset.y],
-								blur: dropShadow.radius,
-								spread: dropShadow.spread,
-								visible: dropShadow.visible,
-								blendMode: mapFigmaBlendModeToDtif(dropShadow.blendMode),
-								opacity: dropShadow.color.a
-							} as COMP.Style;
-						}
-						case 'INNER_SHADOW':
-						case 'LAYER_BLUR':
-						case 'BACKGROUND_BLUR':
-							return undefined; // TODO
-					}
-				})
-				.filter(notEmpty)
-		);
+	const fillStyles = fills.map(
+		(fill) =>
+			({
+				type: 'Fill',
+				paintId: fill.paintId.toString(),
+				blendMode: mapFigmaBlendModeToDtif(fill.blendMode),
+				opacity: fill.opacity,
+				visible: fill.visible
+			}) as COMP.Style
+	);
+
+	const centerStrokeStyles: COMP.Style[] = [];
+	const outsideStrokeStyles: COMP.Style[] = [];
+	for (const stroke of strokes) {
+		const strokeStyle: COMP.Style = {
+			type: 'Stroke',
+			width: stroke.width,
+			paintId: stroke.paintId.toString(),
+			blendMode: mapFigmaBlendModeToDtif(stroke.blendMode),
+			opacity: stroke.opacity,
+			visible: stroke.visible
+		};
+		switch (stroke.strokeAlign) {
+			case 'CENTER':
+				centerStrokeStyles.push(strokeStyle);
+				break;
+			case 'OUTSIDE':
+				outsideStrokeStyles.push(strokeStyle);
+				break;
+			default:
+				console.warn(`Unsuported stroke align: ${stroke.strokeAlign}`);
+		}
+	}
+
+	const effectStyles: COMP.Style[] = [];
+	for (const effect of effects) {
+		switch (effect.variant.type) {
+			case 'DROP_SHADOW': {
+				const dropShadow = effect.variant;
+				effectStyles.push({
+					type: 'DropShadow',
+					color: mapFigmaRGBToDtif(dropShadow.color),
+					position: [dropShadow.offset.x, dropShadow.offset.y],
+					blur: dropShadow.radius,
+					spread: dropShadow.spread,
+					visible: dropShadow.visible,
+					blendMode: mapFigmaBlendModeToDtif(dropShadow.blendMode),
+					opacity: dropShadow.color.a
+				});
+				break;
+			}
+			default:
+				console.warn(`Unsuported stroke align: ${effect.variant.type}`);
+		}
+	}
+
+	return [...centerStrokeStyles, ...fillStyles, ...outsideStrokeStyles, ...effectStyles];
 }

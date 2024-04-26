@@ -4,7 +4,9 @@ pub mod element_changes;
 pub mod styles;
 
 use self::{
-    attributes::SvgAttribute, element_changes::SvgElementChildrenReorderedChange, styles::SvgStyle,
+    attributes::SvgAttribute,
+    element_changes::{SvgAttributeRemovedChange, SvgElementChildrenReorderedChange},
+    styles::SvgStyle,
 };
 use super::svg_bundle::{SvgBundle, SvgBundleVariant};
 use bevy_ecs::{component::Component, entity::Entity, query::Without, system::Query};
@@ -100,6 +102,22 @@ impl SvgElement {
 
     pub fn get_attribute(&self, key: &'static str) -> Option<&SvgAttribute> {
         self.attributes.get(key)
+    }
+
+    pub fn remove_attribute(&mut self, key: &'static str) -> Option<SvgAttribute> {
+        #[cfg(feature = "output_svg_element_changes")]
+        let maybe_removed_attribute = self.attributes.remove(key);
+
+        if let Some(removed_attribute) = &maybe_removed_attribute {
+            self.register_change(
+                SvgElementChange::AttributeRemoved(SvgAttributeRemovedChange {
+                    key: removed_attribute.key(),
+                }),
+                false,
+            );
+        }
+
+        return maybe_removed_attribute;
     }
 
     // =========================================================================
