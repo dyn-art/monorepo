@@ -1,5 +1,5 @@
 import { apply } from 'json-logic-js';
-import { deepReplaceVar } from '@dyn/utils';
+import { deepReplaceVar, toFunction } from '@dyn/utils';
 
 import type { COMP } from '../comp';
 import type {
@@ -18,7 +18,14 @@ export function applyModifications<GKey extends string, GInputType extends TModi
 	const processedActions: TProcessedFieldAction[] = [];
 
 	for (const action of actions) {
-		const { conditions, events } = action;
+		const { conditions, events, compute } = action;
+
+		if (compute != null) {
+			const computeFunction = toFunction(compute);
+			if (computeFunction != null) {
+				modifications[compute.args[0]] = computeFunction(modifications[compute.args[0]]);
+			}
+		}
 
 		// Check whether data matches conditions for action
 		const notMetConditions: TNotMetCondition[] = [];

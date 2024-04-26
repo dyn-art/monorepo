@@ -28,6 +28,7 @@ describe('processField function', () => {
 							notMetMessage: "'moveX' can not be negative!"
 						}
 					],
+					compute: { args: ['moveX'], body: 'return moveX + 10' },
 					events: [{ type: 'EntityMoved', entity: 'n1', dx: { var: 'moveX' }, dy: 0 }]
 				}
 			]
@@ -38,7 +39,7 @@ describe('processField function', () => {
 
 		expect(firstResult).not.toBeNull();
 		expect(firstResult.resolved).toBeTruthy();
-		expect(firstResult.events[0]).toEqual({ type: 'EntityMoved', entity: 'n1', dx: 30, dy: 0 });
+		expect(firstResult.events[0]).toEqual({ type: 'EntityMoved', entity: 'n1', dx: 40, dy: 0 });
 	});
 
 	it('handles not met conditions by returning the appropriate messages', () => {

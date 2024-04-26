@@ -1,4 +1,5 @@
 import type { AdditionalOperation, RulesLogic } from 'json-logic-js';
+import type { TJsonFunction } from '@dyn/utils';
 
 import type { COMP } from '../comp';
 
@@ -20,7 +21,7 @@ export interface TModificationField<
 
 export interface TModificationAction<GKey extends string, GValue> {
 	conditions: TModificationCondition[];
-	// compute?: TJsonFunction;
+	compute?: TJsonFunction<[GKey]>;
 	events: TMdtifInputEvent<GKey, GValue>[];
 }
 
