@@ -105,9 +105,9 @@ impl SvgElement {
     }
 
     pub fn remove_attribute(&mut self, key: &'static str) -> Option<SvgAttribute> {
-        #[cfg(feature = "output_svg_element_changes")]
         let maybe_removed_attribute = self.attributes.remove(key);
 
+        #[cfg(feature = "output_svg_element_changes")]
         if let Some(removed_attribute) = &maybe_removed_attribute {
             self.register_change(
                 SvgElementChange::AttributeRemoved(SvgAttributeRemovedChange {
