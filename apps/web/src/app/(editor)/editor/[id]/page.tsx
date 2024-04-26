@@ -27,7 +27,11 @@ const Page = async (props: TProps): Promise<React.ReactNode> => {
 		);
 	}
 
-	return null;
+	return (
+		<div>
+			<p>Not found</p>
+		</div>
+	);
 };
 
 export default Page;
