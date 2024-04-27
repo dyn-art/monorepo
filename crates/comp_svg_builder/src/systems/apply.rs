@@ -27,7 +27,7 @@ use dyn_comp_bundles::components::{
         BlendModeMixin, ImageAssetMixin, OpacityMixin, PaintParentMixin, PathMixin, SizeMixin,
         StrokePathMixin, StyleChildrenMixin, VisibilityMixin,
     },
-    nodes::{CompNode, FrameCompNode, GroupCompNode},
+    nodes::{CompNode, FrameCompNode},
     paints::{
         CompPaint, GradientCompPaint, GradientVariant, ImageCompPaint, ImageScaleMode,
         SolidCompPaint,
@@ -412,10 +412,7 @@ pub fn apply_visibility_mixin_changes(
 }
 
 pub fn apply_size_mixin_changes(
-    mut query: Query<
-        (&SizeMixin, &mut SvgBundleVariant),
-        (Changed<SizeMixin>, Without<GroupCompNode>),
-    >,
+    mut query: Query<(&SizeMixin, &mut SvgBundleVariant), Changed<SizeMixin>>,
 ) {
     for (SizeMixin(size), mut bundle_variant) in query.iter_mut() {
         bundle_variant.get_root_element_mut().set_attributes(vec![
@@ -474,10 +471,7 @@ pub fn apply_size_mixin_changes(
 }
 
 pub fn apply_transform_changes(
-    mut query: Query<
-        (&Transform, &mut SvgBundleVariant),
-        (Changed<Transform>, Without<GroupCompNode>),
-    >,
+    mut query: Query<(&Transform, &mut SvgBundleVariant), Changed<Transform>>,
 ) {
     for (transform, mut bundle_variant) in query.iter_mut() {
         bundle_variant

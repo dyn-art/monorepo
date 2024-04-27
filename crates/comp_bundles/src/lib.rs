@@ -7,12 +7,12 @@ use bevy_ecs::bundle::Bundle;
 use bevy_transform::TransformBundle;
 use components::{
     mixins::{
-        BlendModeMixin, ConstraintsMixin, CornerRadiiMixin, GroupConstraintsMixin, ImageAssetMixin,
-        OpacityMixin, PaintChildMixin, PathMixin, SizeMixin, VisibilityMixin,
+        BlendModeMixin, ConstraintsMixin, CornerRadiiMixin, ImageAssetMixin, OpacityMixin,
+        PaintChildMixin, PathMixin, SizeMixin, VisibilityMixin,
     },
     nodes::{
-        CompNode, EllipseCompNode, FrameCompNode, GroupCompNode, PolygonCompNode,
-        RectangleCompNode, StarCompNode, TextCompNode, VectorCompNode,
+        CompNode, EllipseCompNode, FrameCompNode, PolygonCompNode, RectangleCompNode, StarCompNode,
+        TextCompNode, VectorCompNode,
     },
     paints::{CompPaint, GradientCompPaint, ImageCompPaint, SolidCompPaint},
     styles::{CompStyle, DropShadowCompStyle, FillCompStyle, StrokeCompStyle},
@@ -31,20 +31,6 @@ pub struct FrameCompNodeBundle {
     pub constraints: ConstraintsMixin,
     // https://github.com/Nilirad/bevy_prototype_lyon/issues/207
     // pub styles: StylesMixin,
-    // pub children: Children,
-}
-
-#[derive(Bundle, Debug)]
-pub struct GroupCompNodeBundle {
-    pub node: CompNode,
-    pub group: GroupCompNode,
-    pub transform: TransformBundle,
-    pub size: SizeMixin,
-    pub visibility: VisibilityMixin,
-    pub blend_mode: BlendModeMixin,
-    pub opacity: OpacityMixin,
-    pub constraints: GroupConstraintsMixin,
-    // https://github.com/Nilirad/bevy_prototype_lyon/issues/207
     // pub children: Children,
 }
 

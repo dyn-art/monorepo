@@ -35,15 +35,6 @@ export async function transformNode(
 				format: shouldExportFrame.format
 			});
 		}
-		case 'Group':
-			// TODO
-			console.warn('Group Node is not supported yet!');
-			return transformNodeToImage(toTransformNode.node, cx, {
-				format: 'PNG'
-			});
-		// return transformGroupNode(toTransformNode.node, {
-		// 	childrenIds: toTransformNode.childrenIds
-		// });
 		case 'Text':
 			return transformTextNode(toTransformNode.node, toTransformNode.attributes, {
 				fills: toTransformNode.fills,
@@ -52,7 +43,10 @@ export async function transformNode(
 			});
 		case 'Shape':
 			return transformShapeNode(toTransformNode);
-		case 'Uncategorized':
+		default:
+			console.warn(
+				`To transform node (${toTransformNode.id}) of type '${toTransformNode.node.type}' not supported yet! Trying to export node as PNG.`
+			);
 			return transformNodeToImage(toTransformNode.node, cx, {
 				format: 'PNG'
 			});

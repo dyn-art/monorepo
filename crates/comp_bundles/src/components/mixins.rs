@@ -135,17 +135,3 @@ pub struct ConstraintsLayoutMetricsMixin {
     pub size: Size,
     pub parent_size: Size,
 }
-
-#[derive(Component, Debug, Default, Clone, Copy)]
-pub struct GroupConstraintsMixin(pub GroupConstraints);
-
-#[derive(Debug, Default, Copy, Clone)]
-#[cfg_attr(
-    feature = "serde_support",
-    derive(serde::Serialize, serde::Deserialize, specta::Type)
-)]
-pub enum GroupConstraints {
-    #[default]
-    Mixed,
-    Constraints(Constraints),
-}

@@ -25,6 +25,7 @@
 	"homepage": "https://s.dyn.art/github",
 	"dependencies": {
 		"@dyn/dtif-comp": "workspace:*",
+		"@dyn/fetch-client": "workspace:^",
 		"@dyn/svg-comp": "workspace:*",
 		"@dyn/ui": "workspace:*",
 		"@tanstack/react-query": "^5.28.9",

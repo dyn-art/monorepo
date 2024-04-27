@@ -11,7 +11,6 @@ pub struct CompNode {
 
 #[derive(Debug, Copy, Clone)]
 pub enum CompNodeVariant {
-    Group,
     Rectangle,
     Frame,
     Ellipse,
@@ -27,10 +26,6 @@ pub struct FrameCompNode {
     /// Whether the frame clips content outside its bounds. `true` enables clipping.
     pub clip_content: bool,
 }
-
-/// Groups related nodes, akin to a layer folder, auto-sized and positioned by its content.
-#[derive(Component, Debug, Default, Copy, Clone)]
-pub struct GroupCompNode;
 
 /// A rectangle shape node.
 #[derive(Component, Debug, Default, Copy, Clone)]

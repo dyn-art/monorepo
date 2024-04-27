@@ -2,7 +2,7 @@ import { Analytics } from '@vercel/analytics/react';
 import type { Metadata, Viewport } from 'next';
 import { Inter as FontSans } from 'next/font/google';
 import { cn } from '@dyn/ui';
-import { landingConfig } from '@/environment';
+import { marketingConfig } from '@/environment';
 
 import './globals.scss';
 
@@ -20,8 +20,8 @@ export const viewport: Viewport = {
 
 // https://nextjs.org/docs/app/api-reference/functions/generate-metadata
 export const metadata: Metadata = {
-	title: landingConfig.meta.title,
-	description: landingConfig.meta.description,
+	title: marketingConfig.meta.title,
+	description: marketingConfig.meta.description,
 	icons: [
 		{ rel: 'apple-touch-icon', url: '/favicon/apple-touch-icon.png', sizes: '180x180' },
 		{ rel: 'icon', url: '/favicon/favicon-32x32.png', sizes: '32x32' },

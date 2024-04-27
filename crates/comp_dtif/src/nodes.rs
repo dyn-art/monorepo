@@ -6,21 +6,18 @@ use bevy_transform::{components::Transform, TransformBundle};
 use dyn_attributed_string::{HorizontalTextAlignment, LineWrap, VerticalTextAlignment};
 use dyn_comp_bundles::{
     components::{
-        marker::{StaleSize, StaleTransform},
         mixins::{
             BlendMode, BlendModeMixin, Constraints, ConstraintsMixin, CornerRadiiMixin,
-            GroupConstraints, GroupConstraintsMixin, OpacityMixin, PathMixin, SizeMixin,
-            VisibilityMixin, WindingRule,
+            OpacityMixin, PathMixin, SizeMixin, VisibilityMixin, WindingRule,
         },
         nodes::{
             CompNode, CompNodeVariant, EllipseArcData, EllipseCompNode, FrameCompNode,
-            GroupCompNode, PolygonCompNode, RectangleCompNode, StarCompNode, TextCompNode,
-            VectorCompNode,
+            PolygonCompNode, RectangleCompNode, StarCompNode, TextCompNode, VectorCompNode,
         },
     },
     properties::TextAttributeInterval,
-    EllipseCompNodeBundle, FrameCompNodeBundle, GroupCompNodeBundle, PolygonCompNodeBundle,
-    RectangleCompNodeBundle, StarCompNodeBundle, TextCompNodeBundle, VectorNodeBundle,
+    EllipseCompNodeBundle, FrameCompNodeBundle, PolygonCompNodeBundle, RectangleCompNodeBundle,
+    StarCompNodeBundle, TextCompNodeBundle, VectorNodeBundle,
 };
 use dyn_utils::{
     properties::{corner_radii::CornerRadii, opacity::Opacity, size::Size},
@@ -33,7 +30,6 @@ use glam::{Quat, Vec2, Vec3};
 #[serde(tag = "type")]
 pub enum Node {
     Frame(FrameNode),
-    // Group(GroupNode), // TODO: Implement properly first
     Rectangle(RectangleNode),
     Ellipse(EllipseNode),
     Star(StarNode),
@@ -95,66 +91,6 @@ impl FrameNode {
 impl SpawnBundleImpl for FrameNode {
     fn spawn<'a>(&self, _: &DtifHandler, world: &'a mut World) -> EntityWorldMut<'a> {
         world.spawn(self.to_ecs_bundle())
-    }
-}
-
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
-#[serde(rename_all = "camelCase")]
-pub struct GroupNode {
-    #[serde(default)]
-    pub translation: Option<Vec2>,
-    #[serde(default)]
-    pub rotation_deg: Option<Angle>,
-    #[serde(default)]
-    pub size: Option<Size>,
-    #[serde(default = "default_as_true")]
-    pub visible: bool,
-    #[serde(default)]
-    pub blend_mode: BlendMode,
-    #[serde(default)]
-    pub opacity: Opacity,
-    #[serde(default)]
-    pub constraints: Option<Constraints>,
-    #[serde(default)]
-    pub children: Vec<String>,
-}
-
-impl GroupNode {
-    fn to_ecs_bundle(&self) -> GroupCompNodeBundle {
-        GroupCompNodeBundle {
-            node: CompNode {
-                variant: CompNodeVariant::Group,
-            },
-            group: GroupCompNode,
-            transform: TransformBundle::from_transform(Transform {
-                translation: self
-                    .translation
-                    .map(|translation| translation.extend(0.0))
-                    .unwrap_or_default(),
-                rotation: self
-                    .rotation_deg
-                    .map(|rotation_deg| Quat::from_rotation_z(rotation_deg.to_rad()))
-                    .unwrap_or_default(),
-                scale: Vec3::ONE,
-            }),
-            size: SizeMixin(self.size.unwrap_or_default()),
-            visibility: VisibilityMixin(self.visible),
-            blend_mode: BlendModeMixin(self.blend_mode),
-            opacity: OpacityMixin(self.opacity),
-            constraints: GroupConstraintsMixin(match self.constraints {
-                Some(constraints) => GroupConstraints::Constraints(constraints),
-                None => GroupConstraints::Mixed,
-            }),
-        }
-    }
-}
-
-impl SpawnBundleImpl for GroupNode {
-    fn spawn<'a>(&self, _: &DtifHandler, world: &'a mut World) -> EntityWorldMut<'a> {
-        let mut entity_world = world.spawn(self.to_ecs_bundle());
-        entity_world.insert(StaleTransform);
-        entity_world.insert(StaleSize);
-        return entity_world;
     }
 }
 

@@ -22,10 +22,6 @@ use systems::{
         entity_set_position_input_system, entity_set_rotation_input_system,
         focus_root_nodes_input_system,
     },
-    group::{
-        compute_group_size, compute_group_transform, mark_group_size_as_stale,
-        mark_group_transform_as_stale,
-    },
     hierarchy::update_hierarchy_levels,
     outline::{
         ellipse::outline_ellipse,
@@ -138,10 +134,6 @@ impl Plugin for CompCorePlugin {
         app.add_systems(
             Update,
             (
-                mark_group_size_as_stale.in_set(CompCoreSystemSet::PreCompute),
-                mark_group_transform_as_stale.in_set(CompCoreSystemSet::PreCompute),
-                compute_group_size.in_set(CompCoreSystemSet::Compute),
-                compute_group_transform.in_set(CompCoreSystemSet::Compute),
                 apply_constraints_offset.in_set(CompCoreSystemSet::PreLayout),
                 apply_constraints.in_set(CompCoreSystemSet::Layout),
                 resize_vector_node.in_set(CompCoreSystemSet::Outline),

@@ -1,7 +1,7 @@
-export function assertValue<T>(v: T | undefined, errorMessage: string): T {
-	if (v === undefined) {
+export function assertValue<T>(value: T | undefined, errorMessage: string): T {
+	if (value === undefined) {
 		throw new Error(errorMessage);
 	}
 
-	return v;
+	return value;
 }

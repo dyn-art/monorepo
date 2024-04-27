@@ -4,7 +4,7 @@ import { Container } from '@dyn/ui';
 
 const Page: React.FC = () => {
 	return (
-		<div className="flex min-h-screen flex-col bg-[#FEFCF0] pt-4">
+		<div className="flex min-h-screen flex-col bg-[#FCFAF4] pt-4">
 			<Container className="min-h-full" size="compact">
 				<Link
 					className="flex items-center gap-2"

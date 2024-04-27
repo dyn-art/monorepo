@@ -16,11 +16,6 @@ use dyn_comp_bundles::components::mixins::{
 use dyn_utils::properties::size::Size;
 use dyn_utils::units::abs::Abs;
 
-// TODO: Use taffy?
-// Don't build any taffy tree by default, instead do it only for a Frame in Auto Layout,
-// because for nodes that are children to a non Auto Layout parent it doesn't make sense
-// https://github.com/bevyengine/bevy/blob/5caf085dacf74bf553a0428a5eb7f4574a9bb99c/crates/bevy_ui/src/layout/ui_surface.rs
-
 pub fn apply_constraints_offset(
     mut commands: Commands,
     tick_res: Res<TickRes>,
@@ -31,8 +26,8 @@ pub fn apply_constraints_offset(
     size_mixin_query: Query<&SizeMixin>,
 ) {
     for (entity, transform, size_mixin, parent) in query.iter_mut() {
-        // Check if Transform has changed in this update cycle or the last.
-        // A change in the current cycle likely indicates a mutation from operations like Translation.
+        // Check if Transform or Size has changed in this update cycle or the last.
+        // A change in the current cycle likely indicates a mutation from operations like Translation or Resizing.
         // A change in the last cycle suggests an update by a Constraint system,
         // whose changes should be ignored by this system.
         //
@@ -111,8 +106,6 @@ fn apply_horizontal_constraint(
             let center_offset_x = (layout_metric.parent_size.width() - layout_metric.size.width())
                 / 2.0
                 - layout_metric.pos.x;
-            child_transform.translation.x =
-                layout_metric.pos.x + parent_size.width() - layout_metric.parent_size.width();
             let current_center_x = (parent_size.width() - child_size_mixin.0.width()) / 2.0;
             child_transform.translation.x = current_center_x - center_offset_x;
         }
@@ -148,8 +141,6 @@ fn apply_vertical_constraint(
             let center_offset_y =
                 (layout_metric.parent_size.height() - layout_metric.size.height()) / 2.0
                     - layout_metric.pos.y;
-            child_transform.translation.y =
-                layout_metric.pos.y + parent_size.height() - layout_metric.parent_size.height();
             let current_center_y = (parent_size.height() - child_size_mixin.0.height()) / 2.0;
             child_transform.translation.y = current_center_y - center_offset_y;
         }
