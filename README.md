@@ -13,17 +13,17 @@
     <br />
     <br />
     <b>Check us out on </b>
-    <a href="https://s.dyn.art/twitter?source=github">Twitter</a>
+    <a href="https://dyn.art/s/twitter?source=github">Twitter</a>
     ·
-    <a href="https://s.dyn.art/discord?source=github">Discord</a>
+    <a href="https://dyn.art/s/discord?source=github">Discord</a>
     ·
-    <a href="https://s.dyn.art/youtube?source=github">YouTube</a>
+    <a href="https://dyn.art/s/youtube?source=github">YouTube</a>
     <br/>
     <br/>
     <i>~ 🚧 Under construction. Coming soon 👀 ~</i>
     <br/>
     <br/>
-    <a href="https://agile-ts.org"><img src="https://img.shields.io/badge/Status-Alpha-green.svg" alt="Status"/></a>
+    <a href="https://dyn.art"><img src="https://img.shields.io/badge/Status-Alpha-green.svg" alt="Status"/></a>
     <a href="https://github.com/dyndotart/monorepo/blob/develop/LICENSE"><img src="https://img.shields.io/badge/license-AGPLv3-purple" alt="License"></a>
     <a href="https://wakatime.com/badge/user/aa5a8ce7-1c57-4f26-a159-ea57ec5ea7c1/project/bb16d098-41de-4bdd-bd28-9ccdfe558de8"><img src="https://wakatime.com/badge/user/aa5a8ce7-1c57-4f26-a159-ea57ec5ea7c1/project/bb16d098-41de-4bdd-bd28-9ccdfe558de8.svg" alt="wakatime"></a>
     <a href="https://github.com/dyndotart/monorepo/pulse"><img src="https://img.shields.io/github/commit-activity/m/dyndotart/monorepo" alt="Commits-per-month"></a>
