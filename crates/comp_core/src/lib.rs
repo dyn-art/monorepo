@@ -13,7 +13,7 @@ use dyn_comp_bundles::events::{
     EntityMovedInputEvent, EntitySetPositionInputEvent, EntitySetRotationInputEvent,
     FocusRootNodesInputEvent,
 };
-use resources::{composition::CompositionRes, tick::TickRes};
+use resources::{composition::CompositionRes, layout::LayoutRes, tick::TickRes};
 use systems::{
     constraints::{apply_constraints, apply_constraints_offset},
     events::{
@@ -83,9 +83,8 @@ impl Plugin for CompCorePlugin {
         app.add_event::<EntitySetRotationInputEvent>();
 
         // Register resources
-        app.insert_resource(TickRes {
-            first_in_cycle: Tick::new(0),
-        });
+        app.init_resource::<LayoutRes>();
+        app.init_resource::<TickRes>();
         #[cfg(not(feature = "dtif"))]
         app.insert_resource(CompositionRes {
             root_nodes: self.root_nodes.clone(),
