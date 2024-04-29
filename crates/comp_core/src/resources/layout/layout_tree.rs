@@ -1,11 +1,9 @@
-use bevy_ecs::entity::{Entity, EntityHashMap};
-use bevy_hierarchy::Children;
+use dyn_comp_bundles::components::mixins::{LeafLayoutMixin, ParentLayoutMixin, ToTaffyStyle};
 use dyn_utils::properties::size::Size;
 use taffy::{prelude::*, TaffyError};
 
 pub struct LayoutTree {
-    pub entity_to_taffy: EntityHashMap<NodeId>,
-    pub taffy_tree: TaffyTree,
+    taffy_tree: TaffyTree,
 }
 
 impl Default for LayoutTree {
@@ -17,86 +15,72 @@ impl Default for LayoutTree {
 impl LayoutTree {
     pub fn new() -> Self {
         Self {
-            entity_to_taffy: EntityHashMap::default(),
             taffy_tree: TaffyTree::new(),
         }
     }
 
-    /// Retrieves the Taffy node associated with the given node entity and updates its style.
-    /// If no associated Taffy node exists a new Taffy node is inserted into the Taffy layout.
-    pub fn upsert_node(&mut self, entity: Entity, style: Style) {
-        match self.entity_to_taffy.entry(entity) {
-            hashbrown::hash_map::Entry::Occupied(entry) => {
-                self.taffy_tree.set_style(*entry.get(), style).unwrap();
-            }
-            hashbrown::hash_map::Entry::Vacant(entry) => {
-                let node_id = self.taffy_tree.new_leaf(style).unwrap();
-                entry.insert(node_id);
-            }
-        }
+    pub fn new_leaf(&mut self, style: Style) -> Result<NodeId, LayoutError> {
+        self.taffy_tree
+            .new_leaf(style)
+            .map_err(|e| LayoutError::TaffyError(e))
     }
 
-    /// Update the children of the Taffy node corresponding to the given [`Entity`].
+    pub fn update_leaf(&mut self, node_id: NodeId, style: Style) -> bool {
+        self.taffy_tree.set_style(node_id, style).is_ok()
+    }
+
     pub fn update_children(
         &mut self,
-        entity: Entity,
-        children: &Children,
+        parent_id: NodeId,
+        child_ids: &Vec<NodeId>,
     ) -> Result<(), LayoutError> {
-        let mut children_ids = Vec::with_capacity(children.len());
-        for child in children {
-            if let Some(taffy_node) = self.entity_to_taffy.get(child) {
-                children_ids.push(*taffy_node);
-            }
-        }
-
-        let node_id = self
-            .entity_to_taffy
-            .get(&entity)
-            .ok_or(LayoutError::InvalidHierarchy)?;
-        return self
-            .taffy_tree
-            .set_children(*node_id, &children_ids)
-            .map_err(|e| LayoutError::TaffyError(e));
+        self.taffy_tree
+            .set_children(parent_id, child_ids)
+            .map_err(|e| LayoutError::TaffyError(e))
     }
 
-    /// Removes children from the entity's Taffy node if it exists. Does nothing otherwise.
-    pub fn try_remove_children(&mut self, entity: Entity) {
-        if let Some(node_id) = self.entity_to_taffy.get(&entity) {
-            self.taffy_tree.set_children(*node_id, &[]).unwrap();
-        }
+    pub fn try_remove_children(&mut self, node_id: NodeId) {
+        self.taffy_tree.set_children(node_id, &[]).unwrap();
     }
 
-    /// Compute the layout for each Taffy node corresponding to the root node [`Entity`] in the layout.
     pub fn compute_layouts(
         &mut self,
-        entity: Entity,
+        node_id: NodeId,
         available_space: Size,
     ) -> Result<(), LayoutError> {
-        if let Some(node_id) = self.entity_to_taffy.get(&entity) {
-            self.taffy_tree
-                .compute_layout(
-                    *node_id,
-                    taffy::Size {
-                        width: AvailableSpace::Definite(available_space.width()),
-                        height: AvailableSpace::Definite(available_space.height()),
-                    },
-                )
-                .map_err(|e| LayoutError::TaffyError(e))
-        } else {
-            Err(LayoutError::InvalidHierarchy)
-        }
+        self.taffy_tree
+            .compute_layout(
+                node_id,
+                taffy::Size {
+                    width: AvailableSpace::Definite(available_space.width()),
+                    height: AvailableSpace::Definite(available_space.height()),
+                },
+            )
+            .map_err(|e| LayoutError::TaffyError(e))
     }
 
-    /// Get the layout geometry for the Taffy node corresponding to the node [`Entity`].
-    /// Does not compute the layout geometry, `compute_layouts` should be run before using this function.
-    pub fn get_layout(&self, entity: Entity) -> Result<&Layout, LayoutError> {
-        if let Some(node_id) = self.entity_to_taffy.get(&entity) {
-            self.taffy_tree
-                .layout(*node_id)
-                .map_err(|e| LayoutError::TaffyError(e))
-        } else {
-            Err(LayoutError::InvalidHierarchy)
-        }
+    pub fn get_layout(&self, node_id: NodeId) -> Result<&Layout, LayoutError> {
+        self.taffy_tree
+            .layout(node_id)
+            .map_err(|e| LayoutError::TaffyError(e))
+    }
+
+    pub fn layout_mixins_to_style(
+        parent_layout_mixin: Option<&ParentLayoutMixin>,
+        leaf_layout_mixin: Option<&LeafLayoutMixin>,
+    ) -> Style {
+        let parent_layout_style = parent_layout_mixin
+            .map(|pl| pl.to_style())
+            .unwrap_or(Style::default());
+        let leaf_layout_style = leaf_layout_mixin
+            .map(|ll| ll.to_style())
+            .unwrap_or(Style::default());
+
+        return Style {
+            align_self: parent_layout_style.align_self,
+            justify_self: parent_layout_style.justify_self,
+            ..Default::default()
+        };
     }
 }
 

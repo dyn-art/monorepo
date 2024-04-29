@@ -2,7 +2,7 @@ use crate::properties::TextAttributeInterval;
 use bevy_ecs::component::Component;
 use dyn_attributed_string::{HorizontalTextAlignment, LineWrap, VerticalTextAlignment};
 use smallvec::SmallVec;
-use std::f32::consts::PI;
+use std::{default, f32::consts::PI};
 
 #[derive(Component, Debug, Copy, Clone)]
 pub struct CompNode {
@@ -25,6 +25,7 @@ pub enum CompNodeVariant {
 pub struct FrameCompNode {
     /// Whether the frame clips content outside its bounds. `true` enables clipping.
     pub clip_content: bool,
+    pub layout: bool,
 }
 
 /// A rectangle shape node.

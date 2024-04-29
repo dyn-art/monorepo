@@ -29,6 +29,7 @@ bevy_transform = { workspace = true }
 glam = { workspace = true }
 smallvec = { workspace = true }
 tiny-skia-path = { workspace = true }
+taffy = "0.4.3"
 
 # Logging
 log = { workspace = true }

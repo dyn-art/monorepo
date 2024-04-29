@@ -72,6 +72,7 @@ impl FrameNode {
             },
             frame: FrameCompNode {
                 clip_content: self.clip_content,
+                layout: false,
             },
             transform: TransformBundle::from_transform(Transform {
                 translation: self.translation.extend(0.0),

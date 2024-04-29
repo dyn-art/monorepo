@@ -4,6 +4,7 @@ use dyn_comp_asset::asset_id::ImageId;
 use dyn_utils::properties::{corner_radii::CornerRadii, opacity::Opacity, size::Size};
 use glam::Vec3;
 use smallvec::SmallVec;
+use taffy::Style;
 
 #[derive(Component, Debug, Default, Clone, Copy)]
 pub struct HierarchyLevel(pub u8);
@@ -102,6 +103,8 @@ pub struct ImageAssetMixin(pub Option<ImageId>);
 #[derive(Component, Debug, Clone)]
 pub struct AttributedStringMixin(pub AttributedString);
 
+// TODO START: Remove current constraints implementation and replace with layout mixin
+
 #[derive(Component, Debug, Default, Clone, Copy)]
 pub struct ConstraintsMixin(pub Constraints);
 
@@ -134,4 +137,83 @@ pub struct ConstraintsLayoutMetricsMixin {
     pub pos: Vec3,
     pub size: Size,
     pub parent_size: Size,
+}
+
+// TODO END
+
+#[derive(Component, Debug, Copy, Clone)]
+pub struct LayoutTreeNodeId(pub taffy::NodeId);
+
+pub trait ToTaffyStyle {
+    fn to_style(&self) -> taffy::Style;
+}
+
+#[derive(Component, Debug, Copy, Clone)]
+pub struct LeafLayoutMixin {
+    pub align_self: AlignItems,
+    pub justify_self: AlignItems,
+}
+
+impl ToTaffyStyle for LeafLayoutMixin {
+    fn to_style(&self) -> taffy::Style {
+        Style {
+            align_self: Some(self.align_self.to_align_items()),
+            justify_self: Some(self.justify_self.to_align_items()),
+            ..Default::default()
+        }
+    }
+}
+
+#[derive(Component, Debug, Copy, Clone)]
+pub struct ParentLayoutMixin {
+    // TODO:
+}
+
+impl ToTaffyStyle for ParentLayoutMixin {
+    fn to_style(&self) -> taffy::Style {
+        Style::default()
+    }
+}
+
+#[derive(Debug, Default, PartialEq, Eq, Copy, Clone)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type)
+)]
+pub enum AlignItems {
+    /// Items are packed toward the start of the axis
+    #[default]
+    Start,
+    /// Items are packed toward the end of the axis
+    End,
+    /// Items are packed towards the flex-relative start of the axis.
+    ///
+    /// For flex containers with flex_direction RowReverse or ColumnReverse this is equivalent
+    /// to End. In all other cases it is equivalent to Start.
+    FlexStart,
+    /// Items are packed towards the flex-relative end of the axis.
+    ///
+    /// For flex containers with flex_direction RowReverse or ColumnReverse this is equivalent
+    /// to Start. In all other cases it is equivalent to End.
+    FlexEnd,
+    /// Items are packed along the center of the cross axis
+    Center,
+    /// Items are aligned such as their baselines align
+    Baseline,
+    /// Stretch to fill the container
+    Stretch,
+}
+
+impl AlignItems {
+    pub fn to_align_items(&self) -> taffy::AlignItems {
+        match self {
+            AlignItems::Start => taffy::AlignItems::Start,
+            AlignItems::End => taffy::AlignItems::End,
+            AlignItems::FlexStart => taffy::AlignItems::FlexStart,
+            AlignItems::FlexEnd => taffy::AlignItems::FlexEnd,
+            AlignItems::Center => taffy::AlignItems::Center,
+            AlignItems::Baseline => taffy::AlignItems::Baseline,
+            AlignItems::Stretch => taffy::AlignItems::Stretch,
+        }
+    }
 }

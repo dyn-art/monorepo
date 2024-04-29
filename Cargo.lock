@@ -841,6 +841,7 @@ dependencies = [
  "serde",
  "smallvec",
  "specta",
+ "taffy",
  "tiny-skia-path",
 ]
 

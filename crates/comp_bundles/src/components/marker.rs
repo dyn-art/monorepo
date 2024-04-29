@@ -17,3 +17,6 @@ pub struct StaleTransform;
 /// This is typically triggered by changes in the entity's dimensions or scaling factors.
 #[derive(Component, Debug, Default, Copy, Clone)]
 pub struct StaleSize;
+
+#[derive(Component, Debug, Default, Copy, Clone)]
+pub struct StaleLayout;
