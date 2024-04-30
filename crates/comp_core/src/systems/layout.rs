@@ -4,118 +4,137 @@ use crate::resources::{
 };
 use bevy_ecs::{
     change_detection::DetectChanges,
-    entity::{Entity, EntityHashSet},
+    entity::Entity,
     query::{Added, Changed, Or, With, Without},
-    system::{Commands, ParamSet, Query, Res, ResMut},
+    system::{Commands, Query, Res, ResMut},
     world::Ref,
 };
 use bevy_hierarchy::{Children, Parent};
 use bevy_transform::components::Transform;
 use dyn_comp_bundles::components::{
     marker::StaleLayout,
-    mixins::{LayoutTreeNodeId, LeafLayoutMixin, ParentLayoutMixin, SizeMixin},
-    nodes::FrameCompNode,
+    mixins::{LayoutElementMixin, LayoutNodeId, LayoutParentMixin, SizeMixin},
 };
 use dyn_utils::units::abs::Abs;
 use glam::Vec3;
+use hashbrown::HashSet;
 
-pub fn discover_nodes_for_layout_trees(
+pub fn add_new_layout_parents_to_layout_tree(
     mut commands: Commands,
     mut layout_res: ResMut<LayoutRes>,
-    changed_frame_without_layout_query: Query<
-        (Entity, &FrameCompNode, &Children),
-        (Changed<FrameCompNode>, Without<LayoutTreeNodeId>),
+    added_layout_parent_query: Query<
+        (Entity, &Children),
+        (Without<LayoutNodeId>, Added<LayoutParentMixin>),
     >,
-    changed_children_query: Query<(Entity, &Children), (With<LayoutTreeNodeId>, Changed<Children>)>,
     layout_mixin_query: Query<
         (
-            Option<&ParentLayoutMixin>,
-            Option<&LeafLayoutMixin>,
+            Option<&LayoutParentMixin>,
+            Option<&LayoutElementMixin>,
             &Transform,
             &SizeMixin,
         ),
-        Without<LayoutTreeNodeId>,
+        Without<LayoutNodeId>,
     >,
 ) {
-    let mut synced_parent = EntityHashSet::default();
-
-    for (entity, frame_comp_node, children) in changed_frame_without_layout_query.iter() {
-        if frame_comp_node.layout {
+    for (parent, children) in added_layout_parent_query.iter() {
+        if let Ok((
+            maybe_parent_layout_parent_mixin,
+            maybe_parent_layout_element_mixin,
+            parent_transform,
+            SizeMixin(parent_size),
+        )) = layout_mixin_query.get(parent)
+        {
             // Insert parent into layout tree
-            if let Ok((parent_layout_mixin, leaf_layout_mixin, transform, SizeMixin(size))) =
-                layout_mixin_query.get(entity)
+            let parent_node_id = layout_res
+                .tree
+                .new_leaf(
+                    parent,
+                    LayoutTree::merge_layout_parent_with_element(
+                        maybe_parent_layout_parent_mixin.map(|mixin| &mixin.0),
+                        maybe_parent_layout_element_mixin.map(|mixin| &mixin.0),
+                        parent_transform,
+                        parent_size,
+                    ),
+                )
+                .unwrap();
+            commands
+                .entity(parent)
+                .insert((LayoutNodeId(parent_node_id), StaleLayout));
+
+            // Insert parent's children into layout tree
+            for child in children {
+                if let Some((
+                    maybe_child_layout_parent_mixin,
+                    maybe_child_layout_elment_mixin,
+                    child_transform,
+                    SizeMixin(child_size),
+                )) = layout_mixin_query.get(*child).ok()
+                {
+                    let child_node_id = layout_res
+                        .tree
+                        .new_leaf(
+                            *child,
+                            LayoutTree::merge_layout_parent_with_element(
+                                maybe_child_layout_parent_mixin.map(|mixin| &mixin.0),
+                                maybe_child_layout_elment_mixin.map(|mixin| &mixin.0),
+                                child_transform,
+                                child_size,
+                            ),
+                        )
+                        .unwrap();
+                    commands
+                        .entity(*child)
+                        .insert((LayoutNodeId(child_node_id), StaleLayout));
+                }
+            }
+        }
+    }
+}
+
+// TODO: System to remove nodes and its children from the layout tree
+// if the LayoutParentMixin got removed (e.g. "remove_layout_parents_from_layout_tree")
+
+pub fn update_layout_parent_children(
+    mut commands: Commands,
+    mut layout_res: ResMut<LayoutRes>,
+    changed_children_query: Query<&Children, (With<LayoutNodeId>, Changed<Children>)>,
+    layout_mixin_query: Query<
+        (
+            Option<&LayoutParentMixin>,
+            Option<&LayoutElementMixin>,
+            &Transform,
+            &SizeMixin,
+        ),
+        Without<LayoutNodeId>,
+    >,
+) {
+    for children in changed_children_query.iter() {
+        for child in children {
+            if let Some((
+                maybe_layout_parent_mixin,
+                maybe_layout_element_mixin,
+                transform,
+                SizeMixin(size),
+            )) = layout_mixin_query.get(*child).ok()
             {
                 let node_id = layout_res
                     .tree
-                    .new_leaf(LayoutTree::node_mixins_to_style(
-                        parent_layout_mixin,
-                        leaf_layout_mixin,
-                        transform,
-                        size,
-                    ))
-                    .unwrap();
-                synced_parent.insert(entity);
-                commands
-                    .entity(entity)
-                    .insert((LayoutTreeNodeId(node_id), StaleLayout));
-
-                // Insert children into layout tree
-                for child in children {
-                    if let Some((
-                        maybe_parent_layout_mixin,
-                        maybe_leaf_layout_mixin,
-                        transform,
-                        SizeMixin(size),
-                    )) = layout_mixin_query.get(*child).ok()
-                    {
-                        let node_id = layout_res
-                            .tree
-                            .new_leaf(LayoutTree::node_mixins_to_style(
-                                maybe_parent_layout_mixin,
-                                maybe_leaf_layout_mixin,
-                                transform,
-                                size,
-                            ))
-                            .unwrap();
-                        commands
-                            .entity(entity)
-                            .insert((LayoutTreeNodeId(node_id), StaleLayout));
-                    }
-                }
-            }
-        }
-    }
-
-    for (entity, children) in changed_children_query.iter() {
-        if !synced_parent.contains(&entity) {
-            for child in children {
-                if let Some((
-                    maybe_parent_layout_mixin,
-                    maybe_leaf_layout_mixin,
-                    transform,
-                    SizeMixin(size),
-                )) = layout_mixin_query.get(*child).ok()
-                {
-                    let node_id = layout_res
-                        .tree
-                        .new_leaf(LayoutTree::node_mixins_to_style(
-                            maybe_parent_layout_mixin,
-                            maybe_leaf_layout_mixin,
+                    .new_leaf(
+                        *child,
+                        LayoutTree::merge_layout_parent_with_element(
+                            maybe_layout_parent_mixin.map(|mixin| &mixin.0),
+                            maybe_layout_element_mixin.map(|mixin| &mixin.0),
                             transform,
                             size,
-                        ))
-                        .unwrap();
-                    commands
-                        .entity(entity)
-                        .insert((LayoutTreeNodeId(node_id), StaleLayout));
-                }
+                        ),
+                    )
+                    .unwrap();
+                commands
+                    .entity(*child)
+                    .insert((LayoutNodeId(node_id), StaleLayout));
             }
         }
     }
-
-    // TODO: Remove removed children from layout tree
-
-    // TODO: Add system to unregister layout
 }
 
 pub fn mark_nodes_with_layout_change_as_stale(
@@ -125,18 +144,18 @@ pub fn mark_nodes_with_layout_change_as_stale(
     query: Query<
         (
             Entity,
-            &LayoutTreeNodeId,
-            Option<&ParentLayoutMixin>,
-            Option<&LeafLayoutMixin>,
+            &LayoutNodeId,
+            Option<&LayoutParentMixin>,
+            Option<&LayoutElementMixin>,
             Ref<Transform>,
             Ref<SizeMixin>,
         ),
         (
-            With<LayoutTreeNodeId>,
+            With<LayoutNodeId>,
             Without<StaleLayout>,
             Or<(
-                Changed<ParentLayoutMixin>,
-                Changed<LeafLayoutMixin>,
+                Changed<LayoutParentMixin>,
+                Changed<LayoutElementMixin>,
                 Changed<Transform>,
                 Changed<SizeMixin>,
             )>,
@@ -145,9 +164,9 @@ pub fn mark_nodes_with_layout_change_as_stale(
 ) {
     for (
         entity,
-        LayoutTreeNodeId(node_id),
-        maybe_parent_layout_mixin,
-        maybe_leaf_layout_mixin,
+        LayoutNodeId(node_id),
+        maybe_layout_parent_mixin,
+        maybe_layout_element_mixin,
         transform,
         size_mixin,
     ) in query.iter()
@@ -163,9 +182,9 @@ pub fn mark_nodes_with_layout_change_as_stale(
         {
             layout_res.tree.update_leaf(
                 *node_id,
-                LayoutTree::node_mixins_to_style(
-                    maybe_parent_layout_mixin,
-                    maybe_leaf_layout_mixin,
+                LayoutTree::merge_layout_parent_with_element(
+                    maybe_layout_parent_mixin.map(|mixin| &mixin.0),
+                    maybe_layout_element_mixin.map(|mixin| &mixin.0),
                     transform.as_ref(),
                     &size_mixin.as_ref().0,
                 ),
@@ -178,43 +197,57 @@ pub fn mark_nodes_with_layout_change_as_stale(
 pub fn update_layout(
     mut commands: Commands,
     mut layout_res: ResMut<LayoutRes>,
-    mut queries: ParamSet<(
-        Query<
-            (Entity, &LayoutTreeNodeId, &SizeMixin, &Children),
-            (Added<StaleLayout>, With<LayoutTreeNodeId>),
-        >,
-        Query<(&LayoutTreeNodeId, &SizeMixin), With<LayoutTreeNodeId>>,
-        Query<(&LayoutTreeNodeId, &mut SizeMixin, &mut Transform), With<LayoutTreeNodeId>>,
-    )>,
-    leaf_query: Query<(Entity, &Parent), (Added<StaleLayout>, With<LayoutTreeNodeId>)>,
-) {
-    let mut to_update_entities: Vec<Entity> = Vec::new();
 
-    for (entity, LayoutTreeNodeId(node_id), SizeMixin(size), children) in queries.p0().iter() {
-        layout_res.tree.compute_layouts(*node_id, *size).unwrap();
-        to_update_entities.push(entity);
-        to_update_entities.extend(children.iter());
+    parent_query: Query<(Entity, Option<&Parent>), (Added<StaleLayout>, With<LayoutNodeId>)>,
+    children_query: Query<&Children, With<LayoutNodeId>>,
+    mut to_update_nodes_query: Query<
+        (&LayoutNodeId, &mut SizeMixin, &mut Transform),
+        With<LayoutNodeId>,
+    >,
+) {
+    let mut to_update_parents: HashSet<Entity> = HashSet::new();
+
+    // Identify parent nodes whose layout needs to be recomputed
+    for (entity, parent) in parent_query.iter() {
+        to_update_parents.insert(parent.map(|p| p.get()).unwrap_or(entity));
         commands.entity(entity).remove::<StaleLayout>();
     }
 
-    for (entity, parent) in leaf_query.iter() {
-        if let Ok((LayoutTreeNodeId(node_id), SizeMixin(size))) = queries.p1().get(parent.get()) {
-            layout_res.tree.compute_layouts(*node_id, *size).unwrap();
-            to_update_entities.push(parent.get());
-            to_update_entities.push(entity);
-            commands.entity(entity).remove::<StaleLayout>();
-        }
-    }
-
-    for entity in to_update_entities {
-        if let Ok((LayoutTreeNodeId(node_id), mut size_mixin, mut transform)) =
-            queries.p2().get_mut(entity)
+    // Recompute layout
+    for parent in to_update_parents {
+        if let Ok((LayoutNodeId(parent_node_id), mut parent_size_mixin, mut parent_transform)) =
+            to_update_nodes_query.get_mut(parent)
         {
-            if let Ok(layout) = layout_res.tree.get_layout(*node_id) {
-                log::info!("[update_layout] {:?}: {:?}", entity, layout); // TODO: REMOVE
-                size_mixin.0.width = Abs::pt(layout.size.width);
-                size_mixin.0.height = Abs::pt(layout.size.height);
-                transform.translation = Vec3::new(layout.location.x, layout.location.y, 0.0);
+            log::info!("[update_layout] Compute Layout: {:?}", parent_size_mixin.0); // TODO: REMOVE
+            layout_res
+                .tree
+                .compute_layouts(*parent_node_id, parent_size_mixin.0)
+                .unwrap();
+
+            if let Ok(layout) = layout_res.tree.get_layout(*parent_node_id) {
+                log::info!("[update_layout] Parent {:?}: {:?}", parent, layout); // TODO: REMOVE
+                parent_size_mixin.0.width = Abs::pt(layout.size.width);
+                parent_size_mixin.0.height = Abs::pt(layout.size.height);
+                parent_transform.translation = Vec3::new(layout.location.x, layout.location.y, 0.0);
+            }
+
+            if let Ok(children) = children_query.get(parent) {
+                for child in children {
+                    if let Ok((
+                        LayoutNodeId(child_node_id),
+                        mut child_size_mixin,
+                        mut child_transform,
+                    )) = to_update_nodes_query.get_mut(*child)
+                    {
+                        if let Ok(child_layout) = layout_res.tree.get_layout(*child_node_id) {
+                            log::info!("[update_layout] Child {:?}: {:?}", child, child_layout); // TODO: REMOVE
+                            child_size_mixin.0.width = Abs::pt(child_layout.size.width);
+                            child_size_mixin.0.height = Abs::pt(child_layout.size.height);
+                            child_transform.translation =
+                                Vec3::new(child_layout.location.x, child_layout.location.y, 0.0);
+                        }
+                    }
+                }
             }
         }
     }

@@ -8,7 +8,7 @@ import type {
 import {
 	createDtifStyles,
 	mapFigmaBlendModeToDtif,
-	mapFigmaConstraintToDtif,
+	mapFigmaConstraintsToDtif,
 	mapFigmaTransformToRotation,
 	mapFigmaTransformToTranslation
 } from '../../utils';
@@ -33,8 +33,7 @@ export function transformRectangleNode(
 		],
 		blendMode: mapFigmaBlendModeToDtif(node.blendMode),
 		opacity: node.opacity,
-		alignSelf: mapFigmaConstraintToDtif(node.constraints.horizontal),
-		justifySelf: mapFigmaConstraintToDtif(node.constraints.vertical),
+		layoutElement: { type: 'Absolute', constraints: mapFigmaConstraintsToDtif(node.constraints) },
 		styles: createDtifStyles(fills, strokes, effects)
 	};
 }

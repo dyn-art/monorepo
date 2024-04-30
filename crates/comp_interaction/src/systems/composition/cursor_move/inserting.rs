@@ -18,7 +18,7 @@ use dyn_comp_bundles::{
     components::{
         marker::Root,
         mixins::{
-            BlendModeMixin, CornerRadiiMixin, LeafLayoutMixin, OpacityMixin, PaintChildMixin,
+            BlendModeMixin, CornerRadiiMixin, LayoutElementMixin, OpacityMixin, PaintChildMixin,
             PaintParentMixin, SizeMixin, StyleChildrenMixin, StyleParentMixin, VisibilityMixin,
         },
         nodes::{
@@ -130,7 +130,7 @@ pub fn handle_inserting(
                     visibility: VisibilityMixin::default(),
                     blend_mode: BlendModeMixin::default(),
                     opacity: OpacityMixin::default(),
-                    leaf_layout: LeafLayoutMixin::default(),
+                    layout_element: LayoutElementMixin::default(),
                 })
                 .id(),
             ShapeVariant::Ellipse => commands
@@ -146,7 +146,7 @@ pub fn handle_inserting(
                     visibility: VisibilityMixin::default(),
                     blend_mode: BlendModeMixin::default(),
                     opacity: OpacityMixin::default(),
-                    leaf_layout: LeafLayoutMixin::default(),
+                    layout_element: LayoutElementMixin::default(),
                 })
                 .id(),
             ShapeVariant::Star => commands
@@ -162,7 +162,7 @@ pub fn handle_inserting(
                     visibility: VisibilityMixin::default(),
                     blend_mode: BlendModeMixin::default(),
                     opacity: OpacityMixin::default(),
-                    leaf_layout: LeafLayoutMixin::default(),
+                    layout_element: LayoutElementMixin::default(),
                 })
                 .id(),
             ShapeVariant::Polygon => commands
@@ -178,7 +178,7 @@ pub fn handle_inserting(
                     visibility: VisibilityMixin::default(),
                     blend_mode: BlendModeMixin::default(),
                     opacity: OpacityMixin::default(),
-                    leaf_layout: LeafLayoutMixin::default(),
+                    layout_element: LayoutElementMixin::default(),
                 })
                 .id(),
         };

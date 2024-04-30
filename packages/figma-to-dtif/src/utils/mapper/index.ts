@@ -1,5 +1,6 @@
 export * from './map-figma-blend-mode-to-dtif';
 export * from './map-figma-constraint-to-dtif';
+export * from './map-figma-constraints-to-dtif';
 export * from './map-figma-format-to-dtif-content-type';
 export * from './map-figma-rgb-to-dtif';
 export * from './map-figma-text-align-horizontal-to-dtif';

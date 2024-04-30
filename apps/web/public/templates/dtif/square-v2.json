@@ -6,7 +6,7 @@
 		"1": {
 			"type": "Frame",
 			"clipContent": false,
-			"layout": true,
+			"layoutParent": {},
 			"visible": true,
 			"children": ["2"],
 			"size": [500, 500],
@@ -15,8 +15,10 @@
 			"cornerRadii": [0, 0, 0, 0],
 			"blendMode": "Normal",
 			"opacity": 1,
-			"alignSelf": "Start",
-			"justifySelf": "Start",
+			"layoutElement": {
+				"type": "Absolute",
+				"constraints": { "horizontal": "Start", "vertical": "Start" }
+			},
 			"styles": [
 				{ "type": "Fill", "paintId": "5", "blendMode": "Normal", "opacity": 1, "visible": true }
 			]
@@ -30,8 +32,10 @@
 			"cornerRadii": [0, 0, 0, 0],
 			"blendMode": "Normal",
 			"opacity": 1,
-			"alignSelf": "Center",
-			"justifySelf": "Center",
+			"layoutElement": {
+				"type": "Absolute",
+				"constraints": { "horizontal": "Start", "vertical": "Start" }
+			},
 			"styles": [
 				{
 					"type": "Stroke",
@@ -48,7 +52,7 @@
 	"paints": {
 		"3": { "type": "Solid", "color": [217, 217, 217] },
 		"4": { "type": "Solid", "color": [0, 0, 0] },
-		"5": { "type": "Solid", "color": [255, 255, 255] }
+		"5": { "type": "Solid", "color": [255, 219, 219] }
 	},
 	"assets": {},
 	"viewport": { "physicalPosition": [0, 0], "physicalSize": [500, 500] }

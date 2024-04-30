@@ -1,6 +1,6 @@
 import type { COMP } from '@dyn/dtif-comp';
 
-export function mapFigmaConstraintToDtif(figmaConstraint?: ConstraintType): COMP.AlignItems {
+export function mapFigmaConstraintToDtif(figmaConstraint?: ConstraintType): COMP.Constraint {
 	switch (figmaConstraint) {
 		case 'MIN':
 			return 'Start';

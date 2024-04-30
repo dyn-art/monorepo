@@ -20,7 +20,8 @@ use systems::{
     },
     hierarchy::update_hierarchy_levels,
     layout::{
-        discover_nodes_for_layout_trees, mark_nodes_with_layout_change_as_stale, update_layout,
+        add_new_layout_parents_to_layout_tree, mark_nodes_with_layout_change_as_stale,
+        update_layout, update_layout_parent_children,
     },
     outline::{
         ellipse::outline_ellipse,
@@ -133,7 +134,8 @@ impl Plugin for CompCorePlugin {
         app.add_systems(
             Update,
             (
-                discover_nodes_for_layout_trees.in_set(CompCoreSystemSet::PreLayout),
+                add_new_layout_parents_to_layout_tree.in_set(CompCoreSystemSet::PreLayout),
+                update_layout_parent_children.in_set(CompCoreSystemSet::PreLayout),
                 mark_nodes_with_layout_change_as_stale.in_set(CompCoreSystemSet::PreLayout),
                 update_layout.in_set(CompCoreSystemSet::Layout),
             ),

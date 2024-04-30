@@ -7,8 +7,9 @@ use dyn_attributed_string::{HorizontalTextAlignment, LineWrap, VerticalTextAlign
 use dyn_comp_bundles::{
     components::{
         mixins::{
-            AlignItems, BlendMode, BlendModeMixin, CornerRadiiMixin, LeafLayoutMixin, OpacityMixin,
-            PathMixin, SizeMixin, VisibilityMixin, WindingRule,
+            BlendMode, BlendModeMixin, CornerRadiiMixin, LayoutElement, LayoutElementMixin,
+            LayoutParent, LayoutParentMixin, OpacityMixin, PathMixin, SizeMixin, VisibilityMixin,
+            WindingRule,
         },
         nodes::{
             CompNode, CompNodeVariant, EllipseArcData, EllipseCompNode, FrameCompNode,
@@ -43,8 +44,8 @@ pub enum Node {
 pub struct FrameNode {
     #[serde(default = "default_as_false")]
     pub clip_content: bool,
-    #[serde(default = "default_as_false")]
-    pub layout: bool,
+    #[serde(default)]
+    pub layout_parent: Option<LayoutParent>,
     #[serde(default)]
     pub translation: Vec2,
     #[serde(default)]
@@ -59,9 +60,7 @@ pub struct FrameNode {
     #[serde(default)]
     pub opacity: Opacity,
     #[serde(default)]
-    pub align_self: AlignItems,
-    #[serde(default)]
-    pub justify_self: AlignItems,
+    layout_element: LayoutElement,
     #[serde(default)]
     pub styles: Vec<Style>,
     #[serde(default)]
@@ -76,7 +75,6 @@ impl FrameNode {
             },
             frame: FrameCompNode {
                 clip_content: self.clip_content,
-                layout: self.layout,
             },
             transform: TransformBundle::from_transform(Transform {
                 translation: self.translation.extend(0.0),
@@ -88,17 +86,20 @@ impl FrameNode {
             visibility: VisibilityMixin(self.visible),
             blend_mode: BlendModeMixin(self.blend_mode),
             opacity: OpacityMixin(self.opacity),
-            leaf_layout: LeafLayoutMixin {
-                align_self: self.align_self,
-                justify_self: self.justify_self,
-            },
+            layout_element: LayoutElementMixin(self.layout_element),
         }
     }
 }
 
 impl SpawnBundleImpl for FrameNode {
     fn spawn<'a>(&self, _: &DtifHandler, world: &'a mut World) -> EntityWorldMut<'a> {
-        world.spawn(self.to_ecs_bundle())
+        let mut entity_world = world.spawn(self.to_ecs_bundle());
+
+        if let Some(layout_parent) = self.layout_parent {
+            entity_world.insert(LayoutParentMixin(layout_parent));
+        }
+
+        return entity_world;
     }
 }
 
@@ -119,9 +120,7 @@ pub struct RectangleNode {
     #[serde(default)]
     pub opacity: Opacity,
     #[serde(default)]
-    pub align_self: AlignItems,
-    #[serde(default)]
-    pub justify_self: AlignItems,
+    layout_element: LayoutElement,
     #[serde(default)]
     pub styles: Vec<Style>,
 }
@@ -143,10 +142,7 @@ impl RectangleNode {
             visibility: VisibilityMixin(self.visible),
             blend_mode: BlendModeMixin(self.blend_mode),
             opacity: OpacityMixin(self.opacity),
-            leaf_layout: LeafLayoutMixin {
-                align_self: self.align_self,
-                justify_self: self.justify_self,
-            },
+            layout_element: LayoutElementMixin(self.layout_element),
         }
     }
 }
@@ -178,9 +174,7 @@ pub struct EllipseNode {
     #[serde(default)]
     pub opacity: Opacity,
     #[serde(default)]
-    pub align_self: AlignItems,
-    #[serde(default)]
-    pub justify_self: AlignItems,
+    layout_element: LayoutElement,
     #[serde(default)]
     pub styles: Vec<Style>,
 }
@@ -207,10 +201,7 @@ impl EllipseNode {
             visibility: VisibilityMixin(self.visible),
             blend_mode: BlendModeMixin(self.blend_mode),
             opacity: OpacityMixin(self.opacity),
-            leaf_layout: LeafLayoutMixin {
-                align_self: self.align_self,
-                justify_self: self.justify_self,
-            },
+            layout_element: LayoutElementMixin(self.layout_element),
         }
     }
 }
@@ -240,9 +231,7 @@ pub struct StarNode {
     #[serde(default)]
     pub opacity: Opacity,
     #[serde(default)]
-    pub align_self: AlignItems,
-    #[serde(default)]
-    pub justify_self: AlignItems,
+    layout_element: LayoutElement,
     #[serde(default)]
     pub styles: Vec<Style>,
 }
@@ -266,10 +255,7 @@ impl StarNode {
             visibility: VisibilityMixin(self.visible),
             blend_mode: BlendModeMixin(self.blend_mode),
             opacity: OpacityMixin(self.opacity),
-            leaf_layout: LeafLayoutMixin {
-                align_self: self.align_self,
-                justify_self: self.justify_self,
-            },
+            layout_element: LayoutElementMixin(self.layout_element),
         }
     }
 }
@@ -302,9 +288,7 @@ pub struct PolygonNode {
     #[serde(default)]
     pub opacity: Opacity,
     #[serde(default)]
-    pub align_self: AlignItems,
-    #[serde(default)]
-    pub justify_self: AlignItems,
+    layout_element: LayoutElement,
     #[serde(default)]
     pub styles: Vec<Style>,
 }
@@ -327,10 +311,7 @@ impl PolygonNode {
             visibility: VisibilityMixin(self.visible),
             blend_mode: BlendModeMixin(self.blend_mode),
             opacity: OpacityMixin(self.opacity),
-            leaf_layout: LeafLayoutMixin {
-                align_self: self.align_self,
-                justify_self: self.justify_self,
-            },
+            layout_element: LayoutElementMixin(self.layout_element),
         }
     }
 }
@@ -369,9 +350,7 @@ pub struct TextNode {
     #[serde(default)]
     pub opacity: Opacity,
     #[serde(default)]
-    pub align_self: AlignItems,
-    #[serde(default)]
-    pub justify_self: AlignItems,
+    layout_element: LayoutElement,
     #[serde(default)]
     pub styles: Vec<Style>,
 }
@@ -398,10 +377,7 @@ impl TextNode {
             visibility: VisibilityMixin(self.visible),
             blend_mode: BlendModeMixin(self.blend_mode),
             opacity: OpacityMixin(self.opacity),
-            leaf_layout: LeafLayoutMixin {
-                align_self: self.align_self,
-                justify_self: self.justify_self,
-            },
+            layout_element: LayoutElementMixin(self.layout_element),
         }
     }
 }
@@ -430,9 +406,7 @@ pub struct VectorNode {
     #[serde(default)]
     pub opacity: Opacity,
     #[serde(default)]
-    pub align_self: AlignItems,
-    #[serde(default)]
-    pub justify_self: AlignItems,
+    layout_element: LayoutElement,
     #[serde(default)]
     pub styles: Vec<Style>,
 }
@@ -457,10 +431,7 @@ impl VectorNode {
             visibility: VisibilityMixin(self.visible),
             blend_mode: BlendModeMixin(self.blend_mode),
             opacity: OpacityMixin(self.opacity),
-            leaf_layout: LeafLayoutMixin {
-                align_self: self.align_self,
-                justify_self: self.justify_self,
-            },
+            layout_element: LayoutElementMixin(self.layout_element),
         }
     }
 }

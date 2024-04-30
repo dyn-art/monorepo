@@ -1,5 +1,6 @@
+use bevy_ecs::entity::Entity;
 use bevy_transform::components::Transform;
-use dyn_comp_bundles::components::mixins::{LeafLayoutMixin, ParentLayoutMixin, ToTaffyStyle};
+use dyn_comp_bundles::components::mixins::{LayoutElement, LayoutParent};
 use dyn_utils::properties::size::Size;
 use taffy::{prelude::*, TaffyError};
 
@@ -20,7 +21,8 @@ impl LayoutTree {
         }
     }
 
-    pub fn new_leaf(&mut self, style: Style) -> Result<NodeId, LayoutError> {
+    pub fn new_leaf(&mut self, entity: Entity, style: Style) -> Result<NodeId, LayoutError> {
+        log::info!("[new_leaf] {:?}: {:#?}", entity, style); // TODO: REMOVE
         self.taffy_tree
             .new_leaf(style)
             .map_err(|e| LayoutError::TaffyError(e))
@@ -66,70 +68,29 @@ impl LayoutTree {
             .map_err(|e| LayoutError::TaffyError(e))
     }
 
-    pub fn node_mixins_to_style(
-        parent_layout_mixin: Option<&ParentLayoutMixin>,
-        leaf_layout_mixin: Option<&LeafLayoutMixin>,
+    pub fn merge_layout_parent_with_element(
+        maybe_layout_parent: Option<&LayoutParent>,
+        maybe_layout_element: Option<&LayoutElement>,
         transform: &Transform,
         size: &Size,
     ) -> Style {
-        let parent_layout_style = parent_layout_mixin
-            .map(|pl| pl.to_style())
-            .unwrap_or(Style::default());
-        let leaf_layout_style = leaf_layout_mixin
-            .map(|ll| ll.to_style())
-            .unwrap_or(Style::default());
+        let mut style = Style::default();
 
-        // Default margins are Auto
-        let mut margin_left = LengthPercentageAuto::Auto;
-        let mut margin_right = LengthPercentageAuto::Auto;
-        let mut margin_top = LengthPercentageAuto::Auto;
-        let mut margin_bottom = LengthPercentageAuto::Auto;
+        if let Some(layout_parent) = maybe_layout_parent {
+            let layout_parent_style = layout_parent.to_style();
 
-        // Adjust margins based on justify_self and align_self
-        match leaf_layout_style.justify_self {
-            Some(AlignItems::Start) | Some(AlignItems::FlexStart) => {
-                margin_left = LengthPercentageAuto::Length(transform.translation.x);
-            }
-            Some(AlignItems::End) | Some(AlignItems::FlexEnd) => {
-                margin_right = LengthPercentageAuto::Length(transform.translation.x);
-            }
-            Some(AlignItems::Center) => {
-                margin_left = LengthPercentageAuto::Length(transform.translation.x / 2.0);
-                margin_right = LengthPercentageAuto::Length(transform.translation.x / 2.0);
-            }
-            _ => {}
+            // TODO:
         }
 
-        match leaf_layout_style.align_self {
-            Some(AlignItems::Start) | Some(AlignItems::FlexStart) => {
-                margin_top = LengthPercentageAuto::Length(transform.translation.y);
-            }
-            Some(AlignItems::End) | Some(AlignItems::FlexEnd) => {
-                margin_bottom = LengthPercentageAuto::Length(transform.translation.y);
-            }
-            Some(AlignItems::Center) => {
-                margin_top = LengthPercentageAuto::Length(transform.translation.y / 2.0);
-                margin_bottom = LengthPercentageAuto::Length(transform.translation.y / 2.0);
-            }
-            _ => {}
+        if let Some(layout_element) = maybe_layout_element {
+            let layout_element_style = layout_element.to_style(transform, size);
+
+            style.position = layout_element_style.position;
+            style.inset = layout_element_style.inset;
+            style.size = layout_element_style.size;
         }
 
-        // Constructing the final Style object
-        Style {
-            align_self: leaf_layout_style.align_self,
-            justify_self: leaf_layout_style.justify_self,
-            margin: Rect {
-                left: margin_left,
-                right: margin_right,
-                top: margin_top,
-                bottom: margin_bottom,
-            },
-            size: taffy::Size {
-                width: Dimension::Length(size.width()),
-                height: Dimension::Length(size.height()),
-            },
-            ..Default::default()
-        }
+        return style;
     }
 }
 

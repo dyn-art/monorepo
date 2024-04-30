@@ -1,9 +1,9 @@
 use bevy_ecs::{component::Component, entity::Entity};
+use bevy_transform::components::Transform;
 use dyn_attributed_string::AttributedString;
 use dyn_comp_asset::asset_id::ImageId;
 use dyn_utils::properties::{corner_radii::CornerRadii, opacity::Opacity, size::Size};
 use smallvec::SmallVec;
-use taffy::Style;
 
 #[derive(Component, Debug, Default, Clone, Copy)]
 pub struct HierarchyLevel(pub u8);
@@ -103,37 +103,142 @@ pub struct ImageAssetMixin(pub Option<ImageId>);
 pub struct AttributedStringMixin(pub AttributedString);
 
 #[derive(Component, Debug, Copy, Clone)]
-pub struct LayoutTreeNodeId(pub taffy::NodeId);
+pub struct LayoutNodeId(pub taffy::NodeId);
 
-pub trait ToTaffyStyle {
-    fn to_style(&self) -> taffy::Style;
+#[derive(Component, Debug, Default, Copy, Clone)]
+pub struct LayoutParentMixin(pub LayoutParent);
+
+#[derive(Debug, Default, Copy, Clone)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type)
+)]
+pub struct LayoutParent {
+    // TODO
+}
+
+impl LayoutParent {
+    pub fn to_style(&self) -> taffy::Style {
+        taffy::Style::default()
+    }
 }
 
 #[derive(Component, Debug, Default, Copy, Clone)]
-pub struct LeafLayoutMixin {
-    pub align_self: AlignItems,
-    pub justify_self: AlignItems,
+pub struct LayoutElementMixin(pub LayoutElement);
+
+#[derive(Debug, Copy, Clone)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type),
+    serde(tag = "type")
+)]
+pub enum LayoutElement {
+    Absolute(AbsoluteLayoutElement),
+    Static(StaticLayoutElement),
 }
 
-impl ToTaffyStyle for LeafLayoutMixin {
-    fn to_style(&self) -> taffy::Style {
-        Style {
-            align_self: Some(self.align_self.to_align_items()),
-            justify_self: Some(self.justify_self.to_align_items()),
-            ..Default::default()
+impl Default for LayoutElement {
+    fn default() -> Self {
+        Self::Absolute(AbsoluteLayoutElement::default())
+    }
+}
+
+impl LayoutElement {
+    pub fn to_style(&self, transform: &Transform, size: &Size) -> taffy::Style {
+        match self {
+            LayoutElement::Absolute(element) => element.to_style(transform, size),
+            LayoutElement::Static(element) => element.to_style(),
         }
     }
 }
 
-#[derive(Component, Debug, Copy, Clone)]
-pub struct ParentLayoutMixin {
-    // TODO:
+#[derive(Debug, Default, Copy, Clone)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type)
+)]
+pub struct AbsoluteLayoutElement {
+    pub constraints: Constraints,
 }
 
-impl ToTaffyStyle for ParentLayoutMixin {
-    fn to_style(&self) -> taffy::Style {
-        Style::default()
+impl AbsoluteLayoutElement {
+    pub fn to_style(&self, transform: &Transform, size: &Size) -> taffy::Style {
+        let mut style = taffy::Style::default();
+
+        // Set the position type to absolute
+        style.position = taffy::Position::Absolute;
+
+        // Default insets
+        let mut top = taffy::LengthPercentageAuto::Auto;
+        let mut bottom = taffy::LengthPercentageAuto::Auto;
+        let mut left = taffy::LengthPercentageAuto::Auto;
+        let mut right = taffy::LengthPercentageAuto::Auto;
+
+        // Adjust horizontal insets based on the horizontal constraint
+        match self.constraints.horizontal {
+            Constraint::Start => {
+                left = taffy::LengthPercentageAuto::Length(transform.translation.x);
+                right = taffy::LengthPercentageAuto::Auto;
+            }
+            Constraint::Center => {
+                // TODO
+            }
+            Constraint::End => {
+                left = taffy::LengthPercentageAuto::Auto;
+                right = taffy::LengthPercentageAuto::Length(transform.translation.x);
+            }
+            Constraint::Stretch | Constraint::Scale => {
+                // TODO
+            }
+        }
+
+        // Adjust vertical insets based on the vertical constraint
+        match self.constraints.vertical {
+            Constraint::Start => {
+                top = taffy::LengthPercentageAuto::Length(transform.translation.y);
+                bottom = taffy::LengthPercentageAuto::Auto;
+            }
+            Constraint::Center => {
+                // TODO
+            }
+            Constraint::End => {
+                top = taffy::LengthPercentageAuto::Auto;
+                bottom = taffy::LengthPercentageAuto::Length(transform.translation.y);
+            }
+            Constraint::Stretch | Constraint::Scale => {
+                // TODO
+            }
+        }
+
+        style.inset = taffy::Rect {
+            top,
+            bottom,
+            left,
+            right,
+        };
+
+        // Set the basic size, unless overridden by Scale
+        if self.constraints.horizontal != Constraint::Scale
+            && self.constraints.vertical != Constraint::Scale
+        {
+            style.size = taffy::Size {
+                width: taffy::Dimension::Length(size.width()),
+                height: taffy::Dimension::Length(size.height()),
+            };
+        }
+
+        return style;
     }
+}
+
+#[derive(Debug, Default, Copy, Clone)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type)
+)]
+pub struct Constraints {
+    pub horizontal: Constraint,
+    pub vertical: Constraint,
 }
 
 #[derive(Debug, Default, PartialEq, Eq, Copy, Clone)]
@@ -141,40 +246,26 @@ impl ToTaffyStyle for ParentLayoutMixin {
     feature = "serde_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
-pub enum AlignItems {
-    /// Items are packed toward the start of the axis
+pub enum Constraint {
     #[default]
     Start,
-    /// Items are packed toward the end of the axis
-    End,
-    /// Items are packed towards the flex-relative start of the axis.
-    ///
-    /// For flex containers with flex_direction RowReverse or ColumnReverse this is equivalent
-    /// to End. In all other cases it is equivalent to Start.
-    FlexStart,
-    /// Items are packed towards the flex-relative end of the axis.
-    ///
-    /// For flex containers with flex_direction RowReverse or ColumnReverse this is equivalent
-    /// to Start. In all other cases it is equivalent to End.
-    FlexEnd,
-    /// Items are packed along the center of the cross axis
     Center,
-    /// Items are aligned such as their baselines align
-    Baseline,
-    /// Stretch to fill the container
+    End,
     Stretch,
+    Scale,
 }
 
-impl AlignItems {
-    pub fn to_align_items(&self) -> taffy::AlignItems {
-        match self {
-            AlignItems::Start => taffy::AlignItems::Start,
-            AlignItems::End => taffy::AlignItems::End,
-            AlignItems::FlexStart => taffy::AlignItems::FlexStart,
-            AlignItems::FlexEnd => taffy::AlignItems::FlexEnd,
-            AlignItems::Center => taffy::AlignItems::Center,
-            AlignItems::Baseline => taffy::AlignItems::Baseline,
-            AlignItems::Stretch => taffy::AlignItems::Stretch,
-        }
+#[derive(Debug, Default, Copy, Clone)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type)
+)]
+pub struct StaticLayoutElement {
+    // padding, ..
+}
+
+impl StaticLayoutElement {
+    pub fn to_style(&self) -> taffy::Style {
+        taffy::Style::default()
     }
 }

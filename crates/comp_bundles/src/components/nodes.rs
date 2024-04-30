@@ -25,7 +25,6 @@ pub enum CompNodeVariant {
 pub struct FrameCompNode {
     /// Whether the frame clips content outside its bounds. `true` enables clipping.
     pub clip_content: bool,
-    pub layout: bool,
 }
 
 /// A rectangle shape node.

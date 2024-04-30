@@ -7,7 +7,7 @@ use bevy_ecs::bundle::Bundle;
 use bevy_transform::TransformBundle;
 use components::{
     mixins::{
-        BlendModeMixin, CornerRadiiMixin, ImageAssetMixin, LeafLayoutMixin, OpacityMixin,
+        BlendModeMixin, CornerRadiiMixin, ImageAssetMixin, LayoutElementMixin, OpacityMixin,
         PaintChildMixin, PathMixin, SizeMixin, VisibilityMixin,
     },
     nodes::{
@@ -28,7 +28,7 @@ pub struct FrameCompNodeBundle {
     pub visibility: VisibilityMixin,
     pub blend_mode: BlendModeMixin,
     pub opacity: OpacityMixin,
-    pub leaf_layout: LeafLayoutMixin,
+    pub layout_element: LayoutElementMixin,
     // https://github.com/Nilirad/bevy_prototype_lyon/issues/207
     // pub styles: StylesMixin,
     // pub children: Children,
@@ -44,7 +44,7 @@ pub struct RectangleCompNodeBundle {
     pub visibility: VisibilityMixin,
     pub blend_mode: BlendModeMixin,
     pub opacity: OpacityMixin,
-    pub leaf_layout: LeafLayoutMixin,
+    pub layout_element: LayoutElementMixin,
     // https://github.com/Nilirad/bevy_prototype_lyon/issues/207
     // pub styles: StylesMixin,
 }
@@ -58,7 +58,7 @@ pub struct EllipseCompNodeBundle {
     pub visibility: VisibilityMixin,
     pub blend_mode: BlendModeMixin,
     pub opacity: OpacityMixin,
-    pub leaf_layout: LeafLayoutMixin,
+    pub layout_element: LayoutElementMixin,
     // https://github.com/Nilirad/bevy_prototype_lyon/issues/207
     // pub styles: StylesMixin,
 }
@@ -72,7 +72,7 @@ pub struct StarCompNodeBundle {
     pub visibility: VisibilityMixin,
     pub blend_mode: BlendModeMixin,
     pub opacity: OpacityMixin,
-    pub leaf_layout: LeafLayoutMixin,
+    pub layout_element: LayoutElementMixin,
     // https://github.com/Nilirad/bevy_prototype_lyon/issues/207
     // pub styles: StylesMixin,
 }
@@ -86,7 +86,7 @@ pub struct PolygonCompNodeBundle {
     pub visibility: VisibilityMixin,
     pub blend_mode: BlendModeMixin,
     pub opacity: OpacityMixin,
-    pub leaf_layout: LeafLayoutMixin,
+    pub layout_element: LayoutElementMixin,
     // https://github.com/Nilirad/bevy_prototype_lyon/issues/207
     // pub styles: StylesMixin,
 }
@@ -100,7 +100,7 @@ pub struct TextCompNodeBundle {
     pub visibility: VisibilityMixin,
     pub blend_mode: BlendModeMixin,
     pub opacity: OpacityMixin,
-    pub leaf_layout: LeafLayoutMixin,
+    pub layout_element: LayoutElementMixin,
     // https://github.com/Nilirad/bevy_prototype_lyon/issues/207
     // pub styles: StylesMixin,
 }
@@ -115,7 +115,7 @@ pub struct VectorNodeBundle {
     pub blend_mode: BlendModeMixin,
     pub opacity: OpacityMixin,
     pub path: PathMixin,
-    pub leaf_layout: LeafLayoutMixin,
+    pub layout_element: LayoutElementMixin,
     // https://github.com/Nilirad/bevy_prototype_lyon/issues/207
     // pub styles: StylesMixin,
 }
