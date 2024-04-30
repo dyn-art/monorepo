@@ -1,3 +1,4 @@
+use bevy_transform::components::Transform;
 use dyn_comp_bundles::components::mixins::{LeafLayoutMixin, ParentLayoutMixin, ToTaffyStyle};
 use dyn_utils::properties::size::Size;
 use taffy::{prelude::*, TaffyError};
@@ -65,9 +66,11 @@ impl LayoutTree {
             .map_err(|e| LayoutError::TaffyError(e))
     }
 
-    pub fn layout_mixins_to_style(
+    pub fn node_mixins_to_style(
         parent_layout_mixin: Option<&ParentLayoutMixin>,
         leaf_layout_mixin: Option<&LeafLayoutMixin>,
+        transform: &Transform,
+        size: &Size,
     ) -> Style {
         let parent_layout_style = parent_layout_mixin
             .map(|pl| pl.to_style())
@@ -76,11 +79,57 @@ impl LayoutTree {
             .map(|ll| ll.to_style())
             .unwrap_or(Style::default());
 
-        return Style {
-            align_self: parent_layout_style.align_self,
-            justify_self: parent_layout_style.justify_self,
+        // Default margins are Auto
+        let mut margin_left = LengthPercentageAuto::Auto;
+        let mut margin_right = LengthPercentageAuto::Auto;
+        let mut margin_top = LengthPercentageAuto::Auto;
+        let mut margin_bottom = LengthPercentageAuto::Auto;
+
+        // Adjust margins based on justify_self and align_self
+        match leaf_layout_style.justify_self {
+            Some(AlignItems::Start) | Some(AlignItems::FlexStart) => {
+                margin_left = LengthPercentageAuto::Length(transform.translation.x);
+            }
+            Some(AlignItems::End) | Some(AlignItems::FlexEnd) => {
+                margin_right = LengthPercentageAuto::Length(transform.translation.x);
+            }
+            Some(AlignItems::Center) => {
+                margin_left = LengthPercentageAuto::Length(transform.translation.x / 2.0);
+                margin_right = LengthPercentageAuto::Length(transform.translation.x / 2.0);
+            }
+            _ => {}
+        }
+
+        match leaf_layout_style.align_self {
+            Some(AlignItems::Start) | Some(AlignItems::FlexStart) => {
+                margin_top = LengthPercentageAuto::Length(transform.translation.y);
+            }
+            Some(AlignItems::End) | Some(AlignItems::FlexEnd) => {
+                margin_bottom = LengthPercentageAuto::Length(transform.translation.y);
+            }
+            Some(AlignItems::Center) => {
+                margin_top = LengthPercentageAuto::Length(transform.translation.y / 2.0);
+                margin_bottom = LengthPercentageAuto::Length(transform.translation.y / 2.0);
+            }
+            _ => {}
+        }
+
+        // Constructing the final Style object
+        Style {
+            align_self: leaf_layout_style.align_self,
+            justify_self: leaf_layout_style.justify_self,
+            margin: Rect {
+                left: margin_left,
+                right: margin_right,
+                top: margin_top,
+                bottom: margin_bottom,
+            },
+            size: taffy::Size {
+                width: Dimension::Length(size.width()),
+                height: Dimension::Length(size.height()),
+            },
             ..Default::default()
-        };
+        }
     }
 }
 

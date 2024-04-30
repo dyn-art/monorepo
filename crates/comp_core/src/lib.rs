@@ -2,10 +2,7 @@ pub mod resources;
 mod systems;
 
 use bevy_app::{App, First, Last, Plugin, Update};
-use bevy_ecs::{
-    component::Tick,
-    schedule::{IntoSystemConfigs, IntoSystemSetConfigs, SystemSet},
-};
+use bevy_ecs::schedule::{IntoSystemConfigs, IntoSystemSetConfigs, SystemSet};
 use bevy_transform::TransformPlugin;
 use dyn_comp_asset::CompAssetPlugin;
 use dyn_comp_bundles::events::{
@@ -15,7 +12,6 @@ use dyn_comp_bundles::events::{
 };
 use resources::{composition::CompositionRes, layout::LayoutRes, tick::TickRes};
 use systems::{
-    constraints::{apply_constraints, apply_constraints_offset},
     events::{
         composition_resized_input_system, composition_viewport_input_system,
         despawn_removed_entities_system, entity_deleted_input_system, entity_moved_input_system,
@@ -23,6 +19,9 @@ use systems::{
         focus_root_nodes_input_system,
     },
     hierarchy::update_hierarchy_levels,
+    layout::{
+        discover_nodes_for_layout_trees, mark_nodes_with_layout_change_as_stale, update_layout,
+    },
     outline::{
         ellipse::outline_ellipse,
         polygon::outline_polygon,
@@ -55,6 +54,7 @@ enum CompCoreSystemSet {
     /// After this label, the system has applied layout calculations to the composition's nodes.
     PreLayout,
     Layout,
+    PostLayout,
 
     // After this label, the system has prepared the nodes for visual outlining.
     Prepare,
@@ -133,8 +133,14 @@ impl Plugin for CompCorePlugin {
         app.add_systems(
             Update,
             (
-                apply_constraints_offset.in_set(CompCoreSystemSet::PreLayout),
-                apply_constraints.in_set(CompCoreSystemSet::Layout),
+                discover_nodes_for_layout_trees.in_set(CompCoreSystemSet::PreLayout),
+                mark_nodes_with_layout_change_as_stale.in_set(CompCoreSystemSet::PreLayout),
+                update_layout.in_set(CompCoreSystemSet::Layout),
+            ),
+        );
+        app.add_systems(
+            Update,
+            (
                 resize_vector_node.in_set(CompCoreSystemSet::Outline),
                 outline_rectangle.in_set(CompCoreSystemSet::Outline),
                 outline_ellipse.in_set(CompCoreSystemSet::Outline),

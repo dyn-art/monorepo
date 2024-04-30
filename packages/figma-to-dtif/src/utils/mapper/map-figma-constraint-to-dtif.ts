@@ -1,6 +1,6 @@
 import type { COMP } from '@dyn/dtif-comp';
 
-export function mapFigmaConstraintToDtif(figmaConstraint?: ConstraintType): COMP.Constraint {
+export function mapFigmaConstraintToDtif(figmaConstraint?: ConstraintType): COMP.AlignItems {
 	switch (figmaConstraint) {
 		case 'MIN':
 			return 'Start';
@@ -10,8 +10,6 @@ export function mapFigmaConstraintToDtif(figmaConstraint?: ConstraintType): COMP
 			return 'Center';
 		case 'STRETCH':
 			return 'Stretch';
-		case 'SCALE':
-			return 'Scale';
 		default:
 			// Fallback for unmatched or undefined constraint
 			return 'Start';

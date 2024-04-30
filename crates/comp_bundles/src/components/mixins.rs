@@ -2,7 +2,6 @@ use bevy_ecs::{component::Component, entity::Entity};
 use dyn_attributed_string::AttributedString;
 use dyn_comp_asset::asset_id::ImageId;
 use dyn_utils::properties::{corner_radii::CornerRadii, opacity::Opacity, size::Size};
-use glam::Vec3;
 use smallvec::SmallVec;
 use taffy::Style;
 
@@ -103,44 +102,6 @@ pub struct ImageAssetMixin(pub Option<ImageId>);
 #[derive(Component, Debug, Clone)]
 pub struct AttributedStringMixin(pub AttributedString);
 
-// TODO START: Remove current constraints implementation and replace with layout mixin
-
-#[derive(Component, Debug, Default, Clone, Copy)]
-pub struct ConstraintsMixin(pub Constraints);
-
-#[derive(Debug, Default, Copy, Clone)]
-#[cfg_attr(
-    feature = "serde_support",
-    derive(serde::Serialize, serde::Deserialize, specta::Type)
-)]
-pub struct Constraints {
-    pub horizontal: Constraint,
-    pub vertical: Constraint,
-}
-
-#[derive(Debug, Default, PartialEq, Eq, Copy, Clone)]
-#[cfg_attr(
-    feature = "serde_support",
-    derive(serde::Serialize, serde::Deserialize, specta::Type)
-)]
-pub enum Constraint {
-    #[default]
-    Start,
-    Center,
-    End,
-    Stretch,
-    Scale,
-}
-
-#[derive(Component, Debug, Default, Clone, Copy)]
-pub struct ConstraintsLayoutMetricsMixin {
-    pub pos: Vec3,
-    pub size: Size,
-    pub parent_size: Size,
-}
-
-// TODO END
-
 #[derive(Component, Debug, Copy, Clone)]
 pub struct LayoutTreeNodeId(pub taffy::NodeId);
 
@@ -148,7 +109,7 @@ pub trait ToTaffyStyle {
     fn to_style(&self) -> taffy::Style;
 }
 
-#[derive(Component, Debug, Copy, Clone)]
+#[derive(Component, Debug, Default, Copy, Clone)]
 pub struct LeafLayoutMixin {
     pub align_self: AlignItems,
     pub justify_self: AlignItems,

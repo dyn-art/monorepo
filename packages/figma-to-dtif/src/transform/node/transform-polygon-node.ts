@@ -8,7 +8,7 @@ import type {
 import {
 	createDtifStyles,
 	mapFigmaBlendModeToDtif,
-	mapFigmaConstraintsToDtif,
+	mapFigmaConstraintToDtif,
 	mapFigmaTransformToRotation,
 	mapFigmaTransformToTranslation
 } from '../../utils';
@@ -28,7 +28,8 @@ export function transformPolygonNode(
 		rotationDeg: mapFigmaTransformToRotation(node.relativeTransform),
 		blendMode: mapFigmaBlendModeToDtif(node.blendMode),
 		opacity: node.opacity,
-		constraints: mapFigmaConstraintsToDtif(node.constraints),
+		alignSelf: mapFigmaConstraintToDtif(node.constraints.horizontal),
+		justifySelf: mapFigmaConstraintToDtif(node.constraints.vertical),
 		styles: createDtifStyles(fills, strokes, effects)
 	};
 }

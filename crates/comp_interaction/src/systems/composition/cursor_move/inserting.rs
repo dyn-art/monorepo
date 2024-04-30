@@ -18,7 +18,7 @@ use dyn_comp_bundles::{
     components::{
         marker::Root,
         mixins::{
-            BlendModeMixin, ConstraintsMixin, CornerRadiiMixin, OpacityMixin, PaintChildMixin,
+            BlendModeMixin, CornerRadiiMixin, LeafLayoutMixin, OpacityMixin, PaintChildMixin,
             PaintParentMixin, SizeMixin, StyleChildrenMixin, StyleParentMixin, VisibilityMixin,
         },
         nodes::{
@@ -130,7 +130,7 @@ pub fn handle_inserting(
                     visibility: VisibilityMixin::default(),
                     blend_mode: BlendModeMixin::default(),
                     opacity: OpacityMixin::default(),
-                    constraints: ConstraintsMixin::default(),
+                    leaf_layout: LeafLayoutMixin::default(),
                 })
                 .id(),
             ShapeVariant::Ellipse => commands
@@ -146,7 +146,7 @@ pub fn handle_inserting(
                     visibility: VisibilityMixin::default(),
                     blend_mode: BlendModeMixin::default(),
                     opacity: OpacityMixin::default(),
-                    constraints: ConstraintsMixin::default(),
+                    leaf_layout: LeafLayoutMixin::default(),
                 })
                 .id(),
             ShapeVariant::Star => commands
@@ -162,7 +162,7 @@ pub fn handle_inserting(
                     visibility: VisibilityMixin::default(),
                     blend_mode: BlendModeMixin::default(),
                     opacity: OpacityMixin::default(),
-                    constraints: ConstraintsMixin::default(),
+                    leaf_layout: LeafLayoutMixin::default(),
                 })
                 .id(),
             ShapeVariant::Polygon => commands
@@ -178,7 +178,7 @@ pub fn handle_inserting(
                     visibility: VisibilityMixin::default(),
                     blend_mode: BlendModeMixin::default(),
                     opacity: OpacityMixin::default(),
-                    constraints: ConstraintsMixin::default(),
+                    leaf_layout: LeafLayoutMixin::default(),
                 })
                 .id(),
         };
