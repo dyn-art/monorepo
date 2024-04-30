@@ -46,7 +46,7 @@ impl LayoutTree {
         self.taffy_tree.set_children(node_id, &[]).unwrap();
     }
 
-    pub fn compute_layouts(
+    pub fn compute_layout(
         &mut self,
         node_id: NodeId,
         available_space: Size,
@@ -76,18 +76,18 @@ impl LayoutTree {
     ) -> Style {
         let mut style = Style::default();
 
-        if let Some(layout_parent) = maybe_layout_parent {
-            let layout_parent_style = layout_parent.to_style();
-
-            // TODO:
-        }
-
         if let Some(layout_element) = maybe_layout_element {
             let layout_element_style = layout_element.to_style(transform, size);
 
             style.position = layout_element_style.position;
             style.inset = layout_element_style.inset;
             style.size = layout_element_style.size;
+        }
+
+        if let Some(layout_parent) = maybe_layout_parent {
+            let layout_parent_style = layout_parent.to_style();
+
+            // TODO:
         }
 
         return style;

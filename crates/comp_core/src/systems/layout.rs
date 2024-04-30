@@ -19,6 +19,15 @@ use dyn_utils::units::abs::Abs;
 use glam::Vec3;
 use hashbrown::HashSet;
 
+// <div class="flex h-screen items-center justify-center bg-gray-100">
+//   <div class="absolute flex bg-blue-500 p-10 text-white" style="top: 50px; left: 50px; width: 300px; height: 300px;">
+//     Absolute Parent Container
+//     <div class="absolute bg-red-500 p-5 text-white" style="bottom: 20px; right: 20px; width: 100px; height: 100px;">Child Container</div>
+//     <div class="bg-green-500 p-5">Not Absolute Container</div>
+//   </div>
+//   <div class="bg-green-500 p-5">Not Absolute Container</div>
+// </div>
+
 pub fn add_new_layout_parents_to_layout_tree(
     mut commands: Commands,
     mut layout_res: ResMut<LayoutRes>,
@@ -44,7 +53,7 @@ pub fn add_new_layout_parents_to_layout_tree(
             SizeMixin(parent_size),
         )) = layout_mixin_query.get(parent)
         {
-            // Insert parent into layout tree
+            // Insert the parent into the layout tree
             let parent_node_id = layout_res
                 .tree
                 .new_leaf(
@@ -61,7 +70,9 @@ pub fn add_new_layout_parents_to_layout_tree(
                 .entity(parent)
                 .insert((LayoutNodeId(parent_node_id), StaleLayout));
 
-            // Insert parent's children into layout tree
+            let mut child_node_ids: Vec<taffy::NodeId> = Vec::with_capacity(children.len());
+
+            // Insert the parent's children into the layout tree
             for child in children {
                 if let Some((
                     maybe_child_layout_parent_mixin,
@@ -82,11 +93,17 @@ pub fn add_new_layout_parents_to_layout_tree(
                             ),
                         )
                         .unwrap();
+                    child_node_ids.push(child_node_id);
                     commands
                         .entity(*child)
                         .insert((LayoutNodeId(child_node_id), StaleLayout));
                 }
             }
+
+            layout_res
+                .tree
+                .update_children(parent_node_id, &child_node_ids)
+                .unwrap();
         }
     }
 }
@@ -97,7 +114,10 @@ pub fn add_new_layout_parents_to_layout_tree(
 pub fn update_layout_parent_children(
     mut commands: Commands,
     mut layout_res: ResMut<LayoutRes>,
-    changed_children_query: Query<&Children, (With<LayoutNodeId>, Changed<Children>)>,
+    changed_children_query: Query<
+        (&LayoutNodeId, &Children),
+        (With<LayoutNodeId>, Changed<Children>),
+    >,
     layout_mixin_query: Query<
         (
             Option<&LayoutParentMixin>,
@@ -108,7 +128,9 @@ pub fn update_layout_parent_children(
         Without<LayoutNodeId>,
     >,
 ) {
-    for children in changed_children_query.iter() {
+    for (LayoutNodeId(parent_node_id), children) in changed_children_query.iter() {
+        let mut child_node_ids: Vec<NodeId> = Vec::with_capacity(children.len());
+
         for child in children {
             if let Some((
                 maybe_layout_parent_mixin,
@@ -117,7 +139,7 @@ pub fn update_layout_parent_children(
                 SizeMixin(size),
             )) = layout_mixin_query.get(*child).ok()
             {
-                let node_id = layout_res
+                let child_node_id = layout_res
                     .tree
                     .new_leaf(
                         *child,
@@ -129,11 +151,17 @@ pub fn update_layout_parent_children(
                         ),
                     )
                     .unwrap();
+                child_node_ids.push(child_node_id);
                 commands
                     .entity(*child)
-                    .insert((LayoutNodeId(node_id), StaleLayout));
+                    .insert((LayoutNodeId(child_node_id), StaleLayout));
             }
         }
+
+        layout_res
+            .tree
+            .update_children(*parent_node_id, &child_node_ids)
+            .unwrap();
     }
 }
 
@@ -221,7 +249,7 @@ pub fn update_layout(
             log::info!("[update_layout] Compute Layout: {:?}", parent_size_mixin.0); // TODO: REMOVE
             layout_res
                 .tree
-                .compute_layouts(*parent_node_id, parent_size_mixin.0)
+                .compute_layout(*parent_node_id, parent_size_mixin.0)
                 .unwrap();
 
             if let Ok(layout) = layout_res.tree.get_layout(*parent_node_id) {
