@@ -129,7 +129,7 @@ pub fn update_layout_parent_children(
     >,
 ) {
     for (LayoutNodeId(parent_node_id), children) in changed_children_query.iter() {
-        let mut child_node_ids: Vec<NodeId> = Vec::with_capacity(children.len());
+        let mut child_node_ids: Vec<taffy::NodeId> = Vec::with_capacity(children.len());
 
         for child in children {
             if let Some((
