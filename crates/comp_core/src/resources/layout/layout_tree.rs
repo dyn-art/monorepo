@@ -24,18 +24,12 @@ impl LayoutTree {
     }
 
     pub fn new_leaf(&mut self, style: Style) -> Result<NodeId, LayoutError> {
-        let node_id = self
-            .taffy_tree
+        self.taffy_tree
             .new_leaf(style.clone())
-            .map_err(|e| LayoutError::TaffyError(e));
-
-        log::info!("[new_leaf] {:?}", node_id); // TODO: REMOVE
-
-        node_id
+            .map_err(|e| LayoutError::TaffyError(e))
     }
 
     pub fn update_leaf(&mut self, node_id: NodeId, style: Style) -> bool {
-        log::info!("[update_leaf] {:?}", node_id); // TODO: REMOVE
         self.taffy_tree.set_style(node_id, style).is_ok()
     }
 
@@ -44,7 +38,6 @@ impl LayoutTree {
         parent_id: NodeId,
         child_ids: &Vec<NodeId>,
     ) -> Result<(), LayoutError> {
-        log::info!("[update_children] {:?}: {:?}", parent_id, child_ids); // TODO: REMOVE
         self.taffy_tree
             .set_children(parent_id, child_ids)
             .map_err(|e| LayoutError::TaffyError(e))
@@ -87,8 +80,7 @@ impl LayoutTree {
         let mut style = Style::default();
 
         if let Some(layout_element) = maybe_layout_element {
-            let layout_element_style =
-                layout_element.to_style(entity, transform, size, parent_size);
+            let layout_element_style = layout_element.to_style(transform, size, parent_size);
 
             style.position = layout_element_style.position;
             style.inset = layout_element_style.inset;

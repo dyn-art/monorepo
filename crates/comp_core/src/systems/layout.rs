@@ -285,10 +285,6 @@ pub fn update_layout(
         commands.entity(entity).remove::<StaleLayout>();
     }
 
-    if to_recompute_parents.len() > 0 {
-        log::info!("[update_layout] {:?}", to_recompute_parents); // TODO: REMOVE
-    }
-
     // Recompute layout
     let taffy_to_entity = create_taffy_to_entity_map(&layout_node_id_query);
     for parent in to_recompute_parents {
@@ -311,25 +307,29 @@ fn update_node_layout_recursive(
     >,
     children_query: &Query<&Children, With<LayoutNodeId>>,
     layout_res: &mut ResMut<LayoutRes>,
-    compute_layout: bool,
+    is_root: bool,
     taffy_to_entity: &HashMap<taffy::NodeId, Entity>,
 ) {
     if let Ok((LayoutNodeId(node_id), mut size_mixin, mut transform)) =
         to_update_nodes_query.get_mut(entity)
     {
-        if compute_layout {
+        if is_root {
             layout_res
                 .tree
                 .compute_layout(*node_id, size_mixin.0)
                 .unwrap();
-            layout_res.tree.print_branch(*node_id, &taffy_to_entity);
+            // layout_res.tree.print_branch(*node_id, &taffy_to_entity);
         }
 
         if let Ok(layout) = layout_res.tree.get_layout(*node_id) {
-            log::info!("[update_node_layout_recursive] {:?}: {:?}", entity, layout); // TODO: REMOVE
             size_mixin.0.width = Abs::pt(layout.size.width);
             size_mixin.0.height = Abs::pt(layout.size.height);
-            transform.translation = Vec3::new(layout.location.x, layout.location.y, 0.0);
+
+            // Don't update root transform because it will be 0
+            // if it was used as start point for the layout compution
+            if !is_root {
+                transform.translation = Vec3::new(layout.location.x, layout.location.y, 0.0);
+            }
         }
 
         // Check for children and recursively update their layout

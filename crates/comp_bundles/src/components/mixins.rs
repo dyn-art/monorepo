@@ -146,15 +146,12 @@ impl Default for LayoutElement {
 impl LayoutElement {
     pub fn to_style(
         &self,
-        entity: Entity, // TODO: REMOVE
         transform: &Transform,
         size: &Size,
         parent_size: Option<&Size>,
     ) -> taffy::Style {
         match self {
-            LayoutElement::Absolute(element) => {
-                element.to_style(entity, transform, size, parent_size)
-            }
+            LayoutElement::Absolute(element) => element.to_style(transform, size, parent_size),
             LayoutElement::Static(element) => element.to_style(),
         }
     }
@@ -172,7 +169,6 @@ pub struct AbsoluteLayoutElement {
 impl AbsoluteLayoutElement {
     pub fn to_style(
         &self,
-        entity: Entity, // TODO: REMOVE
         transform: &Transform,
         size: &Size,
         parent_size: Option<&Size>,
@@ -180,8 +176,7 @@ impl AbsoluteLayoutElement {
         let mut style = taffy::Style::default();
 
         log::info!(
-            "[AbsoluteLayoutElement::to_style] {:?}: {:?}, {:?} | Parent: {:?}",
-            entity,
+            "[AbsoluteLayoutElement::to_style] {:?}, {:?} | Parent: {:?}",
             transform,
             size,
             parent_size
@@ -208,7 +203,7 @@ impl AbsoluteLayoutElement {
             Constraint::End => {
                 left = taffy::LengthPercentageAuto::Auto;
                 right = taffy::LengthPercentageAuto::Length(
-                    parent_size.unwrap().width() - transform.translation.x,
+                    parent_size.unwrap().width() - transform.translation.x - size.width(),
                 );
             }
             Constraint::Stretch | Constraint::Scale => {
@@ -228,7 +223,7 @@ impl AbsoluteLayoutElement {
             Constraint::End => {
                 top = taffy::LengthPercentageAuto::Auto;
                 bottom = taffy::LengthPercentageAuto::Length(
-                    parent_size.unwrap().height() - transform.translation.y,
+                    parent_size.unwrap().height() - transform.translation.y - size.height(),
                 );
             }
             Constraint::Stretch | Constraint::Scale => {
