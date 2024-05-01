@@ -1,7 +1,9 @@
+use super::debug::print_branch;
 use bevy_ecs::entity::Entity;
 use bevy_transform::components::Transform;
 use dyn_comp_bundles::components::mixins::{LayoutElement, LayoutParent};
 use dyn_utils::properties::size::Size;
+use std::collections::HashMap;
 use taffy::{prelude::*, TaffyError};
 
 pub struct LayoutTree {
@@ -100,6 +102,10 @@ impl LayoutTree {
         }
 
         return style;
+    }
+
+    pub fn print_branch(&self, root_node_id: NodeId, taffy_to_entity: &HashMap<NodeId, Entity>) {
+        print_branch(&self.taffy_tree, root_node_id, taffy_to_entity);
     }
 }
 

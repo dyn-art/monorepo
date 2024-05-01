@@ -1,7 +1,7 @@
-mod debug;
+use std::collections::HashMap;
 
 use crate::resources::{
-    layout::{layout_tree::LayoutTree, LayoutRes},
+    layout::{debug::create_taffy_to_entity_map, layout_tree::LayoutTree, LayoutRes},
     tick::TickRes,
 };
 use bevy_ecs::{
@@ -267,6 +267,7 @@ pub fn update_layout(
         (&LayoutNodeId, &mut SizeMixin, &mut Transform),
         With<LayoutNodeId>,
     >,
+    layout_node_id_query: Query<(Entity, &LayoutNodeId)>,
 ) {
     let mut to_recompute_parents: Vec<Entity> = Vec::new();
     let mut lowest_level = u8::MAX;
@@ -289,6 +290,7 @@ pub fn update_layout(
     }
 
     // Recompute layout
+    let taffy_to_entity = create_taffy_to_entity_map(&layout_node_id_query);
     for parent in to_recompute_parents {
         update_node_layout_recursive(
             parent,
@@ -296,6 +298,7 @@ pub fn update_layout(
             &children_query,
             &mut layout_res,
             true,
+            &taffy_to_entity,
         );
     }
 }
@@ -309,16 +312,17 @@ fn update_node_layout_recursive(
     children_query: &Query<&Children, With<LayoutNodeId>>,
     layout_res: &mut ResMut<LayoutRes>,
     compute_layout: bool,
+    taffy_to_entity: &HashMap<taffy::NodeId, Entity>,
 ) {
     if let Ok((LayoutNodeId(node_id), mut size_mixin, mut transform)) =
         to_update_nodes_query.get_mut(entity)
     {
         if compute_layout {
-            log::info!("[update_node_layout_recursive] Compute: {:?}", size_mixin.0); // TODO: REMOVE
             layout_res
                 .tree
                 .compute_layout(*node_id, size_mixin.0)
                 .unwrap();
+            layout_res.tree.print_branch(*node_id, &taffy_to_entity);
         }
 
         if let Ok(layout) = layout_res.tree.get_layout(*node_id) {
@@ -337,6 +341,7 @@ fn update_node_layout_recursive(
                     children_query,
                     layout_res,
                     false,
+                    taffy_to_entity,
                 );
             }
         }

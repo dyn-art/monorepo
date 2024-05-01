@@ -1,3 +1,4 @@
+pub mod debug;
 pub mod layout_tree;
 
 use self::layout_tree::LayoutTree;
