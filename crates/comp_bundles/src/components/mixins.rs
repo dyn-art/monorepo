@@ -144,9 +144,17 @@ impl Default for LayoutElement {
 }
 
 impl LayoutElement {
-    pub fn to_style(&self, transform: &Transform, size: &Size) -> taffy::Style {
+    pub fn to_style(
+        &self,
+        entity: Entity, // TODO: REMOVE
+        transform: &Transform,
+        size: &Size,
+        parent_size: Option<&Size>,
+    ) -> taffy::Style {
         match self {
-            LayoutElement::Absolute(element) => element.to_style(transform, size),
+            LayoutElement::Absolute(element) => {
+                element.to_style(entity, transform, size, parent_size)
+            }
             LayoutElement::Static(element) => element.to_style(),
         }
     }
@@ -162,8 +170,22 @@ pub struct AbsoluteLayoutElement {
 }
 
 impl AbsoluteLayoutElement {
-    pub fn to_style(&self, transform: &Transform, size: &Size) -> taffy::Style {
+    pub fn to_style(
+        &self,
+        entity: Entity, // TODO: REMOVE
+        transform: &Transform,
+        size: &Size,
+        parent_size: Option<&Size>,
+    ) -> taffy::Style {
         let mut style = taffy::Style::default();
+
+        log::info!(
+            "[AbsoluteLayoutElement::to_style] {:?}: {:?}, {:?} | Parent: {:?}",
+            entity,
+            transform,
+            size,
+            parent_size
+        ); // TODO: REMOVE
 
         // Set the position type to absolute
         style.position = taffy::Position::Absolute;
@@ -185,7 +207,9 @@ impl AbsoluteLayoutElement {
             }
             Constraint::End => {
                 left = taffy::LengthPercentageAuto::Auto;
-                right = taffy::LengthPercentageAuto::Length(transform.translation.x);
+                right = taffy::LengthPercentageAuto::Length(
+                    parent_size.unwrap().width() - transform.translation.x,
+                );
             }
             Constraint::Stretch | Constraint::Scale => {
                 // TODO
@@ -203,7 +227,9 @@ impl AbsoluteLayoutElement {
             }
             Constraint::End => {
                 top = taffy::LengthPercentageAuto::Auto;
-                bottom = taffy::LengthPercentageAuto::Length(transform.translation.y);
+                bottom = taffy::LengthPercentageAuto::Length(
+                    parent_size.unwrap().height() - transform.translation.y,
+                );
             }
             Constraint::Stretch | Constraint::Scale => {
                 // TODO
@@ -226,6 +252,8 @@ impl AbsoluteLayoutElement {
                 height: taffy::Dimension::Length(size.height()),
             };
         }
+
+        log::info!("[AbsoluteLayoutElement::to_style] Style: {:?}", style); // TODO: REMOVE
 
         return style;
     }
