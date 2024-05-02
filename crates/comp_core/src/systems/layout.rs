@@ -318,7 +318,7 @@ fn update_node_layout_recursive(
                 .tree
                 .compute_layout(*node_id, size_mixin.0)
                 .unwrap();
-            // layout_res.tree.print_branch(*node_id, &taffy_to_entity);
+            layout_res.tree.print_branch(*node_id, &taffy_to_entity);
         }
 
         if let Ok(layout) = layout_res.tree.get_layout(*node_id) {
@@ -326,9 +326,16 @@ fn update_node_layout_recursive(
             size_mixin.0.height = Abs::pt(layout.size.height);
 
             // Don't update root transform because it will be 0
-            // if it was used as start point for the layout compution
+            // if it was used as the starting point for the layout compution
             if !is_root {
-                transform.translation = Vec3::new(layout.location.x, layout.location.y, 0.0);
+                // TODO: Taffy rounds all floating numbers to whole numbers
+                // See: https://github.com/DioxusLabs/taffy/issues/77
+                //
+                // Thus we can't apply the calculated location e.g. when translating
+                // because those roundings add up and it doesn't feel right in the UI
+                if !transform.is_changed() {
+                    transform.translation = Vec3::new(layout.location.x, layout.location.y, 0.0);
+                }
             }
         }
 

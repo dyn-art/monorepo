@@ -79,6 +79,14 @@ impl LayoutTree {
     ) -> Style {
         let mut style = Style::default();
 
+        log::info!(
+            "[merge_layout_parent_with_element] {:?}: {:?}, {:?} | Parent: {:?}",
+            entity,
+            transform,
+            size,
+            parent_size
+        ); // TODO: REMOVE
+
         if let Some(layout_element) = maybe_layout_element {
             let layout_element_style = layout_element.to_style(transform, size, parent_size);
 

@@ -3,6 +3,7 @@ use bevy_transform::components::Transform;
 use dyn_attributed_string::AttributedString;
 use dyn_comp_asset::asset_id::ImageId;
 use dyn_utils::properties::{corner_radii::CornerRadii, opacity::Opacity, size::Size};
+use glam::Vec3;
 use smallvec::SmallVec;
 
 #[derive(Component, Debug, Default, Clone, Copy)]
@@ -175,13 +176,6 @@ impl AbsoluteLayoutElement {
     ) -> taffy::Style {
         let mut style = taffy::Style::default();
 
-        log::info!(
-            "[AbsoluteLayoutElement::to_style] {:?}, {:?} | Parent: {:?}",
-            transform,
-            size,
-            parent_size
-        ); // TODO: REMOVE
-
         // Set the position type to absolute
         style.position = taffy::Position::Absolute;
 
@@ -198,7 +192,11 @@ impl AbsoluteLayoutElement {
                 right = taffy::LengthPercentageAuto::Auto;
             }
             Constraint::Center => {
-                // TODO
+                let theoretical_center = (parent_size.unwrap().to_vec2() - size.to_vec2()) / 2.0;
+                let offset = transform.translation.truncate() - theoretical_center;
+                let offset_percent = offset / parent_size.unwrap().to_vec2();
+                left = taffy::LengthPercentageAuto::Percent(0.5 + offset_percent.x);
+                right = taffy::LengthPercentageAuto::Auto;
             }
             Constraint::End => {
                 left = taffy::LengthPercentageAuto::Auto;
@@ -218,7 +216,11 @@ impl AbsoluteLayoutElement {
                 bottom = taffy::LengthPercentageAuto::Auto;
             }
             Constraint::Center => {
-                // TODO
+                let theoretical_center = (parent_size.unwrap().to_vec2() - size.to_vec2()) / 2.0;
+                let offset = transform.translation.truncate() - theoretical_center;
+                let offset_percent = offset / parent_size.unwrap().to_vec2();
+                top = taffy::LengthPercentageAuto::Percent(0.5 + offset_percent.y);
+                bottom = taffy::LengthPercentageAuto::Auto;
             }
             Constraint::End => {
                 top = taffy::LengthPercentageAuto::Auto;
@@ -291,4 +293,11 @@ impl StaticLayoutElement {
     pub fn to_style(&self) -> taffy::Style {
         taffy::Style::default()
     }
+}
+
+#[derive(Component, Debug, Default, Copy, Clone)]
+pub struct PreLayoutProperties {
+    pub translation: Vec3,
+    pub size: Size,
+    pub parent_size: Size,
 }
