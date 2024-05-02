@@ -1,7 +1,6 @@
 use super::debug::print_branch;
 use bevy_ecs::entity::Entity;
-use bevy_transform::components::Transform;
-use dyn_comp_bundles::components::mixins::{LayoutElement, LayoutParent};
+use dyn_comp_bundles::components::mixins::{LayoutParent, StaticLayoutElement};
 use dyn_utils::properties::size::Size;
 use std::collections::HashMap;
 use taffy::{prelude::*, TaffyError};
@@ -70,25 +69,13 @@ impl LayoutTree {
     }
 
     pub fn merge_layout_parent_with_element(
-        entity: Entity, // TODO: REMOVE
         maybe_layout_parent: Option<&LayoutParent>,
-        maybe_layout_element: Option<&LayoutElement>,
-        transform: &Transform,
-        size: &Size,
-        parent_size: Option<&Size>,
+        maybe_static_layout_element: Option<&StaticLayoutElement>,
     ) -> Style {
         let mut style = Style::default();
 
-        log::info!(
-            "[merge_layout_parent_with_element] {:?}: {:?}, {:?} | Parent: {:?}",
-            entity,
-            transform,
-            size,
-            parent_size
-        ); // TODO: REMOVE
-
-        if let Some(layout_element) = maybe_layout_element {
-            let layout_element_style = layout_element.to_style(transform, size, parent_size);
+        if let Some(static_layout_element) = maybe_static_layout_element {
+            let layout_element_style = static_layout_element.to_style();
 
             style.position = layout_element_style.position;
             style.inset = layout_element_style.inset;

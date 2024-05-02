@@ -7,9 +7,9 @@ use dyn_attributed_string::{HorizontalTextAlignment, LineWrap, VerticalTextAlign
 use dyn_comp_bundles::{
     components::{
         mixins::{
-            BlendMode, BlendModeMixin, CornerRadiiMixin, LayoutElement, LayoutElementMixin,
-            LayoutParent, LayoutParentMixin, OpacityMixin, PathMixin, SizeMixin, VisibilityMixin,
-            WindingRule,
+            AbsoluteLayoutElementMixin, BlendMode, BlendModeMixin, CornerRadiiMixin, LayoutElement,
+            LayoutParent, OpacityMixin, PathMixin, SizeMixin, StaticLayoutElementMixin,
+            StaticLayoutParentMixin, VisibilityMixin, WindingRule,
         },
         nodes::{
             CompNode, CompNodeVariant, EllipseArcData, EllipseCompNode, FrameCompNode,
@@ -86,7 +86,6 @@ impl FrameNode {
             visibility: VisibilityMixin(self.visible),
             blend_mode: BlendModeMixin(self.blend_mode),
             opacity: OpacityMixin(self.opacity),
-            layout_element: LayoutElementMixin(self.layout_element),
         }
     }
 }
@@ -96,8 +95,17 @@ impl SpawnBundleImpl for FrameNode {
         let mut entity_world = world.spawn(self.to_ecs_bundle());
 
         if let Some(layout_parent) = self.layout_parent {
-            entity_world.insert(LayoutParentMixin(layout_parent));
+            entity_world.insert(StaticLayoutParentMixin(layout_parent));
         }
+
+        match self.layout_element {
+            LayoutElement::Absolute(layout_element) => {
+                entity_world.insert(AbsoluteLayoutElementMixin(layout_element))
+            }
+            LayoutElement::Static(layout_element) => {
+                entity_world.insert(StaticLayoutElementMixin(layout_element))
+            }
+        };
 
         return entity_world;
     }
@@ -142,14 +150,24 @@ impl RectangleNode {
             visibility: VisibilityMixin(self.visible),
             blend_mode: BlendModeMixin(self.blend_mode),
             opacity: OpacityMixin(self.opacity),
-            layout_element: LayoutElementMixin(self.layout_element),
         }
     }
 }
 
 impl SpawnBundleImpl for RectangleNode {
     fn spawn<'a>(&self, _: &DtifHandler, world: &'a mut World) -> EntityWorldMut<'a> {
-        world.spawn(self.to_ecs_bundle())
+        let mut entity_world = world.spawn(self.to_ecs_bundle());
+
+        match self.layout_element {
+            LayoutElement::Absolute(layout_element) => {
+                entity_world.insert(AbsoluteLayoutElementMixin(layout_element))
+            }
+            LayoutElement::Static(layout_element) => {
+                entity_world.insert(StaticLayoutElementMixin(layout_element))
+            }
+        };
+
+        return entity_world;
     }
 }
 
@@ -201,14 +219,24 @@ impl EllipseNode {
             visibility: VisibilityMixin(self.visible),
             blend_mode: BlendModeMixin(self.blend_mode),
             opacity: OpacityMixin(self.opacity),
-            layout_element: LayoutElementMixin(self.layout_element),
         }
     }
 }
 
 impl SpawnBundleImpl for EllipseNode {
     fn spawn<'a>(&self, _: &DtifHandler, world: &'a mut World) -> EntityWorldMut<'a> {
-        world.spawn(self.to_ecs_bundle())
+        let mut entity_world = world.spawn(self.to_ecs_bundle());
+
+        match self.layout_element {
+            LayoutElement::Absolute(layout_element) => {
+                entity_world.insert(AbsoluteLayoutElementMixin(layout_element))
+            }
+            LayoutElement::Static(layout_element) => {
+                entity_world.insert(StaticLayoutElementMixin(layout_element))
+            }
+        };
+
+        return entity_world;
     }
 }
 
@@ -255,14 +283,24 @@ impl StarNode {
             visibility: VisibilityMixin(self.visible),
             blend_mode: BlendModeMixin(self.blend_mode),
             opacity: OpacityMixin(self.opacity),
-            layout_element: LayoutElementMixin(self.layout_element),
         }
     }
 }
 
 impl SpawnBundleImpl for StarNode {
     fn spawn<'a>(&self, _: &DtifHandler, world: &'a mut World) -> EntityWorldMut<'a> {
-        world.spawn(self.to_ecs_bundle())
+        let mut entity_world = world.spawn(self.to_ecs_bundle());
+
+        match self.layout_element {
+            LayoutElement::Absolute(layout_element) => {
+                entity_world.insert(AbsoluteLayoutElementMixin(layout_element))
+            }
+            LayoutElement::Static(layout_element) => {
+                entity_world.insert(StaticLayoutElementMixin(layout_element))
+            }
+        };
+
+        return entity_world;
     }
 }
 
@@ -311,14 +349,24 @@ impl PolygonNode {
             visibility: VisibilityMixin(self.visible),
             blend_mode: BlendModeMixin(self.blend_mode),
             opacity: OpacityMixin(self.opacity),
-            layout_element: LayoutElementMixin(self.layout_element),
         }
     }
 }
 
 impl SpawnBundleImpl for PolygonNode {
     fn spawn<'a>(&self, _: &DtifHandler, world: &'a mut World) -> EntityWorldMut<'a> {
-        world.spawn(self.to_ecs_bundle())
+        let mut entity_world = world.spawn(self.to_ecs_bundle());
+
+        match self.layout_element {
+            LayoutElement::Absolute(layout_element) => {
+                entity_world.insert(AbsoluteLayoutElementMixin(layout_element))
+            }
+            LayoutElement::Static(layout_element) => {
+                entity_world.insert(StaticLayoutElementMixin(layout_element))
+            }
+        };
+
+        return entity_world;
     }
 }
 
@@ -377,14 +425,24 @@ impl TextNode {
             visibility: VisibilityMixin(self.visible),
             blend_mode: BlendModeMixin(self.blend_mode),
             opacity: OpacityMixin(self.opacity),
-            layout_element: LayoutElementMixin(self.layout_element),
         }
     }
 }
 
 impl SpawnBundleImpl for TextNode {
     fn spawn<'a>(&self, _: &DtifHandler, world: &'a mut World) -> EntityWorldMut<'a> {
-        world.spawn(self.to_ecs_bundle())
+        let mut entity_world = world.spawn(self.to_ecs_bundle());
+
+        match self.layout_element {
+            LayoutElement::Absolute(layout_element) => {
+                entity_world.insert(AbsoluteLayoutElementMixin(layout_element))
+            }
+            LayoutElement::Static(layout_element) => {
+                entity_world.insert(StaticLayoutElementMixin(layout_element))
+            }
+        };
+
+        return entity_world;
     }
 }
 
@@ -431,13 +489,23 @@ impl VectorNode {
             visibility: VisibilityMixin(self.visible),
             blend_mode: BlendModeMixin(self.blend_mode),
             opacity: OpacityMixin(self.opacity),
-            layout_element: LayoutElementMixin(self.layout_element),
         }
     }
 }
 
 impl SpawnBundleImpl for VectorNode {
     fn spawn<'a>(&self, _: &DtifHandler, world: &'a mut World) -> EntityWorldMut<'a> {
-        world.spawn(self.to_ecs_bundle())
+        let mut entity_world = world.spawn(self.to_ecs_bundle());
+
+        match self.layout_element {
+            LayoutElement::Absolute(layout_element) => {
+                entity_world.insert(AbsoluteLayoutElementMixin(layout_element))
+            }
+            LayoutElement::Static(layout_element) => {
+                entity_world.insert(StaticLayoutElementMixin(layout_element))
+            }
+        };
+
+        return entity_world;
     }
 }

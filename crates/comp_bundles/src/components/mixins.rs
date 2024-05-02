@@ -1,5 +1,4 @@
 use bevy_ecs::{component::Component, entity::Entity};
-use bevy_transform::components::Transform;
 use dyn_attributed_string::AttributedString;
 use dyn_comp_asset::asset_id::ImageId;
 use dyn_utils::properties::{corner_radii::CornerRadii, opacity::Opacity, size::Size};
@@ -104,10 +103,10 @@ pub struct ImageAssetMixin(pub Option<ImageId>);
 pub struct AttributedStringMixin(pub AttributedString);
 
 #[derive(Component, Debug, Copy, Clone)]
-pub struct LayoutNodeId(pub taffy::NodeId);
+pub struct StaticLayoutNodeId(pub taffy::NodeId);
 
 #[derive(Component, Debug, Default, Copy, Clone)]
-pub struct LayoutParentMixin(pub LayoutParent);
+pub struct StaticLayoutParentMixin(pub LayoutParent);
 
 #[derive(Debug, Default, Copy, Clone)]
 #[cfg_attr(
@@ -125,38 +124,7 @@ impl LayoutParent {
 }
 
 #[derive(Component, Debug, Default, Copy, Clone)]
-pub struct LayoutElementMixin(pub LayoutElement);
-
-#[derive(Debug, Copy, Clone)]
-#[cfg_attr(
-    feature = "serde_support",
-    derive(serde::Serialize, serde::Deserialize, specta::Type),
-    serde(tag = "type")
-)]
-pub enum LayoutElement {
-    Absolute(AbsoluteLayoutElement),
-    Static(StaticLayoutElement),
-}
-
-impl Default for LayoutElement {
-    fn default() -> Self {
-        Self::Absolute(AbsoluteLayoutElement::default())
-    }
-}
-
-impl LayoutElement {
-    pub fn to_style(
-        &self,
-        transform: &Transform,
-        size: &Size,
-        parent_size: Option<&Size>,
-    ) -> taffy::Style {
-        match self {
-            LayoutElement::Absolute(element) => element.to_style(transform, size, parent_size),
-            LayoutElement::Static(element) => element.to_style(),
-        }
-    }
-}
+pub struct AbsoluteLayoutElementMixin(pub AbsoluteLayoutElement);
 
 #[derive(Debug, Default, Copy, Clone)]
 #[cfg_attr(
@@ -165,95 +133,6 @@ impl LayoutElement {
 )]
 pub struct AbsoluteLayoutElement {
     pub constraints: Constraints,
-}
-
-impl AbsoluteLayoutElement {
-    pub fn to_style(
-        &self,
-        transform: &Transform,
-        size: &Size,
-        parent_size: Option<&Size>,
-    ) -> taffy::Style {
-        let mut style = taffy::Style::default();
-
-        // Set the position type to absolute
-        style.position = taffy::Position::Absolute;
-
-        // Default insets
-        let mut top = taffy::LengthPercentageAuto::Auto;
-        let mut bottom = taffy::LengthPercentageAuto::Auto;
-        let mut left = taffy::LengthPercentageAuto::Auto;
-        let mut right = taffy::LengthPercentageAuto::Auto;
-
-        // Adjust horizontal insets based on the horizontal constraint
-        match self.constraints.horizontal {
-            Constraint::Start => {
-                left = taffy::LengthPercentageAuto::Length(transform.translation.x);
-                right = taffy::LengthPercentageAuto::Auto;
-            }
-            Constraint::Center => {
-                let theoretical_center = (parent_size.unwrap().to_vec2() - size.to_vec2()) / 2.0;
-                let offset = transform.translation.truncate() - theoretical_center;
-                let offset_percent = offset / parent_size.unwrap().to_vec2();
-                left = taffy::LengthPercentageAuto::Percent(0.5 + offset_percent.x);
-                right = taffy::LengthPercentageAuto::Auto;
-            }
-            Constraint::End => {
-                left = taffy::LengthPercentageAuto::Auto;
-                right = taffy::LengthPercentageAuto::Length(
-                    parent_size.unwrap().width() - transform.translation.x - size.width(),
-                );
-            }
-            Constraint::Stretch | Constraint::Scale => {
-                // TODO
-            }
-        }
-
-        // Adjust vertical insets based on the vertical constraint
-        match self.constraints.vertical {
-            Constraint::Start => {
-                top = taffy::LengthPercentageAuto::Length(transform.translation.y);
-                bottom = taffy::LengthPercentageAuto::Auto;
-            }
-            Constraint::Center => {
-                let theoretical_center = (parent_size.unwrap().to_vec2() - size.to_vec2()) / 2.0;
-                let offset = transform.translation.truncate() - theoretical_center;
-                let offset_percent = offset / parent_size.unwrap().to_vec2();
-                top = taffy::LengthPercentageAuto::Percent(0.5 + offset_percent.y);
-                bottom = taffy::LengthPercentageAuto::Auto;
-            }
-            Constraint::End => {
-                top = taffy::LengthPercentageAuto::Auto;
-                bottom = taffy::LengthPercentageAuto::Length(
-                    parent_size.unwrap().height() - transform.translation.y - size.height(),
-                );
-            }
-            Constraint::Stretch | Constraint::Scale => {
-                // TODO
-            }
-        }
-
-        style.inset = taffy::Rect {
-            top,
-            bottom,
-            left,
-            right,
-        };
-
-        // Set the basic size, unless overridden by Scale
-        if self.constraints.horizontal != Constraint::Scale
-            && self.constraints.vertical != Constraint::Scale
-        {
-            style.size = taffy::Size {
-                width: taffy::Dimension::Length(size.width()),
-                height: taffy::Dimension::Length(size.height()),
-            };
-        }
-
-        log::info!("[AbsoluteLayoutElement::to_style] Style: {:?}", style); // TODO: REMOVE
-
-        return style;
-    }
 }
 
 #[derive(Debug, Default, Copy, Clone)]
@@ -280,6 +159,9 @@ pub enum Constraint {
     Scale,
 }
 
+#[derive(Component, Debug, Default, Copy, Clone)]
+pub struct StaticLayoutElementMixin(pub StaticLayoutElement);
+
 #[derive(Debug, Default, Copy, Clone)]
 #[cfg_attr(
     feature = "serde_support",
@@ -295,9 +177,26 @@ impl StaticLayoutElement {
     }
 }
 
+#[derive(Debug, Copy, Clone)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type),
+    serde(tag = "type")
+)]
+pub enum LayoutElement {
+    Absolute(AbsoluteLayoutElement),
+    Static(StaticLayoutElement),
+}
+
+impl Default for LayoutElement {
+    fn default() -> Self {
+        Self::Absolute(AbsoluteLayoutElement::default())
+    }
+}
+
 #[derive(Component, Debug, Default, Copy, Clone)]
-pub struct PreLayoutProperties {
+pub struct PreAbsoluteLayoutProperties {
     pub translation: Vec3,
     pub size: Size,
-    pub parent_size: Size,
+    pub parent_size: Option<Size>,
 }

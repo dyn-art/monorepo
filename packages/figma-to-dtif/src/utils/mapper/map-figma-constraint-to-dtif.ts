@@ -10,6 +10,8 @@ export function mapFigmaConstraintToDtif(figmaConstraint?: ConstraintType): COMP
 			return 'Center';
 		case 'STRETCH':
 			return 'Stretch';
+		case 'SCALE':
+			return 'Scale';
 		default:
 			// Fallback for unmatched or undefined constraint
 			return 'Start';

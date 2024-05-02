@@ -20,8 +20,11 @@ use systems::{
     },
     hierarchy::update_hierarchy_levels,
     layout::{
-        add_new_layout_parents_to_layout_tree, mark_nodes_with_layout_change_as_stale,
-        update_layout, update_layout_parent_children,
+        absolute_layout::{apply_pre_absolute_layout_properties, update_absolute_layout},
+        static_layout::{
+            discover_new_static_layout_parents, mark_nodes_with_static_layout_change_as_stale,
+            update_static_layout, update_static_layout_parents_children,
+        },
     },
     outline::{
         ellipse::outline_ellipse,
@@ -55,7 +58,6 @@ enum CompCoreSystemSet {
     /// After this label, the system has applied layout calculations to the composition's nodes.
     PreLayout,
     Layout,
-    PostLayout,
 
     // After this label, the system has prepared the nodes for visual outlining.
     Prepare,
@@ -134,10 +136,14 @@ impl Plugin for CompCorePlugin {
         app.add_systems(
             Update,
             (
-                add_new_layout_parents_to_layout_tree.in_set(CompCoreSystemSet::PreLayout),
-                update_layout_parent_children.in_set(CompCoreSystemSet::PreLayout),
-                mark_nodes_with_layout_change_as_stale.in_set(CompCoreSystemSet::PreLayout),
-                update_layout.in_set(CompCoreSystemSet::Layout),
+                discover_new_static_layout_parents.in_set(CompCoreSystemSet::PreLayout),
+                update_static_layout_parents_children.in_set(CompCoreSystemSet::PreLayout),
+                mark_nodes_with_static_layout_change_as_stale.in_set(CompCoreSystemSet::PreLayout),
+                apply_pre_absolute_layout_properties.in_set(CompCoreSystemSet::PreLayout),
+                update_absolute_layout.in_set(CompCoreSystemSet::Layout),
+                update_static_layout
+                    .in_set(CompCoreSystemSet::Layout)
+                    .after(update_absolute_layout),
             ),
         );
         app.add_systems(

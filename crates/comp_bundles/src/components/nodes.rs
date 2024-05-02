@@ -2,7 +2,7 @@ use crate::properties::TextAttributeInterval;
 use bevy_ecs::component::Component;
 use dyn_attributed_string::{HorizontalTextAlignment, LineWrap, VerticalTextAlignment};
 use smallvec::SmallVec;
-use std::{default, f32::consts::PI};
+use std::f32::consts::PI;
 
 #[derive(Component, Debug, Copy, Clone)]
 pub struct CompNode {

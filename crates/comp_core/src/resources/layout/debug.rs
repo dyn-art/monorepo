@@ -1,14 +1,14 @@
 use bevy_ecs::{entity::Entity, system::Query};
-use dyn_comp_bundles::components::mixins::LayoutNodeId;
+use dyn_comp_bundles::components::mixins::StaticLayoutNodeId;
 use std::collections::HashMap;
 use taffy::{NodeId, PrintTree};
 
 pub fn create_taffy_to_entity_map(
-    layout_node_id_query: &Query<(Entity, &LayoutNodeId)>,
+    layout_node_id_query: &Query<(Entity, &StaticLayoutNodeId)>,
 ) -> HashMap<NodeId, Entity> {
     layout_node_id_query
         .iter()
-        .map(|(entity, LayoutNodeId(node_id))| (*node_id, entity))
+        .map(|(entity, StaticLayoutNodeId(node_id))| (*node_id, entity))
         .collect()
 }
 
