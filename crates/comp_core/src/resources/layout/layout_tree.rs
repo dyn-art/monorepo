@@ -23,12 +23,18 @@ impl LayoutTree {
     }
 
     pub fn new_leaf(&mut self, style: Style) -> Result<NodeId, LayoutError> {
-        self.taffy_tree
+        let node_id = self
+            .taffy_tree
             .new_leaf(style.clone())
-            .map_err(|e| LayoutError::TaffyError(e))
+            .map_err(|e| LayoutError::TaffyError(e));
+
+        log::info!("[new_leaf] {:?}: {:?}", node_id, style); // TODO: REMOVE
+
+        return node_id;
     }
 
     pub fn update_leaf(&mut self, node_id: NodeId, style: Style) -> bool {
+        log::info!("[update_leaf] {:?}: {:?}", node_id, style); // TODO: REMOVE
         self.taffy_tree.set_style(node_id, style).is_ok()
     }
 
@@ -71,22 +77,33 @@ impl LayoutTree {
     pub fn merge_layout_parent_with_element(
         maybe_layout_parent: Option<&StaticLayoutParent>,
         maybe_static_layout_element: Option<&StaticLayoutElement>,
+        size: &Size,
     ) -> Style {
         let mut style = Style::default();
 
         if let Some(static_layout_element) = maybe_static_layout_element {
             let layout_element_style = static_layout_element.to_style();
 
-            style.position = layout_element_style.position;
-            style.inset = layout_element_style.inset;
-            style.size = layout_element_style.size;
+            style.align_self = layout_element_style.align_self;
+            style.justify_self = layout_element_style.justify_self;
+            style.margin = layout_element_style.margin;
         }
 
         if let Some(layout_parent) = maybe_layout_parent {
             let layout_parent_style = layout_parent.to_style();
 
-            // TODO:
+            style.align_items = layout_parent_style.align_items;
+            style.justify_content = layout_parent_style.justify_content;
+            style.gap = layout_parent_style.gap;
+            style.padding = layout_parent_style.padding;
+            style.flex_direction = layout_parent_style.flex_direction;
         }
+
+        // TODO: Figure out when to make it dynamic and when to make it specific
+        style.size = taffy::Size::<taffy::Dimension> {
+            width: Dimension::Length(size.width()),
+            height: Dimension::Length(size.height()),
+        };
 
         return style;
     }

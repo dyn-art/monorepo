@@ -33,18 +33,25 @@ pub fn discover_new_static_layout_parents(
         (
             Option<&StaticLayoutParentMixin>,
             Option<&StaticLayoutElementMixin>,
+            &SizeMixin,
         ),
         (
             Without<StaticLayoutNodeId>,
-            Without<AbsoluteLayoutElementMixin>,
+            Or<(
+                With<StaticLayoutParentMixin>,
+                Without<AbsoluteLayoutElementMixin>,
+            )>,
         ),
     >,
 ) {
     let mut inserted_nodes: EntityHashMap<taffy::NodeId> = EntityHashMap::default();
 
     for (entity, children) in added_layout_parent_query.iter() {
-        if let Ok((maybe_static_layout_parent_mixin, maybe_static_layout_element_mixin)) =
-            layout_mixin_query.get(entity)
+        if let Ok((
+            maybe_static_layout_parent_mixin,
+            maybe_static_layout_element_mixin,
+            SizeMixin(size),
+        )) = layout_mixin_query.get(entity)
         {
             // Insert the parent into the layout tree.
             // Check whether it was already inserted into the layout tree
@@ -57,6 +64,7 @@ pub fn discover_new_static_layout_parents(
                         .new_leaf(LayoutTree::merge_layout_parent_with_element(
                             maybe_static_layout_parent_mixin.map(|mixin| &mixin.0),
                             maybe_static_layout_element_mixin.map(|mixin| &mixin.0),
+                            &size,
                         ))
                         .unwrap();
                     commands
@@ -76,6 +84,7 @@ pub fn discover_new_static_layout_parents(
                 if let Some((
                     maybe_child_static_layout_parent_mixin,
                     maybe_child_static_layout_elment_mixin,
+                    SizeMixin(child_size),
                 )) = layout_mixin_query.get(*child).ok()
                 {
                     // Insert the child into the layout tree.
@@ -89,6 +98,7 @@ pub fn discover_new_static_layout_parents(
                                 .new_leaf(LayoutTree::merge_layout_parent_with_element(
                                     maybe_child_static_layout_parent_mixin.map(|mixin| &mixin.0),
                                     maybe_child_static_layout_elment_mixin.map(|mixin| &mixin.0),
+                                    child_size,
                                 ))
                                 .unwrap();
                             commands
@@ -128,6 +138,7 @@ pub fn update_static_layout_parents_children(
         (
             Option<&StaticLayoutParentMixin>,
             Option<&StaticLayoutElementMixin>,
+            &SizeMixin,
         ),
         (
             Without<StaticLayoutNodeId>,
@@ -142,6 +153,7 @@ pub fn update_static_layout_parents_children(
             if let Some((
                 maybe_child_static_layout_parent_mixin,
                 maybe_child_static_layout_elment_mixin,
+                SizeMixin(size),
             )) = layout_mixin_query.get(*child).ok()
             {
                 let child_node_id = layout_res
@@ -149,6 +161,7 @@ pub fn update_static_layout_parents_children(
                     .new_leaf(LayoutTree::merge_layout_parent_with_element(
                         maybe_child_static_layout_parent_mixin.map(|mixin| &mixin.0),
                         maybe_child_static_layout_elment_mixin.map(|mixin| &mixin.0),
+                        size,
                     ))
                     .unwrap();
                 child_node_ids.push(child_node_id);
@@ -217,6 +230,7 @@ pub fn mark_nodes_with_static_layout_change_as_stale(
                 LayoutTree::merge_layout_parent_with_element(
                     maybe_static_layout_parent_mixin.map(|mixin| &mixin.0),
                     maybe_static_layout_element_mixin.map(|mixin| &mixin.0),
+                    &size_mixin.0,
                 ),
             );
 
@@ -299,6 +313,8 @@ fn update_node_layout_recursive(
         if let Ok(layout) = layout_res.tree.get_layout(*node_id) {
             size_mixin.0.width = Abs::pt(layout.size.width);
             size_mixin.0.height = Abs::pt(layout.size.height);
+
+            log::info!("[update_node_layout_recursive] {:?}: {:?}", node_id, layout); // TODO: REMOVE
 
             // Don't update root transform because it will be 0
             // if it was used as the starting point for the layout compution
