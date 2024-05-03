@@ -17,7 +17,7 @@ export function transformPolygonNode(
 	node: PolygonNode,
 	config: TTransformPolygonNodeConfig
 ): { type: 'Polygon' } & COMP.PolygonNode {
-	const { fills, strokes, effects } = config;
+	const { fills, strokes, effects, autoLayout } = config;
 
 	return {
 		type: 'Polygon',
@@ -28,7 +28,9 @@ export function transformPolygonNode(
 		rotationDeg: mapFigmaTransformToRotation(node.relativeTransform),
 		blendMode: mapFigmaBlendModeToDtif(node.blendMode),
 		opacity: node.opacity,
-		layoutElement: { type: 'Absolute', constraints: mapFigmaConstraintsToDtif(node.constraints) },
+		layoutElement: autoLayout
+			? { type: 'Static' }
+			: { type: 'Absolute', constraints: mapFigmaConstraintsToDtif(node.constraints) },
 		styles: createDtifStyles(fills, strokes, effects)
 	};
 }
@@ -37,4 +39,5 @@ interface TTransformPolygonNodeConfig {
 	fills: TToTransformFill[];
 	strokes: TToTransformStroke[];
 	effects: TToTransformEffect[];
+	autoLayout: boolean;
 }

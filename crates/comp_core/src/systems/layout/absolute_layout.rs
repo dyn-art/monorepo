@@ -13,6 +13,9 @@ use dyn_comp_bundles::components::mixins::{
 };
 use dyn_utils::{properties::size::Size, units::abs::Abs};
 
+// Note: Detached absolute layout calculation from the layout tree
+// because I couldn't figure out how to make all constraints (e.g. center, scale) work with taffy
+
 pub fn apply_pre_absolute_layout_properties(
     mut commands: Commands,
     tick_res: Res<TickRes>,

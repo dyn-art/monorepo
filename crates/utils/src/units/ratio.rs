@@ -1,6 +1,15 @@
-// Based on:
-// https://github.com/typst/typst/blob/main/crates/typst/src/layout/ratio.rs
-
+/**
+ * -----------------------------------------------------------------------------
+ * This file includes code derived from the project typst/typst by @typst.
+ * Project Repository: https://github.com/typst/typst/blob/main/crates/typst/src/layout/ratio.rs
+ *
+ * Date of Import: 03 May 2024
+ * -----------------------------------------------------------------------------
+ * The code included in this file is licensed under the Apache License v2,
+ * as per the original project by @typst.
+ * For the license text, see: https://github.com/typst/typst/blob/main/LICENSE
+ * -----------------------------------------------------------------------------
+ */
 use super::scalar::Scalar;
 use super::Numeric;
 use std::fmt::{Debug, Formatter};

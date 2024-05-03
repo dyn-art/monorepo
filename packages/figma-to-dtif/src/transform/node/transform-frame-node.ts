@@ -9,6 +9,7 @@ import {
 	createDtifStyles,
 	mapFigmaBlendModeToDtif,
 	mapFigmaConstraintsToDtif,
+	mapFigmaParentLayoutToDtif,
 	mapFigmaTransformToRotation,
 	mapFigmaTransformToTranslation
 } from '../../utils';
@@ -22,7 +23,7 @@ export function transformFrameNode(
 	return {
 		type: 'Frame',
 		clipContent: node.clipsContent,
-		layoutParent: {},
+		layoutParent: mapFigmaParentLayoutToDtif(node),
 		visible: node.visible,
 		children: childrenIds.map((childId) => childId.toString()),
 		size: [node.width, node.height],

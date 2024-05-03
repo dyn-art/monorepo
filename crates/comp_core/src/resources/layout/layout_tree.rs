@@ -1,6 +1,6 @@
 use super::debug::print_branch;
 use bevy_ecs::entity::Entity;
-use dyn_comp_bundles::components::mixins::{LayoutParent, StaticLayoutElement};
+use dyn_comp_bundles::components::mixins::{StaticLayoutElement, StaticLayoutParent};
 use dyn_utils::properties::size::Size;
 use std::collections::HashMap;
 use taffy::{prelude::*, TaffyError};
@@ -69,7 +69,7 @@ impl LayoutTree {
     }
 
     pub fn merge_layout_parent_with_element(
-        maybe_layout_parent: Option<&LayoutParent>,
+        maybe_layout_parent: Option<&StaticLayoutParent>,
         maybe_static_layout_element: Option<&StaticLayoutElement>,
     ) -> Style {
         let mut style = Style::default();

@@ -2,8 +2,11 @@
 pub mod macros;
 pub mod abs;
 pub mod angle;
+pub mod auto_length;
+pub mod axes;
 pub mod em;
 pub mod font_unit;
+pub mod length;
 pub mod ratio;
 pub mod scalar;
 

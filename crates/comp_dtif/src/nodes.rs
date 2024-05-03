@@ -8,7 +8,7 @@ use dyn_comp_bundles::{
     components::{
         mixins::{
             AbsoluteLayoutElementMixin, BlendMode, BlendModeMixin, CornerRadiiMixin, LayoutElement,
-            LayoutParent, OpacityMixin, PathMixin, SizeMixin, StaticLayoutElementMixin,
+            OpacityMixin, PathMixin, SizeMixin, StaticLayoutElementMixin, StaticLayoutParent,
             StaticLayoutParentMixin, VisibilityMixin, WindingRule,
         },
         nodes::{
@@ -45,7 +45,7 @@ pub struct FrameNode {
     #[serde(default = "default_as_false")]
     pub clip_content: bool,
     #[serde(default)]
-    pub layout_parent: Option<LayoutParent>,
+    pub layout_parent: Option<StaticLayoutParent>,
     #[serde(default)]
     pub translation: Vec2,
     #[serde(default)]

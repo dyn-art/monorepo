@@ -42,7 +42,7 @@ export class FigmaNodeTreeProcessor {
 		toTransformPaints: TToTransformPaint[];
 		toTransformAssets: TToTransformAsset[];
 	} {
-		const rootId = this.walk(this._root, true);
+		const rootId = this.walk(this._root, this._root.layoutMode !== 'NONE', true);
 
 		return {
 			rootId,
@@ -53,7 +53,7 @@ export class FigmaNodeTreeProcessor {
 	}
 
 	// Recursive method to walk through each node
-	private walk(node: SceneNode, isRoot = false): TContinuousId {
+	private walk(node: SceneNode, autoLayout: boolean, isRoot = false): TContinuousId {
 		const nodeId = ContinuousId.nextId();
 
 		if (isFigmaFrameNode(node) || isFigmaComponentNode(node) || isFigmaInstanceNode(node)) {
@@ -61,7 +61,7 @@ export class FigmaNodeTreeProcessor {
 				type: 'Frame',
 				id: nodeId,
 				node,
-				childrenIds: this.processChildren(node),
+				childrenIds: this.processChildren(node, node.layoutMode !== 'NONE'),
 				fills: this.processFills(node),
 				strokes: this.processStrokes(node),
 				effects: this.processEffects(node),
@@ -72,7 +72,7 @@ export class FigmaNodeTreeProcessor {
 				type: 'Group',
 				id: nodeId,
 				node,
-				childrenIds: [] // this.processChildren(node) // TODO
+				childrenIds: [] // TODO: this.processChildren(node, autoLayout)
 			});
 		} else if (isFigmaTextNode(node)) {
 			this._toTransformNodes.push({
@@ -82,7 +82,8 @@ export class FigmaNodeTreeProcessor {
 				attributes: this.processTextSegments(node),
 				fills: this.processFills(node),
 				strokes: this.processStrokes(node),
-				effects: this.processEffects(node)
+				effects: this.processEffects(node),
+				autoLayout
 			});
 		} else if (isFigmaShapeNode(node)) {
 			this._toTransformNodes.push({
@@ -91,13 +92,15 @@ export class FigmaNodeTreeProcessor {
 				node,
 				fills: this.processFills(node),
 				strokes: this.processStrokes(node),
-				effects: this.processEffects(node)
+				effects: this.processEffects(node),
+				autoLayout
 			});
 		} else if (isFigmaSceneNode(node)) {
 			this._toTransformNodes.push({
 				type: 'Uncategorized',
 				id: nodeId,
-				node
+				node,
+				autoLayout
 			});
 		} else {
 			throw new UnsupportedFigmaNodeException(node);
@@ -107,9 +110,9 @@ export class FigmaNodeTreeProcessor {
 	}
 
 	// Processes children of a node
-	private processChildren(node: TFigmaNodeWithChildren): TContinuousId[] {
+	private processChildren(node: TFigmaNodeWithChildren, autoLayout: boolean): TContinuousId[] {
 		// Reverse so that the most top node is the first item in the array
-		return node.children.map((child) => this.walk(child)).reverse();
+		return node.children.map((child) => this.walk(child, autoLayout)).reverse();
 	}
 
 	// Processes fills of a node
@@ -283,6 +286,7 @@ export interface TToTransformTextNode extends TToTransformBaseNode {
 	fills: TToTransformFill[];
 	strokes: TToTransformStroke[];
 	effects: TToTransformEffect[];
+	autoLayout: boolean;
 }
 
 export type TTextNodeAttributeInterval = Pick<
@@ -319,11 +323,13 @@ export interface TToTransformShapeNode extends TToTransformBaseNode {
 	fills: TToTransformFill[];
 	strokes: TToTransformStroke[];
 	effects: TToTransformEffect[];
+	autoLayout: boolean;
 }
 
 export interface TToTransformUncategorizedSceneNode extends TToTransformBaseNode {
 	type: 'Uncategorized';
 	node: SceneNode;
+	autoLayout: boolean;
 }
 
 export type TToTransformNode =

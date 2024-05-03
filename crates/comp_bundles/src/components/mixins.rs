@@ -1,7 +1,14 @@
+use crate::{
+    properties::{AlignItems, AlignSelf, FlexDirection, JustifyContent, JustifySelf},
+    utils::{auto_length_to_taffy, length_to_taffy},
+};
 use bevy_ecs::{component::Component, entity::Entity};
 use dyn_attributed_string::AttributedString;
 use dyn_comp_asset::asset_id::ImageId;
-use dyn_utils::properties::{corner_radii::CornerRadii, opacity::Opacity, size::Size};
+use dyn_utils::{
+    properties::{corner_radii::CornerRadii, opacity::Opacity, rect::Rect, size::Size},
+    units::{auto_length::AutoLength, axes::Axes, length::Length},
+};
 use glam::Vec3;
 use smallvec::SmallVec;
 
@@ -106,20 +113,45 @@ pub struct AttributedStringMixin(pub AttributedString);
 pub struct StaticLayoutNodeId(pub taffy::NodeId);
 
 #[derive(Component, Debug, Default, Copy, Clone)]
-pub struct StaticLayoutParentMixin(pub LayoutParent);
+pub struct StaticLayoutParentMixin(pub StaticLayoutParent);
 
 #[derive(Debug, Default, Copy, Clone)]
 #[cfg_attr(
     feature = "serde_support",
-    derive(serde::Serialize, serde::Deserialize, specta::Type)
+    derive(serde::Serialize, serde::Deserialize, specta::Type),
+    serde(rename_all = "camelCase")
 )]
-pub struct LayoutParent {
-    // TODO
+pub struct StaticLayoutParent {
+    #[cfg_attr(feature = "serde_support", serde(default))]
+    pub align_items: Option<AlignItems>,
+    #[cfg_attr(feature = "serde_support", serde(default))]
+    pub justify_content: Option<JustifyContent>,
+    #[cfg_attr(feature = "serde_support", serde(default))]
+    pub gap: Axes<Length>,
+    #[cfg_attr(feature = "serde_support", serde(default))]
+    pub padding: Rect<Length>,
+    #[cfg_attr(feature = "serde_support", serde(default))]
+    pub flex_direction: FlexDirection,
 }
 
-impl LayoutParent {
+impl StaticLayoutParent {
     pub fn to_style(&self) -> taffy::Style {
-        taffy::Style::default()
+        taffy::Style {
+            align_items: self.align_items.map(|v| v.into()),
+            justify_content: self.justify_content.map(|v| v.into()),
+            gap: taffy::Size::<taffy::LengthPercentage> {
+                width: length_to_taffy(self.gap.x),
+                height: length_to_taffy(self.gap.y),
+            },
+            padding: taffy::Rect::<taffy::LengthPercentage> {
+                top: length_to_taffy(self.padding.top),
+                bottom: length_to_taffy(self.padding.bottom),
+                left: length_to_taffy(self.padding.left),
+                right: length_to_taffy(self.padding.right),
+            },
+            flex_direction: self.flex_direction.into(),
+            ..Default::default()
+        }
     }
 }
 
@@ -165,15 +197,31 @@ pub struct StaticLayoutElementMixin(pub StaticLayoutElement);
 #[derive(Debug, Default, Copy, Clone)]
 #[cfg_attr(
     feature = "serde_support",
-    derive(serde::Serialize, serde::Deserialize, specta::Type)
+    derive(serde::Serialize, serde::Deserialize, specta::Type),
+    serde(rename_all = "camelCase")
 )]
 pub struct StaticLayoutElement {
-    // padding, ..
+    #[cfg_attr(feature = "serde_support", serde(default))]
+    align_self: Option<AlignSelf>,
+    #[cfg_attr(feature = "serde_support", serde(default))]
+    justify_self: Option<JustifySelf>,
+    #[cfg_attr(feature = "serde_support", serde(default))]
+    margin: Rect<AutoLength>,
 }
 
 impl StaticLayoutElement {
     pub fn to_style(&self) -> taffy::Style {
-        taffy::Style::default()
+        taffy::Style {
+            align_self: self.align_self.map(|v| v.into()),
+            justify_self: self.justify_self.map(|v| v.into()),
+            margin: taffy::Rect::<taffy::LengthPercentageAuto> {
+                top: auto_length_to_taffy(self.margin.top),
+                bottom: auto_length_to_taffy(self.margin.bottom),
+                left: auto_length_to_taffy(self.margin.left),
+                right: auto_length_to_taffy(self.margin.right),
+            },
+            ..Default::default()
+        }
     }
 }
 
