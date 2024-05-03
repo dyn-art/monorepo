@@ -20,7 +20,7 @@
 				"constraints": { "horizontal": "Start", "vertical": "Start" }
 			},
 			"styles": [
-				{ "type": "Fill", "paintId": "6", "blendMode": "Normal", "opacity": 1, "visible": true }
+				{ "type": "Fill", "paintId": "7", "blendMode": "Normal", "opacity": 1, "visible": true }
 			]
 		},
 		"2": {
@@ -28,35 +28,37 @@
 			"clipContent": false,
 			"layoutParent": {
 				"flexDirection": "Column",
-				"alignItems": "Center",
-				"justifyContent": "Center",
+				"alignItems": "Start",
+				"justifyContent": "Start",
 				"padding": {
-					"top": { "type": "Abs", "value": 86 },
-					"bottom": { "type": "Abs", "value": 13 },
-					"left": { "type": "Abs", "value": 86 },
-					"right": { "type": "Abs", "value": 86 }
+					"top": { "type": "Abs", "value": 10 },
+					"bottom": { "type": "Abs", "value": 10 },
+					"left": { "type": "Abs", "value": 10 },
+					"right": { "type": "Abs", "value": 10 }
 				},
 				"gap": { "x": { "type": "Abs", "value": 0 }, "y": { "type": "Abs", "value": 20 } }
 			},
 			"visible": true,
 			"children": ["5", "3"],
-			"size": [272, 246],
-			"translation": [91, 117],
+			"size": [120, 240],
+			"translation": [190, 130],
 			"rotationDeg": 0,
 			"cornerRadii": [0, 0, 0, 0],
 			"blendMode": "Normal",
 			"opacity": 1,
 			"layoutElement": {
 				"type": "Absolute",
-				"constraints": { "horizontal": "Start", "vertical": "Start" }
+				"constraints": { "horizontal": "Center", "vertical": "Center" }
 			},
-			"styles": []
+			"styles": [
+				{ "type": "Fill", "paintId": "6", "blendMode": "Normal", "opacity": 1, "visible": true }
+			]
 		},
 		"3": {
 			"type": "Rectangle",
 			"visible": true,
 			"size": [100, 100],
-			"translation": [86, 13],
+			"translation": [10, 10],
 			"rotationDeg": 0,
 			"cornerRadii": [0, 0, 0, 0],
 			"blendMode": "Normal",
@@ -70,7 +72,7 @@
 			"type": "Rectangle",
 			"visible": true,
 			"size": [100, 100],
-			"translation": [86, 133],
+			"translation": [10, 130],
 			"rotationDeg": 0,
 			"cornerRadii": [0, 0, 0, 0],
 			"blendMode": "Normal",
@@ -83,7 +85,8 @@
 	},
 	"paints": {
 		"4": { "type": "Solid", "color": [217, 217, 217] },
-		"6": { "type": "Solid", "color": [255, 248, 78] }
+		"6": { "type": "Solid", "color": [0, 0, 0] },
+		"7": { "type": "Solid", "color": [255, 248, 78] }
 	},
 	"assets": {},
 	"viewport": { "physicalPosition": [0, 0], "physicalSize": [500, 500] }

@@ -222,6 +222,9 @@ pub fn mark_nodes_with_static_layout_change_as_stale(
         // whose changes should be ignored by this system.
         //
         // https://discord.com/channels/691052431525675048/1228316069207216130
+        //
+        // Note we listen on transform changes although we don't directly use transform
+        // so that we can enforce strict positioning based on the layout
         if transform.last_changed().get() > tick_res.first_in_cycle.get()
             || size_mixin.last_changed().get() > tick_res.first_in_cycle.get()
         {
@@ -307,27 +310,23 @@ fn update_node_layout_recursive(
                 .tree
                 .compute_layout(*node_id, size_mixin.0)
                 .unwrap();
-            layout_res.tree.print_branch(*node_id, &taffy_to_entity);
+            layout_res.tree.print_branch(*node_id, &taffy_to_entity); // TODO: REMOVE
         }
 
         if let Ok(layout) = layout_res.tree.get_layout(*node_id) {
             size_mixin.0.width = Abs::pt(layout.size.width);
             size_mixin.0.height = Abs::pt(layout.size.height);
 
-            log::info!("[update_node_layout_recursive] {:?}: {:?}", node_id, layout); // TODO: REMOVE
-
             // Don't update root transform because it will be 0
-            // if it was used as the starting point for the layout compution
+            // if it was used as the starting point for the layout computation
             if !is_root {
                 // TODO: Taffy rounds all floating numbers to whole numbers
                 // See: https://github.com/DioxusLabs/taffy/issues/77
-                //
-                // Thus we can't apply the calculated location e.g. when translating
-                // because those roundings add up and it doesn't feel right in the UI
-                if !transform.is_changed() {
-                    transform.translation = Vec3::new(layout.location.x, layout.location.y, 0.0);
-                }
+                transform.translation = Vec3::new(layout.location.x, layout.location.y, 0.0);
             }
+
+            // TODO: REMOVE
+            log::info!("[update_node_layout_recursive] {:?}: {:?}", node_id, layout);
         }
 
         // Check for children and recursively update their layout
