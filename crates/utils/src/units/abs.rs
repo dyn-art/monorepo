@@ -1,6 +1,15 @@
-// Based on:
-// https://github.com/typst/typst/blob/main/crates/typst/src/layout/abs.rs
-
+/**
+ * -----------------------------------------------------------------------------
+ * This file includes code derived from the project typst/typst by @typst.
+ * Project Repository: https://github.com/typst/typst/blob/main/crates/typst/src/layout/abs.rs
+ *
+ * Date of Import: 03 May 2024
+ * -----------------------------------------------------------------------------
+ * The code included in this file is licensed under the Apache License v2,
+ * as per the original project by @typst.
+ * For the license text, see: https://github.com/typst/typst/blob/main/LICENSE
+ * -----------------------------------------------------------------------------
+ */
 use super::scalar::Scalar;
 use super::Numeric;
 use std::fmt::{self, Debug, Formatter};
@@ -79,6 +88,32 @@ impl Abs {
     /// Convert this to a number of inches.
     pub fn to_inches(&self) -> f32 {
         self.to_unit(AbsUnit::In)
+    }
+
+    /// The minimum of this and another absolute length.
+    pub fn min(self, other: Self) -> Self {
+        Self(self.0.min(other.0))
+    }
+
+    /// Set to the minimum of this and another absolute length.
+    pub fn set_min(&mut self, other: Self) {
+        *self = (*self).min(other);
+    }
+
+    /// The maximum of this and another absolute length.
+    pub fn max(self, other: Self) -> Self {
+        Self(self.0.max(other.0))
+    }
+
+    /// Set to the maximum of this and another absolute length.
+    pub fn set_max(&mut self, other: Self) {
+        *self = (*self).max(other);
+    }
+
+    /// Whether the other absolute length fits into this one (i.e. is smaller).
+    /// Allows for a bit of slack.
+    pub fn fits(self, other: Self) -> bool {
+        self.0 + 1e-6 >= other.0
     }
 }
 

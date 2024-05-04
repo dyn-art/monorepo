@@ -17,7 +17,7 @@ export function transformEllipseNode(
 	node: EllipseNode,
 	config: TTransformEllipseNodeConfig
 ): { type: 'Ellipse' } & COMP.EllipseNode {
-	const { fills, strokes, effects } = config;
+	const { fills, strokes, effects, autoLayout } = config;
 
 	return {
 		type: 'Ellipse',
@@ -30,7 +30,9 @@ export function transformEllipseNode(
 		rotationDeg: mapFigmaTransformToRotation(node.relativeTransform),
 		blendMode: mapFigmaBlendModeToDtif(node.blendMode),
 		opacity: node.opacity,
-		constraints: mapFigmaConstraintsToDtif(node.constraints),
+		layoutElement: autoLayout
+			? { type: 'Static' }
+			: { type: 'Absolute', constraints: mapFigmaConstraintsToDtif(node.constraints) },
 		styles: createDtifStyles(fills, strokes, effects)
 	};
 }
@@ -39,4 +41,5 @@ interface TTransformEllipseNodeConfig {
 	fills: TToTransformFill[];
 	strokes: TToTransformStroke[];
 	effects: TToTransformEffect[];
+	autoLayout: boolean;
 }

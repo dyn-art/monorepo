@@ -56,7 +56,7 @@ export const useSvgComposition = (
 					interactive: false
 				});
 				newComposition.renderer = new SvgRenderer(newComposition, {
-					domElement: svgContainerRef.current as Element
+					domElement: svgContainerRef.current as HTMLElement
 				});
 				newComposition.update();
 

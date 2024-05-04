@@ -17,7 +17,7 @@ export function transformRectangleNode(
 	node: RectangleNode,
 	config: TTransformRectangleNodeConfig
 ): { type: 'Rectangle' } & COMP.RectangleNode {
-	const { fills, strokes, effects } = config;
+	const { fills, strokes, effects, autoLayout } = config;
 
 	return {
 		type: 'Rectangle',
@@ -33,7 +33,9 @@ export function transformRectangleNode(
 		],
 		blendMode: mapFigmaBlendModeToDtif(node.blendMode),
 		opacity: node.opacity,
-		constraints: mapFigmaConstraintsToDtif(node.constraints),
+		layoutElement: autoLayout
+			? { type: 'Static' }
+			: { type: 'Absolute', constraints: mapFigmaConstraintsToDtif(node.constraints) },
 		styles: createDtifStyles(fills, strokes, effects)
 	};
 }
@@ -42,4 +44,5 @@ interface TTransformRectangleNodeConfig {
 	fills: TToTransformFill[];
 	strokes: TToTransformStroke[];
 	effects: TToTransformEffect[];
+	autoLayout: boolean;
 }

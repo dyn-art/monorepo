@@ -1,7 +1,14 @@
+use crate::{
+    properties::{AlignItems, AlignSelf, FlexDirection, JustifyContent, JustifySelf},
+    utils::{auto_length_to_taffy, length_to_taffy},
+};
 use bevy_ecs::{component::Component, entity::Entity};
 use dyn_attributed_string::AttributedString;
 use dyn_comp_asset::asset_id::ImageId;
-use dyn_utils::properties::{corner_radii::CornerRadii, opacity::Opacity, size::Size};
+use dyn_utils::{
+    properties::{corner_radii::CornerRadii, opacity::Opacity, rect::Rect, size::Size},
+    units::{auto_length::AutoLength, axes::Axes, length::Length},
+};
 use glam::Vec3;
 use smallvec::SmallVec;
 
@@ -102,8 +109,63 @@ pub struct ImageAssetMixin(pub Option<ImageId>);
 #[derive(Component, Debug, Clone)]
 pub struct AttributedStringMixin(pub AttributedString);
 
-#[derive(Component, Debug, Default, Clone, Copy)]
-pub struct ConstraintsMixin(pub Constraints);
+#[derive(Component, Debug, Copy, Clone)]
+pub struct StaticLayoutNodeId(pub taffy::NodeId);
+
+#[derive(Component, Debug, Default, Copy, Clone)]
+pub struct StaticLayoutParentMixin(pub StaticLayoutParent);
+
+#[derive(Debug, Default, Copy, Clone)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type),
+    serde(rename_all = "camelCase")
+)]
+pub struct StaticLayoutParent {
+    #[cfg_attr(feature = "serde_support", serde(default))]
+    pub align_items: Option<AlignItems>,
+    #[cfg_attr(feature = "serde_support", serde(default))]
+    pub justify_content: Option<JustifyContent>,
+    #[cfg_attr(feature = "serde_support", serde(default))]
+    pub gap: Axes<Length>,
+    #[cfg_attr(feature = "serde_support", serde(default))]
+    pub padding: Rect<Length>,
+    #[cfg_attr(feature = "serde_support", serde(default))]
+    pub flex_direction: FlexDirection,
+}
+
+impl StaticLayoutParent {
+    pub fn to_style(&self) -> taffy::Style {
+        taffy::Style {
+            align_items: self.align_items.map(|v| v.into()),
+            justify_content: self.justify_content.map(|v| v.into()),
+            gap: taffy::Size::<taffy::LengthPercentage> {
+                width: length_to_taffy(self.gap.x),
+                height: length_to_taffy(self.gap.y),
+            },
+            padding: taffy::Rect::<taffy::LengthPercentage> {
+                top: length_to_taffy(self.padding.top),
+                bottom: length_to_taffy(self.padding.bottom),
+                left: length_to_taffy(self.padding.left),
+                right: length_to_taffy(self.padding.right),
+            },
+            flex_direction: self.flex_direction.into(),
+            ..Default::default()
+        }
+    }
+}
+
+#[derive(Component, Debug, Default, Copy, Clone)]
+pub struct AbsoluteLayoutElementMixin(pub AbsoluteLayoutElement);
+
+#[derive(Debug, Default, Copy, Clone)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type)
+)]
+pub struct AbsoluteLayoutElement {
+    pub constraints: Constraints,
+}
 
 #[derive(Debug, Default, Copy, Clone)]
 #[cfg_attr(
@@ -129,9 +191,60 @@ pub enum Constraint {
     Scale,
 }
 
-#[derive(Component, Debug, Default, Clone, Copy)]
-pub struct ConstraintsLayoutMetricsMixin {
-    pub pos: Vec3,
+#[derive(Component, Debug, Default, Copy, Clone)]
+pub struct StaticLayoutElementMixin(pub StaticLayoutElement);
+
+#[derive(Debug, Default, Copy, Clone)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type),
+    serde(rename_all = "camelCase")
+)]
+pub struct StaticLayoutElement {
+    #[cfg_attr(feature = "serde_support", serde(default))]
+    align_self: Option<AlignSelf>,
+    #[cfg_attr(feature = "serde_support", serde(default))]
+    justify_self: Option<JustifySelf>,
+    #[cfg_attr(feature = "serde_support", serde(default))]
+    margin: Rect<AutoLength>,
+}
+
+impl StaticLayoutElement {
+    pub fn to_style(&self) -> taffy::Style {
+        taffy::Style {
+            align_self: self.align_self.map(|v| v.into()),
+            justify_self: self.justify_self.map(|v| v.into()),
+            margin: taffy::Rect::<taffy::LengthPercentageAuto> {
+                top: auto_length_to_taffy(self.margin.top),
+                bottom: auto_length_to_taffy(self.margin.bottom),
+                left: auto_length_to_taffy(self.margin.left),
+                right: auto_length_to_taffy(self.margin.right),
+            },
+            ..Default::default()
+        }
+    }
+}
+
+#[derive(Debug, Copy, Clone)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type),
+    serde(tag = "type")
+)]
+pub enum LayoutElement {
+    Absolute(AbsoluteLayoutElement),
+    Static(StaticLayoutElement),
+}
+
+impl Default for LayoutElement {
+    fn default() -> Self {
+        Self::Absolute(AbsoluteLayoutElement::default())
+    }
+}
+
+#[derive(Component, Debug, Default, Copy, Clone)]
+pub struct PreAbsoluteLayoutProperties {
+    pub translation: Vec3,
     pub size: Size,
-    pub parent_size: Size,
+    pub parent_size: Option<Size>,
 }

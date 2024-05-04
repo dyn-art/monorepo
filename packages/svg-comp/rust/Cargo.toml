@@ -78,6 +78,8 @@ wasm-bindgen-test = "0.3.41"
 [profile.release]
 opt-level = "s"
 lto = true
+strip = true
+panic = "abort" # Without console_error_panic_hook in debug mode, the panic's stack trace is useless anway
 
 [profile.dev.package."*"]
 opt-level = 3

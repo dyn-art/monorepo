@@ -26,6 +26,105 @@ export type AbsUnit =
  */
 "In"
 
+export type AbsoluteLayoutElement = { constraints: Constraints }
+
+/**
+ * Sets the distribution of space between and around content items
+ * For Flexbox it controls alignment in the cross axis
+ * For Grid it controls alignment in the block axis
+ * 
+ * [MDN](https://developer.mozilla.org/en-US/docs/Web/CSS/align-content)
+ */
+export type AlignContent = 
+/**
+ * Items are packed toward the start of the axis
+ */
+"Start" | 
+/**
+ * Items are packed toward the end of the axis
+ */
+"End" | 
+/**
+ * Items are packed towards the flex-relative start of the axis.
+ * 
+ * For flex containers with flex_direction RowReverse or ColumnReverse this is equivalent
+ * to End. In all other cases it is equivalent to Start.
+ */
+"FlexStart" | 
+/**
+ * Items are packed towards the flex-relative end of the axis.
+ * 
+ * For flex containers with flex_direction RowReverse or ColumnReverse this is equivalent
+ * to Start. In all other cases it is equivalent to End.
+ */
+"FlexEnd" | 
+/**
+ * Items are centered around the middle of the axis
+ */
+"Center" | 
+/**
+ * Items are stretched to fill the container
+ */
+"Stretch" | 
+/**
+ * The first and last items are aligned flush with the edges of the container (no gap)
+ * The gap between items is distributed evenly.
+ */
+"SpaceBetween" | 
+/**
+ * The gap between the first and last items is exactly THE SAME as the gap between items.
+ * The gaps are distributed evenly
+ */
+"SpaceEvenly" | 
+/**
+ * The gap between the first and last items is exactly HALF the gap between items.
+ * The gaps are distributed evenly in proportion to these ratios.
+ */
+"SpaceAround"
+
+/**
+ * Used to control how child nodes are aligned.
+ * For Flexbox it controls alignment in the cross axis
+ * For Grid it controls alignment in the block axis
+ * 
+ * [MDN](https://developer.mozilla.org/en-US/docs/Web/CSS/align-items)
+ */
+export type AlignItems = 
+/**
+ * Items are packed toward the start of the axis
+ */
+"Start" | 
+/**
+ * Items are packed toward the end of the axis
+ */
+"End" | 
+/**
+ * Items are packed towards the flex-relative start of the axis.
+ * 
+ * For flex containers with flex_direction RowReverse or ColumnReverse this is equivalent
+ * to End. In all other cases it is equivalent to Start.
+ */
+"FlexStart" | 
+/**
+ * Items are packed towards the flex-relative end of the axis.
+ * 
+ * For flex containers with flex_direction RowReverse or ColumnReverse this is equivalent
+ * to Start. In all other cases it is equivalent to End.
+ */
+"FlexEnd" | 
+/**
+ * Items are packed along the center of the cross axis
+ */
+"Center" | 
+/**
+ * Items are aligned such as their baselines align
+ */
+"Baseline" | 
+/**
+ * Stretch to fill the container
+ */
+"Stretch"
+
 /**
  * An angle describing a rotation.
  */
@@ -57,6 +156,21 @@ export type AssetContent =
 { type: "Url"; url: string }
 
 export type AssetContentType = { type: "Unknown" } | { type: "Jpeg" } | { type: "Png" } | { type: "Svg"; width: number; height: number } | { type: "Ttf" }
+
+export type AutoLength = { type: "Abs"; value: Abs } | { type: "Ratio"; value: Ratio } | { type: "Auto" }
+
+/**
+ * A container with a horizontal and vertical component.
+ */
+export type Axes<T> = { 
+/**
+ * The horizontal component.
+ */
+x: T; 
+/**
+ * The vertical component.
+ */
+y: T }
 
 export type BlendMode = "Normal" | "Multiply" | "Screen" | "Overlay" | "Darken" | "Lighten" | "ColorDodge" | "ColorBurn" | "HardLight" | "SoftLight" | "Difference" | "Exclusion" | "Hue" | "Saturation" | "Color" | "Luminosity"
 
@@ -149,7 +263,7 @@ export type DtifEntitySetPositionEvent = { entity: string; x: number; y: number 
 
 export type DtifInputEvent = ({ type: "CompositionResized" } & DtifCompositionResizedEvent) | ({ type: "CompositionViewportChanged" } & DtifCompositionViewportChangedEvent) | ({ type: "EntityMoved" } & DtifEntityMovedEvent) | ({ type: "EntitySetPosition" } & DtifEntitySetPositionEvent) | ({ type: "EntityDeleted" } & DtifEntityDeletedEvent)
 
-export type EllipseNode = { startingAngle?: number; endingAngle?: number; innerRadiusRatio?: number; translation?: Vec2; rotationDeg?: Angle; size: Size; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; constraints?: Constraints; styles?: Style[] }
+export type EllipseNode = { startingAngle?: number; endingAngle?: number; innerRadiusRatio?: number; translation?: Vec2; rotationDeg?: Angle; size: Size; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; layoutElement?: LayoutElement; styles?: Style[] }
 
 /**
  * A length that is relative to the font size.
@@ -169,6 +283,45 @@ export type EntitySetPositionInputEvent = { entity: Entity; x: number; y: number
 export type EntitySetRotationInputEvent = { entity: Entity; rotationDeg: Angle }
 
 export type FillStyle = { paintId: string; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity }
+
+/**
+ * The direction of the flexbox layout main axis.
+ * 
+ * There are always two perpendicular layout axes: main (or primary) and cross (or secondary).
+ * Adding items will cause them to be positioned adjacent to each other along the main axis.
+ * By varying this value throughout your tree, you can create complex axis-aligned layouts.
+ * 
+ * Items are always aligned relative to the cross axis, and justified relative to the main axis.
+ * 
+ * The default behavior is [`FlexDirection::Row`].
+ * 
+ * [Specification](https://www.w3.org/TR/css-flexbox-1/#flex-direction-property)
+ */
+export type FlexDirection = 
+/**
+ * Defines +x as the main axis
+ * 
+ * Items will be added from left to right in a row.
+ */
+"Row" | 
+/**
+ * Defines +y as the main axis
+ * 
+ * Items will be added from top to bottom in a column.
+ */
+"Column" | 
+/**
+ * Defines -x as the main axis
+ * 
+ * Items will be added from right to left in a row.
+ */
+"RowReverse" | 
+/**
+ * Defines -y as the main axis
+ * 
+ * Items will be added from bottom to top in a column.
+ */
+"ColumnReverse"
 
 export type FocusRootNodesInputEvent = null
 
@@ -265,7 +418,7 @@ stretch: FontStretch }
  */
 export type FontWeight = number
 
-export type FrameNode = { clipContent?: boolean; translation?: Vec2; rotationDeg?: Angle; size: Size; cornerRadii?: CornerRadii; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; constraints?: Constraints; styles?: Style[]; children?: string[] }
+export type FrameNode = { clipContent?: boolean; layoutParent?: StaticLayoutParent | null; translation?: Vec2; rotationDeg?: Angle; size: Size; cornerRadii?: CornerRadii; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; layoutElement?: LayoutElement; styles?: Style[]; children?: string[] }
 
 export type GradientColorStop = { 
 /**
@@ -1250,6 +1403,10 @@ export type KeyUpOnCompInputEvent = {
  */
 keyCode: KeyCode }
 
+export type LayoutElement = ({ type: "Absolute" } & AbsoluteLayoutElement) | ({ type: "Static" } & StaticLayoutElement)
+
+export type Length = { type: "Abs"; value: Abs } | { type: "Ratio"; value: Ratio }
+
 export type LineWrap = 
 /**
  * No wrapping
@@ -1366,7 +1523,7 @@ export type Opacity = Ratio
 
 export type Paint = ({ type: "Solid" } & SolidPaint) | ({ type: "Image" } & ImagePaint) | ({ type: "Gradient" } & GradientPaint)
 
-export type PolygonNode = { pointCount?: number; translation?: Vec2; rotationDeg?: Angle; size: Size; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; constraints?: Constraints; styles?: Style[] }
+export type PolygonNode = { pointCount?: number; translation?: Vec2; rotationDeg?: Angle; size: Size; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; layoutElement?: LayoutElement; styles?: Style[] }
 
 /**
  * A ratio of a whole.
@@ -1375,7 +1532,9 @@ export type PolygonNode = { pointCount?: number; translation?: Vec2; rotationDeg
  */
 export type Ratio = Scalar
 
-export type RectangleNode = { translation?: Vec2; rotationDeg?: Angle; size: Size; cornerRadii?: CornerRadii; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; constraints?: Constraints; styles?: Style[] }
+export type Rect<T> = { left: T; right: T; top: T; bottom: T }
+
+export type RectangleNode = { translation?: Vec2; rotationDeg?: Angle; size: Size; cornerRadii?: CornerRadii; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; layoutElement?: LayoutElement; styles?: Style[] }
 
 /**
  * A 32-bit float that implements `Eq`, `Ord` and `Hash`.
@@ -1394,7 +1553,11 @@ export type SolidPaint = { color: Color }
 
 export type SpectaExport = { comp_dtif: DtifComposition; svg_comp_input_event: SvgCompInputEvent; svg_comp_output_event: SvgCompOutputEvent }
 
-export type StarNode = { innerRadiusRatio?: number; pointCount?: number; translation?: Vec2; rotationDeg?: Angle; size: Size; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; constraints?: Constraints; styles?: Style[] }
+export type StarNode = { innerRadiusRatio?: number; pointCount?: number; translation?: Vec2; rotationDeg?: Angle; size: Size; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; layoutElement?: LayoutElement; styles?: Style[] }
+
+export type StaticLayoutElement = { alignSelf?: AlignItems | null; justifySelf?: AlignItems | null; margin?: Rect<AutoLength> }
+
+export type StaticLayoutParent = { alignItems?: AlignItems | null; justifyContent?: AlignContent | null; gap?: Axes<Length>; padding?: Rect<Length>; flexDirection?: FlexDirection }
 
 export type StrokeStyle = { width: number; paintId: string; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity }
 
@@ -1506,11 +1669,11 @@ export type TextAttributeInterval = { start: number; end: number; attributes: Te
 
 export type TextAttributes = { fontFamily?: FontFamily | null; fontStyle?: FontStyle | null; fontStretch?: FontStretch | null; fontWeight?: FontWeight | null; fontSize?: Abs | null; smallCaps?: boolean | null; applyKerning?: boolean | null; letterSpacing?: FontUnit | null; wordSpacing?: FontUnit | null; lineHeight?: FontUnit | null }
 
-export type TextNode = { text: string; attributes: TextAttributeInterval[]; lineWrap?: LineWrap; horizontalTextAlignment?: HorizontalTextAlignment; verticalTextAlignment?: VerticalTextAlignment; translation?: Vec2; rotationDeg?: Angle; size: Size; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; constraints?: Constraints; styles?: Style[] }
+export type TextNode = { text: string; attributes: TextAttributeInterval[]; lineWrap?: LineWrap; horizontalTextAlignment?: HorizontalTextAlignment; verticalTextAlignment?: VerticalTextAlignment; translation?: Vec2; rotationDeg?: Angle; size: Size; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; layoutElement?: LayoutElement; styles?: Style[] }
 
 export type Vec2 = [number, number]
 
-export type VectorNode = { path: string; windingRule?: WindingRule; translation?: Vec2; rotationDeg?: Angle; size: Size; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; constraints?: Constraints; styles?: Style[] }
+export type VectorNode = { path: string; windingRule?: WindingRule; translation?: Vec2; rotationDeg?: Angle; size: Size; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; layoutElement?: LayoutElement; styles?: Style[] }
 
 export type VerticalTextAlignment = "Top" | "Bottom" | "Center"
 

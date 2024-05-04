@@ -55,6 +55,7 @@ export class SvgRenderer extends Renderer {
 				);
 			});
 			this._domElement.addEventListener('wheel', (e) => {
+				e.preventDefault();
 				this.composition.emitInputEvent(
 					'Interaction',
 					{

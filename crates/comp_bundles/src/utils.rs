@@ -1,6 +1,7 @@
 use bevy_ecs::{entity::Entity, system::Query};
 use bevy_hierarchy::Parent;
 use bevy_transform::components::{GlobalTransform, Transform};
+use dyn_utils::units::{auto_length::AutoLength, length::Length};
 use glam::{EulerRot, Vec3};
 
 pub fn transform_to_z_rotation_rad(transform: &Transform) -> f32 {
@@ -52,5 +53,20 @@ pub fn global_to_local_vector3(
     // Fallback to the global point if the parent's global transform cannot be accessed
     else {
         return global_point;
+    }
+}
+
+pub fn length_to_taffy(value: Length) -> taffy::LengthPercentage {
+    match value {
+        Length::Abs { value } => taffy::LengthPercentage::Length(value.to_pt()),
+        Length::Ratio { value } => taffy::LengthPercentage::Percent(value.get()),
+    }
+}
+
+pub fn auto_length_to_taffy(value: AutoLength) -> taffy::LengthPercentageAuto {
+    match value {
+        AutoLength::Abs { value } => taffy::LengthPercentageAuto::Length(value.to_pt()),
+        AutoLength::Ratio { value } => taffy::LengthPercentageAuto::Percent(value.get()),
+        AutoLength::Auto => taffy::LengthPercentageAuto::Auto,
     }
 }

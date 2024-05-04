@@ -39,7 +39,8 @@ export async function transformNode(
 			return transformTextNode(toTransformNode.node, toTransformNode.attributes, {
 				fills: toTransformNode.fills,
 				strokes: toTransformNode.strokes,
-				effects: toTransformNode.effects
+				effects: toTransformNode.effects,
+				autoLayout: toTransformNode.autoLayout
 			});
 		case 'Shape':
 			return transformShapeNode(toTransformNode);

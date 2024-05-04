@@ -1,5 +1,15 @@
-// Based on:
-// https://github.com/typst/typst/blob/main/crates/typst/src/util/macros.rs
+/**
+ * -----------------------------------------------------------------------------
+ * This file includes code derived from the project typst/typst by @typst.
+ * Project Repository: https://github.com/typst/typst/blob/main/crates/typst/src/util/macros.rs
+ *
+ * Date of Import: 03 May 2024
+ * -----------------------------------------------------------------------------
+ * The code included in this file is licensed under the Apache License v2,
+ * as per the original project by @typst.
+ * For the license text, see: https://github.com/typst/typst/blob/main/LICENSE
+ * -----------------------------------------------------------------------------
+ */
 
 /// Implement the `Sub` trait based on existing `Neg` and `Add` impls.
 #[macro_export]

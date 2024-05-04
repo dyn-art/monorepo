@@ -22,7 +22,7 @@ export function transformTextNode(
 	attributes: TToTransformTextNode['attributes'],
 	config: TTransformTextNodeNodeConfig
 ): { type: 'Text' } & COMP.TextNode {
-	const { fills, strokes, effects } = config;
+	const { fills, strokes, effects, autoLayout } = config;
 
 	let nextStart = 0;
 
@@ -77,7 +77,9 @@ export function transformTextNode(
 		rotationDeg: mapFigmaTransformToRotation(node.relativeTransform),
 		blendMode: mapFigmaBlendModeToDtif(node.blendMode),
 		opacity: node.opacity,
-		constraints: mapFigmaConstraintsToDtif(node.constraints),
+		layoutElement: autoLayout
+			? { type: 'Static' }
+			: { type: 'Absolute', constraints: mapFigmaConstraintsToDtif(node.constraints) },
 		styles: createDtifStyles(fills, strokes, effects)
 	};
 }
@@ -86,4 +88,5 @@ interface TTransformTextNodeNodeConfig {
 	fills: TToTransformFill[];
 	strokes: TToTransformStroke[];
 	effects: TToTransformEffect[];
+	autoLayout: boolean;
 }

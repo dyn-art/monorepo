@@ -510,7 +510,7 @@ pub fn apply_blend_mode_mixin_changes(
 pub fn apply_clip_content_changes(
     mut query: Query<(&FrameCompNode, &mut SvgBundleVariant), Changed<FrameCompNode>>,
 ) {
-    for (FrameCompNode { clip_content }, mut bundle_variant) in query.iter_mut() {
+    for (FrameCompNode { clip_content, .. }, mut bundle_variant) in query.iter_mut() {
         match bundle_variant.as_mut() {
             SvgBundleVariant::FrameNode(bundle) => {
                 if *clip_content {

@@ -50,6 +50,11 @@ impl Size {
         (self.width(), self.height())
     }
 
+    /// Whether the other size fits into this one (smaller width and height).
+    pub fn fits(self, other: Self) -> bool {
+        self.width.fits(other.width) && self.height.fits(other.height)
+    }
+
     /// Converts to a ratio of width to height.
     pub fn aspect_ratio(&self) -> Ratio {
         Ratio::new(self.width / self.height)

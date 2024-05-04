@@ -10,6 +10,12 @@ export const CanvasControl: React.FC<TProps> = (props) => {
 	const composition = useWatchComposition(props.composition, true);
 	const selectedEntities = useSelectedEntities(composition);
 
+	React.useEffect(() => {
+		selectedEntities.forEach((entity) => {
+			composition.logEntityComponents(entity);
+		});
+	}, [selectedEntities, composition]);
+
 	return (
 		<svg
 			className="pointer-events-none absolute left-0 top-0"
