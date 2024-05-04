@@ -114,6 +114,8 @@ pub fn discover_new_static_layout_parents(
                 }
             }
 
+            child_node_ids.reverse();
+
             layout_res
                 .tree
                 .update_children(node_id, &child_node_ids)
@@ -170,6 +172,8 @@ pub fn update_static_layout_parents_children(
                     .insert((StaticLayoutNodeId(child_node_id),));
             }
         }
+
+        child_node_ids.reverse();
 
         layout_res
             .tree

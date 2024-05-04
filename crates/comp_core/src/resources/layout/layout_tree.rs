@@ -28,13 +28,13 @@ impl LayoutTree {
             .new_leaf(style.clone())
             .map_err(|e| LayoutError::TaffyError(e));
 
-        log::info!("[new_leaf] {:?}: {:?}", node_id, style); // TODO: REMOVE
+        log::info!("[new_leaf] {:?}: {:#?}", node_id, style); // TODO: REMOVE
 
         return node_id;
     }
 
     pub fn update_leaf(&mut self, node_id: NodeId, style: Style) -> bool {
-        log::info!("[update_leaf] {:?}: {:?}", node_id, style); // TODO: REMOVE
+        log::info!("[update_leaf] {:?}: {:#?}", node_id, style); // TODO: REMOVE
         self.taffy_tree.set_style(node_id, style).is_ok()
     }
 
@@ -84,6 +84,7 @@ impl LayoutTree {
         if let Some(static_layout_element) = maybe_static_layout_element {
             let layout_element_style = static_layout_element.to_style();
 
+            style.display = Display::Block;
             style.align_self = layout_element_style.align_self;
             style.justify_self = layout_element_style.justify_self;
             style.margin = layout_element_style.margin;
@@ -92,6 +93,7 @@ impl LayoutTree {
         if let Some(layout_parent) = maybe_layout_parent {
             let layout_parent_style = layout_parent.to_style();
 
+            style.display = Display::Flex;
             style.align_items = layout_parent_style.align_items;
             style.justify_content = layout_parent_style.justify_content;
             style.gap = layout_parent_style.gap;
