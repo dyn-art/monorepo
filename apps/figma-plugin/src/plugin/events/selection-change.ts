@@ -28,10 +28,6 @@ export const selectionChange: TCustomPluginCallbackRegistration = {
 		});
 
 		// Post on select frame to app part
-		console.log('Route: ', {
-			activeAppRoute: ACTIVE_APP_ROUTE.get()?.toString(),
-			expected: `${EAppRoutes.HOME}${EAppRoutes.HOME__TO_DTIF}`
-		});
 		if (ACTIVE_APP_ROUTE.get()?.toString() === `${EAppRoutes.HOME}${EAppRoutes.HOME__TO_DTIF}`) {
 			if (selectedFrames.length > 0) {
 				instance.post('on-select-frame', {
@@ -48,7 +44,20 @@ export const selectionChange: TCustomPluginCallbackRegistration = {
 		) {
 			instance.post('on-select-node-properties', {
 				selected: selection.map((node) =>
-					pickProperties(node, getObjectPropertyKeys(node) as any)
+					pickProperties(node, getObjectPropertyKeys(node) as any, (value) => {
+						switch (typeof value) {
+							case 'string':
+							case 'number':
+							case 'bigint':
+							case 'boolean':
+							case 'undefined':
+							case 'object':
+								return { value };
+							case 'symbol':
+							case 'function':
+								return { value: value.toString() };
+						}
+					})
 				) as SceneNode[]
 			});
 		}

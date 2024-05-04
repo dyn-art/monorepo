@@ -201,9 +201,9 @@ export class FigmaNodeTreeProcessor {
 					blendMode: stroke.blendMode ?? 'PASS_THROUGH',
 					width: dropMixed(node, 'strokeWeight'),
 					strokeMiterLimit: dropMixed(node, 'strokeMiterLimit'),
-					strokeCap: dropMixed(node, 'strokeCap'),
-					strokeJoin: dropMixed(node, 'strokeJoin'),
-					strokeAlign: dropMixed(node, 'strokeAlign')
+					strokeCap: dropMixed(node, 'strokeCap', 'NONE'),
+					strokeJoin: dropMixed(node, 'strokeJoin', 'MITER'),
+					strokeAlign: dropMixed(node, 'strokeAlign', 'CENTER')
 				};
 			})
 			.filter(notEmpty)

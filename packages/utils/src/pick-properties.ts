@@ -7,11 +7,19 @@
  */
 export function pickProperties<TObject, TPropertyKeys extends keyof TObject>(
 	source: TObject,
-	properties: TPropertyKeys[]
+	properties: TPropertyKeys[],
+	mapper?: (value: unknown) => { value: any } | false
 ): Pick<TObject, TPropertyKeys> {
 	return properties.reduce<Partial<Pick<TObject, TPropertyKeys>>>((result, property) => {
 		const value = source[property];
-		result[property] = value;
+		if (mapper != null) {
+			const newValue = mapper(value);
+			if (newValue !== false) {
+				result[property] = newValue.value;
+			}
+		} else {
+			result[property] = value;
+		}
 		return result;
 	}, {}) as Pick<TObject, TPropertyKeys>;
 }

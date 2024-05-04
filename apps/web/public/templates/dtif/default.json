@@ -6,6 +6,7 @@
 		"1": {
 			"type": "Frame",
 			"clipContent": true,
+			"layoutParent": null,
 			"visible": true,
 			"children": ["38", "36", "34", "33", "32", "30", "27", "15", "2"],
 			"size": [1920, 1080],
@@ -14,7 +15,10 @@
 			"cornerRadii": [0, 0, 0, 0],
 			"blendMode": "Normal",
 			"opacity": 1,
-			"constraints": { "horizontal": "Start", "vertical": "Start" },
+			"layoutElement": {
+				"type": "Absolute",
+				"constraints": { "horizontal": "Start", "vertical": "Start" }
+			},
 			"styles": [
 				{ "type": "Fill", "paintId": "39", "blendMode": "Normal", "opacity": 1, "visible": true }
 			]
@@ -22,28 +26,34 @@
 		"2": {
 			"type": "Frame",
 			"clipContent": false,
+			"layoutParent": null,
 			"visible": true,
-			"children": ["13", "10", "9", "8", "7", "5", "3"],
+			"children": ["14", "13", "12", "10", "8", "5", "3"],
 			"size": [639, 276],
 			"translation": [163, 382.99993896484375],
 			"rotationDeg": 0,
 			"cornerRadii": [0, 0, 0, 0],
 			"blendMode": "Normal",
 			"opacity": 1,
-			"constraints": { "horizontal": "Start", "vertical": "Start" },
+			"layoutElement": {
+				"type": "Absolute",
+				"constraints": { "horizontal": "Start", "vertical": "Start" }
+			},
 			"styles": []
 		},
 		"3": {
-			"type": "Vector",
-			"path": "M 0 0 L 625 0 L 625 262 L 0 262 L 0 0 Z",
-			"windingRule": "Nonzero",
+			"type": "Rectangle",
 			"visible": true,
 			"size": [625, 262],
 			"translation": [7, 7],
 			"rotationDeg": 0,
+			"cornerRadii": [0, 0, 0, 0],
 			"blendMode": "Normal",
 			"opacity": 1,
-			"constraints": { "horizontal": "Scale", "vertical": "Scale" },
+			"layoutElement": {
+				"type": "Absolute",
+				"constraints": { "horizontal": "Stretch", "vertical": "Stretch" }
+			},
 			"styles": [
 				{
 					"type": "Stroke",
@@ -56,94 +66,6 @@
 			]
 		},
 		"5": {
-			"type": "Rectangle",
-			"visible": true,
-			"size": [14, 14],
-			"translation": [625, 0],
-			"rotationDeg": 0,
-			"cornerRadii": [0, 0, 0, 0],
-			"blendMode": "Normal",
-			"opacity": 1,
-			"constraints": { "horizontal": "End", "vertical": "Start" },
-			"styles": [
-				{
-					"type": "Stroke",
-					"width": 2,
-					"paintId": "4",
-					"blendMode": "Normal",
-					"opacity": 1,
-					"visible": true
-				},
-				{ "type": "Fill", "paintId": "6", "blendMode": "Normal", "opacity": 1, "visible": true }
-			]
-		},
-		"7": {
-			"type": "Rectangle",
-			"visible": true,
-			"size": [14, 14],
-			"translation": [625, 262],
-			"rotationDeg": 0,
-			"cornerRadii": [0, 0, 0, 0],
-			"blendMode": "Normal",
-			"opacity": 1,
-			"constraints": { "horizontal": "End", "vertical": "End" },
-			"styles": [
-				{
-					"type": "Stroke",
-					"width": 2,
-					"paintId": "4",
-					"blendMode": "Normal",
-					"opacity": 1,
-					"visible": true
-				},
-				{ "type": "Fill", "paintId": "6", "blendMode": "Normal", "opacity": 1, "visible": true }
-			]
-		},
-		"8": {
-			"type": "Rectangle",
-			"visible": true,
-			"size": [14, 14],
-			"translation": [0, 262],
-			"rotationDeg": 0,
-			"cornerRadii": [0, 0, 0, 0],
-			"blendMode": "Normal",
-			"opacity": 1,
-			"constraints": { "horizontal": "Start", "vertical": "End" },
-			"styles": [
-				{
-					"type": "Stroke",
-					"width": 2,
-					"paintId": "4",
-					"blendMode": "Normal",
-					"opacity": 1,
-					"visible": true
-				},
-				{ "type": "Fill", "paintId": "6", "blendMode": "Normal", "opacity": 1, "visible": true }
-			]
-		},
-		"9": {
-			"type": "Rectangle",
-			"visible": true,
-			"size": [14, 14],
-			"translation": [0, 0],
-			"rotationDeg": 0,
-			"cornerRadii": [0, 0, 0, 0],
-			"blendMode": "Normal",
-			"opacity": 1,
-			"constraints": { "horizontal": "Start", "vertical": "Start" },
-			"styles": [
-				{
-					"type": "Stroke",
-					"width": 2,
-					"paintId": "4",
-					"blendMode": "Normal",
-					"opacity": 1,
-					"visible": true
-				},
-				{ "type": "Fill", "paintId": "6", "blendMode": "Normal", "opacity": 1, "visible": true }
-			]
-		},
-		"10": {
 			"type": "Text",
 			"text": "dyn.art",
 			"attributes": [
@@ -169,12 +91,15 @@
 			"rotationDeg": 0,
 			"blendMode": "Normal",
 			"opacity": 1,
-			"constraints": { "horizontal": "Start", "vertical": "Start" },
+			"layoutElement": {
+				"type": "Absolute",
+				"constraints": { "horizontal": "Start", "vertical": "Start" }
+			},
 			"styles": [
-				{ "type": "Fill", "paintId": "12", "blendMode": "Normal", "opacity": 1, "visible": true }
+				{ "type": "Fill", "paintId": "7", "blendMode": "Normal", "opacity": 1, "visible": true }
 			]
 		},
-		"13": {
+		"8": {
 			"type": "Text",
 			"text": "Demo File",
 			"attributes": [
@@ -200,28 +125,115 @@
 			"rotationDeg": 0,
 			"blendMode": "Normal",
 			"opacity": 1,
-			"constraints": { "horizontal": "Start", "vertical": "Start" },
+			"layoutElement": {
+				"type": "Absolute",
+				"constraints": { "horizontal": "Start", "vertical": "Start" }
+			},
 			"styles": [
-				{ "type": "Fill", "paintId": "12", "blendMode": "Normal", "opacity": 1, "visible": true }
+				{ "type": "Fill", "paintId": "7", "blendMode": "Normal", "opacity": 1, "visible": true }
+			]
+		},
+		"10": {
+			"type": "Rectangle",
+			"visible": true,
+			"size": [14, 14],
+			"translation": [0, 0],
+			"rotationDeg": 0,
+			"cornerRadii": [0, 0, 0, 0],
+			"blendMode": "Normal",
+			"opacity": 1,
+			"layoutElement": {
+				"type": "Absolute",
+				"constraints": { "horizontal": "Start", "vertical": "Start" }
+			},
+			"styles": [
+				{ "type": "Fill", "paintId": "11", "blendMode": "Normal", "opacity": 1, "visible": true }
+			]
+		},
+		"12": {
+			"type": "Rectangle",
+			"visible": true,
+			"size": [14, 14],
+			"translation": [0, 262],
+			"rotationDeg": 0,
+			"cornerRadii": [0, 0, 0, 0],
+			"blendMode": "Normal",
+			"opacity": 1,
+			"layoutElement": {
+				"type": "Absolute",
+				"constraints": { "horizontal": "Start", "vertical": "End" }
+			},
+			"styles": [
+				{ "type": "Fill", "paintId": "11", "blendMode": "Normal", "opacity": 1, "visible": true }
+			]
+		},
+		"13": {
+			"type": "Rectangle",
+			"visible": true,
+			"size": [14, 14],
+			"translation": [625, 262],
+			"rotationDeg": 0,
+			"cornerRadii": [0, 0, 0, 0],
+			"blendMode": "Normal",
+			"opacity": 1,
+			"layoutElement": {
+				"type": "Absolute",
+				"constraints": { "horizontal": "End", "vertical": "End" }
+			},
+			"styles": [
+				{ "type": "Fill", "paintId": "11", "blendMode": "Normal", "opacity": 1, "visible": true }
+			]
+		},
+		"14": {
+			"type": "Rectangle",
+			"visible": true,
+			"size": [14, 14],
+			"translation": [625, 0],
+			"rotationDeg": 0,
+			"cornerRadii": [0, 0, 0, 0],
+			"blendMode": "Normal",
+			"opacity": 1,
+			"layoutElement": {
+				"type": "Absolute",
+				"constraints": { "horizontal": "End", "vertical": "Start" }
+			},
+			"styles": [
+				{ "type": "Fill", "paintId": "11", "blendMode": "Normal", "opacity": 1, "visible": true }
 			]
 		},
 		"15": {
 			"type": "Frame",
 			"clipContent": false,
+			"layoutParent": {
+				"flexDirection": "Row",
+				"alignItems": "Start",
+				"justifyContent": "Start",
+				"padding": {
+					"top": { "type": "Abs", "value": 0 },
+					"bottom": { "type": "Abs", "value": 0 },
+					"left": { "type": "Abs", "value": 0 },
+					"right": { "type": "Abs", "value": 0 }
+				},
+				"gap": { "x": { "type": "Abs", "value": 14 }, "y": { "type": "Abs", "value": 0 } }
+			},
 			"visible": true,
 			"children": ["25", "21", "16"],
-			"size": [244.95555114746094, 73],
+			"size": [247, 73],
 			"translation": [1511, 526],
 			"rotationDeg": 0,
 			"cornerRadii": [0, 0, 0, 0],
 			"blendMode": "Normal",
 			"opacity": 1,
-			"constraints": { "horizontal": "Start", "vertical": "Start" },
+			"layoutElement": {
+				"type": "Absolute",
+				"constraints": { "horizontal": "Start", "vertical": "Start" }
+			},
 			"styles": []
 		},
 		"16": {
 			"type": "Frame",
 			"clipContent": false,
+			"layoutParent": null,
 			"visible": true,
 			"children": ["17"],
 			"size": [73, 73],
@@ -232,12 +244,15 @@
 			],
 			"blendMode": "Normal",
 			"opacity": 1,
-			"constraints": { "horizontal": "Start", "vertical": "Start" },
+			"layoutElement": {
+				"type": "Absolute",
+				"constraints": { "horizontal": "Start", "vertical": "Start" }
+			},
 			"styles": [
 				{ "type": "Fill", "paintId": "19", "blendMode": "Normal", "opacity": 1, "visible": true },
 				{
 					"type": "Stroke",
-					"width": 3.2444443702697754,
+					"width": 3,
 					"paintId": "20",
 					"blendMode": "Normal",
 					"opacity": 1,
@@ -255,7 +270,10 @@
 			"rotationDeg": 0,
 			"blendMode": "Normal",
 			"opacity": 1,
-			"constraints": { "horizontal": "Center", "vertical": "Center" },
+			"layoutElement": {
+				"type": "Absolute",
+				"constraints": { "horizontal": "Center", "vertical": "Center" }
+			},
 			"styles": [
 				{ "type": "Fill", "paintId": "18", "blendMode": "Normal", "opacity": 1, "visible": true }
 			]
@@ -263,22 +281,26 @@
 		"21": {
 			"type": "Frame",
 			"clipContent": false,
+			"layoutParent": null,
 			"visible": true,
 			"children": ["22"],
 			"size": [73, 73],
-			"translation": [85.97777557373047, 0],
+			"translation": [87, 0],
 			"rotationDeg": 0,
 			"cornerRadii": [
 				3.2444443702697754, 3.2444443702697754, 3.2444443702697754, 3.2444443702697754
 			],
 			"blendMode": "Normal",
 			"opacity": 1,
-			"constraints": { "horizontal": "Start", "vertical": "Start" },
+			"layoutElement": {
+				"type": "Absolute",
+				"constraints": { "horizontal": "Start", "vertical": "Start" }
+			},
 			"styles": [
 				{ "type": "Fill", "paintId": "23", "blendMode": "Normal", "opacity": 1, "visible": true },
 				{
 					"type": "Stroke",
-					"width": 3.2444443702697754,
+					"width": 3,
 					"paintId": "24",
 					"blendMode": "Normal",
 					"opacity": 1,
@@ -296,7 +318,10 @@
 			"rotationDeg": 0,
 			"blendMode": "Normal",
 			"opacity": 1,
-			"constraints": { "horizontal": "Center", "vertical": "Center" },
+			"layoutElement": {
+				"type": "Absolute",
+				"constraints": { "horizontal": "Center", "vertical": "Center" }
+			},
 			"styles": [
 				{ "type": "Fill", "paintId": "18", "blendMode": "Normal", "opacity": 1, "visible": true }
 			]
@@ -304,22 +329,26 @@
 		"25": {
 			"type": "Frame",
 			"clipContent": false,
+			"layoutParent": null,
 			"visible": true,
 			"children": ["26"],
 			"size": [73, 73],
-			"translation": [171.95555114746094, 0],
+			"translation": [174, 0],
 			"rotationDeg": 0,
 			"cornerRadii": [
 				3.2444443702697754, 3.2444443702697754, 3.2444443702697754, 3.2444443702697754
 			],
 			"blendMode": "Normal",
 			"opacity": 1,
-			"constraints": { "horizontal": "Start", "vertical": "Start" },
+			"layoutElement": {
+				"type": "Absolute",
+				"constraints": { "horizontal": "Start", "vertical": "Start" }
+			},
 			"styles": [
 				{ "type": "Fill", "paintId": "23", "blendMode": "Normal", "opacity": 1, "visible": true },
 				{
 					"type": "Stroke",
-					"width": 3.2444443702697754,
+					"width": 3,
 					"paintId": "24",
 					"blendMode": "Normal",
 					"opacity": 1,
@@ -337,7 +366,10 @@
 			"rotationDeg": 0,
 			"blendMode": "Normal",
 			"opacity": 1,
-			"constraints": { "horizontal": "Center", "vertical": "Center" },
+			"layoutElement": {
+				"type": "Absolute",
+				"constraints": { "horizontal": "Center", "vertical": "Center" }
+			},
 			"styles": [
 				{ "type": "Fill", "paintId": "18", "blendMode": "Normal", "opacity": 1, "visible": true }
 			]
@@ -352,7 +384,10 @@
 			"rotationDeg": -22.455778621841993,
 			"blendMode": "Normal",
 			"opacity": 1,
-			"constraints": { "horizontal": "Scale", "vertical": "Scale" },
+			"layoutElement": {
+				"type": "Absolute",
+				"constraints": { "horizontal": "Scale", "vertical": "Scale" }
+			},
 			"styles": [
 				{ "type": "Fill", "paintId": "28", "blendMode": "Normal", "opacity": 1, "visible": true }
 			]
@@ -366,7 +401,10 @@
 			"cornerRadii": [0, 0, 0, 0],
 			"blendMode": "Normal",
 			"opacity": 1,
-			"constraints": { "horizontal": "Scale", "vertical": "Scale" },
+			"layoutElement": {
+				"type": "Absolute",
+				"constraints": { "horizontal": "Scale", "vertical": "Scale" }
+			},
 			"styles": [
 				{ "type": "Fill", "paintId": "31", "blendMode": "Normal", "opacity": 1, "visible": true }
 			]
@@ -380,7 +418,10 @@
 			"cornerRadii": [0, 0, 0, 0],
 			"blendMode": "Normal",
 			"opacity": 1,
-			"constraints": { "horizontal": "Scale", "vertical": "Scale" },
+			"layoutElement": {
+				"type": "Absolute",
+				"constraints": { "horizontal": "Scale", "vertical": "Scale" }
+			},
 			"styles": [
 				{ "type": "Fill", "paintId": "31", "blendMode": "Normal", "opacity": 1, "visible": true }
 			]
@@ -395,7 +436,10 @@
 			"rotationDeg": -38.10736459038443,
 			"blendMode": "Normal",
 			"opacity": 1,
-			"constraints": { "horizontal": "Start", "vertical": "Start" },
+			"layoutElement": {
+				"type": "Absolute",
+				"constraints": { "horizontal": "Start", "vertical": "Start" }
+			},
 			"styles": [
 				{
 					"type": "Stroke",
@@ -405,7 +449,7 @@
 					"opacity": 1,
 					"visible": true
 				},
-				{ "type": "Fill", "paintId": "6", "blendMode": "Normal", "opacity": 1, "visible": true }
+				{ "type": "Fill", "paintId": "11", "blendMode": "Normal", "opacity": 1, "visible": true }
 			]
 		},
 		"34": {
@@ -418,7 +462,10 @@
 			"rotationDeg": -14.664123708561684,
 			"blendMode": "Normal",
 			"opacity": 1,
-			"constraints": { "horizontal": "Start", "vertical": "Start" },
+			"layoutElement": {
+				"type": "Absolute",
+				"constraints": { "horizontal": "Start", "vertical": "Start" }
+			},
 			"styles": [
 				{ "type": "Fill", "paintId": "35", "blendMode": "Normal", "opacity": 1, "visible": true }
 			]
@@ -433,7 +480,10 @@
 			"rotationDeg": 15.416816892626981,
 			"blendMode": "Normal",
 			"opacity": 1,
-			"constraints": { "horizontal": "Start", "vertical": "Start" },
+			"layoutElement": {
+				"type": "Absolute",
+				"constraints": { "horizontal": "Start", "vertical": "Start" }
+			},
 			"styles": [
 				{ "type": "Fill", "paintId": "37", "blendMode": "Normal", "opacity": 1, "visible": true }
 			]
@@ -448,7 +498,10 @@
 			"rotationDeg": 138.00904993476155,
 			"blendMode": "Normal",
 			"opacity": 1,
-			"constraints": { "horizontal": "Start", "vertical": "Start" },
+			"layoutElement": {
+				"type": "Absolute",
+				"constraints": { "horizontal": "Start", "vertical": "Start" }
+			},
 			"styles": [
 				{
 					"type": "Stroke",
@@ -458,14 +511,14 @@
 					"opacity": 1,
 					"visible": true
 				},
-				{ "type": "Fill", "paintId": "6", "blendMode": "Normal", "opacity": 1, "visible": true }
+				{ "type": "Fill", "paintId": "11", "blendMode": "Normal", "opacity": 1, "visible": true }
 			]
 		}
 	},
 	"paints": {
 		"4": { "type": "Solid", "color": [49, 110, 255] },
-		"6": { "type": "Solid", "color": [255, 255, 255] },
-		"12": { "type": "Solid", "color": [11, 29, 51] },
+		"7": { "type": "Solid", "color": [11, 29, 51] },
+		"11": { "type": "Solid", "color": [255, 255, 255] },
 		"18": { "type": "Solid", "color": [0, 0, 0] },
 		"19": { "type": "Solid", "color": [253, 253, 253] },
 		"20": { "type": "Solid", "color": [223, 223, 223] },
@@ -479,7 +532,7 @@
 		"39": { "type": "Solid", "color": [252, 250, 244] }
 	},
 	"assets": {
-		"11": {
+		"6": {
 			"content": {
 				"type": "Url",
 				"url": "https://fonts.gstatic.com/s/alegreyasans/v24/5aUu9_-1phKLFgshYDvh6Vwt5eFImE18imdCqxI.ttf",
@@ -487,7 +540,7 @@
 			},
 			"contentType": { "type": "Ttf" }
 		},
-		"14": {
+		"9": {
 			"content": {
 				"type": "Url",
 				"url": "https://fonts.gstatic.com/s/lato/v24/S6uyw4BMUTPHvxk6XweuBCY.ttf",
