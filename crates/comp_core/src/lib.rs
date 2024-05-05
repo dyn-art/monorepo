@@ -22,8 +22,9 @@ use systems::{
     layout::{
         absolute_layout::{apply_pre_absolute_layout_properties, update_absolute_layout},
         static_layout::{
-            discover_new_static_layout_parents, mark_nodes_with_static_layout_change_as_stale,
-            update_static_layout, update_static_layout_parents_children,
+            discover_new_static_layout_parent_nodes, mark_nodes_with_static_layout_change_as_stale,
+            remove_stale_layout_nodes, update_static_layout,
+            update_static_layout_parent_nodes_children,
         },
     },
     outline::{
@@ -136,10 +137,11 @@ impl Plugin for CompCorePlugin {
         app.add_systems(
             Update,
             (
-                discover_new_static_layout_parents.in_set(CompCoreSystemSet::PreLayout),
-                update_static_layout_parents_children.in_set(CompCoreSystemSet::PreLayout),
+                discover_new_static_layout_parent_nodes.in_set(CompCoreSystemSet::PreLayout),
+                update_static_layout_parent_nodes_children.in_set(CompCoreSystemSet::PreLayout),
                 mark_nodes_with_static_layout_change_as_stale.in_set(CompCoreSystemSet::PreLayout),
                 apply_pre_absolute_layout_properties.in_set(CompCoreSystemSet::PreLayout),
+                remove_stale_layout_nodes.in_set(CompCoreSystemSet::PreLayout),
                 update_absolute_layout.in_set(CompCoreSystemSet::Layout),
                 update_static_layout
                     .in_set(CompCoreSystemSet::Layout)

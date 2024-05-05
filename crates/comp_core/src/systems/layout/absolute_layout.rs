@@ -29,10 +29,11 @@ pub fn apply_pre_absolute_layout_properties(
     size_mixin_query: Query<&SizeMixin>,
 ) {
     for (entity, transform, size_mixin, maybe_parent) in query.iter() {
-        // Check if Transform or Size has changed in this update cycle or the last.
-        // A change in the current cycle likely indicates a mutation from operations like Translation or Resizing.
-        // A change in the last cycle suggests an update by a layout system,
-        // whose changes should be ignored by this system.
+        // Check if Transform or Size has been altered during the current update cycle or the previous one.
+        // Modifications within the current cycle (e.g., Translation, Resizing) indicate active user or system interactions
+        // that require immediate attention to ensure accurate layout representation.
+        // Changes from the previous cycle are typically residual updates from the layout system itself,
+        // and should not trigger further updates in this system to avoid redundancy and potential feedback loops.
         //
         // https://discord.com/channels/691052431525675048/1228316069207216130
         if transform.last_changed().get() > tick_res.first_in_cycle.get()
@@ -66,12 +67,14 @@ pub fn update_absolute_layout(
 ) {
     let mut to_update_children = Vec::new();
 
+    // Identify to update children
     for (children, parent_size) in query_set.p0().iter() {
         for child in children.iter() {
             to_update_children.push((*child, parent_size.0))
         }
     }
 
+    // Compute absolute layout and apply it to the children
     for (child, parent_size) in to_update_children.iter() {
         if let Ok((
             mut size_mixin,

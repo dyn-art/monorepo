@@ -24,6 +24,7 @@ impl LayoutTree {
 
     pub fn new_leaf(&mut self, style: Style) -> Result<NodeId, LayoutError> {
         // log::info!("[new_leaf] {:?}: {:#?}", node_id, style); // TODO: REMOVE
+
         return self
             .taffy_tree
             .new_leaf(style)
@@ -40,6 +41,7 @@ impl LayoutTree {
         parent_id: NodeId,
         child_ids: &Vec<NodeId>,
     ) -> Result<(), LayoutError> {
+        // log::info!("[update_children] {:?}: {:?}", parent_id, child_ids); // TODO: REMOVE
         self.taffy_tree
             .set_children(parent_id, child_ids)
             .map_err(|e| LayoutError::TaffyError(e))
@@ -47,6 +49,12 @@ impl LayoutTree {
 
     pub fn try_remove_children(&mut self, node_id: NodeId) {
         self.taffy_tree.set_children(node_id, &[]).unwrap();
+    }
+
+    pub fn remove(&mut self, node_id: NodeId) -> Result<taffy::NodeId, LayoutError> {
+        self.taffy_tree
+            .remove(node_id)
+            .map_err(|e| LayoutError::TaffyError(e))
     }
 
     pub fn compute_layout(
