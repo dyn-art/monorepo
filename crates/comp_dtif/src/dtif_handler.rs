@@ -143,7 +143,6 @@ impl DtifHandler {
             Node::Polygon(node) => &node.styles,
             Node::Text(node) => &node.styles,
             Node::Vector(node) => &node.styles,
-            _ => return,
         };
 
         // Process styles and collect their Bevy entity ids

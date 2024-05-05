@@ -147,6 +147,14 @@
 				"constraints": { "horizontal": "Start", "vertical": "Start" }
 			},
 			"styles": [
+				{
+					"type": "Stroke",
+					"width": 2,
+					"paintId": "4",
+					"blendMode": "Normal",
+					"opacity": 1,
+					"visible": true
+				},
 				{ "type": "Fill", "paintId": "11", "blendMode": "Normal", "opacity": 1, "visible": true }
 			]
 		},
@@ -164,6 +172,14 @@
 				"constraints": { "horizontal": "Start", "vertical": "End" }
 			},
 			"styles": [
+				{
+					"type": "Stroke",
+					"width": 2,
+					"paintId": "4",
+					"blendMode": "Normal",
+					"opacity": 1,
+					"visible": true
+				},
 				{ "type": "Fill", "paintId": "11", "blendMode": "Normal", "opacity": 1, "visible": true }
 			]
 		},
@@ -181,6 +197,14 @@
 				"constraints": { "horizontal": "End", "vertical": "End" }
 			},
 			"styles": [
+				{
+					"type": "Stroke",
+					"width": 2,
+					"paintId": "4",
+					"blendMode": "Normal",
+					"opacity": 1,
+					"visible": true
+				},
 				{ "type": "Fill", "paintId": "11", "blendMode": "Normal", "opacity": 1, "visible": true }
 			]
 		},
@@ -198,6 +222,14 @@
 				"constraints": { "horizontal": "End", "vertical": "Start" }
 			},
 			"styles": [
+				{
+					"type": "Stroke",
+					"width": 2,
+					"paintId": "4",
+					"blendMode": "Normal",
+					"opacity": 1,
+					"visible": true
+				},
 				{ "type": "Fill", "paintId": "11", "blendMode": "Normal", "opacity": 1, "visible": true }
 			]
 		},
@@ -206,8 +238,8 @@
 			"clipContent": false,
 			"layoutParent": {
 				"flexDirection": "Row",
-				"alignItems": "Start",
-				"justifyContent": "Start",
+				"alignItems": "Center",
+				"justifyContent": "Center",
 				"padding": {
 					"top": { "type": "Abs", "value": 0 },
 					"bottom": { "type": "Abs", "value": 0 },

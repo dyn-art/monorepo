@@ -129,13 +129,14 @@ fn apply_horizontal_constraint(
                 pre_translation.x + parent_size.width() - pre_parent_size.unwrap().width();
         }
         Constraint::Stretch => {
-            // TODO
-        }
-        Constraint::Scale => {
             let left = pre_translation.x;
             let right = pre_translation.x + parent_size.width() - pre_parent_size.unwrap().width();
             child_transform.translation.x = left;
             child_size_mixin.0.width = pre_size.width + Abs::pt(right - left);
+        }
+        Constraint::Scale => {
+            // TODO
+            log::warn!("Horizontal 'Scale' constraint currently not supported!");
         }
     }
 }
@@ -168,14 +169,15 @@ fn apply_vertical_constraint(
                 parent_size.height() - pre_parent_size.unwrap().height() + pre_translation.y;
         }
         Constraint::Stretch => {
-            // TODO
-        }
-        Constraint::Scale => {
             let top = pre_translation.y;
             let bottom =
                 pre_translation.y + parent_size.height() - pre_parent_size.unwrap().height();
             child_transform.translation.y = top;
             child_size_mixin.0.height = pre_size.height + Abs::pt(bottom - top);
+        }
+        Constraint::Scale => {
+            // TODO
+            log::warn!("Vertical 'Scale' constraint currently not supported!");
         }
     }
 }
