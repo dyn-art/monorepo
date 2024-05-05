@@ -314,7 +314,7 @@ fn update_node_layout_recursive(
                 .tree
                 .compute_layout(*node_id, size_mixin.0)
                 .unwrap();
-            layout_res.tree.print_branch(*node_id, &taffy_to_entity); // TODO: REMOVE
+            // layout_res.tree.print_branch(*node_id, &taffy_to_entity); // TODO: REMOVE
         }
 
         if let Ok(layout) = layout_res.tree.get_layout(*node_id) {

@@ -40,6 +40,6 @@ impl AutoLength {
 
 impl Default for AutoLength {
     fn default() -> Self {
-        Self::Auto
+        Self::from_length(Length::default())
     }
 }

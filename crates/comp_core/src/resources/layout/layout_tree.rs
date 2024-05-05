@@ -23,18 +23,15 @@ impl LayoutTree {
     }
 
     pub fn new_leaf(&mut self, style: Style) -> Result<NodeId, LayoutError> {
-        let node_id = self
+        // log::info!("[new_leaf] {:?}: {:#?}", node_id, style); // TODO: REMOVE
+        return self
             .taffy_tree
-            .new_leaf(style.clone())
+            .new_leaf(style)
             .map_err(|e| LayoutError::TaffyError(e));
-
-        log::info!("[new_leaf] {:?}: {:#?}", node_id, style); // TODO: REMOVE
-
-        return node_id;
     }
 
     pub fn update_leaf(&mut self, node_id: NodeId, style: Style) -> bool {
-        log::info!("[update_leaf] {:?}: {:#?}", node_id, style); // TODO: REMOVE
+        // log::info!("[update_leaf] {:?}: {:#?}", node_id, style); // TODO: REMOVE
         self.taffy_tree.set_style(node_id, style).is_ok()
     }
 
