@@ -1,4 +1,4 @@
-import type { COMP } from '@dyn/dtif-comp';
+import type { COMP } from '@dyn/comp-dtif';
 
 import { ExportFontAssetException } from '../../exceptions';
 import type { TToTransformFontAsset } from '../../FigmaNodeTreeProcessor';

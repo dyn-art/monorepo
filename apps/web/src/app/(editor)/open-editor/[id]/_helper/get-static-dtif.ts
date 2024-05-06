@@ -1,4 +1,4 @@
-import type { COMP } from '@dyn/dtif-comp';
+import type { COMP } from '@dyn/comp-dtif';
 import { appFetchClient } from '@/core';
 
 export async function getStaticDtif(id: string): Promise<unknown> {

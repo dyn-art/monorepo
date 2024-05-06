@@ -1,6 +1,6 @@
 import React from 'react';
-import { applyModifications, type TMdtifComposition } from '@dyn/dtif-comp';
-import type { Composition } from '@dyn/svg-comp';
+import { applyModifications, type TMdtifComposition } from '@dyn/comp-dtif';
+import type { Composition } from '@dyn/comp-svg-builder';
 import { Badge, Skeleton, useSizeCallback } from '@dyn/ui';
 import { usePreparedDtif } from '@/hooks';
 

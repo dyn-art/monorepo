@@ -1,5 +1,5 @@
 [package]
-name = "dyn-svg-comp-api"
+name = "dyn-comp-svg-builder-api"
 version = "0.0.1"
 description = ""
 edition = { workspace = true }
@@ -9,7 +9,7 @@ license = { workspace = true }
 authors = { workspace = true }
 
 [lib]
-name = "dyn_svg_comp_api"
+name = "dyn_comp_svg_builder_api"
 path = "src/lib.rs"
 crate-type = ["cdylib", "rlib"]
 

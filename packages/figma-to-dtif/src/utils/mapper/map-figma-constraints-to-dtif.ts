@@ -1,4 +1,4 @@
-import type { COMP } from '@dyn/dtif-comp';
+import type { COMP } from '@dyn/comp-dtif';
 
 import { mapFigmaConstraintToDtif } from './map-figma-constraint-to-dtif';
 

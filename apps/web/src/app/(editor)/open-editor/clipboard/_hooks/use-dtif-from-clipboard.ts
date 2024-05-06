@@ -4,7 +4,7 @@ import {
 	isMdtifComposition,
 	type COMP,
 	type TMdtifComposition
-} from '@dyn/dtif-comp';
+} from '@dyn/comp-dtif';
 
 export function useDtifFromClipboard(): {
 	data?: COMP.DtifComposition | TMdtifComposition;

@@ -1,5 +1,5 @@
 import React from 'react';
-import type { COMP } from '@dyn/dtif-comp';
+import type { COMP } from '@dyn/comp-dtif';
 
 const HANDLE_SIZE = 8;
 const INTERACTION_AREA_SIZE = 20;

@@ -4,4 +4,4 @@ export * from './transform';
 export * from './types';
 export * from './utils';
 
-export * from '@dyn/dtif-comp';
+export * from '@dyn/comp-dtif';

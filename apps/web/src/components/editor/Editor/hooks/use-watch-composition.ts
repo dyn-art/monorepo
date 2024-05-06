@@ -1,7 +1,7 @@
 import React from 'react';
 import { flushSync } from 'react-dom';
-import type { COMP } from '@dyn/dtif-comp';
-import type { Composition } from '@dyn/svg-comp';
+import type { COMP } from '@dyn/comp-dtif';
+import type { Composition } from '@dyn/comp-svg-builder';
 
 import { useOutputEvent } from './use-output-event';
 

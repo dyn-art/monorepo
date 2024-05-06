@@ -1,11 +1,11 @@
-import { toKeyCode, toMouseButton } from '@dyn/dtif-comp';
+import { toKeyCode, toMouseButton } from '@dyn/comp-dtif';
 import { shortId } from '@dyn/utils';
 import type {
 	CompositionChangeOutputEvent,
 	SvgElementChangesOutputEvent,
 	SvgElementId,
 	Vec2
-} from '@/rust/dyn-svg-comp-api/bindings';
+} from '@/rust/dyn-comp-svg-builder-api/bindings';
 
 import type { Composition } from '../Composition';
 import { Renderer } from './Renderer';

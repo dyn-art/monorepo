@@ -32,7 +32,7 @@
 		"@dyn/google-client": "workspace:*",
 		"@dyn/state": "workspace:*",
 		"@dyn/state-react": "workspace:*",
-		"@dyn/svg-comp": "workspace:*",
+		"@dyn/comp-svg-builder": "workspace:*",
 		"@dyn/ui": "workspace:*",
 		"@dyn/utils": "workspace:*",
 		"clsx": "^2.1.0",

@@ -95,9 +95,9 @@ importers:
       '@dyn/state-react':
         specifier: workspace:*
         version: link:../../packages/state-react
-      '@dyn/svg-comp':
+      '@dyn/comp-svg-builder':
         specifier: workspace:*
-        version: link:../../packages/svg-comp
+        version: link:../../packages/comp-svg-builder
       '@dyn/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -171,15 +171,15 @@ importers:
 
   apps/web:
     dependencies:
-      '@dyn/dtif-comp':
+      '@dyn/comp-dtif':
         specifier: workspace:*
-        version: link:../../packages/dtif-comp
+        version: link:../../packages/comp-dtif
       '@dyn/fetch-client':
         specifier: workspace:^
         version: link:../../packages/fetch-client
-      '@dyn/svg-comp':
+      '@dyn/comp-svg-builder':
         specifier: workspace:*
-        version: link:../../packages/svg-comp
+        version: link:../../packages/comp-svg-builder
       '@dyn/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -338,7 +338,7 @@ importers:
         specifier: ^2.2.0
         version: 2.2.0(eslint@8.57.0)(react@18.2.0)(typescript@5.4.5)
 
-  packages/dtif-comp:
+  packages/comp-dtif:
     dependencies:
       '@dyn/utils':
         specifier: workspace:*
@@ -410,9 +410,9 @@ importers:
       '@dyn/config':
         specifier: workspace:*
         version: link:../config
-      '@dyn/dtif-comp':
+      '@dyn/comp-dtif':
         specifier: workspace:*
-        version: link:../dtif-comp
+        version: link:../comp-dtif
       '@figma/plugin-typings':
         specifier: ^1.88.0
         version: 1.88.0
@@ -506,11 +506,11 @@ importers:
         specifier: ^18.2.0
         version: 18.2.0
 
-  packages/svg-comp:
+  packages/comp-svg-builder:
     dependencies:
-      '@dyn/dtif-comp':
+      '@dyn/comp-dtif':
         specifier: workspace:*
-        version: link:../dtif-comp
+        version: link:../comp-dtif
       '@dyn/utils':
         specifier: workspace:*
         version: link:../utils

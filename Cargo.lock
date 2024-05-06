@@ -927,6 +927,33 @@ dependencies = [
 ]
 
 [[package]]
+name = "dyn-comp-svg-builder-api"
+version = "0.0.1"
+dependencies = [
+ "bevy_app",
+ "bevy_ecs",
+ "bevy_transform",
+ "clap",
+ "console_error_panic_hook",
+ "dyn-comp-bundles",
+ "dyn-comp-core",
+ "dyn-comp-dtif",
+ "dyn-comp-interaction",
+ "dyn-comp-svg-builder",
+ "dyn-utils",
+ "glam",
+ "js-sys",
+ "log",
+ "once_cell",
+ "serde",
+ "serde-wasm-bindgen",
+ "serde_json",
+ "specta",
+ "wasm-bindgen",
+ "wasm-bindgen-test",
+]
+
+[[package]]
 name = "dyn-comprender"
 version = "0.0.1"
 dependencies = [
@@ -968,33 +995,6 @@ dependencies = [
  "self_cell",
  "serde",
  "specta",
-]
-
-[[package]]
-name = "dyn-svg-comp-api"
-version = "0.0.1"
-dependencies = [
- "bevy_app",
- "bevy_ecs",
- "bevy_transform",
- "clap",
- "console_error_panic_hook",
- "dyn-comp-bundles",
- "dyn-comp-core",
- "dyn-comp-dtif",
- "dyn-comp-interaction",
- "dyn-comp-svg-builder",
- "dyn-utils",
- "glam",
- "js-sys",
- "log",
- "once_cell",
- "serde",
- "serde-wasm-bindgen",
- "serde_json",
- "specta",
- "wasm-bindgen",
- "wasm-bindgen-test",
 ]
 
 [[package]]

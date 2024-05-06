@@ -1,5 +1,5 @@
 import React from 'react';
-import type { Composition } from '@dyn/svg-comp';
+import type { Composition } from '@dyn/comp-svg-builder';
 
 import { CURSOR } from '../cursor';
 import { useCursor } from './use-cursor';

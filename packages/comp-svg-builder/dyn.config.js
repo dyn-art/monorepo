@@ -5,7 +5,7 @@ const { wasm } = require('@rollup/plugin-wasm');
  */
 module.exports = {
 	rust: {
-		typeDeclarationTargetPaths: ['../dtif-comp/src/_gen/bindings.ts']
+		typeDeclarationTargetPaths: ['../comp-dtif/src/_gen/bindings.ts']
 	},
 	library: {
 		rollupConfig: {

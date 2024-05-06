@@ -1,6 +1,6 @@
 import React from 'react';
-import type { COMP } from '@dyn/dtif-comp';
-import type { Composition } from '@dyn/svg-comp';
+import type { COMP } from '@dyn/comp-dtif';
+import type { Composition } from '@dyn/comp-svg-builder';
 import { Button, Skeleton } from '@dyn/ui';
 import { useSvgComposition } from '@/hooks';
 

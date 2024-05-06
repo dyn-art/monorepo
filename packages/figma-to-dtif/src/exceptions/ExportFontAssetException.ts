@@ -1,4 +1,4 @@
-import type { COMP } from '@dyn/dtif-comp';
+import type { COMP } from '@dyn/comp-dtif';
 import { extractErrorData } from '@dyn/utils';
 
 import { NodeException } from './NodeException';

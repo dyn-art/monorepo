@@ -2,7 +2,7 @@ import type {
 	CompositionChangeOutputEvent,
 	SvgElementChangesOutputEvent,
 	Vec2
-} from '@/rust/dyn-svg-comp-api/bindings';
+} from '@/rust/dyn-comp-svg-builder-api/bindings';
 
 import type { Composition } from '../Composition';
 

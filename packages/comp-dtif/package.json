@@ -1,5 +1,5 @@
 {
-	"name": "@dyn/dtif-comp",
+	"name": "@dyn/comp-dtif",
 	"description": "Design Tree Interchange Format (DTIF) type declarations and utility functions",
 	"version": "0.0.1",
 	"private": true,

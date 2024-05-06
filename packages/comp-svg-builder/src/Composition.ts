@@ -1,5 +1,5 @@
 import { shortId } from '@dyn/utils';
-import { SvgCompHandle } from '@/rust/dyn-svg-comp-api';
+import { SvgCompHandle } from '@/rust/dyn-comp-svg-builder-api';
 import type {
 	CompCoreInputEvent,
 	ComponentChange,
@@ -19,7 +19,7 @@ import type {
 	Viewport,
 	WatchableComponentVariant,
 	WatchedEntityChangesOutputEvent
-} from '@/rust/dyn-svg-comp-api/bindings';
+} from '@/rust/dyn-comp-svg-builder-api/bindings';
 
 import type { Renderer } from './render';
 

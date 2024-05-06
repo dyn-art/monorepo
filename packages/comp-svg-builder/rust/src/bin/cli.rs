@@ -7,14 +7,14 @@ mod cli {
     };
 
     // Import types and modules to generate types from
-    use dyn_svg_comp_api::*;
+    use dyn_comp_svg_builder_api::*;
 
     // TODO: Remove once specta can detect specta::Type on its own in the repo
     #[derive(specta::Type)]
     struct SpectaExport {
         comp_dtif: dyn_comp_dtif::DtifComposition,
-        svg_comp_input_event: dyn_svg_comp_api::events::SvgCompInputEvent,
-        svg_comp_output_event: dyn_svg_comp_api::events::SvgCompOutputEvent,
+        svg_comp_input_event: dyn_comp_svg_builder_api::events::SvgCompInputEvent,
+        svg_comp_output_event: dyn_comp_svg_builder_api::events::SvgCompOutputEvent,
     }
 
     #[derive(Parser, Debug)]

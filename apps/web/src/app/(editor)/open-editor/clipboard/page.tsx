@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { isDtifComposition, isMdtifComposition } from '@dyn/dtif-comp';
+import { isDtifComposition, isMdtifComposition } from '@dyn/comp-dtif';
 import { Container, Skeleton } from '@dyn/ui';
 import { Editor, FieldBasedEditor } from '@/components';
 

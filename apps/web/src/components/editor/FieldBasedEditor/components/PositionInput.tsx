@@ -1,5 +1,5 @@
 import React from 'react';
-import type { TPositionModificationInput } from '@dyn/dtif-comp';
+import type { TPositionModificationInput } from '@dyn/comp-dtif';
 import { Input, Label } from '@dyn/ui';
 
 export const PositionInput: React.FC<TProps> = (props) => {

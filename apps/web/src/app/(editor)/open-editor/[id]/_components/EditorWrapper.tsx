@@ -7,7 +7,7 @@ import {
 	isMdtifComposition,
 	type COMP,
 	type TMdtifComposition
-} from '@dyn/dtif-comp';
+} from '@dyn/comp-dtif';
 import { Container } from '@dyn/ui';
 import { Editor, FieldBasedEditor } from '@/components';
 

@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import React from 'react';
-import type { COMP } from '@dyn/dtif-comp';
-import { createSvgComposition, type Composition } from '@dyn/svg-comp';
+import type { COMP } from '@dyn/comp-dtif';
+import { createSvgComposition, type Composition } from '@dyn/comp-svg-builder';
 
 export function useSvgComposition(config: TUseCanvasConfig): {
 	composition: Composition | null;
@@ -14,7 +14,7 @@ export function useSvgComposition(config: TUseCanvasConfig): {
 	const { data: isWasmLoaded, isLoading: isWasmLoading } = useQuery({
 		queryKey: ['wasm'],
 		queryFn: async () => {
-			const { initWasm } = await import('@dyn/svg-comp');
+			const { initWasm } = await import('@dyn/comp-svg-builder');
 			await initWasm();
 			return true;
 		},

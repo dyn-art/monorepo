@@ -1,5 +1,5 @@
 import { MD5 } from 'object-hash';
-import type { COMP } from '@dyn/dtif-comp';
+import type { COMP } from '@dyn/comp-dtif';
 import { ContinuousId, notEmpty, type TContinuousId } from '@dyn/utils';
 
 import { UnsupportedFigmaNodeException } from './exceptions';

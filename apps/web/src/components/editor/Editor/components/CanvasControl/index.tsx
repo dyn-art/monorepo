@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import type { Composition } from '@dyn/svg-comp';
+import type { Composition } from '@dyn/comp-svg-builder';
 
 import { useSelectedEntities, useWatchComposition } from '../../hooks';
 import { EntitySelectionBox } from './EntitySelectionBox';

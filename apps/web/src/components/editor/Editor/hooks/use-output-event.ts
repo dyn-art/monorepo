@@ -1,7 +1,11 @@
 'use client';
 
 import React from 'react';
-import type { Composition, TOutputEventTypeMap, TWatchedOutputEventCallback } from '@dyn/svg-comp';
+import type {
+	Composition,
+	TOutputEventTypeMap,
+	TWatchedOutputEventCallback
+} from '@dyn/comp-svg-builder';
 
 export function useOutputEvent<GEventType extends keyof TOutputEventTypeMap>(
 	composition: Composition | null | undefined,

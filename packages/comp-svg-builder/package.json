@@ -1,5 +1,5 @@
 {
-	"name": "@dyn/svg-comp",
+	"name": "@dyn/comp-svg-builder",
 	"description": "SVG based composition outlet",
 	"version": "0.0.1",
 	"private": true,
@@ -36,7 +36,7 @@
 	},
 	"homepage": "https://s.dyn.art/github",
 	"dependencies": {
-		"@dyn/dtif-comp": "workspace:*",
+		"@dyn/comp-dtif": "workspace:*",
 		"@dyn/utils": "workspace:*"
 	},
 	"devDependencies": {

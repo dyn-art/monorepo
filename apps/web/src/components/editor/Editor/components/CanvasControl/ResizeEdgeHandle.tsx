@@ -1,5 +1,5 @@
 import React from 'react';
-import type { COMP } from '@dyn/dtif-comp';
+import type { COMP } from '@dyn/comp-dtif';
 
 const INTERACTION_AREA_WIDTH = 8;
 
