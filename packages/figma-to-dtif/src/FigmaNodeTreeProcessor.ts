@@ -65,7 +65,8 @@ export class FigmaNodeTreeProcessor {
 				fills: this.processFills(node),
 				strokes: this.processStrokes(node),
 				effects: this.processEffects(node),
-				isRoot
+				isRoot,
+				autoLayout
 			});
 		} else if (isFigmaGroupNode(node)) {
 			this._toTransformNodes.push({
@@ -309,6 +310,7 @@ export interface TToTransformFrameNode extends TToTransformBaseNode {
 	strokes: TToTransformStroke[];
 	effects: TToTransformEffect[];
 	isRoot: boolean;
+	autoLayout: boolean;
 }
 
 export interface TToTransformGroupNode extends TToTransformBaseNode {

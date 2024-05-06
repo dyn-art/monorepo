@@ -276,10 +276,7 @@
 			],
 			"blendMode": "Normal",
 			"opacity": 1,
-			"layoutElement": {
-				"type": "Absolute",
-				"constraints": { "horizontal": "Start", "vertical": "Start" }
-			},
+			"layoutElement": { "type": "Static" },
 			"styles": [
 				{ "type": "Fill", "paintId": "19", "blendMode": "Normal", "opacity": 1, "visible": true },
 				{
@@ -324,10 +321,7 @@
 			],
 			"blendMode": "Normal",
 			"opacity": 1,
-			"layoutElement": {
-				"type": "Absolute",
-				"constraints": { "horizontal": "Start", "vertical": "Start" }
-			},
+			"layoutElement": { "type": "Static" },
 			"styles": [
 				{ "type": "Fill", "paintId": "23", "blendMode": "Normal", "opacity": 1, "visible": true },
 				{
@@ -372,10 +366,7 @@
 			],
 			"blendMode": "Normal",
 			"opacity": 1,
-			"layoutElement": {
-				"type": "Absolute",
-				"constraints": { "horizontal": "Start", "vertical": "Start" }
-			},
+			"layoutElement": { "type": "Static" },
 			"styles": [
 				{ "type": "Fill", "paintId": "23", "blendMode": "Normal", "opacity": 1, "visible": true },
 				{

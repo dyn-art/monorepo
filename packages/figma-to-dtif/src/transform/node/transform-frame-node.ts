@@ -18,7 +18,7 @@ export function transformFrameNode(
 	node: FrameNode | ComponentNode | InstanceNode,
 	config: TTransformFrameNodeConfig
 ): { type: 'Frame' } & COMP.FrameNode {
-	const { childrenIds, fills, strokes, effects } = config;
+	const { childrenIds, fills, strokes, effects, autoLayout } = config;
 
 	return {
 		type: 'Frame',
@@ -37,7 +37,9 @@ export function transformFrameNode(
 		],
 		blendMode: mapFigmaBlendModeToDtif(node.blendMode),
 		opacity: node.opacity,
-		layoutElement: { type: 'Absolute', constraints: mapFigmaConstraintsToDtif(node.constraints) },
+		layoutElement: autoLayout
+			? { type: 'Static' }
+			: { type: 'Absolute', constraints: mapFigmaConstraintsToDtif(node.constraints) },
 		styles: createDtifStyles(fills, strokes, effects)
 	};
 }
@@ -47,4 +49,5 @@ interface TTransformFrameNodeConfig {
 	fills: TToTransformFill[];
 	strokes: TToTransformStroke[];
 	effects: TToTransformEffect[];
+	autoLayout: boolean;
 }

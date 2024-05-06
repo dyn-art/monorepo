@@ -28,7 +28,8 @@ export async function transformNode(
 					childrenIds: toTransformNode.childrenIds,
 					fills: toTransformNode.fills,
 					strokes: toTransformNode.strokes,
-					effects: toTransformNode.effects
+					effects: toTransformNode.effects,
+					autoLayout: toTransformNode.autoLayout
 				});
 			}
 			return transformNodeToImage(toTransformNode.node, cx, {
