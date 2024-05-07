@@ -1,9 +1,12 @@
+'use client';
+
 import React from 'react';
+import { Button } from '@dyn/ui';
 
 export const Test: React.FC = () => {
 	return (
 		<div>
-			<p>Hello World</p>
+			<Button>Hello there</Button>
 		</div>
 	);
 };

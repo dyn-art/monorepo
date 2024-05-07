@@ -22,9 +22,9 @@ const config = {
 		name: getAbsolutePath('@storybook/react-vite'),
 		options: {}
 	},
-	docs: {
-		autodocs: 'tag'
-	},
+	// docs: {
+	// 	autodocs: 'tag'
+	// },
 	async viteFinal(config) {
 		return mergeConfig(config, {
 			plugins: [tsconfigPaths()]
