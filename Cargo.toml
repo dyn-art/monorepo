@@ -1,11 +1,16 @@
 [workspace]
 resolver = "2"
-members = ["crates/*", "packages/comp-svg-builder/rust", "apps/comprender", "apps/web"]
+members = [
+    "crates/*",
+    "packages/comp-svg-builder/rust",
+    "apps/comprender",
+    "apps/web",
+]
 exclude = ["crates/_deprecated"]
 
 [workspace.package]
 edition = "2021"
-homepage = "https://s.dyn.art/github"
+homepage = "https://dyn.art/?source=github"
 repository = "https://github.com/dyndotart/monorepo"
 license = "AGPL-3.0-or-later"
 authors = ["@bennoinbeta"]

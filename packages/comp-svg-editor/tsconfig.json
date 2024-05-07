@@ -8,8 +8,7 @@
 		"paths": {
 			"@/utils": ["./src/utils/index.ts"],
 			"@/hooks": ["./src/hooks/index.ts"],
-			"@/components/*": ["./src/components/*"],
-			"@/components/temp/shadcn": ["./src/components/temp/shadcn"]
+			"@/components/*": ["./src/components/*"]
 		}
 	},
 	"include": ["src"]

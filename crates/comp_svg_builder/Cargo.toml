@@ -5,7 +5,7 @@ description = ""
 edition = { workspace = true }
 homepage = { workspace = true }
 repository = { workspace = true }
-license = { workspace = true }
+license = "Commercial License"
 authors = { workspace = true }
 
 [features]
