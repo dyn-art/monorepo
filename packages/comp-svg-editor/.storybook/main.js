@@ -28,6 +28,9 @@ const config = {
 	async viteFinal(config) {
 		return mergeConfig(config, {
 			plugins: [tsconfigPaths()]
+			// resolve: {
+			// 	preserveSymlinks: true
+			// }
 		});
 	}
 };
