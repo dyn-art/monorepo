@@ -72,6 +72,9 @@ export async function createOverrideRollupConfig(
 			}),
 			replace({
 				'preventAssignment': true,
+				// TODO: Find root cause, because 'react-dom' got already resolved by 'commonjs' plugin?
+				//       Has something to do with react-query.
+				'require("react-dom");': '',
 				'process.env.npm_package_version': JSON.stringify(packageJson.version),
 				'process.env.NODE_ENV': JSON.stringify(isProduction ? 'production' : 'development'),
 				'process.env.WATCH_MODE': isWatchMode

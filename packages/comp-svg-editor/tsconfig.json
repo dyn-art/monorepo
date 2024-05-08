@@ -1,0 +1,15 @@
+{
+	"extends": "@dyn/config/react-library.tsconfig.json",
+	"compilerOptions": {
+		"outDir": "./dist",
+		"rootDir": "./src",
+		"declarationDir": "./dist/types",
+		"baseUrl": ".",
+		"paths": {
+			"@/utils": ["./src/utils/index.ts"],
+			"@/hooks": ["./src/hooks/index.ts"],
+			"@/components/*": ["./src/components/*"]
+		}
+	},
+	"include": ["src"]
+}

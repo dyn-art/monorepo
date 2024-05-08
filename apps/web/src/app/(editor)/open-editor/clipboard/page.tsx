@@ -2,8 +2,8 @@
 
 import React from 'react';
 import { isDtifComposition, isMdtifComposition } from '@dyn/comp-dtif';
+import { Editor, FieldBasedEditor } from '@dyn/comp-svg-editor';
 import { Container, Skeleton } from '@dyn/ui';
-import { Editor, FieldBasedEditor } from '@/components';
 
 import { useDtifFromClipboard } from './_hooks';
 

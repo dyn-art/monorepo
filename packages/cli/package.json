@@ -26,9 +26,9 @@
 	"author": "@bennoinbeta",
 	"license": "AGPL-3.0-or-later",
 	"bugs": {
-		"url": "https://s.dyn.art/github/issues"
+		"url": "https://github.com/dyndotart/monorepo/issues"
 	},
-	"homepage": "https://s.dyn.art/github",
+	"homepage": "https://dyn.art/?source=github",
 	"dependencies": {
 		"@oclif/core": "^3.9.2",
 		"@rollup/plugin-commonjs": "^25.0.7",

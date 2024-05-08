@@ -3,11 +3,12 @@
  * @param {object} tailwindConfig - Custom Tailwind config object
  * @return {object} Merged config object
  */
-function withDynUI(tailwindConfig) {
+function withTailwind(tailwindConfig) {
 	const baseConfig = require('./tailwind.config.js');
 
 	return {
 		...tailwindConfig,
+		withDynUi: true,
 		content: [
 			...(tailwindConfig?.content ?? []),
 			'./node_modules/@dyn/ui/dist/esm/components/**/*.{js,ts,jsx,tsx}'
@@ -16,4 +17,4 @@ function withDynUI(tailwindConfig) {
 	};
 }
 
-module.exports = withDynUI;
+module.exports = withTailwind;

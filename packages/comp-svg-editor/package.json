@@ -1,0 +1,76 @@
+{
+	"name": "@dyn/comp-svg-editor",
+	"description": "SVG based editor for dyn.art",
+	"version": "0.0.1",
+	"private": true,
+	"scripts": {
+		"build": "shx rm -rf dist && pnpm run build:css:tailwind && pnpm run build:css:root && ../../scripts/cli.sh bundle",
+		"build:css:root": "tailwindcss -i ./src/styles/root.scss -o ./dist/styles.css",
+		"build:css:tailwind": "tailwindcss -i ./src/styles/tailwind.scss -o ./dist/tailwind.css",
+		"build-storybook": "storybook build",
+		"storybook": "storybook dev -p 6006",
+		"start:dev": "pnpm run watch:css:tailwind && pnpm run watch:css:root && tsc -w",
+		"watch:css:root": "pnpm run build:css:root --watch",
+		"watch:css:tailwind": "pnpm build:css:tailwind --watch",
+		"lint": "eslint --ext .js,.ts src/",
+		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
+		"install:clean": "pnpm run clean && pnpm install",
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"update:deps": "pnpm update --latest"
+	},
+	"source": "./src/index.ts",
+	"main": "./dist/cjs/index.js",
+	"module": "./dist/esm/index.js",
+	"types": "./dist/types/index.d.ts",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/dyndotart/monorepo.git"
+	},
+	"keywords": [],
+	"author": "@bennoinbeta",
+	"license": "Commercial License",
+	"bugs": {
+		"url": "https://github.com/dyndotart/monorepo/issues"
+	},
+	"homepage": "https://dyn.art/?source=github",
+	"dependencies": {
+		"@dyn/comp-dtif": "workspace:*",
+		"@dyn/comp-svg-builder": "workspace:*",
+		"@dyn/ui": "workspace:*"
+	},
+	"peerDependencies": {
+		"@tanstack/react-query": "^5.35.1",
+		"react": "^18.2.0"
+	},
+	"devDependencies": {
+		"@dyn/config": "workspace:*",
+		"@storybook/addon-essentials": "^8.1.0-alpha.8",
+		"@storybook/addon-interactions": "^8.1.0-alpha.8",
+		"@storybook/addon-links": "^8.1.0-alpha.8",
+		"@storybook/blocks": "^8.1.0-alpha.8",
+		"@storybook/react": "^8.1.0-alpha.8",
+		"@storybook/react-vite": "^8.1.0-alpha.8",
+		"@storybook/test": "^8.1.0-alpha.8",
+		"@tanstack/react-query": "^5.35.1",
+		"@types/node": "^20.12.10",
+		"@types/react": "^18.3.1",
+		"@types/react-dom": "^18.3.0",
+		"autoprefixer": "^10.4.19",
+		"eslint-plugin-storybook": "^0.8.0",
+		"postcss": "^8.4.38",
+		"postcss-nested": "^6.0.1",
+		"react": "^18.3.1",
+		"rollup-plugin-preserve-directives": "^0.2.0",
+		"scss": "^0.2.4",
+		"storybook": "^8.1.0-alpha.8",
+		"tailwindcss": "^3.4.3",
+		"vite": "^5.2.11",
+		"vite-tsconfig-paths": "^4.3.2"
+	},
+	"files": [
+		"dist",
+		"tailwind.config.js",
+		"with-dyn-comp-svg-editor.js",
+		"README.md"
+	]
+}

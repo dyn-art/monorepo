@@ -14,9 +14,9 @@
 	"author": "@bennoinbeta",
 	"license": "AGPL-3.0-or-later",
 	"bugs": {
-		"url": "https://s.dyn.art/github/issues"
+		"url": "https://github.com/dyndotart/monorepo/issues"
 	},
-	"homepage": "https://s.dyn.art/github",
+	"homepage": "https://dyn.art/?source=github",
 	"dependencies": {
 		"@vercel/style-guide": "^5.0.1",
 		"eslint-config-turbo": "^1.10.16",

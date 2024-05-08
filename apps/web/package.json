@@ -20,30 +20,31 @@
 	"author": "@bennoinbeta",
 	"license": "AGPL-3.0-or-later",
 	"bugs": {
-		"url": "https://s.dyn.art/github/issues"
+		"url": "https://github.com/dyndotart/monorepo/issues"
 	},
-	"homepage": "https://s.dyn.art/github",
+	"homepage": "https://dyn.art/?source=github",
 	"dependencies": {
 		"@dyn/comp-dtif": "workspace:*",
-		"@dyn/fetch-client": "workspace:^",
 		"@dyn/comp-svg-builder": "workspace:*",
+		"@dyn/comp-svg-editor": "workspace:*",
+		"@dyn/fetch-client": "workspace:*",
 		"@dyn/ui": "workspace:*",
-		"@tanstack/react-query": "^5.28.9",
+		"@tanstack/react-query": "^5.35.1",
 		"@vercel/analytics": "^1.2.2",
-		"clsx": "^2.1.0",
+		"clsx": "^2.1.1",
 		"next": "14.0.4",
-		"react": "^18.2.0",
-		"react-dom": "^18.2.0"
+		"react": "^18.3.1",
+		"react-dom": "^18.3.1"
 	},
 	"devDependencies": {
 		"@dyn/config": "workspace:*",
-		"@types/node": "^20.11.30",
-		"@types/react": "^18.2.72",
-		"@types/react-dom": "^18.2.22",
+		"@types/node": "^20.12.10",
+		"@types/react": "^18.3.1",
+		"@types/react-dom": "^18.3.0",
 		"autoprefixer": "^10.4.19",
 		"postcss": "^8.4.38",
-		"sass": "^1.72.0",
-		"tailwindcss": "^3.4.1",
-		"vercel": "^33.6.1"
+		"sass": "^1.77.0",
+		"tailwindcss": "^3.4.3",
+		"vercel": "^33.7.1"
 	}
 }

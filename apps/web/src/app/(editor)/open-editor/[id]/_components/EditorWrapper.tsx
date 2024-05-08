@@ -8,8 +8,8 @@ import {
 	type COMP,
 	type TMdtifComposition
 } from '@dyn/comp-dtif';
+import { Editor, FieldBasedEditor } from '@dyn/comp-svg-editor';
 import { Container } from '@dyn/ui';
-import { Editor, FieldBasedEditor } from '@/components';
 
 const queryClient = new QueryClient();
 

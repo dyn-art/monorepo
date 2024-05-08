@@ -43,9 +43,9 @@ The structure of the `package.json` file in this project should adhere to a spec
 	"author": "@yourgithubname",
 	"license": "AGPL-3.0-or-later",
 	"bugs": {
-		"url": "https://s.dyn.art/github/issues"
+		"url": "https://github.com/dyndotart/monorepo/issues"
 	},
-	"homepage": "https://s.dyn.art/github",
+	"homepage": "https://dyn.art/?source=github",
 	"dependencies": {
 		// Project dependencies here
 	},
@@ -83,7 +83,7 @@ name = "dyn_example"
 version = "0.0.1"
 edition = "2021"
 description = "Description of the package"
-homepage = "https://s.dyn.art/github"
+homepage = "https://dyn.art/?source=github"
 repository = "https://github.com/dyndotart/monorepo"
 license = "AGPL-3.0-or-later"
 authors = ["@yourgithubname"]
