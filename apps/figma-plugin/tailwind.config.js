@@ -1,6 +1,6 @@
-const withDynUI = require('@dyn/ui/with-dyn-ui');
+const withDynUi = require('@dyn/ui/with-dyn-ui');
 
-module.exports = withDynUI(
+module.exports = withDynUi(
 	/** @type {import('tailwindcss').Config} */
 	{
 		content: ['./src/app/**/*.{ts,tsx}']
