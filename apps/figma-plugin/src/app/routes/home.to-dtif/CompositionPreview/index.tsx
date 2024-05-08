@@ -1,6 +1,8 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
-import type { COMP } from '@dyn/figma-to-dtif';
-import { Button, ClipboardCopyIcon, FrameIcon, ScrollArea, SpinnerIcon } from '@dyn/ui';
+import { ReadonlyEditor } from '@dyn/comp-svg-editor';
+import { prepareDtifComposition, type COMP } from '@dyn/figma-to-dtif';
+import { Button, ClipboardCopyIcon, FrameIcon, ScrollArea, Skeleton } from '@dyn/ui';
 
 import { appHandler } from '../../../app-handler';
 import { useAppCallback } from '../../../hooks';
@@ -8,23 +10,17 @@ import { useAppCallback } from '../../../hooks';
 import './styles.css';
 
 import { copyToClipboard } from '../../../core/utils';
-import { useSvgComposition } from './use-svg-composition';
 
 const WIDTH = 364;
 const HEIGHT = 256;
 
+const queryClient = new QueryClient();
+
 export const CompositionPreview: React.FC<TProps> = (props) => {
 	const { isTransforming } = props;
 
-	const [dtif, setDTIF] = React.useState<COMP.DtifComposition | null>(null);
-	const { svgContainerRef, isLoading } = useSvgComposition({
-		dtif: dtif ?? undefined,
-		deps: [isTransforming],
-		dimensions: {
-			width: WIDTH,
-			height: HEIGHT
-		}
-	});
+	const [dtif, setDtif] = React.useState<COMP.DtifComposition | null>(null);
+	const [isPreparing, setIsPreparing] = React.useState(false);
 
 	// =========================================================================
 	// Lifecycle
@@ -37,7 +33,10 @@ export const CompositionPreview: React.FC<TProps> = (props) => {
 			key: 'intermediate-format-export-result',
 			callback: async (instance, args) => {
 				if (args.type === 'success') {
-					setDTIF(args.content);
+					setIsPreparing(true);
+					const preparedDtif = await prepareDtifComposition(args.content);
+					setIsPreparing(false);
+					setDtif(preparedDtif);
 					await copyToClipboard(JSON.stringify(args.content));
 				}
 			}
@@ -49,7 +48,7 @@ export const CompositionPreview: React.FC<TProps> = (props) => {
 	// UI
 	// =========================================================================
 
-	if (dtif == null || isTransforming) {
+	if (isTransforming || (dtif == null && !isPreparing)) {
 		return null;
 	}
 
@@ -65,13 +64,15 @@ export const CompositionPreview: React.FC<TProps> = (props) => {
 				className="preview border-base-300 mt-2 flex items-center justify-center overflow-hidden border"
 				style={{ width: WIDTH, height: HEIGHT }}
 			>
-				{isLoading && (
-					<div className="flex flex-grow flex-col items-center justify-center">
-						<SpinnerIcon className="h-4 w-4 animate-spin" />
-						<p className="mt-2">Loading Preview</p>
-					</div>
-				)}
-				<div className="pointer-events-none" ref={svgContainerRef} />
+				<QueryClientProvider client={queryClient}>
+					{dtif != null && !isPreparing ? (
+						<ReadonlyEditor dtif={dtif} />
+					) : (
+						<Skeleton className="flex h-full w-full items-center justify-center rounded-none">
+							Preparing Dtif
+						</Skeleton>
+					)}
+				</QueryClientProvider>
 			</div>
 			<div className="p-x-1 mt-2 flex flex-row justify-between">
 				<Button>Open in dyn.art</Button>

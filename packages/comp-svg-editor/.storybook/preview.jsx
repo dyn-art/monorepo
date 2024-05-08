@@ -2,6 +2,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
 
 import '../src/styles/root.scss';
+import '../src/styles/tailwind.scss';
 
 const queryClient = new QueryClient();
 
