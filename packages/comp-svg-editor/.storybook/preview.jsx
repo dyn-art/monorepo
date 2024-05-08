@@ -1,7 +1,7 @@
-import '../src/styles/root.scss';
-import React from "react";
-
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import React from 'react';
+
+import '../src/styles/root.scss';
 
 const queryClient = new QueryClient();
 

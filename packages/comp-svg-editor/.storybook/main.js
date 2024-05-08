@@ -5,6 +5,8 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 /**
  * This function is used to resolve the absolute path of a package.
  * It is needed in projects that use Yarn PnP or are set up within a monorepo.
+ *
+ * https://storybook.js.org/docs/faq#how-do-i-fix-module-resolution-in-special-environments
  */
 function getAbsolutePath(value) {
 	return dirname(require.resolve(join(value, 'package.json')));
@@ -22,15 +24,16 @@ const config = {
 		name: getAbsolutePath('@storybook/react-vite'),
 		options: {}
 	},
-	// docs: {
-	// 	autodocs: 'tag'
-	// },
+	docs: {
+		autodocs: 'tag'
+	},
+	typescript: {
+		// https://github.com/storybookjs/storybook/discussions/27044
+		reactDocgen: false
+	},
 	async viteFinal(config) {
 		return mergeConfig(config, {
 			plugins: [tsconfigPaths()]
-			// resolve: {
-			// 	preserveSymlinks: true
-			// }
 		});
 	}
 };

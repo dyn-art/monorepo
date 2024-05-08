@@ -45,7 +45,7 @@ export const Editor: React.FC<TEditorProps> = (props) => {
 				</div>
 			</ResizablePanel>
 			<ResizableHandle />
-			<ResizablePanel defaultSize={60}>
+			<ResizablePanel defaultSize={70}>
 				{isPreparingDtif || preparedDtif == null ? (
 					<Skeleton className="h-full w-full rounded-none" />
 				) : (
