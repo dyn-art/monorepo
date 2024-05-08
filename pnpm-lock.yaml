@@ -84,7 +84,7 @@ importers:
         specifier: workspace:*
         version: link:../../packages/comp-svg-builder
       '@dyn/comp-svg-editor':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../../packages/comp-svg-editor
       '@dyn/figma-handler':
         specifier: workspace:*
