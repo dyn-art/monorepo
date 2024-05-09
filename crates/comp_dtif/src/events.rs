@@ -1,11 +1,12 @@
 use bevy_ecs::entity::Entity;
+use dyn_attributed_string::{HorizontalTextAlignment, LineWrap, VerticalTextAlignment};
 use dyn_comp_bundles::{
     events::{
-        CompCoreInputEvent, DeleteEntityInputEvent, MoveEntityInputEvent,
-        ResizeCompositionInputEvent, SetCompositionViewportInputEvent, SetEntityPositionInputEvent,
-        SetEntityRotationInputEvent,
+        CompCoreInputEvent, DeleteEntityInputEvent, FocusRootNodesInputEvent, MoveEntityInputEvent,
+        UpdateCompositionSizeInputEvent, UpdateCompositionViewportInputEvent,
+        UpdateEntityPositionInputEvent, UpdateEntityRotationInputEvent, UpdateEntityTextInputEvent,
     },
-    properties::Viewport,
+    properties::{TextAttributeInterval, Viewport},
 };
 use dyn_utils::{properties::size::Size, units::angle::Angle};
 use std::collections::HashMap;
@@ -14,14 +15,18 @@ use std::collections::HashMap;
 #[serde(tag = "type")]
 pub enum DtifInputEvent {
     // Composition
-    ResizeComposition(ResizeCompositionDtifInputEvent),
-    SetCompositionViewport(SetCompositionViewportDtifInputEvent),
+    UpdateCompositionSize(UpdateCompositionSizeDtifInputEvent),
+    UpdateCompositionViewport(UpdateCompositionViewportDtifInputEvent),
+
+    // Node
+    FocusRootNodes(FocusRootNodesDtifInputEvent),
 
     // Entity
     DeleteEntity(DeleteEntityDtifInputEvent),
     MoveEntity(MoveEntityDtifInputEvent),
-    SetEntityPosition(SetEntityPositionDtifInputEvent),
-    SetEntityRotation(SetEntityRotationDtifInputEvent),
+    UpdateEntityPosition(UpdateEntityPositionDtifInputEvent),
+    UpdateEntityRotation(UpdateEntityRotationDtifInputEvent),
+    UpdateEntityText(UpdateEntityTextDtifInputEvent),
 }
 
 impl DtifInputEvent {
@@ -31,16 +36,23 @@ impl DtifInputEvent {
     ) -> Option<CompCoreInputEvent> {
         match self {
             // Composition
-            DtifInputEvent::ResizeComposition(event) => {
-                Some(CompCoreInputEvent::ResizeComposition(
-                    ResizeCompositionInputEvent { size: event.size },
+            DtifInputEvent::UpdateCompositionSize(event) => {
+                Some(CompCoreInputEvent::UpdateCompositionSize(
+                    UpdateCompositionSizeInputEvent { size: event.size },
                 ))
             }
-            DtifInputEvent::SetCompositionViewport(event) => Some(
-                CompCoreInputEvent::SetCompositionViewport(SetCompositionViewportInputEvent {
-                    viewport: event.viewport,
-                }),
-            ),
+            DtifInputEvent::UpdateCompositionViewport(event) => {
+                Some(CompCoreInputEvent::UpdateCompositionViewport(
+                    UpdateCompositionViewportInputEvent {
+                        viewport: event.viewport,
+                    },
+                ))
+            }
+
+            // Node
+            DtifInputEvent::FocusRootNodes(_) => {
+                Some(CompCoreInputEvent::FocusRootNodes(FocusRootNodesInputEvent))
+            }
 
             // Entity
             DtifInputEvent::DeleteEntity(event) => sid_to_entity.get(&event.entity).map(|entity| {
@@ -53,20 +65,32 @@ impl DtifInputEvent {
                     dy: event.dy,
                 })
             }),
-            DtifInputEvent::SetEntityPosition(event) => {
+            DtifInputEvent::UpdateEntityPosition(event) => {
                 sid_to_entity.get(&event.entity).map(|entity| {
-                    CompCoreInputEvent::SetEntityPosition(SetEntityPositionInputEvent {
+                    CompCoreInputEvent::UpdateEntityPosition(UpdateEntityPositionInputEvent {
                         entity: *entity,
                         x: event.x,
                         y: event.y,
                     })
                 })
             }
-            DtifInputEvent::SetEntityRotation(event) => {
+            DtifInputEvent::UpdateEntityRotation(event) => {
                 sid_to_entity.get(&event.entity).map(|entity| {
-                    CompCoreInputEvent::SetEntityRotation(SetEntityRotationInputEvent {
+                    CompCoreInputEvent::UpdateEntityRotation(UpdateEntityRotationInputEvent {
                         entity: *entity,
                         rotation_deg: event.rotation_deg,
+                    })
+                })
+            }
+            DtifInputEvent::UpdateEntityText(event) => {
+                sid_to_entity.get(&event.entity).map(|entity| {
+                    CompCoreInputEvent::UpdateEntityText(UpdateEntityTextInputEvent {
+                        entity: *entity,
+                        text: event.text,
+                        attributes: event.attributes,
+                        line_wrap: event.line_wrap,
+                        horizontal_text_alignment: event.horizontal_text_alignment,
+                        vertical_text_alignment: event.vertical_text_alignment,
                     })
                 })
             }
@@ -79,32 +103,25 @@ impl DtifInputEvent {
 // =============================================================================
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
-pub struct ResizeCompositionDtifInputEvent {
+pub struct UpdateCompositionSizeDtifInputEvent {
     pub size: Size,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
-pub struct SetCompositionViewportDtifInputEvent {
+pub struct UpdateCompositionViewportDtifInputEvent {
     pub viewport: Viewport,
 }
 
 // =============================================================================
-// Entity
+// Node
 // =============================================================================
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
-pub struct MoveEntityDtifInputEvent {
-    pub entity: String,
-    pub dx: f32,
-    pub dy: f32,
-}
+pub struct FocusRootNodesDtifInputEvent;
 
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
-pub struct SetEntityPositionDtifInputEvent {
-    pub entity: String,
-    pub x: f32,
-    pub y: f32,
-}
+// =============================================================================
+// Entity
+// =============================================================================
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
 pub struct DeleteEntityDtifInputEvent {
@@ -112,7 +129,42 @@ pub struct DeleteEntityDtifInputEvent {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
-pub struct SetEntityRotationDtifInputEvent {
+pub struct MoveEntityDtifInputEvent {
+    pub entity: String,
+    #[serde(default)]
+    pub dx: Option<f32>,
+    #[serde(default)]
+    pub dy: Option<f32>,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
+pub struct UpdateEntityPositionDtifInputEvent {
+    pub entity: String,
+    #[serde(default)]
+    pub x: Option<f32>,
+    #[serde(default)]
+    pub y: Option<f32>,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
+#[serde(rename_all = "camelCase")]
+pub struct UpdateEntityRotationDtifInputEvent {
     pub entity: String,
     pub rotation_deg: Angle,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
+#[serde(rename_all = "camelCase")]
+pub struct UpdateEntityTextDtifInputEvent {
+    pub entity: String,
+    #[serde(default)]
+    pub text: Option<String>,
+    #[serde(default)]
+    pub attributes: Option<Vec<TextAttributeInterval>>,
+    #[serde(default)]
+    pub line_wrap: Option<LineWrap>,
+    #[serde(default)]
+    pub horizontal_text_alignment: Option<HorizontalTextAlignment>,
+    #[serde(default)]
+    pub vertical_text_alignment: Option<VerticalTextAlignment>,
 }

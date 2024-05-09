@@ -83,7 +83,7 @@
 					],
 					"events": [
 						{
-							"type": "SetEntityPosition",
+							"type": "UpdateEntityPosition",
 							"entity": "square",
 							"x": { "var": "pos.0" },
 							"y": { "var": "pos.1" }

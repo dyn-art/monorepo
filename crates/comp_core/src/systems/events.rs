@@ -11,22 +11,27 @@ use dyn_comp_bundles::{
     components::{
         marker::{Removed, Root},
         mixins::SizeMixin,
-        nodes::CompNode,
+        nodes::{CompNode, TextCompNode},
     },
     events::{
         DeleteEntityInputEvent, FocusRootNodesInputEvent, MoveEntityInputEvent,
-        ResizeCompositionInputEvent, SetCompositionViewportInputEvent, SetEntityPositionInputEvent,
-        SetEntityRotationInputEvent,
+        UpdateCompositionSizeInputEvent, UpdateCompositionViewportInputEvent,
+        UpdateEntityPositionInputEvent, UpdateEntityRotationInputEvent, UpdateEntityTextInputEvent,
     },
     properties::Viewport,
     utils::transform_to_z_rotation_rad,
 };
 use dyn_utils::{math::matrix::rotate_around_point, properties::size::Size, units::abs::Abs};
 use glam::{Vec2, Vec3};
+use smallvec::SmallVec;
 
-pub fn composition_resized_input_system(
+// =============================================================================
+// Composition
+// =============================================================================
+
+pub fn update_composition_size_input_system(
     mut comp_res: ResMut<CompositionRes>,
-    mut event_reader: EventReader<ResizeCompositionInputEvent>,
+    mut event_reader: EventReader<UpdateCompositionSizeInputEvent>,
 ) {
     if let Some(event) = event_reader.read().last() {
         comp_res.size = event.size;
@@ -34,93 +39,18 @@ pub fn composition_resized_input_system(
     }
 }
 
-pub fn composition_viewport_input_system(
+pub fn update_composition_viewport_input_system(
     mut comp_res: ResMut<CompositionRes>,
-    mut event_reader: EventReader<SetCompositionViewportInputEvent>,
+    mut event_reader: EventReader<UpdateCompositionViewportInputEvent>,
 ) {
     if let Some(event) = event_reader.read().last() {
         comp_res.viewport = event.viewport;
     }
 }
 
-// https://bevy-cheatbook.github.io/fundamentals/hierarchy.html#despawning-child-entities
-// https://github.com/bevyengine/bevy/issues/5584
-pub fn entity_deleted_input_system(
-    mut commands: Commands,
-    mut event_reader: EventReader<DeleteEntityInputEvent>,
-    children_query: Query<&Children>,
-) {
-    for event in event_reader.read() {
-        commands
-            .entity(event.entity)
-            .insert(Removed)
-            .remove_parent();
-
-        if let Ok(children) = children_query.get(event.entity) {
-            for child in children.iter() {
-                commands.entity(*child).insert(Removed);
-            }
-        }
-    }
-}
-
-pub fn despawn_removed_entities_system(
-    mut commands: Commands,
-    query: Query<Entity, With<Removed>>,
-) {
-    for entity in query.iter() {
-        commands.entity(entity).despawn_recursive();
-    }
-}
-
-pub fn entity_moved_input_system(
-    mut event_reader: EventReader<MoveEntityInputEvent>,
-    mut query: Query<&mut Transform>,
-) {
-    for MoveEntityInputEvent { entity, dx, dy } in event_reader.read() {
-        if let Ok(mut transform) = query.get_mut(*entity) {
-            transform.translation += Vec3::new(*dx, *dy, 0.0);
-        }
-    }
-}
-
-pub fn entity_set_position_input_system(
-    mut event_reader: EventReader<SetEntityPositionInputEvent>,
-    mut query: Query<&mut Transform>,
-) {
-    for SetEntityPositionInputEvent { entity, x, y } in event_reader.read() {
-        if let Ok(mut transform) = query.get_mut(*entity) {
-            transform.translation.x = *x;
-            transform.translation.y = *y;
-        }
-    }
-}
-
-pub fn entity_set_rotation_input_system(
-    mut event_reader: EventReader<SetEntityRotationInputEvent>,
-    mut query: Query<(&mut Transform, &SizeMixin)>,
-) {
-    for SetEntityRotationInputEvent {
-        entity,
-        rotation_deg,
-    } in event_reader.read()
-    {
-        if let Ok((mut transform, SizeMixin(size))) = query.get_mut(*entity) {
-            let pivot_point = Vec3::new(size.width() / 2.0, size.height() / 2.0, 0.0);
-            let reset_rotation_transform_mat4 = rotate_around_point(
-                transform.compute_matrix(),
-                -transform_to_z_rotation_rad(&transform),
-                pivot_point,
-            );
-            let rotation_transform_mat4 = rotate_around_point(
-                reset_rotation_transform_mat4,
-                rotation_deg.to_rad(),
-                pivot_point,
-            );
-            *transform = Transform::from_matrix(rotation_transform_mat4);
-        }
-    }
-}
+// =============================================================================
+// Noe
+// =============================================================================
 
 pub fn focus_root_nodes_input_system(
     mut event_reader: EventReader<FocusRootNodesInputEvent>,
@@ -184,5 +114,136 @@ pub fn focus_root_nodes_input_system(
 
         comp_res.viewport.physical_position = new_physical_position;
         comp_res.viewport.physical_size = new_physical_size;
+    }
+}
+
+// =============================================================================
+// Entity
+// =============================================================================
+
+// https://bevy-cheatbook.github.io/fundamentals/hierarchy.html#despawning-child-entities
+// https://github.com/bevyengine/bevy/issues/5584
+pub fn delete_entity_input_system(
+    mut commands: Commands,
+    mut event_reader: EventReader<DeleteEntityInputEvent>,
+    children_query: Query<&Children>,
+) {
+    for event in event_reader.read() {
+        commands
+            .entity(event.entity)
+            .insert(Removed)
+            .remove_parent();
+
+        if let Ok(children) = children_query.get(event.entity) {
+            for child in children.iter() {
+                commands.entity(*child).insert(Removed);
+            }
+        }
+    }
+}
+
+pub fn despawn_removed_entities_system(
+    mut commands: Commands,
+    query: Query<Entity, With<Removed>>,
+) {
+    for entity in query.iter() {
+        commands.entity(entity).despawn_recursive();
+    }
+}
+
+pub fn move_entity_input_system(
+    mut event_reader: EventReader<MoveEntityInputEvent>,
+    mut query: Query<&mut Transform>,
+) {
+    for MoveEntityInputEvent {
+        entity,
+        dx: maybe_dx,
+        dy: maybe_dy,
+    } in event_reader.read()
+    {
+        if let Ok(mut transform) = query.get_mut(*entity) {
+            transform.translation +=
+                Vec3::new(maybe_dx.unwrap_or(0.0), maybe_dy.unwrap_or(0.0), 0.0);
+        }
+    }
+}
+
+pub fn update_entity_position_input_system(
+    mut event_reader: EventReader<UpdateEntityPositionInputEvent>,
+    mut query: Query<&mut Transform>,
+) {
+    for UpdateEntityPositionInputEvent {
+        entity,
+        x: maybe_x,
+        y: maybe_y,
+    } in event_reader.read()
+    {
+        if let Ok(mut transform) = query.get_mut(*entity) {
+            if let Some(x) = maybe_x {
+                transform.translation.x = *x;
+            }
+            if let Some(y) = maybe_y {
+                transform.translation.y = *y;
+            }
+        }
+    }
+}
+
+pub fn update_entity_rotation_input_system(
+    mut event_reader: EventReader<UpdateEntityRotationInputEvent>,
+    mut query: Query<(&mut Transform, &SizeMixin)>,
+) {
+    for UpdateEntityRotationInputEvent {
+        entity,
+        rotation_deg,
+    } in event_reader.read()
+    {
+        if let Ok((mut transform, SizeMixin(size))) = query.get_mut(*entity) {
+            let pivot_point = Vec3::new(size.width() / 2.0, size.height() / 2.0, 0.0);
+            let reset_rotation_transform_mat4 = rotate_around_point(
+                transform.compute_matrix(),
+                -transform_to_z_rotation_rad(&transform),
+                pivot_point,
+            );
+            let rotation_transform_mat4 = rotate_around_point(
+                reset_rotation_transform_mat4,
+                rotation_deg.to_rad(),
+                pivot_point,
+            );
+            *transform = Transform::from_matrix(rotation_transform_mat4);
+        }
+    }
+}
+
+pub fn update_entity_text_input_system(
+    mut event_reader: EventReader<UpdateEntityTextInputEvent>,
+    mut query: Query<&mut TextCompNode>,
+) {
+    for UpdateEntityTextInputEvent {
+        entity,
+        text: maybe_text,
+        attributes: maybe_attributes,
+        line_wrap: maybe_line_wrap,
+        horizontal_text_alignment: maybe_horizontal_text_alignment,
+        vertical_text_alignment: maybe_vertical_text_alignment,
+    } in event_reader.read()
+    {
+        if let Ok(mut text_comp_node) = query.get_mut(*entity) {
+            if let Some(text) = maybe_text {
+                text_comp_node.text = text.clone();
+            }
+            if let Some(attributes) = maybe_attributes {
+                text_comp_node.attributes = SmallVec::from_vec(attributes.clone());
+            }
+            if let Some(line_wrap) = maybe_line_wrap {
+                text_comp_node.line_wrap = *line_wrap;
+            }
+            if let Some(horizontal_text_alignment) = maybe_horizontal_text_alignment {
+                text_comp_node.horizontal_text_alignment = *horizontal_text_alignment;
+            }
+            if let Some(vertical_text_alignment) = maybe_vertical_text_alignment {
+                text_comp_node.vertical_text_alignment = *vertical_text_alignment;
+            }
+        }
     }
 }

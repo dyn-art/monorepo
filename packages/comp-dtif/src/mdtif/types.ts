@@ -41,8 +41,8 @@ export type TMdtifInputEvent<GKey extends string, GValue> =
 			GKey,
 			GValue
 	  >)
-	| ({ type: 'SetEntityPosition' } & TMakeEventModifiable<
-			COMP.SetEntityPositionDtifInputEvent,
+	| ({ type: 'UpdateEntityPosition' } & TMakeEventModifiable<
+			COMP.UpdateEntityPositionDtifInputEvent,
 			'x' | 'y',
 			GKey,
 			GValue

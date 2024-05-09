@@ -7,16 +7,16 @@ use bevy_transform::TransformPlugin;
 use dyn_comp_asset::CompAssetPlugin;
 use dyn_comp_bundles::events::{
     DeleteEntityInputEvent, FocusRootNodesInputEvent, MoveEntityInputEvent,
-    ResizeCompositionInputEvent, SetCompositionViewportInputEvent, SetEntityPositionInputEvent,
-    SetEntityRotationInputEvent,
+    UpdateCompositionSizeInputEvent, UpdateCompositionViewportInputEvent,
+    UpdateEntityPositionInputEvent, UpdateEntityRotationInputEvent, UpdateEntityTextInputEvent,
 };
 use resources::{composition::CompositionRes, layout::LayoutRes, tick::TickRes};
 use systems::{
     events::{
-        composition_resized_input_system, composition_viewport_input_system,
-        despawn_removed_entities_system, entity_deleted_input_system, entity_moved_input_system,
-        entity_set_position_input_system, entity_set_rotation_input_system,
-        focus_root_nodes_input_system,
+        delete_entity_input_system, despawn_removed_entities_system, focus_root_nodes_input_system,
+        move_entity_input_system, update_composition_size_input_system,
+        update_composition_viewport_input_system, update_entity_position_input_system,
+        update_entity_rotation_input_system, update_entity_text_input_system,
     },
     hierarchy::update_hierarchy_levels,
     layout::{
@@ -77,13 +77,14 @@ impl Plugin for CompCorePlugin {
         app.add_plugins(TransformPlugin);
 
         // Register events
-        app.add_event::<ResizeCompositionInputEvent>();
-        app.add_event::<SetCompositionViewportInputEvent>();
+        app.add_event::<UpdateCompositionSizeInputEvent>();
+        app.add_event::<UpdateCompositionViewportInputEvent>();
         app.add_event::<FocusRootNodesInputEvent>();
         app.add_event::<DeleteEntityInputEvent>();
         app.add_event::<MoveEntityInputEvent>();
-        app.add_event::<SetEntityPositionInputEvent>();
-        app.add_event::<SetEntityRotationInputEvent>();
+        app.add_event::<UpdateEntityPositionInputEvent>();
+        app.add_event::<UpdateEntityRotationInputEvent>();
+        app.add_event::<UpdateEntityTextInputEvent>();
 
         // Register resources
         app.init_resource::<LayoutRes>();
@@ -122,15 +123,16 @@ impl Plugin for CompCorePlugin {
         app.add_systems(
             Update,
             (
-                composition_resized_input_system.in_set(CompCoreSystemSet::InputEvents),
-                composition_viewport_input_system.in_set(CompCoreSystemSet::InputEvents),
+                update_composition_size_input_system.in_set(CompCoreSystemSet::InputEvents),
+                update_composition_viewport_input_system.in_set(CompCoreSystemSet::InputEvents),
                 focus_root_nodes_input_system
                     .in_set(CompCoreSystemSet::InputEvents)
-                    .after(composition_resized_input_system),
-                entity_deleted_input_system.in_set(CompCoreSystemSet::InputEvents),
-                entity_moved_input_system.in_set(CompCoreSystemSet::InputEvents),
-                entity_set_position_input_system.in_set(CompCoreSystemSet::InputEvents),
-                entity_set_rotation_input_system.in_set(CompCoreSystemSet::InputEvents),
+                    .after(update_composition_size_input_system),
+                delete_entity_input_system.in_set(CompCoreSystemSet::InputEvents),
+                move_entity_input_system.in_set(CompCoreSystemSet::InputEvents),
+                update_entity_position_input_system.in_set(CompCoreSystemSet::InputEvents),
+                update_entity_rotation_input_system.in_set(CompCoreSystemSet::InputEvents),
+                update_entity_text_input_system.in_set(CompCoreSystemSet::InputEvents),
             ),
         );
         app.add_systems(
