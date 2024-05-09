@@ -74,11 +74,11 @@
 					"conditions": [
 						{
 							"condition": { ">=": [{ "var": "pos.0" }, 0] },
-							"notMetMessage": "x can not be negative!"
+							"notMetMessage": "X can not be negative!"
 						},
 						{
 							"condition": { ">=": [{ "var": "pos.1" }, 0] },
-							"notMetMessage": "y can not be negative!"
+							"notMetMessage": "Y can not be negative!"
 						}
 					],
 					"events": [
@@ -87,6 +87,32 @@
 							"entity": "square",
 							"x": { "var": "pos.0" },
 							"y": { "var": "pos.1" }
+						}
+					]
+				}
+			]
+		},
+		{
+			"key": "rotation",
+			"displayName": "Set Rotation",
+			"inputType": { "type": "NUMBER", "default": 0 },
+			"actions": [
+				{
+					"conditions": [
+						{
+							"condition": { ">=": [{ "var": "rotation" }, 0] },
+							"notMetMessage": "Rotation can not be negative!"
+						},
+						{
+							"condition": { "<=": [{ "var": "rotation" }, 360] },
+							"notMetMessage": "Rotation can not be larger than 360!"
+						}
+					],
+					"events": [
+						{
+							"type": "UpdateEntityRotation",
+							"entity": "square",
+							"rotationDeg": { "var": "rotation" }
 						}
 					]
 				}

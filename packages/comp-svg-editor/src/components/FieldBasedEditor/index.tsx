@@ -4,7 +4,7 @@ import type { Composition } from '@dyn/comp-svg-builder';
 import { Badge, Skeleton, useSizeCallback } from '@dyn/ui';
 import { usePreparedDtif } from '@/hooks';
 
-import { PositionInput, Viewport } from './components';
+import { NumberInput, PositionInput, Viewport } from './components';
 
 export const FieldBasedEditor: React.FC<TFieldBasedEditorProps> = (props) => {
 	const { mdtif } = props;
@@ -32,7 +32,7 @@ export const FieldBasedEditor: React.FC<TFieldBasedEditorProps> = (props) => {
 	return (
 		<div className="grid flex-1 gap-4 overflow-auto p-4 md:grid-cols-2 lg:grid-cols-3">
 			{composition != null && mdtif != null ? (
-				<form className="grid w-full items-start gap-6">
+				<form className="flex w-full flex-col items-start gap-6">
 					{mdtif.modificationFields.map((field) => {
 						switch (field.inputType.type) {
 							case 'POSITION':
@@ -55,6 +55,30 @@ export const FieldBasedEditor: React.FC<TFieldBasedEditorProps> = (props) => {
 										}}
 									/>
 								);
+							case 'NUMBER':
+								return (
+									<NumberInput
+										displayName={field.displayName}
+										inputType={field.inputType}
+										key={field.key}
+										onChange={(value) => {
+											const processedActions = applyModifications(field, {
+												[field.key]: value
+											});
+
+											for (const processedAction of processedActions) {
+												if (processedAction.resolved) {
+													composition.emitInputEvents('Dtif', processedAction.events);
+													composition.update();
+												}
+											}
+										}}
+									/>
+								);
+							case 'STRING':
+							case 'BOOLEAN':
+							case 'RANGE':
+							case 'COLOR':
 							default:
 								return <p>Coming Soon</p>;
 						}

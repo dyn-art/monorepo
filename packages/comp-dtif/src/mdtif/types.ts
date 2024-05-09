@@ -35,6 +35,7 @@ type TMakeEventModifiable<T, K extends keyof T, GKey extends string, GValue> = {
 };
 
 export type TMdtifInputEvent<GKey extends string, GValue> =
+	| ({ type: 'DeleteEntity' } & COMP.DeleteEntityDtifInputEvent)
 	| ({ type: 'MoveEntity' } & TMakeEventModifiable<
 			COMP.MoveEntityDtifInputEvent,
 			'dx' | 'dy',
@@ -44,6 +45,18 @@ export type TMdtifInputEvent<GKey extends string, GValue> =
 	| ({ type: 'UpdateEntityPosition' } & TMakeEventModifiable<
 			COMP.UpdateEntityPositionDtifInputEvent,
 			'x' | 'y',
+			GKey,
+			GValue
+	  >)
+	| ({ type: 'UpdateEntityRotation' } & TMakeEventModifiable<
+			COMP.UpdateEntityRotationDtifInputEvent,
+			'rotationDeg',
+			GKey,
+			GValue
+	  >)
+	| ({ type: 'UpdateEntityText' } & TMakeEventModifiable<
+			COMP.UpdateEntityTextDtifInputEvent,
+			'text' | 'attributes' | 'lineWrap' | 'horizontalTextAlignment' | 'verticalTextAlignment',
 			GKey,
 			GValue
 	  >);

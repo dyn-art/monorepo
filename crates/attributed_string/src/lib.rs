@@ -33,13 +33,7 @@ impl AttributedString {
         mut attrs_intervals: Vec<AttrsInterval>,
         config: AttributedStringConfig,
     ) -> Self {
-        if attrs_intervals.is_empty() {
-            attrs_intervals.push(AttrsInterval {
-                start: 0,
-                stop: text.len(),
-                val: Attrs::new(),
-            });
-        }
+        AttributedString::adjust_intervals(&mut attrs_intervals, &text);
 
         let text_len = text.len();
         let bidi_info = unicode_bidi::BidiInfo::new(&text, None);
@@ -204,6 +198,43 @@ impl AttributedString {
                         return Span::new(range, merged_attrs);
                     }
                 });
+        }
+    }
+
+    fn adjust_intervals(attrs_intervals: &mut Vec<AttrsInterval>, text: &str) {
+        if attrs_intervals.is_empty() {
+            attrs_intervals.push(AttrsInterval {
+                start: 0,
+                stop: text.len(),
+                val: Attrs::new(),
+            });
+            return;
+        }
+
+        let text_len = text.len();
+
+        let mut largest = None;
+        let mut largest_stop = 0;
+
+        // Adjust intervals where 'stop' exceeds the text length
+        // and find the interval with the largest 'stop'
+        for interval in attrs_intervals.iter_mut() {
+            if interval.stop > text_len {
+                interval.stop = text_len;
+            }
+
+            if interval.stop > largest_stop {
+                largest_stop = interval.stop;
+                largest = Some(interval);
+            }
+        }
+
+        // If no interval exactly matches the text length,
+        // extend the longest interval to match the text length
+        if largest_stop < text_len {
+            if let Some(longest) = largest {
+                longest.stop = text_len;
+            }
         }
     }
 }
