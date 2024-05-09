@@ -27,7 +27,7 @@ export const Editor: React.FC<TEditorProps> = (props) => {
 		(size) => {
 			composition?.emitInputEvents('Composition', [
 				{
-					type: 'CompositionResized',
+					type: 'ResizeComposition',
 					size: [size.width, size.height]
 				},
 				{ type: 'FocusRootNodes' }

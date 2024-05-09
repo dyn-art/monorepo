@@ -75,6 +75,8 @@ impl DtifHandler {
 
             self.dtif = Some(dtif);
             return maybe_root_node_entity;
+        } else {
+            log::warn!("Couldn't find DTIF to insert into world!");
         }
         return None;
     }

@@ -6,9 +6,9 @@ use bevy_ecs::schedule::{IntoSystemConfigs, IntoSystemSetConfigs, SystemSet};
 use bevy_transform::TransformPlugin;
 use dyn_comp_asset::CompAssetPlugin;
 use dyn_comp_bundles::events::{
-    CompositionResizedInputEvent, CompositionViewportChangedInputEvent, EntityDeletedInputEvent,
-    EntityMovedInputEvent, EntitySetPositionInputEvent, EntitySetRotationInputEvent,
-    FocusRootNodesInputEvent,
+    DeleteEntityInputEvent, FocusRootNodesInputEvent, MoveEntityInputEvent,
+    ResizeCompositionInputEvent, SetCompositionViewportInputEvent, SetEntityPositionInputEvent,
+    SetEntityRotationInputEvent,
 };
 use resources::{composition::CompositionRes, layout::LayoutRes, tick::TickRes};
 use systems::{
@@ -77,14 +77,13 @@ impl Plugin for CompCorePlugin {
         app.add_plugins(TransformPlugin);
 
         // Register events
-        app.add_event::<CompositionResizedInputEvent>();
-        app.add_event::<CompositionViewportChangedInputEvent>();
+        app.add_event::<ResizeCompositionInputEvent>();
+        app.add_event::<SetCompositionViewportInputEvent>();
         app.add_event::<FocusRootNodesInputEvent>();
-        app.add_event::<EntityDeletedInputEvent>();
-        app.add_event::<EntityMovedInputEvent>();
-        app.add_event::<EntitySetPositionInputEvent>();
-        app.add_event::<EntityDeletedInputEvent>();
-        app.add_event::<EntitySetRotationInputEvent>();
+        app.add_event::<DeleteEntityInputEvent>();
+        app.add_event::<MoveEntityInputEvent>();
+        app.add_event::<SetEntityPositionInputEvent>();
+        app.add_event::<SetEntityRotationInputEvent>();
 
         // Register resources
         app.init_resource::<LayoutRes>();
@@ -191,6 +190,10 @@ pub fn insert_dtif_into_world(
                 }),
                 size: dtif.size,
             });
+        } else {
+            panic!("Failed to get DTIF from DTIF-Handler!");
         }
+    } else {
+        panic!("Failed to insert root node into world!");
     }
 }

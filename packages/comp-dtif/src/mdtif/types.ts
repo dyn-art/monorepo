@@ -35,14 +35,14 @@ type TMakeEventModifiable<T, K extends keyof T, GKey extends string, GValue> = {
 };
 
 export type TMdtifInputEvent<GKey extends string, GValue> =
-	| ({ type: 'EntityMoved' } & TMakeEventModifiable<
-			COMP.DtifEntityMovedEvent,
+	| ({ type: 'MoveEntity' } & TMakeEventModifiable<
+			COMP.MoveEntityDtifInputEvent,
 			'dx' | 'dy',
 			GKey,
 			GValue
 	  >)
-	| ({ type: 'EntitySetPosition' } & TMakeEventModifiable<
-			COMP.DtifEntitySetPositionEvent,
+	| ({ type: 'SetEntityPosition' } & TMakeEventModifiable<
+			COMP.SetEntityPositionDtifInputEvent,
 			'x' | 'y',
 			GKey,
 			GValue

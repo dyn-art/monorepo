@@ -19,7 +19,7 @@ export const FieldBasedEditor: React.FC<TFieldBasedEditorProps> = (props) => {
 		(size) => {
 			composition?.emitInputEvents('Composition', [
 				{
-					type: 'CompositionResized',
+					type: 'ResizeComposition',
 					size: [size.width, size.height]
 				},
 				{ type: 'FocusRootNodes' }

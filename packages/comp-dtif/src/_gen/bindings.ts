@@ -178,15 +178,11 @@ export type Color = [number, number, number]
 
 export type ColorMatrix = { x_axis: [number, number, number, number]; y_axis: [number, number, number, number]; z_axis: [number, number, number, number]; w_axis: [number, number, number, number]; v_axis: [number, number, number, number] }
 
-export type CompCoreInputEvent = ({ type: "CompositionResized" } & CompositionResizedInputEvent) | ({ type: "CompositionViewportChanged" } & CompositionViewportChangedInputEvent) | ({ type: "FocusRootNodes" }) | ({ type: "EntityDeleted" } & EntityDeletedInputEvent) | ({ type: "EntityMoved" } & EntityMovedInputEvent) | ({ type: "EntitySetPosition" } & EntitySetPositionInputEvent) | ({ type: "EntitySetRotation" } & EntitySetRotationInputEvent)
+export type CompCoreInputEvent = ({ type: "ResizeComposition" } & ResizeCompositionInputEvent) | ({ type: "SetCompositionViewport" } & SetCompositionViewportInputEvent) | ({ type: "FocusRootNodes" }) | ({ type: "DeleteEntity" } & DeleteEntityInputEvent) | ({ type: "MoveEntity" } & MoveEntityInputEvent) | ({ type: "SetEntityPosition" } & SetEntityPositionInputEvent) | ({ type: "SetEntityRotation" } & SetEntityRotationInputEvent)
 
 export type ComponentChange = { type: "Size"; size: Size } | { type: "Transform"; rotationDeg: number; translation: Vec2 } | { type: "GlobalTransform"; rotationDeg: number; translation: Vec2 }
 
 export type CompositionChangeOutputEvent = { rootNodes: Entity[]; viewport: Viewport; size: Size }
-
-export type CompositionResizedInputEvent = { size: Size }
-
-export type CompositionViewportChangedInputEvent = { viewport: Viewport }
 
 export type Constraint = "Start" | "Center" | "End" | "Stretch" | "Scale"
 
@@ -213,6 +209,10 @@ export type CursorExitedCompInputEvent = null
 export type CursorMovedOnCompInputEvent = { position: Vec2 }
 
 export type CursorUpOnCompInputEvent = { position: Vec2; button: MouseButton }
+
+export type DeleteEntityDtifInputEvent = { entity: string }
+
+export type DeleteEntityInputEvent = { entity: Entity }
 
 export type DropShadowStyle = { color?: Color; position: Vec2; spread?: Abs; blur: Abs; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity }
 
@@ -251,17 +251,7 @@ paints?: { [key in string]: Paint };
  */
 assets?: { [key in string]: Asset }; events?: DtifInputEvent[] }
 
-export type DtifCompositionResizedEvent = { size: Size }
-
-export type DtifCompositionViewportChangedEvent = { viewport: Viewport }
-
-export type DtifEntityDeletedEvent = { entity: string }
-
-export type DtifEntityMovedEvent = { entity: string; dx: number; dy: number }
-
-export type DtifEntitySetPositionEvent = { entity: string; x: number; y: number }
-
-export type DtifInputEvent = ({ type: "CompositionResized" } & DtifCompositionResizedEvent) | ({ type: "CompositionViewportChanged" } & DtifCompositionViewportChangedEvent) | ({ type: "EntityMoved" } & DtifEntityMovedEvent) | ({ type: "EntitySetPosition" } & DtifEntitySetPositionEvent) | ({ type: "EntityDeleted" } & DtifEntityDeletedEvent)
+export type DtifInputEvent = ({ type: "ResizeComposition" } & ResizeCompositionDtifInputEvent) | ({ type: "SetCompositionViewport" } & SetCompositionViewportDtifInputEvent) | ({ type: "DeleteEntity" } & DeleteEntityDtifInputEvent) | ({ type: "MoveEntity" } & MoveEntityDtifInputEvent) | ({ type: "SetEntityPosition" } & SetEntityPositionDtifInputEvent) | ({ type: "SetEntityRotation" } & SetEntityRotationDtifInputEvent)
 
 export type EllipseNode = { startingAngle?: number; endingAngle?: number; innerRadiusRatio?: number; translation?: Vec2; rotationDeg?: Angle; size: Size; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; layoutElement?: LayoutElement; styles?: Style[] }
 
@@ -273,14 +263,6 @@ export type EllipseNode = { startingAngle?: number; endingAngle?: number; innerR
 export type Em = Scalar
 
 export type Entity = number
-
-export type EntityDeletedInputEvent = { entity: Entity }
-
-export type EntityMovedInputEvent = { entity: Entity; dx: number; dy: number }
-
-export type EntitySetPositionInputEvent = { entity: Entity; x: number; y: number }
-
-export type EntitySetRotationInputEvent = { entity: Entity; rotationDeg: Angle }
 
 export type FillStyle = { paintId: string; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity }
 
@@ -1479,6 +1461,10 @@ export type MouseButtonValue = { position: Vec2 }
 
 export type MouseWheeledOnCompInputEvent = { position: Vec2; delta: Vec2 }
 
+export type MoveEntityDtifInputEvent = { entity: string; dx: number; dy: number }
+
+export type MoveEntityInputEvent = { entity: Entity; dx: number; dy: number }
+
 /**
  * Contains the platform-native physical key identifier
  * 
@@ -1536,6 +1522,10 @@ export type Rect<T> = { left: T; right: T; top: T; bottom: T }
 
 export type RectangleNode = { translation?: Vec2; rotationDeg?: Angle; size: Size; cornerRadii?: CornerRadii; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; layoutElement?: LayoutElement; styles?: Style[] }
 
+export type ResizeCompositionDtifInputEvent = { size: Size }
+
+export type ResizeCompositionInputEvent = { size: Size }
+
 /**
  * A 32-bit float that implements `Eq`, `Ord` and `Hash`.
  * 
@@ -1544,6 +1534,18 @@ export type RectangleNode = { translation?: Vec2; rotationDeg?: Angle; size: Siz
 export type Scalar = number
 
 export type SelectionChangeOutputEvent = { selectedEntities: Entity[] }
+
+export type SetCompositionViewportDtifInputEvent = { viewport: Viewport }
+
+export type SetCompositionViewportInputEvent = { viewport: Viewport }
+
+export type SetEntityPositionDtifInputEvent = { entity: string; x: number; y: number }
+
+export type SetEntityPositionInputEvent = { entity: Entity; x: number; y: number }
+
+export type SetEntityRotationDtifInputEvent = { entity: string; rotation_deg: Angle }
+
+export type SetEntityRotationInputEvent = { entity: Entity; rotationDeg: Angle }
 
 export type ShapeVariant = "Rectangle" | "Ellipse" | "Star" | "Polygon"
 

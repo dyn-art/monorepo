@@ -2,14 +2,14 @@
 	"template": {
 		"version": "1.0",
 		"size": [500, 500],
-		"rootNodeId": "1",
+		"rootNodeId": "container",
 		"nodes": {
-			"1": {
+			"container": {
 				"type": "Frame",
 				"clipContent": false,
 				"layoutParent": null,
 				"visible": true,
-				"children": ["2"],
+				"children": ["square"],
 				"size": [500, 500],
 				"translation": [0, 0],
 				"rotationDeg": 0,
@@ -21,10 +21,10 @@
 					"constraints": { "horizontal": "Start", "vertical": "Start" }
 				},
 				"styles": [
-					{ "type": "Fill", "paintId": "5", "blendMode": "Normal", "opacity": 1, "visible": true }
+					{ "type": "Fill", "paintId": "red", "blendMode": "Normal", "opacity": 1, "visible": true }
 				]
 			},
-			"2": {
+			"square": {
 				"type": "Rectangle",
 				"visible": true,
 				"size": [100, 100],
@@ -41,19 +41,25 @@
 					{
 						"type": "Stroke",
 						"width": 4,
-						"paintId": "4",
+						"paintId": "black",
 						"blendMode": "Normal",
 						"opacity": 1,
 						"visible": true
 					},
-					{ "type": "Fill", "paintId": "3", "blendMode": "Normal", "opacity": 1, "visible": true }
+					{
+						"type": "Fill",
+						"paintId": "gray",
+						"blendMode": "Normal",
+						"opacity": 1,
+						"visible": true
+					}
 				]
 			}
 		},
 		"paints": {
-			"3": { "type": "Solid", "color": [217, 217, 217] },
-			"4": { "type": "Solid", "color": [0, 0, 0] },
-			"5": { "type": "Solid", "color": [255, 219, 219] }
+			"gray": { "type": "Solid", "color": [217, 217, 217] },
+			"black": { "type": "Solid", "color": [0, 0, 0] },
+			"red": { "type": "Solid", "color": [255, 219, 219] }
 		},
 		"assets": {},
 		"viewport": { "physicalPosition": [0, 0], "physicalSize": [500, 500] }
@@ -77,8 +83,8 @@
 					],
 					"events": [
 						{
-							"type": "EntitySetPosition",
-							"entity": "2",
+							"type": "SetEntityPosition",
+							"entity": "square",
 							"x": { "var": "pos.0" },
 							"y": { "var": "pos.1" }
 						}

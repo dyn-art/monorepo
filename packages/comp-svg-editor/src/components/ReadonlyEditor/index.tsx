@@ -20,7 +20,7 @@ export const ReadonlyEditor: React.FC<TReadonlyEditorProps> = (props) => {
 		(size) => {
 			composition?.emitInputEvents('Composition', [
 				{
-					type: 'CompositionResized',
+					type: 'ResizeComposition',
 					size: [size.width, size.height]
 				},
 				{ type: 'FocusRootNodes' }

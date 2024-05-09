@@ -14,49 +14,63 @@ pub trait InputEvent {
     serde(tag = "type")
 )]
 pub enum CompCoreInputEvent {
-    CompositionResized(CompositionResizedInputEvent),
-    CompositionViewportChanged(CompositionViewportChangedInputEvent),
+    // Composition
+    ResizeComposition(ResizeCompositionInputEvent),
+    SetCompositionViewport(SetCompositionViewportInputEvent),
+
+    // Node
     FocusRootNodes(FocusRootNodesInputEvent),
-    EntityDeleted(EntityDeletedInputEvent),
-    EntityMoved(EntityMovedInputEvent),
-    EntitySetPosition(EntitySetPositionInputEvent),
-    EntitySetRotation(EntitySetRotationInputEvent),
+
+    // Entity
+    DeleteEntity(DeleteEntityInputEvent),
+    MoveEntity(MoveEntityInputEvent),
+    SetEntityPosition(SetEntityPositionInputEvent),
+    SetEntityRotation(SetEntityRotationInputEvent),
 }
 
 impl InputEvent for CompCoreInputEvent {
     fn send_into_ecs(self, world: &mut World) {
         match self {
-            CompCoreInputEvent::CompositionResized(event) => {
+            // Composition
+            CompCoreInputEvent::ResizeComposition(event) => {
                 world.send_event(event);
             }
-            CompCoreInputEvent::CompositionViewportChanged(event) => {
+            CompCoreInputEvent::SetCompositionViewport(event) => {
                 world.send_event(event);
             }
+
+            // Node
             CompCoreInputEvent::FocusRootNodes(event) => {
                 world.send_event(event);
             }
-            CompCoreInputEvent::EntityMoved(event) => {
+
+            // Entity
+            CompCoreInputEvent::DeleteEntity(event) => {
                 world.send_event(event);
             }
-            CompCoreInputEvent::EntitySetPosition(event) => {
+            CompCoreInputEvent::MoveEntity(event) => {
                 world.send_event(event);
             }
-            CompCoreInputEvent::EntityDeleted(event) => {
+            CompCoreInputEvent::SetEntityPosition(event) => {
                 world.send_event(event);
             }
-            CompCoreInputEvent::EntitySetRotation(event) => {
+            CompCoreInputEvent::SetEntityRotation(event) => {
                 world.send_event(event);
             }
         }
     }
 }
 
+// =============================================================================
+// Composition
+// =============================================================================
+
 #[derive(Event, Debug, Default, Copy, Clone)]
 #[cfg_attr(
     feature = "serde_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
-pub struct CompositionResizedInputEvent {
+pub struct ResizeCompositionInputEvent {
     pub size: Size,
 }
 
@@ -65,9 +79,13 @@ pub struct CompositionResizedInputEvent {
     feature = "serde_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
-pub struct CompositionViewportChangedInputEvent {
+pub struct SetCompositionViewportInputEvent {
     pub viewport: Viewport,
 }
+
+// =============================================================================
+// Node
+// =============================================================================
 
 #[derive(Event, Debug, Copy, Clone)]
 #[cfg_attr(
@@ -77,12 +95,16 @@ pub struct CompositionViewportChangedInputEvent {
 )]
 pub struct FocusRootNodesInputEvent;
 
+// =============================================================================
+// Entity
+// =============================================================================
+
 #[derive(Event, Debug, Copy, Clone)]
 #[cfg_attr(
     feature = "serde_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
-pub struct EntityMovedInputEvent {
+pub struct MoveEntityInputEvent {
     pub entity: Entity,
     pub dx: f32,
     pub dy: f32,
@@ -93,7 +115,7 @@ pub struct EntityMovedInputEvent {
     feature = "serde_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
-pub struct EntitySetPositionInputEvent {
+pub struct SetEntityPositionInputEvent {
     pub entity: Entity,
     pub x: f32,
     pub y: f32,
@@ -104,7 +126,7 @@ pub struct EntitySetPositionInputEvent {
     feature = "serde_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
-pub struct EntityDeletedInputEvent {
+pub struct DeleteEntityInputEvent {
     pub entity: Entity,
 }
 
@@ -114,7 +136,7 @@ pub struct EntityDeletedInputEvent {
     derive(serde::Serialize, serde::Deserialize, specta::Type),
     serde(rename_all = "camelCase")
 )]
-pub struct EntitySetRotationInputEvent {
+pub struct SetEntityRotationInputEvent {
     pub entity: Entity,
     pub rotation_deg: Angle,
 }
