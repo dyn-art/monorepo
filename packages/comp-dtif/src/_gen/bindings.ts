@@ -1389,6 +1389,8 @@ keyCode: KeyCode }
 
 export type LayoutElement = ({ type: "Absolute" } & AbsoluteLayoutElement) | ({ type: "Static" } & StaticLayoutElement)
 
+export type LayoutSizingMode = "Fixed" | "Hug" | "Fill"
+
 export type Length = { type: "Abs"; value: Abs } | { type: "Ratio"; value: Ratio }
 
 export type LineWrap = 
@@ -1543,9 +1545,9 @@ export type SpectaExport = { comp_dtif: DtifComposition; svg_comp_input_event: S
 
 export type StarNode = { innerRadiusRatio?: number; pointCount?: number; translation?: Vec2; rotationDeg?: Angle; size: Size; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; layoutElement?: LayoutElement; styles?: Style[] }
 
-export type StaticLayoutElement = { alignSelf?: AlignItems | null; justifySelf?: AlignItems | null; margin?: Rect<AutoLength> }
+export type StaticLayoutElement = { alignSelf?: AlignItems | null; justifySelf?: AlignItems | null; margin?: Rect<AutoLength>; horizontalSizingMode?: LayoutSizingMode; verticalSizingMode?: LayoutSizingMode }
 
-export type StaticLayoutParent = { alignItems?: AlignItems | null; justifyContent?: AlignContent | null; gap?: Axes<Length>; padding?: Rect<Length>; flexDirection?: FlexDirection }
+export type StaticLayoutParent = { alignItems?: AlignItems | null; justifyContent?: AlignContent | null; gap?: Axes<Length>; padding?: Rect<Length>; flexDirection?: FlexDirection; horizontalSizingMode?: LayoutSizingMode; verticalSizingMode?: LayoutSizingMode }
 
 export type StrokeStyle = { width: number; paintId: string; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity }
 
@@ -1657,7 +1659,9 @@ export type TextAttributeInterval = { start: number; end: number; attributes: Te
 
 export type TextAttributes = { fontFamily?: FontFamily | null; fontStyle?: FontStyle | null; fontStretch?: FontStretch | null; fontWeight?: FontWeight | null; fontSize?: Abs | null; smallCaps?: boolean | null; applyKerning?: boolean | null; letterSpacing?: FontUnit | null; wordSpacing?: FontUnit | null; lineHeight?: FontUnit | null }
 
-export type TextNode = { text: string; attributes: TextAttributeInterval[]; lineWrap?: LineWrap; horizontalTextAlignment?: HorizontalTextAlignment; verticalTextAlignment?: VerticalTextAlignment; translation?: Vec2; rotationDeg?: Angle; size: Size; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; layoutElement?: LayoutElement; styles?: Style[] }
+export type TextNode = { text: string; attributes: TextAttributeInterval[]; lineWrap?: LineWrap; horizontalTextAlignment?: HorizontalTextAlignment; verticalTextAlignment?: VerticalTextAlignment; sizingMode?: TextSizingMode; translation?: Vec2; rotationDeg?: Angle; size: Size; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; layoutElement?: LayoutElement; styles?: Style[] }
+
+export type TextSizingMode = "WidthAndHeight" | "Height" | "Fixed"
 
 export type UpdateCompositionSizeDtifInputEvent = { size: Size }
 

@@ -1,5 +1,7 @@
 import type { COMP } from '@dyn/comp-dtif';
 
+import { mapFigmaLayoutSizingModeToDtif } from './map-figma-layout-sizing-mode-to-dtif';
+
 export function mapFigmaParentLayoutToDtif(
 	node: FrameNode | ComponentNode | InstanceNode
 ): COMP.StaticLayoutParent | null {
@@ -21,7 +23,9 @@ export function mapFigmaParentLayoutToDtif(
 		gap:
 			flexDirection === 'Column' || flexDirection === 'ColumnReverse'
 				? { x: { type: 'Abs', value: 0 }, y: { type: 'Abs', value: node.itemSpacing } }
-				: { x: { type: 'Abs', value: node.itemSpacing }, y: { type: 'Abs', value: 0 } }
+				: { x: { type: 'Abs', value: node.itemSpacing }, y: { type: 'Abs', value: 0 } },
+		horizontalSizingMode: mapFigmaLayoutSizingModeToDtif(node.layoutSizingHorizontal),
+		verticalSizingMode: mapFigmaLayoutSizingModeToDtif(node.layoutSizingVertical)
 	};
 }
 

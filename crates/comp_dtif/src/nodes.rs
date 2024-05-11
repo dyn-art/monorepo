@@ -16,7 +16,7 @@ use dyn_comp_bundles::{
             PolygonCompNode, RectangleCompNode, StarCompNode, TextCompNode, VectorCompNode,
         },
     },
-    properties::TextAttributeInterval,
+    properties::{TextAttributeInterval, TextSizingMode},
     EllipseCompNodeBundle, FrameCompNodeBundle, PolygonCompNodeBundle, RectangleCompNodeBundle,
     StarCompNodeBundle, TextCompNodeBundle, VectorNodeBundle,
 };
@@ -387,6 +387,8 @@ pub struct TextNode {
     #[serde(default)]
     pub vertical_text_alignment: VerticalTextAlignment,
     #[serde(default)]
+    pub sizing_mode: TextSizingMode,
+    #[serde(default)]
     pub translation: Vec2,
     #[serde(default)]
     pub rotation_deg: Angle,
@@ -415,6 +417,7 @@ impl TextNode {
                 line_wrap: self.line_wrap,
                 horizontal_text_alignment: self.horizontal_text_alignment,
                 vertical_text_alignment: self.vertical_text_alignment,
+                sizing_mode: self.sizing_mode,
             },
             transform: TransformBundle::from_transform(Transform {
                 translation: self.translation.extend(0.0),

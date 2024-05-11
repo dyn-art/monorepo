@@ -10,9 +10,10 @@ import type {
 import {
 	createDtifStyles,
 	mapFigmaBlendModeToDtif,
-	mapFigmaConstraintsToDtif,
+	mapFigmaElementLayoutToDtif,
 	mapFigmaTextAlignHorizontalToDtif,
 	mapFigmaTextAlignVerticalToDtif,
+	mapFigmaTextSizingModeToDtif,
 	mapFigmaTransformToRotation,
 	mapFigmaTransformToTranslation
 } from '../../utils';
@@ -71,15 +72,14 @@ export function transformTextNode(
 		lineWrap: 'Word',
 		horizontalTextAlignment: mapFigmaTextAlignHorizontalToDtif(node.textAlignHorizontal),
 		verticalTextAlignment: mapFigmaTextAlignVerticalToDtif(node.textAlignVertical),
+		sizingMode: mapFigmaTextSizingModeToDtif(node.textAutoResize),
 		visible: node.visible,
 		size: [node.width, node.height],
 		translation: mapFigmaTransformToTranslation(node.relativeTransform),
 		rotationDeg: mapFigmaTransformToRotation(node.relativeTransform),
 		blendMode: mapFigmaBlendModeToDtif(node.blendMode),
 		opacity: node.opacity,
-		layoutElement: autoLayout
-			? { type: 'Static' }
-			: { type: 'Absolute', constraints: mapFigmaConstraintsToDtif(node.constraints) },
+		layoutElement: mapFigmaElementLayoutToDtif(node, autoLayout),
 		styles: createDtifStyles(fills, strokes, effects)
 	};
 }
