@@ -1389,7 +1389,9 @@ keyCode: KeyCode }
 
 export type LayoutElement = ({ type: "Absolute" } & AbsoluteLayoutElement) | ({ type: "Static" } & StaticLayoutElement)
 
-export type LayoutSizingMode = "Fixed" | "Hug" | "Fill"
+export type LayoutElementSizingMode = "Fixed" | "Fill"
+
+export type LayoutParentSizingMode = "Fixed" | "Hug"
 
 export type Length = { type: "Abs"; value: Abs } | { type: "Ratio"; value: Ratio }
 
@@ -1545,9 +1547,9 @@ export type SpectaExport = { comp_dtif: DtifComposition; svg_comp_input_event: S
 
 export type StarNode = { innerRadiusRatio?: number; pointCount?: number; translation?: Vec2; rotationDeg?: Angle; size: Size; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; layoutElement?: LayoutElement; styles?: Style[] }
 
-export type StaticLayoutElement = { alignSelf?: AlignItems | null; justifySelf?: AlignItems | null; margin?: Rect<AutoLength>; horizontalSizingMode?: LayoutSizingMode; verticalSizingMode?: LayoutSizingMode }
+export type StaticLayoutElement = { alignSelf?: AlignItems | null; justifySelf?: AlignItems | null; margin?: Rect<AutoLength>; horizontalSizingMode?: LayoutElementSizingMode; verticalSizingMode?: LayoutElementSizingMode }
 
-export type StaticLayoutParent = { alignItems?: AlignItems | null; justifyContent?: AlignContent | null; gap?: Axes<Length>; padding?: Rect<Length>; flexDirection?: FlexDirection; horizontalSizingMode?: LayoutSizingMode; verticalSizingMode?: LayoutSizingMode }
+export type StaticLayoutParent = { alignItems?: AlignItems | null; justifyContent?: AlignContent | null; gap?: Axes<Length>; padding?: Rect<Length>; flexDirection?: FlexDirection; horizontalSizingMode?: LayoutParentSizingMode; verticalSizingMode?: LayoutParentSizingMode }
 
 export type StrokeStyle = { width: number; paintId: string; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity }
 

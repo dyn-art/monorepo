@@ -133,9 +133,9 @@ pub struct StaticLayoutParent {
     #[cfg_attr(feature = "serde_support", serde(default))]
     pub flex_direction: FlexDirection,
     #[cfg_attr(feature = "serde_support", serde(default))]
-    pub horizontal_sizing_mode: LayoutSizingMode,
+    pub horizontal_sizing_mode: LayoutParentSizingMode,
     #[cfg_attr(feature = "serde_support", serde(default))]
-    pub vertical_sizing_mode: LayoutSizingMode,
+    pub vertical_sizing_mode: LayoutParentSizingMode,
 }
 
 impl StaticLayoutParent {
@@ -164,11 +164,10 @@ impl StaticLayoutParent {
     feature = "serde_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
-pub enum LayoutSizingMode {
+pub enum LayoutParentSizingMode {
     #[default]
     Fixed,
     Hug,
-    Fill,
 }
 
 #[derive(Component, Debug, Default, Copy, Clone)]
@@ -224,9 +223,9 @@ pub struct StaticLayoutElement {
     #[cfg_attr(feature = "serde_support", serde(default))]
     margin: Rect<AutoLength>,
     #[cfg_attr(feature = "serde_support", serde(default))]
-    pub horizontal_sizing_mode: LayoutSizingMode,
+    pub horizontal_sizing_mode: LayoutElementSizingMode,
     #[cfg_attr(feature = "serde_support", serde(default))]
-    pub vertical_sizing_mode: LayoutSizingMode,
+    pub vertical_sizing_mode: LayoutElementSizingMode,
 }
 
 impl StaticLayoutElement {
@@ -243,6 +242,17 @@ impl StaticLayoutElement {
             ..Default::default()
         }
     }
+}
+
+#[derive(Debug, Default, PartialEq, Eq, Copy, Clone)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type)
+)]
+pub enum LayoutElementSizingMode {
+    #[default]
+    Fixed,
+    Fill,
 }
 
 #[derive(Debug, Copy, Clone)]

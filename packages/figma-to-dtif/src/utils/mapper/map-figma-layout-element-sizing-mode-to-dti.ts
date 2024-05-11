@@ -1,13 +1,12 @@
 import type { COMP } from '@dyn/comp-dtif';
 
-export function mapFigmaLayoutSizingModeToDtif(
+export function mapFigmaLayoutElementSizingModeToDtif(
 	sizingMode: 'FIXED' | 'HUG' | 'FILL'
-): COMP.LayoutSizingMode {
+): COMP.LayoutElementSizingMode {
 	switch (sizingMode) {
 		case 'FIXED':
-			return 'Fixed';
 		case 'HUG':
-			return 'Hug';
+			return 'Fixed';
 		case 'FILL':
 			return 'Fill';
 	}
