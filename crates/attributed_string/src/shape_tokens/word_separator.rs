@@ -1,7 +1,7 @@
 use super::{glyph::GlyphToken, ShapeBuffer, ShapeToken};
 use crate::{attrs::Attrs, shape::shape_text_with_fallback};
 use dyn_fonts_book::FontsBook;
-use dyn_utils::units::{abs::Abs, em::Em};
+use dyn_utils::units::abs::Abs;
 use std::ops::Range;
 
 /// Represents spaces or punctuation between words.

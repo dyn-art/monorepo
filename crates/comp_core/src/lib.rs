@@ -32,7 +32,9 @@ use systems::{
         polygon::outline_polygon,
         rectangle::outline_rectangle,
         star::outline_star,
-        text::{outline_text_from_scratch, outline_text_on_size_change},
+        text::{
+            outline_text_from_scratch, outline_text_on_node_change, outline_text_on_size_change,
+        },
     },
     stroke::stroke_path_system,
     tick::collect_first_tick,
@@ -159,6 +161,7 @@ impl Plugin for CompCorePlugin {
                 outline_polygon.in_set(CompCoreSystemSet::Outline),
                 outline_text_from_scratch.in_set(CompCoreSystemSet::Outline),
                 outline_text_on_size_change.in_set(CompCoreSystemSet::Outline),
+                outline_text_on_node_change.in_set(CompCoreSystemSet::Outline),
                 stroke_path_system.in_set(CompCoreSystemSet::PostOutline),
             ),
         );

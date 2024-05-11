@@ -77,7 +77,6 @@ pub fn outline_text_on_size_change(
     }
 }
 
-// TODO
 pub fn outline_text_on_node_change(
     mut commands: Commands,
     mut assets_res: ResMut<AssetsRes>,
@@ -86,11 +85,25 @@ pub fn outline_text_on_node_change(
     for (entity, mut attributed_string_mixin, text) in query.iter_mut() {
         let attributed_string = &mut attributed_string_mixin.0;
 
-        // TODO
+        let size = attributed_string.get_size();
+        let mut new_attributed_string = AttributedString::new(
+            text.text.clone(),
+            text.attributes
+                .iter()
+                .map(|attrs| attrs.to_attrs_interval())
+                .collect(),
+            AttributedStringConfig {
+                size: *size,
+                line_wrap: text.line_wrap,
+                horizontal_text_alignment: text.horizontal_text_alignment,
+                vertical_text_alignment: text.vertical_text_alignment,
+            },
+        );
+        new_attributed_string.tokenize_text(assets_res.get_fonts_book_mut());
+        new_attributed_string.layout();
 
-        // attributed_string.set_size(*size);
         let maybe_path =
-            TinySkiaPathBuilder::outline(&attributed_string, assets_res.get_fonts_book_mut());
+            TinySkiaPathBuilder::outline(&new_attributed_string, assets_res.get_fonts_book_mut());
 
         // Insert or update the PathMixin component for the entity
         if let Some(path) = maybe_path {
@@ -99,5 +112,6 @@ pub fn outline_text_on_node_change(
                 winding_rule: WindingRule::Nonzero,
             });
         }
+        attributed_string_mixin.0 = new_attributed_string;
     }
 }
