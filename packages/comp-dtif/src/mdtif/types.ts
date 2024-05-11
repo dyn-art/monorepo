@@ -66,7 +66,7 @@ export type TMdtifInputEvent<GKey extends string, GValue> =
 
 export type TModificationInputType =
 	| TNumberModificationInput
-	| TStringModificationInput
+	| TTextModificationInput
 	| TBooleanModificationInput
 	| TRangeModificationInput
 	| TColorModificationInput
@@ -79,8 +79,8 @@ export interface TNumberModificationInput {
 	min?: number;
 }
 
-export interface TStringModificationInput {
-	type: 'STRING';
+export interface TTextModificationInput {
+	type: 'TEXT';
 	default: string;
 }
 

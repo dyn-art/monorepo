@@ -1,3 +1,4 @@
+export * from './AdvancedInput';
 export * from './Button';
 export * from './DropdownMenu';
 export * from './IconSelect';

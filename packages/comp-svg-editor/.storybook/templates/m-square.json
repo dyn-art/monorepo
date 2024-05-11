@@ -9,7 +9,7 @@
 				"clipContent": false,
 				"layoutParent": null,
 				"visible": true,
-				"children": ["square"],
+				"children": ["square", "text"],
 				"size": [500, 500],
 				"translation": [0, 0],
 				"rotationDeg": 0,
@@ -54,6 +54,58 @@
 						"visible": true
 					}
 				]
+			},
+			"text": {
+				"type": "Text",
+				"text": "Hello World",
+				"attributes": [
+					{
+						"start": 0,
+						"end": 11,
+						"attributes": {
+							"fontFamily": {
+								"Named": "Inter"
+							},
+							"fontStretch": 1,
+							"fontStyle": "Normal",
+							"fontWeight": 500,
+							"fontSize": 14,
+							"letterSpacing": {
+								"type": "Em",
+								"value": 0
+							},
+							"lineHeight": {
+								"type": "Abs",
+								"value": 24
+							}
+						}
+					}
+				],
+				"lineWrap": "Word",
+				"horizontalTextAlignment": "Center",
+				"verticalTextAlignment": "Top",
+				"visible": true,
+				"size": [77, 24],
+				"translation": [212, 374],
+				"rotationDeg": 0,
+				"blendMode": "Normal",
+				"opacity": 1,
+				"layoutElement": {
+					"type": "Absolute",
+					"constraints": {
+						"horizontal": "Center",
+						"vertical": "Start"
+					}
+				},
+				"styles": [
+					{
+						"type": "Fill",
+						"paintId": "black",
+						"blendMode": "Normal",
+						"opacity": 1,
+						"visible": true
+					}
+				]
 			}
 		},
 		"paints": {
@@ -61,7 +113,20 @@
 			"black": { "type": "Solid", "color": [0, 0, 0] },
 			"red": { "type": "Solid", "color": [255, 219, 219] }
 		},
-		"assets": {},
+		"assets": {
+			"interFont": {
+				"content": {
+					"type": "Url",
+					"url": "https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuI6fMZhrib2Bg-4.ttf",
+					"contentType": {
+						"mimeType": "font/ttf"
+					}
+				},
+				"contentType": {
+					"type": "Ttf"
+				}
+			}
+		},
 		"viewport": { "physicalPosition": [0, 0], "physicalSize": [500, 500] }
 	},
 	"modificationFields": [
@@ -113,6 +178,23 @@
 							"type": "UpdateEntityRotation",
 							"entity": "square",
 							"rotationDeg": { "var": "rotation" }
+						}
+					]
+				}
+			]
+		},
+		{
+			"key": "text",
+			"displayName": "Set Text",
+			"inputType": { "type": "TEXT", "default": "Hello World" },
+			"actions": [
+				{
+					"conditions": [],
+					"events": [
+						{
+							"type": "UpdateEntityText",
+							"entity": "text",
+							"text": { "var": "text" }
 						}
 					]
 				}

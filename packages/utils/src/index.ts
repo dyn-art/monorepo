@@ -1,5 +1,6 @@
 export * from './ContinuousId';
 export * from './calculate-bytes';
+export * from './deep-copy';
 export * from './deep-replace-var';
 export * from './define-config';
 export * from './extract-error-data';

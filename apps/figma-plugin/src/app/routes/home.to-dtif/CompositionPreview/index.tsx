@@ -3,13 +3,13 @@ import React from 'react';
 import { ReadonlyEditor } from '@dyn/comp-svg-editor';
 import { prepareDtifComposition, type COMP } from '@dyn/figma-to-dtif';
 import { Button, ClipboardCopyIcon, FrameIcon, ScrollArea, Skeleton } from '@dyn/ui';
+import { deepCopy } from '@dyn/utils';
 
 import { appHandler } from '../../../app-handler';
+import { copyToClipboard } from '../../../core/utils';
 import { useAppCallback } from '../../../hooks';
 
 import './styles.css';
-
-import { copyToClipboard } from '../../../core/utils';
 
 const WIDTH = 364;
 const HEIGHT = 256;
@@ -20,6 +20,7 @@ export const CompositionPreview: React.FC<TProps> = (props) => {
 	const { isTransforming } = props;
 
 	const [dtif, setDtif] = React.useState<COMP.DtifComposition | null>(null);
+	const [preparedDtif, setPreparedDtif] = React.useState<COMP.DtifComposition | null>(null);
 	const [isPreparing, setIsPreparing] = React.useState(false);
 
 	// =========================================================================
@@ -31,12 +32,13 @@ export const CompositionPreview: React.FC<TProps> = (props) => {
 		{
 			type: 'plugin.message',
 			key: 'intermediate-format-export-result',
-			callback: async (instance, args) => {
+			callback: async (_, args) => {
 				if (args.type === 'success') {
 					setIsPreparing(true);
-					const preparedDtif = await prepareDtifComposition(args.content);
+					setPreparedDtif(await prepareDtifComposition(deepCopy(args.content)));
 					setIsPreparing(false);
-					setDtif(preparedDtif);
+
+					setDtif(args.content);
 					await copyToClipboard(JSON.stringify(args.content));
 				}
 			}
@@ -65,11 +67,11 @@ export const CompositionPreview: React.FC<TProps> = (props) => {
 				style={{ width: WIDTH, height: HEIGHT }}
 			>
 				<QueryClientProvider client={queryClient}>
-					{dtif != null && !isPreparing ? (
-						<ReadonlyEditor dtif={dtif} />
+					{preparedDtif != null && !isPreparing ? (
+						<ReadonlyEditor dtif={preparedDtif} />
 					) : (
 						<Skeleton className="flex h-full w-full items-center justify-center rounded-none">
-							Preparing Dtif
+							Resolving Assets
 						</Skeleton>
 					)}
 				</QueryClientProvider>

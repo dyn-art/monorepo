@@ -1,3 +1,2 @@
-export * from './NumberInput';
-export * from './PositionInput';
 export * from './Viewport';
+export * from './fields';

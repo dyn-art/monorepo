@@ -47,11 +47,18 @@ export const Destructive: Story = {
  * Add an icon element to a button to enhance visual communication and
  * providing additional context for the action.
  */
-export const WithIcon: Story = {
+export const DestructiveWithIcon: Story = {
 	render: (args) => (
-		<AdvancedInput {...args}>
-			<Mail className="mr-2 h-4 w-4" />
-		</AdvancedInput>
+		<div>
+			<AdvancedInput {...args} className="pl-10 pr-10">
+				<div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+					<Mail className="h-4 w-4" />
+				</div>
+			</AdvancedInput>
+			<p className="mt-2 text-sm text-red-600" id="email-error">
+				Not a valid email address.
+			</p>
+		</div>
 	),
 	args: {
 		...Destructive.args

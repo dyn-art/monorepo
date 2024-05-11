@@ -1,10 +1,16 @@
 import React from 'react';
-import { applyModifications, type TMdtifComposition } from '@dyn/comp-dtif';
+import type {
+	TMdtifComposition,
+	TModificationField,
+	TNumberModificationInput,
+	TPositionModificationInput,
+	TTextModificationInput
+} from '@dyn/comp-dtif';
 import type { Composition } from '@dyn/comp-svg-builder';
 import { Badge, Skeleton, useSizeCallback } from '@dyn/ui';
 import { usePreparedDtif } from '@/hooks';
 
-import { NumberInput, PositionInput, Viewport } from './components';
+import { NumberInput, PositionInput, TextInput, Viewport } from './components';
 
 export const FieldBasedEditor: React.FC<TFieldBasedEditorProps> = (props) => {
 	const { mdtif } = props;
@@ -38,44 +44,27 @@ export const FieldBasedEditor: React.FC<TFieldBasedEditorProps> = (props) => {
 							case 'POSITION':
 								return (
 									<PositionInput
-										displayName={field.displayName}
-										inputType={field.inputType}
+										composition={composition}
+										field={field as TModificationField<string, TPositionModificationInput>}
 										key={field.key}
-										onChange={(x, y) => {
-											const processedActions = applyModifications(field, {
-												[field.key]: [x, y]
-											});
-
-											for (const processedAction of processedActions) {
-												if (processedAction.resolved) {
-													composition.emitInputEvents('Dtif', processedAction.events);
-													composition.update();
-												}
-											}
-										}}
 									/>
 								);
 							case 'NUMBER':
 								return (
 									<NumberInput
-										displayName={field.displayName}
-										inputType={field.inputType}
+										composition={composition}
+										field={field as TModificationField<string, TNumberModificationInput>}
 										key={field.key}
-										onChange={(value) => {
-											const processedActions = applyModifications(field, {
-												[field.key]: value
-											});
-
-											for (const processedAction of processedActions) {
-												if (processedAction.resolved) {
-													composition.emitInputEvents('Dtif', processedAction.events);
-													composition.update();
-												}
-											}
-										}}
 									/>
 								);
-							case 'STRING':
+							case 'TEXT':
+								return (
+									<TextInput
+										composition={composition}
+										field={field as TModificationField<string, TTextModificationInput>}
+										key={field.key}
+									/>
+								);
 							case 'BOOLEAN':
 							case 'RANGE':
 							case 'COLOR':
