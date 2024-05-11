@@ -29,7 +29,7 @@ describe('processField function', () => {
 						}
 					],
 					compute: { args: ['moveX'], body: 'return moveX + 10' },
-					events: [{ type: 'EntityMoved', entity: 'n1', dx: { var: 'moveX' }, dy: 0 }]
+					events: [{ type: 'MoveEntity', entity: 'n1', dx: { var: 'moveX' }, dy: 0 }]
 				}
 			]
 		});
@@ -55,7 +55,7 @@ describe('processField function', () => {
 							notMetMessage: "'moveX' can not be negative!"
 						}
 					],
-					events: [{ type: 'EntityMoved', entity: 'n1', dx: { var: 'moveX' }, dy: 0 }]
+					events: [{ type: 'MoveEntity', entity: 'n1', dx: { var: 'moveX' }, dy: 0 }]
 				}
 			]
 		});
@@ -90,7 +90,7 @@ describe('processField function', () => {
 					],
 					events: [
 						{
-							type: 'EntitySetPosition',
+							type: 'UpdateEntityPosition',
 							entity: 'n1',
 							x: { var: 'pos.0' },
 							y: { var: 'pos.1' }
@@ -132,7 +132,7 @@ describe('processField function', () => {
 					],
 					events: [
 						{
-							type: 'EntitySetPosition',
+							type: 'UpdateEntityPosition',
 							entity: 'n1',
 							x: { var: 'pos.0' },
 							y: { var: 'pos.1' }
@@ -182,13 +182,13 @@ describe('processField function', () => {
 					],
 					events: [
 						{
-							type: 'EntitySetPosition',
+							type: 'UpdateEntityPosition',
 							entity: 'n1',
 							x: { var: 'color.r' },
 							y: { var: 'color.g' }
 						},
 						{
-							type: 'EntitySetPosition',
+							type: 'UpdateEntityPosition',
 							entity: 'n1',
 							x: { var: 'color.g' },
 							y: { var: 'color.b' }
