@@ -1,7 +1,7 @@
 use super::debug::print_branch;
 use bevy_ecs::entity::Entity;
 use dyn_comp_bundles::components::mixins::{
-    LayoutElementSizingMode, StaticLayoutElement, StaticLayoutParent,
+    LayoutElementSizingMode, LayoutParentSizingMode, StaticLayoutElement, StaticLayoutParent,
 };
 use dyn_utils::properties::size::Size;
 use std::collections::HashMap;
@@ -105,8 +105,8 @@ impl LayoutTree {
             };
         }
 
-        if let Some(layout_parent) = maybe_layout_parent {
-            let layout_parent_style = layout_parent.to_style();
+        if let Some(static_layout_parent) = maybe_layout_parent {
+            let layout_parent_style = static_layout_parent.to_style();
 
             style.display = Display::Flex;
             style.align_items = layout_parent_style.align_items;
@@ -114,6 +114,15 @@ impl LayoutTree {
             style.gap = layout_parent_style.gap;
             style.padding = layout_parent_style.padding;
             style.flex_direction = layout_parent_style.flex_direction;
+
+            taffy_size.width = match static_layout_parent.horizontal_sizing_mode {
+                LayoutParentSizingMode::Fixed => Dimension::Length(size.width()),
+                LayoutParentSizingMode::Hug => Dimension::Auto,
+            };
+            taffy_size.height = match static_layout_parent.vertical_sizing_mode {
+                LayoutParentSizingMode::Fixed => Dimension::Length(size.height()),
+                LayoutParentSizingMode::Hug => Dimension::Auto,
+            };
         }
 
         style.size = taffy_size;

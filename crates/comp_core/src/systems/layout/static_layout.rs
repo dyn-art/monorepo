@@ -21,6 +21,7 @@ use dyn_comp_bundles::components::{
 use dyn_utils::units::abs::Abs;
 use glam::Vec3;
 use std::collections::HashMap;
+use taffy::style_helpers::TaffyMaxContent;
 
 pub fn discover_new_static_layout_parent_nodes(
     mut commands: Commands,
@@ -387,6 +388,12 @@ fn update_node_layout_recursive(
         // TODO: Taffy rounds all floating numbers to whole numbers
         // See: https://github.com/DioxusLabs/taffy/issues/77
         if let Ok(layout) = layout_res.tree.get_layout(*layout_node_id) {
+            // log::info!(
+            //     "[update_node_layout_recursive] {:?}: {:?}",
+            //     layout_node_id,
+            //     layout
+            // ); // TODO: REMOVE
+
             size_mixin.0.width = Abs::pt(layout.size.width);
             size_mixin.0.height = Abs::pt(layout.size.height);
 
