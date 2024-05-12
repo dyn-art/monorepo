@@ -115,6 +115,7 @@ impl LayoutTree {
             style.padding = layout_parent_style.padding;
             style.flex_direction = layout_parent_style.flex_direction;
 
+            // TODO: Does this conflict with the layout element?
             taffy_size.width = match static_layout_parent.horizontal_sizing_mode {
                 LayoutParentSizingMode::Fixed => Dimension::Length(size.width()),
                 LayoutParentSizingMode::Hug => Dimension::Auto,

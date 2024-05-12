@@ -21,7 +21,6 @@ use dyn_comp_bundles::components::{
 use dyn_utils::units::abs::Abs;
 use glam::Vec3;
 use std::collections::HashMap;
-use taffy::style_helpers::TaffyMaxContent;
 
 pub fn discover_new_static_layout_parent_nodes(
     mut commands: Commands,
@@ -378,9 +377,9 @@ fn update_node_layout_recursive(
                 );
                 return;
             }
-            layout_res
-                .tree
-                .print_branch(*layout_node_id, &taffy_to_entity); // TODO: REMOVE
+            // layout_res
+            //     .tree
+            //     .print_branch(*layout_node_id, &taffy_to_entity); // TODO: REMOVE
         }
 
         // Apply computed layout to the node's properties

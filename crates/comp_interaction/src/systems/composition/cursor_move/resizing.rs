@@ -8,7 +8,10 @@ use bevy_ecs::{query::With, system::Query};
 use bevy_hierarchy::Parent;
 use bevy_transform::components::{GlobalTransform, Transform};
 use dyn_comp_bundles::{
-    components::mixins::SizeMixin,
+    components::mixins::{
+        LayoutElementSizingMode, LayoutParentSizingMode, SizeMixin, StaticLayoutElementMixin,
+        StaticLayoutParentMixin,
+    },
     utils::{get_parent_global_transfrom, global_to_local_point3, transform_to_z_rotation_rad},
 };
 use dyn_comp_core::resources::composition::CompositionRes;
@@ -18,7 +21,13 @@ use glam::Vec2;
 pub fn handle_resizing(
     comp_res: &CompositionRes,
     selected_nodes_query: &mut Query<
-        (&mut Transform, &mut SizeMixin, Option<&Parent>),
+        (
+            &mut Transform,
+            &mut SizeMixin,
+            Option<&Parent>,
+            Option<&mut StaticLayoutParentMixin>,
+            Option<&mut StaticLayoutElementMixin>,
+        ),
         With<Selected>,
     >,
     global_transform_query: &Query<&GlobalTransform>,
@@ -32,7 +41,14 @@ pub fn handle_resizing(
     } = event;
     let global_cursor_position = transform_point_to_viewport(comp_res, cursor_position, true);
 
-    for (mut transform, mut size_mixin, maybe_parent) in selected_nodes_query.iter_mut() {
+    for (
+        mut transform,
+        mut size_mixin,
+        maybe_parent,
+        maybe_static_layout_parent_mixin,
+        maybe_static_layout_element_mixin,
+    ) in selected_nodes_query.iter_mut()
+    {
         let SizeMixin(size) = size_mixin.as_mut();
         let maybe_parent_global_transform =
             get_parent_global_transfrom(maybe_parent, global_transform_query);
@@ -56,6 +72,25 @@ pub fn handle_resizing(
             &local_cursor_position,
             -transform_to_z_rotation_rad(&transform),
         );
+
+        if let Some(mut layout_parent_mixin) = maybe_static_layout_parent_mixin {
+            if size.width() != new_bounds.size.width() {
+                layout_parent_mixin.0.horizontal_sizing_mode = LayoutParentSizingMode::Fixed;
+            }
+
+            if size.height() != new_bounds.size.height() {
+                layout_parent_mixin.0.vertical_sizing_mode = LayoutParentSizingMode::Fixed;
+            }
+        }
+        if let Some(mut layout_element_mixin) = maybe_static_layout_element_mixin {
+            if size.width() != new_bounds.size.width() {
+                layout_element_mixin.0.horizontal_sizing_mode = LayoutElementSizingMode::Fixed;
+            }
+
+            if size.height() != new_bounds.size.height() {
+                layout_element_mixin.0.vertical_sizing_mode = LayoutElementSizingMode::Fixed;
+            }
+        }
 
         transform.translation.x = new_bounds.position.x;
         transform.translation.y = new_bounds.position.y;

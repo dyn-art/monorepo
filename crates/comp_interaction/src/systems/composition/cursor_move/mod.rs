@@ -21,7 +21,11 @@ use bevy_ecs::{
 };
 use bevy_hierarchy::Parent;
 use bevy_transform::components::{GlobalTransform, Transform};
-use dyn_comp_bundles::components::{marker::Root, mixins::SizeMixin, nodes::CompNode};
+use dyn_comp_bundles::components::{
+    marker::Root,
+    mixins::{SizeMixin, StaticLayoutElementMixin, StaticLayoutParentMixin},
+    nodes::CompNode,
+};
 use dyn_comp_core::resources::composition::CompositionRes;
 
 pub fn cursor_moved_on_comp_input_system(
@@ -34,7 +38,16 @@ pub fn cursor_moved_on_comp_input_system(
         // Translating
         Query<(&mut Transform, Option<&Parent>), With<Selected>>,
         // Resizing
-        Query<(&mut Transform, &mut SizeMixin, Option<&Parent>), With<Selected>>,
+        Query<
+            (
+                &mut Transform,
+                &mut SizeMixin,
+                Option<&Parent>,
+                Option<&mut StaticLayoutParentMixin>,
+                Option<&mut StaticLayoutElementMixin>,
+            ),
+            With<Selected>,
+        >,
         // Rotating
         Query<(&mut Transform, &GlobalTransform, &SizeMixin), With<Selected>>,
         // Inserting
