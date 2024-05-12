@@ -1,6 +1,8 @@
 use super::debug::print_branch;
 use bevy_ecs::entity::Entity;
-use dyn_comp_bundles::components::mixins::{StaticLayoutElement, StaticLayoutParent};
+use dyn_comp_bundles::components::mixins::{
+    LayoutElementSizingMode, StaticLayoutElement, StaticLayoutParent,
+};
 use dyn_utils::properties::size::Size;
 use std::collections::HashMap;
 use taffy::{prelude::*, TaffyError};
@@ -60,16 +62,10 @@ impl LayoutTree {
     pub fn compute_layout(
         &mut self,
         node_id: NodeId,
-        available_space: Size,
+        available_space: taffy::Size<taffy::AvailableSpace>,
     ) -> Result<(), LayoutError> {
         self.taffy_tree
-            .compute_layout(
-                node_id,
-                taffy::Size {
-                    width: AvailableSpace::Definite(available_space.width()),
-                    height: AvailableSpace::Definite(available_space.height()),
-                },
-            )
+            .compute_layout(node_id, available_space)
             .map_err(|e| LayoutError::TaffyError(e))
     }
 
@@ -86,6 +82,11 @@ impl LayoutTree {
     ) -> Style {
         let mut style = Style::default();
 
+        let mut taffy_size = taffy::Size::<taffy::Dimension> {
+            width: Dimension::Length(size.width()),
+            height: Dimension::Length(size.height()),
+        };
+
         if let Some(static_layout_element) = maybe_static_layout_element {
             let layout_element_style = static_layout_element.to_style();
 
@@ -93,6 +94,15 @@ impl LayoutTree {
             style.align_self = layout_element_style.align_self;
             style.justify_self = layout_element_style.justify_self;
             style.margin = layout_element_style.margin;
+
+            taffy_size.width = match static_layout_element.horizontal_sizing_mode {
+                LayoutElementSizingMode::Fixed => Dimension::Length(size.width()),
+                LayoutElementSizingMode::Fill => Dimension::Percent(100.0),
+            };
+            taffy_size.height = match static_layout_element.vertical_sizing_mode {
+                LayoutElementSizingMode::Fixed => Dimension::Length(size.height()),
+                LayoutElementSizingMode::Fill => Dimension::Percent(100.0),
+            };
         }
 
         if let Some(layout_parent) = maybe_layout_parent {
@@ -106,11 +116,7 @@ impl LayoutTree {
             style.flex_direction = layout_parent_style.flex_direction;
         }
 
-        // TODO: Figure out when to make it dynamic and when to make it specific
-        style.size = taffy::Size::<taffy::Dimension> {
-            width: Dimension::Length(size.width()),
-            height: Dimension::Length(size.height()),
-        };
+        style.size = taffy_size;
 
         return style;
     }

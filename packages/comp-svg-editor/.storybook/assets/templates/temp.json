@@ -1,0 +1,100 @@
+{
+	"version": "1.0",
+	"size": [500, 500],
+	"rootNodeId": "1",
+	"nodes": {
+		"1": {
+			"type": "Frame",
+			"clipContent": false,
+			"layoutParent": null,
+			"visible": true,
+			"children": ["2"],
+			"size": [500, 500],
+			"translation": [0, 0],
+			"rotationDeg": 0,
+			"cornerRadii": [0, 0, 0, 0],
+			"blendMode": "Normal",
+			"opacity": 1,
+			"layoutElement": {
+				"type": "Absolute",
+				"constraints": { "horizontal": "Start", "vertical": "Start" }
+			},
+			"styles": [
+				{ "type": "Fill", "paintId": "6", "blendMode": "Normal", "opacity": 1, "visible": true }
+			]
+		},
+		"2": {
+			"type": "Frame",
+			"clipContent": false,
+			"layoutParent": {
+				"flexDirection": "Column",
+				"alignItems": "Center",
+				"justifyContent": "Center",
+				"padding": {
+					"top": { "type": "Abs", "value": 0 },
+					"bottom": { "type": "Abs", "value": 0 },
+					"left": { "type": "Abs", "value": 0 },
+					"right": { "type": "Abs", "value": 0 }
+				},
+				"gap": { "x": { "type": "Abs", "value": 0 }, "y": { "type": "Abs", "value": 0 } },
+				"horizontalSizingMode": "Hug",
+				"verticalSizingMode": "Fixed"
+			},
+			"visible": true,
+			"children": ["5", "3"],
+			"size": [100, 239],
+			"translation": [181, 97],
+			"rotationDeg": 0,
+			"cornerRadii": [0, 0, 0, 0],
+			"blendMode": "Normal",
+			"opacity": 1,
+			"layoutElement": {
+				"type": "Absolute",
+				"constraints": { "horizontal": "Start", "vertical": "Start" }
+			},
+			"styles": []
+		},
+		"3": {
+			"type": "Rectangle",
+			"visible": true,
+			"size": [100, 100],
+			"translation": [0, 19.5],
+			"rotationDeg": 0,
+			"cornerRadii": [0, 0, 0, 0],
+			"blendMode": "Normal",
+			"opacity": 1,
+			"layoutElement": {
+				"type": "Static",
+				"horizontalSizingMode": "Fixed",
+				"verticalSizingMode": "Fixed"
+			},
+			"styles": [
+				{ "type": "Fill", "paintId": "4", "blendMode": "Normal", "opacity": 1, "visible": true }
+			]
+		},
+		"5": {
+			"type": "Rectangle",
+			"visible": true,
+			"size": [100, 100],
+			"translation": [0, 119.5],
+			"rotationDeg": 0,
+			"cornerRadii": [0, 0, 0, 0],
+			"blendMode": "Normal",
+			"opacity": 1,
+			"layoutElement": {
+				"type": "Static",
+				"horizontalSizingMode": "Fixed",
+				"verticalSizingMode": "Fixed"
+			},
+			"styles": [
+				{ "type": "Fill", "paintId": "4", "blendMode": "Normal", "opacity": 1, "visible": true }
+			]
+		}
+	},
+	"paints": {
+		"4": { "type": "Solid", "color": [217, 217, 217] },
+		"6": { "type": "Solid", "color": [255, 248, 78] }
+	},
+	"assets": {},
+	"viewport": { "physicalPosition": [0, 0], "physicalSize": [500, 500] }
+}

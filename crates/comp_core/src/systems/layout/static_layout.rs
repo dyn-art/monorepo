@@ -14,8 +14,8 @@ use bevy_transform::components::Transform;
 use dyn_comp_bundles::components::{
     marker::{Removed, StaleStaticLayout},
     mixins::{
-        AbsoluteLayoutElementMixin, SizeMixin, StaticLayoutElementMixin, StaticLayoutNodeId,
-        StaticLayoutParentMixin,
+        AbsoluteLayoutElementMixin, LayoutParentSizingMode, SizeMixin, StaticLayoutElementMixin,
+        StaticLayoutNodeId, StaticLayoutParentMixin,
     },
 };
 use dyn_utils::units::abs::Abs;
@@ -272,7 +272,12 @@ pub fn update_static_layout(
     parent_query: Query<(Entity, Option<&Parent>), With<StaticLayoutNodeId>>,
     children_query: Query<&Children, With<StaticLayoutNodeId>>,
     mut to_update_nodes_query: Query<
-        (&StaticLayoutNodeId, &mut SizeMixin, &mut Transform),
+        (
+            &StaticLayoutNodeId,
+            &mut SizeMixin,
+            &mut Transform,
+            Option<&StaticLayoutParentMixin>,
+        ),
         With<StaticLayoutNodeId>,
     >,
     layout_node_id_query: Query<(Entity, &StaticLayoutNodeId)>,
@@ -320,7 +325,12 @@ fn find_topmost_parent(
 fn update_node_layout_recursive(
     entity: Entity,
     to_update_nodes_query: &mut Query<
-        (&StaticLayoutNodeId, &mut SizeMixin, &mut Transform),
+        (
+            &StaticLayoutNodeId,
+            &mut SizeMixin,
+            &mut Transform,
+            Option<&StaticLayoutParentMixin>,
+        ),
         With<StaticLayoutNodeId>,
     >,
     children_query: &Query<&Children, With<StaticLayoutNodeId>>,
@@ -328,15 +338,38 @@ fn update_node_layout_recursive(
     is_root: bool,
     taffy_to_entity: &HashMap<taffy::NodeId, Entity>,
 ) {
-    if let Ok((StaticLayoutNodeId(layout_node_id), mut size_mixin, mut transform)) =
-        to_update_nodes_query.get_mut(entity)
+    if let Ok((
+        StaticLayoutNodeId(layout_node_id),
+        mut size_mixin,
+        mut transform,
+        maybe_static_layout_parent_mixin,
+    )) = to_update_nodes_query.get_mut(entity)
     {
         // Root nodes have their layout computed only once at the beginning.
         if is_root {
-            if let Err(e) = layout_res
-                .tree
-                .compute_layout(*layout_node_id, size_mixin.0)
+            let mut taffy_size = taffy::Size {
+                width: taffy::AvailableSpace::Definite(size_mixin.0.width()),
+                height: taffy::AvailableSpace::Definite(size_mixin.0.height()),
+            };
+
+            if let Some(StaticLayoutParentMixin(static_layout_parent)) =
+                maybe_static_layout_parent_mixin
             {
+                taffy_size.width = match static_layout_parent.horizontal_sizing_mode {
+                    LayoutParentSizingMode::Fixed => {
+                        taffy::AvailableSpace::Definite(size_mixin.0.width())
+                    }
+                    LayoutParentSizingMode::Hug => taffy::AvailableSpace::MinContent,
+                };
+                taffy_size.height = match static_layout_parent.vertical_sizing_mode {
+                    LayoutParentSizingMode::Fixed => {
+                        taffy::AvailableSpace::Definite(size_mixin.0.height())
+                    }
+                    LayoutParentSizingMode::Hug => taffy::AvailableSpace::MinContent,
+                };
+            };
+
+            if let Err(e) = layout_res.tree.compute_layout(*layout_node_id, taffy_size) {
                 log::error!(
                     "Failed to compute layout for node {:?}: {:?}",
                     layout_node_id,
@@ -344,9 +377,9 @@ fn update_node_layout_recursive(
                 );
                 return;
             }
-            // layout_res
-            //     .tree
-            //     .print_branch(*layout_node_id, &taffy_to_entity); // TODO: REMOVE
+            layout_res
+                .tree
+                .print_branch(*layout_node_id, &taffy_to_entity); // TODO: REMOVE
         }
 
         // Apply computed layout to the node's properties
