@@ -7,14 +7,14 @@ use crate::{
 use bevy_ecs::{query::With, system::Query};
 use bevy_hierarchy::Parent;
 use bevy_transform::components::{GlobalTransform, Transform};
-use dyn_attributed_string::TextSizingMode;
+use dyn_attributed_string::layout::layout_config::TextSizingMode;
 use dyn_comp_bundles::{
     components::{
         mixins::{
             LayoutElementSizingMode, LayoutParentSizingMode, SizeMixin, StaticLayoutElementMixin,
             StaticLayoutParentMixin,
         },
-        nodes::{CompNode, CompNodeVariant, TextCompNode},
+        nodes::TextCompNode,
     },
     utils::{get_parent_global_transfrom, global_to_local_point3, transform_to_z_rotation_rad},
 };
@@ -80,26 +80,38 @@ pub fn handle_resizing(
         );
 
         if let Some(mut layout_parent_mixin) = maybe_static_layout_parent_mixin {
-            if size.width() != new_bounds.size.width() {
+            if size.width() != new_bounds.size.width()
+                && layout_parent_mixin.0.horizontal_sizing_mode != LayoutParentSizingMode::Fixed
+            {
                 layout_parent_mixin.0.horizontal_sizing_mode = LayoutParentSizingMode::Fixed;
             }
-            if size.height() != new_bounds.size.height() {
+            if size.height() != new_bounds.size.height()
+                && layout_parent_mixin.0.vertical_sizing_mode != LayoutParentSizingMode::Fixed
+            {
                 layout_parent_mixin.0.vertical_sizing_mode = LayoutParentSizingMode::Fixed;
             }
         }
         if let Some(mut layout_element_mixin) = maybe_static_layout_element_mixin {
-            if size.width() != new_bounds.size.width() {
+            if size.width() != new_bounds.size.width()
+                && layout_element_mixin.0.horizontal_sizing_mode != LayoutElementSizingMode::Fixed
+            {
                 layout_element_mixin.0.horizontal_sizing_mode = LayoutElementSizingMode::Fixed;
             }
-            if size.height() != new_bounds.size.height() {
+            if size.height() != new_bounds.size.height()
+                && layout_element_mixin.0.vertical_sizing_mode != LayoutElementSizingMode::Fixed
+            {
                 layout_element_mixin.0.vertical_sizing_mode = LayoutElementSizingMode::Fixed;
             }
         }
         if let Some(mut text_node) = maybe_text_node {
-            if size.width() != new_bounds.size.width() {
+            if size.width() != new_bounds.size.width()
+                && text_node.sizing_mode != TextSizingMode::Height
+            {
                 text_node.sizing_mode = TextSizingMode::Height;
             }
-            if size.height() != new_bounds.size.height() {
+            if size.height() != new_bounds.size.height()
+                && text_node.sizing_mode != TextSizingMode::Fixed
+            {
                 text_node.sizing_mode = TextSizingMode::Fixed;
             }
         }

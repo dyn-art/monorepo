@@ -1,5 +1,7 @@
 use dyn_attributed_string::{
-    outline::tiny_skia_path_builder::TinySkiaPathBuilder, AttributedString, TextSizingMode,
+    layout::{layout_config::LayoutConfig, layout_handler::LayoutHandler},
+    outline::tiny_skia_path_builder::TinySkiaPathBuilder,
+    AttributedString,
 };
 use dyn_fonts_book::FontsBook;
 use dyn_utils::properties::size::Size;
@@ -34,7 +36,7 @@ impl TestPaths {
 pub fn assert_attributed_string_rendered(
     name: &'static str,
     attributed_string: &mut AttributedString,
-    size: &Size,
+    config: LayoutConfig,
 ) {
     init_env_logger();
 
@@ -54,7 +56,9 @@ pub fn assert_attributed_string_rendered(
         .load_fonts_dir(test_paths.fonts_dir_path);
 
     attributed_string.tokenize_text(&mut fonts_book);
-    attributed_string.layout(size, &TextSizingMode::Fixed);
+    let layout_handler = attributed_string.layout(config);
+    let container_size = layout_handler
+        .compute_container_size(&layout_handler.compute_text_size(attributed_string.get_spans()));
 
     let path = TinySkiaPathBuilder::outline(attributed_string, &mut fonts_book).unwrap();
 
@@ -62,8 +66,11 @@ pub fn assert_attributed_string_rendered(
     paint.set_color(Color::BLACK);
     paint.anti_alias = true;
 
-    let mut pixmap =
-        Pixmap::new(path.bounds().width() as u32, path.bounds().height() as u32).unwrap();
+    let mut pixmap = Pixmap::new(
+        container_size.width() as u32,
+        container_size.height() as u32,
+    )
+    .unwrap();
     pixmap.fill(Color::WHITE);
     pixmap.fill_path(
         &path,

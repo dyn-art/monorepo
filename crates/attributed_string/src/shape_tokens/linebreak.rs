@@ -19,11 +19,11 @@ impl ShapeToken for LinebreakToken {
         &self.range
     }
 
-    fn get_width(&self) -> Abs {
+    fn x_advance(&self) -> Abs {
         Abs::zero()
     }
 
-    fn get_height(&self) -> Abs {
+    fn y_advance(&self) -> Abs {
         Abs::zero()
     }
 }

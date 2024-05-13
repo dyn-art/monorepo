@@ -1,6 +1,6 @@
 use super::LineWrapStrategy;
 use crate::{
-    line::Line,
+    layout::line::Line,
     shape_tokens::{ShapeToken, ShapeTokenVariant},
     span::SpanIntervals,
 };
@@ -93,13 +93,15 @@ impl WordWrap {
 
 // TODO: Improve this implementation right now its not efficient in every way
 impl LineWrapStrategy for WordWrap {
-    fn compute_lines(&mut self, spans: &SpanIntervals, size: &Size, _: &str) -> Vec<Line> {
+    fn compute_lines(&mut self, spans: &SpanIntervals, size: &Size) -> Vec<Line> {
         for Interval { val: span, .. } in spans.iter() {
             let mut span_range_start = span.get_range().start;
 
             for token_variant in span.get_tokens() {
                 let (token_width, token_range_end) = match token_variant {
-                    ShapeTokenVariant::Glyph(token) => (token.x_advance, token.get_range().end),
+                    ShapeTokenVariant::Glyph(token) => {
+                        (token.layout.x_advance, token.get_range().end)
+                    }
                     ShapeTokenVariant::TextFragment(token) => {
                         (token.x_advance(), token.get_range().end)
                     }

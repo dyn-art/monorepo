@@ -1,5 +1,7 @@
 use bevy_ecs::entity::Entity;
-use dyn_attributed_string::{HorizontalTextAlignment, LineWrap, VerticalTextAlignment};
+use dyn_attributed_string::layout::layout_config::{
+    HorizontalTextAlignment, LineWrap, VerticalTextAlignment,
+};
 use dyn_comp_bundles::{
     events::{
         CompCoreInputEvent, DeleteEntityInputEvent, FocusRootNodesInputEvent, MoveEntityInputEvent,

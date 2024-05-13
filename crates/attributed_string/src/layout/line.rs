@@ -66,9 +66,9 @@ impl Line {
             for Interval { val: span, .. } in spans.find(range.start, range.end) {
                 for token in span.iter_tokens_in_range(range) {
                     if token.is_blank() {
-                        current_space += token.get_shape_token().get_width();
+                        current_space += token.get_shape_token().x_advance();
                     } else {
-                        width += token.get_shape_token().get_width();
+                        width += token.get_shape_token().x_advance();
                         if !current_space.is_zero() {
                             width += current_space;
                             current_space = Abs::zero();

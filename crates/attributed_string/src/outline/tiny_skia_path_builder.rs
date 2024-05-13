@@ -53,18 +53,18 @@ impl TinySkiaPathBuilder {
                         // So we have to keep an advance.
                         transform.tx += (x + glyph_token.get_glyph().x_offset.at(font_size))
                             .to_pt()
-                            + glyph_token.transform.tx;
+                            + glyph_token.layout.transform.tx;
                         transform.ty += glyph_token.get_glyph().y_offset.at(font_size).to_pt()
-                            + glyph_token.transform.ty;
+                            + glyph_token.layout.transform.ty;
 
                         if let Some(outline) = outline.transform(transform) {
                             cluster_builder.push_path(&outline);
                         }
                     }
 
-                    x += glyph_token.x_advance;
+                    x += glyph_token.layout.x_advance;
 
-                    let glyph_width = glyph_token.x_advance;
+                    let glyph_width = glyph_token.layout.x_advance;
                     if glyph_width > width {
                         width = glyph_width;
                     }

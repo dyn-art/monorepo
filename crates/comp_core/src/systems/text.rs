@@ -1,18 +1,24 @@
 use bevy_ecs::{
     entity::Entity,
-    query::{Changed, Or, Without},
+    query::{Changed, Or, With, Without},
     system::{Commands, Query, ResMut},
 };
 use dyn_attributed_string::{
-    outline::tiny_skia_path_builder::TinySkiaPathBuilder, AttributedString, AttributedStringConfig,
-    TextSizingMode,
+    layout::layout_config::{LayoutConfig, LayoutSize, TextSizingMode},
+    AttributedString,
 };
 use dyn_comp_asset::resources::AssetsRes;
 use dyn_comp_bundles::components::{
-    mixins::{AttributedStringMixin, PathMixin, SizeMixin, WindingRule},
+    mixins::{AttributedStringMixin, SizeMixin},
     nodes::TextCompNode,
 };
-use dyn_utils::units::abs::Abs;
+use dyn_utils::units::{abs::Abs, auto_length::AutoLength};
+
+// TODO:
+// 1. Compute text bounding box without outlining (for text computation)
+// 2. Figure out how to best apply sizing mode
+//    - I guess best would be to create custom Size (with Auto and Absolute)
+// 3. If Auto sizing mode figure out how to update elements position e.g. if center or right aligned
 
 pub fn compute_text_from_scratch(
     mut commands: Commands,
@@ -32,34 +38,37 @@ pub fn compute_text_from_scratch(
                 .iter()
                 .map(|attrs| attrs.to_attrs_interval())
                 .collect(),
-            AttributedStringConfig {
-                line_wrap: text.line_wrap,
-                horizontal_text_alignment: text.horizontal_text_alignment,
-                vertical_text_alignment: text.vertical_text_alignment,
-            },
         );
 
         attributed_string.tokenize_text(assets_res.get_fonts_book_mut());
-        attributed_string.layout(&size_mixin.0, &text.sizing_mode);
-        let maybe_path =
-            TinySkiaPathBuilder::outline(&attributed_string, assets_res.get_fonts_book_mut());
+        let layout_handler = attributed_string.layout(LayoutConfig {
+            size: match text.sizing_mode {
+                TextSizingMode::Fixed => LayoutSize::new(
+                    AutoLength::abs(size_mixin.0.width),
+                    AutoLength::abs(size_mixin.0.height),
+                ),
+                TextSizingMode::WidthAndHeight => {
+                    LayoutSize::new(AutoLength::Auto, AutoLength::Auto)
+                }
+                TextSizingMode::Height => {
+                    LayoutSize::new(AutoLength::abs(size_mixin.0.width), AutoLength::Auto)
+                }
+            },
+            line_wrap: text.line_wrap,
+            horizontal_text_alignment: text.horizontal_text_alignment,
+            vertical_text_alignment: text.vertical_text_alignment,
+        });
 
-        if let Some(path) = maybe_path {
-            // Update bounds
-            if text.sizing_mode == TextSizingMode::WidthAndHeight {
-                size_mixin.0.width = Abs::pt(path.bounds().width())
-            }
-            if text.sizing_mode == TextSizingMode::WidthAndHeight
-                || text.sizing_mode == TextSizingMode::Height
-            {
-                size_mixin.0.height = Abs::pt(path.bounds().height())
-            }
+        let text_size = layout_handler.compute_text_size(attributed_string.get_spans());
 
-            // Insert or update the PathMixin component for the entity
-            commands.entity(entity).insert(PathMixin {
-                path,
-                winding_rule: WindingRule::Nonzero,
-            });
+        // Update bounds
+        if text.sizing_mode == TextSizingMode::WidthAndHeight {
+            size_mixin.0.width = Abs::pt(text_size.width())
+        }
+        if text.sizing_mode == TextSizingMode::WidthAndHeight
+            || text.sizing_mode == TextSizingMode::Height
+        {
+            size_mixin.0.height = Abs::pt(text_size.height())
         }
 
         commands
@@ -69,81 +78,76 @@ pub fn compute_text_from_scratch(
 }
 
 pub fn compute_text_on_size_change(
-    mut commands: Commands,
-    mut assets_res: ResMut<AssetsRes>,
     mut query: Query<
-        (
-            Entity,
-            &TextCompNode,
-            &mut AttributedStringMixin,
-            &mut SizeMixin,
-        ),
-        Changed<SizeMixin>,
+        (&TextCompNode, &mut AttributedStringMixin, &SizeMixin),
+        (With<AttributedStringMixin>, Changed<SizeMixin>),
     >,
 ) {
-    for (entity, text, mut attributed_string_mixin, mut size_mixin) in query.iter_mut() {
-        let attributed_string = &mut attributed_string_mixin.0;
-
-        attributed_string.layout_lines(&size_mixin.0, &text.sizing_mode);
-        let maybe_path =
-            TinySkiaPathBuilder::outline(&attributed_string, assets_res.get_fonts_book_mut());
-
-        if let Some(path) = maybe_path {
-            // Update bounds
-            if text.sizing_mode == TextSizingMode::WidthAndHeight {
-                size_mixin.0.width = Abs::pt(path.bounds().width())
-            }
-            if text.sizing_mode == TextSizingMode::WidthAndHeight
-                || text.sizing_mode == TextSizingMode::Height
-            {
-                size_mixin.0.height = Abs::pt(path.bounds().height())
-            }
-        }
+    for (text, mut attributed_string_mixin, size_mixin) in query.iter_mut() {
+        attributed_string_mixin.0.layout(LayoutConfig {
+            size: match text.sizing_mode {
+                TextSizingMode::Fixed => LayoutSize::new(
+                    AutoLength::abs(size_mixin.0.width),
+                    AutoLength::abs(size_mixin.0.height),
+                ),
+                TextSizingMode::WidthAndHeight => {
+                    LayoutSize::new(AutoLength::Auto, AutoLength::Auto)
+                }
+                TextSizingMode::Height => {
+                    LayoutSize::new(AutoLength::abs(size_mixin.0.width), AutoLength::Auto)
+                }
+            },
+            line_wrap: text.line_wrap,
+            horizontal_text_alignment: text.horizontal_text_alignment,
+            vertical_text_alignment: text.vertical_text_alignment,
+        });
     }
 }
 
 pub fn compute_text_on_node_change(
-    mut commands: Commands,
     mut assets_res: ResMut<AssetsRes>,
     mut query: Query<
-        (
-            Entity,
-            &TextCompNode,
-            &mut AttributedStringMixin,
-            &mut SizeMixin,
-        ),
-        Changed<TextCompNode>,
+        (&TextCompNode, &mut AttributedStringMixin, &mut SizeMixin),
+        (With<AttributedStringMixin>, Changed<TextCompNode>),
     >,
 ) {
-    for (entity, text, mut attributed_string_mixin, mut size_mixin) in query.iter_mut() {
+    for (text, mut attributed_string_mixin, mut size_mixin) in query.iter_mut() {
         let mut new_attributed_string = AttributedString::new(
             text.text.clone(),
             text.attributes
                 .iter()
                 .map(|attrs| attrs.to_attrs_interval())
                 .collect(),
-            AttributedStringConfig {
-                line_wrap: text.line_wrap,
-                horizontal_text_alignment: text.horizontal_text_alignment,
-                vertical_text_alignment: text.vertical_text_alignment,
-            },
         );
         new_attributed_string.tokenize_text(assets_res.get_fonts_book_mut());
-        new_attributed_string.layout(&size_mixin.0, &text.sizing_mode);
+        let layout_handler = attributed_string_mixin.0.layout(LayoutConfig {
+            size: match text.sizing_mode {
+                TextSizingMode::Fixed => LayoutSize::new(
+                    AutoLength::abs(size_mixin.0.width),
+                    AutoLength::abs(size_mixin.0.height),
+                ),
+                TextSizingMode::WidthAndHeight => {
+                    LayoutSize::new(AutoLength::Auto, AutoLength::Auto)
+                }
+                TextSizingMode::Height => {
+                    LayoutSize::new(AutoLength::abs(size_mixin.0.width), AutoLength::Auto)
+                }
+            },
+            line_wrap: text.line_wrap,
+            horizontal_text_alignment: text.horizontal_text_alignment,
+            vertical_text_alignment: text.vertical_text_alignment,
+        });
 
-        let maybe_path =
-            TinySkiaPathBuilder::outline(&new_attributed_string, assets_res.get_fonts_book_mut());
+        let text_size = layout_handler.compute_text_size(attributed_string_mixin.0.get_spans());
 
-        if let Some(path) = maybe_path {
-            // Update bounds
-            if text.sizing_mode == TextSizingMode::WidthAndHeight {
-                size_mixin.0.width = Abs::pt(path.bounds().width());
-            }
-            if text.sizing_mode == TextSizingMode::WidthAndHeight
-                || text.sizing_mode == TextSizingMode::Height
-            {
-                size_mixin.0.height = Abs::pt(path.bounds().height());
-            }
+        // Update bounds
+        if text.sizing_mode == TextSizingMode::WidthAndHeight {
+            size_mixin.0.width = Abs::pt(text_size.width());
+        }
+        if text.sizing_mode == TextSizingMode::WidthAndHeight
+            || text.sizing_mode == TextSizingMode::Height
+        {
+            size_mixin.0.height = Abs::pt(text_size.height());
         }
 
         attributed_string_mixin.0 = new_attributed_string;

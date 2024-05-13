@@ -1,9 +1,9 @@
 use dyn_attributed_string::{
-    attrs::{AttrsInterval, TextAttrs},
     dyn_fonts_book::font::{
         info::FontFamily,
         variant::{FontStretch, FontStyle, FontWeight},
     },
+    text_attrs::{TextAttrs, TextAttrsInterval},
 };
 use dyn_utils::{
     properties::size::Size,
@@ -35,8 +35,8 @@ pub struct TextAttributeInterval {
 }
 
 impl TextAttributeInterval {
-    pub fn to_attrs_interval(&self) -> AttrsInterval {
-        AttrsInterval {
+    pub fn to_attrs_interval(&self) -> TextAttrsInterval {
+        TextAttrsInterval {
             start: self.start,
             stop: self.end,
             val: TextAttrs {

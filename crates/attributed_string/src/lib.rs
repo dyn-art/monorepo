@@ -1,40 +1,29 @@
-pub mod attrs;
 pub mod glyph;
 pub mod glyph_clusters;
-pub mod line;
-pub mod line_wrap;
+pub mod layout;
 pub mod outline;
 pub mod script;
 pub mod shape;
 pub mod shape_tokens;
 pub mod span;
+pub mod text_attrs;
 pub mod utils;
 
-use attrs::{AttrsInterval, TextAttrs};
 pub use dyn_fonts_book;
 use dyn_fonts_book::FontsBook;
-use dyn_utils::{properties::size::Size, units::abs::Abs};
-use line::{Line, LineDirection};
-use line_wrap::{no_wrap::NoLineWrap, word_wrap::WordWrap, LineWrapStrategy};
+use layout::{layout_config::LayoutConfig, layout_handler::LayoutHandler};
 use rust_lapper::{Interval, Lapper};
 use span::{Span, SpanIntervals};
+use text_attrs::{TextAttrs, TextAttrsInterval};
 
 #[derive(Debug, Clone)]
 pub struct AttributedString {
     text: String,
     spans: SpanIntervals,
-    lines: Vec<Line>,
-    config: AttributedStringConfig,
 }
 
 impl AttributedString {
-    pub fn new(
-        text: String,
-        mut attrs_intervals: Vec<AttrsInterval>,
-        config: AttributedStringConfig,
-    ) -> Self {
-        AttributedString::adjust_intervals(&mut attrs_intervals, &text);
-
+    pub fn new(text: String, attrs_intervals: Vec<TextAttrsInterval>) -> Self {
         let text_len = text.len();
         let bidi_info = unicode_bidi::BidiInfo::new(&text, None);
         let span_intervals = attrs_intervals
@@ -58,8 +47,6 @@ impl AttributedString {
         return Self {
             text,
             spans: Lapper::new(span_intervals),
-            lines: Vec::new(),
-            config,
         };
     }
 
@@ -77,99 +64,10 @@ impl AttributedString {
         }
     }
 
-    pub fn layout(&mut self, size: &Size, sizing_mode: &TextSizingMode) {
-        for (span, ..) in self.spans.iter_mut() {
-            span.apply_letter_spacing();
-            span.apply_word_spacing();
-        }
-        self.layout_lines(size, sizing_mode);
-    }
-
-    pub fn layout_lines(&mut self, size: &Size, sizing_mode: &TextSizingMode) {
-        let lines = self.compute_lines(size, sizing_mode);
-
-        let container_width = size.width;
-        let container_height = size.height;
-
-        // let text_width = lines.iter().fold(Abs::zero(), |acc, line| {
-        //     acc.max(line.get_width(&self.spans))
-        // });
-        let text_height = lines
-            .iter()
-            .enumerate()
-            .fold(Abs::zero(), |acc, (index, line)| {
-                if index == 0 {
-                    acc + line.get_max_ascent(&self.spans)
-                } else {
-                    acc + line.get_max_height(&self.spans)
-                }
-            });
-        let vertical_alignment_correction = match self.config.vertical_text_alignment {
-            VerticalTextAlignment::Top => Abs::zero(),
-            VerticalTextAlignment::Bottom => container_height - text_height,
-            VerticalTextAlignment::Center => (container_height - text_height) / 2.0,
-        };
-
-        let mut curr_pos_x: Abs;
-        let mut curr_pos_y = vertical_alignment_correction;
-
-        // Layout tokens based on lines
-        for (index, line) in lines.iter().enumerate() {
-            if line.get_ranges().is_empty() {
-                continue;
-            }
-
-            let line_direction = line.get_direction(&self.spans);
-            let line_width = line.get_width(&self.spans);
-
-            let horizontal_alignment_correction =
-                match (self.config.horizontal_text_alignment, line_direction) {
-                    (HorizontalTextAlignment::Left, _) => Abs::zero(),
-                    (HorizontalTextAlignment::Right, _) => container_width - line_width,
-                    (HorizontalTextAlignment::Center, _) => (container_width - line_width) / 2.0,
-                    (HorizontalTextAlignment::Start, LineDirection::LeftToRight) => Abs::zero(),
-                    (HorizontalTextAlignment::End, LineDirection::LeftToRight) => {
-                        container_width - line_width
-                    }
-                    (HorizontalTextAlignment::Start, LineDirection::RightToLeft) => {
-                        container_width - line_width
-                    }
-                    (HorizontalTextAlignment::End, LineDirection::RightToLeft) => Abs::zero(),
-                };
-
-            curr_pos_x = horizontal_alignment_correction;
-            curr_pos_y += if index == 0 {
-                line.get_max_ascent(&self.spans)
-            } else {
-                line.get_max_height(&self.spans)
-            };
-
-            for range in line.get_ranges().iter() {
-                for (span, ..) in self.spans.find_mut(range.start, range.end) {
-                    for glyph_token in span.iter_glyphs_in_range_mut(&range) {
-                        glyph_token.transform = tiny_skia_path::Transform::from_translate(
-                            curr_pos_x.to_pt(),
-                            curr_pos_y.to_pt(),
-                        );
-
-                        curr_pos_x += glyph_token.x_advance;
-                    }
-                }
-            }
-        }
-
-        self.lines = lines;
-    }
-
-    pub fn compute_lines(&self, size: &Size, sizing_mode: &TextSizingMode) -> Vec<Line> {
-        let mut line_wrap_strategy: Box<dyn LineWrapStrategy> =
-            match (sizing_mode, self.config.line_wrap) {
-                (_, LineWrap::None) => Box::new(NoLineWrap),
-                (TextSizingMode::Fixed, LineWrap::Word)
-                | (TextSizingMode::Height, LineWrap::Word) => Box::new(WordWrap::new()),
-                _ => Box::new(NoLineWrap),
-            };
-        return line_wrap_strategy.compute_lines(&self.spans, size, &self.text);
+    pub fn layout(&mut self, config: LayoutConfig) -> LayoutHandler {
+        let mut layout_handler = LayoutHandler::new(config);
+        layout_handler.layout(&mut self.spans);
+        return layout_handler;
     }
 
     fn divide_overlapping_spans(&mut self) {
@@ -197,9 +95,9 @@ impl AttributedString {
         }
     }
 
-    fn adjust_intervals(attrs_intervals: &mut Vec<AttrsInterval>, text: &str) {
+    pub fn adjust_intervals(attrs_intervals: &mut Vec<TextAttrsInterval>, text: &str) {
         if attrs_intervals.is_empty() {
-            attrs_intervals.push(AttrsInterval {
+            attrs_intervals.push(TextAttrsInterval {
                 start: 0,
                 stop: text.len(),
                 val: TextAttrs::new(),
@@ -233,68 +131,4 @@ impl AttributedString {
             }
         }
     }
-}
-
-#[derive(Debug, Default, Clone)]
-pub struct AttributedStringConfig {
-    pub line_wrap: LineWrap,
-    pub horizontal_text_alignment: HorizontalTextAlignment,
-    pub vertical_text_alignment: VerticalTextAlignment,
-}
-
-#[derive(Debug, Default, Clone, Copy)]
-#[cfg_attr(
-    feature = "serde_support",
-    derive(serde::Serialize, serde::Deserialize, specta::Type)
-)]
-pub enum LineWrap {
-    /// No wrapping
-    #[default]
-    None,
-    // /// Wraps at a glyph level
-    // Glyph,
-    /// Wraps at the word level
-    Word,
-    // /// Wraps at the word level, or fallback to glyph level if a word can't fit on a line by itself
-    // WordOrGlyph,
-}
-
-#[derive(Debug, Default, Clone, Copy)]
-#[cfg_attr(
-    feature = "serde_support",
-    derive(serde::Serialize, serde::Deserialize, specta::Type)
-)]
-pub enum HorizontalTextAlignment {
-    #[default]
-    Start,
-    End,
-    Left,
-    Right,
-    Center,
-    // Justified, // TODO
-}
-
-#[derive(Debug, Default, Clone, Copy)]
-#[cfg_attr(
-    feature = "serde_support",
-    derive(serde::Serialize, serde::Deserialize, specta::Type)
-)]
-pub enum VerticalTextAlignment {
-    #[default]
-    Top,
-    Bottom,
-    Center,
-    // Justified, // TODO
-}
-
-#[derive(Debug, Default, PartialEq, Eq, Copy, Clone)]
-#[cfg_attr(
-    feature = "serde_support",
-    derive(serde::Serialize, serde::Deserialize, specta::Type)
-)]
-pub enum TextSizingMode {
-    #[default]
-    WidthAndHeight,
-    Height,
-    Fixed,
 }
