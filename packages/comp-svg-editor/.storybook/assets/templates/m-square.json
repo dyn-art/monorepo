@@ -57,45 +57,35 @@
 			},
 			"text": {
 				"type": "Text",
-				"text": "Hello World",
+				"text": "Hello there",
 				"attributes": [
 					{
 						"start": 0,
 						"end": 11,
 						"attributes": {
-							"fontFamily": {
-								"Named": "Inter"
-							},
+							"fontFamily": { "Named": "Inter" },
 							"fontStretch": 1,
 							"fontStyle": "Normal",
 							"fontWeight": 500,
 							"fontSize": 14,
-							"letterSpacing": {
-								"type": "Em",
-								"value": 0
-							},
-							"lineHeight": {
-								"type": "Abs",
-								"value": 24
-							}
+							"letterSpacing": { "type": "Em", "value": 0 },
+							"lineHeight": { "type": "Abs", "value": 24 }
 						}
 					}
 				],
 				"lineWrap": "Word",
 				"horizontalTextAlignment": "Center",
 				"verticalTextAlignment": "Top",
+				"sizingMode": "WidthAndHeight",
 				"visible": true,
-				"size": [77, 24],
-				"translation": [212, 374],
+				"size": [74, 24],
+				"translation": [137, 362],
 				"rotationDeg": 0,
 				"blendMode": "Normal",
 				"opacity": 1,
 				"layoutElement": {
 					"type": "Absolute",
-					"constraints": {
-						"horizontal": "Center",
-						"vertical": "Start"
-					}
+					"constraints": { "horizontal": "Start", "vertical": "Start" }
 				},
 				"styles": [
 					{
@@ -118,13 +108,9 @@
 				"content": {
 					"type": "Url",
 					"url": "https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuI6fMZhrib2Bg-4.ttf",
-					"contentType": {
-						"mimeType": "font/ttf"
-					}
+					"contentType": { "mimeType": "font/ttf" }
 				},
-				"contentType": {
-					"type": "Ttf"
-				}
+				"contentType": { "type": "Ttf" }
 			}
 		},
 		"viewport": { "physicalPosition": [0, 0], "physicalSize": [500, 500] }

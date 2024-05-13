@@ -20,7 +20,7 @@
 				"constraints": { "horizontal": "Start", "vertical": "Start" }
 			},
 			"styles": [
-				{ "type": "Fill", "paintId": "6", "blendMode": "Normal", "opacity": 1, "visible": true }
+				{ "type": "Fill", "paintId": "8", "blendMode": "Normal", "opacity": 1, "visible": true }
 			]
 		},
 		"2": {
@@ -31,34 +31,36 @@
 				"alignItems": "Center",
 				"justifyContent": "Center",
 				"padding": {
-					"top": { "type": "Abs", "value": 0 },
-					"bottom": { "type": "Abs", "value": 0 },
-					"left": { "type": "Abs", "value": 0 },
-					"right": { "type": "Abs", "value": 0 }
+					"top": { "type": "Abs", "value": 10 },
+					"bottom": { "type": "Abs", "value": 10 },
+					"left": { "type": "Abs", "value": 10 },
+					"right": { "type": "Abs", "value": 10 }
 				},
 				"gap": { "x": { "type": "Abs", "value": 0 }, "y": { "type": "Abs", "value": 0 } },
-				"horizontalSizingMode": "Hug",
+				"horizontalSizingMode": "Fixed",
 				"verticalSizingMode": "Fixed"
 			},
 			"visible": true,
 			"children": ["5", "3"],
-			"size": [100, 239],
-			"translation": [181, 97],
+			"size": [120, 285],
+			"translation": [190, 128],
 			"rotationDeg": 0,
 			"cornerRadii": [0, 0, 0, 0],
 			"blendMode": "Normal",
 			"opacity": 1,
 			"layoutElement": {
 				"type": "Absolute",
-				"constraints": { "horizontal": "Start", "vertical": "Start" }
+				"constraints": { "horizontal": "Center", "vertical": "Center" }
 			},
-			"styles": []
+			"styles": [
+				{ "type": "Fill", "paintId": "7", "blendMode": "Normal", "opacity": 1, "visible": true }
+			]
 		},
 		"3": {
 			"type": "Rectangle",
 			"visible": true,
 			"size": [100, 100],
-			"translation": [0, 19.5],
+			"translation": [10, 46],
 			"rotationDeg": 0,
 			"cornerRadii": [0, 0, 0, 0],
 			"blendMode": "Normal",
@@ -75,8 +77,8 @@
 		"5": {
 			"type": "Rectangle",
 			"visible": true,
-			"size": [100, 100],
-			"translation": [0, 119.5],
+			"size": [100, 93],
+			"translation": [10, 146],
 			"rotationDeg": 0,
 			"cornerRadii": [0, 0, 0, 0],
 			"blendMode": "Normal",
@@ -87,13 +89,15 @@
 				"verticalSizingMode": "Fixed"
 			},
 			"styles": [
-				{ "type": "Fill", "paintId": "4", "blendMode": "Normal", "opacity": 1, "visible": true }
+				{ "type": "Fill", "paintId": "6", "blendMode": "Normal", "opacity": 1, "visible": true }
 			]
 		}
 	},
 	"paints": {
-		"4": { "type": "Solid", "color": [217, 217, 217] },
-		"6": { "type": "Solid", "color": [255, 248, 78] }
+		"4": { "type": "Solid", "color": [200, 180, 180] },
+		"6": { "type": "Solid", "color": [217, 217, 217] },
+		"7": { "type": "Solid", "color": [0, 0, 0] },
+		"8": { "type": "Solid", "color": [255, 248, 78] }
 	},
 	"assets": {},
 	"viewport": { "physicalPosition": [0, 0], "physicalSize": [500, 500] }

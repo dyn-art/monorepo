@@ -17,7 +17,9 @@
 						"left": { "type": "Abs", "value": 50 },
 						"right": { "type": "Abs", "value": 50 }
 					},
-					"gap": { "x": { "type": "Abs", "value": 0 }, "y": { "type": "Abs", "value": 30 } }
+					"gap": { "x": { "type": "Abs", "value": 0 }, "y": { "type": "Abs", "value": 30 } },
+					"horizontalSizingMode": "Hug",
+					"verticalSizingMode": "Hug"
 				},
 				"visible": true,
 				"children": ["17", "2"],
@@ -27,7 +29,11 @@
 				"cornerRadii": [10, 10, 10, 10],
 				"blendMode": "Normal",
 				"opacity": 1,
-				"layoutElement": { "type": "Static" },
+				"layoutElement": {
+					"type": "Static",
+					"horizontalSizingMode": "Fixed",
+					"verticalSizingMode": "Fixed"
+				},
 				"styles": [
 					{ "type": "Fill", "paintId": "23", "blendMode": "Normal", "opacity": 1, "visible": true },
 					{
@@ -55,7 +61,9 @@
 						"left": { "type": "Abs", "value": 0 },
 						"right": { "type": "Abs", "value": 0 }
 					},
-					"gap": { "x": { "type": "Abs", "value": 0 }, "y": { "type": "Abs", "value": 20 } }
+					"gap": { "x": { "type": "Abs", "value": 0 }, "y": { "type": "Abs", "value": 20 } },
+					"horizontalSizingMode": "Hug",
+					"verticalSizingMode": "Hug"
 				},
 				"visible": true,
 				"children": ["16", "3"],
@@ -65,7 +73,11 @@
 				"cornerRadii": [0, 0, 0, 0],
 				"blendMode": "Normal",
 				"opacity": 1,
-				"layoutElement": { "type": "Static" },
+				"layoutElement": {
+					"type": "Static",
+					"horizontalSizingMode": "Fixed",
+					"verticalSizingMode": "Fixed"
+				},
 				"styles": []
 			},
 			"3": {
@@ -81,7 +93,9 @@
 						"left": { "type": "Abs", "value": 0 },
 						"right": { "type": "Abs", "value": 0 }
 					},
-					"gap": { "x": { "type": "Abs", "value": 16 }, "y": { "type": "Abs", "value": 0 } }
+					"gap": { "x": { "type": "Abs", "value": 16 }, "y": { "type": "Abs", "value": 0 } },
+					"horizontalSizingMode": "Fixed",
+					"verticalSizingMode": "Hug"
 				},
 				"visible": true,
 				"children": ["6", "4"],
@@ -91,7 +105,11 @@
 				"cornerRadii": [0, 0, 0, 0],
 				"blendMode": "Normal",
 				"opacity": 1,
-				"layoutElement": { "type": "Static" },
+				"layoutElement": {
+					"type": "Static",
+					"horizontalSizingMode": "Fixed",
+					"verticalSizingMode": "Fixed"
+				},
 				"styles": []
 			},
 			"4": {
@@ -105,7 +123,11 @@
 				"rotationDeg": 0,
 				"blendMode": "Normal",
 				"opacity": 1,
-				"layoutElement": { "type": "Static" },
+				"layoutElement": {
+					"type": "Static",
+					"horizontalSizingMode": "Fixed",
+					"verticalSizingMode": "Fixed"
+				},
 				"styles": [
 					{ "type": "Fill", "paintId": "5", "blendMode": "Normal", "opacity": 1, "visible": true }
 				]
@@ -123,7 +145,9 @@
 						"left": { "type": "Abs", "value": 0 },
 						"right": { "type": "Abs", "value": 0 }
 					},
-					"gap": { "x": { "type": "Abs", "value": 0 }, "y": { "type": "Abs", "value": 6 } }
+					"gap": { "x": { "type": "Abs", "value": 0 }, "y": { "type": "Abs", "value": 6 } },
+					"horizontalSizingMode": "Fixed",
+					"verticalSizingMode": "Hug"
 				},
 				"visible": true,
 				"children": ["13", "7"],
@@ -133,7 +157,11 @@
 				"cornerRadii": [0, 0, 0, 0],
 				"blendMode": "Normal",
 				"opacity": 1,
-				"layoutElement": { "type": "Static" },
+				"layoutElement": {
+					"type": "Static",
+					"horizontalSizingMode": "Fixed",
+					"verticalSizingMode": "Fixed"
+				},
 				"styles": []
 			},
 			"7": {
@@ -149,7 +177,9 @@
 						"left": { "type": "Abs", "value": 0 },
 						"right": { "type": "Abs", "value": 0 }
 					},
-					"gap": { "x": { "type": "Abs", "value": 10 }, "y": { "type": "Abs", "value": 0 } }
+					"gap": { "x": { "type": "Abs", "value": 10 }, "y": { "type": "Abs", "value": 0 } },
+					"horizontalSizingMode": "Fixed",
+					"verticalSizingMode": "Hug"
 				},
 				"visible": true,
 				"children": ["11", "8"],
@@ -159,7 +189,11 @@
 				"cornerRadii": [0, 0, 0, 0],
 				"blendMode": "Normal",
 				"opacity": 1,
-				"layoutElement": { "type": "Static" },
+				"layoutElement": {
+					"type": "Static",
+					"horizontalSizingMode": "Fixed",
+					"verticalSizingMode": "Fixed"
+				},
 				"styles": []
 			},
 			"8": {
@@ -182,13 +216,18 @@
 				"lineWrap": "Word",
 				"horizontalTextAlignment": "Left",
 				"verticalTextAlignment": "Top",
+				"sizingMode": "WidthAndHeight",
 				"visible": true,
 				"size": [177, 39],
 				"translation": [0, 0],
 				"rotationDeg": 0,
 				"blendMode": "Normal",
 				"opacity": 1,
-				"layoutElement": { "type": "Static" },
+				"layoutElement": {
+					"type": "Static",
+					"horizontalSizingMode": "Fixed",
+					"verticalSizingMode": "Fixed"
+				},
 				"styles": [
 					{ "type": "Fill", "paintId": "10", "blendMode": "Normal", "opacity": 1, "visible": true }
 				]
@@ -203,7 +242,11 @@
 				"rotationDeg": 0,
 				"blendMode": "Normal",
 				"opacity": 1,
-				"layoutElement": { "type": "Static" },
+				"layoutElement": {
+					"type": "Static",
+					"horizontalSizingMode": "Fixed",
+					"verticalSizingMode": "Fixed"
+				},
 				"styles": [
 					{ "type": "Fill", "paintId": "12", "blendMode": "Normal", "opacity": 1, "visible": true }
 				]
@@ -228,13 +271,18 @@
 				"lineWrap": "Word",
 				"horizontalTextAlignment": "Left",
 				"verticalTextAlignment": "Top",
+				"sizingMode": "WidthAndHeight",
 				"visible": true,
 				"size": [179, 39],
 				"translation": [0, 45],
 				"rotationDeg": 0,
 				"blendMode": "Normal",
 				"opacity": 1,
-				"layoutElement": { "type": "Static" },
+				"layoutElement": {
+					"type": "Static",
+					"horizontalSizingMode": "Fixed",
+					"verticalSizingMode": "Fixed"
+				},
 				"styles": [
 					{ "type": "Fill", "paintId": "15", "blendMode": "Normal", "opacity": 1, "visible": true }
 				]
@@ -260,13 +308,18 @@
 				"lineWrap": "Word",
 				"horizontalTextAlignment": "Left",
 				"verticalTextAlignment": "Top",
+				"sizingMode": "Height",
 				"visible": true,
 				"size": [790, 110],
 				"translation": [0, 140],
 				"rotationDeg": 0,
 				"blendMode": "Normal",
 				"opacity": 1,
-				"layoutElement": { "type": "Static" },
+				"layoutElement": {
+					"type": "Static",
+					"horizontalSizingMode": "Fixed",
+					"verticalSizingMode": "Fixed"
+				},
 				"styles": [
 					{ "type": "Fill", "paintId": "10", "blendMode": "Normal", "opacity": 1, "visible": true }
 				]
@@ -284,7 +337,9 @@
 						"left": { "type": "Abs", "value": 0 },
 						"right": { "type": "Abs", "value": 0 }
 					},
-					"gap": { "x": { "type": "Abs", "value": 10 }, "y": { "type": "Abs", "value": 0 } }
+					"gap": { "x": { "type": "Abs", "value": 10 }, "y": { "type": "Abs", "value": 0 } },
+					"horizontalSizingMode": "Fixed",
+					"verticalSizingMode": "Hug"
 				},
 				"visible": true,
 				"children": ["21", "20", "18"],
@@ -294,7 +349,11 @@
 				"cornerRadii": [0, 0, 0, 0],
 				"blendMode": "Normal",
 				"opacity": 1,
-				"layoutElement": { "type": "Static" },
+				"layoutElement": {
+					"type": "Static",
+					"horizontalSizingMode": "Fixed",
+					"verticalSizingMode": "Fixed"
+				},
 				"styles": []
 			},
 			"18": {
@@ -317,13 +376,18 @@
 				"lineWrap": "Word",
 				"horizontalTextAlignment": "Left",
 				"verticalTextAlignment": "Top",
+				"sizingMode": "WidthAndHeight",
 				"visible": true,
 				"size": [274, 31],
 				"translation": [0, 0],
 				"rotationDeg": 0,
 				"blendMode": "Normal",
 				"opacity": 1,
-				"layoutElement": { "type": "Static" },
+				"layoutElement": {
+					"type": "Static",
+					"horizontalSizingMode": "Fixed",
+					"verticalSizingMode": "Fixed"
+				},
 				"styles": [
 					{ "type": "Fill", "paintId": "15", "blendMode": "Normal", "opacity": 1, "visible": true }
 				]
@@ -348,13 +412,18 @@
 				"lineWrap": "Word",
 				"horizontalTextAlignment": "Center",
 				"verticalTextAlignment": "Top",
+				"sizingMode": "WidthAndHeight",
 				"visible": true,
 				"size": [8, 31],
 				"translation": [284, 0],
 				"rotationDeg": 0,
 				"blendMode": "Normal",
 				"opacity": 1,
-				"layoutElement": { "type": "Static" },
+				"layoutElement": {
+					"type": "Static",
+					"horizontalSizingMode": "Fixed",
+					"verticalSizingMode": "Fixed"
+				},
 				"styles": [
 					{ "type": "Fill", "paintId": "15", "blendMode": "Normal", "opacity": 1, "visible": true }
 				]
@@ -379,13 +448,18 @@
 				"lineWrap": "Word",
 				"horizontalTextAlignment": "Left",
 				"verticalTextAlignment": "Top",
+				"sizingMode": "WidthAndHeight",
 				"visible": true,
 				"size": [197, 31],
 				"translation": [302, 0],
 				"rotationDeg": 0,
 				"blendMode": "Normal",
 				"opacity": 1,
-				"layoutElement": { "type": "Static" },
+				"layoutElement": {
+					"type": "Static",
+					"horizontalSizingMode": "Fixed",
+					"verticalSizingMode": "Fixed"
+				},
 				"styles": [
 					{ "type": "Fill", "paintId": "22", "blendMode": "Normal", "opacity": 1, "visible": true }
 				]

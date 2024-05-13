@@ -24,7 +24,7 @@ use bevy_transform::components::{GlobalTransform, Transform};
 use dyn_comp_bundles::components::{
     marker::Root,
     mixins::{SizeMixin, StaticLayoutElementMixin, StaticLayoutParentMixin},
-    nodes::CompNode,
+    nodes::{CompNode, TextCompNode},
 };
 use dyn_comp_core::resources::composition::CompositionRes;
 
@@ -45,6 +45,7 @@ pub fn cursor_moved_on_comp_input_system(
                 Option<&Parent>,
                 Option<&mut StaticLayoutParentMixin>,
                 Option<&mut StaticLayoutElementMixin>,
+                Option<&mut TextCompNode>,
             ),
             With<Selected>,
         >,

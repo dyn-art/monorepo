@@ -10,7 +10,7 @@ pub mod shape_tokens;
 pub mod span;
 pub mod utils;
 
-use attrs::{Attrs, AttrsInterval};
+use attrs::{AttrsInterval, TextAttrs};
 pub use dyn_fonts_book;
 use dyn_fonts_book::FontsBook;
 use dyn_utils::{properties::size::Size, units::abs::Abs};
@@ -67,10 +67,6 @@ impl AttributedString {
         &self.spans
     }
 
-    pub fn get_size(&self) -> &Size {
-        &self.config.size
-    }
-
     pub fn tokenize_text(&mut self, fonts_book: &mut FontsBook) {
         self.divide_overlapping_spans();
 
@@ -81,26 +77,24 @@ impl AttributedString {
         }
     }
 
-    pub fn apply_size(&mut self, size: Size) {
-        self.config.size = size;
-        self.layout_lines();
-    }
-
-    pub fn layout(&mut self) {
+    pub fn layout(&mut self, size: &Size, sizing_mode: &TextSizingMode) {
         for (span, ..) in self.spans.iter_mut() {
             span.apply_letter_spacing();
             span.apply_word_spacing();
         }
-        self.layout_lines();
+        self.layout_lines(size, sizing_mode);
     }
 
-    pub fn layout_lines(&mut self) {
-        let lines = self.compute_lines();
+    pub fn layout_lines(&mut self, size: &Size, sizing_mode: &TextSizingMode) {
+        let lines = self.compute_lines(size, sizing_mode);
 
-        let container_width = self.config.size.width;
-        let container_height = self.config.size.height;
+        let container_width = size.width;
+        let container_height = size.height;
 
-        let total_text_height = lines
+        // let text_width = lines.iter().fold(Abs::zero(), |acc, line| {
+        //     acc.max(line.get_width(&self.spans))
+        // });
+        let text_height = lines
             .iter()
             .enumerate()
             .fold(Abs::zero(), |acc, (index, line)| {
@@ -112,8 +106,8 @@ impl AttributedString {
             });
         let vertical_alignment_correction = match self.config.vertical_text_alignment {
             VerticalTextAlignment::Top => Abs::zero(),
-            VerticalTextAlignment::Bottom => container_height - total_text_height,
-            VerticalTextAlignment::Center => (container_height - total_text_height) / 2.0,
+            VerticalTextAlignment::Bottom => container_height - text_height,
+            VerticalTextAlignment::Center => (container_height - text_height) / 2.0,
         };
 
         let mut curr_pos_x: Abs;
@@ -167,13 +161,15 @@ impl AttributedString {
         self.lines = lines;
     }
 
-    pub fn compute_lines(&self) -> Vec<Line> {
-        let mut line_wrap_strategy: Box<dyn LineWrapStrategy> = match self.config.line_wrap {
-            LineWrap::None => Box::new(NoLineWrap),
-            LineWrap::Word => Box::new(WordWrap::new()),
-            _ => Box::new(NoLineWrap),
-        };
-        return line_wrap_strategy.compute_lines(&self.spans, &self.config.size, &self.text);
+    pub fn compute_lines(&self, size: &Size, sizing_mode: &TextSizingMode) -> Vec<Line> {
+        let mut line_wrap_strategy: Box<dyn LineWrapStrategy> =
+            match (sizing_mode, self.config.line_wrap) {
+                (_, LineWrap::None) => Box::new(NoLineWrap),
+                (TextSizingMode::Fixed, LineWrap::Word)
+                | (TextSizingMode::Height, LineWrap::Word) => Box::new(WordWrap::new()),
+                _ => Box::new(NoLineWrap),
+            };
+        return line_wrap_strategy.compute_lines(&self.spans, size, &self.text);
     }
 
     fn divide_overlapping_spans(&mut self) {
@@ -190,7 +186,7 @@ impl AttributedString {
                         return overlap;
                     }
                     _ => {
-                        let mut merged_attrs = Attrs::new();
+                        let mut merged_attrs = TextAttrs::new();
                         for &span in overlaps.iter() {
                             merged_attrs.merge(span.get_attrs().clone());
                         }
@@ -206,7 +202,7 @@ impl AttributedString {
             attrs_intervals.push(AttrsInterval {
                 start: 0,
                 stop: text.len(),
-                val: Attrs::new(),
+                val: TextAttrs::new(),
             });
             return;
         }
@@ -241,7 +237,6 @@ impl AttributedString {
 
 #[derive(Debug, Default, Clone)]
 pub struct AttributedStringConfig {
-    pub size: Size,
     pub line_wrap: LineWrap,
     pub horizontal_text_alignment: HorizontalTextAlignment,
     pub vertical_text_alignment: VerticalTextAlignment,
@@ -256,12 +251,12 @@ pub enum LineWrap {
     /// No wrapping
     #[default]
     None,
-    /// Wraps at a glyph level
-    Glyph,
+    // /// Wraps at a glyph level
+    // Glyph,
     /// Wraps at the word level
     Word,
-    /// Wraps at the word level, or fallback to glyph level if a word can't fit on a line by itself
-    WordOrGlyph,
+    // /// Wraps at the word level, or fallback to glyph level if a word can't fit on a line by itself
+    // WordOrGlyph,
 }
 
 #[derive(Debug, Default, Clone, Copy)]
@@ -290,4 +285,16 @@ pub enum VerticalTextAlignment {
     Bottom,
     Center,
     // Justified, // TODO
+}
+
+#[derive(Debug, Default, PartialEq, Eq, Copy, Clone)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type)
+)]
+pub enum TextSizingMode {
+    #[default]
+    WidthAndHeight,
+    Height,
+    Fixed,
 }

@@ -1401,17 +1401,9 @@ export type LineWrap =
  */
 "None" | 
 /**
- * Wraps at a glyph level
- */
-"Glyph" | 
-/**
  * Wraps at the word level
  */
-"Word" | 
-/**
- * Wraps at the word level, or fallback to glyph level if a word can't fit on a line by itself
- */
-"WordOrGlyph"
+"Word"
 
 export type Mat3 = [number, number, number, number, number, number, number, number, number]
 

@@ -893,6 +893,7 @@ dependencies = [
  "bevy_ecs",
  "bevy_hierarchy",
  "bevy_transform",
+ "dyn-attributed-string",
  "dyn-comp-bundles",
  "dyn-comp-core",
  "dyn-utils",

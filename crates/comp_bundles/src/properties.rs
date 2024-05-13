@@ -1,5 +1,5 @@
 use dyn_attributed_string::{
-    attrs::{Attrs, AttrsInterval},
+    attrs::{AttrsInterval, TextAttrs},
     dyn_fonts_book::font::{
         info::FontFamily,
         variant::{FontStretch, FontStyle, FontWeight},
@@ -39,7 +39,7 @@ impl TextAttributeInterval {
         AttrsInterval {
             start: self.start,
             stop: self.end,
-            val: Attrs {
+            val: TextAttrs {
                 font_id: None,
                 font_family: self.attributes.font_family.clone(),
                 font_style: self.attributes.font_style,
@@ -265,16 +265,4 @@ impl From<FlexDirection> for taffy::FlexDirection {
             FlexDirection::ColumnReverse => taffy::FlexDirection::ColumnReverse,
         }
     }
-}
-
-#[derive(Debug, Default, PartialEq, Eq, Copy, Clone)]
-#[cfg_attr(
-    feature = "serde_support",
-    derive(serde::Serialize, serde::Deserialize, specta::Type)
-)]
-pub enum TextSizingMode {
-    #[default]
-    WidthAndHeight,
-    Height,
-    Fixed,
 }

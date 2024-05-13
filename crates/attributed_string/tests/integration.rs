@@ -2,7 +2,7 @@ mod common;
 
 use common::assert_attributed_string_rendered;
 use dyn_attributed_string::{
-    attrs::{Attrs, AttrsInterval},
+    attrs::{AttrsInterval, TextAttrs},
     AttributedString, AttributedStringConfig, HorizontalTextAlignment, LineWrap,
     VerticalTextAlignment,
 };
@@ -18,19 +18,20 @@ fn test_hebrew_word() {
     let attrs_intervals = vec![AttrsInterval {
         start: 0,
         stop: text.len(),
-        val: Attrs::new()
+        val: TextAttrs::new()
             .font_family(FontFamily::Named(String::from("Noto Sans")))
             .font_size(Abs::pt(36.0))
             .line_height(FontUnit::abs(Abs::pt(40.0))),
     }];
-    let config = AttributedStringConfig {
-        size: Size::new(Abs::pt(120.0), Abs::pt(60.0)),
-        ..Default::default()
-    };
+    let config = AttributedStringConfig::default();
 
     let mut attributed_string = AttributedString::new(text, attrs_intervals, config);
 
-    assert_attributed_string_rendered("test_hebrew_word", &mut attributed_string);
+    assert_attributed_string_rendered(
+        "test_hebrew_word",
+        &mut attributed_string,
+        &Size::new(Abs::pt(120.0), Abs::pt(60.0)),
+    );
 }
 
 #[test]
@@ -39,20 +40,23 @@ fn test_hebrew_paragraph() {
     let attrs_intervals = vec![AttrsInterval {
         start: 0,
         stop: text.len(),
-        val: Attrs::new()
+        val: TextAttrs::new()
             .font_family(FontFamily::Named(String::from("Noto Sans")))
             .font_size(Abs::pt(36.0))
             .line_height(FontUnit::abs(Abs::pt(40.0))),
     }];
     let config = AttributedStringConfig {
-        size: Size::new(Abs::pt(400.0), Abs::pt(110.0)),
         line_wrap: LineWrap::Word,
         ..Default::default()
     };
 
     let mut attributed_string = AttributedString::new(text, attrs_intervals, config);
 
-    assert_attributed_string_rendered("test_hebrew_paragraph", &mut attributed_string);
+    assert_attributed_string_rendered(
+        "test_hebrew_paragraph",
+        &mut attributed_string,
+        &Size::new(Abs::pt(400.0), Abs::pt(110.0)),
+    );
 }
 
 #[test]
@@ -61,13 +65,12 @@ fn test_english_mixed_with_hebrew_paragraph() {
     let attrs_intervals = vec![AttrsInterval {
         start: 0,
         stop: text.len(),
-        val: Attrs::new()
+        val: TextAttrs::new()
             .font_family(FontFamily::Named(String::from("Noto Sans")))
             .font_size(Abs::pt(16.0))
             .line_height(FontUnit::abs(Abs::pt(20.0))),
     }];
     let config = AttributedStringConfig {
-        size: Size::new(Abs::pt(400.0), Abs::pt(120.0)),
         line_wrap: LineWrap::Word,
         ..Default::default()
     };
@@ -77,6 +80,7 @@ fn test_english_mixed_with_hebrew_paragraph() {
     assert_attributed_string_rendered(
         "test_english_mixed_with_hebrew_paragraph",
         &mut attributed_string,
+        &Size::new(Abs::pt(400.0), Abs::pt(120.0)),
     );
 }
 
@@ -86,19 +90,22 @@ fn test_arabic_word() {
     let attrs_intervals = vec![AttrsInterval {
         start: 0,
         stop: text.len(),
-        val: Attrs::new()
+        val: TextAttrs::new()
             .font_family(FontFamily::Named(String::from("Noto Sans")))
             .font_size(Abs::pt(36.0))
             .line_height(FontUnit::abs(Abs::pt(40.0))),
     }];
     let config = AttributedStringConfig {
-        size: Size::new(Abs::pt(120.0), Abs::pt(60.0)),
         ..Default::default()
     };
 
     let mut attributed_string = AttributedString::new(text, attrs_intervals, config);
 
-    assert_attributed_string_rendered("test_arabic_word", &mut attributed_string);
+    assert_attributed_string_rendered(
+        "test_arabic_word",
+        &mut attributed_string,
+        &Size::new(Abs::pt(120.0), Abs::pt(60.0)),
+    );
 }
 
 #[test]
@@ -107,20 +114,23 @@ fn test_arabic_paragraph() {
     let attrs_intervals = vec![AttrsInterval {
         start: 0,
         stop: text.len(),
-        val: Attrs::new()
+        val: TextAttrs::new()
             .font_family(FontFamily::Named(String::from("Noto Sans")))
             .font_size(Abs::pt(36.0))
             .line_height(FontUnit::abs(Abs::pt(40.0))),
     }];
     let config = AttributedStringConfig {
-        size: Size::new(Abs::pt(400.0), Abs::pt(110.0)),
         line_wrap: LineWrap::Word,
         ..Default::default()
     };
 
     let mut attributed_string = AttributedString::new(text, attrs_intervals, config);
 
-    assert_attributed_string_rendered("test_arabic_paragraph", &mut attributed_string);
+    assert_attributed_string_rendered(
+        "test_arabic_paragraph",
+        &mut attributed_string,
+        &Size::new(Abs::pt(400.0), Abs::pt(110.0)),
+    );
 }
 
 #[test]
@@ -129,13 +139,12 @@ fn test_english_mixed_with_arabic_paragraph() {
     let attrs_intervals = vec![AttrsInterval {
         start: 0,
         stop: text.len(),
-        val: Attrs::new()
+        val: TextAttrs::new()
             .font_family(FontFamily::Named(String::from("Noto Sans")))
             .font_size(Abs::pt(36.0))
             .line_height(FontUnit::abs(Abs::pt(40.0))),
     }];
     let config = AttributedStringConfig {
-        size: Size::new(Abs::pt(400.0), Abs::pt(110.0)),
         line_wrap: LineWrap::Word,
         ..Default::default()
     };
@@ -145,6 +154,7 @@ fn test_english_mixed_with_arabic_paragraph() {
     assert_attributed_string_rendered(
         "test_english_mixed_with_arabic_paragraph",
         &mut attributed_string,
+        &Size::new(Abs::pt(400.0), Abs::pt(110.0)),
     );
 }
 
@@ -155,7 +165,7 @@ fn test_english_mixed_with_hebrew_paragraph_and_different_fonts() {
         AttrsInterval {
             start: 0,
             stop: 10,
-            val: Attrs::new()
+            val: TextAttrs::new()
                 .font_family(FontFamily::Named(String::from("Fira Mono")))
                 .font_weight(FontWeight::MEDIUM)
                 .font_size(Abs::pt(48.0))
@@ -164,14 +174,13 @@ fn test_english_mixed_with_hebrew_paragraph_and_different_fonts() {
         AttrsInterval {
             start: 10,
             stop: text.len(),
-            val: Attrs::new()
+            val: TextAttrs::new()
                 .font_family(FontFamily::Named(String::from("Noto Sans")))
                 .font_weight(FontWeight::REGULAR)
                 .font_size(Abs::pt(24.0)),
         },
     ];
     let config = AttributedStringConfig {
-        size: Size::new(Abs::pt(300.0), Abs::pt(240.0)),
         line_wrap: LineWrap::Word,
         ..Default::default()
     };
@@ -181,6 +190,7 @@ fn test_english_mixed_with_hebrew_paragraph_and_different_fonts() {
     assert_attributed_string_rendered(
         "test_english_mixed_with_hebrew_paragraph_and_different_fonts",
         &mut attributed_string,
+        &Size::new(Abs::pt(300.0), Abs::pt(240.0)),
     );
 }
 
@@ -191,7 +201,7 @@ fn test_horizontal_text_align_start() {
         AttrsInterval {
             start: 0,
             stop: 10,
-            val: Attrs::new()
+            val: TextAttrs::new()
                 .font_family(FontFamily::Named(String::from("Fira Mono")))
                 .font_weight(FontWeight::MEDIUM)
                 .font_size(Abs::pt(48.0))
@@ -200,14 +210,13 @@ fn test_horizontal_text_align_start() {
         AttrsInterval {
             start: 10,
             stop: text.len(),
-            val: Attrs::new()
+            val: TextAttrs::new()
                 .font_family(FontFamily::Named(String::from("Noto Sans")))
                 .font_weight(FontWeight::REGULAR)
                 .font_size(Abs::pt(24.0)),
         },
     ];
     let config = AttributedStringConfig {
-        size: Size::new(Abs::pt(300.0), Abs::pt(240.0)),
         line_wrap: LineWrap::Word,
         horizontal_text_alignment: HorizontalTextAlignment::Start,
         ..Default::default()
@@ -215,7 +224,11 @@ fn test_horizontal_text_align_start() {
 
     let mut attributed_string = AttributedString::new(text, attrs_intervals, config);
 
-    assert_attributed_string_rendered("test_horizontal_text_align_start", &mut attributed_string);
+    assert_attributed_string_rendered(
+        "test_horizontal_text_align_start",
+        &mut attributed_string,
+        &Size::new(Abs::pt(300.0), Abs::pt(240.0)),
+    );
 }
 
 #[test]
@@ -225,7 +238,7 @@ fn test_horizontal_text_align_end() {
         AttrsInterval {
             start: 0,
             stop: 10,
-            val: Attrs::new()
+            val: TextAttrs::new()
                 .font_family(FontFamily::Named(String::from("Fira Mono")))
                 .font_weight(FontWeight::MEDIUM)
                 .font_size(Abs::pt(48.0))
@@ -234,14 +247,13 @@ fn test_horizontal_text_align_end() {
         AttrsInterval {
             start: 10,
             stop: text.len(),
-            val: Attrs::new()
+            val: TextAttrs::new()
                 .font_family(FontFamily::Named(String::from("Noto Sans")))
                 .font_weight(FontWeight::REGULAR)
                 .font_size(Abs::pt(24.0)),
         },
     ];
     let config = AttributedStringConfig {
-        size: Size::new(Abs::pt(300.0), Abs::pt(240.0)),
         line_wrap: LineWrap::Word,
         horizontal_text_alignment: HorizontalTextAlignment::End,
         ..Default::default()
@@ -249,7 +261,11 @@ fn test_horizontal_text_align_end() {
 
     let mut attributed_string = AttributedString::new(text, attrs_intervals, config);
 
-    assert_attributed_string_rendered("test_horizontal_text_align_end", &mut attributed_string);
+    assert_attributed_string_rendered(
+        "test_horizontal_text_align_end",
+        &mut attributed_string,
+        &Size::new(Abs::pt(300.0), Abs::pt(240.0)),
+    );
 }
 
 #[test]
@@ -259,7 +275,7 @@ fn test_horizontal_text_align_left() {
         AttrsInterval {
             start: 0,
             stop: 10,
-            val: Attrs::new()
+            val: TextAttrs::new()
                 .font_family(FontFamily::Named(String::from("Fira Mono")))
                 .font_weight(FontWeight::MEDIUM)
                 .font_size(Abs::pt(48.0))
@@ -268,14 +284,13 @@ fn test_horizontal_text_align_left() {
         AttrsInterval {
             start: 10,
             stop: text.len(),
-            val: Attrs::new()
+            val: TextAttrs::new()
                 .font_family(FontFamily::Named(String::from("Noto Sans")))
                 .font_weight(FontWeight::REGULAR)
                 .font_size(Abs::pt(24.0)),
         },
     ];
     let config = AttributedStringConfig {
-        size: Size::new(Abs::pt(300.0), Abs::pt(240.0)),
         line_wrap: LineWrap::Word,
         horizontal_text_alignment: HorizontalTextAlignment::Left,
         ..Default::default()
@@ -283,7 +298,11 @@ fn test_horizontal_text_align_left() {
 
     let mut attributed_string = AttributedString::new(text, attrs_intervals, config);
 
-    assert_attributed_string_rendered("test_horizontal_text_align_left", &mut attributed_string);
+    assert_attributed_string_rendered(
+        "test_horizontal_text_align_left",
+        &mut attributed_string,
+        &Size::new(Abs::pt(300.0), Abs::pt(240.0)),
+    );
 }
 
 #[test]
@@ -293,7 +312,7 @@ fn test_horizontal_text_align_right() {
         AttrsInterval {
             start: 0,
             stop: 10,
-            val: Attrs::new()
+            val: TextAttrs::new()
                 .font_family(FontFamily::Named(String::from("Fira Mono")))
                 .font_weight(FontWeight::MEDIUM)
                 .font_size(Abs::pt(48.0))
@@ -302,14 +321,13 @@ fn test_horizontal_text_align_right() {
         AttrsInterval {
             start: 10,
             stop: text.len(),
-            val: Attrs::new()
+            val: TextAttrs::new()
                 .font_family(FontFamily::Named(String::from("Noto Sans")))
                 .font_weight(FontWeight::REGULAR)
                 .font_size(Abs::pt(24.0)),
         },
     ];
     let config = AttributedStringConfig {
-        size: Size::new(Abs::pt(300.0), Abs::pt(240.0)),
         line_wrap: LineWrap::Word,
         horizontal_text_alignment: HorizontalTextAlignment::Right,
         ..Default::default()
@@ -317,7 +335,11 @@ fn test_horizontal_text_align_right() {
 
     let mut attributed_string = AttributedString::new(text, attrs_intervals, config);
 
-    assert_attributed_string_rendered("test_horizontal_text_align_right", &mut attributed_string);
+    assert_attributed_string_rendered(
+        "test_horizontal_text_align_right",
+        &mut attributed_string,
+        &Size::new(Abs::pt(300.0), Abs::pt(240.0)),
+    );
 }
 
 #[test]
@@ -327,7 +349,7 @@ fn test_horizontal_text_align_center() {
         AttrsInterval {
             start: 0,
             stop: 10,
-            val: Attrs::new()
+            val: TextAttrs::new()
                 .font_family(FontFamily::Named(String::from("Fira Mono")))
                 .font_weight(FontWeight::MEDIUM)
                 .font_size(Abs::pt(48.0))
@@ -336,14 +358,13 @@ fn test_horizontal_text_align_center() {
         AttrsInterval {
             start: 10,
             stop: text.len(),
-            val: Attrs::new()
+            val: TextAttrs::new()
                 .font_family(FontFamily::Named(String::from("Noto Sans")))
                 .font_weight(FontWeight::REGULAR)
                 .font_size(Abs::pt(24.0)),
         },
     ];
     let config = AttributedStringConfig {
-        size: Size::new(Abs::pt(300.0), Abs::pt(240.0)),
         line_wrap: LineWrap::Word,
         horizontal_text_alignment: HorizontalTextAlignment::Center,
         ..Default::default()
@@ -351,7 +372,11 @@ fn test_horizontal_text_align_center() {
 
     let mut attributed_string = AttributedString::new(text, attrs_intervals, config);
 
-    assert_attributed_string_rendered("test_horizontal_text_align_center", &mut attributed_string);
+    assert_attributed_string_rendered(
+        "test_horizontal_text_align_center",
+        &mut attributed_string,
+        &Size::new(Abs::pt(300.0), Abs::pt(240.0)),
+    );
 }
 
 #[test]
@@ -361,7 +386,7 @@ fn test_vertical_text_align_top() {
         AttrsInterval {
             start: 0,
             stop: 10,
-            val: Attrs::new()
+            val: TextAttrs::new()
                 .font_family(FontFamily::Named(String::from("Fira Mono")))
                 .font_weight(FontWeight::MEDIUM)
                 .font_size(Abs::pt(48.0))
@@ -370,14 +395,13 @@ fn test_vertical_text_align_top() {
         AttrsInterval {
             start: 10,
             stop: text.len(),
-            val: Attrs::new()
+            val: TextAttrs::new()
                 .font_family(FontFamily::Named(String::from("Noto Sans")))
                 .font_weight(FontWeight::REGULAR)
                 .font_size(Abs::pt(24.0)),
         },
     ];
     let config = AttributedStringConfig {
-        size: Size::new(Abs::pt(300.0), Abs::pt(300.0)),
         line_wrap: LineWrap::Word,
         vertical_text_alignment: VerticalTextAlignment::Top,
         ..Default::default()
@@ -385,7 +409,11 @@ fn test_vertical_text_align_top() {
 
     let mut attributed_string = AttributedString::new(text, attrs_intervals, config);
 
-    assert_attributed_string_rendered("test_vertical_text_align_top", &mut attributed_string);
+    assert_attributed_string_rendered(
+        "test_vertical_text_align_top",
+        &mut attributed_string,
+        &Size::new(Abs::pt(300.0), Abs::pt(300.0)),
+    );
 }
 
 #[test]
@@ -395,7 +423,7 @@ fn test_vertical_text_align_bottom() {
         AttrsInterval {
             start: 0,
             stop: 10,
-            val: Attrs::new()
+            val: TextAttrs::new()
                 .font_family(FontFamily::Named(String::from("Fira Mono")))
                 .font_weight(FontWeight::MEDIUM)
                 .font_size(Abs::pt(48.0))
@@ -404,14 +432,13 @@ fn test_vertical_text_align_bottom() {
         AttrsInterval {
             start: 10,
             stop: text.len(),
-            val: Attrs::new()
+            val: TextAttrs::new()
                 .font_family(FontFamily::Named(String::from("Noto Sans")))
                 .font_weight(FontWeight::REGULAR)
                 .font_size(Abs::pt(24.0)),
         },
     ];
     let config = AttributedStringConfig {
-        size: Size::new(Abs::pt(300.0), Abs::pt(300.0)),
         line_wrap: LineWrap::Word,
         vertical_text_alignment: VerticalTextAlignment::Bottom,
         ..Default::default()
@@ -419,7 +446,11 @@ fn test_vertical_text_align_bottom() {
 
     let mut attributed_string = AttributedString::new(text, attrs_intervals, config);
 
-    assert_attributed_string_rendered("test_vertical_text_align_bottom", &mut attributed_string);
+    assert_attributed_string_rendered(
+        "test_vertical_text_align_bottom",
+        &mut attributed_string,
+        &Size::new(Abs::pt(300.0), Abs::pt(300.0)),
+    );
 }
 
 #[test]
@@ -429,7 +460,7 @@ fn test_vertical_text_align_center() {
         AttrsInterval {
             start: 0,
             stop: 10,
-            val: Attrs::new()
+            val: TextAttrs::new()
                 .font_family(FontFamily::Named(String::from("Fira Mono")))
                 .font_weight(FontWeight::MEDIUM)
                 .font_size(Abs::pt(48.0))
@@ -438,14 +469,13 @@ fn test_vertical_text_align_center() {
         AttrsInterval {
             start: 10,
             stop: text.len(),
-            val: Attrs::new()
+            val: TextAttrs::new()
                 .font_family(FontFamily::Named(String::from("Noto Sans")))
                 .font_weight(FontWeight::REGULAR)
                 .font_size(Abs::pt(24.0)),
         },
     ];
     let config = AttributedStringConfig {
-        size: Size::new(Abs::pt(300.0), Abs::pt(300.0)),
         line_wrap: LineWrap::Word,
         vertical_text_alignment: VerticalTextAlignment::Center,
         ..Default::default()
@@ -453,5 +483,9 @@ fn test_vertical_text_align_center() {
 
     let mut attributed_string = AttributedString::new(text, attrs_intervals, config);
 
-    assert_attributed_string_rendered("test_vertical_text_align_center", &mut attributed_string);
+    assert_attributed_string_rendered(
+        "test_vertical_text_align_center",
+        &mut attributed_string,
+        &Size::new(Abs::pt(300.0), Abs::pt(300.0)),
+    );
 }

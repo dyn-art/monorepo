@@ -1,6 +1,8 @@
-use crate::properties::{TextAttributeInterval, TextSizingMode};
+use crate::properties::TextAttributeInterval;
 use bevy_ecs::component::Component;
-use dyn_attributed_string::{HorizontalTextAlignment, LineWrap, VerticalTextAlignment};
+use dyn_attributed_string::{
+    HorizontalTextAlignment, LineWrap, TextSizingMode, VerticalTextAlignment,
+};
 use smallvec::SmallVec;
 use std::f32::consts::PI;
 

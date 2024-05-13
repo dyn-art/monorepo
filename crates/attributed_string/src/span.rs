@@ -1,5 +1,5 @@
 use crate::{
-    attrs::Attrs,
+    attrs::TextAttrs,
     script::script_supports_letter_spacing,
     shape_tokens::{
         glyph::GlyphToken, linebreak::LinebreakToken, text_fragment::TextFragmentToken,
@@ -21,17 +21,17 @@ pub struct Span {
     dirty: bool,
     tokens: Vec<ShapeTokenVariant>,
     bidi_level: Option<unicode_bidi::Level>,
-    attrs: Attrs,
+    attrs: TextAttrs,
 }
 
 impl Span {
-    pub fn new(range: Range<usize>, attrs: Attrs) -> Self {
+    pub fn new(range: Range<usize>, attrs: TextAttrs) -> Self {
         Self::new_with_bidi(range, attrs, None)
     }
 
     pub fn new_with_bidi(
         range: Range<usize>,
-        attrs: Attrs,
+        attrs: TextAttrs,
         bidi_level: Option<unicode_bidi::Level>,
     ) -> Self {
         Self {
@@ -69,7 +69,7 @@ impl Span {
     }
 
     #[inline]
-    pub fn get_attrs(&self) -> &Attrs {
+    pub fn get_attrs(&self) -> &TextAttrs {
         &self.attrs
     }
 

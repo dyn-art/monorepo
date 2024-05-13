@@ -1,5 +1,5 @@
 use super::{glyph::GlyphToken, ShapeBuffer, ShapeToken};
-use crate::{attrs::Attrs, shape::shape_text_with_fallback};
+use crate::{attrs::TextAttrs, shape::shape_text_with_fallback};
 use dyn_fonts_book::FontsBook;
 use dyn_utils::units::abs::Abs;
 use std::ops::Range;
@@ -16,7 +16,7 @@ impl WordSeparatorToken {
     pub fn from_text(
         text: &str,
         range: Range<usize>,
-        attrs: &Attrs,
+        attrs: &TextAttrs,
         shape_buffer: &mut ShapeBuffer,
         fonts_book: &mut FontsBook,
     ) -> Self {

@@ -7,7 +7,8 @@ use dyn_utils::units::{abs::Abs, font_unit::FontUnit};
 use rust_lapper::Interval;
 
 #[derive(Debug, PartialEq, Eq, Clone)]
-pub struct Attrs {
+
+pub struct TextAttrs {
     pub font_id: Option<FontId>,
     pub font_family: Option<FontFamily>,
     pub font_style: Option<FontStyle>,
@@ -21,7 +22,7 @@ pub struct Attrs {
     pub line_height: Option<FontUnit>,
 }
 
-impl Attrs {
+impl TextAttrs {
     pub fn new() -> Self {
         Self {
             font_id: None,
@@ -151,7 +152,7 @@ impl Attrs {
         }
     }
 
-    pub fn merge(&mut self, to_merge_attrs: Attrs) {
+    pub fn merge(&mut self, to_merge_attrs: TextAttrs) {
         if self.font_family.is_none() && to_merge_attrs.font_family.is_some() {
             self.font_family = to_merge_attrs.font_family;
         }
@@ -185,4 +186,4 @@ impl Attrs {
     }
 }
 
-pub type AttrsInterval = Interval<usize, Attrs>;
+pub type AttrsInterval = Interval<usize, TextAttrs>;

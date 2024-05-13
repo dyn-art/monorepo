@@ -3,7 +3,9 @@ use crate::{
 };
 use bevy_ecs::world::{EntityWorldMut, World};
 use bevy_transform::{components::Transform, TransformBundle};
-use dyn_attributed_string::{HorizontalTextAlignment, LineWrap, VerticalTextAlignment};
+use dyn_attributed_string::{
+    HorizontalTextAlignment, LineWrap, TextSizingMode, VerticalTextAlignment,
+};
 use dyn_comp_bundles::{
     components::{
         mixins::{
@@ -16,7 +18,7 @@ use dyn_comp_bundles::{
             PolygonCompNode, RectangleCompNode, StarCompNode, TextCompNode, VectorCompNode,
         },
     },
-    properties::{TextAttributeInterval, TextSizingMode},
+    properties::TextAttributeInterval,
     EllipseCompNodeBundle, FrameCompNodeBundle, PolygonCompNodeBundle, RectangleCompNodeBundle,
     StarCompNodeBundle, TextCompNodeBundle, VectorNodeBundle,
 };
