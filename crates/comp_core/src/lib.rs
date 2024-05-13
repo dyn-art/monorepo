@@ -28,15 +28,11 @@ use systems::{
         },
     },
     outline::{
-        ellipse::outline_ellipse,
-        polygon::outline_polygon,
-        rectangle::outline_rectangle,
-        star::outline_star,
-        text::{
-            outline_text_from_scratch, outline_text_on_node_change, outline_text_on_size_change,
-        },
+        ellipse::outline_ellipse, polygon::outline_polygon, rectangle::outline_rectangle,
+        star::outline_star, text::outline_text,
     },
     stroke::stroke_path_system,
+    text::{compute_text_from_scratch, compute_text_on_node_change, compute_text_on_size_change},
     tick::collect_first_tick,
     vector::resize_vector_node,
 };
@@ -140,6 +136,14 @@ impl Plugin for CompCorePlugin {
         app.add_systems(
             Update,
             (
+                compute_text_from_scratch.in_set(CompCoreSystemSet::Compute),
+                compute_text_on_size_change.in_set(CompCoreSystemSet::Compute),
+                compute_text_on_node_change.in_set(CompCoreSystemSet::Compute),
+            ),
+        );
+        app.add_systems(
+            Update,
+            (
                 discover_new_static_layout_parent_nodes.in_set(CompCoreSystemSet::PreLayout),
                 update_static_layout_parent_nodes_children.in_set(CompCoreSystemSet::PreLayout),
                 mark_nodes_with_static_layout_change_as_stale.in_set(CompCoreSystemSet::PreLayout),
@@ -159,9 +163,7 @@ impl Plugin for CompCorePlugin {
                 outline_ellipse.in_set(CompCoreSystemSet::Outline),
                 outline_star.in_set(CompCoreSystemSet::Outline),
                 outline_polygon.in_set(CompCoreSystemSet::Outline),
-                outline_text_from_scratch.in_set(CompCoreSystemSet::Outline),
-                outline_text_on_size_change.in_set(CompCoreSystemSet::Outline),
-                outline_text_on_node_change.in_set(CompCoreSystemSet::Outline),
+                outline_text.in_set(CompCoreSystemSet::Outline),
                 stroke_path_system.in_set(CompCoreSystemSet::PostOutline),
             ),
         );
