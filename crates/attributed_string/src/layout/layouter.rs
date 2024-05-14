@@ -137,14 +137,7 @@ impl Layouter {
                 .fold(Abs::zero(), |acc, line| acc.max(line.get_x_advance(&spans))),
             self.lines
                 .iter()
-                .enumerate()
-                .fold(Abs::zero(), |acc, (index, line)| {
-                    if index == 0 {
-                        acc + line.get_max_ascent(&spans)
-                    } else {
-                        acc + line.get_max_height(&spans)
-                    }
-                }),
+                .fold(Abs::zero(), |acc, line| acc + line.get_max_height(&spans)),
         )
     }
 
