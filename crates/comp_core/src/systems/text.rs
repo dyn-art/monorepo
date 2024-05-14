@@ -56,7 +56,7 @@ pub fn compute_text_from_scratch(
             horizontal_text_alignment: text.horizontal_text_alignment,
             vertical_text_alignment: text.vertical_text_alignment,
         });
-        layouter.layout(&mut attributed_string);
+        layouter.layout(attributed_string.get_spans_mut());
         let container_size = layouter.get_container_size().unwrap();
 
         // Update bounds
@@ -77,11 +77,16 @@ pub fn compute_text_from_scratch(
 
 pub fn compute_text_on_size_change(
     mut query: Query<
-        (&TextCompNode, &mut AttributedStringMixin, &SizeMixin),
+        (
+            Entity,
+            &TextCompNode,
+            &mut AttributedStringMixin,
+            &SizeMixin,
+        ),
         (With<AttributedStringMixin>, Changed<SizeMixin>),
     >,
 ) {
-    for (text, mut attributed_string_mixin, size_mixin) in query.iter_mut() {
+    for (entity, text, mut attributed_string_mixin, size_mixin) in query.iter_mut() {
         let mut layouter = Layouter::new(LayouterConfig {
             size: match text.sizing_mode {
                 TextSizingMode::Fixed => LayoutSize::new(
@@ -99,6 +104,7 @@ pub fn compute_text_on_size_change(
             horizontal_text_alignment: text.horizontal_text_alignment,
             vertical_text_alignment: text.vertical_text_alignment,
         });
-        layouter.layout(&mut attributed_string_mixin.0);
+        // TODO: attributed_string_mixin will always be marked as changed
+        layouter.layout_lines(attributed_string_mixin.0.get_spans_mut());
     }
 }

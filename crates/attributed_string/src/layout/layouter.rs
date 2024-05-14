@@ -39,15 +39,15 @@ impl Layouter {
         self.container_size
     }
 
-    pub fn layout(&mut self, attributed_string: &mut AttributedString) {
-        for (span, ..) in attributed_string.get_spans_mut().iter_mut() {
+    pub fn layout(&mut self, spans: &mut SpanIntervals) {
+        for (span, ..) in spans.iter_mut() {
             span.apply_letter_spacing();
             span.apply_word_spacing();
         }
-        self.layout_lines(attributed_string.get_spans_mut());
+        self.layout_lines(spans);
     }
 
-    fn layout_lines(&mut self, spans: &mut SpanIntervals) {
+    pub fn layout_lines(&mut self, spans: &mut SpanIntervals) {
         self.lines = self.compute_lines(spans);
 
         let text_size = self.compute_text_size(&spans);

@@ -57,10 +57,11 @@ pub fn assert_attributed_string_rendered(
 
     attributed_string.tokenize_text(&mut fonts_book);
     let mut layouter = Layouter::new(config);
-    layouter.layout(attributed_string);
+    layouter.layout(attributed_string.get_spans_mut());
     let container_size = layouter.get_container_size().unwrap();
 
-    let path = TinySkiaPathBuilder::outline(attributed_string, &mut fonts_book).unwrap();
+    let path =
+        TinySkiaPathBuilder::outline(attributed_string.get_spans(), &mut fonts_book).unwrap();
 
     let mut paint = Paint::default();
     paint.set_color(Color::BLACK);
