@@ -142,7 +142,7 @@
 		{
 			"key": "text",
 			"displayName": "Set Text",
-			"inputType": { "type": "TEXT", "default": "Hello World" },
+			"inputType": { "type": "TEXT", "default": "Hello World", "area": true },
 			"actions": [
 				{
 					"conditions": [],
