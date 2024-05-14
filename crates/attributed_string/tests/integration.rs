@@ -2,8 +2,9 @@ mod common;
 
 use common::assert_attributed_string_rendered;
 use dyn_attributed_string::{
-    layout::layout_config::{
-        HorizontalTextAlignment, LayoutConfig, LayoutSize, LineWrap, VerticalTextAlignment,
+    layout::{
+        layouter::LayouterConfig, HorizontalTextAlignment, LayoutSize, LineWrap,
+        VerticalTextAlignment,
     },
     text_attrs::{TextAttrs, TextAttrsInterval},
     AttributedString,
@@ -28,7 +29,7 @@ fn test_hebrew_word() {
     assert_attributed_string_rendered(
         "test_hebrew_word",
         &mut attributed_string,
-        LayoutConfig {
+        LayouterConfig {
             size: LayoutSize::new(
                 AutoLength::abs(Abs::pt(120.0)),
                 AutoLength::abs(Abs::pt(60.0)),
@@ -55,7 +56,7 @@ fn test_hebrew_paragraph() {
     assert_attributed_string_rendered(
         "test_hebrew_paragraph",
         &mut attributed_string,
-        LayoutConfig {
+        LayouterConfig {
             line_wrap: LineWrap::Word,
             size: LayoutSize::new(
                 AutoLength::abs(Abs::pt(400.0)),
@@ -83,7 +84,7 @@ fn test_english_mixed_with_hebrew_paragraph() {
     assert_attributed_string_rendered(
         "test_english_mixed_with_hebrew_paragraph",
         &mut attributed_string,
-        LayoutConfig {
+        LayouterConfig {
             line_wrap: LineWrap::Word,
             size: LayoutSize::new(
                 AutoLength::abs(Abs::pt(400.0)),
@@ -111,7 +112,7 @@ fn test_arabic_word() {
     assert_attributed_string_rendered(
         "test_arabic_word",
         &mut attributed_string,
-        LayoutConfig {
+        LayouterConfig {
             size: LayoutSize::new(
                 AutoLength::abs(Abs::pt(120.0)),
                 AutoLength::abs(Abs::pt(60.0)),
@@ -138,7 +139,7 @@ fn test_arabic_paragraph() {
     assert_attributed_string_rendered(
         "test_arabic_paragraph",
         &mut attributed_string,
-        LayoutConfig {
+        LayouterConfig {
             line_wrap: LineWrap::Word,
             size: LayoutSize::new(
                 AutoLength::abs(Abs::pt(400.0)),
@@ -166,7 +167,7 @@ fn test_english_mixed_with_arabic_paragraph() {
     assert_attributed_string_rendered(
         "test_english_mixed_with_arabic_paragraph",
         &mut attributed_string,
-        LayoutConfig {
+        LayouterConfig {
             line_wrap: LineWrap::Word,
             size: LayoutSize::new(
                 AutoLength::abs(Abs::pt(400.0)),
@@ -205,7 +206,7 @@ fn test_english_mixed_with_hebrew_paragraph_and_different_fonts() {
     assert_attributed_string_rendered(
         "test_english_mixed_with_hebrew_paragraph_and_different_fonts",
         &mut attributed_string,
-        LayoutConfig {
+        LayouterConfig {
             line_wrap: LineWrap::Word,
             size: LayoutSize::new(
                 AutoLength::abs(Abs::pt(300.0)),
@@ -244,7 +245,7 @@ fn test_horizontal_text_align_start() {
     assert_attributed_string_rendered(
         "test_horizontal_text_align_start",
         &mut attributed_string,
-        LayoutConfig {
+        LayouterConfig {
             line_wrap: LineWrap::Word,
             horizontal_text_alignment: HorizontalTextAlignment::Start,
             size: LayoutSize::new(
@@ -284,7 +285,7 @@ fn test_horizontal_text_align_end() {
     assert_attributed_string_rendered(
         "test_horizontal_text_align_end",
         &mut attributed_string,
-        LayoutConfig {
+        LayouterConfig {
             line_wrap: LineWrap::Word,
             horizontal_text_alignment: HorizontalTextAlignment::End,
             size: LayoutSize::new(
@@ -324,7 +325,7 @@ fn test_horizontal_text_align_left() {
     assert_attributed_string_rendered(
         "test_horizontal_text_align_left",
         &mut attributed_string,
-        LayoutConfig {
+        LayouterConfig {
             line_wrap: LineWrap::Word,
             horizontal_text_alignment: HorizontalTextAlignment::Left,
             size: LayoutSize::new(
@@ -364,7 +365,7 @@ fn test_horizontal_text_align_right() {
     assert_attributed_string_rendered(
         "test_horizontal_text_align_right",
         &mut attributed_string,
-        LayoutConfig {
+        LayouterConfig {
             line_wrap: LineWrap::Word,
             horizontal_text_alignment: HorizontalTextAlignment::Right,
             size: LayoutSize::new(
@@ -404,7 +405,7 @@ fn test_horizontal_text_align_center() {
     assert_attributed_string_rendered(
         "test_horizontal_text_align_center",
         &mut attributed_string,
-        LayoutConfig {
+        LayouterConfig {
             line_wrap: LineWrap::Word,
             horizontal_text_alignment: HorizontalTextAlignment::Center,
             size: LayoutSize::new(
@@ -444,7 +445,7 @@ fn test_vertical_text_align_top() {
     assert_attributed_string_rendered(
         "test_vertical_text_align_top",
         &mut attributed_string,
-        LayoutConfig {
+        LayouterConfig {
             line_wrap: LineWrap::Word,
             vertical_text_alignment: VerticalTextAlignment::Top,
             size: LayoutSize::new(
@@ -484,7 +485,7 @@ fn test_vertical_text_align_bottom() {
     assert_attributed_string_rendered(
         "test_vertical_text_align_bottom",
         &mut attributed_string,
-        LayoutConfig {
+        LayouterConfig {
             line_wrap: LineWrap::Word,
             vertical_text_alignment: VerticalTextAlignment::Bottom,
             size: LayoutSize::new(
@@ -524,7 +525,7 @@ fn test_vertical_text_align_center() {
     assert_attributed_string_rendered(
         "test_vertical_text_align_center",
         &mut attributed_string,
-        LayoutConfig {
+        LayouterConfig {
             line_wrap: LineWrap::Word,
             vertical_text_alignment: VerticalTextAlignment::Center,
             size: LayoutSize::new(

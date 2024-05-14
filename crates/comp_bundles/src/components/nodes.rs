@@ -1,6 +1,6 @@
 use crate::properties::TextAttributeInterval;
 use bevy_ecs::component::Component;
-use dyn_attributed_string::layout::layout_config::{
+use dyn_attributed_string::layout::{
     HorizontalTextAlignment, LineWrap, TextSizingMode, VerticalTextAlignment,
 };
 use smallvec::SmallVec;

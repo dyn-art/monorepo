@@ -7,7 +7,7 @@ use crate::{
 use bevy_ecs::{query::With, system::Query};
 use bevy_hierarchy::Parent;
 use bevy_transform::components::{GlobalTransform, Transform};
-use dyn_attributed_string::layout::layout_config::TextSizingMode;
+use dyn_attributed_string::layout::TextSizingMode;
 use dyn_comp_bundles::{
     components::{
         mixins::{

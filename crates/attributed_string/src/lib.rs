@@ -11,7 +11,6 @@ pub mod utils;
 
 pub use dyn_fonts_book;
 use dyn_fonts_book::FontsBook;
-use layout::{layout_config::LayoutConfig, layout_handler::LayoutHandler};
 use rust_lapper::{Interval, Lapper};
 use span::{Span, SpanIntervals};
 use text_attrs::{TextAttrs, TextAttrsInterval};
@@ -54,6 +53,10 @@ impl AttributedString {
         &self.spans
     }
 
+    pub fn get_spans_mut(&mut self) -> &mut SpanIntervals {
+        &mut self.spans
+    }
+
     pub fn tokenize_text(&mut self, fonts_book: &mut FontsBook) {
         self.divide_overlapping_spans();
 
@@ -62,12 +65,6 @@ impl AttributedString {
                 span.compute_tokens(&self.text, fonts_book);
             }
         }
-    }
-
-    pub fn layout(&mut self, config: LayoutConfig) -> LayoutHandler {
-        let mut layout_handler = LayoutHandler::new(config);
-        layout_handler.layout(&mut self.spans);
-        return layout_handler;
     }
 
     fn divide_overlapping_spans(&mut self) {

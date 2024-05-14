@@ -41,9 +41,8 @@ impl WordWrap {
 
         // Add the current line to lines and prepare for next line
         if !self.current_line.is_empty() {
-            let mut line = Line::new(std::mem::take(&mut self.current_line));
-            line.merge_contiguous_ranges();
-            self.lines.push(line);
+            self.lines
+                .push(Line::from_ranges(std::mem::take(&mut self.current_line)));
             self.current_line_width = Abs::zero();
         }
 

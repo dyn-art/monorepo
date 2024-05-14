@@ -4,7 +4,10 @@ use bevy_ecs::{
     system::{Commands, Query, ResMut},
 };
 use dyn_attributed_string::{
-    layout::layout_config::{LayoutConfig, LayoutSize, TextSizingMode},
+    layout::{
+        layouter::{Layouter, LayouterConfig},
+        LayoutSize, TextSizingMode,
+    },
     AttributedString,
 };
 use dyn_comp_asset::resources::AssetsRes;
@@ -36,7 +39,7 @@ pub fn compute_text_from_scratch(
         let mut attributed_string = AttributedString::new(text.text.clone(), intervals);
 
         attributed_string.tokenize_text(assets_res.get_fonts_book_mut());
-        let layout_handler = attributed_string.layout(LayoutConfig {
+        let mut layouter = Layouter::new(LayouterConfig {
             size: match text.sizing_mode {
                 TextSizingMode::Fixed => LayoutSize::new(
                     AutoLength::abs(size_mixin.0.width),
@@ -53,17 +56,17 @@ pub fn compute_text_from_scratch(
             horizontal_text_alignment: text.horizontal_text_alignment,
             vertical_text_alignment: text.vertical_text_alignment,
         });
-
-        let text_size = layout_handler.compute_text_size(attributed_string.get_spans());
+        layouter.layout(&mut attributed_string);
+        let container_size = layouter.get_container_size().unwrap();
 
         // Update bounds
         if text.sizing_mode == TextSizingMode::WidthAndHeight {
-            size_mixin.0.width = Abs::pt(text_size.width())
+            size_mixin.0.width = Abs::pt(container_size.width())
         }
         if text.sizing_mode == TextSizingMode::WidthAndHeight
             || text.sizing_mode == TextSizingMode::Height
         {
-            size_mixin.0.height = Abs::pt(text_size.height())
+            size_mixin.0.height = Abs::pt(container_size.height())
         }
 
         commands
@@ -79,7 +82,7 @@ pub fn compute_text_on_size_change(
     >,
 ) {
     for (text, mut attributed_string_mixin, size_mixin) in query.iter_mut() {
-        attributed_string_mixin.0.layout(LayoutConfig {
+        let mut layouter = Layouter::new(LayouterConfig {
             size: match text.sizing_mode {
                 TextSizingMode::Fixed => LayoutSize::new(
                     AutoLength::abs(size_mixin.0.width),
@@ -96,5 +99,6 @@ pub fn compute_text_on_size_change(
             horizontal_text_alignment: text.horizontal_text_alignment,
             vertical_text_alignment: text.vertical_text_alignment,
         });
+        layouter.layout(&mut attributed_string_mixin.0);
     }
 }

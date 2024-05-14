@@ -1,5 +1,5 @@
 use dyn_attributed_string::{
-    layout::{layout_config::LayoutConfig, layout_handler::LayoutHandler},
+    layout::layouter::{Layouter, LayouterConfig},
     outline::tiny_skia_path_builder::TinySkiaPathBuilder,
     AttributedString,
 };
@@ -36,7 +36,7 @@ impl TestPaths {
 pub fn assert_attributed_string_rendered(
     name: &'static str,
     attributed_string: &mut AttributedString,
-    config: LayoutConfig,
+    config: LayouterConfig,
 ) {
     init_env_logger();
 
@@ -56,9 +56,9 @@ pub fn assert_attributed_string_rendered(
         .load_fonts_dir(test_paths.fonts_dir_path);
 
     attributed_string.tokenize_text(&mut fonts_book);
-    let layout_handler = attributed_string.layout(config);
-    let container_size = layout_handler
-        .compute_container_size(&layout_handler.compute_text_size(attributed_string.get_spans()));
+    let mut layouter = Layouter::new(config);
+    layouter.layout(attributed_string);
+    let container_size = layouter.get_container_size().unwrap();
 
     let path = TinySkiaPathBuilder::outline(attributed_string, &mut fonts_book).unwrap();
 

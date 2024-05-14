@@ -1,5 +1,5 @@
 use bevy_ecs::entity::Entity;
-use dyn_attributed_string::layout::layout_config::{
+use dyn_attributed_string::layout::{
     HorizontalTextAlignment, LineWrap, VerticalTextAlignment,
 };
 use dyn_comp_bundles::{

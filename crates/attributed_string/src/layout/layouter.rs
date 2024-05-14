@@ -1,41 +1,59 @@
 use super::{
-    layout_config::{HorizontalTextAlignment, LayoutConfig, LineWrap, VerticalTextAlignment},
     line::{Line, LineDirection},
     line_wrap::{no_wrap::NoLineWrap, word_wrap::WordWrap, LineWrapStrategy},
+    HorizontalTextAlignment, LayoutSize, LineWrap, VerticalTextAlignment,
 };
-use crate::span::SpanIntervals;
+use crate::{span::SpanIntervals, AttributedString};
 use dyn_utils::{
     properties::size::Size,
     units::{abs::Abs, auto_length::AutoLength},
 };
 
 #[derive(Debug, Clone)]
-pub struct LayoutHandler {
+pub struct Layouter {
     lines: Vec<Line>,
-    config: LayoutConfig,
+    container_size: Option<Size>,
+    text_size: Option<Size>,
+    pub config: LayouterConfig,
 }
 
-impl LayoutHandler {
-    pub fn new(config: LayoutConfig) -> Self {
+impl Layouter {
+    pub fn new(config: LayouterConfig) -> Self {
         Self {
             lines: Vec::new(),
+            container_size: None,
+            text_size: None,
             config,
         }
     }
 
-    pub fn layout(&mut self, spans: &mut SpanIntervals) {
-        for (span, ..) in spans.iter_mut() {
+    pub fn get_lines(&self) -> &Vec<Line> {
+        &self.lines
+    }
+
+    pub fn get_text_size(&self) -> Option<Size> {
+        self.text_size
+    }
+
+    pub fn get_container_size(&self) -> Option<Size> {
+        self.container_size
+    }
+
+    pub fn layout(&mut self, attributed_string: &mut AttributedString) {
+        for (span, ..) in attributed_string.get_spans_mut().iter_mut() {
             span.apply_letter_spacing();
             span.apply_word_spacing();
         }
-        self.layout_lines(spans);
+        self.layout_lines(attributed_string.get_spans_mut());
     }
 
-    pub fn layout_lines(&mut self, spans: &mut SpanIntervals) {
+    fn layout_lines(&mut self, spans: &mut SpanIntervals) {
         self.lines = self.compute_lines(spans);
 
         let text_size = self.compute_text_size(&spans);
+        self.text_size = Some(text_size);
         let container_size = self.compute_container_size(&text_size);
+        self.container_size = Some(container_size);
 
         let vertical_alignment_correction = match self.config.vertical_text_alignment {
             VerticalTextAlignment::Top => Abs::zero(),
@@ -48,12 +66,8 @@ impl LayoutHandler {
 
         // Layout tokens based on lines
         for (index, line) in self.lines.iter().enumerate() {
-            if line.get_ranges().is_empty() {
-                continue;
-            }
-
             let line_direction = line.get_direction(&spans);
-            let line_width = line.get_width(&spans);
+            let line_width = line.get_x_advance(&spans);
 
             let horizontal_alignment_correction =
                 match (self.config.horizontal_text_alignment, line_direction) {
@@ -79,16 +93,14 @@ impl LayoutHandler {
                 line.get_max_height(&spans)
             };
 
-            for range in line.get_ranges().iter() {
-                for (span, ..) in spans.find_mut(range.start, range.end) {
-                    for glyph_token in span.iter_glyphs_in_range_mut(&range) {
-                        glyph_token.layout.transform = tiny_skia_path::Transform::from_translate(
-                            curr_pos_x.to_pt(),
-                            curr_pos_y.to_pt(),
-                        );
+            for (span, ..) in spans.find_mut(line.get_range().start, line.get_range().end) {
+                for glyph_token in span.iter_glyphs_in_range_mut(line.get_range()) {
+                    glyph_token.layout.transform = tiny_skia_path::Transform::from_translate(
+                        curr_pos_x.to_pt(),
+                        curr_pos_y.to_pt(),
+                    );
 
-                        curr_pos_x += glyph_token.layout.x_advance;
-                    }
+                    curr_pos_x += glyph_token.layout.x_advance;
                 }
             }
         }
@@ -114,6 +126,7 @@ impl LayoutHandler {
             }
             _ => Box::new(NoLineWrap),
         };
+
         return line_wrap_strategy.compute_lines(spans, &size);
     }
 
@@ -121,7 +134,7 @@ impl LayoutHandler {
         Size::new(
             self.lines
                 .iter()
-                .fold(Abs::zero(), |acc, line| acc.max(line.get_width(&spans))),
+                .fold(Abs::zero(), |acc, line| acc.max(line.get_x_advance(&spans))),
             self.lines
                 .iter()
                 .enumerate()
@@ -149,4 +162,12 @@ impl LayoutHandler {
             },
         )
     }
+}
+
+#[derive(Debug, Default, Clone)]
+pub struct LayouterConfig {
+    pub size: LayoutSize,
+    pub line_wrap: LineWrap,
+    pub horizontal_text_alignment: HorizontalTextAlignment,
+    pub vertical_text_alignment: VerticalTextAlignment,
 }
