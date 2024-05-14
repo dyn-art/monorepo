@@ -32,7 +32,7 @@ use systems::{
         star::outline_star, text::outline_text,
     },
     stroke::stroke_path_system,
-    text::{compute_text_from_scratch, compute_text_on_node_change, compute_text_on_size_change},
+    text::{compute_text_from_scratch, compute_text_on_size_change},
     tick::collect_first_tick,
     vector::resize_vector_node,
 };
@@ -138,7 +138,6 @@ impl Plugin for CompCorePlugin {
             (
                 compute_text_from_scratch.in_set(CompCoreSystemSet::Compute),
                 compute_text_on_size_change.in_set(CompCoreSystemSet::Compute),
-                compute_text_on_node_change.in_set(CompCoreSystemSet::Compute),
             ),
         );
         app.add_systems(

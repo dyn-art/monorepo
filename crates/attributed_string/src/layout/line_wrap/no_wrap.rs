@@ -1,6 +1,6 @@
 use super::LineWrapStrategy;
 use crate::{
-    line::Line,
+    layout::line::Line,
     shape_tokens::{ShapeToken, ShapeTokenVariant},
     span::SpanIntervals,
 };
@@ -12,7 +12,7 @@ use std::ops::Range;
 pub struct NoLineWrap;
 
 impl LineWrapStrategy for NoLineWrap {
-    fn compute_lines(&mut self, spans: &SpanIntervals, _: &Size, _: &str) -> Vec<Line> {
+    fn compute_lines(&mut self, spans: &SpanIntervals, _: &Size) -> Vec<Line> {
         let mut lines: Vec<Line> = Vec::new();
         let mut current_line_ranges: Vec<Range<usize>> = Vec::new();
 
@@ -24,7 +24,7 @@ impl LineWrapStrategy for NoLineWrap {
                     ShapeTokenVariant::Linebreak(token) => {
                         current_line_ranges.push(span_range_start..token.get_range().end);
                         span_range_start = token.get_range().end;
-                        lines.push(Line::new(std::mem::take(&mut current_line_ranges)));
+                        lines.push(Line::from_ranges(std::mem::take(&mut current_line_ranges)));
                     }
                     _ => {}
                 }
@@ -38,7 +38,7 @@ impl LineWrapStrategy for NoLineWrap {
 
         // Flush any remaining span ranges to a new line
         if !current_line_ranges.is_empty() {
-            lines.push(Line::new(current_line_ranges));
+            lines.push(Line::from_ranges(current_line_ranges));
         }
 
         return lines;

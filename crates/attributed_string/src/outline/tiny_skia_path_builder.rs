@@ -1,4 +1,4 @@
-use crate::AttributedString;
+use crate::span::SpanIntervals;
 use dyn_fonts_book::{font::Font, FontsBook};
 use dyn_utils::units::abs::Abs;
 use rust_lapper::Interval;
@@ -15,12 +15,12 @@ impl TinySkiaPathBuilder {
 
     // TODO: Not performant and needs caching for outlined glyphs
     pub fn outline(
-        attributed_string: &AttributedString,
+        spans: &SpanIntervals,
         fonts_book: &mut FontsBook,
     ) -> Option<tiny_skia_path::Path> {
         let mut text_builder = tiny_skia_path::PathBuilder::new();
 
-        for Interval { val: span, .. } in attributed_string.get_spans().iter() {
+        for Interval { val: span, .. } in spans.iter() {
             let mut span_builder = tiny_skia_path::PathBuilder::new();
 
             let font_size = span.get_attrs().get_font_size();
@@ -53,18 +53,18 @@ impl TinySkiaPathBuilder {
                         // So we have to keep an advance.
                         transform.tx += (x + glyph_token.get_glyph().x_offset.at(font_size))
                             .to_pt()
-                            + glyph_token.transform.tx;
+                            + glyph_token.layout.transform.tx;
                         transform.ty += glyph_token.get_glyph().y_offset.at(font_size).to_pt()
-                            + glyph_token.transform.ty;
+                            + glyph_token.layout.transform.ty;
 
                         if let Some(outline) = outline.transform(transform) {
                             cluster_builder.push_path(&outline);
                         }
                     }
 
-                    x += glyph_token.x_advance;
+                    x += glyph_token.layout.x_advance;
 
-                    let glyph_width = glyph_token.x_advance;
+                    let glyph_width = glyph_token.layout.x_advance;
                     if glyph_width > width {
                         width = glyph_width;
                     }

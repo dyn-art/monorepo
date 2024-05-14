@@ -1,6 +1,6 @@
 use crate::properties::{TextAttributeInterval, Viewport};
 use bevy_ecs::{entity::Entity, event::Event, world::World};
-use dyn_attributed_string::{HorizontalTextAlignment, LineWrap, VerticalTextAlignment};
+use dyn_attributed_string::layout::{HorizontalTextAlignment, LineWrap, VerticalTextAlignment};
 use dyn_utils::{properties::size::Size, units::angle::Angle};
 use std::fmt::Debug;
 

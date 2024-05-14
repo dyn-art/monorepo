@@ -3,7 +3,7 @@ use crate::{
 };
 use bevy_ecs::world::{EntityWorldMut, World};
 use bevy_transform::{components::Transform, TransformBundle};
-use dyn_attributed_string::{
+use dyn_attributed_string::layout::{
     HorizontalTextAlignment, LineWrap, TextSizingMode, VerticalTextAlignment,
 };
 use dyn_comp_bundles::{

@@ -1,5 +1,5 @@
 use super::{glyph::GlyphToken, ShapeBuffer, ShapeToken};
-use crate::{attrs::TextAttrs, shape::shape_text_with_fallback};
+use crate::{shape::shape_text_with_fallback, text_attrs::TextAttrs};
 use dyn_fonts_book::FontsBook;
 use dyn_utils::units::abs::Abs;
 use std::ops::Range;
@@ -54,18 +54,6 @@ impl WordSeparatorToken {
     pub(crate) fn get_tokens_mut(&mut self) -> &mut Vec<GlyphToken> {
         &mut self.tokens
     }
-
-    pub fn x_advance(&self) -> Abs {
-        self.tokens
-            .iter()
-            .fold(Abs::zero(), |acc, token| acc + token.x_advance)
-    }
-
-    pub fn y_advance(&self) -> Abs {
-        self.tokens
-            .iter()
-            .fold(Abs::zero(), |acc, token| acc + token.y_advance)
-    }
 }
 
 impl ShapeToken for WordSeparatorToken {
@@ -73,11 +61,15 @@ impl ShapeToken for WordSeparatorToken {
         &self.range
     }
 
-    fn get_width(&self) -> Abs {
-        self.x_advance()
+    fn x_advance(&self) -> Abs {
+        self.tokens
+            .iter()
+            .fold(Abs::zero(), |acc, token| acc + token.layout.x_advance)
     }
 
-    fn get_height(&self) -> Abs {
-        self.y_advance()
+    fn y_advance(&self) -> Abs {
+        self.tokens
+            .iter()
+            .fold(Abs::zero(), |acc, token| acc + token.layout.y_advance)
     }
 }

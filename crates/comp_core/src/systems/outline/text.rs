@@ -13,8 +13,10 @@ pub fn outline_text(
     mut query: Query<(Entity, &AttributedStringMixin), Changed<AttributedStringMixin>>,
 ) {
     for (entity, AttributedStringMixin(attributed_string)) in query.iter_mut() {
-        let maybe_path =
-            TinySkiaPathBuilder::outline(&attributed_string, assets_res.get_fonts_book_mut());
+        let maybe_path = TinySkiaPathBuilder::outline(
+            attributed_string.get_spans(),
+            assets_res.get_fonts_book_mut(),
+        );
 
         // Insert or update the PathMixin component for the entity
         if let Some(path) = maybe_path {

@@ -1,6 +1,7 @@
 // Templates
 import defaultDtifTemplate from './assets/templates/default.json';
 import squareMdtifTemplate from './assets/templates/m-square.json';
+import tempMdtifTemplate from './assets/templates/m-temp.json';
 import tweetMdtifTemplate from './assets/templates/m-tweet.json';
 import sqareDtifTemplate from './assets/templates/square.json';
 import tempDtifTemplate from './assets/templates/temp.json';
@@ -17,6 +18,7 @@ export default {
 	},
 	mdtif: {
 		square: squareMdtifTemplate,
-		tweet: tweetMdtifTemplate
+		tweet: tweetMdtifTemplate,
+		temp: tempMdtifTemplate
 	}
 };

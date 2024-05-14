@@ -186,4 +186,4 @@ impl TextAttrs {
     }
 }
 
-pub type AttrsInterval = Interval<usize, TextAttrs>;
+pub type TextAttrsInterval = Interval<usize, TextAttrs>;

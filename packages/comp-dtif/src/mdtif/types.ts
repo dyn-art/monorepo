@@ -82,6 +82,7 @@ export interface TNumberModificationInput {
 export interface TTextModificationInput {
 	type: 'TEXT';
 	default: string;
+	area: boolean;
 }
 
 export interface TBooleanModificationInput {

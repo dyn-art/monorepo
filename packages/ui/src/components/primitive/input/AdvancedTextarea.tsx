@@ -4,7 +4,7 @@ import * as React from 'react';
 import { cn } from '@/utils';
 
 const inputVariants = cva(
-	'border-input placeholder:text-muted-foreground flex items-center justify-center w-full border bg-transparent px-3 py-1 shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50',
+	'border-input min-h-[60px] placeholder:text-muted-foreground flex items-center justify-center w-full border bg-transparent px-3 py-2 shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50',
 	{
 		variants: {
 			variant: {
@@ -24,19 +24,19 @@ const inputVariants = cva(
 	}
 );
 
-export interface TAdvancedInputProps
-	extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'>,
+export interface TAdvancedTextareaProps
+	extends Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'size'>,
 		VariantProps<typeof inputVariants> {
 	children?: React.ReactElement;
 	childrenAfter?: React.ReactElement;
 }
 
-const AdvancedInput = React.forwardRef<HTMLInputElement, TAdvancedInputProps>(
+const AdvancedTextarea = React.forwardRef<HTMLTextAreaElement, TAdvancedTextareaProps>(
 	({ className, variant, size, children, childrenAfter, ...props }, ref) => {
 		if (variant === 'destructive' && childrenAfter == null) {
 			// eslint-disable-next-line no-param-reassign -- Ok here
 			childrenAfter = (
-				<div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+				<div className="pointer-events-none absolute right-0 top-0 flex items-center pr-3 pt-3">
 					<AlertCircle aria-hidden="true" className="h-5 w-5 text-red-500" />
 				</div>
 			);
@@ -46,17 +46,21 @@ const AdvancedInput = React.forwardRef<HTMLInputElement, TAdvancedInputProps>(
 			return (
 				<div className="relative">
 					{children}
-					<input className={cn(inputVariants({ variant, size, className }))} ref={ref} {...props} />
+					<textarea
+						className={cn(inputVariants({ variant, size, className }))}
+						ref={ref}
+						{...props}
+					/>
 					{childrenAfter}
 				</div>
 			);
 		}
 
 		return (
-			<input className={cn(inputVariants({ variant, size, className }))} ref={ref} {...props} />
+			<textarea className={cn(inputVariants({ variant, size, className }))} ref={ref} {...props} />
 		);
 	}
 );
-AdvancedInput.displayName = 'AdvancedInput';
+AdvancedTextarea.displayName = 'AdvancedTextarea';
 
-export { AdvancedInput };
+export { AdvancedTextarea };

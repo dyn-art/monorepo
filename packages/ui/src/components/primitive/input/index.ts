@@ -1,4 +1,5 @@
 export * from './AdvancedInput';
+export * from './AdvancedTextarea';
 export * from './Button';
 export * from './DropdownMenu';
 export * from './IconSelect';

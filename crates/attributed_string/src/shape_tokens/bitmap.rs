@@ -20,11 +20,11 @@ impl ShapeToken for BitmapToken {
         &self.range
     }
 
-    fn get_width(&self) -> Abs {
+    fn x_advance(&self) -> Abs {
         Abs::pt(self.size.x)
     }
 
-    fn get_height(&self) -> Abs {
+    fn y_advance(&self) -> Abs {
         Abs::pt(self.size.y)
     }
 }
