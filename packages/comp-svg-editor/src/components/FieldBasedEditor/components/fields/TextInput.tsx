@@ -13,6 +13,7 @@ export const TextInput: React.FC<TProps> = (props) => {
 	const [error, setError] = React.useState<string | null>(null);
 
 	const handleChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+		// TODO: \n gets escaped to \\n
 		setValue(e.target.value);
 	}, []);
 

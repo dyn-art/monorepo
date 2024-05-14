@@ -17,12 +17,6 @@ use dyn_comp_bundles::components::{
 };
 use dyn_utils::units::{abs::Abs, auto_length::AutoLength};
 
-// TODO:
-// 1. Compute text bounding box without outlining (for text computation)
-// 2. Figure out how to best apply sizing mode
-//    - I guess best would be to create custom Size (with Auto and Absolute)
-// 3. If Auto sizing mode figure out how to update elements position e.g. if center or right aligned
-
 pub fn compute_text_from_scratch(
     mut commands: Commands,
     mut assets_res: ResMut<AssetsRes>,
@@ -77,16 +71,11 @@ pub fn compute_text_from_scratch(
 
 pub fn compute_text_on_size_change(
     mut query: Query<
-        (
-            Entity,
-            &TextCompNode,
-            &mut AttributedStringMixin,
-            &SizeMixin,
-        ),
+        (&TextCompNode, &mut AttributedStringMixin, &SizeMixin),
         (With<AttributedStringMixin>, Changed<SizeMixin>),
     >,
 ) {
-    for (entity, text, mut attributed_string_mixin, size_mixin) in query.iter_mut() {
+    for (text, mut attributed_string_mixin, size_mixin) in query.iter_mut() {
         let mut layouter = Layouter::new(LayouterConfig {
             size: match text.sizing_mode {
                 TextSizingMode::Fixed => LayoutSize::new(

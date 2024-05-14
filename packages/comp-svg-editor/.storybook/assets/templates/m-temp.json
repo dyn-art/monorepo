@@ -1,0 +1,160 @@
+{
+	"template": {
+		"version": "1.0",
+		"size": [500, 500],
+		"rootNodeId": "1",
+		"nodes": {
+			"1": {
+				"type": "Frame",
+				"clipContent": false,
+				"layoutParent": null,
+				"visible": true,
+				"children": ["5", "2"],
+				"size": [500, 500],
+				"translation": [0, 0],
+				"rotationDeg": 0,
+				"cornerRadii": [0, 0, 0, 0],
+				"blendMode": "Normal",
+				"opacity": 1,
+				"layoutElement": {
+					"type": "Absolute",
+					"constraints": { "horizontal": "Start", "vertical": "Start" }
+				},
+				"styles": [
+					{ "type": "Fill", "paintId": "9", "blendMode": "Normal", "opacity": 1, "visible": true }
+				]
+			},
+			"2": {
+				"type": "Rectangle",
+				"visible": true,
+				"size": [100, 100],
+				"translation": [200, 200],
+				"rotationDeg": -3.1805546814635168e-15,
+				"cornerRadii": [0, 0, 0, 0],
+				"blendMode": "Normal",
+				"opacity": 1,
+				"layoutElement": {
+					"type": "Absolute",
+					"constraints": { "horizontal": "Center", "vertical": "Center" }
+				},
+				"styles": [
+					{
+						"type": "Stroke",
+						"width": 4,
+						"paintId": "4",
+						"blendMode": "Normal",
+						"opacity": 1,
+						"visible": true
+					},
+					{ "type": "Fill", "paintId": "3", "blendMode": "Normal", "opacity": 1, "visible": true }
+				]
+			},
+			"5": {
+				"type": "Frame",
+				"clipContent": false,
+				"layoutParent": {
+					"flexDirection": "Row",
+					"alignItems": "Center",
+					"justifyContent": "Center",
+					"padding": {
+						"top": { "type": "Abs", "value": 0 },
+						"bottom": { "type": "Abs", "value": 0 },
+						"left": { "type": "Abs", "value": 0 },
+						"right": { "type": "Abs", "value": 0 }
+					},
+					"gap": { "x": { "type": "Abs", "value": 10 }, "y": { "type": "Abs", "value": 0 } },
+					"horizontalSizingMode": "Hug",
+					"verticalSizingMode": "Hug"
+				},
+				"visible": true,
+				"children": ["6"],
+				"size": [85, 48],
+				"translation": [132, 362],
+				"rotationDeg": 0,
+				"cornerRadii": [0, 0, 0, 0],
+				"blendMode": "Normal",
+				"opacity": 1,
+				"layoutElement": {
+					"type": "Absolute",
+					"constraints": { "horizontal": "Start", "vertical": "Start" }
+				},
+				"styles": [
+					{ "type": "Fill", "paintId": "8", "blendMode": "Normal", "opacity": 1, "visible": true }
+				]
+			},
+			"6": {
+				"type": "Text",
+				"text": "Hello thsdfa\nsdfasdfsfere",
+				"attributes": [
+					{
+						"start": 0,
+						"end": 25,
+						"attributes": {
+							"fontFamily": { "Named": "Inter" },
+							"fontStretch": 1,
+							"fontStyle": "Normal",
+							"fontWeight": 500,
+							"fontSize": 14,
+							"letterSpacing": { "type": "Em", "value": 0 },
+							"lineHeight": { "type": "Abs", "value": 24 }
+						}
+					}
+				],
+				"lineWrap": "Word",
+				"horizontalTextAlignment": "Center",
+				"verticalTextAlignment": "Top",
+				"sizingMode": "WidthAndHeight",
+				"visible": true,
+				"size": [85, 48],
+				"translation": [0, 0],
+				"rotationDeg": 0,
+				"blendMode": "Normal",
+				"opacity": 1,
+				"layoutElement": {
+					"type": "Static",
+					"horizontalSizingMode": "Fixed",
+					"verticalSizingMode": "Fixed"
+				},
+				"styles": [
+					{ "type": "Fill", "paintId": "4", "blendMode": "Normal", "opacity": 1, "visible": true }
+				]
+			}
+		},
+		"paints": {
+			"3": { "type": "Solid", "color": [217, 217, 217] },
+			"4": { "type": "Solid", "color": [0, 0, 0] },
+			"8": { "type": "Solid", "color": [255, 255, 255] },
+			"9": { "type": "Solid", "color": [255, 219, 219] }
+		},
+		"assets": {
+			"7": {
+				"content": {
+					"type": "Url",
+					"url": "https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuI6fMZhrib2Bg-4.ttf",
+					"contentType": { "mimeType": "font/ttf" }
+				},
+				"contentType": { "type": "Ttf" }
+			}
+		},
+		"viewport": { "physicalPosition": [0, 0], "physicalSize": [500, 500] }
+	},
+	"modificationFields": [
+		{
+			"key": "text",
+			"displayName": "Set Text",
+			"inputType": { "type": "TEXT", "default": "Hello World" },
+			"actions": [
+				{
+					"conditions": [],
+					"events": [
+						{
+							"type": "UpdateEntityText",
+							"entity": "6",
+							"text": { "var": "text" }
+						}
+					]
+				}
+			]
+		}
+	]
+}

@@ -3,7 +3,7 @@ use super::{
     line_wrap::{no_wrap::NoLineWrap, word_wrap::WordWrap, LineWrapStrategy},
     HorizontalTextAlignment, LayoutSize, LineWrap, VerticalTextAlignment,
 };
-use crate::{span::SpanIntervals, AttributedString};
+use crate::span::SpanIntervals;
 use dyn_utils::{
     properties::size::Size,
     units::{abs::Abs, auto_length::AutoLength},
