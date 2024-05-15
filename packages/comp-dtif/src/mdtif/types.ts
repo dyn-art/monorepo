@@ -99,8 +99,9 @@ export interface TBooleanModificationInput {
 export interface TRangeModificationInput {
 	type: 'RANGE';
 	default: number;
-	start: number;
-	stop: number;
+	max: number;
+	min: number;
+	step?: number;
 }
 
 export interface TColorModificationInput {

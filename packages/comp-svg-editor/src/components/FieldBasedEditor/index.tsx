@@ -5,13 +5,21 @@ import type {
 	TModificationField,
 	TNumberModificationInput,
 	TPositionModificationInput,
+	TRangeModificationInput,
 	TTextModificationInput
 } from '@dyn/comp-dtif';
 import type { Composition } from '@dyn/comp-svg-builder';
 import { Badge, Skeleton, useSizeCallback } from '@dyn/ui';
 import { usePreparedDtif } from '@/hooks';
 
-import { BooleanInput, NumberInput, PositionInput, TextInput, Viewport } from './components';
+import {
+	BooleanInput,
+	NumberInput,
+	PositionInput,
+	RangeInput,
+	TextInput,
+	Viewport
+} from './components';
 
 export const FieldBasedEditor: React.FC<TFieldBasedEditorProps> = (props) => {
 	const { mdtif } = props;
@@ -75,6 +83,13 @@ export const FieldBasedEditor: React.FC<TFieldBasedEditorProps> = (props) => {
 									/>
 								);
 							case 'RANGE':
+								return (
+									<RangeInput
+										composition={composition}
+										field={field as TModificationField<string, TRangeModificationInput>}
+										key={field.key}
+									/>
+								);
 							case 'COLOR':
 							default:
 								return <p>Coming Soon</p>;
