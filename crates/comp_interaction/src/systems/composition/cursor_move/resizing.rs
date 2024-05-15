@@ -79,39 +79,41 @@ pub fn handle_resizing(
             -transform_to_z_rotation_rad(&transform),
         );
 
+        let width_changed = local_initial_bounds.size.width != new_bounds.size.width;
+        let height_changed = local_initial_bounds.size.height != new_bounds.size.height;
+
         if let Some(mut layout_parent_mixin) = maybe_static_layout_parent_mixin {
-            if size.width() != new_bounds.size.width()
+            if width_changed
                 && layout_parent_mixin.0.horizontal_sizing_mode != LayoutParentSizingMode::Fixed
             {
                 layout_parent_mixin.0.horizontal_sizing_mode = LayoutParentSizingMode::Fixed;
             }
-            if size.height() != new_bounds.size.height()
+            if height_changed
                 && layout_parent_mixin.0.vertical_sizing_mode != LayoutParentSizingMode::Fixed
             {
                 layout_parent_mixin.0.vertical_sizing_mode = LayoutParentSizingMode::Fixed;
             }
         }
         if let Some(mut layout_element_mixin) = maybe_static_layout_element_mixin {
-            if size.width() != new_bounds.size.width()
+            if width_changed
                 && layout_element_mixin.0.horizontal_sizing_mode != LayoutElementSizingMode::Fixed
             {
                 layout_element_mixin.0.horizontal_sizing_mode = LayoutElementSizingMode::Fixed;
             }
-            if size.height() != new_bounds.size.height()
+            if height_changed
                 && layout_element_mixin.0.vertical_sizing_mode != LayoutElementSizingMode::Fixed
             {
                 layout_element_mixin.0.vertical_sizing_mode = LayoutElementSizingMode::Fixed;
             }
         }
         if let Some(mut text_node) = maybe_text_node {
-            if size.width() != new_bounds.size.width()
+            if width_changed
                 && text_node.sizing_mode != TextSizingMode::Height
+                && text_node.sizing_mode != TextSizingMode::Fixed
             {
                 text_node.sizing_mode = TextSizingMode::Height;
             }
-            if size.height() != new_bounds.size.height()
-                && text_node.sizing_mode != TextSizingMode::Fixed
-            {
+            if height_changed && text_node.sizing_mode != TextSizingMode::Fixed {
                 text_node.sizing_mode = TextSizingMode::Fixed;
             }
         }

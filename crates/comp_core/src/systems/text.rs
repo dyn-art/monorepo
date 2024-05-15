@@ -71,11 +71,11 @@ pub fn compute_text_from_scratch(
 
 pub fn compute_text_on_size_change(
     mut query: Query<
-        (&TextCompNode, &mut AttributedStringMixin, &SizeMixin),
+        (&TextCompNode, &mut AttributedStringMixin, &mut SizeMixin),
         (With<AttributedStringMixin>, Changed<SizeMixin>),
     >,
 ) {
-    for (text, mut attributed_string_mixin, size_mixin) in query.iter_mut() {
+    for (text, mut attributed_string_mixin, mut size_mixin) in query.iter_mut() {
         let mut layouter = Layouter::new(LayouterConfig {
             size: match text.sizing_mode {
                 TextSizingMode::Fixed => LayoutSize::new(
@@ -93,7 +93,17 @@ pub fn compute_text_on_size_change(
             horizontal_text_alignment: text.horizontal_text_alignment,
             vertical_text_alignment: text.vertical_text_alignment,
         });
-        // TODO: attributed_string_mixin will always be marked as changed
         layouter.layout_lines(attributed_string_mixin.0.get_spans_mut());
+        let container_size = layouter.get_container_size().unwrap();
+
+        // Update bounds
+        if text.sizing_mode == TextSizingMode::WidthAndHeight {
+            size_mixin.0.width = Abs::pt(container_size.width())
+        }
+        if text.sizing_mode == TextSizingMode::WidthAndHeight
+            || text.sizing_mode == TextSizingMode::Height
+        {
+            size_mixin.0.height = Abs::pt(container_size.height())
+        }
     }
 }
