@@ -62,6 +62,12 @@ export type TMdtifInputEvent<GKey extends string, GValue> =
 			'text' | 'attributes' | 'lineWrap' | 'horizontalTextAlignment' | 'verticalTextAlignment',
 			GKey,
 			GValue
+	  >)
+	| ({ type: 'UpdateEntityVisibility' } & TMakeEventModifiable<
+			COMP.UpdateEntityVisibilityInputEvent,
+			'visible',
+			GKey,
+			GValue
 	  >);
 
 export type TModificationInputType =
@@ -107,6 +113,11 @@ export interface TPositionModificationInput {
 	default: [number, number];
 	max?: [number, number];
 	min?: [number, number];
+}
+
+export interface TImageModificationInput {
+	type: 'IMAGE';
+	default?: string;
 }
 
 export type TMapToDefaultType<T> = T extends { default: infer U } ? U : never;

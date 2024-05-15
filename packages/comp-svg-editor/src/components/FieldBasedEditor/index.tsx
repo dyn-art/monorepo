@@ -1,5 +1,6 @@
 import React from 'react';
 import type {
+	TBooleanModificationInput,
 	TMdtifComposition,
 	TModificationField,
 	TNumberModificationInput,
@@ -10,7 +11,7 @@ import type { Composition } from '@dyn/comp-svg-builder';
 import { Badge, Skeleton, useSizeCallback } from '@dyn/ui';
 import { usePreparedDtif } from '@/hooks';
 
-import { NumberInput, PositionInput, TextInput, Viewport } from './components';
+import { BooleanInput, NumberInput, PositionInput, TextInput, Viewport } from './components';
 
 export const FieldBasedEditor: React.FC<TFieldBasedEditorProps> = (props) => {
 	const { mdtif } = props;
@@ -66,6 +67,13 @@ export const FieldBasedEditor: React.FC<TFieldBasedEditorProps> = (props) => {
 									/>
 								);
 							case 'BOOLEAN':
+								return (
+									<BooleanInput
+										composition={composition}
+										field={field as TModificationField<string, TBooleanModificationInput>}
+										key={field.key}
+									/>
+								);
 							case 'RANGE':
 							case 'COLOR':
 							default:

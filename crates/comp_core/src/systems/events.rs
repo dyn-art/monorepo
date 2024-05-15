@@ -10,13 +10,14 @@ use bevy_transform::components::Transform;
 use dyn_comp_bundles::{
     components::{
         marker::{Removed, Root},
-        mixins::SizeMixin,
+        mixins::{SizeMixin, VisibilityMixin},
         nodes::{CompNode, TextCompNode},
     },
     events::{
         DeleteEntityInputEvent, FocusRootNodesInputEvent, MoveEntityInputEvent,
         UpdateCompositionSizeInputEvent, UpdateCompositionViewportInputEvent,
         UpdateEntityPositionInputEvent, UpdateEntityRotationInputEvent, UpdateEntityTextInputEvent,
+        UpdateEntityVisibilityInputEvent,
     },
     properties::Viewport,
     utils::transform_to_z_rotation_rad,
@@ -244,6 +245,17 @@ pub fn update_entity_text_input_system(
             if let Some(vertical_text_alignment) = maybe_vertical_text_alignment {
                 text_comp_node.vertical_text_alignment = *vertical_text_alignment;
             }
+        }
+    }
+}
+
+pub fn update_entity_visibility_input_system(
+    mut event_reader: EventReader<UpdateEntityVisibilityInputEvent>,
+    mut query: Query<&mut VisibilityMixin>,
+) {
+    for UpdateEntityVisibilityInputEvent { entity, visible } in event_reader.read() {
+        if let Ok(mut visibility_mixin) = query.get_mut(*entity) {
+            visibility_mixin.0 = *visible;
         }
     }
 }

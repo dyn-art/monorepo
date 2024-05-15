@@ -28,6 +28,7 @@ pub enum CompCoreInputEvent {
     UpdateEntityPosition(UpdateEntityPositionInputEvent),
     UpdateEntityRotation(UpdateEntityRotationInputEvent),
     UpdateEntityText(UpdateEntityTextInputEvent),
+    UpdateEntityVisibility(UpdateEntityVisibilityInputEvent),
 }
 
 impl InputEvent for CompCoreInputEvent {
@@ -60,6 +61,9 @@ impl InputEvent for CompCoreInputEvent {
                 world.send_event(event);
             }
             CompCoreInputEvent::UpdateEntityText(event) => {
+                world.send_event(event);
+            }
+            CompCoreInputEvent::UpdateEntityVisibility(event) => {
                 world.send_event(event);
             }
         }
@@ -168,4 +172,14 @@ pub struct UpdateEntityTextInputEvent {
     pub horizontal_text_alignment: Option<HorizontalTextAlignment>,
     #[cfg_attr(feature = "serde_support", serde(default))]
     pub vertical_text_alignment: Option<VerticalTextAlignment>,
+}
+
+#[derive(Event, Debug, Clone)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type)
+)]
+pub struct UpdateEntityVisibilityInputEvent {
+    pub entity: Entity,
+    pub visible: bool,
 }

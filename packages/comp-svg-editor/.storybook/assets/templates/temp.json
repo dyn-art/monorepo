@@ -1,15 +1,15 @@
 {
 	"version": "1.0",
-	"size": [500, 500],
+	"size": [1200, 400],
 	"rootNodeId": "1",
 	"nodes": {
 		"1": {
 			"type": "Frame",
-			"clipContent": false,
+			"clipContent": true,
 			"layoutParent": null,
 			"visible": true,
-			"children": ["2"],
-			"size": [500, 500],
+			"children": ["10", "7", "5", "2"],
+			"size": [1200, 400],
 			"translation": [0, 0],
 			"rotationDeg": 0,
 			"cornerRadii": [0, 0, 0, 0],
@@ -20,67 +20,167 @@
 				"constraints": { "horizontal": "Start", "vertical": "Start" }
 			},
 			"styles": [
-				{ "type": "Fill", "paintId": "8", "blendMode": "Normal", "opacity": 1, "visible": true }
+				{ "type": "Fill", "paintId": "14", "blendMode": "Normal", "opacity": 1, "visible": true }
 			]
 		},
 		"2": {
-			"type": "Frame",
-			"clipContent": false,
-			"layoutParent": {
-				"flexDirection": "Column",
-				"alignItems": "Center",
-				"justifyContent": "Center",
-				"padding": {
-					"top": { "type": "Abs", "value": 10 },
-					"bottom": { "type": "Abs", "value": 10 },
-					"left": { "type": "Abs", "value": 10 },
-					"right": { "type": "Abs", "value": 10 }
-				},
-				"gap": { "x": { "type": "Abs", "value": 0 }, "y": { "type": "Abs", "value": 0 } },
-				"horizontalSizingMode": "Fixed",
-				"verticalSizingMode": "Fixed"
-			},
+			"type": "Text",
+			"text": "Lorem ipsum dolor sit amet consectetur. Hendrerit fusce adipiscing pellentesque parturient eu consequat. ",
+			"attributes": [
+				{
+					"start": 0,
+					"end": 105,
+					"attributes": {
+						"fontFamily": { "Named": "IBM Plex Mono" },
+						"fontStretch": 1,
+						"fontStyle": "Normal",
+						"fontWeight": 600,
+						"fontSize": 19.200000762939453,
+						"letterSpacing": { "type": "Abs", "value": -0.800000011920929 },
+						"lineHeight": { "type": "Abs", "value": 25.600000381469727 }
+					}
+				}
+			],
+			"lineWrap": "Word",
+			"horizontalTextAlignment": "Left",
+			"verticalTextAlignment": "Top",
+			"sizingMode": "Height",
 			"visible": true,
-			"children": ["5", "3"],
-			"size": [120, 285],
-			"translation": [190, 128],
+			"size": [631.2000122070312, 52],
+			"translation": [113.5999755859375, 232.7999267578125],
 			"rotationDeg": 0,
-			"cornerRadii": [0, 0, 0, 0],
 			"blendMode": "Normal",
 			"opacity": 1,
 			"layoutElement": {
 				"type": "Absolute",
-				"constraints": { "horizontal": "Center", "vertical": "Center" }
-			},
-			"styles": [
-				{ "type": "Fill", "paintId": "7", "blendMode": "Normal", "opacity": 1, "visible": true }
-			]
-		},
-		"3": {
-			"type": "Rectangle",
-			"visible": true,
-			"size": [100, 100],
-			"translation": [10, 46],
-			"rotationDeg": 0,
-			"cornerRadii": [0, 0, 0, 0],
-			"blendMode": "Normal",
-			"opacity": 1,
-			"layoutElement": {
-				"type": "Static",
-				"horizontalSizingMode": "Fixed",
-				"verticalSizingMode": "Fixed"
+				"constraints": { "horizontal": "Start", "vertical": "Start" }
 			},
 			"styles": [
 				{ "type": "Fill", "paintId": "4", "blendMode": "Normal", "opacity": 1, "visible": true }
 			]
 		},
 		"5": {
-			"type": "Rectangle",
+			"type": "Text",
+			"text": "Hi, I'm Jessica  ",
+			"attributes": [
+				{
+					"start": 0,
+					"end": 17,
+					"attributes": {
+						"fontFamily": { "Named": "Poppins" },
+						"fontStretch": 1,
+						"fontStyle": "Normal",
+						"fontWeight": 900,
+						"fontSize": 64,
+						"letterSpacing": { "type": "Abs", "value": -1.600000023841858 }
+					}
+				}
+			],
+			"lineWrap": "Word",
+			"horizontalTextAlignment": "Left",
+			"verticalTextAlignment": "Center",
+			"sizingMode": "WidthAndHeight",
 			"visible": true,
-			"size": [100, 93],
-			"translation": [10, 146],
+			"size": [450, 96],
+			"translation": [114, 108],
+			"rotationDeg": 0,
+			"blendMode": "Normal",
+			"opacity": 1,
+			"layoutElement": {
+				"type": "Absolute",
+				"constraints": { "horizontal": "Start", "vertical": "Start" }
+			},
+			"styles": [
+				{ "type": "Fill", "paintId": "4", "blendMode": "Normal", "opacity": 1, "visible": true }
+			]
+		},
+		"7": {
+			"type": "Vector",
+			"path": "M 327.20001220703125 128 L 280.4542236328125 103.88008117675781 L 233.7084197998047 128 L 186.96775817871094 103.88008117675781 L 140.22711181640625 128 L 93.48645782470703 103.88008117675781 L 46.74065399169922 128 L 0 103.88008117675781 L 0 0 L 46.74065399169922 24.11991310119629 L 93.48645782470703 0 L 140.22711181640625 24.11991310119629 L 186.96775817871094 0 L 233.7084197998047 24.11991310119629 L 280.4542236328125 0 L 327.20001220703125 24.11991310119629 L 327.20001220703125 128 Z",
+			"windingRule": "Nonzero",
+			"visible": true,
+			"size": [327.20001220703125, 128],
+			"translation": [778, 178],
+			"rotationDeg": 0,
+			"blendMode": "Normal",
+			"opacity": 1,
+			"layoutElement": {
+				"type": "Absolute",
+				"constraints": { "horizontal": "Scale", "vertical": "Scale" }
+			},
+			"styles": [
+				{ "type": "Fill", "paintId": "8", "blendMode": "Normal", "opacity": 1, "visible": true },
+				{
+					"type": "DropShadow",
+					"color": [38, 16, 61],
+					"position": [16, 16],
+					"blur": 0,
+					"spread": 0,
+					"visible": true,
+					"blendMode": "Normal",
+					"opacity": 1
+				}
+			]
+		},
+		"10": {
+			"type": "Frame",
+			"clipContent": false,
+			"layoutParent": {
+				"flexDirection": "Row",
+				"alignItems": "Start",
+				"justifyContent": "Start",
+				"padding": {
+					"top": { "type": "Abs", "value": 0 },
+					"bottom": { "type": "Abs", "value": 0 },
+					"left": { "type": "Abs", "value": 0 },
+					"right": { "type": "Abs", "value": 0 }
+				},
+				"gap": {
+					"x": { "type": "Abs", "value": 12.800000190734863 },
+					"y": { "type": "Abs", "value": 0 }
+				},
+				"horizontalSizingMode": "Hug",
+				"verticalSizingMode": "Hug"
+			},
+			"visible": true,
+			"children": ["23", "20", "17", "11"],
+			"size": [443.4000244140625, 38.400001525878906],
+			"translation": [379.20001220703125, 40.79998779296875],
 			"rotationDeg": 0,
 			"cornerRadii": [0, 0, 0, 0],
+			"blendMode": "Normal",
+			"opacity": 1,
+			"layoutElement": {
+				"type": "Absolute",
+				"constraints": { "horizontal": "Start", "vertical": "Start" }
+			},
+			"styles": []
+		},
+		"11": {
+			"type": "Frame",
+			"clipContent": false,
+			"layoutParent": {
+				"flexDirection": "Row",
+				"alignItems": "Start",
+				"justifyContent": "Start",
+				"padding": {
+					"top": { "type": "Abs", "value": 30.40000343322754 },
+					"bottom": { "type": "Abs", "value": 12.000000953674316 },
+					"left": { "type": "Abs", "value": 30.40000343322754 },
+					"right": { "type": "Abs", "value": 30.40000343322754 }
+				},
+				"gap": { "x": { "type": "Abs", "value": 8 }, "y": { "type": "Abs", "value": 0 } },
+				"horizontalSizingMode": "Hug",
+				"verticalSizingMode": "Fixed"
+			},
+			"visible": true,
+			"children": ["12"],
+			"size": [100.80000305175781, 38.400001525878906],
+			"translation": [0, 0],
+			"rotationDeg": 0,
+			"cornerRadii": [
+				40.000003814697266, 40.000003814697266, 40.000003814697266, 40.000003814697266
+			],
 			"blendMode": "Normal",
 			"opacity": 1,
 			"layoutElement": {
@@ -89,16 +189,302 @@
 				"verticalSizingMode": "Fixed"
 			},
 			"styles": [
-				{ "type": "Fill", "paintId": "6", "blendMode": "Normal", "opacity": 1, "visible": true }
+				{ "type": "Fill", "paintId": "15", "blendMode": "Normal", "opacity": 1, "visible": true }
+			]
+		},
+		"12": {
+			"type": "Text",
+			"text": "Figma",
+			"attributes": [
+				{
+					"start": 0,
+					"end": 5,
+					"attributes": {
+						"fontFamily": { "Named": "Inter" },
+						"fontStretch": 1,
+						"fontStyle": "Normal",
+						"fontWeight": 600,
+						"fontSize": 14.40000057220459,
+						"letterSpacing": { "type": "Abs", "value": -0.800000011920929 },
+						"lineHeight": { "type": "Abs", "value": 14.40000057220459 }
+					}
+				}
+			],
+			"lineWrap": "Word",
+			"horizontalTextAlignment": "Left",
+			"verticalTextAlignment": "Top",
+			"sizingMode": "WidthAndHeight",
+			"visible": true,
+			"size": [40, 15],
+			"translation": [30.399810791015625, 11.999825477600098],
+			"rotationDeg": 0,
+			"blendMode": "Normal",
+			"opacity": 1,
+			"layoutElement": {
+				"type": "Static",
+				"horizontalSizingMode": "Fixed",
+				"verticalSizingMode": "Fixed"
+			},
+			"styles": [
+				{ "type": "Fill", "paintId": "14", "blendMode": "Normal", "opacity": 1, "visible": true }
+			]
+		},
+		"17": {
+			"type": "Frame",
+			"clipContent": false,
+			"layoutParent": {
+				"flexDirection": "Row",
+				"alignItems": "Start",
+				"justifyContent": "Start",
+				"padding": {
+					"top": { "type": "Abs", "value": 30.40000343322754 },
+					"bottom": { "type": "Abs", "value": 12.000000953674316 },
+					"left": { "type": "Abs", "value": 30.40000343322754 },
+					"right": { "type": "Abs", "value": 30.40000343322754 }
+				},
+				"gap": { "x": { "type": "Abs", "value": 8 }, "y": { "type": "Abs", "value": 0 } },
+				"horizontalSizingMode": "Hug",
+				"verticalSizingMode": "Fixed"
+			},
+			"visible": true,
+			"children": ["18"],
+			"size": [103.80000305175781, 38.400001525878906],
+			"translation": [113.60000610351562, 0],
+			"rotationDeg": 0,
+			"cornerRadii": [
+				40.000003814697266, 40.000003814697266, 40.000003814697266, 40.000003814697266
+			],
+			"blendMode": "Normal",
+			"opacity": 1,
+			"layoutElement": {
+				"type": "Static",
+				"horizontalSizingMode": "Fixed",
+				"verticalSizingMode": "Fixed"
+			},
+			"styles": [
+				{ "type": "Fill", "paintId": "19", "blendMode": "Normal", "opacity": 1, "visible": true }
+			]
+		},
+		"18": {
+			"type": "Text",
+			"text": "Notion",
+			"attributes": [
+				{
+					"start": 0,
+					"end": 6,
+					"attributes": {
+						"fontFamily": { "Named": "Inter" },
+						"fontStretch": 1,
+						"fontStyle": "Normal",
+						"fontWeight": 600,
+						"fontSize": 14.40000057220459,
+						"letterSpacing": { "type": "Abs", "value": -0.800000011920929 },
+						"lineHeight": { "type": "Abs", "value": 14.40000057220459 }
+					}
+				}
+			],
+			"lineWrap": "Word",
+			"horizontalTextAlignment": "Left",
+			"verticalTextAlignment": "Top",
+			"sizingMode": "WidthAndHeight",
+			"visible": true,
+			"size": [43, 15],
+			"translation": [30.40000343322754, 12.000000953674316],
+			"rotationDeg": 0,
+			"blendMode": "Normal",
+			"opacity": 1,
+			"layoutElement": {
+				"type": "Static",
+				"horizontalSizingMode": "Fixed",
+				"verticalSizingMode": "Fixed"
+			},
+			"styles": [
+				{ "type": "Fill", "paintId": "14", "blendMode": "Normal", "opacity": 1, "visible": true }
+			]
+		},
+		"20": {
+			"type": "Frame",
+			"clipContent": false,
+			"layoutParent": {
+				"flexDirection": "Row",
+				"alignItems": "Start",
+				"justifyContent": "Start",
+				"padding": {
+					"top": { "type": "Abs", "value": 20.000001907348633 },
+					"bottom": { "type": "Abs", "value": 12.000000953674316 },
+					"left": { "type": "Abs", "value": 20.000001907348633 },
+					"right": { "type": "Abs", "value": 20.000001907348633 }
+				},
+				"gap": { "x": { "type": "Abs", "value": 8 }, "y": { "type": "Abs", "value": 0 } },
+				"horizontalSizingMode": "Hug",
+				"verticalSizingMode": "Fixed"
+			},
+			"visible": true,
+			"children": ["21"],
+			"size": [100, 38.400001525878906],
+			"translation": [230.20001220703125, 0],
+			"rotationDeg": 0,
+			"cornerRadii": [
+				40.000003814697266, 40.000003814697266, 40.000003814697266, 40.000003814697266
+			],
+			"blendMode": "Normal",
+			"opacity": 1,
+			"layoutElement": {
+				"type": "Static",
+				"horizontalSizingMode": "Fixed",
+				"verticalSizingMode": "Fixed"
+			},
+			"styles": [
+				{ "type": "Fill", "paintId": "22", "blendMode": "Normal", "opacity": 1, "visible": true }
+			]
+		},
+		"21": {
+			"type": "Text",
+			"text": "Illustrator",
+			"attributes": [
+				{
+					"start": 0,
+					"end": 11,
+					"attributes": {
+						"fontFamily": { "Named": "Inter" },
+						"fontStretch": 1,
+						"fontStyle": "Normal",
+						"fontWeight": 600,
+						"fontSize": 14.40000057220459,
+						"letterSpacing": { "type": "Abs", "value": -0.800000011920929 },
+						"lineHeight": { "type": "Abs", "value": 14.40000057220459 }
+					}
+				}
+			],
+			"lineWrap": "Word",
+			"horizontalTextAlignment": "Left",
+			"verticalTextAlignment": "Top",
+			"sizingMode": "WidthAndHeight",
+			"visible": true,
+			"size": [60, 15],
+			"translation": [20.000001907348633, 12.000000953674316],
+			"rotationDeg": 0,
+			"blendMode": "Normal",
+			"opacity": 1,
+			"layoutElement": {
+				"type": "Static",
+				"horizontalSizingMode": "Fixed",
+				"verticalSizingMode": "Fixed"
+			},
+			"styles": [
+				{ "type": "Fill", "paintId": "14", "blendMode": "Normal", "opacity": 1, "visible": true }
+			]
+		},
+		"23": {
+			"type": "Frame",
+			"clipContent": false,
+			"layoutParent": {
+				"flexDirection": "Row",
+				"alignItems": "Start",
+				"justifyContent": "Start",
+				"padding": {
+					"top": { "type": "Abs", "value": 15.20000171661377 },
+					"bottom": { "type": "Abs", "value": 12.000000953674316 },
+					"left": { "type": "Abs", "value": 15.20000171661377 },
+					"right": { "type": "Abs", "value": 15.20000171661377 }
+				},
+				"gap": { "x": { "type": "Abs", "value": 8 }, "y": { "type": "Abs", "value": 0 } },
+				"horizontalSizingMode": "Hug",
+				"verticalSizingMode": "Fixed"
+			},
+			"visible": true,
+			"children": ["24"],
+			"size": [100.4000015258789, 38.400001525878906],
+			"translation": [343, 0],
+			"rotationDeg": 0,
+			"cornerRadii": [
+				40.000003814697266, 40.000003814697266, 40.000003814697266, 40.000003814697266
+			],
+			"blendMode": "Normal",
+			"opacity": 1,
+			"layoutElement": {
+				"type": "Static",
+				"horizontalSizingMode": "Fixed",
+				"verticalSizingMode": "Fixed"
+			},
+			"styles": [
+				{ "type": "Fill", "paintId": "25", "blendMode": "Normal", "opacity": 1, "visible": true }
+			]
+		},
+		"24": {
+			"type": "Text",
+			"text": "Photoshop",
+			"attributes": [
+				{
+					"start": 0,
+					"end": 9,
+					"attributes": {
+						"fontFamily": { "Named": "Inter" },
+						"fontStretch": 1,
+						"fontStyle": "Normal",
+						"fontWeight": 600,
+						"fontSize": 14.40000057220459,
+						"letterSpacing": { "type": "Abs", "value": -0.800000011920929 },
+						"lineHeight": { "type": "Abs", "value": 14.40000057220459 }
+					}
+				}
+			],
+			"lineWrap": "Word",
+			"horizontalTextAlignment": "Left",
+			"verticalTextAlignment": "Top",
+			"sizingMode": "WidthAndHeight",
+			"visible": true,
+			"size": [70, 15],
+			"translation": [15.199991226196289, 12.000012397766113],
+			"rotationDeg": 0,
+			"blendMode": "Normal",
+			"opacity": 1,
+			"layoutElement": {
+				"type": "Static",
+				"horizontalSizingMode": "Fixed",
+				"verticalSizingMode": "Fixed"
+			},
+			"styles": [
+				{ "type": "Fill", "paintId": "14", "blendMode": "Normal", "opacity": 1, "visible": true }
 			]
 		}
 	},
 	"paints": {
-		"4": { "type": "Solid", "color": [200, 180, 180] },
-		"6": { "type": "Solid", "color": [217, 217, 217] },
-		"7": { "type": "Solid", "color": [0, 0, 0] },
-		"8": { "type": "Solid", "color": [255, 248, 78] }
+		"4": { "type": "Solid", "color": [13, 13, 13] },
+		"8": { "type": "Solid", "color": [188, 122, 255] },
+		"9": { "type": "Solid", "color": [38, 16, 61] },
+		"14": { "type": "Solid", "color": [251, 251, 251] },
+		"15": { "type": "Solid", "color": [235, 36, 191] },
+		"16": { "type": "Solid", "color": [255, 255, 255] },
+		"19": { "type": "Solid", "color": [255, 97, 97] },
+		"22": { "type": "Solid", "color": [97, 0, 255] },
+		"25": { "type": "Solid", "color": [17, 175, 255] }
 	},
-	"assets": {},
-	"viewport": { "physicalPosition": [0, 0], "physicalSize": [500, 500] }
+	"assets": {
+		"3": {
+			"content": {
+				"type": "Url",
+				"url": "https://fonts.gstatic.com/s/ibmplexmono/v19/-F6qfjptAgt5VM-kVkqdyU8n3vAO8ldPg-IUDNg.ttf",
+				"contentType": { "mimeType": "font/ttf" }
+			},
+			"contentType": { "type": "Ttf" }
+		},
+		"6": {
+			"content": {
+				"type": "Url",
+				"url": "https://fonts.gstatic.com/s/poppins/v21/pxiByp8kv8JHgFVrLBT5V1tvFP-KUEg.ttf",
+				"contentType": { "mimeType": "font/ttf" }
+			},
+			"contentType": { "type": "Ttf" }
+		},
+		"13": {
+			"content": {
+				"type": "Url",
+				"url": "https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuGKYMZhrib2Bg-4.ttf",
+				"contentType": { "mimeType": "font/ttf" }
+			},
+			"contentType": { "type": "Ttf" }
+		}
+	},
+	"viewport": { "physicalPosition": [0, 0], "physicalSize": [1200, 400] }
 }

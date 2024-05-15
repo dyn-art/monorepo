@@ -1,12 +1,11 @@
 use bevy_ecs::entity::Entity;
-use dyn_attributed_string::layout::{
-    HorizontalTextAlignment, LineWrap, VerticalTextAlignment,
-};
+use dyn_attributed_string::layout::{HorizontalTextAlignment, LineWrap, VerticalTextAlignment};
 use dyn_comp_bundles::{
     events::{
         CompCoreInputEvent, DeleteEntityInputEvent, FocusRootNodesInputEvent, MoveEntityInputEvent,
         UpdateCompositionSizeInputEvent, UpdateCompositionViewportInputEvent,
         UpdateEntityPositionInputEvent, UpdateEntityRotationInputEvent, UpdateEntityTextInputEvent,
+        UpdateEntityVisibilityInputEvent,
     },
     properties::{TextAttributeInterval, Viewport},
 };
@@ -29,6 +28,7 @@ pub enum DtifInputEvent {
     UpdateEntityPosition(UpdateEntityPositionDtifInputEvent),
     UpdateEntityRotation(UpdateEntityRotationDtifInputEvent),
     UpdateEntityText(UpdateEntityTextDtifInputEvent),
+    UpdateEntityVisibility(UpdateEntityVisibilityDtifInputEvent),
 }
 
 impl DtifInputEvent {
@@ -93,6 +93,14 @@ impl DtifInputEvent {
                         line_wrap: event.line_wrap,
                         horizontal_text_alignment: event.horizontal_text_alignment,
                         vertical_text_alignment: event.vertical_text_alignment,
+                    })
+                })
+            }
+            DtifInputEvent::UpdateEntityVisibility(event) => {
+                sid_to_entity.get(&event.entity).map(|entity| {
+                    CompCoreInputEvent::UpdateEntityVisibility(UpdateEntityVisibilityInputEvent {
+                        entity: *entity,
+                        visible: event.visible,
                     })
                 })
             }
@@ -169,4 +177,10 @@ pub struct UpdateEntityTextDtifInputEvent {
     pub horizontal_text_alignment: Option<HorizontalTextAlignment>,
     #[serde(default)]
     pub vertical_text_alignment: Option<VerticalTextAlignment>,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
+pub struct UpdateEntityVisibilityDtifInputEvent {
+    pub entity: String,
+    pub visible: bool,
 }

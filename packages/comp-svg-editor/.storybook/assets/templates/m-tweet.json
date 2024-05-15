@@ -534,7 +534,7 @@
 	"modificationFields": [
 		{
 			"key": "name",
-			"displayName": "Name",
+			"displayName": "User Name",
 			"inputType": { "type": "TEXT", "default": "John Kappa" },
 			"actions": [
 				{
@@ -550,8 +550,26 @@
 			]
 		},
 		{
-			"key": "body",
-			"displayName": "Body",
+			"key": "handle",
+			"displayName": "User Handle",
+			"inputType": { "type": "TEXT", "default": "johnkappa" },
+			"actions": [
+				{
+					"conditions": [],
+					"compute": { "args": ["handle"], "body": "return '@' + handle" },
+					"events": [
+						{
+							"type": "UpdateEntityText",
+							"entity": "14",
+							"text": { "var": "handle" }
+						}
+					]
+				}
+			]
+		},
+		{
+			"key": "text",
+			"displayName": "Tweet Text",
 			"inputType": {
 				"type": "TEXT",
 				"default": "This is the original component. Edit me to\nmake global changes to allasdf. 🎉",
@@ -564,7 +582,27 @@
 						{
 							"type": "UpdateEntityText",
 							"entity": "17",
-							"text": { "var": "body" }
+							"text": { "var": "text" }
+						}
+					]
+				}
+			]
+		},
+		{
+			"key": "verified",
+			"displayName": "Verified Badge",
+			"inputType": {
+				"type": "BOOLEAN",
+				"default": true
+			},
+			"actions": [
+				{
+					"conditions": [],
+					"events": [
+						{
+							"type": "UpdateEntityVisibility",
+							"entity": "12",
+							"visible": { "var": "verified" }
 						}
 					]
 				}

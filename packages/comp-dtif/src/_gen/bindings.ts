@@ -178,7 +178,7 @@ export type Color = [number, number, number]
 
 export type ColorMatrix = { x_axis: [number, number, number, number]; y_axis: [number, number, number, number]; z_axis: [number, number, number, number]; w_axis: [number, number, number, number]; v_axis: [number, number, number, number] }
 
-export type CompCoreInputEvent = ({ type: "UpdateCompositionSize" } & UpdateCompositionSizeInputEvent) | ({ type: "UpdateCompositionViewport" } & UpdateCompositionViewportInputEvent) | ({ type: "FocusRootNodes" }) | ({ type: "DeleteEntity" } & DeleteEntityInputEvent) | ({ type: "MoveEntity" } & MoveEntityInputEvent) | ({ type: "UpdateEntityPosition" } & UpdateEntityPositionInputEvent) | ({ type: "UpdateEntityRotation" } & UpdateEntityRotationInputEvent) | ({ type: "UpdateEntityText" } & UpdateEntityTextInputEvent)
+export type CompCoreInputEvent = ({ type: "UpdateCompositionSize" } & UpdateCompositionSizeInputEvent) | ({ type: "UpdateCompositionViewport" } & UpdateCompositionViewportInputEvent) | ({ type: "FocusRootNodes" }) | ({ type: "DeleteEntity" } & DeleteEntityInputEvent) | ({ type: "MoveEntity" } & MoveEntityInputEvent) | ({ type: "UpdateEntityPosition" } & UpdateEntityPositionInputEvent) | ({ type: "UpdateEntityRotation" } & UpdateEntityRotationInputEvent) | ({ type: "UpdateEntityText" } & UpdateEntityTextInputEvent) | ({ type: "UpdateEntityVisibility" } & UpdateEntityVisibilityInputEvent)
 
 export type ComponentChange = { type: "Size"; size: Size } | { type: "Transform"; rotationDeg: number; translation: Vec2 } | { type: "GlobalTransform"; rotationDeg: number; translation: Vec2 }
 
@@ -251,7 +251,7 @@ paints?: { [key in string]: Paint };
  */
 assets?: { [key in string]: Asset }; events?: DtifInputEvent[] }
 
-export type DtifInputEvent = ({ type: "UpdateCompositionSize" } & UpdateCompositionSizeDtifInputEvent) | ({ type: "UpdateCompositionViewport" } & UpdateCompositionViewportDtifInputEvent) | ({ type: "FocusRootNodes" }) | ({ type: "DeleteEntity" } & DeleteEntityDtifInputEvent) | ({ type: "MoveEntity" } & MoveEntityDtifInputEvent) | ({ type: "UpdateEntityPosition" } & UpdateEntityPositionDtifInputEvent) | ({ type: "UpdateEntityRotation" } & UpdateEntityRotationDtifInputEvent) | ({ type: "UpdateEntityText" } & UpdateEntityTextDtifInputEvent)
+export type DtifInputEvent = ({ type: "UpdateCompositionSize" } & UpdateCompositionSizeDtifInputEvent) | ({ type: "UpdateCompositionViewport" } & UpdateCompositionViewportDtifInputEvent) | ({ type: "FocusRootNodes" }) | ({ type: "DeleteEntity" } & DeleteEntityDtifInputEvent) | ({ type: "MoveEntity" } & MoveEntityDtifInputEvent) | ({ type: "UpdateEntityPosition" } & UpdateEntityPositionDtifInputEvent) | ({ type: "UpdateEntityRotation" } & UpdateEntityRotationDtifInputEvent) | ({ type: "UpdateEntityText" } & UpdateEntityTextDtifInputEvent) | ({ type: "UpdateEntityVisibility" } & UpdateEntityVisibilityDtifInputEvent)
 
 export type EllipseNode = { startingAngle?: number; endingAngle?: number; innerRadiusRatio?: number; translation?: Vec2; rotationDeg?: Angle; size: Size; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; layoutElement?: LayoutElement; styles?: Style[] }
 
@@ -1676,6 +1676,10 @@ export type UpdateEntityRotationInputEvent = { entity: Entity; rotationDeg: Angl
 export type UpdateEntityTextDtifInputEvent = { entity: string; text?: string | null; attributes?: TextAttributeInterval[] | null; lineWrap?: LineWrap | null; horizontalTextAlignment?: HorizontalTextAlignment | null; verticalTextAlignment?: VerticalTextAlignment | null }
 
 export type UpdateEntityTextInputEvent = { entity: Entity; text?: string | null; attributes?: TextAttributeInterval[] | null; lineWrap?: LineWrap | null; horizontalTextAlignment?: HorizontalTextAlignment | null; verticalTextAlignment?: VerticalTextAlignment | null }
+
+export type UpdateEntityVisibilityDtifInputEvent = { entity: string; visible: boolean }
+
+export type UpdateEntityVisibilityInputEvent = { entity: Entity; visible: boolean }
 
 export type Vec2 = [number, number]
 
