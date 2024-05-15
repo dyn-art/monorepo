@@ -57,7 +57,7 @@ pub fn apply_pre_absolute_layout_properties(
 pub fn update_absolute_layout(
     mut query_set: ParamSet<(
         Query<(&Children, &SizeMixin), Changed<SizeMixin>>,
-        Query<(Entity, &Parent), Changed<SizeMixin>>,
+        Query<(Entity, &Parent), (With<AbsoluteLayoutElementMixin>, Changed<SizeMixin>)>,
         Query<&SizeMixin, With<Children>>,
         Query<(
             &mut SizeMixin,

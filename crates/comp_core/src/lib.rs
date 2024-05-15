@@ -58,7 +58,8 @@ enum CompCoreSystemSet {
 
     /// After this label, the system has applied layout calculations to the composition's nodes.
     PreLayout,
-    Layout,
+    StaticLayout,
+    AbsoluteLayout,
 
     // After this label, the system has prepared the nodes for visual outlining.
     Prepare,
@@ -105,7 +106,8 @@ impl Plugin for CompCorePlugin {
                 CompCoreSystemSet::PreCompute,
                 CompCoreSystemSet::Compute,
                 CompCoreSystemSet::PreLayout,
-                CompCoreSystemSet::Layout,
+                CompCoreSystemSet::StaticLayout,
+                CompCoreSystemSet::AbsoluteLayout,
                 CompCoreSystemSet::Prepare,
                 CompCoreSystemSet::Outline,
                 CompCoreSystemSet::PostOutline,
@@ -147,15 +149,13 @@ impl Plugin for CompCorePlugin {
         app.add_systems(
             Update,
             (
+                apply_pre_absolute_layout_properties.in_set(CompCoreSystemSet::PreLayout),
                 discover_new_static_layout_parent_nodes.in_set(CompCoreSystemSet::PreLayout),
                 update_static_layout_parent_nodes_children.in_set(CompCoreSystemSet::PreLayout),
                 mark_nodes_with_static_layout_change_as_stale.in_set(CompCoreSystemSet::PreLayout),
-                apply_pre_absolute_layout_properties.in_set(CompCoreSystemSet::PreLayout),
                 remove_stale_layout_nodes.in_set(CompCoreSystemSet::PreLayout),
-                update_absolute_layout.in_set(CompCoreSystemSet::Layout),
-                update_static_layout
-                    .in_set(CompCoreSystemSet::Layout)
-                    .after(update_absolute_layout),
+                update_static_layout.in_set(CompCoreSystemSet::StaticLayout),
+                update_absolute_layout.in_set(CompCoreSystemSet::AbsoluteLayout),
             ),
         );
         app.add_systems(
