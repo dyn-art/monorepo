@@ -134,7 +134,7 @@
 					],
 					"events": [
 						{
-							"type": "UpdateEntityPosition",
+							"type": "UpdateEntityTransform",
 							"entity": "square",
 							"x": { "var": "pos.0" },
 							"y": { "var": "pos.1" }
@@ -178,7 +178,7 @@
 					"conditions": [],
 					"events": [
 						{
-							"type": "UpdateEntityText",
+							"type": "UpdateTextNode",
 							"entity": "text",
 							"text": { "var": "text" }
 						}

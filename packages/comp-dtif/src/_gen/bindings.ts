@@ -178,7 +178,7 @@ export type Color = [number, number, number]
 
 export type ColorMatrix = { x_axis: [number, number, number, number]; y_axis: [number, number, number, number]; z_axis: [number, number, number, number]; w_axis: [number, number, number, number]; v_axis: [number, number, number, number] }
 
-export type CompCoreInputEvent = ({ type: "UpdateCompositionSize" } & UpdateCompositionSizeInputEvent) | ({ type: "UpdateCompositionViewport" } & UpdateCompositionViewportInputEvent) | ({ type: "FocusRootNodes" }) | ({ type: "DeleteEntity" } & DeleteEntityInputEvent) | ({ type: "MoveEntity" } & MoveEntityInputEvent) | ({ type: "UpdateEntityPosition" } & UpdateEntityPositionInputEvent) | ({ type: "UpdateEntityRotation" } & UpdateEntityRotationInputEvent) | ({ type: "UpdateEntityText" } & UpdateEntityTextInputEvent) | ({ type: "UpdateEntityVisibility" } & UpdateEntityVisibilityInputEvent)
+export type CompCoreInputEvent = ({ type: "UpdateCompositionSize" } & UpdateCompositionSizeInputEvent) | ({ type: "UpdateCompositionViewport" } & UpdateCompositionViewportInputEvent) | ({ type: "FocusRootNodes" }) | ({ type: "UpdateTextNode" } & UpdateTextNodeInputEvent) | ({ type: "DeleteEntity" } & DeleteEntityInputEvent) | ({ type: "UpdateEntityTransform" } & UpdateEntityTransformInputEvent) | ({ type: "UpdateEntitySize" } & UpdateEntitySizeInputEvent) | ({ type: "MoveEntity" } & MoveEntityInputEvent) | ({ type: "UpdateEntityRotation" } & UpdateEntityRotationInputEvent) | ({ type: "UpdateEntityVisibility" } & UpdateEntityVisibilityInputEvent) | ({ type: "UpdateEntityCornerRadii" } & UpdateEntityCornerRadiiInputEvent) | ({ type: "UpdateEntityBlendMode" } & UpdateEntityBlendModeInputEvent) | ({ type: "UpdateEntityOpacity" } & UpdateEntityOpacityInputEvent)
 
 export type ComponentChange = { type: "Size"; size: Size } | { type: "Transform"; rotationDeg: number; translation: Vec2 } | { type: "GlobalTransform"; rotationDeg: number; translation: Vec2 }
 
@@ -251,7 +251,7 @@ paints?: { [key in string]: Paint };
  */
 assets?: { [key in string]: Asset }; events?: DtifInputEvent[] }
 
-export type DtifInputEvent = ({ type: "UpdateCompositionSize" } & UpdateCompositionSizeDtifInputEvent) | ({ type: "UpdateCompositionViewport" } & UpdateCompositionViewportDtifInputEvent) | ({ type: "FocusRootNodes" }) | ({ type: "DeleteEntity" } & DeleteEntityDtifInputEvent) | ({ type: "MoveEntity" } & MoveEntityDtifInputEvent) | ({ type: "UpdateEntityPosition" } & UpdateEntityPositionDtifInputEvent) | ({ type: "UpdateEntityRotation" } & UpdateEntityRotationDtifInputEvent) | ({ type: "UpdateEntityText" } & UpdateEntityTextDtifInputEvent) | ({ type: "UpdateEntityVisibility" } & UpdateEntityVisibilityDtifInputEvent)
+export type DtifInputEvent = ({ type: "UpdateCompositionSize" } & UpdateCompositionSizeDtifInputEvent) | ({ type: "UpdateCompositionViewport" } & UpdateCompositionViewportDtifInputEvent) | ({ type: "FocusRootNodes" }) | ({ type: "UpdateTextNode" } & UpdateTextNodeDtifInputEvent) | ({ type: "DeleteEntity" } & DeleteEntityDtifInputEvent) | ({ type: "UpdateEntityTransform" } & UpdateEntityTransformDtifInputEvent) | ({ type: "UpdateEntitySize" } & UpdateEntitySizeDtifInputEvent) | ({ type: "MoveEntity" } & MoveEntityDtifInputEvent) | ({ type: "UpdateEntityRotation" } & UpdateEntityRotationDtifInputEvent) | ({ type: "UpdateEntityVisibility" } & UpdateEntityVisibilityDtifInputEvent) | ({ type: "UpdateEntityCornerRadii" } & UpdateEntityCornerRadiiDtifInputEvent) | ({ type: "UpdateEntityBlendMode" } & UpdateEntityBlendModeDtifInputEvent) | ({ type: "UpdateEntityOpacity" } & UpdateEntityOpacityDtifInputEvent)
 
 export type EllipseNode = { startingAngle?: number; endingAngle?: number; innerRadiusRatio?: number; translation?: Vec2; rotationDeg?: Angle; size: Size; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; layoutElement?: LayoutElement; styles?: Style[] }
 
@@ -1665,21 +1665,37 @@ export type UpdateCompositionViewportDtifInputEvent = { viewport: Viewport }
 
 export type UpdateCompositionViewportInputEvent = { viewport: Viewport }
 
-export type UpdateEntityPositionDtifInputEvent = { entity: string; x?: number | null; y?: number | null }
+export type UpdateEntityBlendModeDtifInputEvent = { entity: string; blendMode: BlendMode }
 
-export type UpdateEntityPositionInputEvent = { entity: Entity; x?: number | null; y?: number | null }
+export type UpdateEntityBlendModeInputEvent = { entity: Entity; blendMode: BlendMode }
+
+export type UpdateEntityCornerRadiiDtifInputEvent = { entity: string; cornerRadii: CornerRadii }
+
+export type UpdateEntityCornerRadiiInputEvent = { entity: Entity; cornerRadii: CornerRadii }
+
+export type UpdateEntityOpacityDtifInputEvent = { entity: string; opacity: Opacity }
+
+export type UpdateEntityOpacityInputEvent = { entity: Entity; opacity: Opacity }
 
 export type UpdateEntityRotationDtifInputEvent = { entity: string; rotationDeg: Angle }
 
 export type UpdateEntityRotationInputEvent = { entity: Entity; rotationDeg: Angle }
 
-export type UpdateEntityTextDtifInputEvent = { entity: string; text?: string | null; attributes?: TextAttributeInterval[] | null; lineWrap?: LineWrap | null; horizontalTextAlignment?: HorizontalTextAlignment | null; verticalTextAlignment?: VerticalTextAlignment | null }
+export type UpdateEntitySizeDtifInputEvent = { entity: string; size?: Size }
 
-export type UpdateEntityTextInputEvent = { entity: Entity; text?: string | null; attributes?: TextAttributeInterval[] | null; lineWrap?: LineWrap | null; horizontalTextAlignment?: HorizontalTextAlignment | null; verticalTextAlignment?: VerticalTextAlignment | null }
+export type UpdateEntitySizeInputEvent = { entity: Entity; size: Size }
+
+export type UpdateEntityTransformDtifInputEvent = { entity: string; x?: number | null; y?: number | null; rotationDeg?: Angle | null }
+
+export type UpdateEntityTransformInputEvent = { entity: Entity; x?: number | null; y?: number | null; rotationDeg?: Angle | null }
 
 export type UpdateEntityVisibilityDtifInputEvent = { entity: string; visible: boolean }
 
 export type UpdateEntityVisibilityInputEvent = { entity: Entity; visible: boolean }
+
+export type UpdateTextNodeDtifInputEvent = { entity: string; text?: string | null; attributes?: TextAttributeInterval[] | null; lineWrap?: LineWrap | null; horizontalTextAlignment?: HorizontalTextAlignment | null; verticalTextAlignment?: VerticalTextAlignment | null; sizingMode?: TextSizingMode | null }
+
+export type UpdateTextNodeInputEvent = { entity: Entity; text?: string | null; attributes?: TextAttributeInterval[] | null; lineWrap?: LineWrap | null; horizontalTextAlignment?: HorizontalTextAlignment | null; verticalTextAlignment?: VerticalTextAlignment | null; sizingMode?: TextSizingMode | null }
 
 export type Vec2 = [number, number]
 

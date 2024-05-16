@@ -38,16 +38,27 @@ type TMakeEventModifiable<T, K extends keyof T, GKey extends string, GValue> = {
 };
 
 export type TMdtifInputEvent<GKey extends string, GValue> =
-	| ({ type: 'DeleteEntity' } & COMP.DeleteEntityDtifInputEvent)
-	| ({ type: 'MoveEntity' } & TMakeEventModifiable<
-			COMP.MoveEntityDtifInputEvent,
-			'dx' | 'dy',
+	| ({ type: 'UpdateTextNode' } & TMakeEventModifiable<
+			COMP.UpdateTextNodeDtifInputEvent,
+			| 'text'
+			| 'attributes'
+			| 'lineWrap'
+			| 'horizontalTextAlignment'
+			| 'verticalTextAlignment'
+			| 'sizingMode',
 			GKey,
 			GValue
 	  >)
+	| ({ type: 'DeleteEntity' } & COMP.DeleteEntityDtifInputEvent)
 	| ({ type: 'UpdateEntityPosition' } & TMakeEventModifiable<
-			COMP.UpdateEntityPositionDtifInputEvent,
-			'x' | 'y',
+			COMP.UpdateEntityTransformDtifInputEvent,
+			'x' | 'y' | 'rotationDeg',
+			GKey,
+			GValue
+	  >)
+	| ({ type: 'MoveEntity' } & TMakeEventModifiable<
+			COMP.MoveEntityDtifInputEvent,
+			'dx' | 'dy',
 			GKey,
 			GValue
 	  >)
@@ -57,15 +68,27 @@ export type TMdtifInputEvent<GKey extends string, GValue> =
 			GKey,
 			GValue
 	  >)
-	| ({ type: 'UpdateEntityText' } & TMakeEventModifiable<
-			COMP.UpdateEntityTextDtifInputEvent,
-			'text' | 'attributes' | 'lineWrap' | 'horizontalTextAlignment' | 'verticalTextAlignment',
-			GKey,
-			GValue
-	  >)
 	| ({ type: 'UpdateEntityVisibility' } & TMakeEventModifiable<
 			COMP.UpdateEntityVisibilityInputEvent,
 			'visible',
+			GKey,
+			GValue
+	  >)
+	| ({ type: 'UpdateEntityCornerRadii' } & TMakeEventModifiable<
+			COMP.UpdateEntityCornerRadiiDtifInputEvent,
+			'cornerRadii',
+			GKey,
+			GValue
+	  >)
+	| ({ type: 'UpdateEntityBlendMode' } & TMakeEventModifiable<
+			COMP.UpdateEntityBlendModeDtifInputEvent,
+			'blendMode',
+			GKey,
+			GValue
+	  >)
+	| ({ type: 'UpdateEntityOpacity' } & TMakeEventModifiable<
+			COMP.UpdateEntityOpacityDtifInputEvent,
+			'opacity',
 			GKey,
 			GValue
 	  >);

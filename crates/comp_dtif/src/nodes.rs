@@ -80,7 +80,7 @@ impl FrameNode {
             },
             transform: TransformBundle::from_transform(Transform {
                 translation: self.translation.extend(0.0),
-                rotation: Quat::from_rotation_z(self.rotation_deg.to_rad()),
+                rotation: self.rotation_deg.to_quat(),
                 scale: Vec3::ONE,
             }),
             size: SizeMixin(self.size),
@@ -144,7 +144,7 @@ impl RectangleNode {
             rectangle: RectangleCompNode::default(),
             transform: TransformBundle::from_transform(Transform {
                 translation: self.translation.extend(0.0),
-                rotation: Quat::from_rotation_z(self.rotation_deg.to_rad()),
+                rotation: self.rotation_deg.to_quat(),
                 scale: Vec3::ONE,
             }),
             size: SizeMixin(self.size),
@@ -214,7 +214,7 @@ impl EllipseNode {
             },
             transform: TransformBundle::from_transform(Transform {
                 translation: self.translation.extend(0.0),
-                rotation: Quat::from_rotation_z(self.rotation_deg.to_rad()),
+                rotation: self.rotation_deg.to_quat(),
                 scale: Vec3::ONE,
             }),
             size: SizeMixin(self.size),
@@ -278,7 +278,7 @@ impl StarNode {
             },
             transform: TransformBundle::from_transform(Transform {
                 translation: self.translation.extend(0.0),
-                rotation: Quat::from_rotation_z(self.rotation_deg.to_rad()),
+                rotation: self.rotation_deg.to_quat(),
                 scale: Vec3::ONE,
             }),
             size: SizeMixin(self.size),
@@ -344,7 +344,7 @@ impl PolygonNode {
             },
             transform: TransformBundle::from_transform(Transform {
                 translation: self.translation.extend(0.0),
-                rotation: Quat::from_rotation_z(self.rotation_deg.to_rad()),
+                rotation: self.rotation_deg.to_quat(),
                 scale: Vec3::ONE,
             }),
             size: SizeMixin(self.size),
@@ -423,7 +423,7 @@ impl TextNode {
             },
             transform: TransformBundle::from_transform(Transform {
                 translation: self.translation.extend(0.0),
-                rotation: Quat::from_rotation_z(self.rotation_deg.to_rad()),
+                rotation: self.rotation_deg.to_quat(),
                 scale: Vec3::ONE,
             }),
             size: SizeMixin(self.size),
@@ -487,7 +487,7 @@ impl VectorNode {
             vector: VectorCompNode,
             transform: TransformBundle::from_transform(Transform {
                 translation: self.translation.extend(0.0),
-                rotation: Quat::from_rotation_z(self.rotation_deg.to_rad()),
+                rotation: self.rotation_deg.to_quat(),
                 scale: Vec3::ONE,
             }),
             size: SizeMixin(self.size),

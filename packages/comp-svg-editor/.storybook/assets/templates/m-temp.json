@@ -148,7 +148,7 @@
 					"conditions": [],
 					"events": [
 						{
-							"type": "UpdateEntityText",
+							"type": "UpdateTextNode",
 							"entity": "6",
 							"text": { "var": "text" }
 						}

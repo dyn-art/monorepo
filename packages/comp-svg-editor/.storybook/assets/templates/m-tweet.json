@@ -541,7 +541,7 @@
 					"conditions": [],
 					"events": [
 						{
-							"type": "UpdateEntityText",
+							"type": "UpdateTextNode",
 							"entity": "9",
 							"text": { "var": "name" }
 						}
@@ -559,7 +559,7 @@
 					"compute": { "args": ["handle"], "body": "return '@' + handle" },
 					"events": [
 						{
-							"type": "UpdateEntityText",
+							"type": "UpdateTextNode",
 							"entity": "14",
 							"text": { "var": "handle" }
 						}
@@ -580,7 +580,7 @@
 					"conditions": [],
 					"events": [
 						{
-							"type": "UpdateEntityText",
+							"type": "UpdateTextNode",
 							"entity": "17",
 							"text": { "var": "text" }
 						}
@@ -618,7 +618,19 @@
 				"max": 30,
 				"step": 1
 			},
-			"actions": []
+			"actions": [
+				{
+					"conditions": [],
+					"compute": { "args": ["corner"], "body": "return [corner, corner, corner, corner]" },
+					"events": [
+						{
+							"type": "UpdateEntityCornerRadii",
+							"entity": "12",
+							"cornerRadii": { "var": "corner" }
+						}
+					]
+				}
+			]
 		}
 	]
 }

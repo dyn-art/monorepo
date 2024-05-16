@@ -8,16 +8,19 @@ use dyn_comp_asset::CompAssetPlugin;
 use dyn_comp_bundles::events::{
     DeleteEntityInputEvent, FocusRootNodesInputEvent, MoveEntityInputEvent,
     UpdateCompositionSizeInputEvent, UpdateCompositionViewportInputEvent,
-    UpdateEntityPositionInputEvent, UpdateEntityRotationInputEvent, UpdateEntityTextInputEvent,
-    UpdateEntityVisibilityInputEvent,
+    UpdateEntityBlendModeInputEvent, UpdateEntityCornerRadiiInputEvent,
+    UpdateEntityOpacityInputEvent, UpdateEntityRotationInputEvent, UpdateEntitySizeInputEvent,
+    UpdateEntityTransformInputEvent, UpdateEntityVisibilityInputEvent, UpdateTextNodeInputEvent,
 };
 use resources::{composition::CompositionRes, layout::LayoutRes, tick::TickRes};
 use systems::{
     events::{
         delete_entity_input_system, despawn_removed_entities_system, focus_root_nodes_input_system,
         move_entity_input_system, update_composition_size_input_system,
-        update_composition_viewport_input_system, update_entity_position_input_system,
-        update_entity_rotation_input_system, update_entity_text_input_system,
+        update_composition_viewport_input_system, update_entity_blend_mode_input_system,
+        update_entity_corner_radii_input_system, update_entity_opacity_input_system,
+        update_entity_rotation_input_system, update_entity_size_input_system,
+        update_entity_text_node_input_system, update_entity_transform_input_system,
         update_entity_visibility_input_system,
     },
     hierarchy::update_hierarchy_levels,
@@ -81,12 +84,16 @@ impl Plugin for CompCorePlugin {
         app.add_event::<UpdateCompositionSizeInputEvent>();
         app.add_event::<UpdateCompositionViewportInputEvent>();
         app.add_event::<FocusRootNodesInputEvent>();
+        app.add_event::<UpdateTextNodeInputEvent>();
         app.add_event::<DeleteEntityInputEvent>();
+        app.add_event::<UpdateEntityTransformInputEvent>();
+        app.add_event::<UpdateEntitySizeInputEvent>();
         app.add_event::<MoveEntityInputEvent>();
-        app.add_event::<UpdateEntityPositionInputEvent>();
         app.add_event::<UpdateEntityRotationInputEvent>();
-        app.add_event::<UpdateEntityTextInputEvent>();
         app.add_event::<UpdateEntityVisibilityInputEvent>();
+        app.add_event::<UpdateEntityCornerRadiiInputEvent>();
+        app.add_event::<UpdateEntityBlendModeInputEvent>();
+        app.add_event::<UpdateEntityOpacityInputEvent>();
 
         // Register resources
         app.init_resource::<LayoutRes>();
@@ -126,17 +133,24 @@ impl Plugin for CompCorePlugin {
         app.add_systems(
             Update,
             (
+                // Composition
                 update_composition_size_input_system.in_set(CompCoreSystemSet::InputEvents),
                 update_composition_viewport_input_system.in_set(CompCoreSystemSet::InputEvents),
                 focus_root_nodes_input_system
                     .in_set(CompCoreSystemSet::InputEvents)
                     .after(update_composition_size_input_system),
+                // Node
+                update_entity_text_node_input_system.in_set(CompCoreSystemSet::InputEvents),
+                // Entity
                 delete_entity_input_system.in_set(CompCoreSystemSet::InputEvents),
+                update_entity_transform_input_system.in_set(CompCoreSystemSet::InputEvents),
+                update_entity_size_input_system.in_set(CompCoreSystemSet::InputEvents),
                 move_entity_input_system.in_set(CompCoreSystemSet::InputEvents),
-                update_entity_position_input_system.in_set(CompCoreSystemSet::InputEvents),
                 update_entity_rotation_input_system.in_set(CompCoreSystemSet::InputEvents),
-                update_entity_text_input_system.in_set(CompCoreSystemSet::InputEvents),
                 update_entity_visibility_input_system.in_set(CompCoreSystemSet::InputEvents),
+                update_entity_corner_radii_input_system.in_set(CompCoreSystemSet::InputEvents),
+                update_entity_blend_mode_input_system.in_set(CompCoreSystemSet::InputEvents),
+                update_entity_opacity_input_system.in_set(CompCoreSystemSet::InputEvents),
             ),
         );
         app.add_systems(

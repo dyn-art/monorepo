@@ -12,6 +12,7 @@
  */
 use super::scalar::Scalar;
 use super::Numeric;
+use glam::Quat;
 use std::f32::consts::PI;
 use std::fmt::{Debug, Formatter};
 use std::ops::{Add, Div, Mul, Neg};
@@ -68,6 +69,10 @@ impl Angle {
     /// Converts this angle to degrees.
     pub fn to_deg(&self) -> f32 {
         self.to_unit(AngleUnit::Deg)
+    }
+
+    pub fn to_quat(&self) -> Quat {
+        Quat::from_rotation_z(self.0.get())
     }
 }
 

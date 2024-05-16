@@ -10,14 +10,16 @@ use bevy_transform::components::Transform;
 use dyn_comp_bundles::{
     components::{
         marker::{Removed, Root},
-        mixins::{SizeMixin, VisibilityMixin},
+        mixins::{BlendModeMixin, CornerRadiiMixin, OpacityMixin, SizeMixin, VisibilityMixin},
         nodes::{CompNode, TextCompNode},
     },
     events::{
         DeleteEntityInputEvent, FocusRootNodesInputEvent, MoveEntityInputEvent,
         UpdateCompositionSizeInputEvent, UpdateCompositionViewportInputEvent,
-        UpdateEntityPositionInputEvent, UpdateEntityRotationInputEvent, UpdateEntityTextInputEvent,
-        UpdateEntityVisibilityInputEvent,
+        UpdateEntityBlendModeInputEvent, UpdateEntityCornerRadiiInputEvent,
+        UpdateEntityOpacityInputEvent, UpdateEntityRotationInputEvent, UpdateEntitySizeInputEvent,
+        UpdateEntityTransformInputEvent, UpdateEntityVisibilityInputEvent,
+        UpdateTextNodeInputEvent,
     },
     properties::Viewport,
     utils::transform_to_z_rotation_rad,
@@ -48,10 +50,6 @@ pub fn update_composition_viewport_input_system(
         comp_res.viewport = event.viewport;
     }
 }
-
-// =============================================================================
-// Noe
-// =============================================================================
 
 pub fn focus_root_nodes_input_system(
     mut event_reader: EventReader<FocusRootNodesInputEvent>,
@@ -119,6 +117,47 @@ pub fn focus_root_nodes_input_system(
 }
 
 // =============================================================================
+// Node
+// =============================================================================
+
+pub fn update_entity_text_node_input_system(
+    mut event_reader: EventReader<UpdateTextNodeInputEvent>,
+    mut query: Query<&mut TextCompNode>,
+) {
+    for UpdateTextNodeInputEvent {
+        entity,
+        text: maybe_text,
+        attributes: maybe_attributes,
+        line_wrap: maybe_line_wrap,
+        horizontal_text_alignment: maybe_horizontal_text_alignment,
+        vertical_text_alignment: maybe_vertical_text_alignment,
+        sizing_mode: maybe_sizing_mode,
+    } in event_reader.read()
+    {
+        if let Ok(mut text_comp_node) = query.get_mut(*entity) {
+            if let Some(text) = maybe_text {
+                text_comp_node.text = text.clone();
+            }
+            if let Some(attributes) = maybe_attributes {
+                text_comp_node.attributes = SmallVec::from_vec(attributes.clone());
+            }
+            if let Some(line_wrap) = maybe_line_wrap {
+                text_comp_node.line_wrap = *line_wrap;
+            }
+            if let Some(horizontal_text_alignment) = maybe_horizontal_text_alignment {
+                text_comp_node.horizontal_text_alignment = *horizontal_text_alignment;
+            }
+            if let Some(vertical_text_alignment) = maybe_vertical_text_alignment {
+                text_comp_node.vertical_text_alignment = *vertical_text_alignment;
+            }
+            if let Some(sizing_mode) = maybe_sizing_mode {
+                text_comp_node.sizing_mode = *sizing_mode;
+            }
+        }
+    }
+}
+
+// =============================================================================
 // Entity
 // =============================================================================
 
@@ -152,6 +191,42 @@ pub fn despawn_removed_entities_system(
     }
 }
 
+pub fn update_entity_transform_input_system(
+    mut event_reader: EventReader<UpdateEntityTransformInputEvent>,
+    mut query: Query<&mut Transform>,
+) {
+    for UpdateEntityTransformInputEvent {
+        entity,
+        x: maybe_x,
+        y: maybe_y,
+        rotation_deg: maybe_rotation_deg,
+    } in event_reader.read()
+    {
+        if let Ok(mut transform) = query.get_mut(*entity) {
+            if let Some(x) = maybe_x {
+                transform.translation.x = *x;
+            }
+            if let Some(y) = maybe_y {
+                transform.translation.y = *y;
+            }
+            if let Some(rotation_deg) = maybe_rotation_deg {
+                transform.rotation = rotation_deg.to_quat();
+            }
+        }
+    }
+}
+
+pub fn update_entity_size_input_system(
+    mut event_reader: EventReader<UpdateEntitySizeInputEvent>,
+    mut query: Query<&mut SizeMixin>,
+) {
+    for UpdateEntitySizeInputEvent { entity, size } in event_reader.read() {
+        if let Ok(mut size_mixin) = query.get_mut(*entity) {
+            size_mixin.0 = *size;
+        }
+    }
+}
+
 pub fn move_entity_input_system(
     mut event_reader: EventReader<MoveEntityInputEvent>,
     mut query: Query<&mut Transform>,
@@ -165,27 +240,6 @@ pub fn move_entity_input_system(
         if let Ok(mut transform) = query.get_mut(*entity) {
             transform.translation +=
                 Vec3::new(maybe_dx.unwrap_or(0.0), maybe_dy.unwrap_or(0.0), 0.0);
-        }
-    }
-}
-
-pub fn update_entity_position_input_system(
-    mut event_reader: EventReader<UpdateEntityPositionInputEvent>,
-    mut query: Query<&mut Transform>,
-) {
-    for UpdateEntityPositionInputEvent {
-        entity,
-        x: maybe_x,
-        y: maybe_y,
-    } in event_reader.read()
-    {
-        if let Ok(mut transform) = query.get_mut(*entity) {
-            if let Some(x) = maybe_x {
-                transform.translation.x = *x;
-            }
-            if let Some(y) = maybe_y {
-                transform.translation.y = *y;
-            }
         }
     }
 }
@@ -216,39 +270,6 @@ pub fn update_entity_rotation_input_system(
     }
 }
 
-pub fn update_entity_text_input_system(
-    mut event_reader: EventReader<UpdateEntityTextInputEvent>,
-    mut query: Query<&mut TextCompNode>,
-) {
-    for UpdateEntityTextInputEvent {
-        entity,
-        text: maybe_text,
-        attributes: maybe_attributes,
-        line_wrap: maybe_line_wrap,
-        horizontal_text_alignment: maybe_horizontal_text_alignment,
-        vertical_text_alignment: maybe_vertical_text_alignment,
-    } in event_reader.read()
-    {
-        if let Ok(mut text_comp_node) = query.get_mut(*entity) {
-            if let Some(text) = maybe_text {
-                text_comp_node.text = text.clone();
-            }
-            if let Some(attributes) = maybe_attributes {
-                text_comp_node.attributes = SmallVec::from_vec(attributes.clone());
-            }
-            if let Some(line_wrap) = maybe_line_wrap {
-                text_comp_node.line_wrap = *line_wrap;
-            }
-            if let Some(horizontal_text_alignment) = maybe_horizontal_text_alignment {
-                text_comp_node.horizontal_text_alignment = *horizontal_text_alignment;
-            }
-            if let Some(vertical_text_alignment) = maybe_vertical_text_alignment {
-                text_comp_node.vertical_text_alignment = *vertical_text_alignment;
-            }
-        }
-    }
-}
-
 pub fn update_entity_visibility_input_system(
     mut event_reader: EventReader<UpdateEntityVisibilityInputEvent>,
     mut query: Query<&mut VisibilityMixin>,
@@ -256,6 +277,43 @@ pub fn update_entity_visibility_input_system(
     for UpdateEntityVisibilityInputEvent { entity, visible } in event_reader.read() {
         if let Ok(mut visibility_mixin) = query.get_mut(*entity) {
             visibility_mixin.0 = *visible;
+        }
+    }
+}
+
+pub fn update_entity_corner_radii_input_system(
+    mut event_reader: EventReader<UpdateEntityCornerRadiiInputEvent>,
+    mut query: Query<&mut CornerRadiiMixin>,
+) {
+    for UpdateEntityCornerRadiiInputEvent {
+        entity,
+        corner_radii,
+    } in event_reader.read()
+    {
+        if let Ok(mut corner_radii_mixin) = query.get_mut(*entity) {
+            corner_radii_mixin.0 = *corner_radii;
+        }
+    }
+}
+
+pub fn update_entity_blend_mode_input_system(
+    mut event_reader: EventReader<UpdateEntityBlendModeInputEvent>,
+    mut query: Query<&mut BlendModeMixin>,
+) {
+    for UpdateEntityBlendModeInputEvent { entity, blend_mode } in event_reader.read() {
+        if let Ok(mut blend_mode_mixin) = query.get_mut(*entity) {
+            blend_mode_mixin.0 = *blend_mode;
+        }
+    }
+}
+
+pub fn update_entity_opacity_input_system(
+    mut event_reader: EventReader<UpdateEntityOpacityInputEvent>,
+    mut query: Query<&mut OpacityMixin>,
+) {
+    for UpdateEntityOpacityInputEvent { entity, opacity } in event_reader.read() {
+        if let Ok(mut opacity_mixin) = query.get_mut(*entity) {
+            opacity_mixin.0 = *opacity;
         }
     }
 }

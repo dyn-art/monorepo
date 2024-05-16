@@ -1,15 +1,23 @@
 use bevy_ecs::entity::Entity;
-use dyn_attributed_string::layout::{HorizontalTextAlignment, LineWrap, VerticalTextAlignment};
+use dyn_attributed_string::layout::{
+    HorizontalTextAlignment, LineWrap, TextSizingMode, VerticalTextAlignment,
+};
 use dyn_comp_bundles::{
+    components::mixins::BlendMode,
     events::{
         CompCoreInputEvent, DeleteEntityInputEvent, FocusRootNodesInputEvent, MoveEntityInputEvent,
         UpdateCompositionSizeInputEvent, UpdateCompositionViewportInputEvent,
-        UpdateEntityPositionInputEvent, UpdateEntityRotationInputEvent, UpdateEntityTextInputEvent,
-        UpdateEntityVisibilityInputEvent,
+        UpdateEntityBlendModeInputEvent, UpdateEntityCornerRadiiInputEvent,
+        UpdateEntityOpacityInputEvent, UpdateEntityRotationInputEvent, UpdateEntitySizeInputEvent,
+        UpdateEntityTransformInputEvent, UpdateEntityVisibilityInputEvent,
+        UpdateTextNodeInputEvent,
     },
     properties::{TextAttributeInterval, Viewport},
 };
-use dyn_utils::{properties::size::Size, units::angle::Angle};
+use dyn_utils::{
+    properties::{corner_radii::CornerRadii, opacity::Opacity, size::Size},
+    units::angle::Angle,
+};
 use std::collections::HashMap;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
@@ -18,17 +26,21 @@ pub enum DtifInputEvent {
     // Composition
     UpdateCompositionSize(UpdateCompositionSizeDtifInputEvent),
     UpdateCompositionViewport(UpdateCompositionViewportDtifInputEvent),
+    FocusRootNodes(FocusRootNodesDtifInputEvent),
 
     // Node
-    FocusRootNodes(FocusRootNodesDtifInputEvent),
+    UpdateTextNode(UpdateTextNodeDtifInputEvent),
 
     // Entity
     DeleteEntity(DeleteEntityDtifInputEvent),
+    UpdateEntityTransform(UpdateEntityTransformDtifInputEvent),
+    UpdateEntitySize(UpdateEntitySizeDtifInputEvent),
     MoveEntity(MoveEntityDtifInputEvent),
-    UpdateEntityPosition(UpdateEntityPositionDtifInputEvent),
     UpdateEntityRotation(UpdateEntityRotationDtifInputEvent),
-    UpdateEntityText(UpdateEntityTextDtifInputEvent),
     UpdateEntityVisibility(UpdateEntityVisibilityDtifInputEvent),
+    UpdateEntityCornerRadii(UpdateEntityCornerRadiiDtifInputEvent),
+    UpdateEntityBlendMode(UpdateEntityBlendModeDtifInputEvent),
+    UpdateEntityOpacity(UpdateEntityOpacityDtifInputEvent),
 }
 
 impl DtifInputEvent {
@@ -50,16 +62,47 @@ impl DtifInputEvent {
                     },
                 ))
             }
-
-            // Node
             DtifInputEvent::FocusRootNodes(_) => {
                 Some(CompCoreInputEvent::FocusRootNodes(FocusRootNodesInputEvent))
+            }
+
+            // Node
+            DtifInputEvent::UpdateTextNode(event) => {
+                sid_to_entity.get(&event.entity).map(|entity| {
+                    CompCoreInputEvent::UpdateTextNode(UpdateTextNodeInputEvent {
+                        entity: *entity,
+                        text: event.text,
+                        attributes: event.attributes,
+                        line_wrap: event.line_wrap,
+                        horizontal_text_alignment: event.horizontal_text_alignment,
+                        vertical_text_alignment: event.vertical_text_alignment,
+                        sizing_mode: event.sizing_mode,
+                    })
+                })
             }
 
             // Entity
             DtifInputEvent::DeleteEntity(event) => sid_to_entity.get(&event.entity).map(|entity| {
                 CompCoreInputEvent::DeleteEntity(DeleteEntityInputEvent { entity: *entity })
             }),
+            DtifInputEvent::UpdateEntityTransform(event) => {
+                sid_to_entity.get(&event.entity).map(|entity| {
+                    CompCoreInputEvent::UpdateEntityTransform(UpdateEntityTransformInputEvent {
+                        entity: *entity,
+                        x: event.x,
+                        y: event.y,
+                        rotation_deg: event.rotation_deg,
+                    })
+                })
+            }
+            DtifInputEvent::UpdateEntitySize(event) => {
+                sid_to_entity.get(&event.entity).map(|entity| {
+                    CompCoreInputEvent::UpdateEntitySize(UpdateEntitySizeInputEvent {
+                        entity: *entity,
+                        size: event.size,
+                    })
+                })
+            }
             DtifInputEvent::MoveEntity(event) => sid_to_entity.get(&event.entity).map(|entity| {
                 CompCoreInputEvent::MoveEntity(MoveEntityInputEvent {
                     entity: *entity,
@@ -67,15 +110,6 @@ impl DtifInputEvent {
                     dy: event.dy,
                 })
             }),
-            DtifInputEvent::UpdateEntityPosition(event) => {
-                sid_to_entity.get(&event.entity).map(|entity| {
-                    CompCoreInputEvent::UpdateEntityPosition(UpdateEntityPositionInputEvent {
-                        entity: *entity,
-                        x: event.x,
-                        y: event.y,
-                    })
-                })
-            }
             DtifInputEvent::UpdateEntityRotation(event) => {
                 sid_to_entity.get(&event.entity).map(|entity| {
                     CompCoreInputEvent::UpdateEntityRotation(UpdateEntityRotationInputEvent {
@@ -84,23 +118,35 @@ impl DtifInputEvent {
                     })
                 })
             }
-            DtifInputEvent::UpdateEntityText(event) => {
-                sid_to_entity.get(&event.entity).map(|entity| {
-                    CompCoreInputEvent::UpdateEntityText(UpdateEntityTextInputEvent {
-                        entity: *entity,
-                        text: event.text,
-                        attributes: event.attributes,
-                        line_wrap: event.line_wrap,
-                        horizontal_text_alignment: event.horizontal_text_alignment,
-                        vertical_text_alignment: event.vertical_text_alignment,
-                    })
-                })
-            }
             DtifInputEvent::UpdateEntityVisibility(event) => {
                 sid_to_entity.get(&event.entity).map(|entity| {
                     CompCoreInputEvent::UpdateEntityVisibility(UpdateEntityVisibilityInputEvent {
                         entity: *entity,
                         visible: event.visible,
+                    })
+                })
+            }
+            DtifInputEvent::UpdateEntityCornerRadii(event) => {
+                sid_to_entity.get(&event.entity).map(|entity| {
+                    CompCoreInputEvent::UpdateEntityCornerRadii(UpdateEntityCornerRadiiInputEvent {
+                        entity: *entity,
+                        corner_radii: event.corner_radii,
+                    })
+                })
+            }
+            DtifInputEvent::UpdateEntityBlendMode(event) => {
+                sid_to_entity.get(&event.entity).map(|entity| {
+                    CompCoreInputEvent::UpdateEntityBlendMode(UpdateEntityBlendModeInputEvent {
+                        entity: *entity,
+                        blend_mode: event.blend_mode,
+                    })
+                })
+            }
+            DtifInputEvent::UpdateEntityOpacity(event) => {
+                sid_to_entity.get(&event.entity).map(|entity| {
+                    CompCoreInputEvent::UpdateEntityOpacity(UpdateEntityOpacityInputEvent {
+                        entity: *entity,
+                        opacity: event.opacity,
                     })
                 })
             }
@@ -122,12 +168,30 @@ pub struct UpdateCompositionViewportDtifInputEvent {
     pub viewport: Viewport,
 }
 
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
+pub struct FocusRootNodesDtifInputEvent;
+
 // =============================================================================
 // Node
 // =============================================================================
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
-pub struct FocusRootNodesDtifInputEvent;
+#[serde(rename_all = "camelCase")]
+pub struct UpdateTextNodeDtifInputEvent {
+    pub entity: String,
+    #[serde(default)]
+    pub text: Option<String>,
+    #[serde(default)]
+    pub attributes: Option<Vec<TextAttributeInterval>>,
+    #[serde(default)]
+    pub line_wrap: Option<LineWrap>,
+    #[serde(default)]
+    pub horizontal_text_alignment: Option<HorizontalTextAlignment>,
+    #[serde(default)]
+    pub vertical_text_alignment: Option<VerticalTextAlignment>,
+    #[serde(default)]
+    pub sizing_mode: Option<TextSizingMode>,
+}
 
 // =============================================================================
 // Entity
@@ -136,6 +200,25 @@ pub struct FocusRootNodesDtifInputEvent;
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
 pub struct DeleteEntityDtifInputEvent {
     pub entity: String,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
+#[serde(rename_all = "camelCase")]
+pub struct UpdateEntityTransformDtifInputEvent {
+    pub entity: String,
+    #[serde(default)]
+    pub x: Option<f32>,
+    #[serde(default)]
+    pub y: Option<f32>,
+    #[serde(default)]
+    pub rotation_deg: Option<Angle>,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
+pub struct UpdateEntitySizeDtifInputEvent {
+    pub entity: String,
+    #[serde(default)]
+    size: Size,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
@@ -148,15 +231,6 @@ pub struct MoveEntityDtifInputEvent {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
-pub struct UpdateEntityPositionDtifInputEvent {
-    pub entity: String,
-    #[serde(default)]
-    pub x: Option<f32>,
-    #[serde(default)]
-    pub y: Option<f32>,
-}
-
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateEntityRotationDtifInputEvent {
     pub entity: String,
@@ -164,23 +238,27 @@ pub struct UpdateEntityRotationDtifInputEvent {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
-#[serde(rename_all = "camelCase")]
-pub struct UpdateEntityTextDtifInputEvent {
-    pub entity: String,
-    #[serde(default)]
-    pub text: Option<String>,
-    #[serde(default)]
-    pub attributes: Option<Vec<TextAttributeInterval>>,
-    #[serde(default)]
-    pub line_wrap: Option<LineWrap>,
-    #[serde(default)]
-    pub horizontal_text_alignment: Option<HorizontalTextAlignment>,
-    #[serde(default)]
-    pub vertical_text_alignment: Option<VerticalTextAlignment>,
-}
-
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
 pub struct UpdateEntityVisibilityDtifInputEvent {
     pub entity: String,
     pub visible: bool,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
+#[serde(rename_all = "camelCase")]
+pub struct UpdateEntityCornerRadiiDtifInputEvent {
+    pub entity: String,
+    pub corner_radii: CornerRadii,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
+#[serde(rename_all = "camelCase")]
+pub struct UpdateEntityBlendModeDtifInputEvent {
+    pub entity: String,
+    pub blend_mode: BlendMode,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
+pub struct UpdateEntityOpacityDtifInputEvent {
+    pub entity: String,
+    pub opacity: Opacity,
 }
