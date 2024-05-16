@@ -16,4 +16,6 @@ export * from './shallow-merge';
 export * from './short-id';
 export * from './sleep';
 export * from './to-array';
+export * from './to-hex-color';
+export * from './to-rgb-color';
 export * from './types';

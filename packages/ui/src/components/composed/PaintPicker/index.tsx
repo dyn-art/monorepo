@@ -4,6 +4,7 @@ import React from 'react';
 
 import { Popover, PopoverContent, PopoverTrigger } from '../../layout';
 import { Button, Input, Tabs, TabsContent, TabsList, TabsTrigger } from '../../primitive';
+import { GradientPaint } from './GradientPaint';
 import { mapColorToCss } from './map-color-to-css';
 import { mapGradientToCss } from './map-gradient-to-css';
 import { GRADIENT_COLORS as GRADIENT_PAINTS, SOLID_COLORS as SOLID_PAINTS } from './presets';
@@ -46,7 +47,7 @@ export const PaintPicker: React.FC<TPaintPickerProps> = (props) => {
 						{SOLID_PAINTS.map((solidColor) => (
 							<button
 								className="h-6 w-6 cursor-pointer rounded-md active:scale-105"
-								key={mapColorToCss(solidColor.color)}
+								key={solidColor.color.join('-')}
 								onClick={() => {
 									onPaintUpdate(solidColor);
 								}}
@@ -60,14 +61,15 @@ export const PaintPicker: React.FC<TPaintPickerProps> = (props) => {
 						<div className="mb-2 flex flex-wrap gap-1">
 							{GRADIENT_PAINTS.map((gradientPaint) => (
 								<button
-									className="h-6 w-6 cursor-pointer rounded-md active:scale-105"
-									key={mapGradientToCss(gradientPaint)}
+									className="h-6 w-6 cursor-pointer overflow-hidden rounded-md active:scale-105"
+									key={gradientPaint.stops.map((stop) => stop.color).join('-')}
 									onClick={() => {
 										onPaintUpdate(gradientPaint);
 									}}
-									style={{ background: mapGradientToCss(gradientPaint) }}
 									type="button"
-								/>
+								>
+									<GradientPaint paint={gradientPaint} />
+								</button>
 							))}
 						</div>
 					</TabsContent>

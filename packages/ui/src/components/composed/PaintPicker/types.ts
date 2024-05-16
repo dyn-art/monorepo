@@ -1,10 +1,10 @@
-import type { TColor } from '@dyn/utils';
+import type { TRgbColor } from '@dyn/utils';
 
 export type TPaint = TSolidPaint | TGradientPaint;
 
 export interface TSolidPaint {
 	type: 'Solid';
-	color: TColor;
+	color: TRgbColor;
 }
 
 export interface TGradientPaint {
@@ -21,7 +21,7 @@ export interface TGradientColorStop {
 	/**
 	 * The color of the stop.
 	 */
-	color: TColor;
+	color: TRgbColor;
 	/**
 	 * The opacity of the stop.
 	 */

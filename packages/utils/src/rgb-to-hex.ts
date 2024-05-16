@@ -1,6 +1,6 @@
-import type { TRgbColor } from './types';
+import type { THexColor, TRgbColor } from './types';
 
-export function rgbToHex(rgb: TRgbColor): string {
+export function rgbToHex(rgb: TRgbColor): THexColor {
 	return `#${rgb
 		.map((x) => {
 			const hex = x.toString(16);
