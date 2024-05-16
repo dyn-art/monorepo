@@ -11,14 +11,18 @@ use dyn_comp_bundles::{
     components::{
         marker::{Removed, Root},
         mixins::{BlendModeMixin, CornerRadiiMixin, OpacityMixin, SizeMixin, VisibilityMixin},
-        nodes::{CompNode, TextCompNode},
+        nodes::{
+            CompNode, EllipseCompNode, FrameCompNode, PolygonCompNode, StarCompNode, TextCompNode,
+        },
     },
     events::{
         DeleteEntityInputEvent, FocusRootNodesInputEvent, MoveEntityInputEvent,
         UpdateCompositionSizeInputEvent, UpdateCompositionViewportInputEvent,
-        UpdateEntityBlendModeInputEvent, UpdateEntityCornerRadiiInputEvent,
-        UpdateEntityOpacityInputEvent, UpdateEntityRotationInputEvent, UpdateEntitySizeInputEvent,
+        UpdateEllipseNodeInputEvent, UpdateEntityBlendModeInputEvent,
+        UpdateEntityCornerRadiiInputEvent, UpdateEntityOpacityInputEvent,
+        UpdateEntityRotationInputEvent, UpdateEntitySizeInputEvent,
         UpdateEntityTransformInputEvent, UpdateEntityVisibilityInputEvent,
+        UpdateFrameNodeInputEvent, UpdatePolygonNodeInputEvent, UpdateStarNodeInputEvent,
         UpdateTextNodeInputEvent,
     },
     properties::Viewport,
@@ -120,7 +124,87 @@ pub fn focus_root_nodes_input_system(
 // Node
 // =============================================================================
 
-pub fn update_entity_text_node_input_system(
+pub fn update_frame_node_input_system(
+    mut event_reader: EventReader<UpdateFrameNodeInputEvent>,
+    mut query: Query<&mut FrameCompNode>,
+) {
+    for UpdateFrameNodeInputEvent {
+        entity,
+        clip_content: maybe_clip_content,
+    } in event_reader.read()
+    {
+        if let Ok(mut frame_comp_node) = query.get_mut(*entity) {
+            if let Some(clip_content) = maybe_clip_content {
+                frame_comp_node.clip_content = *clip_content;
+            }
+        }
+    }
+}
+
+pub fn update_ellipse_node_input_system(
+    mut event_reader: EventReader<UpdateEllipseNodeInputEvent>,
+    mut query: Query<&mut EllipseCompNode>,
+) {
+    for UpdateEllipseNodeInputEvent {
+        entity,
+        starting_angle: maybe_starting_angle,
+        ending_angle: maybe_ending_angle,
+        inner_radius_ratio: maybe_inner_radius_ratio,
+    } in event_reader.read()
+    {
+        if let Ok(mut ellipse_comp_node) = query.get_mut(*entity) {
+            if let Some(starting_angle) = maybe_starting_angle {
+                ellipse_comp_node.arc_data.starting_angle = *starting_angle;
+            }
+            if let Some(ending_angle) = maybe_ending_angle {
+                ellipse_comp_node.arc_data.ending_angle = *ending_angle;
+            }
+            if let Some(inner_radius_ratio) = maybe_inner_radius_ratio {
+                ellipse_comp_node.arc_data.inner_radius_ratio = *inner_radius_ratio;
+            }
+        }
+    }
+}
+
+pub fn update_star_node_input_system(
+    mut event_reader: EventReader<UpdateStarNodeInputEvent>,
+    mut query: Query<&mut StarCompNode>,
+) {
+    for UpdateStarNodeInputEvent {
+        entity,
+        point_count: maybe_point_count,
+        inner_radius_ratio: maybe_inner_radius_ratio,
+    } in event_reader.read()
+    {
+        if let Ok(mut star_comp_node) = query.get_mut(*entity) {
+            if let Some(point_count) = maybe_point_count {
+                star_comp_node.point_count = *point_count;
+            }
+            if let Some(inner_radius_ratio) = maybe_inner_radius_ratio {
+                star_comp_node.inner_radius_ratio = *inner_radius_ratio;
+            }
+        }
+    }
+}
+
+pub fn update_polygon_node_input_system(
+    mut event_reader: EventReader<UpdatePolygonNodeInputEvent>,
+    mut query: Query<&mut PolygonCompNode>,
+) {
+    for UpdatePolygonNodeInputEvent {
+        entity,
+        point_count: maybe_point_count,
+    } in event_reader.read()
+    {
+        if let Ok(mut polygon_comp_node) = query.get_mut(*entity) {
+            if let Some(point_count) = maybe_point_count {
+                polygon_comp_node.point_count = *point_count;
+            }
+        }
+    }
+}
+
+pub fn update_text_node_input_system(
     mut event_reader: EventReader<UpdateTextNodeInputEvent>,
     mut query: Query<&mut TextCompNode>,
 ) {

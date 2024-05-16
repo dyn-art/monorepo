@@ -29,10 +29,10 @@ pub enum CompCoreInputEvent {
     FocusRootNodes(FocusRootNodesInputEvent),
 
     // Node
-    // UpdateFrameNode
-    // UpdateEllipseNode
-    // UpdateStarNode
-    // UpdatePolygonNode
+    UpdateFrameNode(UpdateFrameNodeInputEvent),
+    UpdateEllipseNode(UpdateEllipseNodeInputEvent),
+    UpdateStarNode(UpdateStarNodeInputEvent),
+    UpdatePolygonNode(UpdatePolygonNodeInputEvent),
     UpdateTextNode(UpdateTextNodeInputEvent),
 
     // Paint
@@ -62,17 +62,29 @@ impl InputEvent for CompCoreInputEvent {
             CompCoreInputEvent::UpdateCompositionViewport(event) => {
                 world.send_event(event);
             }
+            CompCoreInputEvent::FocusRootNodes(event) => {
+                world.send_event(event);
+            }
 
             // Node
-            CompCoreInputEvent::FocusRootNodes(event) => {
+            CompCoreInputEvent::UpdateFrameNode(event) => {
+                world.send_event(event);
+            }
+            CompCoreInputEvent::UpdateEllipseNode(event) => {
+                world.send_event(event);
+            }
+            CompCoreInputEvent::UpdateStarNode(event) => {
+                world.send_event(event);
+            }
+            CompCoreInputEvent::UpdatePolygonNode(event) => {
+                world.send_event(event);
+            }
+            CompCoreInputEvent::UpdateTextNode(event) => {
                 world.send_event(event);
             }
 
             // Entity
             CompCoreInputEvent::DeleteEntity(event) => {
-                world.send_event(event);
-            }
-            CompCoreInputEvent::MoveEntity(event) => {
                 world.send_event(event);
             }
             CompCoreInputEvent::UpdateEntityTransform(event) => {
@@ -81,10 +93,10 @@ impl InputEvent for CompCoreInputEvent {
             CompCoreInputEvent::UpdateEntitySize(event) => {
                 world.send_event(event);
             }
-            CompCoreInputEvent::UpdateEntityRotation(event) => {
+            CompCoreInputEvent::MoveEntity(event) => {
                 world.send_event(event);
             }
-            CompCoreInputEvent::UpdateTextNode(event) => {
+            CompCoreInputEvent::UpdateEntityRotation(event) => {
                 world.send_event(event);
             }
             CompCoreInputEvent::UpdateEntityVisibility(event) => {
@@ -136,6 +148,60 @@ pub struct FocusRootNodesInputEvent;
 // =============================================================================
 // Node
 // =============================================================================
+
+#[derive(Event, Debug, Copy, Clone)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type),
+    serde(rename_all = "camelCase")
+)]
+pub struct UpdateFrameNodeInputEvent {
+    pub entity: Entity,
+    #[cfg_attr(feature = "serde_support", serde(default))]
+    pub clip_content: Option<bool>,
+}
+
+#[derive(Event, Debug, Copy, Clone)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type),
+    serde(rename_all = "camelCase")
+)]
+pub struct UpdateEllipseNodeInputEvent {
+    pub entity: Entity,
+    #[cfg_attr(feature = "serde_support", serde(default))]
+    pub starting_angle: Option<f32>,
+    #[cfg_attr(feature = "serde_support", serde(default))]
+    pub ending_angle: Option<f32>,
+    #[cfg_attr(feature = "serde_support", serde(default))]
+    pub inner_radius_ratio: Option<f32>,
+}
+
+#[derive(Event, Debug, Copy, Clone)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type),
+    serde(rename_all = "camelCase")
+)]
+pub struct UpdateStarNodeInputEvent {
+    pub entity: Entity,
+    #[cfg_attr(feature = "serde_support", serde(default))]
+    pub point_count: Option<u8>,
+    #[cfg_attr(feature = "serde_support", serde(default))]
+    pub inner_radius_ratio: Option<f32>,
+}
+
+#[derive(Event, Debug, Copy, Clone)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type),
+    serde(rename_all = "camelCase")
+)]
+pub struct UpdatePolygonNodeInputEvent {
+    pub entity: Entity,
+    #[cfg_attr(feature = "serde_support", serde(default))]
+    pub point_count: Option<u8>,
+}
 
 #[derive(Event, Debug, Clone)]
 #[cfg_attr(

@@ -7,9 +7,11 @@ use dyn_comp_bundles::{
     events::{
         CompCoreInputEvent, DeleteEntityInputEvent, FocusRootNodesInputEvent, MoveEntityInputEvent,
         UpdateCompositionSizeInputEvent, UpdateCompositionViewportInputEvent,
-        UpdateEntityBlendModeInputEvent, UpdateEntityCornerRadiiInputEvent,
-        UpdateEntityOpacityInputEvent, UpdateEntityRotationInputEvent, UpdateEntitySizeInputEvent,
+        UpdateEllipseNodeInputEvent, UpdateEntityBlendModeInputEvent,
+        UpdateEntityCornerRadiiInputEvent, UpdateEntityOpacityInputEvent,
+        UpdateEntityRotationInputEvent, UpdateEntitySizeInputEvent,
         UpdateEntityTransformInputEvent, UpdateEntityVisibilityInputEvent,
+        UpdateFrameNodeInputEvent, UpdatePolygonNodeInputEvent, UpdateStarNodeInputEvent,
         UpdateTextNodeInputEvent,
     },
     properties::{TextAttributeInterval, Viewport},
@@ -29,6 +31,10 @@ pub enum DtifInputEvent {
     FocusRootNodes(FocusRootNodesDtifInputEvent),
 
     // Node
+    UpdateFrameNode(UpdateFrameNodeDtifInputEvent),
+    UpdateEllipseNode(UpdateEllipseNodeDtifInputEvent),
+    UpdateStarNode(UpdateStarNodeDtifInputEvent),
+    UpdatePolygonNode(UpdatePolygonNodeDtifInputEvent),
     UpdateTextNode(UpdateTextNodeDtifInputEvent),
 
     // Entity
@@ -67,6 +73,41 @@ impl DtifInputEvent {
             }
 
             // Node
+            DtifInputEvent::UpdateFrameNode(event) => {
+                sid_to_entity.get(&event.entity).map(|entity| {
+                    CompCoreInputEvent::UpdateFrameNode(UpdateFrameNodeInputEvent {
+                        entity: *entity,
+                        clip_content: event.clip_content,
+                    })
+                })
+            }
+            DtifInputEvent::UpdateEllipseNode(event) => {
+                sid_to_entity.get(&event.entity).map(|entity| {
+                    CompCoreInputEvent::UpdateEllipseNode(UpdateEllipseNodeInputEvent {
+                        entity: *entity,
+                        starting_angle: event.starting_angle,
+                        ending_angle: event.ending_angle,
+                        inner_radius_ratio: event.inner_radius_ratio,
+                    })
+                })
+            }
+            DtifInputEvent::UpdateStarNode(event) => {
+                sid_to_entity.get(&event.entity).map(|entity| {
+                    CompCoreInputEvent::UpdateStarNode(UpdateStarNodeInputEvent {
+                        entity: *entity,
+                        point_count: event.point_count,
+                        inner_radius_ratio: event.inner_radius_ratio,
+                    })
+                })
+            }
+            DtifInputEvent::UpdatePolygonNode(event) => {
+                sid_to_entity.get(&event.entity).map(|entity| {
+                    CompCoreInputEvent::UpdatePolygonNode(UpdatePolygonNodeInputEvent {
+                        entity: *entity,
+                        point_count: event.point_count,
+                    })
+                })
+            }
             DtifInputEvent::UpdateTextNode(event) => {
                 sid_to_entity.get(&event.entity).map(|entity| {
                     CompCoreInputEvent::UpdateTextNode(UpdateTextNodeInputEvent {
@@ -174,6 +215,44 @@ pub struct FocusRootNodesDtifInputEvent;
 // =============================================================================
 // Node
 // =============================================================================
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
+#[serde(rename_all = "camelCase")]
+pub struct UpdateFrameNodeDtifInputEvent {
+    pub entity: String,
+    #[serde(default)]
+    pub clip_content: Option<bool>,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
+#[serde(rename_all = "camelCase")]
+pub struct UpdateEllipseNodeDtifInputEvent {
+    pub entity: String,
+    #[serde(default)]
+    pub starting_angle: Option<f32>,
+    #[serde(default)]
+    pub ending_angle: Option<f32>,
+    #[serde(default)]
+    pub inner_radius_ratio: Option<f32>,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
+#[serde(rename_all = "camelCase")]
+pub struct UpdateStarNodeDtifInputEvent {
+    pub entity: String,
+    #[serde(default)]
+    pub point_count: Option<u8>,
+    #[serde(default)]
+    pub inner_radius_ratio: Option<f32>,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
+#[serde(rename_all = "camelCase")]
+pub struct UpdatePolygonNodeDtifInputEvent {
+    pub entity: String,
+    #[serde(default)]
+    pub point_count: Option<u8>,
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
 #[serde(rename_all = "camelCase")]
