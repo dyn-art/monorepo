@@ -1,16 +1,19 @@
 use crate::{
-    components::mixins::BlendMode,
+    components::{
+        mixins::BlendMode,
+        paints::{GradientColorStop, ImageScaleMode},
+    },
     properties::{TextAttributeInterval, Viewport},
 };
 use bevy_ecs::{entity::Entity, event::Event, world::World};
 use dyn_attributed_string::layout::{
     HorizontalTextAlignment, LineWrap, TextSizingMode, VerticalTextAlignment,
 };
+use dyn_comp_asset::asset_id::ImageId;
 use dyn_utils::{
-    properties::{corner_radii::CornerRadii, opacity::Opacity, size::Size},
+    properties::{color::Color, corner_radii::CornerRadii, opacity::Opacity, size::Size},
     units::angle::Angle,
 };
-use std::fmt::Debug;
 
 pub trait InputEvent {
     fn send_into_ecs(self, world: &mut World);
@@ -36,9 +39,9 @@ pub enum CompCoreInputEvent {
     UpdateTextNode(UpdateTextNodeInputEvent),
 
     // Paint
-    // UpdateSolidPaint
-    // UpdateImagePaint
-    // UpdateGradientPaint
+    UpdateSolidPaint(UpdateSolidPaintInputEvent),
+    UpdateImagePaint(UpdateImagePaintInputEvent),
+    UpdateGradientPaint(UpdateGradientPaintInputEvent),
 
     // Entity
     DeleteEntity(DeleteEntityInputEvent),
@@ -80,6 +83,17 @@ impl InputEvent for CompCoreInputEvent {
                 world.send_event(event);
             }
             CompCoreInputEvent::UpdateTextNode(event) => {
+                world.send_event(event);
+            }
+
+            // Paint
+            CompCoreInputEvent::UpdateSolidPaint(event) => {
+                world.send_event(event);
+            }
+            CompCoreInputEvent::UpdateImagePaint(event) => {
+                world.send_event(event);
+            }
+            CompCoreInputEvent::UpdateGradientPaint(event) => {
                 world.send_event(event);
             }
 
@@ -223,6 +237,46 @@ pub struct UpdateTextNodeInputEvent {
     pub vertical_text_alignment: Option<VerticalTextAlignment>,
     #[cfg_attr(feature = "serde_support", serde(default))]
     pub sizing_mode: Option<TextSizingMode>,
+}
+
+// =============================================================================
+// Paint
+// =============================================================================
+
+#[derive(Event, Debug, Copy, Clone)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type)
+)]
+pub struct UpdateSolidPaintInputEvent {
+    pub entity: Entity,
+    #[cfg_attr(feature = "serde_support", serde(default))]
+    pub color: Color,
+}
+
+#[derive(Event, Debug, Copy, Clone)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type),
+    serde(rename_all = "camelCase")
+)]
+pub struct UpdateImagePaintInputEvent {
+    pub entity: Entity,
+    #[cfg_attr(feature = "serde_support", serde(default))]
+    pub scale_mode: Option<ImageScaleMode>,
+    #[cfg_attr(feature = "serde_support", serde(default))]
+    pub image_id: Option<ImageId>,
+}
+
+#[derive(Event, Debug, Clone)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type)
+)]
+pub struct UpdateGradientPaintInputEvent {
+    pub entity: Entity,
+    #[cfg_attr(feature = "serde_support", serde(default))]
+    pub stops: Vec<GradientColorStop>,
 }
 
 // =============================================================================

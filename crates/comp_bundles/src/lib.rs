@@ -18,6 +18,10 @@ use components::{
     styles::{CompStyle, DropShadowCompStyle, FillCompStyle, StrokeCompStyle},
 };
 
+// =============================================================================
+// Node
+// =============================================================================
+
 #[derive(Bundle, Debug)]
 pub struct FrameCompNodeBundle {
     pub node: CompNode,
@@ -113,6 +117,10 @@ pub struct VectorNodeBundle {
     // pub styles: StylesMixin,
 }
 
+// =============================================================================
+// Paint
+// =============================================================================
+
 #[derive(Bundle, Debug)]
 pub struct SolidPaintBundle {
     pub paint: CompPaint,
@@ -137,6 +145,10 @@ pub struct GradientPaintBundle {
     // https://github.com/Nilirad/bevy_prototype_lyon/issues/207
     // pub parent: PaintParentMixin,
 }
+
+// =============================================================================
+// Style
+// =============================================================================
 
 #[derive(Bundle, Debug)]
 pub struct FillStyleBundle {

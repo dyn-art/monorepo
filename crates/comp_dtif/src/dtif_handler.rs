@@ -215,7 +215,7 @@ impl DtifHandler {
         events
             .iter()
             .cloned()
-            .map(|event| event.to_comp_input_event(&self.sid_to_entity))
+            .map(|event| event.to_comp_input_event(&self.sid_to_entity, &self.sid_to_asset_id))
             .for_each(|maybe_event| {
                 if let Some(event) = maybe_event {
                     event.send_into_ecs(world);

@@ -178,7 +178,7 @@ export type Color = [number, number, number]
 
 export type ColorMatrix = { x_axis: [number, number, number, number]; y_axis: [number, number, number, number]; z_axis: [number, number, number, number]; w_axis: [number, number, number, number]; v_axis: [number, number, number, number] }
 
-export type CompCoreInputEvent = ({ type: "UpdateCompositionSize" } & UpdateCompositionSizeInputEvent) | ({ type: "UpdateCompositionViewport" } & UpdateCompositionViewportInputEvent) | ({ type: "FocusRootNodes" }) | ({ type: "UpdateFrameNode" } & UpdateFrameNodeInputEvent) | ({ type: "UpdateEllipseNode" } & UpdateEllipseNodeInputEvent) | ({ type: "UpdateStarNode" } & UpdateStarNodeInputEvent) | ({ type: "UpdatePolygonNode" } & UpdatePolygonNodeInputEvent) | ({ type: "UpdateTextNode" } & UpdateTextNodeInputEvent) | ({ type: "DeleteEntity" } & DeleteEntityInputEvent) | ({ type: "UpdateEntityTransform" } & UpdateEntityTransformInputEvent) | ({ type: "UpdateEntitySize" } & UpdateEntitySizeInputEvent) | ({ type: "MoveEntity" } & MoveEntityInputEvent) | ({ type: "UpdateEntityRotation" } & UpdateEntityRotationInputEvent) | ({ type: "UpdateEntityVisibility" } & UpdateEntityVisibilityInputEvent) | ({ type: "UpdateEntityCornerRadii" } & UpdateEntityCornerRadiiInputEvent) | ({ type: "UpdateEntityBlendMode" } & UpdateEntityBlendModeInputEvent) | ({ type: "UpdateEntityOpacity" } & UpdateEntityOpacityInputEvent)
+export type CompCoreInputEvent = ({ type: "UpdateCompositionSize" } & UpdateCompositionSizeInputEvent) | ({ type: "UpdateCompositionViewport" } & UpdateCompositionViewportInputEvent) | ({ type: "FocusRootNodes" }) | ({ type: "UpdateFrameNode" } & UpdateFrameNodeInputEvent) | ({ type: "UpdateEllipseNode" } & UpdateEllipseNodeInputEvent) | ({ type: "UpdateStarNode" } & UpdateStarNodeInputEvent) | ({ type: "UpdatePolygonNode" } & UpdatePolygonNodeInputEvent) | ({ type: "UpdateTextNode" } & UpdateTextNodeInputEvent) | ({ type: "UpdateSolidPaint" } & UpdateSolidPaintInputEvent) | ({ type: "UpdateImagePaint" } & UpdateImagePaintInputEvent) | ({ type: "UpdateGradientPaint" } & UpdateGradientPaintInputEvent) | ({ type: "DeleteEntity" } & DeleteEntityInputEvent) | ({ type: "UpdateEntityTransform" } & UpdateEntityTransformInputEvent) | ({ type: "UpdateEntitySize" } & UpdateEntitySizeInputEvent) | ({ type: "MoveEntity" } & MoveEntityInputEvent) | ({ type: "UpdateEntityRotation" } & UpdateEntityRotationInputEvent) | ({ type: "UpdateEntityVisibility" } & UpdateEntityVisibilityInputEvent) | ({ type: "UpdateEntityCornerRadii" } & UpdateEntityCornerRadiiInputEvent) | ({ type: "UpdateEntityBlendMode" } & UpdateEntityBlendModeInputEvent) | ({ type: "UpdateEntityOpacity" } & UpdateEntityOpacityInputEvent)
 
 export type ComponentChange = { type: "Size"; size: Size } | { type: "Transform"; rotationDeg: number; translation: Vec2 } | { type: "GlobalTransform"; rotationDeg: number; translation: Vec2 }
 
@@ -251,7 +251,7 @@ paints?: { [key in string]: Paint };
  */
 assets?: { [key in string]: Asset }; events?: DtifInputEvent[] }
 
-export type DtifInputEvent = ({ type: "UpdateCompositionSize" } & UpdateCompositionSizeDtifInputEvent) | ({ type: "UpdateCompositionViewport" } & UpdateCompositionViewportDtifInputEvent) | ({ type: "FocusRootNodes" }) | ({ type: "UpdateFrameNode" } & UpdateFrameNodeDtifInputEvent) | ({ type: "UpdateEllipseNode" } & UpdateEllipseNodeDtifInputEvent) | ({ type: "UpdateStarNode" } & UpdateStarNodeDtifInputEvent) | ({ type: "UpdatePolygonNode" } & UpdatePolygonNodeDtifInputEvent) | ({ type: "UpdateTextNode" } & UpdateTextNodeDtifInputEvent) | ({ type: "DeleteEntity" } & DeleteEntityDtifInputEvent) | ({ type: "UpdateEntityTransform" } & UpdateEntityTransformDtifInputEvent) | ({ type: "UpdateEntitySize" } & UpdateEntitySizeDtifInputEvent) | ({ type: "MoveEntity" } & MoveEntityDtifInputEvent) | ({ type: "UpdateEntityRotation" } & UpdateEntityRotationDtifInputEvent) | ({ type: "UpdateEntityVisibility" } & UpdateEntityVisibilityDtifInputEvent) | ({ type: "UpdateEntityCornerRadii" } & UpdateEntityCornerRadiiDtifInputEvent) | ({ type: "UpdateEntityBlendMode" } & UpdateEntityBlendModeDtifInputEvent) | ({ type: "UpdateEntityOpacity" } & UpdateEntityOpacityDtifInputEvent)
+export type DtifInputEvent = ({ type: "UpdateCompositionSize" } & UpdateCompositionSizeDtifInputEvent) | ({ type: "UpdateCompositionViewport" } & UpdateCompositionViewportDtifInputEvent) | ({ type: "FocusRootNodes" }) | ({ type: "UpdateFrameNode" } & UpdateFrameNodeDtifInputEvent) | ({ type: "UpdateEllipseNode" } & UpdateEllipseNodeDtifInputEvent) | ({ type: "UpdateStarNode" } & UpdateStarNodeDtifInputEvent) | ({ type: "UpdatePolygonNode" } & UpdatePolygonNodeDtifInputEvent) | ({ type: "UpdateTextNode" } & UpdateTextNodeDtifInputEvent) | ({ type: "UpdateSolidPaint" } & UpdateSolidPaintDtifInputEvent) | ({ type: "UpdateImagePaint" } & UpdateImagePaintDtifInputEvent) | ({ type: "UpdateGradientPaint" } & UpdateGradientPaintDtifInputEvent) | ({ type: "DeleteEntity" } & DeleteEntityDtifInputEvent) | ({ type: "UpdateEntityTransform" } & UpdateEntityTransformDtifInputEvent) | ({ type: "UpdateEntitySize" } & UpdateEntitySizeDtifInputEvent) | ({ type: "MoveEntity" } & MoveEntityDtifInputEvent) | ({ type: "UpdateEntityRotation" } & UpdateEntityRotationDtifInputEvent) | ({ type: "UpdateEntityVisibility" } & UpdateEntityVisibilityDtifInputEvent) | ({ type: "UpdateEntityCornerRadii" } & UpdateEntityCornerRadiiDtifInputEvent) | ({ type: "UpdateEntityBlendMode" } & UpdateEntityBlendModeDtifInputEvent) | ({ type: "UpdateEntityOpacity" } & UpdateEntityOpacityDtifInputEvent)
 
 export type EllipseNode = { startingAngle?: number; endingAngle?: number; innerRadiusRatio?: number; translation?: Vec2; rotationDeg?: Angle; size: Size; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; layoutElement?: LayoutElement; styles?: Style[] }
 
@@ -1701,9 +1701,21 @@ export type UpdateFrameNodeDtifInputEvent = { entity: string; clipContent?: bool
 
 export type UpdateFrameNodeInputEvent = { entity: Entity; clipContent?: boolean | null }
 
+export type UpdateGradientPaintDtifInputEvent = { entity: string; stops?: GradientColorStop[] }
+
+export type UpdateGradientPaintInputEvent = { entity: Entity; stops?: GradientColorStop[] }
+
+export type UpdateImagePaintDtifInputEvent = { entity: string; scaleMode?: ImageScaleMode | null; assetId?: string | null }
+
+export type UpdateImagePaintInputEvent = { entity: Entity; scaleMode?: ImageScaleMode | null; imageId?: { idx: number; version: number } | null }
+
 export type UpdatePolygonNodeDtifInputEvent = { entity: string; pointCount?: number | null }
 
 export type UpdatePolygonNodeInputEvent = { entity: Entity; pointCount?: number | null }
+
+export type UpdateSolidPaintDtifInputEvent = { entity: string; color?: Color }
+
+export type UpdateSolidPaintInputEvent = { entity: Entity; color?: Color }
 
 export type UpdateStarNodeDtifInputEvent = { entity: string; pointCount?: number | null; innerRadiusRatio?: number | null }
 

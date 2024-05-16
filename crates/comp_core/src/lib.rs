@@ -11,7 +11,8 @@ use dyn_comp_bundles::events::{
     UpdateEllipseNodeInputEvent, UpdateEntityBlendModeInputEvent,
     UpdateEntityCornerRadiiInputEvent, UpdateEntityOpacityInputEvent,
     UpdateEntityRotationInputEvent, UpdateEntitySizeInputEvent, UpdateEntityTransformInputEvent,
-    UpdateEntityVisibilityInputEvent, UpdateFrameNodeInputEvent, UpdatePolygonNodeInputEvent,
+    UpdateEntityVisibilityInputEvent, UpdateFrameNodeInputEvent, UpdateGradientPaintInputEvent,
+    UpdateImagePaintInputEvent, UpdatePolygonNodeInputEvent, UpdateSolidPaintInputEvent,
     UpdateStarNodeInputEvent, UpdateTextNodeInputEvent,
 };
 use resources::{composition::CompositionRes, layout::LayoutRes, tick::TickRes};
@@ -24,8 +25,9 @@ use systems::{
         update_entity_opacity_input_system, update_entity_rotation_input_system,
         update_entity_size_input_system, update_entity_transform_input_system,
         update_entity_visibility_input_system, update_frame_node_input_system,
-        update_polygon_node_input_system, update_star_node_input_system,
-        update_text_node_input_system,
+        update_gradient_paint_input_system, update_image_paint_input_system,
+        update_polygon_node_input_system, update_solid_paint_input_system,
+        update_star_node_input_system, update_text_node_input_system,
     },
     hierarchy::update_hierarchy_levels,
     layout::{
@@ -93,6 +95,9 @@ impl Plugin for CompCorePlugin {
         app.add_event::<UpdateStarNodeInputEvent>();
         app.add_event::<UpdatePolygonNodeInputEvent>();
         app.add_event::<UpdateTextNodeInputEvent>();
+        app.add_event::<UpdateSolidPaintInputEvent>();
+        app.add_event::<UpdateGradientPaintInputEvent>();
+        app.add_event::<UpdateImagePaintInputEvent>();
         app.add_event::<DeleteEntityInputEvent>();
         app.add_event::<UpdateEntityTransformInputEvent>();
         app.add_event::<UpdateEntitySizeInputEvent>();
@@ -153,6 +158,10 @@ impl Plugin for CompCorePlugin {
                 update_star_node_input_system.in_set(CompCoreSystemSet::InputEvents),
                 update_polygon_node_input_system.in_set(CompCoreSystemSet::InputEvents),
                 update_text_node_input_system.in_set(CompCoreSystemSet::InputEvents),
+                // Paint
+                update_solid_paint_input_system.in_set(CompCoreSystemSet::InputEvents),
+                update_image_paint_input_system.in_set(CompCoreSystemSet::InputEvents),
+                update_gradient_paint_input_system.in_set(CompCoreSystemSet::InputEvents),
                 // Entity
                 delete_entity_input_system.in_set(CompCoreSystemSet::InputEvents),
                 update_entity_transform_input_system.in_set(CompCoreSystemSet::InputEvents),

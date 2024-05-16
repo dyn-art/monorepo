@@ -38,28 +38,24 @@ type TMakeEventModifiable<T, K extends keyof T, GKey extends string, GValue> = {
 };
 
 export type TMdtifInputEvent<GKey extends string, GValue> =
-	// eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents -- ?
 	| ({ type: 'UpdateFrameNode' } & TMakeEventModifiable<
 			COMP.UpdateFrameNodeDtifInputEvent,
 			'clipContent',
 			GKey,
 			GValue
 	  >)
-	// eslint-disable-next-line @typescript-eslint/no-duplicate-type-constituents, @typescript-eslint/no-redundant-type-constituents -- ?
 	| ({ type: 'UpdateEllipseNode' } & TMakeEventModifiable<
 			COMP.UpdateEllipseNodeDtifInputEvent,
 			'startingAngle' | 'endingAngle' | 'innerRadiusRatio',
 			GKey,
 			GValue
 	  >)
-	// eslint-disable-next-line @typescript-eslint/no-duplicate-type-constituents, @typescript-eslint/no-redundant-type-constituents -- ?
 	| ({ type: 'UpdateStarNode' } & TMakeEventModifiable<
 			COMP.UpdateStarNodeDtifInputEvent,
 			'pointCount' | 'innerRadiusRatio',
 			GKey,
 			GValue
 	  >)
-	// eslint-disable-next-line @typescript-eslint/no-duplicate-type-constituents, @typescript-eslint/no-redundant-type-constituents -- ?
 	| ({ type: 'UpdatePolygonNode' } & TMakeEventModifiable<
 			COMP.UpdatePolygonNodeDtifInputEvent,
 			'pointCount',
@@ -74,6 +70,24 @@ export type TMdtifInputEvent<GKey extends string, GValue> =
 			| 'horizontalTextAlignment'
 			| 'verticalTextAlignment'
 			| 'sizingMode',
+			GKey,
+			GValue
+	  >)
+	| ({ type: 'UpdateSolidPaint' } & TMakeEventModifiable<
+			COMP.UpdateSolidPaintDtifInputEvent,
+			'color',
+			GKey,
+			GValue
+	  >)
+	| ({ type: 'UpdateImagePaint' } & TMakeEventModifiable<
+			COMP.UpdateImagePaintDtifInputEvent,
+			'assetId' | 'scaleMode',
+			GKey,
+			GValue
+	  >)
+	| ({ type: 'UpdateGradientPaint' } & TMakeEventModifiable<
+			COMP.UpdateGradientPaintDtifInputEvent,
+			'stops',
 			GKey,
 			GValue
 	  >)

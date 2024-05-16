@@ -10,10 +10,14 @@ use bevy_transform::components::Transform;
 use dyn_comp_bundles::{
     components::{
         marker::{Removed, Root},
-        mixins::{BlendModeMixin, CornerRadiiMixin, OpacityMixin, SizeMixin, VisibilityMixin},
+        mixins::{
+            BlendModeMixin, CornerRadiiMixin, ImageAssetMixin, OpacityMixin, SizeMixin,
+            VisibilityMixin,
+        },
         nodes::{
             CompNode, EllipseCompNode, FrameCompNode, PolygonCompNode, StarCompNode, TextCompNode,
         },
+        paints::{GradientCompPaint, ImageCompPaint, SolidCompPaint},
     },
     events::{
         DeleteEntityInputEvent, FocusRootNodesInputEvent, MoveEntityInputEvent,
@@ -22,7 +26,8 @@ use dyn_comp_bundles::{
         UpdateEntityCornerRadiiInputEvent, UpdateEntityOpacityInputEvent,
         UpdateEntityRotationInputEvent, UpdateEntitySizeInputEvent,
         UpdateEntityTransformInputEvent, UpdateEntityVisibilityInputEvent,
-        UpdateFrameNodeInputEvent, UpdatePolygonNodeInputEvent, UpdateStarNodeInputEvent,
+        UpdateFrameNodeInputEvent, UpdateGradientPaintInputEvent, UpdateImagePaintInputEvent,
+        UpdatePolygonNodeInputEvent, UpdateSolidPaintInputEvent, UpdateStarNodeInputEvent,
         UpdateTextNodeInputEvent,
     },
     properties::Viewport,
@@ -237,6 +242,53 @@ pub fn update_text_node_input_system(
             if let Some(sizing_mode) = maybe_sizing_mode {
                 text_comp_node.sizing_mode = *sizing_mode;
             }
+        }
+    }
+}
+
+// =============================================================================
+// Paint
+// =============================================================================
+
+pub fn update_solid_paint_input_system(
+    mut event_reader: EventReader<UpdateSolidPaintInputEvent>,
+    mut query: Query<&mut SolidCompPaint>,
+) {
+    for UpdateSolidPaintInputEvent { entity, color } in event_reader.read() {
+        if let Ok(mut solid_comp_paint) = query.get_mut(*entity) {
+            solid_comp_paint.color = *color;
+        }
+    }
+}
+
+pub fn update_image_paint_input_system(
+    mut event_reader: EventReader<UpdateImagePaintInputEvent>,
+    mut query: Query<(&mut ImageCompPaint, &mut ImageAssetMixin)>,
+) {
+    for UpdateImagePaintInputEvent {
+        entity,
+        scale_mode: maybe_scale_mode,
+        image_id: maybe_image_id,
+    } in event_reader.read()
+    {
+        if let Ok((mut image_comp_paint, mut image_asset_mixin)) = query.get_mut(*entity) {
+            if let Some(scale_mode) = maybe_scale_mode {
+                image_comp_paint.scale_mode = *scale_mode;
+            }
+            if let Some(image_id) = maybe_image_id {
+                image_asset_mixin.0 = Some(*image_id);
+            }
+        }
+    }
+}
+
+pub fn update_gradient_paint_input_system(
+    mut event_reader: EventReader<UpdateGradientPaintInputEvent>,
+    mut query: Query<&mut GradientCompPaint>,
+) {
+    for UpdateGradientPaintInputEvent { entity, stops } in event_reader.read() {
+        if let Ok(mut gradient_comp_paint) = query.get_mut(*entity) {
+            gradient_comp_paint.stops = SmallVec::from_vec(stops.clone());
         }
     }
 }

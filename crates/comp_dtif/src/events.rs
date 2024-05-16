@@ -2,8 +2,12 @@ use bevy_ecs::entity::Entity;
 use dyn_attributed_string::layout::{
     HorizontalTextAlignment, LineWrap, TextSizingMode, VerticalTextAlignment,
 };
+use dyn_comp_asset::asset_id::AssetId;
 use dyn_comp_bundles::{
-    components::mixins::BlendMode,
+    components::{
+        mixins::BlendMode,
+        paints::{GradientColorStop, ImageScaleMode},
+    },
     events::{
         CompCoreInputEvent, DeleteEntityInputEvent, FocusRootNodesInputEvent, MoveEntityInputEvent,
         UpdateCompositionSizeInputEvent, UpdateCompositionViewportInputEvent,
@@ -11,13 +15,14 @@ use dyn_comp_bundles::{
         UpdateEntityCornerRadiiInputEvent, UpdateEntityOpacityInputEvent,
         UpdateEntityRotationInputEvent, UpdateEntitySizeInputEvent,
         UpdateEntityTransformInputEvent, UpdateEntityVisibilityInputEvent,
-        UpdateFrameNodeInputEvent, UpdatePolygonNodeInputEvent, UpdateStarNodeInputEvent,
+        UpdateFrameNodeInputEvent, UpdateGradientPaintInputEvent, UpdateImagePaintInputEvent,
+        UpdatePolygonNodeInputEvent, UpdateSolidPaintInputEvent, UpdateStarNodeInputEvent,
         UpdateTextNodeInputEvent,
     },
     properties::{TextAttributeInterval, Viewport},
 };
 use dyn_utils::{
-    properties::{corner_radii::CornerRadii, opacity::Opacity, size::Size},
+    properties::{color::Color, corner_radii::CornerRadii, opacity::Opacity, size::Size},
     units::angle::Angle,
 };
 use std::collections::HashMap;
@@ -37,6 +42,11 @@ pub enum DtifInputEvent {
     UpdatePolygonNode(UpdatePolygonNodeDtifInputEvent),
     UpdateTextNode(UpdateTextNodeDtifInputEvent),
 
+    // Paint
+    UpdateSolidPaint(UpdateSolidPaintDtifInputEvent),
+    UpdateImagePaint(UpdateImagePaintDtifInputEvent),
+    UpdateGradientPaint(UpdateGradientPaintDtifInputEvent),
+
     // Entity
     DeleteEntity(DeleteEntityDtifInputEvent),
     UpdateEntityTransform(UpdateEntityTransformDtifInputEvent),
@@ -53,6 +63,7 @@ impl DtifInputEvent {
     pub fn to_comp_input_event(
         self,
         sid_to_entity: &HashMap<String, Entity>,
+        sid_to_asset: &HashMap<String, AssetId>,
     ) -> Option<CompCoreInputEvent> {
         match self {
             // Composition
@@ -118,6 +129,41 @@ impl DtifInputEvent {
                         horizontal_text_alignment: event.horizontal_text_alignment,
                         vertical_text_alignment: event.vertical_text_alignment,
                         sizing_mode: event.sizing_mode,
+                    })
+                })
+            }
+
+            // Paint
+            DtifInputEvent::UpdateSolidPaint(event) => {
+                sid_to_entity.get(&event.entity).map(|entity| {
+                    CompCoreInputEvent::UpdateSolidPaint(UpdateSolidPaintInputEvent {
+                        entity: *entity,
+                        color: event.color,
+                    })
+                })
+            }
+            DtifInputEvent::UpdateImagePaint(event) => {
+                sid_to_entity.get(&event.entity).map(|entity| {
+                    CompCoreInputEvent::UpdateImagePaint(UpdateImagePaintInputEvent {
+                        entity: *entity,
+                        scale_mode: event.scale_mode,
+                        image_id: event.asset_id.and_then(|image_id| {
+                            sid_to_asset.get(&image_id).and_then(|asset| {
+                                if let AssetId::Image(id) = asset {
+                                    Some(*id)
+                                } else {
+                                    None
+                                }
+                            })
+                        }),
+                    })
+                })
+            }
+            DtifInputEvent::UpdateGradientPaint(event) => {
+                sid_to_entity.get(&event.entity).map(|entity| {
+                    CompCoreInputEvent::UpdateGradientPaint(UpdateGradientPaintInputEvent {
+                        entity: *entity,
+                        stops: event.stops.clone(),
                     })
                 })
             }
@@ -270,6 +316,34 @@ pub struct UpdateTextNodeDtifInputEvent {
     pub vertical_text_alignment: Option<VerticalTextAlignment>,
     #[serde(default)]
     pub sizing_mode: Option<TextSizingMode>,
+}
+
+// =============================================================================
+// Paint
+// =============================================================================
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
+pub struct UpdateSolidPaintDtifInputEvent {
+    pub entity: String,
+    #[serde(default)]
+    pub color: Color,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
+#[serde(rename_all = "camelCase")]
+pub struct UpdateImagePaintDtifInputEvent {
+    pub entity: String,
+    #[serde(default)]
+    pub scale_mode: Option<ImageScaleMode>,
+    #[serde(default)]
+    pub asset_id: Option<String>,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
+pub struct UpdateGradientPaintDtifInputEvent {
+    pub entity: String,
+    #[serde(default)]
+    pub stops: Vec<GradientColorStop>,
 }
 
 // =============================================================================

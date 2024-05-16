@@ -89,9 +89,10 @@ impl SvgCompHandle {
                         event.send_into_ecs(&mut self.app.world);
                     }
                     SvgCompInputEvent::Dtif { event } => {
-                        if let Some(event) =
-                            event.to_comp_input_event(self.dtif_handler.get_sid_to_entity())
-                        {
+                        if let Some(event) = event.to_comp_input_event(
+                            self.dtif_handler.get_sid_to_entity(),
+                            self.dtif_handler.get_sid_to_asset_id(),
+                        ) {
                             event.send_into_ecs(&mut self.app.world);
                         }
                     }

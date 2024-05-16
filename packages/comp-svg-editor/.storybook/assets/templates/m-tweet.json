@@ -533,7 +533,7 @@
 	},
 	"modificationFields": [
 		{
-			"key": "name",
+			"key": "userName",
 			"displayName": "User Name",
 			"inputType": { "type": "TEXT", "default": "John Kappa" },
 			"actions": [
@@ -543,32 +543,32 @@
 						{
 							"type": "UpdateTextNode",
 							"entity": "9",
-							"text": { "var": "name" }
+							"text": { "var": "userName" }
 						}
 					]
 				}
 			]
 		},
 		{
-			"key": "handle",
+			"key": "userHandle",
 			"displayName": "User Handle",
 			"inputType": { "type": "TEXT", "default": "johnkappa" },
 			"actions": [
 				{
 					"conditions": [],
-					"compute": { "args": ["handle"], "body": "return '@' + handle" },
+					"compute": { "args": ["userHandle"], "body": "return '@' + userHandle" },
 					"events": [
 						{
 							"type": "UpdateTextNode",
 							"entity": "14",
-							"text": { "var": "handle" }
+							"text": { "var": "userHandle" }
 						}
 					]
 				}
 			]
 		},
 		{
-			"key": "text",
+			"key": "tweetText",
 			"displayName": "Tweet Text",
 			"inputType": {
 				"type": "TEXT",
@@ -582,14 +582,14 @@
 						{
 							"type": "UpdateTextNode",
 							"entity": "17",
-							"text": { "var": "text" }
+							"text": { "var": "tweetText" }
 						}
 					]
 				}
 			]
 		},
 		{
-			"key": "verified",
+			"key": "verifiedBadge",
 			"displayName": "Verified Badge",
 			"inputType": {
 				"type": "BOOLEAN",
@@ -602,14 +602,14 @@
 						{
 							"type": "UpdateEntityVisibility",
 							"entity": "12",
-							"visible": { "var": "verified" }
+							"visible": { "var": "verifiedBadge" }
 						}
 					]
 				}
 			]
 		},
 		{
-			"key": "corner",
+			"key": "cornerRadius",
 			"displayName": "Corner Radius",
 			"inputType": {
 				"type": "RANGE",
@@ -621,12 +621,39 @@
 			"actions": [
 				{
 					"conditions": [],
-					"compute": { "args": ["corner"], "body": "return [corner, corner, corner, corner]" },
+					"compute": {
+						"args": ["cornerRadius"],
+						"body": "return [cornerRadius, cornerRadius, cornerRadius, cornerRadius]"
+					},
 					"events": [
 						{
 							"type": "UpdateEntityCornerRadii",
 							"entity": "2",
-							"cornerRadii": { "var": "corner" }
+							"cornerRadii": { "var": "cornerRadius" }
+						}
+					]
+				}
+			]
+		},
+		{
+			"key": "backgroundColor",
+			"displayName": "Background Color",
+			"inputType": {
+				"type": "TEXT",
+				"default": "255, 219, 219"
+			},
+			"actions": [
+				{
+					"conditions": [],
+					"compute": {
+						"args": ["backgroundColor"],
+						"body": "return backgroundColor.split(',').map(str => Number(str.trim()))"
+					},
+					"events": [
+						{
+							"type": "UpdateSolidPaint",
+							"entity": "25",
+							"color": { "var": "backgroundColor" }
 						}
 					]
 				}
