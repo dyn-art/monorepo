@@ -625,7 +625,7 @@
 					"events": [
 						{
 							"type": "UpdateEntityCornerRadii",
-							"entity": "12",
+							"entity": "2",
 							"cornerRadii": { "var": "corner" }
 						}
 					]
