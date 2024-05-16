@@ -1701,9 +1701,9 @@ export type UpdateFrameNodeDtifInputEvent = { entity: string; clipContent?: bool
 
 export type UpdateFrameNodeInputEvent = { entity: Entity; clipContent?: boolean | null }
 
-export type UpdateGradientPaintDtifInputEvent = { entity: string; stops?: GradientColorStop[] }
+export type UpdateGradientPaintDtifInputEvent = { entity: string; variant?: GradientVariant | null; stops?: GradientColorStop[] | null }
 
-export type UpdateGradientPaintInputEvent = { entity: Entity; stops?: GradientColorStop[] }
+export type UpdateGradientPaintInputEvent = { entity: Entity; variant?: GradientVariant | null; stops?: GradientColorStop[] | null }
 
 export type UpdateImagePaintDtifInputEvent = { entity: string; scaleMode?: ImageScaleMode | null; assetId?: string | null }
 

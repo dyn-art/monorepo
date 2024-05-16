@@ -1,3 +1,5 @@
+import type { TColor } from '@dyn/utils';
+
 export type TPaint = TSolidPaint | TGradientPaint;
 
 export interface TSolidPaint {
@@ -11,10 +13,6 @@ export interface TGradientPaint {
 	stops: TGradientColorStop[];
 }
 
-export type TColor = TRGB;
-
-export type TRGB = [number, number, number];
-
 export interface TGradientColorStop {
 	/**
 	 * The position of the color stop in the gradient, ranging from 0.0 to 1.0.
@@ -23,7 +21,7 @@ export interface TGradientColorStop {
 	/**
 	 * The color of the stop.
 	 */
-	color: TRGB;
+	color: TColor;
 	/**
 	 * The opacity of the stop.
 	 */
