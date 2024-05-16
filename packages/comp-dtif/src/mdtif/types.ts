@@ -87,7 +87,7 @@ export type TMdtifInputEvent<GKey extends string, GValue> =
 	  >)
 	| ({ type: 'UpdateGradientPaint' } & TMakeEventModifiable<
 			COMP.UpdateGradientPaintDtifInputEvent,
-			'stops',
+			'variant' | 'stops',
 			GKey,
 			GValue
 	  >)

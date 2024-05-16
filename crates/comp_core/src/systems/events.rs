@@ -286,9 +286,19 @@ pub fn update_gradient_paint_input_system(
     mut event_reader: EventReader<UpdateGradientPaintInputEvent>,
     mut query: Query<&mut GradientCompPaint>,
 ) {
-    for UpdateGradientPaintInputEvent { entity, stops } in event_reader.read() {
+    for UpdateGradientPaintInputEvent {
+        entity,
+        variant: maybe_variant,
+        stops: maybe_stops,
+    } in event_reader.read()
+    {
         if let Ok(mut gradient_comp_paint) = query.get_mut(*entity) {
-            gradient_comp_paint.stops = SmallVec::from_vec(stops.clone());
+            if let Some(variant) = maybe_variant {
+                gradient_comp_paint.variant = *variant;
+            }
+            if let Some(stops) = maybe_stops {
+                gradient_comp_paint.stops = SmallVec::from_vec(stops.clone());
+            }
         }
     }
 }

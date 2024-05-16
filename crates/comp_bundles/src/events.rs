@@ -1,7 +1,7 @@
 use crate::{
     components::{
         mixins::BlendMode,
-        paints::{GradientColorStop, ImageScaleMode},
+        paints::{GradientColorStop, GradientVariant, ImageScaleMode},
     },
     properties::{TextAttributeInterval, Viewport},
 };
@@ -276,7 +276,9 @@ pub struct UpdateImagePaintInputEvent {
 pub struct UpdateGradientPaintInputEvent {
     pub entity: Entity,
     #[cfg_attr(feature = "serde_support", serde(default))]
-    pub stops: Vec<GradientColorStop>,
+    pub variant: Option<GradientVariant>,
+    #[cfg_attr(feature = "serde_support", serde(default))]
+    pub stops: Option<Vec<GradientColorStop>>,
 }
 
 // =============================================================================

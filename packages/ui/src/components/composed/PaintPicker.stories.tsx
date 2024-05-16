@@ -7,9 +7,19 @@ const meta: Meta<typeof PaintPicker> = {
 	component: PaintPicker,
 	tags: ['autodocs'],
 	argTypes: {},
-	render: (args) => <PaintPicker {...args} />,
+	render: (args) => (
+		<PaintPicker
+			{...args}
+			onPaintUpdate={() => {
+				/* do nothing */
+			}}
+		/>
+	),
 	parameters: {
 		layout: 'centered'
+	},
+	args: {
+		paint: { type: 'Solid', color: [240, 128, 128] }
 	}
 } satisfies Meta<typeof PaintPicker>;
 

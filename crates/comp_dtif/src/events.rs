@@ -6,7 +6,7 @@ use dyn_comp_asset::asset_id::AssetId;
 use dyn_comp_bundles::{
     components::{
         mixins::BlendMode,
-        paints::{GradientColorStop, ImageScaleMode},
+        paints::{GradientColorStop, GradientVariant, ImageScaleMode},
     },
     events::{
         CompCoreInputEvent, DeleteEntityInputEvent, FocusRootNodesInputEvent, MoveEntityInputEvent,
@@ -163,7 +163,8 @@ impl DtifInputEvent {
                 sid_to_entity.get(&event.entity).map(|entity| {
                     CompCoreInputEvent::UpdateGradientPaint(UpdateGradientPaintInputEvent {
                         entity: *entity,
-                        stops: event.stops.clone(),
+                        variant: event.variant,
+                        stops: event.stops.map(|stops| stops.clone()),
                     })
                 })
             }
@@ -343,7 +344,9 @@ pub struct UpdateImagePaintDtifInputEvent {
 pub struct UpdateGradientPaintDtifInputEvent {
     pub entity: String,
     #[serde(default)]
-    pub stops: Vec<GradientColorStop>,
+    pub variant: Option<GradientVariant>,
+    #[serde(default)]
+    pub stops: Option<Vec<GradientColorStop>>,
 }
 
 // =============================================================================
