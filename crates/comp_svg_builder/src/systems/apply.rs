@@ -675,7 +675,7 @@ pub fn apply_gradient_paint_changes(
                         match gradient_paint.variant {
                             GradientVariant::Linear { transform } => {
                                 let (start, end) =
-                                    extract_linear_gradient_params_from_transform(size, &transform);
+                                    extract_start_end_point_from_mat3(size, &transform);
                                 bundle.gradient.set_attributes(vec![
                                     SvgAttribute::X1 { x1: start.x },
                                     SvgAttribute::Y1 { y1: start.y },
@@ -727,18 +727,16 @@ pub fn apply_gradient_paint_changes(
 /// Helper function to extract the x and y positions of the start and end of the linear gradient
 /// (scale is not important here).
 ///
-/// Credits:
+/// Inspired by:
 /// https://github.com/figma-plugin-helper-functions/figma-plugin-helpers/tree/master
-fn extract_linear_gradient_params_from_transform(
-    shape_size: &Size,
-    transform: &Mat3,
-) -> (Vec2, Vec2) {
-    let mx_inv = transform.inverse();
-    let start_end = [Vec2::new(0.0, 0.5), Vec2::new(1.0, 0.5)].map(|p| mx_inv.transform_point2(p));
+fn extract_start_end_point_from_mat3(shape_size: &Size, transform: &Mat3) -> (Vec2, Vec2) {
+    let mat3_inv = transform.inverse();
+    let start_end_point =
+        [Vec2::new(0.0, 0.5), Vec2::new(1.0, 0.5)].map(|p| mat3_inv.transform_point2(p));
 
     (
-        start_end[0] * shape_size.to_vec2(),
-        start_end[1] * shape_size.to_vec2(),
+        start_end_point[0] * shape_size.to_vec2(),
+        start_end_point[1] * shape_size.to_vec2(),
     )
 }
 
