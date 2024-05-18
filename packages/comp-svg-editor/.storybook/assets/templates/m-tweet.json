@@ -647,13 +647,18 @@
 					"conditions": [],
 					"compute": {
 						"args": ["backgroundColor"],
-						"body": "return [backgroundColor[0], backgroundColor[1], backgroundColor[2]]"
+						"body": "return { rgb: [backgroundColor[0], backgroundColor[1], backgroundColor[2]], alpha: backgroundColor[3] }"
 					},
 					"events": [
 						{
 							"type": "UpdateSolidPaint",
 							"entity": "25",
-							"color": { "var": "backgroundColor" }
+							"color": { "var": "backgroundColor.rgb" }
+						},
+						{
+							"type": "UpdateEntityOpacity",
+							"entity": "25",
+							"opacity": { "var": "backgroundColor.alpha" }
 						}
 					]
 				}
