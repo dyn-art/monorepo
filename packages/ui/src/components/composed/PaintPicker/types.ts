@@ -1,10 +1,10 @@
-import type { TRgbColor } from '@dyn/utils';
+import type { TMat3, TRgbaColor } from '@dyn/utils';
 
 export type TPaint = TSolidPaint | TGradientPaint;
 
 export interface TSolidPaint {
 	type: 'Solid';
-	color: TRgbColor;
+	color: TRgbaColor;
 }
 
 export interface TGradientPaint {
@@ -21,15 +21,9 @@ export interface TGradientColorStop {
 	/**
 	 * The color of the stop.
 	 */
-	color: TRgbColor;
-	/**
-	 * The opacity of the stop.
-	 */
-	opacity?: number;
+	color: TRgbaColor;
 }
 
 export type TGradientVariant =
 	| { type: 'Linear'; transform?: TMat3 }
 	| { type: 'Radial'; transform?: TMat3 };
-
-export type TMat3 = [number, number, number, number, number, number, number, number, number];

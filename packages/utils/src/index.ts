@@ -17,6 +17,8 @@ export * from './multiply-vec2';
 export * from './not-empty';
 export * from './pick-properties';
 export * from './rgb-to-hex';
+export * from './rgb-to-rgba';
+export * from './rgba-to-rgb';
 export * from './shallow-merge';
 export * from './short-id';
 export * from './sleep';

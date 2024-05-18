@@ -1,25 +1,10 @@
 import React from 'react';
-import type {
-	TBooleanModificationInput,
-	TMdtifComposition,
-	TModificationField,
-	TNumberModificationInput,
-	TPositionModificationInput,
-	TRangeModificationInput,
-	TTextModificationInput
-} from '@dyn/comp-dtif';
+import type { TMdtifComposition } from '@dyn/comp-dtif';
 import type { Composition } from '@dyn/comp-svg-builder';
 import { Badge, Skeleton, useSizeCallback } from '@dyn/ui';
 import { usePreparedDtif } from '@/hooks';
 
-import {
-	BooleanInput,
-	NumberInput,
-	PositionInput,
-	RangeInput,
-	TextInput,
-	Viewport
-} from './components';
+import { ModificationField, Viewport } from './components';
 
 export const FieldBasedEditor: React.FC<TFieldBasedEditorProps> = (props) => {
 	const { mdtif } = props;
@@ -48,53 +33,9 @@ export const FieldBasedEditor: React.FC<TFieldBasedEditorProps> = (props) => {
 		<div className="grid flex-1 gap-4 overflow-auto p-4 md:grid-cols-2 lg:grid-cols-3">
 			{composition != null && mdtif != null ? (
 				<form className="flex w-full flex-col items-start gap-6">
-					{mdtif.modificationFields.map((field) => {
-						switch (field.inputType.type) {
-							case 'POSITION':
-								return (
-									<PositionInput
-										composition={composition}
-										field={field as TModificationField<string, TPositionModificationInput>}
-										key={field.key}
-									/>
-								);
-							case 'NUMBER':
-								return (
-									<NumberInput
-										composition={composition}
-										field={field as TModificationField<string, TNumberModificationInput>}
-										key={field.key}
-									/>
-								);
-							case 'TEXT':
-								return (
-									<TextInput
-										composition={composition}
-										field={field as TModificationField<string, TTextModificationInput>}
-										key={field.key}
-									/>
-								);
-							case 'BOOLEAN':
-								return (
-									<BooleanInput
-										composition={composition}
-										field={field as TModificationField<string, TBooleanModificationInput>}
-										key={field.key}
-									/>
-								);
-							case 'RANGE':
-								return (
-									<RangeInput
-										composition={composition}
-										field={field as TModificationField<string, TRangeModificationInput>}
-										key={field.key}
-									/>
-								);
-							case 'COLOR':
-							default:
-								return <p>Coming Soon</p>;
-						}
-					})}
+					{mdtif.modificationFields.map((field) => (
+						<ModificationField composition={composition} field={field} key={field.key} />
+					))}
 				</form>
 			) : (
 				<Skeleton className="h-full w-full rounded-none" />

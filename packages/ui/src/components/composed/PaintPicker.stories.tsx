@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import React from 'react';
 
 import { PaintPicker } from './PaintPicker';
 
@@ -7,19 +8,15 @@ const meta: Meta<typeof PaintPicker> = {
 	component: PaintPicker,
 	tags: ['autodocs'],
 	argTypes: {},
-	render: (args) => (
-		<PaintPicker
-			{...args}
-			onPaintUpdate={() => {
-				/* do nothing */
-			}}
-		/>
-	),
+	render: (args) => {
+		const [paint, setPaint] = React.useState(args.paint);
+		return <PaintPicker {...args} onPaintUpdate={setPaint} paint={paint} />;
+	},
 	parameters: {
 		layout: 'centered'
 	},
 	args: {
-		paint: { type: 'Solid', color: [240, 128, 128] }
+		paint: { type: 'Solid', color: [240, 128, 128, 1] }
 	}
 } satisfies Meta<typeof PaintPicker>;
 

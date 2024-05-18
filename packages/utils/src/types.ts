@@ -1,6 +1,7 @@
 export type THexColor = `#${string}`;
 export type TRgbColor = [number, number, number];
-export type TColor = THexColor | TRgbColor;
+export type TRgbaColor = [number, number, number, number];
+export type TColor = THexColor | TRgbColor | TRgbaColor;
 
 /**
  * A 3x3 column majfor matrix.

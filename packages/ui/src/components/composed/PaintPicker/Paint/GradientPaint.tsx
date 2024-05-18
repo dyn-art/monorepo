@@ -1,11 +1,13 @@
 import React from 'react';
-import { shortId } from '@dyn/utils';
+import { extractStartEndPointFromMat3, rgbaToRgb, shortId, type TVec2 } from '@dyn/utils';
 
-import type { TGradientPaint } from './types';
+import type { TGradientPaint } from '../types';
 
 export const GradientPaint: React.FC<TProps> = (props) => {
 	const {
-		paint: { variant, stops }
+		paint: { variant, stops },
+		size,
+		...other
 	} = props;
 	const gradientId = React.useMemo(() => `gradient-${shortId()}`, []);
 	const gradientTransform = React.useMemo(
@@ -13,14 +15,31 @@ export const GradientPaint: React.FC<TProps> = (props) => {
 		[variant.transform]
 	);
 
+	const gradientStartStop = React.useMemo(
+		() =>
+			extractStartEndPointFromMat3(
+				size,
+				variant.transform ?? [
+					[1, 0, 0],
+					[0, 1, 0],
+					[0, 0, 1]
+				]
+			),
+		[variant.transform, size]
+	);
+	if (gradientStartStop == null) {
+		return null;
+	}
+
 	const GradientStops = stops.map((stop, index) => {
-		const color = `rgb(${stop.color.join(',')})`;
+		const { rgb, alpha } = rgbaToRgb(stop.color);
+		const color = `rgb(${rgb.join(',')})`;
 		return (
 			<stop
 				key={`${index}-${color}`}
 				offset={`${stop.position * 100}%`}
 				stopColor={color}
-				stopOpacity={stop.opacity ?? 1}
+				stopOpacity={alpha}
 			/>
 		);
 	});
@@ -33,6 +52,10 @@ export const GradientPaint: React.FC<TProps> = (props) => {
 					gradientTransform={gradientTransform}
 					gradientUnits="userSpaceOnUse"
 					id={gradientId}
+					x1={gradientStartStop[0][0]}
+					x2={gradientStartStop[1][0]}
+					y1={gradientStartStop[0][1]}
+					y2={gradientStartStop[1][1]}
 				>
 					{GradientStops}
 				</linearGradient>
@@ -52,13 +75,14 @@ export const GradientPaint: React.FC<TProps> = (props) => {
 	}
 
 	return (
-		<svg height="100%" width="100%">
+		<svg {...other} height={size[1]} width={size[0]}>
 			<defs>{GradientElement}</defs>
-			<rect fill={`url(#${gradientId})`} height="100%" width="100%" />
+			<rect fill={`url(#${gradientId})`} height={size[1]} width={size[0]} />
 		</svg>
 	);
 };
 
-interface TProps {
+interface TProps extends React.SVGAttributes<SVGSVGElement> {
 	paint: TGradientPaint;
+	size: TVec2;
 }
