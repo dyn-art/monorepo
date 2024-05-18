@@ -1,24 +1,31 @@
 import React from 'react';
 import {
 	applyModifications,
-	type TModificationField,
-	type TRangeModificationInput
+	type TColorModificationInput,
+	type TModificationField
 } from '@dyn/comp-dtif';
 import type { Composition } from '@dyn/comp-svg-builder';
-import { Slider } from '@dyn/ui';
+import { PaintPicker, type TPaint } from '@dyn/ui';
 
-export const RangeInput: React.FC<TProps> = (props) => {
+export const ColorInput: React.FC<TProps> = (props) => {
 	const { composition, field } = props;
-	const [value, setValue] = React.useState<number[]>([field.inputType.default]);
+	const [value, setValue] = React.useState<TPaint>({
+		type: 'Solid',
+		color: field.inputType.default
+	});
 	const [error, setError] = React.useState<string | null>(null);
 
-	const onValueChange = React.useCallback(
-		(newValue: number[]) => {
-			setValue(newValue);
+	const onPaintUpdate = React.useCallback(
+		(paint: TPaint) => {
+			setValue(paint);
 			setError(null);
 
+			if (paint.type !== 'Solid') {
+				return;
+			}
+
 			const processedActions = applyModifications(field, {
-				[field.key]: newValue[0] ?? 0
+				[field.key]: paint.color
 			});
 
 			for (const processedAction of processedActions) {
@@ -36,13 +43,7 @@ export const RangeInput: React.FC<TProps> = (props) => {
 	return (
 		<fieldset className="w-full rounded-lg border p-4">
 			<legend className="-ml-1 px-1 text-sm font-medium">{field.displayName}</legend>
-			<Slider
-				max={field.inputType.max}
-				min={field.inputType.min}
-				onValueChange={onValueChange}
-				step={field.inputType.step ?? 1}
-				value={value}
-			/>
+			<PaintPicker onPaintUpdate={onPaintUpdate} paint={value} tabs={['Solid']} />
 			{error != null ? (
 				<p className="mt-2 text-sm text-red-600" id="email-error">
 					{error}
@@ -54,5 +55,5 @@ export const RangeInput: React.FC<TProps> = (props) => {
 
 interface TProps {
 	composition: Composition;
-	field: TModificationField<string, TRangeModificationInput>;
+	field: TModificationField<string, TColorModificationInput>;
 }

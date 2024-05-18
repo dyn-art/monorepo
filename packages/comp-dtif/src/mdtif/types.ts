@@ -1,5 +1,5 @@
 import type { AdditionalOperation, RulesLogic } from 'json-logic-js';
-import type { TJsonFunction } from '@dyn/utils';
+import type { TJsonFunction, TRgbaColor } from '@dyn/utils';
 
 import type { COMP } from '../comp';
 
@@ -171,7 +171,7 @@ export interface TRangeModificationInput {
 
 export interface TColorModificationInput {
 	type: 'COLOR';
-	default: { r: number; g: number; b: number };
+	default: TRgbaColor;
 }
 
 export interface TPositionModificationInput {

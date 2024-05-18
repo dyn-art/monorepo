@@ -12,11 +12,11 @@ export const NumberInput: React.FC<TProps> = (props) => {
 	const [value, setValue] = React.useState<number>(field.inputType.default);
 	const [error, setError] = React.useState<string | null>(null);
 
-	const handleChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+	const onChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
 		setValue(parseFloat(e.target.value));
 	}, []);
 
-	const handleFocus = React.useCallback(
+	const onFocus = React.useCallback(
 		(focus: boolean) => {
 			if (focus) {
 				return;
@@ -48,11 +48,11 @@ export const NumberInput: React.FC<TProps> = (props) => {
 				max={field.inputType.max}
 				min={field.inputType.min}
 				onBlur={() => {
-					handleFocus(false);
+					onFocus(false);
 				}}
-				onChange={handleChange}
+				onChange={onChange}
 				onFocus={() => {
-					handleFocus(true);
+					onFocus(true);
 				}}
 				type="number"
 				variant={error != null ? 'destructive' : 'default'}

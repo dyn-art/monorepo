@@ -1,6 +1,7 @@
 import React from 'react';
 import type {
 	TBooleanModificationInput,
+	TColorModificationInput,
 	TModificationField,
 	TNumberModificationInput,
 	TPositionModificationInput,
@@ -10,6 +11,7 @@ import type {
 import type { Composition } from '@dyn/comp-svg-builder';
 
 import { BooleanInput } from './BooleanInput';
+import { ColorInput } from './ColorInput';
 import { NumberInput } from './NumberInput';
 import { PositionInput } from './PositionInput';
 import { RangeInput } from './RangeInput';
@@ -66,6 +68,13 @@ export const ModificationField: React.FC<TProps> = (props) => {
 				/>
 			);
 		case 'COLOR':
+			return (
+				<ColorInput
+					composition={composition}
+					field={field as TModificationField<string, TColorModificationInput>}
+					key={field.key}
+				/>
+			);
 		default:
 			return <p>Coming Soon</p>;
 	}

@@ -12,14 +12,14 @@ export const TextInput: React.FC<TProps> = (props) => {
 	const [value, setValue] = React.useState<string>(field.inputType.default);
 	const [error, setError] = React.useState<string | null>(null);
 
-	const handleChange = React.useCallback(
+	const onChange = React.useCallback(
 		(e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement>) => {
 			setValue(e.target.value);
 		},
 		[]
 	);
 
-	const handleFocus = React.useCallback(
+	const onFocus = React.useCallback(
 		(focus: boolean) => {
 			if (focus) {
 				return;
@@ -50,11 +50,11 @@ export const TextInput: React.FC<TProps> = (props) => {
 					childrenAfter={<div />}
 					defaultValue={value}
 					onBlur={() => {
-						handleFocus(false);
+						onFocus(false);
 					}}
-					onChange={handleChange}
+					onChange={onChange}
 					onFocus={() => {
-						handleFocus(true);
+						onFocus(true);
 					}}
 					variant={error != null ? 'destructive' : 'default'}
 				/>
@@ -63,11 +63,11 @@ export const TextInput: React.FC<TProps> = (props) => {
 					childrenAfter={<div />}
 					defaultValue={value}
 					onBlur={() => {
-						handleFocus(false);
+						onFocus(false);
 					}}
-					onChange={handleChange}
+					onChange={onChange}
 					onFocus={() => {
-						handleFocus(true);
+						onFocus(true);
 					}}
 					variant={error != null ? 'destructive' : 'default'}
 				/>

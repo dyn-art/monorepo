@@ -12,7 +12,7 @@ export const BooleanInput: React.FC<TProps> = (props) => {
 	const [value, setValue] = React.useState<boolean>(field.inputType.default);
 	const [error, setError] = React.useState<string | null>(null);
 
-	const handleCheckedChange = React.useCallback(
+	const onCheckedChange = React.useCallback(
 		(checked: boolean) => {
 			setValue(checked);
 			setError(null);
@@ -36,7 +36,7 @@ export const BooleanInput: React.FC<TProps> = (props) => {
 	return (
 		<fieldset className="w-full rounded-lg border p-4">
 			<legend className="-ml-1 px-1 text-sm font-medium">{field.displayName}</legend>
-			<Switch checked={value} onCheckedChange={handleCheckedChange} />
+			<Switch checked={value} onCheckedChange={onCheckedChange} />
 			{error != null ? (
 				<p className="mt-2 text-sm text-red-600" id="email-error">
 					{error}

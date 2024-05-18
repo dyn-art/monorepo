@@ -10,8 +10,13 @@ import { GRADIENT_COLORS as GRADIENT_PAINTS } from './presets';
 import { SolidPaintTab } from './SolidPaintTab';
 import type { TPaint } from './types';
 
+export * from './ColorInputGrid';
+export * from './GradientPaintInputRow';
+export * from './SolidPaintInputRow';
+export * from './types';
+
 export const PaintPicker: React.FC<TPaintPickerProps> = (props) => {
-	const { paint, onPaintUpdate } = props;
+	const { paint, onPaintUpdate, tabs = ['Solid', 'Gradient'] } = props;
 	const [activeTab, setActiveTab] = React.useState<TPaint['type']>(paint.type);
 
 	return (
@@ -28,14 +33,15 @@ export const PaintPicker: React.FC<TPaintPickerProps> = (props) => {
 					}}
 					value={activeTab}
 				>
-					<TabsList className="mb-4 w-full">
-						<TabsTrigger className="flex-1" value="Solid">
-							Solid
-						</TabsTrigger>
-						<TabsTrigger className="flex-1" value="Gradient">
-							Gradient
-						</TabsTrigger>
-					</TabsList>
+					{tabs.length > 1 ? (
+						<TabsList className="mb-4 w-full">
+							{tabs.map((tab) => (
+								<TabsTrigger className="flex-1" key={tab} value={tab}>
+									{tab}
+								</TabsTrigger>
+							))}
+						</TabsList>
+					) : null}
 
 					<SolidPaintTab onPaintUpdate={onPaintUpdate} paint={paint} />
 
@@ -64,4 +70,5 @@ export const PaintPicker: React.FC<TPaintPickerProps> = (props) => {
 export interface TPaintPickerProps {
 	paint: TPaint;
 	onPaintUpdate: (paint: TPaint) => void;
+	tabs?: TPaint['type'][];
 }

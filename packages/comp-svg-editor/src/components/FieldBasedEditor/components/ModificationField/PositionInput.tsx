@@ -13,15 +13,15 @@ export const PositionInput: React.FC<TProps> = (props) => {
 	const [yValue, setYValue] = React.useState<number>(field.inputType.default[1]);
 	const [error, setError] = React.useState<string | null>(null);
 
-	const handleXChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+	const onXChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
 		setXValue(parseFloat(e.target.value));
 	}, []);
 
-	const handleYChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+	const onYChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
 		setYValue(parseFloat(e.target.value));
 	}, []);
 
-	const handleFocus = React.useCallback(
+	const onFocus = React.useCallback(
 		(focus: boolean) => {
 			if (focus) {
 				return;
@@ -56,11 +56,11 @@ export const PositionInput: React.FC<TProps> = (props) => {
 					max={field.inputType.max?.[0]}
 					min={field.inputType.min?.[0]}
 					onBlur={() => {
-						handleFocus(false);
+						onFocus(false);
 					}}
-					onChange={handleXChange}
+					onChange={onXChange}
 					onFocus={() => {
-						handleFocus(true);
+						onFocus(true);
 					}}
 					type="number"
 					variant={error != null ? 'destructive' : 'default'}
@@ -78,11 +78,11 @@ export const PositionInput: React.FC<TProps> = (props) => {
 					max={field.inputType.max?.[1]}
 					min={field.inputType.min?.[1]}
 					onBlur={() => {
-						handleFocus(false);
+						onFocus(false);
 					}}
-					onChange={handleYChange}
+					onChange={onYChange}
 					onFocus={() => {
-						handleFocus(true);
+						onFocus(true);
 					}}
 					type="number"
 					variant={error != null ? 'destructive' : 'default'}

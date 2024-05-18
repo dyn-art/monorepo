@@ -639,15 +639,15 @@
 			"key": "backgroundColor",
 			"displayName": "Background Color",
 			"inputType": {
-				"type": "TEXT",
-				"default": "255, 219, 219"
+				"type": "COLOR",
+				"default": [255, 219, 219, 1]
 			},
 			"actions": [
 				{
 					"conditions": [],
 					"compute": {
 						"args": ["backgroundColor"],
-						"body": "return backgroundColor.split(',').map(str => Number(str.trim()))"
+						"body": "return [backgroundColor[0], backgroundColor[1], backgroundColor[2]]"
 					},
 					"events": [
 						{
