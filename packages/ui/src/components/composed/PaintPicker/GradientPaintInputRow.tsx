@@ -1,15 +1,11 @@
 import React from 'react';
 
-import type { PopoverTrigger } from '../../layout';
 import { AdvancedInput } from '../../primitive';
 import { Paint } from './Paint';
 import type { TGradientPaint } from './types';
 
-export const GradientPaintInputRow = React.forwardRef<
-	React.ElementRef<typeof PopoverTrigger>,
-	TProps
->((props, forwardedRef) => {
-	const { paint, ...popoverTrigger } = props;
+export const GradientPaintInputRow: React.FC<TProps> = (props) => {
+	const { paint, onPopoverTriggerClick } = props;
 
 	return (
 		<div className="flex flex-row justify-start">
@@ -21,9 +17,8 @@ export const GradientPaintInputRow = React.forwardRef<
 			>
 				<div className="absolute inset-y-0 left-2 flex items-center">
 					<button
-						{...popoverTrigger}
 						className="cursor-pointer overflow-hidden rounded-sm border-[1px] border-black  hover:border-2 active:scale-105"
-						ref={forwardedRef}
+						onClick={onPopoverTriggerClick}
 						type="button"
 					>
 						<Paint paint={paint} size={[16, 16]} />
@@ -32,9 +27,9 @@ export const GradientPaintInputRow = React.forwardRef<
 			</AdvancedInput>
 		</div>
 	);
-});
-GradientPaintInputRow.displayName = 'GradientPaintInputRow';
+};
 
 interface TProps {
 	paint: TGradientPaint;
+	onPopoverTriggerClick: React.HTMLAttributes<HTMLButtonElement>['onClick'];
 }

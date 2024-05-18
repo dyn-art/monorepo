@@ -4,10 +4,9 @@ import React from 'react';
 
 import { Popover, PopoverContent, PopoverTrigger } from '../../layout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../primitive';
-import { GradientPaintInputRow } from './GradientPaintInputRow';
+import { InputRow } from './InputRow';
 import { Paint } from './Paint';
 import { GRADIENT_COLORS as GRADIENT_PAINTS } from './presets';
-import { SolidPaintInputRow } from './SolidPaintInputRow';
 import { SolidPaintTab } from './SolidPaintTab';
 import type { TPaint } from './types';
 
@@ -18,14 +17,10 @@ export const PaintPicker: React.FC<TPaintPickerProps> = (props) => {
 	return (
 		<Popover>
 			<PopoverTrigger asChild>
-				{paint.type === 'Solid' ? (
-					<SolidPaintInputRow onPaintUpdate={onPaintUpdate} paint={paint} />
-				) : (
-					<GradientPaintInputRow paint={paint} />
-				)}
+				<InputRow onPaintUpdate={onPaintUpdate} paint={paint} />
 			</PopoverTrigger>
 
-			<PopoverContent align="start" alignOffset={-8} className="w-64" side="bottom" sideOffset={12}>
+			<PopoverContent align="start" className="w-64" side="bottom" sideOffset={4}>
 				<Tabs
 					className="w-full"
 					onValueChange={(value) => {
