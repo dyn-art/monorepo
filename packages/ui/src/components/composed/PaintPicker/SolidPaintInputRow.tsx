@@ -85,7 +85,7 @@ export const SolidPaintInputRow = React.forwardRef<React.ElementRef<typeof Popov
 					value={alphaValue}
 					variant={isAlphaValid ? 'default' : 'destructive'}
 				>
-					<div className="pointer-events-none absolute inset-y-0 left-2 flex items-center text-sm">
+					<div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-sm">
 						<p className="mt-0.5 font-bold text-gray-400">%</p>
 					</div>
 				</AdvancedInput>
