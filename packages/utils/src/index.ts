@@ -12,6 +12,8 @@ export * from './inverse-mat3';
 export * from './is-hex-color';
 export * from './is-object';
 export * from './is-rgb-color';
+export * from './is-valid-alpha';
+export * from './is-valid-u8';
 export * from './json-function';
 export * from './multiply-vec2';
 export * from './not-empty';

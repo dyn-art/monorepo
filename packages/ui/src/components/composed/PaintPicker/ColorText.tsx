@@ -2,6 +2,8 @@ import React from 'react';
 import {
 	hexToRgb,
 	isHexColor,
+	isValidAlpha,
+	isValidU8,
 	rgbaToRgb,
 	rgbToHex,
 	type TRgbaColor,
@@ -10,20 +12,50 @@ import {
 
 import { AdvancedInput } from '../../primitive';
 
-export const ColorText: React.FC<TProps> = (props) => {
-	const { rgba, onRgbaUpdate } = props;
-
+export const ColorText: React.FC<TProps> = ({ rgba, onRgbaUpdate }) => {
 	const { rgb, alpha } = React.useMemo(() => rgbaToRgb(rgba), [rgba]);
 	const hex = React.useMemo(() => rgbToHex(rgb), [rgb]);
+	const [hexValue, setHexValue] = React.useState<string>(hex);
+	const [rValue, setRValue] = React.useState<number | string>(rgb[0]);
+	const [gValue, setGValue] = React.useState<number | string>(rgb[1]);
+	const [bValue, setBValue] = React.useState<number | string>(rgb[2]);
+	const [alphaValue, setAlphaValue] = React.useState<number | string>(alpha);
+
+	const [isHexValid, setIsHexValid] = React.useState(true);
+	const [isRValid, setIsRValid] = React.useState(true);
+	const [isGValid, setIsGValid] = React.useState(true);
+	const [isBValid, setIsBValid] = React.useState(true);
+	const [isAlphaValid, setIsAlphaValid] = React.useState(true);
+
+	React.useEffect(() => {
+		setHexValue(hex);
+		setIsHexValid(true);
+	}, [hex]);
+
+	React.useEffect(() => {
+		setRValue(rgb[0]);
+		setGValue(rgb[1]);
+		setBValue(rgb[2]);
+		setAlphaValue(alpha);
+
+		setIsRValid(true);
+		setIsGValid(true);
+		setIsBValid(true);
+		setIsAlphaValid(true);
+	}, [rgb, alpha]);
 
 	const onHexChange = React.useCallback(
 		(e: React.ChangeEvent<HTMLInputElement>) => {
 			const maybeHex = e.target.value;
+			setHexValue(maybeHex);
 			if (isHexColor(maybeHex)) {
+				setIsHexValid(true);
 				const newRgb = hexToRgb(maybeHex);
 				if (newRgb != null) {
 					onRgbaUpdate([newRgb[0], newRgb[1], newRgb[2], alpha]);
 				}
+			} else {
+				setIsHexValid(false);
 			}
 		},
 		[alpha, onRgbaUpdate]
@@ -32,8 +64,12 @@ export const ColorText: React.FC<TProps> = (props) => {
 	const onAlphaChange = React.useCallback(
 		(e: React.ChangeEvent<HTMLInputElement>) => {
 			const newAlpha = parseFloat(e.currentTarget.value);
-			if (!isNaN(newAlpha)) {
+			setAlphaValue(newAlpha);
+			if (isValidAlpha(newAlpha)) {
+				setIsAlphaValid(true);
 				onRgbaUpdate([rgb[0], rgb[1], rgb[2], newAlpha]);
+			} else {
+				setIsAlphaValid(false);
 			}
 		},
 		[onRgbaUpdate, rgb]
@@ -41,11 +77,25 @@ export const ColorText: React.FC<TProps> = (props) => {
 
 	const onRgbChange = React.useCallback(
 		(colorIndex: 0 | 1 | 2, e: React.ChangeEvent<HTMLInputElement>) => {
-			const newValue = parseInt(e.currentTarget.value, 10);
-			if (!isNaN(newValue)) {
+			const newValue = e.currentTarget.value;
+			const numericValue = parseInt(newValue, 10);
+
+			if (colorIndex === 0) setRValue(newValue);
+			if (colorIndex === 1) setGValue(newValue);
+			if (colorIndex === 2) setBValue(newValue);
+
+			if (isValidU8(numericValue)) {
+				if (colorIndex === 0) setIsRValid(true);
+				if (colorIndex === 1) setIsGValid(true);
+				if (colorIndex === 2) setIsBValid(true);
+
 				const newRgb: TRgbColor = [...rgb];
-				newRgb[colorIndex] = newValue;
+				newRgb[colorIndex] = numericValue;
 				onRgbaUpdate([newRgb[0], newRgb[1], newRgb[2], alpha]);
+			} else {
+				if (colorIndex === 0) setIsRValid(false);
+				if (colorIndex === 1) setIsGValid(false);
+				if (colorIndex === 2) setIsBValid(false);
 			}
 		},
 		[alpha, onRgbaUpdate, rgb]
@@ -55,7 +105,15 @@ export const ColorText: React.FC<TProps> = (props) => {
 		<div className="mt-2 grid grid-cols-3 gap-2">
 			{/* HEX Input */}
 			<div className="relative col-span-2">
-				<AdvancedInput className="pl-10" id="custom" onChange={onHexChange} size="sm" value={hex}>
+				<AdvancedInput
+					childrenAfter={<div />}
+					className="pl-10"
+					id="custom"
+					onChange={onHexChange}
+					size="sm"
+					value={hexValue}
+					variant={isHexValid ? 'default' : 'destructive'}
+				>
 					<div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-xs">
 						<p className="mt-0.5 text-gray-400">HEX</p>
 					</div>
@@ -65,12 +123,14 @@ export const ColorText: React.FC<TProps> = (props) => {
 			{/* Alpha Input */}
 			<div className="relative col-span-1">
 				<AdvancedInput
+					childrenAfter={<div />}
 					className="no-spinner pl-6"
 					id="alpha"
 					onChange={onAlphaChange}
 					size="sm"
 					type="number"
-					value={alpha}
+					value={alphaValue}
+					variant={isAlphaValid ? 'default' : 'destructive'}
 				>
 					<div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-xs">
 						<p className="mt-0.5 text-gray-400">A</p>
@@ -81,6 +141,7 @@ export const ColorText: React.FC<TProps> = (props) => {
 			{/* RGB Inputs */}
 			<div className="relative col-span-1">
 				<AdvancedInput
+					childrenAfter={<div />}
 					className="no-spinner pl-6"
 					id="red"
 					onChange={(e) => {
@@ -88,7 +149,8 @@ export const ColorText: React.FC<TProps> = (props) => {
 					}}
 					size="sm"
 					type="number"
-					value={rgb[0]}
+					value={rValue}
+					variant={isRValid ? 'default' : 'destructive'}
 				>
 					<div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-xs">
 						<p className="mt-0.5 text-gray-400">R</p>
@@ -98,6 +160,7 @@ export const ColorText: React.FC<TProps> = (props) => {
 
 			<div className="relative col-span-1">
 				<AdvancedInput
+					childrenAfter={<div />}
 					className="no-spinner pl-6"
 					id="green"
 					onChange={(e) => {
@@ -105,7 +168,8 @@ export const ColorText: React.FC<TProps> = (props) => {
 					}}
 					size="sm"
 					type="number"
-					value={rgb[1]}
+					value={gValue}
+					variant={isGValid ? 'default' : 'destructive'}
 				>
 					<div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-xs">
 						<p className="mt-0.5 text-gray-400">G</p>
@@ -115,6 +179,7 @@ export const ColorText: React.FC<TProps> = (props) => {
 
 			<div className="relative col-span-1">
 				<AdvancedInput
+					childrenAfter={<div />}
 					className="no-spinner pl-6"
 					id="blue"
 					onChange={(e) => {
@@ -122,7 +187,8 @@ export const ColorText: React.FC<TProps> = (props) => {
 					}}
 					size="sm"
 					type="number"
-					value={rgb[2]}
+					value={bValue}
+					variant={isBValid ? 'default' : 'destructive'}
 				>
 					<div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-xs">
 						<p className="mt-0.5 text-gray-400">B</p>
