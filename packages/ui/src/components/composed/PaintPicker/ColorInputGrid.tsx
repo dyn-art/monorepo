@@ -48,7 +48,7 @@ export const ColorInputGrid: React.FC<TProps> = ({ rgba, onRgbaUpdate }) => {
 		(e: React.ChangeEvent<HTMLInputElement>) => {
 			const maybeHex = e.target.value;
 			setHexValue(maybeHex);
-			if (isHexColor(maybeHex)) {
+			if (isHexColor(maybeHex) && maybeHex.length === 7) {
 				setIsHexValid(true);
 				const newRgb = hexToRgb(maybeHex);
 				if (newRgb != null) {

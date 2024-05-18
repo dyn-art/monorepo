@@ -10,7 +10,11 @@ const meta: Meta<typeof PaintPicker> = {
 	argTypes: {},
 	render: (args) => {
 		const [paint, setPaint] = React.useState(args.paint);
-		return <PaintPicker {...args} onPaintUpdate={setPaint} paint={paint} />;
+		return (
+			<div className="w-48">
+				<PaintPicker {...args} onPaintUpdate={setPaint} paint={paint} />
+			</div>
+		);
 	},
 	parameters: {
 		layout: 'centered'
