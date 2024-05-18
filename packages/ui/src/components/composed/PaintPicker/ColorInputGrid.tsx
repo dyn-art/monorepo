@@ -12,14 +12,14 @@ import {
 
 import { AdvancedInput } from '../../primitive';
 
-export const ColorText: React.FC<TProps> = ({ rgba, onRgbaUpdate }) => {
+export const ColorInputGrid: React.FC<TProps> = ({ rgba, onRgbaUpdate }) => {
 	const { rgb, alpha } = React.useMemo(() => rgbaToRgb(rgba), [rgba]);
 	const hex = React.useMemo(() => rgbToHex(rgb), [rgb]);
 	const [hexValue, setHexValue] = React.useState<string>(hex);
 	const [rValue, setRValue] = React.useState<number | string>(rgb[0]);
 	const [gValue, setGValue] = React.useState<number | string>(rgb[1]);
 	const [bValue, setBValue] = React.useState<number | string>(rgb[2]);
-	const [alphaValue, setAlphaValue] = React.useState<number | string>(alpha);
+	const [alphaValue, setAlphaValue] = React.useState<number | string>(alpha * 100);
 
 	const [isHexValid, setIsHexValid] = React.useState(true);
 	const [isRValid, setIsRValid] = React.useState(true);
@@ -36,7 +36,7 @@ export const ColorText: React.FC<TProps> = ({ rgba, onRgbaUpdate }) => {
 		setRValue(rgb[0]);
 		setGValue(rgb[1]);
 		setBValue(rgb[2]);
-		setAlphaValue(alpha);
+		setAlphaValue(alpha * 100);
 
 		setIsRValid(true);
 		setIsGValid(true);
@@ -63,8 +63,9 @@ export const ColorText: React.FC<TProps> = ({ rgba, onRgbaUpdate }) => {
 
 	const onAlphaChange = React.useCallback(
 		(e: React.ChangeEvent<HTMLInputElement>) => {
-			const newAlpha = parseFloat(e.currentTarget.value);
-			setAlphaValue(newAlpha);
+			const newValue = parseFloat(e.currentTarget.value);
+			const newAlpha = newValue / 100;
+			setAlphaValue(newValue);
 			if (isValidAlpha(newAlpha)) {
 				setIsAlphaValid(true);
 				onRgbaUpdate([rgb[0], rgb[1], rgb[2], newAlpha]);

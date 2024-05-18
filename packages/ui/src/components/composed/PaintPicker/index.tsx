@@ -1,46 +1,27 @@
 'use client';
 
 import React from 'react';
-import { rgbaToRgb, rgbToHex } from '@dyn/utils';
 
-import { Popover, PopoverContent, PopoverTrigger } from '../../layout';
-import { Button, Tabs, TabsContent, TabsList, TabsTrigger } from '../../primitive';
+import { Popover, PopoverContent } from '../../layout';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../primitive';
 import { Paint } from './Paint';
 import { GRADIENT_COLORS as GRADIENT_PAINTS } from './presets';
+import { SolidPaintInputRow } from './SolidPaintInputRow';
 import { SolidPaintTab } from './SolidPaintTab';
 import type { TPaint } from './types';
 
 export const PaintPicker: React.FC<TPaintPickerProps> = (props) => {
 	const { paint, onPaintUpdate } = props;
 	const [activeTab, setActiveTab] = React.useState<TPaint['type']>(paint.type);
-
-	const paintName = React.useMemo(() => {
-		switch (paint.type) {
-			case 'Solid': {
-				const { rgb, alpha } = rgbaToRgb(paint.color);
-				return `${rgbToHex(rgb)} | ${alpha * 100}%`;
-			}
-			case 'Gradient':
-				return paint.variant.type === 'Linear' ? 'Linear Gradient' : 'Radial Gradient';
-		}
-	}, [paint]);
-
 	return (
 		<Popover>
-			<PopoverTrigger asChild>
-				<Button className={`w-[220px] justify-start text-left font-normal `} variant="outline">
-					<div className="flex w-full items-center gap-2">
-						<Paint
-							className="rounded !bg-cover !bg-center transition-all"
-							paint={paint}
-							size={[16, 16]}
-						/>
+			{paint.type === 'Solid' ? (
+				<SolidPaintInputRow onPaintUpdate={onPaintUpdate} paint={paint} />
+			) : (
+				'todo'
+			)}
 
-						<div className="flex-1 truncate">{paintName}</div>
-					</div>
-				</Button>
-			</PopoverTrigger>
-			<PopoverContent className="w-64">
+			<PopoverContent align="start" alignOffset={-8} className="w-64" side="bottom">
 				<Tabs
 					className="w-full"
 					onValueChange={(value) => {

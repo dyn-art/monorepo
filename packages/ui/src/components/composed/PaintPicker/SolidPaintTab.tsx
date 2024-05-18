@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { TabsContent } from '../../primitive';
-import { ColorText } from './ColorText';
+import { ColorInputGrid } from './ColorInputGrid';
 import { Paint } from './Paint';
 import { SOLID_PAINTS } from './presets';
 import type { TPaint } from './types';
@@ -26,7 +26,7 @@ export const SolidPaintTab: React.FC<TProps> = (props) => {
 				))}
 			</div>
 			{paint.type === 'Solid' && (
-				<ColorText
+				<ColorInputGrid
 					onRgbaUpdate={(rgba) => {
 						onPaintUpdate({ type: 'Solid', color: rgba });
 					}}
