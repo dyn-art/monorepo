@@ -1,2 +1,2 @@
+export * from './ModificationField';
 export * from './Viewport';
-export * from './fields';
