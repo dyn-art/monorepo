@@ -186,6 +186,11 @@ export interface TImageModificationInput {
 	default?: string;
 }
 
+export interface TDateTimeModificationInput {
+	type: 'DATETIME';
+	default: string;
+}
+
 export type TMapToDefaultType<T> = T extends { default: infer U } ? U : never;
 
 export type TExpandKey<GPrefix extends string, GValue> = GValue extends any[]

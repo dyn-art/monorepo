@@ -1,6 +1,6 @@
 import React from 'react';
+import { AdvancedInput } from '@/components/primitive';
 
-import { AdvancedInput } from '../../primitive';
 import { Paint } from './Paint';
 import type { TGradientPaint } from './types';
 

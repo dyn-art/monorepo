@@ -1,6 +1,6 @@
 import React from 'react';
+import { TabsContent } from '@/components/primitive';
 
-import { TabsContent } from '../../primitive';
 import { ColorInputGrid } from './ColorInputGrid';
 import { Paint } from './Paint';
 import { SOLID_PAINTS } from './presets';

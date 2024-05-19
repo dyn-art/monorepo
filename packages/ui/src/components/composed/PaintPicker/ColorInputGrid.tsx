@@ -1,4 +1,3 @@
-import React from 'react';
 import {
 	hexToRgb,
 	isHexColor,
@@ -9,8 +8,9 @@ import {
 	type TRgbaColor,
 	type TRgbColor
 } from '@dyn/utils';
+import React from 'react';
 
-import { AdvancedInput } from '../../primitive';
+import { AdvancedInput } from '@/components/primitive';
 
 export const ColorInputGrid: React.FC<TProps> = ({ rgba, onRgbaUpdate }) => {
 	const { rgb, alpha } = React.useMemo(() => rgbaToRgb(rgba), [rgba]);

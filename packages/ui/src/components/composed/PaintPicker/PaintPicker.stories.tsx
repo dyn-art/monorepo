@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import React from 'react';
 
-import { PaintPicker } from './PaintPicker';
+import { PaintPicker } from './index';
 
 const meta: Meta<typeof PaintPicker> = {
 	title: 'ui/PaintPicker',
