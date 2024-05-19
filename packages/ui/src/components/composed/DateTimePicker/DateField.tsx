@@ -14,7 +14,7 @@ export const DateField: React.FC<TProps> = (props) => {
 	const ref = React.useRef<HTMLDivElement | null>(null);
 	const { locale } = useLocale();
 	const state = useDateFieldState({
-		...props,
+		...dateFieldProps,
 		locale,
 		createCalendar
 	});

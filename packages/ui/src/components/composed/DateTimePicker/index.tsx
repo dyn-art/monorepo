@@ -33,7 +33,7 @@ export const DateTimePicker: React.FC<TProps> = (props) => {
 	return (
 		<Popover aria-label="Date Time Picker">
 			<DateField
-				className="pl-10"
+				className="pl-8"
 				onChange={state.setValue}
 				value={dateTime != null ? dateToCalendarDateTime(dateTime) : undefined}
 				withTime={withTime}
@@ -52,6 +52,7 @@ export const DateTimePicker: React.FC<TProps> = (props) => {
 					footer={
 						<TimeField
 							aria-label="Time Picker"
+							className="mt-4"
 							onChange={state.setTimeValue}
 							value={state.timeValue}
 						/>
