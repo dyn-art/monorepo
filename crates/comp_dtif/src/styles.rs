@@ -27,6 +27,8 @@ pub enum Style {
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
 #[serde(rename_all = "camelCase")]
 pub struct FillStyle {
+    #[serde(default)]
+    pub id: Option<String>,
     pub paint_id: String,
     #[serde(default = "default_as_true")]
     pub visible: bool,
@@ -65,6 +67,8 @@ impl SpawnBundleImpl for FillStyle {
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
 #[serde(rename_all = "camelCase")]
 pub struct StrokeStyle {
+    #[serde(default)]
+    pub id: Option<String>,
     width: f32,
     pub paint_id: String,
     #[serde(default = "default_as_true")]
@@ -109,6 +113,8 @@ impl SpawnBundleImpl for StrokeStyle {
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
 #[serde(rename_all = "camelCase")]
 pub struct DropShadowStyle {
+    #[serde(default)]
+    pub id: Option<String>,
     #[serde(default)]
     pub color: Color,
     pub position: Vec2,

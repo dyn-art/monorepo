@@ -6,7 +6,7 @@ use dyn_utils::{
 use glam::Mat3;
 use smallvec::SmallVec;
 
-// TODO: Should Paint be directly embedded in FillStyle or exist as separate Entity?
+// TODO: Should Paint be directly embedded in FillStyle & StorkeStyle or exist as separate Entity?
 // Embedding simplifies logic but keeping it separate allows reuse across multiple nodes (like texture).
 // Is the added complexity justified?
 //

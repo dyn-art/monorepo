@@ -27,7 +27,7 @@ use dyn_utils::{
     serde::{default_as_false, default_as_true},
     units::angle::Angle,
 };
-use glam::{Quat, Vec2, Vec3};
+use glam::{Vec2, Vec3};
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
 #[serde(tag = "type")]

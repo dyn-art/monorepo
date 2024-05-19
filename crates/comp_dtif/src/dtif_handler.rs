@@ -160,7 +160,7 @@ impl DtifHandler {
     }
 
     fn insert_style(
-        &self,
+        &mut self,
         style: &Style,
         node_entity: Entity,
         world: &mut World,
@@ -169,6 +169,15 @@ impl DtifHandler {
         let mut style_entity_world_mut = self.spawn_style(style, world);
         style_entity_world_mut.insert(StyleParentMixin(node_entity));
         let style_entity = style_entity_world_mut.id();
+
+        let maybe_sid = match style {
+            Style::DropShadow(s) => s.id.clone(),
+            Style::Fill(s) => s.id.clone(),
+            Style::Stroke(s) => s.id.clone(),
+        };
+        if let Some(sid) = maybe_sid {
+            self.sid_to_entity.insert(sid, style_entity);
+        }
 
         // Reference style entity in paint
         if let Some(paint_entity) = style_entity_world_mut

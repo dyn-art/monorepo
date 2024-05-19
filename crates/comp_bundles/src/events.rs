@@ -38,6 +38,11 @@ pub enum CompCoreInputEvent {
     UpdatePolygonNode(UpdatePolygonNodeInputEvent),
     UpdateTextNode(UpdateTextNodeInputEvent),
 
+    // Style
+    // UpdateFillStyle
+    // UpdateStrokeStyle
+    // UpdateDropShadowStyle
+
     // Paint
     UpdateSolidPaint(UpdateSolidPaintInputEvent),
     UpdateImagePaint(UpdateImagePaintInputEvent),
