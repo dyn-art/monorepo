@@ -11,13 +11,13 @@ use dyn_comp_bundles::{
     components::{
         marker::{Removed, Root},
         mixins::{
-            BlendModeMixin, CornerRadiiMixin, ImageAssetMixin, OpacityMixin, SizeMixin,
-            VisibilityMixin,
+            BlendModeMixin, CornerRadiiMixin, ImageAssetMixin, OpacityMixin, PaintParentMixin,
+            SizeMixin, VisibilityMixin,
         },
         nodes::{
             CompNode, EllipseCompNode, FrameCompNode, PolygonCompNode, StarCompNode, TextCompNode,
         },
-        paints::{GradientCompPaint, ImageCompPaint, SolidCompPaint},
+        paints::{CompPaint, GradientCompPaint, ImageCompPaint, SolidCompPaint},
     },
     events::{
         DeleteEntityInputEvent, FocusRootNodesInputEvent, MoveEntityInputEvent,
@@ -456,10 +456,20 @@ pub fn update_entity_blend_mode_input_system(
 pub fn update_entity_opacity_input_system(
     mut event_reader: EventReader<UpdateEntityOpacityInputEvent>,
     mut query: Query<&mut OpacityMixin>,
+    paint_query: Query<&PaintParentMixin, With<CompPaint>>,
 ) {
     for UpdateEntityOpacityInputEvent { entity, opacity } in event_reader.read() {
         if let Ok(mut opacity_mixin) = query.get_mut(*entity) {
             opacity_mixin.0 = *opacity;
+        } else {
+            // TODO: Should Paint be able to update opacity of Style?
+            if let Ok(PaintParentMixin(paint_parent)) = paint_query.get(*entity) {
+                for parent in paint_parent {
+                    if let Ok(mut opacity_mixin) = query.get_mut(*parent) {
+                        opacity_mixin.0 = *opacity;
+                    }
+                }
+            }
         }
     }
 }
