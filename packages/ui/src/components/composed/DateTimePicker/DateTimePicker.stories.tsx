@@ -12,8 +12,8 @@ const meta: Meta<typeof DateTimePicker> = {
 	tags: ['autodocs'],
 	argTypes: {},
 	render: (args) => {
-		const [date, setDate] = React.useState({ date: new Date(), hasTime: true });
-		return <DateTimePicker {...args} dateTime={date} onDateTimeUpdate={setDate} />;
+		const [date, setDate] = React.useState(new Date());
+		return <DateTimePicker {...args} dateTime={date} onDateTimeUpdate={setDate} withTime />;
 	},
 	parameters: {
 		layout: 'centered'

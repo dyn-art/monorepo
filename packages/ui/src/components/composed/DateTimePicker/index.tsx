@@ -3,7 +3,7 @@
 import type { CalendarDateTime } from '@internationalized/date';
 import { CalendarIcon } from 'lucide-react';
 import React from 'react';
-import { useDatePickerState, type DatePickerStateOptions } from 'react-stately';
+import { useDatePickerState } from 'react-stately';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/layout';
 
 import { Calendar } from '../Calendar';
@@ -12,35 +12,31 @@ import { DateField } from './DateField';
 import { TimeField } from './TimeField';
 
 export const DateTimePicker: React.FC<TProps> = (props) => {
-	const { dateTime, onDateTimeUpdate, isDisabled } = props;
+	const { dateTime, onDateTimeUpdate, isDisabled, withTime } = props;
 	const contentRef = React.useRef<HTMLDivElement | null>(null);
-
-	const [open, setOpen] = React.useState(false);
 
 	const onCalendarSelect = React.useCallback(
 		(value?: CalendarDateTime) => {
 			const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-			onDateTimeUpdate(value != null ? { date: value.toDate(timeZone), hasTime: true } : undefined);
+			onDateTimeUpdate(value != null ? value.toDate(timeZone) : undefined);
 		},
 		[onDateTimeUpdate]
 	);
 
-	const datePickerProps: DatePickerStateOptions<CalendarDateTime> = {
-		value: dateTime != null ? dateToCalendarDateTime(dateTime.date) : undefined,
+	const state = useDatePickerState({
+		value: dateTime != null ? dateToCalendarDateTime(dateTime) : undefined,
 		onChange: onCalendarSelect,
 		isDisabled: props.isDisabled,
 		granularity: 'minute'
-	};
-
-	const state = useDatePickerState(datePickerProps);
+	});
 
 	return (
-		<Popover aria-label="Date Time Picker" onOpenChange={setOpen} open={open}>
+		<Popover aria-label="Date Time Picker">
 			<DateField
 				className="pl-10"
 				onChange={state.setValue}
-				value={dateTime != null ? dateToCalendarDateTime(dateTime.date) : undefined}
-				withTime={dateTime?.hasTime ?? false}
+				value={dateTime != null ? dateToCalendarDateTime(dateTime) : undefined}
+				withTime={withTime}
 			>
 				<PopoverTrigger asChild>
 					<button
@@ -65,7 +61,7 @@ export const DateTimePicker: React.FC<TProps> = (props) => {
 					onSelect={(value) => {
 						onCalendarSelect(value != null ? dateToCalendarDateTime(value) : undefined);
 					}}
-					selected={dateTime?.date}
+					selected={dateTime}
 				/>
 			</PopoverContent>
 		</Popover>
@@ -73,7 +69,8 @@ export const DateTimePicker: React.FC<TProps> = (props) => {
 };
 
 interface TProps {
-	dateTime?: { date: Date; hasTime: boolean };
-	onDateTimeUpdate: (value?: { date: Date; hasTime: boolean }) => void;
+	dateTime?: Date;
+	onDateTimeUpdate: (value?: Date) => void;
+	withTime?: boolean;
 	isDisabled?: boolean;
 }
