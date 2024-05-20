@@ -21,7 +21,14 @@
 					"constraints": { "horizontal": "Start", "vertical": "Start" }
 				},
 				"styles": [
-					{ "type": "Fill", "paintId": "25", "blendMode": "Normal", "opacity": 1, "visible": true }
+					{
+						"id": "s1",
+						"type": "Fill",
+						"paintId": "25",
+						"blendMode": "Normal",
+						"opacity": 1,
+						"visible": true
+					}
 				]
 			},
 			"2": {
@@ -657,7 +664,7 @@
 						},
 						{
 							"type": "UpdateEntityOpacity",
-							"entity": "25",
+							"entity": "s1",
 							"opacity": { "var": "backgroundColor.alpha" }
 						}
 					]
