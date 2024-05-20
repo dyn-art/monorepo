@@ -7,11 +7,13 @@ import {
 import type { Composition } from '@dyn/comp-svg-builder';
 import { PaintPicker, type TPaint } from '@dyn/ui';
 
+import { runJsonFunction } from '../run-json-function';
+
 export const ColorInput: React.FC<TProps> = (props) => {
 	const { composition, field } = props;
 	const [value, setValue] = React.useState<TPaint>({
 		type: 'Solid',
-		color: field.inputType.default
+		color: field.inputVariant.default
 	});
 	const [error, setError] = React.useState<string | null>(null);
 
@@ -24,18 +26,26 @@ export const ColorInput: React.FC<TProps> = (props) => {
 				return;
 			}
 
-			const processedActions = applyModifications(field, {
-				[field.key]: paint.color
-			});
+			// eslint-disable-next-line @typescript-eslint/no-floating-promises -- ok
+			(async () => {
+				// eslint-disable-next-line @typescript-eslint/await-thenable -- idk
+				const processedActions = await applyModifications(
+					field,
+					{
+						[field.key]: paint.color
+					},
+					async (jsonFunction, args) => runJsonFunction(jsonFunction, args, 'iframe')
+				);
 
-			for (const processedAction of processedActions) {
-				if (processedAction.resolved) {
-					composition.emitInputEvents('Dtif', processedAction.events);
-					composition.update();
-				} else {
-					setError(processedAction.notMetConditions[0]?.message ?? null);
+				for (const processedAction of processedActions) {
+					if (processedAction.resolved) {
+						composition.emitInputEvents('Dtif', processedAction.events);
+						composition.update();
+					} else {
+						setError(processedAction.notMetConditions[0]?.message ?? null);
+					}
 				}
-			}
+			})();
 		},
 		[field, composition]
 	);

@@ -7,10 +7,12 @@ import {
 import type { Composition } from '@dyn/comp-svg-builder';
 import { AdvancedInput } from '@dyn/ui';
 
+import { runJsonFunction } from '../run-json-function';
+
 export const PositionInput: React.FC<TProps> = (props) => {
 	const { composition, field } = props;
-	const [xValue, setXValue] = React.useState<number>(field.inputType.default[0]);
-	const [yValue, setYValue] = React.useState<number>(field.inputType.default[1]);
+	const [xValue, setXValue] = React.useState<number>(field.inputVariant.default[0]);
+	const [yValue, setYValue] = React.useState<number>(field.inputVariant.default[1]);
 	const [error, setError] = React.useState<string | null>(null);
 
 	const onXChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -28,18 +30,26 @@ export const PositionInput: React.FC<TProps> = (props) => {
 			}
 			setError(null);
 
-			const processedActions = applyModifications(field, {
-				[field.key]: [xValue, yValue]
-			});
+			// eslint-disable-next-line @typescript-eslint/no-floating-promises -- ok
+			(async () => {
+				// eslint-disable-next-line @typescript-eslint/await-thenable -- idk
+				const processedActions = await applyModifications(
+					field,
+					{
+						[field.key]: [xValue, yValue]
+					},
+					async (jsonFunction, args) => runJsonFunction(jsonFunction, args, 'iframe')
+				);
 
-			for (const processedAction of processedActions) {
-				if (processedAction.resolved) {
-					composition.emitInputEvents('Dtif', processedAction.events);
-					composition.update();
-				} else {
-					setError(processedAction.notMetConditions[0]?.message ?? null);
+				for (const processedAction of processedActions) {
+					if (processedAction.resolved) {
+						composition.emitInputEvents('Dtif', processedAction.events);
+						composition.update();
+					} else {
+						setError(processedAction.notMetConditions[0]?.message ?? null);
+					}
 				}
-			}
+			})();
 		},
 		[xValue, yValue, field, composition]
 	);
@@ -53,8 +63,8 @@ export const PositionInput: React.FC<TProps> = (props) => {
 					className="pl-7"
 					defaultValue={xValue}
 					id="x"
-					max={field.inputType.max?.[0]}
-					min={field.inputType.min?.[0]}
+					max={field.inputVariant.max?.[0]}
+					min={field.inputVariant.min?.[0]}
 					onBlur={() => {
 						onFocus(false);
 					}}
@@ -75,8 +85,8 @@ export const PositionInput: React.FC<TProps> = (props) => {
 					className="pl-7"
 					defaultValue={yValue}
 					id="y"
-					max={field.inputType.max?.[1]}
-					min={field.inputType.min?.[1]}
+					max={field.inputVariant.max?.[1]}
+					min={field.inputVariant.min?.[1]}
 					onBlur={() => {
 						onFocus(false);
 					}}

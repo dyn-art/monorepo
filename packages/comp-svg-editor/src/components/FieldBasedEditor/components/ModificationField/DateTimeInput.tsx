@@ -1,23 +1,41 @@
 import React from 'react';
 import {
 	applyModifications,
-	type TBooleanModificationInput,
+	type TDateTimeModificationInput,
 	type TModificationField
 } from '@dyn/comp-dtif';
 import type { Composition } from '@dyn/comp-svg-builder';
-import { Switch } from '@dyn/ui';
+import { DateTimePicker } from '@dyn/ui';
 
 import { runJsonFunction } from '../run-json-function';
 
-export const BooleanInput: React.FC<TProps> = (props) => {
+function getDefaultDate(
+	maybeUnixTimestamp: TDateTimeModificationInput['default']
+): Date | undefined {
+	if (maybeUnixTimestamp === 'NOW') {
+		return new Date();
+	} else if (typeof maybeUnixTimestamp === 'number') {
+		return new Date(maybeUnixTimestamp * 1000);
+	}
+	return undefined;
+}
+
+export const DateTimeInput: React.FC<TProps> = (props) => {
 	const { composition, field } = props;
-	const [value, setValue] = React.useState<boolean>(field.inputVariant.default);
+	const [value, setValue] = React.useState<Date | undefined>(
+		getDefaultDate(field.inputVariant.default)
+	);
 	const [error, setError] = React.useState<string | null>(null);
 
-	const onCheckedChange = React.useCallback(
-		(checked: boolean) => {
-			setValue(checked);
+	const onDateTimeUpdate = React.useCallback(
+		(date?: Date) => {
+			setValue(date);
 			setError(null);
+
+			if (date == null) {
+				setError('Date can not be empty!');
+				return;
+			}
 
 			// eslint-disable-next-line @typescript-eslint/no-floating-promises -- ok
 			(async () => {
@@ -25,7 +43,7 @@ export const BooleanInput: React.FC<TProps> = (props) => {
 				const processedActions = await applyModifications(
 					field,
 					{
-						[field.key]: checked
+						[field.key]: date.getTime()
 					},
 					async (jsonFunction, args) => runJsonFunction(jsonFunction, args, 'iframe')
 				);
@@ -46,7 +64,11 @@ export const BooleanInput: React.FC<TProps> = (props) => {
 	return (
 		<fieldset className="w-full rounded-lg border p-4">
 			<legend className="-ml-1 px-1 text-sm font-medium">{field.displayName}</legend>
-			<Switch checked={value} onCheckedChange={onCheckedChange} />
+			<DateTimePicker
+				dateTime={value}
+				onDateTimeUpdate={onDateTimeUpdate}
+				withTime={field.inputVariant.withTime}
+			/>
 			{error != null ? (
 				<p className="mt-2 text-sm text-red-600" id="email-error">
 					{error}
@@ -58,5 +80,5 @@ export const BooleanInput: React.FC<TProps> = (props) => {
 
 interface TProps {
 	composition: Composition;
-	field: TModificationField<string, TBooleanModificationInput>;
+	field: TModificationField<string, TDateTimeModificationInput>;
 }

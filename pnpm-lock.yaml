@@ -383,6 +383,9 @@ importers:
       '@dyn/ui':
         specifier: workspace:*
         version: link:../ui
+      '@dyn/utils':
+        specifier: workspace:^
+        version: link:../utils
     devDependencies:
       '@dyn/config':
         specifier: workspace:*

@@ -1,5 +1,5 @@
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/Function
-export function jsonFunction<GArgs extends string[]>(
+export function createJsonFunction<GArgs extends string[]>(
 	args: GArgs,
 	body: string
 ): TJsonFunction<GArgs> {
@@ -9,15 +9,10 @@ export function jsonFunction<GArgs extends string[]>(
 	};
 }
 
-// eslint-disable-next-line @typescript-eslint/no-shadow, @typescript-eslint/ban-types -- .
-export function toFunction(jsonFunction: TJsonFunction): Function | null {
-	try {
-		// eslint-disable-next-line @typescript-eslint/no-implied-eval, no-new-func -- .
-		return new Function(...jsonFunction.args, jsonFunction.body);
-	} catch (e) {
-		// do nothing
-	}
-	return null;
+// Only run in restricted scope (e.g. iframe)!
+export function toFunction(jsonFunction: TJsonFunction): Function {
+	// eslint-disable-next-line @typescript-eslint/no-implied-eval, no-new-func -- .
+	return new Function(...jsonFunction.args, jsonFunction.body);
 }
 
 export interface TJsonFunction<GArgs extends string[] = string[]> {

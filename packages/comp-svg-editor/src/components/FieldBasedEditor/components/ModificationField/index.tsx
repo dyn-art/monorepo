@@ -2,6 +2,7 @@ import React from 'react';
 import type {
 	TBooleanModificationInput,
 	TColorModificationInput,
+	TDateTimeModificationInput,
 	TModificationField,
 	TNumberModificationInput,
 	TPositionModificationInput,
@@ -12,12 +13,15 @@ import type { Composition } from '@dyn/comp-svg-builder';
 
 import { BooleanInput } from './BooleanInput';
 import { ColorInput } from './ColorInput';
+import { DateTimeInput } from './DateTimeInput';
 import { NumberInput } from './NumberInput';
 import { PositionInput } from './PositionInput';
 import { RangeInput } from './RangeInput';
 import { TextInput } from './TextInput';
 
 export * from './BooleanInput';
+export * from './ColorInput';
+export * from './DateTimeInput';
 export * from './NumberInput';
 export * from './PositionInput';
 export * from './RangeInput';
@@ -26,7 +30,7 @@ export * from './TextInput';
 export const ModificationField: React.FC<TProps> = (props) => {
 	const { field, composition } = props;
 
-	switch (field.inputType.type) {
+	switch (field.inputVariant.type) {
 		case 'POSITION':
 			return (
 				<PositionInput
@@ -72,6 +76,14 @@ export const ModificationField: React.FC<TProps> = (props) => {
 				<ColorInput
 					composition={composition}
 					field={field as TModificationField<string, TColorModificationInput>}
+					key={field.key}
+				/>
+			);
+		case 'DATETIME':
+			return (
+				<DateTimeInput
+					composition={composition}
+					field={field as TModificationField<string, TDateTimeModificationInput>}
 					key={field.key}
 				/>
 			);

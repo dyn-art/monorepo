@@ -7,9 +7,11 @@ import {
 import type { Composition } from '@dyn/comp-svg-builder';
 import { Slider } from '@dyn/ui';
 
+import { runJsonFunction } from '../run-json-function';
+
 export const RangeInput: React.FC<TProps> = (props) => {
 	const { composition, field } = props;
-	const [value, setValue] = React.useState<number[]>([field.inputType.default]);
+	const [value, setValue] = React.useState<number[]>([field.inputVariant.default]);
 	const [error, setError] = React.useState<string | null>(null);
 
 	const onValueChange = React.useCallback(
@@ -17,18 +19,26 @@ export const RangeInput: React.FC<TProps> = (props) => {
 			setValue(newValue);
 			setError(null);
 
-			const processedActions = applyModifications(field, {
-				[field.key]: newValue[0] ?? 0
-			});
+			// eslint-disable-next-line @typescript-eslint/no-floating-promises -- ok
+			(async () => {
+				// eslint-disable-next-line @typescript-eslint/await-thenable -- idk
+				const processedActions = await applyModifications(
+					field,
+					{
+						[field.key]: newValue[0] ?? 0
+					},
+					async (jsonFunction, args) => runJsonFunction(jsonFunction, args, 'iframe')
+				);
 
-			for (const processedAction of processedActions) {
-				if (processedAction.resolved) {
-					composition.emitInputEvents('Dtif', processedAction.events);
-					composition.update();
-				} else {
-					setError(processedAction.notMetConditions[0]?.message ?? null);
+				for (const processedAction of processedActions) {
+					if (processedAction.resolved) {
+						composition.emitInputEvents('Dtif', processedAction.events);
+						composition.update();
+					} else {
+						setError(processedAction.notMetConditions[0]?.message ?? null);
+					}
 				}
-			}
+			})();
 		},
 		[field, composition]
 	);
@@ -37,10 +47,10 @@ export const RangeInput: React.FC<TProps> = (props) => {
 		<fieldset className="w-full rounded-lg border p-4">
 			<legend className="-ml-1 px-1 text-sm font-medium">{field.displayName}</legend>
 			<Slider
-				max={field.inputType.max}
-				min={field.inputType.min}
+				max={field.inputVariant.max}
+				min={field.inputVariant.min}
 				onValueChange={onValueChange}
-				step={field.inputType.step ?? 1}
+				step={field.inputVariant.step ?? 1}
 				value={value}
 			/>
 			{error != null ? (

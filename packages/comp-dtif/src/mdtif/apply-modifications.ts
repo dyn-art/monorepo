@@ -1,30 +1,37 @@
 import { apply } from 'json-logic-js';
-import { deepReplaceVar, toFunction } from '@dyn/utils';
+import { deepReplaceVar, type TJsonFunction } from '@dyn/utils';
 
 import type { COMP } from '../comp';
 import type {
 	TFieldData as TFieldModifications,
-	TMapToDefaultType,
+	TMapToReturnType,
 	TMdtifInputEvent,
 	TModificationField,
-	TModificationInputType
+	TModificationInputVariant
 } from './types';
 
-export function applyModifications<GKey extends string, GInputType extends TModificationInputType>(
-	field: TModificationField<GKey, GInputType>,
-	modifications: TFieldModifications<GKey, GInputType>
-): TProcessedFieldAction[] {
+export async function applyModifications<
+	GKey extends string,
+	GInputVariant extends TModificationInputVariant
+>(
+	field: TModificationField<GKey, GInputVariant>,
+	modifications: TFieldModifications<GKey, GInputVariant>,
+	runJsonFunction?: <T extends string[]>(
+		jsonFunction: TJsonFunction<T>,
+		args: unknown[]
+	) => Promise<any>
+): Promise<TProcessedFieldAction[]> {
 	const { actions } = field;
 	const processedActions: TProcessedFieldAction[] = [];
 
 	for (const action of actions) {
 		const { conditions, events, compute } = action;
 
-		if (compute != null) {
-			const computeFunction = toFunction(compute);
-			if (computeFunction != null) {
-				modifications[compute.args[0]] = computeFunction(modifications[compute.args[0]]);
-			}
+		if (compute != null && runJsonFunction != null) {
+			// eslint-disable-next-line no-await-in-loop -- ok here
+			modifications[compute.args[0]] = await runJsonFunction(compute, [
+				modifications[compute.args[0]]
+			]);
 		}
 
 		// Check whether data matches conditions for action
@@ -42,7 +49,7 @@ export function applyModifications<GKey extends string, GInputType extends TModi
 			processedActions.push({
 				resolved: true,
 				events: events.map((event) =>
-					toDtifInputEvent<GKey, TMapToDefaultType<GInputType>>(event, modifications)
+					toDtifInputEvent<GKey, TMapToReturnType<GInputVariant>>(event, modifications)
 				)
 			});
 		}

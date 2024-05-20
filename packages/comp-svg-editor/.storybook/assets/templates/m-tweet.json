@@ -535,7 +535,7 @@
 		{
 			"key": "userName",
 			"displayName": "User Name",
-			"inputType": { "type": "TEXT", "default": "John Kappa" },
+			"inputVariant": { "type": "TEXT", "default": "John Kappa" },
 			"actions": [
 				{
 					"conditions": [],
@@ -552,7 +552,7 @@
 		{
 			"key": "userHandle",
 			"displayName": "User Handle",
-			"inputType": { "type": "TEXT", "default": "johnkappa" },
+			"inputVariant": { "type": "TEXT", "default": "johnkappa" },
 			"actions": [
 				{
 					"conditions": [],
@@ -570,7 +570,7 @@
 		{
 			"key": "tweetText",
 			"displayName": "Tweet Text",
-			"inputType": {
+			"inputVariant": {
 				"type": "TEXT",
 				"default": "This is the original component. Edit me to\nmake global changes to allasdf. 🎉",
 				"area": true
@@ -591,7 +591,7 @@
 		{
 			"key": "verifiedBadge",
 			"displayName": "Verified Badge",
-			"inputType": {
+			"inputVariant": {
 				"type": "BOOLEAN",
 				"default": true
 			},
@@ -611,7 +611,7 @@
 		{
 			"key": "cornerRadius",
 			"displayName": "Corner Radius",
-			"inputType": {
+			"inputVariant": {
 				"type": "RANGE",
 				"default": 10,
 				"min": 0,
@@ -638,7 +638,7 @@
 		{
 			"key": "backgroundColor",
 			"displayName": "Background Color",
-			"inputType": {
+			"inputVariant": {
 				"type": "COLOR",
 				"default": [255, 219, 219, 1]
 			},
@@ -659,6 +659,31 @@
 							"type": "UpdateEntityOpacity",
 							"entity": "25",
 							"opacity": { "var": "backgroundColor.alpha" }
+						}
+					]
+				}
+			]
+		},
+		{
+			"key": "date",
+			"displayName": "Date",
+			"inputVariant": {
+				"type": "DATETIME",
+				"default": "NOW",
+				"withTime": true
+			},
+			"actions": [
+				{
+					"conditions": [],
+					"compute": {
+						"args": ["date"],
+						"body": "const dateObj = new Date(date);\n\n// Format the time\nlet hours = dateObj.getHours();\nconst minutes = dateObj.getMinutes();\nconst ampm = hours >= 12 ? 'PM' : 'AM';\nhours = hours % 12;\nhours = hours ? hours : 12; // the hour '0' should be '12'\nconst minutesStr = minutes < 10 ? '0' + minutes : minutes;\nconst timeStr = hours + ':' + minutesStr + ' ' + ampm;\n\n// Format the date\nconst options = { month: 'short', day: 'numeric', year: 'numeric' };\nconst dateStr = dateObj.toLocaleDateString('en-US', options);\n\n// Combine time and date\nreturn timeStr + ' · ' + dateStr;"
+					},
+					"events": [
+						{
+							"type": "UpdateTextNode",
+							"entity": "19",
+							"text": { "var": "date" }
 						}
 					]
 				}

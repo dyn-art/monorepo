@@ -7,9 +7,11 @@ import {
 import type { Composition } from '@dyn/comp-svg-builder';
 import { AdvancedInput } from '@dyn/ui';
 
+import { runJsonFunction } from '../run-json-function';
+
 export const NumberInput: React.FC<TProps> = (props) => {
 	const { composition, field } = props;
-	const [value, setValue] = React.useState<number>(field.inputType.default);
+	const [value, setValue] = React.useState<number>(field.inputVariant.default);
 	const [error, setError] = React.useState<string | null>(null);
 
 	const onChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -23,18 +25,26 @@ export const NumberInput: React.FC<TProps> = (props) => {
 			}
 			setError(null);
 
-			const processedActions = applyModifications(field, {
-				[field.key]: value
-			});
+			// eslint-disable-next-line @typescript-eslint/no-floating-promises -- ok
+			(async () => {
+				// eslint-disable-next-line @typescript-eslint/await-thenable -- idk
+				const processedActions = await applyModifications(
+					field,
+					{
+						[field.key]: value
+					},
+					async (jsonFunction, args) => runJsonFunction(jsonFunction, args, 'iframe')
+				);
 
-			for (const processedAction of processedActions) {
-				if (processedAction.resolved) {
-					composition.emitInputEvents('Dtif', processedAction.events);
-					composition.update();
-				} else {
-					setError(processedAction.notMetConditions[0]?.message ?? null);
+				for (const processedAction of processedActions) {
+					if (processedAction.resolved) {
+						composition.emitInputEvents('Dtif', processedAction.events);
+						composition.update();
+					} else {
+						setError(processedAction.notMetConditions[0]?.message ?? null);
+					}
 				}
-			}
+			})();
 		},
 		[value, field, composition]
 	);
@@ -45,8 +55,8 @@ export const NumberInput: React.FC<TProps> = (props) => {
 			<AdvancedInput
 				childrenAfter={<div />}
 				defaultValue={value}
-				max={field.inputType.max}
-				min={field.inputType.min}
+				max={field.inputVariant.max}
+				min={field.inputVariant.min}
 				onBlur={() => {
 					onFocus(false);
 				}}

@@ -36,7 +36,8 @@
 	"dependencies": {
 		"@dyn/comp-dtif": "workspace:*",
 		"@dyn/comp-svg-builder": "workspace:*",
-		"@dyn/ui": "workspace:*"
+		"@dyn/ui": "workspace:*",
+		"@dyn/utils": "workspace:*"
 	},
 	"peerDependencies": {
 		"@tanstack/react-query": "^5.35.1",

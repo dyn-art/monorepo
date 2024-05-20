@@ -1,5 +1,5 @@
 import type { AdditionalOperation, RulesLogic } from 'json-logic-js';
-import type { TJsonFunction, TRgbaColor } from '@dyn/utils';
+import type { TJsonFunction, TRgbaColor, TVec2 } from '@dyn/utils';
 
 import type { COMP } from '../comp';
 
@@ -10,16 +10,16 @@ export interface TMdtifComposition {
 
 export interface TModificationField<
 	GKey extends string = string,
-	GInputType extends TModificationInputType = TModificationInputType,
+	GInputVariant extends TModificationInputVariant = TModificationInputVariant,
 	GInferredKey extends GKey = GKey
 > {
 	key: GKey;
-	inputType: GInputType;
+	inputVariant: GInputVariant;
 	displayName: string;
-	actions: TModificationAction<GInferredKey, TMapToDefaultType<GInputType>>[];
+	actions: TModificationAction<GInferredKey, TMapToReturnType<GInputVariant>>[];
 	// TODO: Map specified output events to this modification field,
 	// because for example if the rotation changes the position modification field changes too
-	// outputEventMapper?: TModificationOutputEventMapper<GInputType, any>[];
+	// outputEventMapper?: TModificationOutputEventMapper<GInputVariant, any>[];
 }
 
 export interface TModificationAction<GKey extends string, GValue> {
@@ -135,16 +135,18 @@ export type TMdtifInputEvent<GKey extends string, GValue> =
 			GValue
 	  >);
 
-export type TModificationInputType =
+export type TModificationInputVariant =
 	| TNumberModificationInput
 	| TTextModificationInput
 	| TBooleanModificationInput
 	| TRangeModificationInput
 	| TColorModificationInput
-	| TPositionModificationInput;
+	| TPositionModificationInput
+	| TDateTimeModificationInput;
 
 export interface TNumberModificationInput {
 	type: 'NUMBER';
+	_returnType?: number;
 	default: number;
 	max?: number;
 	min?: number;
@@ -152,17 +154,20 @@ export interface TNumberModificationInput {
 
 export interface TTextModificationInput {
 	type: 'TEXT';
+	_returnType?: string;
 	default: string;
 	area: boolean;
 }
 
 export interface TBooleanModificationInput {
 	type: 'BOOLEAN';
+	_returnType?: boolean;
 	default: boolean;
 }
 
 export interface TRangeModificationInput {
 	type: 'RANGE';
+	_returnType?: number;
 	default: number;
 	max: number;
 	min: number;
@@ -171,27 +176,34 @@ export interface TRangeModificationInput {
 
 export interface TColorModificationInput {
 	type: 'COLOR';
+	_returnType?: TRgbaColor;
 	default: TRgbaColor;
 }
 
 export interface TPositionModificationInput {
 	type: 'POSITION';
-	default: [number, number];
-	max?: [number, number];
-	min?: [number, number];
+	_returnType?: TVec2;
+	default: TVec2;
+	max?: TVec2;
+	min?: TVec2;
 }
 
 export interface TImageModificationInput {
 	type: 'IMAGE';
+	_returnType?: string;
 	default?: string;
 }
 
 export interface TDateTimeModificationInput {
 	type: 'DATETIME';
-	default: string;
+	_returnType?: number;
+	default: number | 'NOW';
+	withTime?: boolean;
 }
 
-export type TMapToDefaultType<T> = T extends { default: infer U } ? U : never;
+export type TMapToReturnType<T> = T extends { _returnType?: infer U }
+	? Exclude<U, undefined>
+	: never;
 
 export type TExpandKey<GPrefix extends string, GValue> = GValue extends any[]
 	? `${GPrefix}.${number}`
@@ -203,7 +215,7 @@ export type TExpandKey<GPrefix extends string, GValue> = GValue extends any[]
 
 // export interface TModificationOutputEventMapper<
 // 	GKey extends string = string,
-// 	GInputType extends TModificationInputType = TModificationInputType,
+// 	GInputVariant extends TModificationInputVariant = TModificationInputVariant,
 // 	GOutputEventType extends COMP.WatchableComponentVariant = COMP.WatchableComponentVariant,
 // 	GInferredOutputEventType extends GOutputEventType = GOutputEventType
 // > {
@@ -212,7 +224,7 @@ export type TExpandKey<GPrefix extends string, GValue> = GValue extends any[]
 // 	map: Record<
 // 		GKey,
 // 		TInputToOutputPathMap<
-// 			TMapToDefaultType<GInputType>,
+// 			TMapToDefaultType<GInputVariant>,
 // 			TExpandKey<GInferredOutputEventType, TComponent<GInferredOutputEventType>>
 // 		>
 // 	>;
@@ -229,6 +241,6 @@ export type TExpandKey<GPrefix extends string, GValue> = GValue extends any[]
 // 		? { [P in keyof GInput]?: GOutputPath }[keyof GInput]
 // 		: GOutputPath;
 
-export type TFieldData<GKey extends string, GInputType extends TModificationInputType> = {
-	[key in GKey]: TMapToDefaultType<GInputType>;
+export type TFieldData<GKey extends string, GInputVariant extends TModificationInputVariant> = {
+	[key in GKey]: TMapToReturnType<GInputVariant>;
 };
