@@ -11,20 +11,21 @@ use dyn_comp_bundles::{
     events::{
         CompCoreInputEvent, DeleteEntityInputEvent, FocusRootNodesInputEvent, MoveEntityInputEvent,
         UpdateCompositionSizeInputEvent, UpdateCompositionViewportInputEvent,
-        UpdateEllipseNodeInputEvent, UpdateEntityBlendModeInputEvent,
-        UpdateEntityCornerRadiiInputEvent, UpdateEntityOpacityInputEvent,
-        UpdateEntityRotationInputEvent, UpdateEntitySizeInputEvent,
+        UpdateDropShadowStyleInputEvent, UpdateEllipseNodeInputEvent,
+        UpdateEntityBlendModeInputEvent, UpdateEntityCornerRadiiInputEvent,
+        UpdateEntityOpacityInputEvent, UpdateEntityRotationInputEvent, UpdateEntitySizeInputEvent,
         UpdateEntityTransformInputEvent, UpdateEntityVisibilityInputEvent,
-        UpdateFrameNodeInputEvent, UpdateGradientPaintInputEvent, UpdateImagePaintInputEvent,
-        UpdatePolygonNodeInputEvent, UpdateSolidPaintInputEvent, UpdateStarNodeInputEvent,
-        UpdateTextNodeInputEvent,
+        UpdateFillStyleInputEvent, UpdateFrameNodeInputEvent, UpdateGradientPaintInputEvent,
+        UpdateImagePaintInputEvent, UpdatePolygonNodeInputEvent, UpdateSolidPaintInputEvent,
+        UpdateStarNodeInputEvent, UpdateStorkeStyleInputEvent, UpdateTextNodeInputEvent,
     },
     properties::{TextAttributeInterval, Viewport},
 };
 use dyn_utils::{
     properties::{color::Color, corner_radii::CornerRadii, opacity::Opacity, size::Size},
-    units::angle::Angle,
+    units::{abs::Abs, angle::Angle},
 };
+use glam::Vec2;
 use std::collections::HashMap;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
@@ -41,6 +42,11 @@ pub enum DtifInputEvent {
     UpdateStarNode(UpdateStarNodeDtifInputEvent),
     UpdatePolygonNode(UpdatePolygonNodeDtifInputEvent),
     UpdateTextNode(UpdateTextNodeDtifInputEvent),
+
+    // Style
+    UpdateFillStyle(UpdateFillStyleDtifInputEvent),
+    UpdateStrokeStyle(UpdateStorkeStyleDtifInputEvent),
+    UpdateDropShadowStyle(UpdateDropShadowStyleDtifInputEvent),
 
     // Paint
     UpdateSolidPaint(UpdateSolidPaintDtifInputEvent),
@@ -133,6 +139,40 @@ impl DtifInputEvent {
                 })
             }
 
+            // Style
+            DtifInputEvent::UpdateFillStyle(event) => {
+                sid_to_entity.get(&event.entity).map(|entity| {
+                    CompCoreInputEvent::UpdateFillStyle(UpdateFillStyleInputEvent {
+                        entity: *entity,
+                        paint_id: event
+                            .paint_id
+                            .and_then(|paint_id| sid_to_entity.get(&paint_id).map(|e| *e)),
+                    })
+                })
+            }
+            DtifInputEvent::UpdateStrokeStyle(event) => {
+                sid_to_entity.get(&event.entity).map(|entity| {
+                    CompCoreInputEvent::UpdateStrokeStyle(UpdateStorkeStyleInputEvent {
+                        entity: *entity,
+                        paint_id: event
+                            .paint_id
+                            .and_then(|paint_id| sid_to_entity.get(&paint_id).map(|e| *e)),
+                        width: event.width,
+                    })
+                })
+            }
+            DtifInputEvent::UpdateDropShadowStyle(event) => {
+                sid_to_entity.get(&event.entity).map(|entity| {
+                    CompCoreInputEvent::UpdateDropShadowStyle(UpdateDropShadowStyleInputEvent {
+                        entity: *entity,
+                        color: event.color,
+                        position: event.position,
+                        spread: event.spread,
+                        blur: event.blur,
+                    })
+                })
+            }
+
             // Paint
             DtifInputEvent::UpdateSolidPaint(event) => {
                 sid_to_entity.get(&event.entity).map(|entity| {
@@ -147,8 +187,8 @@ impl DtifInputEvent {
                     CompCoreInputEvent::UpdateImagePaint(UpdateImagePaintInputEvent {
                         entity: *entity,
                         scale_mode: event.scale_mode,
-                        image_id: event.asset_id.and_then(|image_id| {
-                            sid_to_asset.get(&image_id).and_then(|asset| {
+                        image_id: event.asset_id.and_then(|asset_id| {
+                            sid_to_asset.get(&asset_id).and_then(|asset| {
                                 if let AssetId::Image(id) = asset {
                                     Some(*id)
                                 } else {
@@ -317,6 +357,38 @@ pub struct UpdateTextNodeDtifInputEvent {
     pub vertical_text_alignment: Option<VerticalTextAlignment>,
     #[serde(default)]
     pub sizing_mode: Option<TextSizingMode>,
+}
+
+// =============================================================================
+// Style
+// =============================================================================
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
+pub struct UpdateFillStyleDtifInputEvent {
+    pub entity: String,
+    pub paint_id: Option<String>,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
+pub struct UpdateStorkeStyleDtifInputEvent {
+    pub entity: String,
+    #[serde(default)]
+    pub paint_id: Option<String>,
+    #[serde(default)]
+    pub width: Option<Abs>,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
+pub struct UpdateDropShadowStyleDtifInputEvent {
+    pub entity: String,
+    #[serde(default)]
+    pub color: Option<Color>,
+    #[serde(default)]
+    pub position: Option<Vec2>,
+    #[serde(default)]
+    pub spread: Option<Abs>,
+    #[serde(default)]
+    pub blur: Option<Abs>,
 }
 
 // =============================================================================

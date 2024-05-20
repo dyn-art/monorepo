@@ -12,8 +12,9 @@ use dyn_attributed_string::layout::{
 use dyn_comp_asset::asset_id::ImageId;
 use dyn_utils::{
     properties::{color::Color, corner_radii::CornerRadii, opacity::Opacity, size::Size},
-    units::angle::Angle,
+    units::{abs::Abs, angle::Angle},
 };
+use glam::Vec2;
 
 pub trait InputEvent {
     fn send_into_ecs(self, world: &mut World);
@@ -39,9 +40,9 @@ pub enum CompCoreInputEvent {
     UpdateTextNode(UpdateTextNodeInputEvent),
 
     // Style
-    // UpdateFillStyle
-    // UpdateStrokeStyle
-    // UpdateDropShadowStyle
+    UpdateFillStyle(UpdateFillStyleInputEvent),
+    UpdateStrokeStyle(UpdateStorkeStyleInputEvent),
+    UpdateDropShadowStyle(UpdateDropShadowStyleInputEvent),
 
     // Paint
     UpdateSolidPaint(UpdateSolidPaintInputEvent),
@@ -88,6 +89,17 @@ impl InputEvent for CompCoreInputEvent {
                 world.send_event(event);
             }
             CompCoreInputEvent::UpdateTextNode(event) => {
+                world.send_event(event);
+            }
+
+            // Style
+            CompCoreInputEvent::UpdateFillStyle(event) => {
+                world.send_event(event);
+            }
+            CompCoreInputEvent::UpdateStrokeStyle(event) => {
+                world.send_event(event);
+            }
+            CompCoreInputEvent::UpdateDropShadowStyle(event) => {
                 world.send_event(event);
             }
 
@@ -242,6 +254,50 @@ pub struct UpdateTextNodeInputEvent {
     pub vertical_text_alignment: Option<VerticalTextAlignment>,
     #[cfg_attr(feature = "serde_support", serde(default))]
     pub sizing_mode: Option<TextSizingMode>,
+}
+
+// =============================================================================
+// Style
+// =============================================================================
+
+#[derive(Event, Debug, Copy, Clone)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type)
+)]
+pub struct UpdateFillStyleInputEvent {
+    pub entity: Entity,
+    pub paint_id: Option<Entity>,
+}
+
+#[derive(Event, Debug, Copy, Clone)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type)
+)]
+pub struct UpdateStorkeStyleInputEvent {
+    pub entity: Entity,
+    #[cfg_attr(feature = "serde_support", serde(default))]
+    pub paint_id: Option<Entity>,
+    #[cfg_attr(feature = "serde_support", serde(default))]
+    pub width: Option<Abs>,
+}
+
+#[derive(Event, Debug, Copy, Clone)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type)
+)]
+pub struct UpdateDropShadowStyleInputEvent {
+    pub entity: Entity,
+    #[cfg_attr(feature = "serde_support", serde(default))]
+    pub color: Option<Color>,
+    #[cfg_attr(feature = "serde_support", serde(default))]
+    pub position: Option<Vec2>,
+    #[cfg_attr(feature = "serde_support", serde(default))]
+    pub spread: Option<Abs>,
+    #[cfg_attr(feature = "serde_support", serde(default))]
+    pub blur: Option<Abs>,
 }
 
 // =============================================================================

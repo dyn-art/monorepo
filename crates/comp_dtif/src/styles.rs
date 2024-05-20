@@ -69,7 +69,7 @@ impl SpawnBundleImpl for FillStyle {
 pub struct StrokeStyle {
     #[serde(default)]
     pub id: Option<String>,
-    width: f32,
+    width: Abs,
     pub paint_id: String,
     #[serde(default = "default_as_true")]
     pub visible: bool,
@@ -87,7 +87,7 @@ impl StrokeStyle {
             },
             stroke: StrokeCompStyle {
                 stroke: tiny_skia_path::Stroke {
-                    width: self.width,
+                    width: self.width.to_pt(),
                     ..Default::default()
                 },
             },

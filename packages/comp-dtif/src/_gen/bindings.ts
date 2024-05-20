@@ -178,7 +178,7 @@ export type Color = [number, number, number]
 
 export type ColorMatrix = { x_axis: [number, number, number, number]; y_axis: [number, number, number, number]; z_axis: [number, number, number, number]; w_axis: [number, number, number, number]; v_axis: [number, number, number, number] }
 
-export type CompCoreInputEvent = ({ type: "UpdateCompositionSize" } & UpdateCompositionSizeInputEvent) | ({ type: "UpdateCompositionViewport" } & UpdateCompositionViewportInputEvent) | ({ type: "FocusRootNodes" }) | ({ type: "UpdateFrameNode" } & UpdateFrameNodeInputEvent) | ({ type: "UpdateEllipseNode" } & UpdateEllipseNodeInputEvent) | ({ type: "UpdateStarNode" } & UpdateStarNodeInputEvent) | ({ type: "UpdatePolygonNode" } & UpdatePolygonNodeInputEvent) | ({ type: "UpdateTextNode" } & UpdateTextNodeInputEvent) | ({ type: "UpdateSolidPaint" } & UpdateSolidPaintInputEvent) | ({ type: "UpdateImagePaint" } & UpdateImagePaintInputEvent) | ({ type: "UpdateGradientPaint" } & UpdateGradientPaintInputEvent) | ({ type: "DeleteEntity" } & DeleteEntityInputEvent) | ({ type: "UpdateEntityTransform" } & UpdateEntityTransformInputEvent) | ({ type: "UpdateEntitySize" } & UpdateEntitySizeInputEvent) | ({ type: "MoveEntity" } & MoveEntityInputEvent) | ({ type: "UpdateEntityRotation" } & UpdateEntityRotationInputEvent) | ({ type: "UpdateEntityVisibility" } & UpdateEntityVisibilityInputEvent) | ({ type: "UpdateEntityCornerRadii" } & UpdateEntityCornerRadiiInputEvent) | ({ type: "UpdateEntityBlendMode" } & UpdateEntityBlendModeInputEvent) | ({ type: "UpdateEntityOpacity" } & UpdateEntityOpacityInputEvent)
+export type CompCoreInputEvent = ({ type: "UpdateCompositionSize" } & UpdateCompositionSizeInputEvent) | ({ type: "UpdateCompositionViewport" } & UpdateCompositionViewportInputEvent) | ({ type: "FocusRootNodes" }) | ({ type: "UpdateFrameNode" } & UpdateFrameNodeInputEvent) | ({ type: "UpdateEllipseNode" } & UpdateEllipseNodeInputEvent) | ({ type: "UpdateStarNode" } & UpdateStarNodeInputEvent) | ({ type: "UpdatePolygonNode" } & UpdatePolygonNodeInputEvent) | ({ type: "UpdateTextNode" } & UpdateTextNodeInputEvent) | ({ type: "UpdateFillStyle" } & UpdateFillStyleInputEvent) | ({ type: "UpdateStrokeStyle" } & UpdateStorkeStyleInputEvent) | ({ type: "UpdateDropShadowStyle" } & UpdateDropShadowStyleInputEvent) | ({ type: "UpdateSolidPaint" } & UpdateSolidPaintInputEvent) | ({ type: "UpdateImagePaint" } & UpdateImagePaintInputEvent) | ({ type: "UpdateGradientPaint" } & UpdateGradientPaintInputEvent) | ({ type: "DeleteEntity" } & DeleteEntityInputEvent) | ({ type: "UpdateEntityTransform" } & UpdateEntityTransformInputEvent) | ({ type: "UpdateEntitySize" } & UpdateEntitySizeInputEvent) | ({ type: "MoveEntity" } & MoveEntityInputEvent) | ({ type: "UpdateEntityRotation" } & UpdateEntityRotationInputEvent) | ({ type: "UpdateEntityVisibility" } & UpdateEntityVisibilityInputEvent) | ({ type: "UpdateEntityCornerRadii" } & UpdateEntityCornerRadiiInputEvent) | ({ type: "UpdateEntityBlendMode" } & UpdateEntityBlendModeInputEvent) | ({ type: "UpdateEntityOpacity" } & UpdateEntityOpacityInputEvent)
 
 export type ComponentChange = { type: "Size"; size: Size } | { type: "Transform"; rotationDeg: number; translation: Vec2 } | { type: "GlobalTransform"; rotationDeg: number; translation: Vec2 }
 
@@ -214,7 +214,7 @@ export type DeleteEntityDtifInputEvent = { entity: string }
 
 export type DeleteEntityInputEvent = { entity: Entity }
 
-export type DropShadowStyle = { color?: Color; position: Vec2; spread?: Abs; blur: Abs; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity }
+export type DropShadowStyle = { id?: string | null; color?: Color; position: Vec2; spread?: Abs; blur: Abs; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity }
 
 /**
  * DTIF (Design Tree Interchange Format) utilizes a flat structure for easy readability
@@ -251,7 +251,7 @@ paints?: { [key in string]: Paint };
  */
 assets?: { [key in string]: Asset }; events?: DtifInputEvent[] }
 
-export type DtifInputEvent = ({ type: "UpdateCompositionSize" } & UpdateCompositionSizeDtifInputEvent) | ({ type: "UpdateCompositionViewport" } & UpdateCompositionViewportDtifInputEvent) | ({ type: "FocusRootNodes" }) | ({ type: "UpdateFrameNode" } & UpdateFrameNodeDtifInputEvent) | ({ type: "UpdateEllipseNode" } & UpdateEllipseNodeDtifInputEvent) | ({ type: "UpdateStarNode" } & UpdateStarNodeDtifInputEvent) | ({ type: "UpdatePolygonNode" } & UpdatePolygonNodeDtifInputEvent) | ({ type: "UpdateTextNode" } & UpdateTextNodeDtifInputEvent) | ({ type: "UpdateSolidPaint" } & UpdateSolidPaintDtifInputEvent) | ({ type: "UpdateImagePaint" } & UpdateImagePaintDtifInputEvent) | ({ type: "UpdateGradientPaint" } & UpdateGradientPaintDtifInputEvent) | ({ type: "DeleteEntity" } & DeleteEntityDtifInputEvent) | ({ type: "UpdateEntityTransform" } & UpdateEntityTransformDtifInputEvent) | ({ type: "UpdateEntitySize" } & UpdateEntitySizeDtifInputEvent) | ({ type: "MoveEntity" } & MoveEntityDtifInputEvent) | ({ type: "UpdateEntityRotation" } & UpdateEntityRotationDtifInputEvent) | ({ type: "UpdateEntityVisibility" } & UpdateEntityVisibilityDtifInputEvent) | ({ type: "UpdateEntityCornerRadii" } & UpdateEntityCornerRadiiDtifInputEvent) | ({ type: "UpdateEntityBlendMode" } & UpdateEntityBlendModeDtifInputEvent) | ({ type: "UpdateEntityOpacity" } & UpdateEntityOpacityDtifInputEvent)
+export type DtifInputEvent = ({ type: "UpdateCompositionSize" } & UpdateCompositionSizeDtifInputEvent) | ({ type: "UpdateCompositionViewport" } & UpdateCompositionViewportDtifInputEvent) | ({ type: "FocusRootNodes" }) | ({ type: "UpdateFrameNode" } & UpdateFrameNodeDtifInputEvent) | ({ type: "UpdateEllipseNode" } & UpdateEllipseNodeDtifInputEvent) | ({ type: "UpdateStarNode" } & UpdateStarNodeDtifInputEvent) | ({ type: "UpdatePolygonNode" } & UpdatePolygonNodeDtifInputEvent) | ({ type: "UpdateTextNode" } & UpdateTextNodeDtifInputEvent) | ({ type: "UpdateFillStyle" } & UpdateFillStyleDtifInputEvent) | ({ type: "UpdateStrokeStyle" } & UpdateStorkeStyleDtifInputEvent) | ({ type: "UpdateDropShadowStyle" } & UpdateDropShadowStyleDtifInputEvent) | ({ type: "UpdateSolidPaint" } & UpdateSolidPaintDtifInputEvent) | ({ type: "UpdateImagePaint" } & UpdateImagePaintDtifInputEvent) | ({ type: "UpdateGradientPaint" } & UpdateGradientPaintDtifInputEvent) | ({ type: "DeleteEntity" } & DeleteEntityDtifInputEvent) | ({ type: "UpdateEntityTransform" } & UpdateEntityTransformDtifInputEvent) | ({ type: "UpdateEntitySize" } & UpdateEntitySizeDtifInputEvent) | ({ type: "MoveEntity" } & MoveEntityDtifInputEvent) | ({ type: "UpdateEntityRotation" } & UpdateEntityRotationDtifInputEvent) | ({ type: "UpdateEntityVisibility" } & UpdateEntityVisibilityDtifInputEvent) | ({ type: "UpdateEntityCornerRadii" } & UpdateEntityCornerRadiiDtifInputEvent) | ({ type: "UpdateEntityBlendMode" } & UpdateEntityBlendModeDtifInputEvent) | ({ type: "UpdateEntityOpacity" } & UpdateEntityOpacityDtifInputEvent)
 
 export type EllipseNode = { startingAngle?: number; endingAngle?: number; innerRadiusRatio?: number; translation?: Vec2; rotationDeg?: Angle; size: Size; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; layoutElement?: LayoutElement; styles?: Style[] }
 
@@ -264,7 +264,7 @@ export type Em = Scalar
 
 export type Entity = number
 
-export type FillStyle = { paintId: string; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity }
+export type FillStyle = { id?: string | null; paintId: string; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity }
 
 /**
  * The direction of the flexbox layout main axis.
@@ -1543,7 +1543,7 @@ export type StaticLayoutElement = { alignSelf?: AlignItems | null; justifySelf?:
 
 export type StaticLayoutParent = { alignItems?: AlignItems | null; justifyContent?: AlignContent | null; gap?: Axes<Length>; padding?: Rect<Length>; flexDirection?: FlexDirection; horizontalSizingMode?: LayoutParentSizingMode; verticalSizingMode?: LayoutParentSizingMode }
 
-export type StrokeStyle = { width: number; paintId: string; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity }
+export type StrokeStyle = { id?: string | null; width: Abs; paintId: string; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity }
 
 export type Style = ({ type: "Fill" } & FillStyle) | ({ type: "Stroke" } & StrokeStyle) | ({ type: "DropShadow" } & DropShadowStyle)
 
@@ -1665,6 +1665,10 @@ export type UpdateCompositionViewportDtifInputEvent = { viewport: Viewport }
 
 export type UpdateCompositionViewportInputEvent = { viewport: Viewport }
 
+export type UpdateDropShadowStyleDtifInputEvent = { entity: string; color?: Color | null; position?: Vec2 | null; spread?: Abs | null; blur?: Abs | null }
+
+export type UpdateDropShadowStyleInputEvent = { entity: Entity; color?: Color | null; position?: Vec2 | null; spread?: Abs | null; blur?: Abs | null }
+
 export type UpdateEllipseNodeDtifInputEvent = { entity: string; startingAngle?: number | null; endingAngle?: number | null; innerRadiusRatio?: number | null }
 
 export type UpdateEllipseNodeInputEvent = { entity: Entity; startingAngle?: number | null; endingAngle?: number | null; innerRadiusRatio?: number | null }
@@ -1697,6 +1701,10 @@ export type UpdateEntityVisibilityDtifInputEvent = { entity: string; visible: bo
 
 export type UpdateEntityVisibilityInputEvent = { entity: Entity; visible: boolean }
 
+export type UpdateFillStyleDtifInputEvent = { entity: string; paint_id: string | null }
+
+export type UpdateFillStyleInputEvent = { entity: Entity; paint_id: Entity | null }
+
 export type UpdateFrameNodeDtifInputEvent = { entity: string; clipContent?: boolean | null }
 
 export type UpdateFrameNodeInputEvent = { entity: Entity; clipContent?: boolean | null }
@@ -1720,6 +1728,10 @@ export type UpdateSolidPaintInputEvent = { entity: Entity; color?: Color }
 export type UpdateStarNodeDtifInputEvent = { entity: string; pointCount?: number | null; innerRadiusRatio?: number | null }
 
 export type UpdateStarNodeInputEvent = { entity: Entity; pointCount?: number | null; innerRadiusRatio?: number | null }
+
+export type UpdateStorkeStyleDtifInputEvent = { entity: string; paint_id?: string | null; width?: Abs | null }
+
+export type UpdateStorkeStyleInputEvent = { entity: Entity; paint_id?: Entity | null; width?: Abs | null }
 
 export type UpdateTextNodeDtifInputEvent = { entity: string; text?: string | null; attributes?: TextAttributeInterval[] | null; lineWrap?: LineWrap | null; horizontalTextAlignment?: HorizontalTextAlignment | null; verticalTextAlignment?: VerticalTextAlignment | null; sizingMode?: TextSizingMode | null }
 

@@ -8,26 +8,29 @@ use dyn_comp_asset::CompAssetPlugin;
 use dyn_comp_bundles::events::{
     DeleteEntityInputEvent, FocusRootNodesInputEvent, MoveEntityInputEvent,
     UpdateCompositionSizeInputEvent, UpdateCompositionViewportInputEvent,
-    UpdateEllipseNodeInputEvent, UpdateEntityBlendModeInputEvent,
+    UpdateDropShadowStyleInputEvent, UpdateEllipseNodeInputEvent, UpdateEntityBlendModeInputEvent,
     UpdateEntityCornerRadiiInputEvent, UpdateEntityOpacityInputEvent,
     UpdateEntityRotationInputEvent, UpdateEntitySizeInputEvent, UpdateEntityTransformInputEvent,
-    UpdateEntityVisibilityInputEvent, UpdateFrameNodeInputEvent, UpdateGradientPaintInputEvent,
-    UpdateImagePaintInputEvent, UpdatePolygonNodeInputEvent, UpdateSolidPaintInputEvent,
-    UpdateStarNodeInputEvent, UpdateTextNodeInputEvent,
+    UpdateEntityVisibilityInputEvent, UpdateFillStyleInputEvent, UpdateFrameNodeInputEvent,
+    UpdateGradientPaintInputEvent, UpdateImagePaintInputEvent, UpdatePolygonNodeInputEvent,
+    UpdateSolidPaintInputEvent, UpdateStarNodeInputEvent, UpdateStorkeStyleInputEvent,
+    UpdateTextNodeInputEvent,
 };
 use resources::{composition::CompositionRes, layout::LayoutRes, tick::TickRes};
 use systems::{
     events::{
         delete_entity_input_system, despawn_removed_entities_system, focus_root_nodes_input_system,
         move_entity_input_system, update_composition_size_input_system,
-        update_composition_viewport_input_system, update_ellipse_node_input_system,
-        update_entity_blend_mode_input_system, update_entity_corner_radii_input_system,
-        update_entity_opacity_input_system, update_entity_rotation_input_system,
-        update_entity_size_input_system, update_entity_transform_input_system,
-        update_entity_visibility_input_system, update_frame_node_input_system,
+        update_composition_viewport_input_system, update_drop_shadow_style_input_system,
+        update_ellipse_node_input_system, update_entity_blend_mode_input_system,
+        update_entity_corner_radii_input_system, update_entity_opacity_input_system,
+        update_entity_rotation_input_system, update_entity_size_input_system,
+        update_entity_transform_input_system, update_entity_visibility_input_system,
+        update_fill_style_input_system, update_frame_node_input_system,
         update_gradient_paint_input_system, update_image_paint_input_system,
         update_polygon_node_input_system, update_solid_paint_input_system,
-        update_star_node_input_system, update_text_node_input_system,
+        update_star_node_input_system, update_storke_style_input_system,
+        update_text_node_input_system,
     },
     hierarchy::update_hierarchy_levels,
     layout::{
@@ -95,6 +98,9 @@ impl Plugin for CompCorePlugin {
         app.add_event::<UpdateStarNodeInputEvent>();
         app.add_event::<UpdatePolygonNodeInputEvent>();
         app.add_event::<UpdateTextNodeInputEvent>();
+        app.add_event::<UpdateFillStyleInputEvent>();
+        app.add_event::<UpdateStorkeStyleInputEvent>();
+        app.add_event::<UpdateDropShadowStyleInputEvent>();
         app.add_event::<UpdateSolidPaintInputEvent>();
         app.add_event::<UpdateGradientPaintInputEvent>();
         app.add_event::<UpdateImagePaintInputEvent>();
@@ -152,16 +158,40 @@ impl Plugin for CompCorePlugin {
                 focus_root_nodes_input_system
                     .in_set(CompCoreSystemSet::InputEvents)
                     .after(update_composition_size_input_system),
+            ),
+        );
+        app.add_systems(
+            Update,
+            (
                 // Node
                 update_frame_node_input_system.in_set(CompCoreSystemSet::InputEvents),
                 update_ellipse_node_input_system.in_set(CompCoreSystemSet::InputEvents),
                 update_star_node_input_system.in_set(CompCoreSystemSet::InputEvents),
                 update_polygon_node_input_system.in_set(CompCoreSystemSet::InputEvents),
                 update_text_node_input_system.in_set(CompCoreSystemSet::InputEvents),
+            ),
+        );
+        app.add_systems(
+            Update,
+            (
+                // Style
+                update_fill_style_input_system.in_set(CompCoreSystemSet::InputEvents),
+                update_storke_style_input_system.in_set(CompCoreSystemSet::InputEvents),
+                update_drop_shadow_style_input_system.in_set(CompCoreSystemSet::InputEvents),
+            ),
+        );
+        app.add_systems(
+            Update,
+            (
                 // Paint
                 update_solid_paint_input_system.in_set(CompCoreSystemSet::InputEvents),
                 update_image_paint_input_system.in_set(CompCoreSystemSet::InputEvents),
                 update_gradient_paint_input_system.in_set(CompCoreSystemSet::InputEvents),
+            ),
+        );
+        app.add_systems(
+            Update,
+            (
                 // Entity
                 delete_entity_input_system.in_set(CompCoreSystemSet::InputEvents),
                 update_entity_transform_input_system.in_set(CompCoreSystemSet::InputEvents),

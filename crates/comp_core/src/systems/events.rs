@@ -11,24 +11,25 @@ use dyn_comp_bundles::{
     components::{
         marker::{Removed, Root},
         mixins::{
-            BlendModeMixin, CornerRadiiMixin, ImageAssetMixin, OpacityMixin, PaintParentMixin,
-            SizeMixin, VisibilityMixin,
+            BlendModeMixin, CornerRadiiMixin, ImageAssetMixin, OpacityMixin, PaintChildMixin,
+            PaintParentMixin, SizeMixin, VisibilityMixin,
         },
         nodes::{
             CompNode, EllipseCompNode, FrameCompNode, PolygonCompNode, StarCompNode, TextCompNode,
         },
         paints::{CompPaint, GradientCompPaint, ImageCompPaint, SolidCompPaint},
+        styles::{DropShadowCompStyle, FillCompStyle, StrokeCompStyle},
     },
     events::{
         DeleteEntityInputEvent, FocusRootNodesInputEvent, MoveEntityInputEvent,
         UpdateCompositionSizeInputEvent, UpdateCompositionViewportInputEvent,
-        UpdateEllipseNodeInputEvent, UpdateEntityBlendModeInputEvent,
-        UpdateEntityCornerRadiiInputEvent, UpdateEntityOpacityInputEvent,
-        UpdateEntityRotationInputEvent, UpdateEntitySizeInputEvent,
+        UpdateDropShadowStyleInputEvent, UpdateEllipseNodeInputEvent,
+        UpdateEntityBlendModeInputEvent, UpdateEntityCornerRadiiInputEvent,
+        UpdateEntityOpacityInputEvent, UpdateEntityRotationInputEvent, UpdateEntitySizeInputEvent,
         UpdateEntityTransformInputEvent, UpdateEntityVisibilityInputEvent,
-        UpdateFrameNodeInputEvent, UpdateGradientPaintInputEvent, UpdateImagePaintInputEvent,
-        UpdatePolygonNodeInputEvent, UpdateSolidPaintInputEvent, UpdateStarNodeInputEvent,
-        UpdateTextNodeInputEvent,
+        UpdateFillStyleInputEvent, UpdateFrameNodeInputEvent, UpdateGradientPaintInputEvent,
+        UpdateImagePaintInputEvent, UpdatePolygonNodeInputEvent, UpdateSolidPaintInputEvent,
+        UpdateStarNodeInputEvent, UpdateStorkeStyleInputEvent, UpdateTextNodeInputEvent,
     },
     properties::Viewport,
     utils::transform_to_z_rotation_rad,
@@ -241,6 +242,77 @@ pub fn update_text_node_input_system(
             }
             if let Some(sizing_mode) = maybe_sizing_mode {
                 text_comp_node.sizing_mode = *sizing_mode;
+            }
+        }
+    }
+}
+
+// =============================================================================
+// Style
+// =============================================================================
+
+pub fn update_fill_style_input_system(
+    mut event_reader: EventReader<UpdateFillStyleInputEvent>,
+    mut query: Query<&mut PaintChildMixin, With<FillCompStyle>>,
+) {
+    for UpdateFillStyleInputEvent {
+        entity,
+        paint_id: maybe_paint_id,
+    } in event_reader.read()
+    {
+        if let Ok(mut paint_child_mixin) = query.get_mut(*entity) {
+            if let Some(paint_id) = maybe_paint_id {
+                paint_child_mixin.0 = Some(*paint_id);
+            }
+        }
+    }
+}
+
+pub fn update_storke_style_input_system(
+    mut event_reader: EventReader<UpdateStorkeStyleInputEvent>,
+    mut query: Query<(&mut StrokeCompStyle, &mut PaintChildMixin), With<StrokeCompStyle>>,
+) {
+    for UpdateStorkeStyleInputEvent {
+        entity,
+        paint_id: maybe_paint_id,
+        width: maybe_width,
+    } in event_reader.read()
+    {
+        if let Ok((mut stroke_comp_style, mut paint_child_mixin)) = query.get_mut(*entity) {
+            if let Some(paint_id) = maybe_paint_id {
+                paint_child_mixin.0 = Some(*paint_id);
+            }
+            if let Some(width) = maybe_width {
+                stroke_comp_style.stroke.width = width.to_pt();
+            }
+        }
+    }
+}
+
+pub fn update_drop_shadow_style_input_system(
+    mut event_reader: EventReader<UpdateDropShadowStyleInputEvent>,
+    mut query: Query<&mut DropShadowCompStyle, With<StrokeCompStyle>>,
+) {
+    for UpdateDropShadowStyleInputEvent {
+        entity,
+        color: maybe_color,
+        position: maybe_position,
+        spread: maybe_spread,
+        blur: maybe_blur,
+    } in event_reader.read()
+    {
+        if let Ok(mut drop_shadow_comp_style) = query.get_mut(*entity) {
+            if let Some(color) = maybe_color {
+                drop_shadow_comp_style.color = *color;
+            }
+            if let Some(position) = maybe_position {
+                drop_shadow_comp_style.position = *position;
+            }
+            if let Some(spread) = maybe_spread {
+                drop_shadow_comp_style.spread = *spread;
+            }
+            if let Some(blur) = maybe_blur {
+                drop_shadow_comp_style.blur = *blur;
             }
         }
     }
