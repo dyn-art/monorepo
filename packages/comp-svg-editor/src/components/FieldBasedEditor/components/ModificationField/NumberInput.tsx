@@ -7,6 +7,7 @@ import {
 import type { Composition } from '@dyn/comp-svg-builder';
 import { AdvancedInput } from '@dyn/ui';
 
+import { deterimeJsonFunctionExecutionEnv } from '../determine-json-function-execution-env';
 import { runJsonFunction } from '../run-json-function';
 
 export const NumberInput: React.FC<TProps> = (props) => {
@@ -33,7 +34,8 @@ export const NumberInput: React.FC<TProps> = (props) => {
 					{
 						[field.key]: value
 					},
-					async (jsonFunction, args) => runJsonFunction(jsonFunction, args, 'iframe')
+					async (jsonFunction, args) =>
+						runJsonFunction(jsonFunction, args, deterimeJsonFunctionExecutionEnv(jsonFunction))
 				);
 
 				for (const processedAction of processedActions) {
