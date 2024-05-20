@@ -6,8 +6,8 @@ import {
 } from '@dyn/comp-dtif';
 import type { Composition } from '@dyn/comp-svg-builder';
 import { PaintPicker, type TPaint } from '@dyn/ui';
+import { getJsonFunctionExecutionEnv } from '@dyn/utils';
 
-import { deterimeJsonFunctionExecutionEnv } from '../determine-json-function-execution-env';
 import { runJsonFunction } from '../run-json-function';
 
 export const ColorInput: React.FC<TProps> = (props) => {
@@ -36,7 +36,7 @@ export const ColorInput: React.FC<TProps> = (props) => {
 						[field.key]: paint.color
 					},
 					async (jsonFunction, args) =>
-						runJsonFunction(jsonFunction, args, deterimeJsonFunctionExecutionEnv(jsonFunction))
+						runJsonFunction(jsonFunction, args, getJsonFunctionExecutionEnv(jsonFunction))
 				);
 
 				for (const processedAction of processedActions) {

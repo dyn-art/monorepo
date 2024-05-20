@@ -1,16 +1,16 @@
-import { toFunction, type TJsonFunction } from '@dyn/utils';
+import { toFunction, type TJsonFunction, type TJsonFunctionEnv } from '@dyn/utils';
 
 export async function runJsonFunction<GResponse>(
 	jsonFunction: TJsonFunction,
 	args: unknown[],
-	env: 'iframe' | 'direct'
+	env: TJsonFunctionEnv
 ): Promise<GResponse> {
 	switch (env) {
-		case 'direct': {
+		case 'INLINE': {
 			const func = toFunction(jsonFunction);
 			return Promise.resolve(func(...args));
 		}
-		case 'iframe':
+		case 'SANDBOX':
 			return new Promise((resolve, reject) => {
 				// Create the iframe element
 				const iframe = document.createElement('iframe');
