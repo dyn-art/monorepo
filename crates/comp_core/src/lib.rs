@@ -15,18 +15,18 @@ use resources::{
 };
 use systems::{
     events::{
-        delete_entity_input_system, despawn_removed_entities_system, focus_root_nodes_input_system,
-        move_entity_input_system, update_composition_size_input_system,
-        update_composition_viewport_input_system, update_drop_shadow_style_input_system,
-        update_ellipse_node_input_system, update_entity_blend_mode_input_system,
-        update_entity_corner_radii_input_system, update_entity_opacity_input_system,
-        update_entity_rotation_input_system, update_entity_size_input_system,
-        update_entity_transform_input_system, update_entity_visibility_input_system,
-        update_fill_style_input_system, update_frame_node_input_system,
-        update_gradient_paint_input_system, update_image_paint_input_system,
-        update_polygon_node_input_system, update_solid_paint_input_system,
-        update_star_node_input_system, update_storke_style_input_system,
-        update_text_node_input_system,
+        create_node_input_system, create_paint_input_system, delete_entity_input_system,
+        despawn_removed_entities_system, focus_root_nodes_input_system, move_entity_input_system,
+        update_composition_size_input_system, update_composition_viewport_input_system,
+        update_drop_shadow_style_input_system, update_ellipse_node_input_system,
+        update_entity_blend_mode_input_system, update_entity_corner_radii_input_system,
+        update_entity_opacity_input_system, update_entity_rotation_input_system,
+        update_entity_size_input_system, update_entity_transform_input_system,
+        update_entity_visibility_input_system, update_fill_style_input_system,
+        update_frame_node_input_system, update_gradient_paint_input_system,
+        update_image_paint_input_system, update_polygon_node_input_system,
+        update_solid_paint_input_system, update_star_node_input_system,
+        update_storke_style_input_system, update_text_node_input_system,
     },
     hierarchy::update_hierarchy_levels,
     layout::{
@@ -56,7 +56,9 @@ pub struct CompCorePlugin {
 #[derive(SystemSet, Debug, Hash, PartialEq, Eq, Clone)]
 enum CompCoreSystemSet {
     /// After this label, the system has processed input events.
-    InputEvents,
+    PreCreateInputEvents,
+    CreateInputEvents,
+    UpdateInputEvents,
 
     PreCompute,
     Compute,
@@ -99,7 +101,9 @@ impl Plugin for CompCorePlugin {
         app.configure_sets(
             Update,
             (
-                CompCoreSystemSet::InputEvents,
+                CompCoreSystemSet::PreCreateInputEvents,
+                CompCoreSystemSet::CreateInputEvents,
+                CompCoreSystemSet::UpdateInputEvents,
                 CompCoreSystemSet::PreCompute,
                 CompCoreSystemSet::Compute,
                 CompCoreSystemSet::PreLayout,
@@ -123,11 +127,19 @@ impl Plugin for CompCorePlugin {
         app.add_systems(
             Update,
             (
+                create_paint_input_system.in_set(CompCoreSystemSet::PreCreateInputEvents),
+                create_node_input_system.in_set(CompCoreSystemSet::CreateInputEvents),
+            ),
+        );
+        app.add_systems(
+            Update,
+            (
                 // Composition
-                update_composition_size_input_system.in_set(CompCoreSystemSet::InputEvents),
-                update_composition_viewport_input_system.in_set(CompCoreSystemSet::InputEvents),
+                update_composition_size_input_system.in_set(CompCoreSystemSet::UpdateInputEvents),
+                update_composition_viewport_input_system
+                    .in_set(CompCoreSystemSet::UpdateInputEvents),
                 focus_root_nodes_input_system
-                    .in_set(CompCoreSystemSet::InputEvents)
+                    .in_set(CompCoreSystemSet::UpdateInputEvents)
                     .after(update_composition_size_input_system),
             ),
         );
@@ -135,44 +147,45 @@ impl Plugin for CompCorePlugin {
             Update,
             (
                 // Node
-                update_frame_node_input_system.in_set(CompCoreSystemSet::InputEvents),
-                update_ellipse_node_input_system.in_set(CompCoreSystemSet::InputEvents),
-                update_star_node_input_system.in_set(CompCoreSystemSet::InputEvents),
-                update_polygon_node_input_system.in_set(CompCoreSystemSet::InputEvents),
-                update_text_node_input_system.in_set(CompCoreSystemSet::InputEvents),
+                update_frame_node_input_system.in_set(CompCoreSystemSet::UpdateInputEvents),
+                update_ellipse_node_input_system.in_set(CompCoreSystemSet::UpdateInputEvents),
+                update_star_node_input_system.in_set(CompCoreSystemSet::UpdateInputEvents),
+                update_polygon_node_input_system.in_set(CompCoreSystemSet::UpdateInputEvents),
+                update_text_node_input_system.in_set(CompCoreSystemSet::UpdateInputEvents),
             ),
         );
         app.add_systems(
             Update,
             (
                 // Style
-                update_fill_style_input_system.in_set(CompCoreSystemSet::InputEvents),
-                update_storke_style_input_system.in_set(CompCoreSystemSet::InputEvents),
-                update_drop_shadow_style_input_system.in_set(CompCoreSystemSet::InputEvents),
+                update_fill_style_input_system.in_set(CompCoreSystemSet::UpdateInputEvents),
+                update_storke_style_input_system.in_set(CompCoreSystemSet::UpdateInputEvents),
+                update_drop_shadow_style_input_system.in_set(CompCoreSystemSet::UpdateInputEvents),
             ),
         );
         app.add_systems(
             Update,
             (
                 // Paint
-                update_solid_paint_input_system.in_set(CompCoreSystemSet::InputEvents),
-                update_image_paint_input_system.in_set(CompCoreSystemSet::InputEvents),
-                update_gradient_paint_input_system.in_set(CompCoreSystemSet::InputEvents),
+                update_solid_paint_input_system.in_set(CompCoreSystemSet::UpdateInputEvents),
+                update_image_paint_input_system.in_set(CompCoreSystemSet::UpdateInputEvents),
+                update_gradient_paint_input_system.in_set(CompCoreSystemSet::UpdateInputEvents),
             ),
         );
         app.add_systems(
             Update,
             (
                 // Entity
-                delete_entity_input_system.in_set(CompCoreSystemSet::InputEvents),
-                update_entity_transform_input_system.in_set(CompCoreSystemSet::InputEvents),
-                update_entity_size_input_system.in_set(CompCoreSystemSet::InputEvents),
-                move_entity_input_system.in_set(CompCoreSystemSet::InputEvents),
-                update_entity_rotation_input_system.in_set(CompCoreSystemSet::InputEvents),
-                update_entity_visibility_input_system.in_set(CompCoreSystemSet::InputEvents),
-                update_entity_corner_radii_input_system.in_set(CompCoreSystemSet::InputEvents),
-                update_entity_blend_mode_input_system.in_set(CompCoreSystemSet::InputEvents),
-                update_entity_opacity_input_system.in_set(CompCoreSystemSet::InputEvents),
+                delete_entity_input_system.in_set(CompCoreSystemSet::UpdateInputEvents),
+                update_entity_transform_input_system.in_set(CompCoreSystemSet::UpdateInputEvents),
+                update_entity_size_input_system.in_set(CompCoreSystemSet::UpdateInputEvents),
+                move_entity_input_system.in_set(CompCoreSystemSet::UpdateInputEvents),
+                update_entity_rotation_input_system.in_set(CompCoreSystemSet::UpdateInputEvents),
+                update_entity_visibility_input_system.in_set(CompCoreSystemSet::UpdateInputEvents),
+                update_entity_corner_radii_input_system
+                    .in_set(CompCoreSystemSet::UpdateInputEvents),
+                update_entity_blend_mode_input_system.in_set(CompCoreSystemSet::UpdateInputEvents),
+                update_entity_opacity_input_system.in_set(CompCoreSystemSet::UpdateInputEvents),
             ),
         );
         app.add_systems(

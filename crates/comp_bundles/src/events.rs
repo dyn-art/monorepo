@@ -5,7 +5,7 @@ use crate::{
     },
     properties::{TextAttributeInterval, Viewport},
     reference_id::ReferenceIdOrEntity,
-    AssetWithId, Node, Paint, Style,
+    AssetWithId, Node, Paint,
 };
 use bevy_app::App;
 use bevy_ecs::{entity::Entity, event::Event, world::World};
@@ -45,7 +45,6 @@ pub enum CoreInputEvent {
     UpdateTextNode(UpdateTextNodeInputEvent),
 
     // Style
-    CreateStyle(CreateStyleInputEvent),
     UpdateFillStyle(UpdateFillStyleInputEvent),
     UpdateStrokeStyle(UpdateStorkeStyleInputEvent),
     UpdateDropShadowStyle(UpdateDropShadowStyleInputEvent),
@@ -69,6 +68,7 @@ pub enum CoreInputEvent {
     UpdateEntityCornerRadii(UpdateEntityCornerRadiiInputEvent),
     UpdateEntityBlendMode(UpdateEntityBlendModeInputEvent),
     UpdateEntityOpacity(UpdateEntityOpacityInputEvent),
+    UpdateEntityChildren(UpdateEntityChildrenInputEvent),
 }
 
 impl InputEvent for CoreInputEvent {
@@ -87,7 +87,6 @@ impl InputEvent for CoreInputEvent {
         app.add_event::<UpdateTextNodeInputEvent>();
 
         // Style
-        app.add_event::<CreateStyleInputEvent>();
         app.add_event::<UpdateFillStyleInputEvent>();
         app.add_event::<UpdateStorkeStyleInputEvent>();
         app.add_event::<UpdateDropShadowStyleInputEvent>();
@@ -111,6 +110,7 @@ impl InputEvent for CoreInputEvent {
         app.add_event::<UpdateEntityCornerRadiiInputEvent>();
         app.add_event::<UpdateEntityBlendModeInputEvent>();
         app.add_event::<UpdateEntityOpacityInputEvent>();
+        app.add_event::<UpdateEntityChildrenInputEvent>();
     }
 
     fn send_into_world(self, world: &mut World) {
@@ -147,9 +147,6 @@ impl InputEvent for CoreInputEvent {
             }
 
             // Style
-            CoreInputEvent::CreateStyle(event) => {
-                world.send_event(event);
-            }
             CoreInputEvent::UpdateFillStyle(event) => {
                 world.send_event(event);
             }
@@ -205,6 +202,9 @@ impl InputEvent for CoreInputEvent {
                 world.send_event(event);
             }
             CoreInputEvent::UpdateEntityOpacity(event) => {
+                world.send_event(event);
+            }
+            CoreInputEvent::UpdateEntityChildren(event) => {
                 world.send_event(event);
             }
         }
@@ -334,14 +334,16 @@ pub struct UpdateTextNodeInputEvent {
 // Style
 // =============================================================================
 
-#[derive(Event, Debug, Clone)]
-#[cfg_attr(
-    feature = "serde_support",
-    derive(serde::Serialize, serde::Deserialize, specta::Type)
-)]
-pub struct CreateStyleInputEvent {
-    pub style: Style,
-}
+// TODO: For now Styles can only be created via Node
+//
+// #[derive(Event, Debug, Clone)]
+// #[cfg_attr(
+//     feature = "serde_support",
+//     derive(serde::Serialize, serde::Deserialize, specta::Type)
+// )]
+// pub struct CreateStyleInputEvent {
+//     pub style: Style,
+// }
 
 #[derive(Event, Debug, Clone)]
 #[cfg_attr(
@@ -551,4 +553,14 @@ pub struct UpdateEntityBlendModeInputEvent {
 pub struct UpdateEntityOpacityInputEvent {
     pub id: ReferenceIdOrEntity,
     pub opacity: Opacity,
+}
+
+#[derive(Event, Debug, Clone)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type)
+)]
+pub struct UpdateEntityChildrenInputEvent {
+    pub id: ReferenceIdOrEntity,
+    pub children: Vec<ReferenceIdOrEntity>,
 }

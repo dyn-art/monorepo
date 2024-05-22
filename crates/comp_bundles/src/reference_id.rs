@@ -17,8 +17,13 @@ pub struct ReferenceId(String);
     serde(tag = "type")
 )]
 pub enum ReferenceIdOrEntity {
-    Entity { value: Entity },
-    ReferenceId { value: ReferenceId },
+    Entity {
+        entity: Entity,
+    },
+    #[cfg_attr(feature = "serde_support", serde(rename_all = "camelCase"))]
+    ReferenceId {
+        reference_id: ReferenceId,
+    },
 }
 
 impl ReferenceIdOrEntity {
@@ -27,10 +32,10 @@ impl ReferenceIdOrEntity {
         reference_id_to_entity: &HashMap<ReferenceId, Entity>,
     ) -> Option<Entity> {
         match self {
-            ReferenceIdOrEntity::Entity { value: entity } => Some(*entity),
-            ReferenceIdOrEntity::ReferenceId {
-                value: reference_id,
-            } => reference_id_to_entity.get(reference_id).copied(),
+            ReferenceIdOrEntity::Entity { entity } => Some(*entity),
+            ReferenceIdOrEntity::ReferenceId { reference_id } => {
+                reference_id_to_entity.get(reference_id).copied()
+            }
         }
     }
 }
@@ -42,8 +47,10 @@ impl ReferenceIdOrEntity {
     serde(tag = "type")
 )]
 pub enum ReferenceIdOrImageId {
-    ImageId { value: ImageId },
-    ReferenceId { value: ReferenceId },
+    #[cfg_attr(feature = "serde_support", serde(rename_all = "camelCase"))]
+    ImageId { image_id: ImageId },
+    #[cfg_attr(feature = "serde_support", serde(rename_all = "camelCase"))]
+    ReferenceId { reference_id: ReferenceId },
 }
 
 impl ReferenceIdOrImageId {
@@ -52,10 +59,8 @@ impl ReferenceIdOrImageId {
         reference_id_to_asset_id: &HashMap<ReferenceId, AssetId>,
     ) -> Option<ImageId> {
         match self {
-            ReferenceIdOrImageId::ImageId { value: image_id } => Some(*image_id),
-            ReferenceIdOrImageId::ReferenceId {
-                value: reference_id,
-            } => {
+            ReferenceIdOrImageId::ImageId { image_id } => Some(*image_id),
+            ReferenceIdOrImageId::ReferenceId { reference_id } => {
                 if let Some(asset_id) = reference_id_to_asset_id.get(reference_id) {
                     match asset_id {
                         AssetId::Image(image_id) => Some(*image_id),

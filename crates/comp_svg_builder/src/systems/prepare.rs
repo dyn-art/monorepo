@@ -68,7 +68,8 @@ pub fn insert_style_svg_bundle(
     for (entity, style, maybe_paint_mixin) in query.iter() {
         let maybe_bundle_variant: Option<SvgBundleVariant> = match style.variant {
             CompStyleVariant::Fill | CompStyleVariant::Stroke => {
-                if let Some(paint_entity) = maybe_paint_mixin.and_then(|paint_mixin| paint_mixin.0)
+                if let Some(paint_entity) =
+                    maybe_paint_mixin.map(|paint_child_mixin| paint_child_mixin.0)
                 {
                     if let Ok((paint, maybe_gradient_paint, maybe_image_paint)) =
                         paint_query.get(paint_entity)

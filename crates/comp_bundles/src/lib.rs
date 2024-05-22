@@ -14,12 +14,17 @@ use crate::components::{
     paints::{CompPaint, GradientCompPaint, ImageCompPaint, SolidCompPaint},
     styles::{DropShadowCompStyle, StrokeCompStyle},
 };
-use bevy_ecs::{bundle::Bundle, entity::Entity};
+use bevy_ecs::{
+    bundle::Bundle,
+    entity::Entity,
+    system::{Commands, EntityCommands},
+};
 use bevy_transform::{components::Transform, TransformBundle};
 use components::{
     mixins::{
-        BlendMode, BlendModeMixin, LayoutElement, OpacityMixin, PaintChildMixin,
-        StaticLayoutParent, VisibilityMixin, WindingRule,
+        AbsoluteLayoutElementMixin, BlendMode, BlendModeMixin, LayoutElement, OpacityMixin,
+        PaintChildMixin, StaticLayoutElementMixin, StaticLayoutParent, StaticLayoutParentMixin,
+        VisibilityMixin, WindingRule,
     },
     nodes::{CompNodeVariant, EllipseArcData},
     paints::{CompPaintVariant, GradientColorStop, GradientVariant, ImageScaleMode},
@@ -30,7 +35,7 @@ use dyn_attributed_string::layout::{
 };
 use dyn_comp_asset::{
     asset::{Asset, AssetContent, AssetContentType},
-    asset_id::AssetId,
+    asset_id::{AssetId, ImageId},
 };
 use dyn_utils::{
     properties::{color::Color, corner_radii::CornerRadii, opacity::Opacity, size::Size},
@@ -133,6 +138,25 @@ impl FrameNode {
             opacity: OpacityMixin(self.opacity),
         }
     }
+
+    pub fn spawn<'a>(&self, commands: &'a mut Commands) -> EntityCommands<'a> {
+        let mut entity_commands = commands.spawn(self.to_bundle());
+
+        if let Some(layout_parent) = self.layout_parent {
+            entity_commands.insert(StaticLayoutParentMixin(layout_parent));
+        }
+
+        match self.layout_element {
+            LayoutElement::Absolute(layout_element) => {
+                entity_commands.insert(AbsoluteLayoutElementMixin(layout_element))
+            }
+            LayoutElement::Static(layout_element) => {
+                entity_commands.insert(StaticLayoutElementMixin(layout_element))
+            }
+        };
+
+        return entity_commands;
+    }
 }
 
 #[derive(Bundle, Debug)]
@@ -195,6 +219,21 @@ impl RectangleNode {
             blend_mode: BlendModeMixin(self.blend_mode),
             opacity: OpacityMixin(self.opacity),
         }
+    }
+
+    pub fn spawn<'a>(&self, commands: &'a mut Commands) -> EntityCommands<'a> {
+        let mut entity_commands = commands.spawn(self.to_bundle());
+
+        match self.layout_element {
+            LayoutElement::Absolute(layout_element) => {
+                entity_commands.insert(AbsoluteLayoutElementMixin(layout_element))
+            }
+            LayoutElement::Static(layout_element) => {
+                entity_commands.insert(StaticLayoutElementMixin(layout_element))
+            }
+        };
+
+        return entity_commands;
     }
 }
 
@@ -267,6 +306,21 @@ impl EllipseNode {
             opacity: OpacityMixin(self.opacity),
         }
     }
+
+    pub fn spawn<'a>(&self, commands: &'a mut Commands) -> EntityCommands<'a> {
+        let mut entity_commands = commands.spawn(self.to_bundle());
+
+        match self.layout_element {
+            LayoutElement::Absolute(layout_element) => {
+                entity_commands.insert(AbsoluteLayoutElementMixin(layout_element))
+            }
+            LayoutElement::Static(layout_element) => {
+                entity_commands.insert(StaticLayoutElementMixin(layout_element))
+            }
+        };
+
+        return entity_commands;
+    }
 }
 
 #[derive(Bundle, Debug)]
@@ -332,6 +386,21 @@ impl StarNode {
             blend_mode: BlendModeMixin(self.blend_mode),
             opacity: OpacityMixin(self.opacity),
         }
+    }
+
+    pub fn spawn<'a>(&self, commands: &'a mut Commands) -> EntityCommands<'a> {
+        let mut entity_commands = commands.spawn(self.to_bundle());
+
+        match self.layout_element {
+            LayoutElement::Absolute(layout_element) => {
+                entity_commands.insert(AbsoluteLayoutElementMixin(layout_element))
+            }
+            LayoutElement::Static(layout_element) => {
+                entity_commands.insert(StaticLayoutElementMixin(layout_element))
+            }
+        };
+
+        return entity_commands;
     }
 }
 
@@ -403,6 +472,21 @@ impl PolygonNode {
             blend_mode: BlendModeMixin(self.blend_mode),
             opacity: OpacityMixin(self.opacity),
         }
+    }
+
+    pub fn spawn<'a>(&self, commands: &'a mut Commands) -> EntityCommands<'a> {
+        let mut entity_commands = commands.spawn(self.to_bundle());
+
+        match self.layout_element {
+            LayoutElement::Absolute(layout_element) => {
+                entity_commands.insert(AbsoluteLayoutElementMixin(layout_element))
+            }
+            LayoutElement::Static(layout_element) => {
+                entity_commands.insert(StaticLayoutElementMixin(layout_element))
+            }
+        };
+
+        return entity_commands;
     }
 }
 
@@ -485,6 +569,21 @@ impl TextNode {
             opacity: OpacityMixin(self.opacity),
         }
     }
+
+    pub fn spawn<'a>(&self, commands: &'a mut Commands) -> EntityCommands<'a> {
+        let mut entity_commands = commands.spawn(self.to_bundle());
+
+        match self.layout_element {
+            LayoutElement::Absolute(layout_element) => {
+                entity_commands.insert(AbsoluteLayoutElementMixin(layout_element))
+            }
+            LayoutElement::Static(layout_element) => {
+                entity_commands.insert(StaticLayoutElementMixin(layout_element))
+            }
+        };
+
+        return entity_commands;
+    }
 }
 
 #[derive(Bundle, Debug)]
@@ -551,6 +650,21 @@ impl VectorNode {
             opacity: OpacityMixin(self.opacity),
         }
     }
+
+    pub fn spawn<'a>(&self, commands: &'a mut Commands) -> EntityCommands<'a> {
+        let mut entity_commands = commands.spawn(self.to_bundle());
+
+        match self.layout_element {
+            LayoutElement::Absolute(layout_element) => {
+                entity_commands.insert(AbsoluteLayoutElementMixin(layout_element))
+            }
+            LayoutElement::Static(layout_element) => {
+                entity_commands.insert(StaticLayoutElementMixin(layout_element))
+            }
+        };
+
+        return entity_commands;
+    }
 }
 
 // =============================================================================
@@ -597,6 +711,10 @@ impl SolidPaint {
             solid: SolidCompPaint { color: self.color },
         }
     }
+
+    pub fn spawn<'a>(&self, commands: &'a mut Commands) -> EntityCommands<'a> {
+        commands.spawn(self.to_bundle())
+    }
 }
 
 #[derive(Bundle, Debug)]
@@ -623,10 +741,7 @@ pub struct ImagePaint {
 }
 
 impl ImagePaint {
-    pub fn to_bundle(
-        &self,
-        reference_id_to_asset_id: &HashMap<ReferenceId, AssetId>,
-    ) -> ImagePaintBundle {
+    pub fn to_bundle(&self, maybe_image_id: Option<ImageId>) -> ImagePaintBundle {
         ImagePaintBundle {
             paint: CompPaint {
                 variant: CompPaintVariant::Image,
@@ -634,8 +749,16 @@ impl ImagePaint {
             image: ImageCompPaint {
                 scale_mode: self.scale_mode,
             },
-            asset: ImageAssetMixin(self.image_id.get_image_id(reference_id_to_asset_id)),
+            asset: ImageAssetMixin(maybe_image_id),
         }
+    }
+
+    pub fn spawn<'a>(
+        &self,
+        commands: &'a mut Commands,
+        maybe_image_id: Option<ImageId>,
+    ) -> EntityCommands<'a> {
+        commands.spawn(self.to_bundle(maybe_image_id))
     }
 }
 
@@ -670,6 +793,10 @@ impl GradientPaint {
                 stops: self.stops.iter().copied().collect(),
             },
         }
+    }
+
+    pub fn spawn<'a>(&self, commands: &'a mut Commands) -> EntityCommands<'a> {
+        commands.spawn(self.to_bundle())
     }
 }
 
@@ -720,20 +847,25 @@ pub struct FillStyle {
 }
 
 impl FillStyle {
-    pub fn to_bundle(
-        &self,
-        reference_id_to_entity: &HashMap<ReferenceId, Entity>,
-    ) -> FillStyleBundle {
+    pub fn to_bundle(&self, paint_entity: Entity) -> FillStyleBundle {
         FillStyleBundle {
             style: CompStyle {
                 variant: CompStyleVariant::Fill,
             },
             fill: FillCompStyle,
-            paint: PaintChildMixin(self.paint_id.get_entity(reference_id_to_entity)),
+            paint: PaintChildMixin(paint_entity),
             visibility: VisibilityMixin(self.visible),
             blend_mode: BlendModeMixin(self.blend_mode),
             opacity: OpacityMixin(self.opacity),
         }
+    }
+
+    pub fn spawn<'a>(
+        &self,
+        commands: &'a mut Commands,
+        paint_entity: Entity,
+    ) -> EntityCommands<'a> {
+        commands.spawn(self.to_bundle(paint_entity))
     }
 }
 
@@ -770,10 +902,7 @@ pub struct StrokeStyle {
 }
 
 impl StrokeStyle {
-    pub fn to_bundle(
-        &self,
-        reference_id_to_entity: &HashMap<ReferenceId, Entity>,
-    ) -> StrokeStyleBundle {
+    pub fn to_bundle(&self, paint_entity: Entity) -> StrokeStyleBundle {
         StrokeStyleBundle {
             style: CompStyle {
                 variant: CompStyleVariant::Fill,
@@ -784,11 +913,19 @@ impl StrokeStyle {
                     ..Default::default()
                 },
             },
-            paint: PaintChildMixin(self.paint_id.get_entity(reference_id_to_entity)),
+            paint: PaintChildMixin(paint_entity),
             visibility: VisibilityMixin(self.visible),
             blend_mode: BlendModeMixin(self.blend_mode),
             opacity: OpacityMixin(self.opacity),
         }
+    }
+
+    pub fn spawn<'a>(
+        &self,
+        commands: &'a mut Commands,
+        paint_entity: Entity,
+    ) -> EntityCommands<'a> {
+        commands.spawn(self.to_bundle(paint_entity))
     }
 }
 
@@ -842,6 +979,10 @@ impl DropShadowStyle {
             blend_mode: BlendModeMixin(self.blend_mode),
             opacity: OpacityMixin(self.opacity),
         }
+    }
+
+    pub fn spawn<'a>(&self, commands: &'a mut Commands) -> EntityCommands<'a> {
+        commands.spawn(self.to_bundle())
     }
 }
 

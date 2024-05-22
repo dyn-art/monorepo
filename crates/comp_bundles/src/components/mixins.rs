@@ -98,7 +98,7 @@ pub struct StyleChildrenMixin(pub SmallVec<[Entity; 2]>);
 pub struct StyleParentMixin(pub Entity);
 
 #[derive(Component, Debug, Clone)]
-pub struct PaintChildMixin(pub Option<Entity>);
+pub struct PaintChildMixin(pub Entity);
 
 #[derive(Component, Debug, Default, Clone)]
 pub struct PaintParentMixin(pub SmallVec<[Entity; 2]>);

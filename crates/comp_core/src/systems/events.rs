@@ -1,7 +1,7 @@
 use crate::resources::{composition::CompositionRes, referencer::ReferencerRes};
 use bevy_ecs::{
     entity::Entity,
-    event::EventReader,
+    event::{EventReader, EventWriter},
     query::With,
     system::{Commands, Query, Res, ResMut},
 };
@@ -11,8 +11,10 @@ use dyn_comp_bundles::{
     components::{
         marker::{Removed, Root},
         mixins::{
-            BlendModeMixin, CornerRadiiMixin, ImageAssetMixin, OpacityMixin, PaintChildMixin,
-            PaintParentMixin, SizeMixin, VisibilityMixin,
+            AbsoluteLayoutElementMixin, BlendModeMixin, CornerRadiiMixin, ImageAssetMixin,
+            LayoutElement, OpacityMixin, PaintChildMixin, PaintParentMixin, SizeMixin,
+            StaticLayoutElementMixin, StaticLayoutParentMixin, StyleChildrenMixin,
+            StyleParentMixin, VisibilityMixin,
         },
         nodes::{
             CompNode, EllipseCompNode, FrameCompNode, PolygonCompNode, StarCompNode, TextCompNode,
@@ -21,10 +23,11 @@ use dyn_comp_bundles::{
         styles::{DropShadowCompStyle, FillCompStyle, StrokeCompStyle},
     },
     events::{
-        DeleteEntityInputEvent, FocusRootNodesInputEvent, MoveEntityInputEvent,
-        UpdateCompositionSizeInputEvent, UpdateCompositionViewportInputEvent,
-        UpdateDropShadowStyleInputEvent, UpdateEllipseNodeInputEvent,
-        UpdateEntityBlendModeInputEvent, UpdateEntityCornerRadiiInputEvent,
+        CreateNodeInputEvent, CreatePaintInputEvent, DeleteEntityInputEvent,
+        FocusRootNodesInputEvent, MoveEntityInputEvent, UpdateCompositionSizeInputEvent,
+        UpdateCompositionViewportInputEvent, UpdateDropShadowStyleInputEvent,
+        UpdateEllipseNodeInputEvent, UpdateEntityBlendModeInputEvent,
+        UpdateEntityChildrenInputEvent, UpdateEntityCornerRadiiInputEvent,
         UpdateEntityOpacityInputEvent, UpdateEntityRotationInputEvent, UpdateEntitySizeInputEvent,
         UpdateEntityTransformInputEvent, UpdateEntityVisibilityInputEvent,
         UpdateFillStyleInputEvent, UpdateFrameNodeInputEvent, UpdateGradientPaintInputEvent,
@@ -32,7 +35,9 @@ use dyn_comp_bundles::{
         UpdateStarNodeInputEvent, UpdateStorkeStyleInputEvent, UpdateTextNodeInputEvent,
     },
     properties::Viewport,
+    reference_id::ReferenceIdOrEntity,
     utils::transform_to_z_rotation_rad,
+    Node, Paint, Style,
 };
 use dyn_utils::{math::matrix::rotate_around_point, properties::size::Size, units::abs::Abs};
 use glam::{Vec2, Vec3};
@@ -129,6 +134,129 @@ pub fn focus_root_nodes_input_system(
 // =============================================================================
 // Node
 // =============================================================================
+
+// TODO: Improve
+pub fn create_node_input_system(
+    mut commands: Commands,
+    mut referencer_res: ResMut<ReferencerRes>,
+    mut update_children_event_writer: EventWriter<UpdateEntityChildrenInputEvent>,
+    mut event_reader: EventReader<CreateNodeInputEvent>,
+    mut paint_parent_query: Query<&mut PaintParentMixin>,
+) {
+    for CreateNodeInputEvent { node } in event_reader.read() {
+        // Spawn node
+        let node_entity_commands = match node {
+            Node::Frame(n) => n.spawn(&mut commands),
+            Node::Rectangle(n) => n.spawn(&mut commands),
+            Node::Ellipse(n) => n.spawn(&mut commands),
+            Node::Star(n) => n.spawn(&mut commands),
+            Node::Polygon(n) => n.spawn(&mut commands),
+            Node::Text(n) => n.spawn(&mut commands),
+            Node::Vector(n) => n.spawn(&mut commands),
+        };
+        let node_entity = node_entity_commands.id();
+
+        let maybe_children = match node {
+            Node::Frame(node) => Some(&node.children),
+            _ => None,
+        };
+
+        // Handle children
+        if let Some(children) = maybe_children {
+            update_children_event_writer.send(UpdateEntityChildrenInputEvent {
+                id: ReferenceIdOrEntity::Entity {
+                    entity: node_entity,
+                },
+                children: children.clone(),
+            });
+        }
+
+        let maybe_styles = match node {
+            Node::Frame(n) => Some(&n.styles),
+            Node::Rectangle(n) => Some(&n.styles),
+            Node::Ellipse(n) => Some(&n.styles),
+            Node::Star(n) => Some(&n.styles),
+            Node::Polygon(n) => Some(&n.styles),
+            Node::Text(n) => Some(&n.styles),
+            Node::Vector(n) => Some(&n.styles),
+            _ => None,
+        };
+
+        // Handle styles
+        let mut style_children_mixin = StyleChildrenMixin(SmallVec::new());
+        if let Some(styles) = maybe_styles {
+            for style in styles {
+                let maybe_paint_entity = match style {
+                    Style::Fill(s) => s
+                        .paint_id
+                        .get_entity(referencer_res.get_reference_id_to_entity_map()),
+                    Style::Stroke(s) => s
+                        .paint_id
+                        .get_entity(referencer_res.get_reference_id_to_entity_map()),
+                    _ => None,
+                };
+
+                // Spawn style
+                let mut style_entity_commands = match style {
+                    Style::Fill(s) => {
+                        if let Some(paint_entity) = maybe_paint_entity {
+                            s.spawn(&mut commands, paint_entity)
+                        } else {
+                            continue;
+                        }
+                    }
+                    Style::Stroke(s) => {
+                        if let Some(paint_entity) = maybe_paint_entity {
+                            s.spawn(&mut commands, paint_entity)
+                        } else {
+                            continue;
+                        }
+                    }
+                    Style::DropShadow(s) => s.spawn(&mut commands),
+                };
+                let style_entity = style_entity_commands.id();
+
+                // Establish parent child relation between node and style (1)
+                style_entity_commands.insert(StyleParentMixin(node_entity));
+                style_children_mixin.0.push(style_entity);
+
+                // Establish parent child relation between style and paint
+                if let Some(paint_entity) = maybe_paint_entity {
+                    if let Ok(mut paint_parent_mixin) = paint_parent_query.get_mut(paint_entity) {
+                        paint_parent_mixin.0.push(style_entity);
+                    }
+                }
+
+                // Reference style entity
+                let maybe_style_id = match style {
+                    Style::DropShadow(s) => s.id.clone(),
+                    Style::Fill(s) => s.id.clone(),
+                    Style::Stroke(s) => s.id.clone(),
+                };
+                if let Some(style_id) = maybe_style_id {
+                    referencer_res.reference_entity(style_id, style_entity);
+                }
+            }
+        }
+
+        // Establish parent child relation between node and style (2)
+        commands.entity(node_entity).insert(style_children_mixin);
+
+        // Reference node entity
+        let maybe_node_id = match node {
+            Node::Frame(n) => n.id.clone(),
+            Node::Rectangle(n) => n.id.clone(),
+            Node::Ellipse(n) => n.id.clone(),
+            Node::Star(n) => n.id.clone(),
+            Node::Polygon(n) => n.id.clone(),
+            Node::Text(n) => n.id.clone(),
+            Node::Vector(n) => n.id.clone(),
+        };
+        if let Some(node_id) = maybe_node_id {
+            referencer_res.reference_entity(node_id, node_entity);
+        }
+    }
+}
 
 pub fn update_frame_node_input_system(
     referencer_res: Res<ReferencerRes>,
@@ -279,7 +407,7 @@ pub fn update_fill_style_input_system(
         if let Some(entity) = id.get_entity(referencer_res.get_reference_id_to_entity_map()) {
             if let Ok(mut paint_child_mixin) = query.get_mut(entity) {
                 if let Some(paint_id) = maybe_paint_id {
-                    paint_child_mixin.0 = Some(*paint_id);
+                    paint_child_mixin.0 = *paint_id;
                 }
             }
         }
@@ -300,7 +428,7 @@ pub fn update_storke_style_input_system(
         if let Some(entity) = id.get_entity(referencer_res.get_reference_id_to_entity_map()) {
             if let Ok((mut stroke_comp_style, mut paint_child_mixin)) = query.get_mut(entity) {
                 if let Some(paint_id) = maybe_paint_id {
-                    paint_child_mixin.0 = Some(*paint_id);
+                    paint_child_mixin.0 = *paint_id;
                 }
                 if let Some(width) = maybe_width {
                     stroke_comp_style.stroke.width = width.to_pt();
@@ -345,6 +473,38 @@ pub fn update_drop_shadow_style_input_system(
 // =============================================================================
 // Paint
 // =============================================================================
+
+pub fn create_paint_input_system(
+    mut commands: Commands,
+    mut referencer_res: ResMut<ReferencerRes>,
+    mut event_reader: EventReader<CreatePaintInputEvent>,
+) {
+    for CreatePaintInputEvent { paint } in event_reader.read() {
+        // Spawn paint
+        let mut paint_entity_commands = match paint {
+            Paint::Solid(p) => p.spawn(&mut commands),
+            Paint::Gradient(p) => p.spawn(&mut commands),
+            Paint::Image(p) => p.spawn(
+                &mut commands,
+                p.image_id
+                    .get_image_id(referencer_res.get_reference_id_to_asset_id_map()),
+            ),
+        };
+        let paint_entity = paint_entity_commands.id();
+
+        paint_entity_commands.insert(PaintParentMixin(SmallVec::new()));
+
+        // Reference paint entity
+        let maybe_paint_id = match paint {
+            Paint::Solid(p) => p.id.clone(),
+            Paint::Gradient(p) => p.id.clone(),
+            Paint::Image(p) => p.id.clone(),
+        };
+        if let Some(paint_id) = maybe_paint_id {
+            referencer_res.reference_entity(paint_id, paint_entity);
+        }
+    }
+}
 
 pub fn update_solid_paint_input_system(
     referencer_res: Res<ReferencerRes>,
