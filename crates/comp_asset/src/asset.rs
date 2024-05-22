@@ -7,6 +7,8 @@ use imagesize::ImageType;
     serde(rename_all = "camelCase")
 )]
 pub struct Asset {
+    #[cfg_attr(feature = "serde_support", serde(default))]
+    pub id: Option<String>, // ReferenceId
     pub content: AssetContent,
     pub content_type: AssetContentType,
 }

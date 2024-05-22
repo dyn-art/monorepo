@@ -18,10 +18,8 @@ use dyn_comp_bundles::{
     components::{marker::Root, mixins::SizeMixin},
     events::InputEvent,
 };
-use dyn_comp_core::{
-    insert_dtif_into_world, resources::composition::CompositionRes, CompCorePlugin,
-};
-use dyn_comp_dtif::{dtif_handler::DtifHandler, DtifComposition};
+use dyn_comp_core::{resources::composition::CompositionRes, CompCorePlugin};
+use dyn_comp_dtif::DtifComposition;
 use dyn_comp_interaction::CompInteractionPlugin;
 use dyn_comp_svg_builder::{
     events::SvgBuilderOutputEvent, svg::svg_bundle::SvgBundleVariant, CompSvgBuilderPlugin,
@@ -34,7 +32,6 @@ use wasm_bindgen::{prelude::wasm_bindgen, JsValue};
 #[wasm_bindgen]
 pub struct SvgCompHandle {
     app: App,
-    dtif_handler: DtifHandler,
     svg_builder_output_event_receiver: Receiver<SvgBuilderOutputEvent>,
     output_event_receiver: Receiver<SvgCompOutputEvent>,
 }
@@ -43,7 +40,6 @@ pub struct SvgCompHandle {
 impl SvgCompHandle {
     pub fn create(js_dtif: JsValue, interactive: bool) -> Result<SvgCompHandle, JsValue> {
         let dtif: DtifComposition = serde_wasm_bindgen::from_value(js_dtif)?;
-        let mut dtif_handler = DtifHandler::new(dtif);
         let mut app = App::new();
 
         let (svg_builder_output_event_sender, svg_builder_output_event_receiver) =
@@ -64,11 +60,10 @@ impl SvgCompHandle {
         if interactive {
             app.add_plugins(CompInteractionPlugin);
         }
-        insert_dtif_into_world(&mut app.world, &mut dtif_handler);
+        // insert_dtif_into_world(&mut app.world, &mut dtif_handler); // TODO
 
         return Ok(Self {
             app,
-            dtif_handler,
             svg_builder_output_event_receiver,
             output_event_receiver,
         });
@@ -88,13 +83,14 @@ impl SvgCompHandle {
                     SvgCompInputEvent::Interaction { event } => {
                         event.send_into_ecs(&mut self.app.world);
                     }
+                    // TODO
                     SvgCompInputEvent::Dtif { event } => {
-                        if let Some(event) = event.to_comp_input_event(
-                            self.dtif_handler.get_sid_to_entity(),
-                            self.dtif_handler.get_sid_to_asset_id(),
-                        ) {
-                            event.send_into_ecs(&mut self.app.world);
-                        }
+                        // if let Some(event) = event.to_comp_input_event(
+                        //     self.dtif_handler.get_sid_to_entity(),
+                        //     self.dtif_handler.get_sid_to_asset_id(),
+                        // ) {
+                        //     event.send_into_ecs(&mut self.app.world);
+                        // }
                     }
                 }
             }

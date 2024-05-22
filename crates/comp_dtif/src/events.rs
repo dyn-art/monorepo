@@ -28,6 +28,8 @@ use dyn_utils::{
 use glam::Vec2;
 use std::collections::HashMap;
 
+// TODO: REMOVE and combine with InputEvents via ReferenceIdOrEntity
+
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
 #[serde(tag = "type")]
 pub enum DtifInputEvent {

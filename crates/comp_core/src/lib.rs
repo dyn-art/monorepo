@@ -16,7 +16,7 @@ use dyn_comp_bundles::events::{
     UpdateSolidPaintInputEvent, UpdateStarNodeInputEvent, UpdateStorkeStyleInputEvent,
     UpdateTextNodeInputEvent,
 };
-use resources::{composition::CompositionRes, layout::LayoutRes, tick::TickRes};
+use resources::{layout::LayoutRes, tick::TickRes};
 use systems::{
     events::{
         delete_entity_input_system, despawn_removed_entities_system, focus_root_nodes_input_system,
@@ -149,6 +149,12 @@ impl Plugin for CompCorePlugin {
                 update_hierarchy_levels.after(collect_first_tick),
             ),
         );
+        // TODO: Create Input Events
+        // Create Assets -> Enity & Components -> Created Output Event
+        // Create Paints -> Enity & Components -> Created Output Event
+        // Create Nodes (with Styles) -> Enity & Components -> Created Output Event
+        // Establish hierarchy
+        //
         app.add_systems(
             Update,
             (
@@ -239,36 +245,37 @@ impl Plugin for CompCorePlugin {
     }
 }
 
-#[cfg(feature = "dtif")]
-pub fn insert_dtif_into_world(
-    world: &mut bevy_ecs::world::World,
-    dtif_handler: &mut dyn_comp_dtif::dtif_handler::DtifHandler,
-) {
-    use dyn_comp_asset::resources::AssetsRes;
-    use dyn_comp_bundles::properties::Viewport;
-    use glam::Vec2;
+// TODO
+// #[cfg(feature = "dtif")]
+// pub fn insert_dtif_into_world(
+//     world: &mut bevy_ecs::world::World,
+//     dtif_handler: &mut dyn_comp_dtif::dtif_handler::DtifHandler,
+// ) {
+//     use dyn_comp_asset::resources::AssetsRes;
+//     use dyn_comp_bundles::properties::Viewport;
+//     use glam::Vec2;
 
-    // Load assets
-    if let Some(mut asset_db) = world.get_resource_mut::<AssetsRes>() {
-        dtif_handler.load_assets(asset_db.as_mut());
-    }
+//     // Load assets
+//     if let Some(mut asset_db) = world.get_resource_mut::<AssetsRes>() {
+//         dtif_handler.load_assets(asset_db.as_mut());
+//     }
 
-    // Spawn nodes recursively
-    let maybe_root_node_entity = dtif_handler.insert_into_world(world);
-    if let Some(root_node_entity) = maybe_root_node_entity {
-        if let Some(dtif) = dtif_handler.get_dtif() {
-            world.insert_resource(CompositionRes {
-                root_nodes: vec![root_node_entity],
-                viewport: dtif.viewport.unwrap_or(Viewport {
-                    physical_position: Vec2::default(),
-                    physical_size: dtif.size,
-                }),
-                size: dtif.size,
-            });
-        } else {
-            panic!("Failed to get DTIF from DTIF-Handler!");
-        }
-    } else {
-        panic!("Failed to insert root node into world!");
-    }
-}
+//     // Spawn nodes recursively
+//     let maybe_root_node_entity = dtif_handler.insert_into_world(world);
+//     if let Some(root_node_entity) = maybe_root_node_entity {
+//         if let Some(dtif) = dtif_handler.get_dtif() {
+//             world.insert_resource(CompositionRes {
+//                 root_nodes: vec![root_node_entity],
+//                 viewport: dtif.viewport.unwrap_or(Viewport {
+//                     physical_position: Vec2::default(),
+//                     physical_size: dtif.size,
+//                 }),
+//                 size: dtif.size,
+//             });
+//         } else {
+//             panic!("Failed to get DTIF from DTIF-Handler!");
+//         }
+//     } else {
+//         panic!("Failed to insert root node into world!");
+//     }
+// }

@@ -143,7 +143,7 @@ export type AngleUnit =
  */
 "Deg"
 
-export type Asset = { content: AssetContent; contentType: AssetContentType }
+export type Asset = { id?: string | null; content: AssetContent; contentType: AssetContentType }
 
 export type AssetContent = 
 /**
@@ -178,7 +178,7 @@ export type Color = [number, number, number]
 
 export type ColorMatrix = { x_axis: [number, number, number, number]; y_axis: [number, number, number, number]; z_axis: [number, number, number, number]; w_axis: [number, number, number, number]; v_axis: [number, number, number, number] }
 
-export type CompCoreInputEvent = ({ type: "UpdateCompositionSize" } & UpdateCompositionSizeInputEvent) | ({ type: "UpdateCompositionViewport" } & UpdateCompositionViewportInputEvent) | ({ type: "FocusRootNodes" }) | ({ type: "UpdateFrameNode" } & UpdateFrameNodeInputEvent) | ({ type: "UpdateEllipseNode" } & UpdateEllipseNodeInputEvent) | ({ type: "UpdateStarNode" } & UpdateStarNodeInputEvent) | ({ type: "UpdatePolygonNode" } & UpdatePolygonNodeInputEvent) | ({ type: "UpdateTextNode" } & UpdateTextNodeInputEvent) | ({ type: "UpdateFillStyle" } & UpdateFillStyleInputEvent) | ({ type: "UpdateStrokeStyle" } & UpdateStorkeStyleInputEvent) | ({ type: "UpdateDropShadowStyle" } & UpdateDropShadowStyleInputEvent) | ({ type: "UpdateSolidPaint" } & UpdateSolidPaintInputEvent) | ({ type: "UpdateImagePaint" } & UpdateImagePaintInputEvent) | ({ type: "UpdateGradientPaint" } & UpdateGradientPaintInputEvent) | ({ type: "DeleteEntity" } & DeleteEntityInputEvent) | ({ type: "UpdateEntityTransform" } & UpdateEntityTransformInputEvent) | ({ type: "UpdateEntitySize" } & UpdateEntitySizeInputEvent) | ({ type: "MoveEntity" } & MoveEntityInputEvent) | ({ type: "UpdateEntityRotation" } & UpdateEntityRotationInputEvent) | ({ type: "UpdateEntityVisibility" } & UpdateEntityVisibilityInputEvent) | ({ type: "UpdateEntityCornerRadii" } & UpdateEntityCornerRadiiInputEvent) | ({ type: "UpdateEntityBlendMode" } & UpdateEntityBlendModeInputEvent) | ({ type: "UpdateEntityOpacity" } & UpdateEntityOpacityInputEvent)
+export type CompCoreInputEvent = ({ type: "UpdateCompositionSize" } & UpdateCompositionSizeInputEvent) | ({ type: "UpdateCompositionViewport" } & UpdateCompositionViewportInputEvent) | ({ type: "FocusRootNodes" }) | ({ type: "CreateNode" } & CreateNodeInputEvent) | ({ type: "UpdateFrameNode" } & UpdateFrameNodeInputEvent) | ({ type: "UpdateEllipseNode" } & UpdateEllipseNodeInputEvent) | ({ type: "UpdateStarNode" } & UpdateStarNodeInputEvent) | ({ type: "UpdatePolygonNode" } & UpdatePolygonNodeInputEvent) | ({ type: "UpdateTextNode" } & UpdateTextNodeInputEvent) | ({ type: "CreateStyle" } & CreateStyleInputEvent) | ({ type: "UpdateFillStyle" } & UpdateFillStyleInputEvent) | ({ type: "UpdateStrokeStyle" } & UpdateStorkeStyleInputEvent) | ({ type: "UpdateDropShadowStyle" } & UpdateDropShadowStyleInputEvent) | ({ type: "CreatePaint" } & CreatePaintInputEvent) | ({ type: "UpdateSolidPaint" } & UpdateSolidPaintInputEvent) | ({ type: "UpdateImagePaint" } & UpdateImagePaintInputEvent) | ({ type: "UpdateGradientPaint" } & UpdateGradientPaintInputEvent) | ({ type: "DeleteEntity" } & DeleteEntityInputEvent) | ({ type: "UpdateEntityTransform" } & UpdateEntityTransformInputEvent) | ({ type: "UpdateEntitySize" } & UpdateEntitySizeInputEvent) | ({ type: "MoveEntity" } & MoveEntityInputEvent) | ({ type: "UpdateEntityRotation" } & UpdateEntityRotationInputEvent) | ({ type: "UpdateEntityVisibility" } & UpdateEntityVisibilityInputEvent) | ({ type: "UpdateEntityCornerRadii" } & UpdateEntityCornerRadiiInputEvent) | ({ type: "UpdateEntityBlendMode" } & UpdateEntityBlendModeInputEvent) | ({ type: "UpdateEntityOpacity" } & UpdateEntityOpacityInputEvent)
 
 export type ComponentChange = { type: "Size"; size: Size } | { type: "Transform"; rotationDeg: number; translation: Vec2 } | { type: "GlobalTransform"; rotationDeg: number; translation: Vec2 }
 
@@ -189,6 +189,12 @@ export type Constraint = "Start" | "Center" | "End" | "Stretch" | "Scale"
 export type Constraints = { horizontal: Constraint; vertical: Constraint }
 
 export type CornerRadii = [Angle, Angle, Angle, Angle]
+
+export type CreateNodeInputEvent = { node: Node }
+
+export type CreatePaintInputEvent = { paint: Paint }
+
+export type CreateStyleInputEvent = { style: Style }
 
 export type Cursor = { type: "Default" } | { type: "Grabbing" } | { type: "Crosshair" } | { type: "Resize"; rotationDeg: number } | { type: "Rotate"; rotationDeg: number }
 
@@ -214,7 +220,7 @@ export type DeleteEntityDtifInputEvent = { entity: string }
 
 export type DeleteEntityInputEvent = { entity: Entity }
 
-export type DropShadowStyle = { id?: string | null; color?: Color; position: Vec2; spread?: Abs; blur: Abs; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity }
+export type DropShadowStyle = { id?: ReferenceId | null; color?: Color; position: Vec2; spread?: Abs; blur: Abs; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity }
 
 /**
  * DTIF (Design Tree Interchange Format) utilizes a flat structure for easy readability
@@ -237,23 +243,23 @@ viewport?: Viewport | null;
 /**
  * The identifier of the root node in the composition.
  */
-rootNodeId: string; 
+rootNodeId: ReferenceIdOrEntity; 
 /**
- * A mapping of node identifiers to their corresponding nodes within the composition.
+ * A list of nodes.
  */
-nodes: { [key in string]: Node }; 
+nodes: Node[]; 
 /**
- * A mapping of paint identifiers to their corresponding paints within the composition.
+ * A list of paints.
  */
-paints?: { [key in string]: Paint }; 
+paints?: Paint[]; 
 /**
- * A mapping of asset identifiers to their corresponding assets within the composition.
+ * A list of assets.
  */
-assets?: { [key in string]: Asset }; events?: DtifInputEvent[] }
+assets?: Asset[]; events?: DtifInputEvent[] }
 
 export type DtifInputEvent = ({ type: "UpdateCompositionSize" } & UpdateCompositionSizeDtifInputEvent) | ({ type: "UpdateCompositionViewport" } & UpdateCompositionViewportDtifInputEvent) | ({ type: "FocusRootNodes" }) | ({ type: "UpdateFrameNode" } & UpdateFrameNodeDtifInputEvent) | ({ type: "UpdateEllipseNode" } & UpdateEllipseNodeDtifInputEvent) | ({ type: "UpdateStarNode" } & UpdateStarNodeDtifInputEvent) | ({ type: "UpdatePolygonNode" } & UpdatePolygonNodeDtifInputEvent) | ({ type: "UpdateTextNode" } & UpdateTextNodeDtifInputEvent) | ({ type: "UpdateFillStyle" } & UpdateFillStyleDtifInputEvent) | ({ type: "UpdateStrokeStyle" } & UpdateStorkeStyleDtifInputEvent) | ({ type: "UpdateDropShadowStyle" } & UpdateDropShadowStyleDtifInputEvent) | ({ type: "UpdateSolidPaint" } & UpdateSolidPaintDtifInputEvent) | ({ type: "UpdateImagePaint" } & UpdateImagePaintDtifInputEvent) | ({ type: "UpdateGradientPaint" } & UpdateGradientPaintDtifInputEvent) | ({ type: "DeleteEntity" } & DeleteEntityDtifInputEvent) | ({ type: "UpdateEntityTransform" } & UpdateEntityTransformDtifInputEvent) | ({ type: "UpdateEntitySize" } & UpdateEntitySizeDtifInputEvent) | ({ type: "MoveEntity" } & MoveEntityDtifInputEvent) | ({ type: "UpdateEntityRotation" } & UpdateEntityRotationDtifInputEvent) | ({ type: "UpdateEntityVisibility" } & UpdateEntityVisibilityDtifInputEvent) | ({ type: "UpdateEntityCornerRadii" } & UpdateEntityCornerRadiiDtifInputEvent) | ({ type: "UpdateEntityBlendMode" } & UpdateEntityBlendModeDtifInputEvent) | ({ type: "UpdateEntityOpacity" } & UpdateEntityOpacityDtifInputEvent)
 
-export type EllipseNode = { startingAngle?: number; endingAngle?: number; innerRadiusRatio?: number; translation?: Vec2; rotationDeg?: Angle; size: Size; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; layoutElement?: LayoutElement; styles?: Style[] }
+export type EllipseNode = { id?: ReferenceId | null; startingAngle?: number; endingAngle?: number; innerRadiusRatio?: number; translation?: Vec2; rotationDeg?: Angle; size: Size; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; layoutElement?: LayoutElement; styles?: Style[] }
 
 /**
  * A length that is relative to the font size.
@@ -264,7 +270,7 @@ export type Em = Scalar
 
 export type Entity = number
 
-export type FillStyle = { id?: string | null; paintId: string; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity }
+export type FillStyle = { id?: ReferenceId | null; paintId: ReferenceIdOrEntity; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity }
 
 /**
  * The direction of the flexbox layout main axis.
@@ -402,7 +408,7 @@ stretch: FontStretch }
  */
 export type FontWeight = number
 
-export type FrameNode = { clipContent?: boolean; layoutParent?: StaticLayoutParent | null; translation?: Vec2; rotationDeg?: Angle; size: Size; cornerRadii?: CornerRadii; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; layoutElement?: LayoutElement; styles?: Style[]; children?: string[] }
+export type FrameNode = { id?: ReferenceId | null; clipContent?: boolean; layoutParent?: StaticLayoutParent | null; cornerRadii?: CornerRadii; translation?: Vec2; rotationDeg?: Angle; size: Size; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; layoutElement?: LayoutElement; styles?: Style[]; children?: ReferenceIdOrEntity[] }
 
 export type GradientColorStop = { 
 /**
@@ -418,7 +424,7 @@ color: Color;
  */
 opacity?: Opacity }
 
-export type GradientPaint = { variant: GradientVariant; stops: GradientColorStop[] }
+export type GradientPaint = { id?: ReferenceId | null; variant: GradientVariant; stops: GradientColorStop[] }
 
 export type GradientVariant = { type: "Linear"; transform?: Mat3 } | { type: "Radial"; transform?: Mat3 }
 
@@ -426,7 +432,7 @@ export type HandleSide = "Top" | "Bottom" | "Left" | "Right"
 
 export type HorizontalTextAlignment = "Start" | "End" | "Left" | "Right" | "Center"
 
-export type ImagePaint = { assetId: string; scaleMode?: ImageScaleMode }
+export type ImagePaint = { id?: ReferenceId | null; imageId: ReferenceIdOrImageId; scaleMode?: ImageScaleMode }
 
 export type ImageScaleMode = 
 /**
@@ -1507,7 +1513,7 @@ export type Opacity = Ratio
 
 export type Paint = ({ type: "Solid" } & SolidPaint) | ({ type: "Image" } & ImagePaint) | ({ type: "Gradient" } & GradientPaint)
 
-export type PolygonNode = { pointCount?: number; translation?: Vec2; rotationDeg?: Angle; size: Size; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; layoutElement?: LayoutElement; styles?: Style[] }
+export type PolygonNode = { id?: ReferenceId | null; pointCount?: number; translation?: Vec2; rotationDeg?: Angle; size: Size; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; layoutElement?: LayoutElement; styles?: Style[] }
 
 /**
  * A ratio of a whole.
@@ -1518,7 +1524,13 @@ export type Ratio = Scalar
 
 export type Rect<T> = { left: T; right: T; top: T; bottom: T }
 
-export type RectangleNode = { translation?: Vec2; rotationDeg?: Angle; size: Size; cornerRadii?: CornerRadii; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; layoutElement?: LayoutElement; styles?: Style[] }
+export type RectangleNode = { id?: ReferenceId | null; cornerRadii?: CornerRadii; translation?: Vec2; rotationDeg?: Angle; size: Size; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; layoutElement?: LayoutElement; styles?: Style[] }
+
+export type ReferenceId = string
+
+export type ReferenceIdOrEntity = { type: "Entity"; value: Entity } | { type: "ReferenceId"; value: ReferenceId }
+
+export type ReferenceIdOrImageId = { type: "ImageId"; value: { idx: number; version: number } } | { type: "ReferenceId"; value: ReferenceId }
 
 /**
  * A 32-bit float that implements `Eq`, `Ord` and `Hash`.
@@ -1533,17 +1545,17 @@ export type ShapeVariant = "Rectangle" | "Ellipse" | "Star" | "Polygon"
 
 export type Size = [Abs, Abs]
 
-export type SolidPaint = { color: Color }
+export type SolidPaint = { id?: ReferenceId | null; color: Color }
 
 export type SpectaExport = { comp_dtif: DtifComposition; svg_comp_input_event: SvgCompInputEvent; svg_comp_output_event: SvgCompOutputEvent }
 
-export type StarNode = { innerRadiusRatio?: number; pointCount?: number; translation?: Vec2; rotationDeg?: Angle; size: Size; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; layoutElement?: LayoutElement; styles?: Style[] }
+export type StarNode = { id?: ReferenceId | null; innerRadiusRatio?: number; pointCount?: number; translation?: Vec2; rotationDeg?: Angle; size: Size; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; layoutElement?: LayoutElement; styles?: Style[] }
 
 export type StaticLayoutElement = { alignSelf?: AlignItems | null; justifySelf?: AlignItems | null; margin?: Rect<AutoLength>; horizontalSizingMode?: LayoutElementSizingMode; verticalSizingMode?: LayoutElementSizingMode }
 
 export type StaticLayoutParent = { alignItems?: AlignItems | null; justifyContent?: AlignContent | null; gap?: Axes<Length>; padding?: Rect<Length>; flexDirection?: FlexDirection; horizontalSizingMode?: LayoutParentSizingMode; verticalSizingMode?: LayoutParentSizingMode }
 
-export type StrokeStyle = { id?: string | null; width: Abs; paintId: string; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity }
+export type StrokeStyle = { id?: ReferenceId | null; width: Abs; paintId: ReferenceIdOrEntity; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity }
 
 export type Style = ({ type: "Fill" } & FillStyle) | ({ type: "Stroke" } & StrokeStyle) | ({ type: "DropShadow" } & DropShadowStyle)
 
@@ -1653,7 +1665,7 @@ export type TextAttributeInterval = { start: number; end: number; attributes: Te
 
 export type TextAttributes = { fontFamily?: FontFamily | null; fontStyle?: FontStyle | null; fontStretch?: FontStretch | null; fontWeight?: FontWeight | null; fontSize?: Abs | null; smallCaps?: boolean | null; applyKerning?: boolean | null; letterSpacing?: FontUnit | null; wordSpacing?: FontUnit | null; lineHeight?: FontUnit | null }
 
-export type TextNode = { text: string; attributes: TextAttributeInterval[]; lineWrap?: LineWrap; horizontalTextAlignment?: HorizontalTextAlignment; verticalTextAlignment?: VerticalTextAlignment; sizingMode?: TextSizingMode; translation?: Vec2; rotationDeg?: Angle; size: Size; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; layoutElement?: LayoutElement; styles?: Style[] }
+export type TextNode = { id?: ReferenceId | null; text: string; attributes: TextAttributeInterval[]; lineWrap?: LineWrap; horizontalTextAlignment?: HorizontalTextAlignment; verticalTextAlignment?: VerticalTextAlignment; sizingMode?: TextSizingMode; translation?: Vec2; rotationDeg?: Angle; size: Size; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; layoutElement?: LayoutElement; styles?: Style[] }
 
 export type TextSizingMode = "WidthAndHeight" | "Height" | "Fixed"
 
@@ -1739,7 +1751,7 @@ export type UpdateTextNodeInputEvent = { entity: Entity; text?: string | null; a
 
 export type Vec2 = [number, number]
 
-export type VectorNode = { path: string; windingRule?: WindingRule; translation?: Vec2; rotationDeg?: Angle; size: Size; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; layoutElement?: LayoutElement; styles?: Style[] }
+export type VectorNode = { id?: ReferenceId | null; path: string; windingRule: WindingRule; translation?: Vec2; rotationDeg?: Angle; size: Size; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; layoutElement?: LayoutElement; styles?: Style[] }
 
 export type VerticalTextAlignment = "Top" | "Bottom" | "Center"
 

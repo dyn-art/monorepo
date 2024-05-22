@@ -4,6 +4,7 @@ use crate::{
         paints::{GradientColorStop, GradientVariant, ImageScaleMode},
     },
     properties::{TextAttributeInterval, Viewport},
+    Node, Paint, Style,
 };
 use bevy_ecs::{entity::Entity, event::Event, world::World};
 use dyn_attributed_string::layout::{
@@ -33,6 +34,7 @@ pub enum CompCoreInputEvent {
     FocusRootNodes(FocusRootNodesInputEvent),
 
     // Node
+    CreateNode(CreateNodeInputEvent),
     UpdateFrameNode(UpdateFrameNodeInputEvent),
     UpdateEllipseNode(UpdateEllipseNodeInputEvent),
     UpdateStarNode(UpdateStarNodeInputEvent),
@@ -40,11 +42,13 @@ pub enum CompCoreInputEvent {
     UpdateTextNode(UpdateTextNodeInputEvent),
 
     // Style
+    CreateStyle(CreateStyleInputEvent),
     UpdateFillStyle(UpdateFillStyleInputEvent),
     UpdateStrokeStyle(UpdateStorkeStyleInputEvent),
     UpdateDropShadowStyle(UpdateDropShadowStyleInputEvent),
 
     // Paint
+    CreatePaint(CreatePaintInputEvent),
     UpdateSolidPaint(UpdateSolidPaintInputEvent),
     UpdateImagePaint(UpdateImagePaintInputEvent),
     UpdateGradientPaint(UpdateGradientPaintInputEvent),
@@ -76,6 +80,9 @@ impl InputEvent for CompCoreInputEvent {
             }
 
             // Node
+            CompCoreInputEvent::CreateNode(event) => {
+                world.send_event(event);
+            }
             CompCoreInputEvent::UpdateFrameNode(event) => {
                 world.send_event(event);
             }
@@ -93,6 +100,9 @@ impl InputEvent for CompCoreInputEvent {
             }
 
             // Style
+            CompCoreInputEvent::CreateStyle(event) => {
+                world.send_event(event);
+            }
             CompCoreInputEvent::UpdateFillStyle(event) => {
                 world.send_event(event);
             }
@@ -104,6 +114,9 @@ impl InputEvent for CompCoreInputEvent {
             }
 
             // Paint
+            CompCoreInputEvent::CreatePaint(event) => {
+                world.send_event(event);
+            }
             CompCoreInputEvent::UpdateSolidPaint(event) => {
                 world.send_event(event);
             }
@@ -179,6 +192,15 @@ pub struct FocusRootNodesInputEvent;
 // =============================================================================
 // Node
 // =============================================================================
+
+#[derive(Event, Debug, Clone)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type)
+)]
+pub struct CreateNodeInputEvent {
+    pub node: Node,
+}
 
 #[derive(Event, Debug, Copy, Clone)]
 #[cfg_attr(
@@ -260,6 +282,15 @@ pub struct UpdateTextNodeInputEvent {
 // Style
 // =============================================================================
 
+#[derive(Event, Debug, Clone)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type)
+)]
+pub struct CreateStyleInputEvent {
+    pub style: Style,
+}
+
 #[derive(Event, Debug, Copy, Clone)]
 #[cfg_attr(
     feature = "serde_support",
@@ -303,6 +334,15 @@ pub struct UpdateDropShadowStyleInputEvent {
 // =============================================================================
 // Paint
 // =============================================================================
+
+#[derive(Event, Debug, Clone)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type)
+)]
+pub struct CreatePaintInputEvent {
+    pub paint: Paint,
+}
 
 #[derive(Event, Debug, Copy, Clone)]
 #[cfg_attr(

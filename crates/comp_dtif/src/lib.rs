@@ -1,19 +1,13 @@
 pub mod conversion;
-pub mod dtif_handler;
 pub mod events;
-pub mod nodes;
-pub mod paints;
-pub mod styles;
 
-use crate::nodes::Node;
-use bevy_ecs::world::{EntityWorldMut, World};
-use dtif_handler::DtifHandler;
 use dyn_comp_asset::asset::Asset;
-use dyn_comp_bundles::properties::Viewport;
+use dyn_comp_bundles::{
+    properties::{ReferenceIdOrEntity, Viewport},
+    Node, Paint,
+};
 use dyn_utils::properties::size::Size;
 use events::DtifInputEvent;
-use paints::Paint;
-use std::collections::HashMap;
 
 /// DTIF (Design Tree Interchange Format) utilizes a flat structure for easy readability
 /// and efficient access & manipulation of design elements (Nodes, Paints, ..).
@@ -30,20 +24,16 @@ pub struct DtifComposition {
     #[serde(default)]
     pub viewport: Option<Viewport>,
     /// The identifier of the root node in the composition.
-    pub root_node_id: String,
-    /// A mapping of node identifiers to their corresponding nodes within the composition.
-    pub nodes: HashMap<String, Node>,
-    /// A mapping of paint identifiers to their corresponding paints within the composition.
+    pub root_node_id: ReferenceIdOrEntity,
+    /// A list of nodes.
+    pub nodes: Vec<Node>,
+    /// A list of paints.
     #[serde(default)]
-    pub paints: HashMap<String, Paint>,
-    /// A mapping of asset identifiers to their corresponding assets within the composition.
+    pub paints: Vec<Paint>,
+    /// A list of assets.
     #[serde(default)]
-    pub assets: HashMap<String, Asset>,
+    pub assets: Vec<Asset>,
     // A list of input events.
     #[serde(default)]
     pub events: Vec<DtifInputEvent>,
-}
-
-pub trait SpawnBundleImpl {
-    fn spawn<'a>(&self, dtif_injector: &DtifHandler, world: &'a mut World) -> EntityWorldMut<'a>;
 }
