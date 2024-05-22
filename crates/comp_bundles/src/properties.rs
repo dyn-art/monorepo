@@ -1,6 +1,3 @@
-use std::collections::HashMap;
-
-use bevy_ecs::entity::Entity;
 use dyn_attributed_string::{
     dyn_fonts_book::font::{
         info::FontFamily,
@@ -8,78 +5,20 @@ use dyn_attributed_string::{
     },
     text_attrs::{TextAttrs, TextAttrsInterval},
 };
-use dyn_comp_asset::asset_id::{AssetId, ImageId};
 use dyn_utils::{
     properties::size::Size,
     units::{abs::Abs, font_unit::FontUnit},
 };
 use glam::Vec2;
 
-#[derive(Debug, Hash, PartialEq, Eq, Clone)]
+#[derive(Debug, Default, Copy, Clone)]
 #[cfg_attr(
     feature = "serde_support",
-    derive(serde::Serialize, serde::Deserialize, specta::Type),
-    serde(rename_all = "camelCase")
+    derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
-pub struct ReferenceId(String);
-
-#[derive(Debug, Clone)]
-#[cfg_attr(
-    feature = "serde_support",
-    derive(serde::Serialize, serde::Deserialize, specta::Type),
-    serde(tag = "type")
-)]
-pub enum ReferenceIdOrEntity {
-    Entity { value: Entity },
-    ReferenceId { value: ReferenceId },
-}
-
-impl ReferenceIdOrEntity {
-    pub fn get_entity(
-        &self,
-        reference_id_to_entity: &HashMap<ReferenceId, Entity>,
-    ) -> Option<Entity> {
-        match self {
-            ReferenceIdOrEntity::Entity { value: entity } => Some(*entity),
-            ReferenceIdOrEntity::ReferenceId {
-                value: reference_id,
-            } => reference_id_to_entity.get(reference_id).copied(),
-        }
-    }
-}
-
-#[derive(Debug, Clone)]
-#[cfg_attr(
-    feature = "serde_support",
-    derive(serde::Serialize, serde::Deserialize, specta::Type),
-    serde(tag = "type")
-)]
-pub enum ReferenceIdOrImageId {
-    ImageId { value: ImageId },
-    ReferenceId { value: ReferenceId },
-}
-
-impl ReferenceIdOrImageId {
-    pub fn get_image_id(
-        &self,
-        reference_id_to_asset_id: &HashMap<ReferenceId, AssetId>,
-    ) -> Option<ImageId> {
-        match self {
-            ReferenceIdOrImageId::ImageId { value: image_id } => Some(*image_id),
-            ReferenceIdOrImageId::ReferenceId {
-                value: reference_id,
-            } => {
-                if let Some(asset_id) = reference_id_to_asset_id.get(reference_id) {
-                    match asset_id {
-                        AssetId::Image(image_id) => Some(*image_id),
-                        _ => None,
-                    }
-                } else {
-                    None
-                }
-            }
-        }
-    }
+pub enum CompVersion {
+    #[default]
+    V000001, // v0.0.1
 }
 
 #[derive(Debug, Default, Copy, Clone)]

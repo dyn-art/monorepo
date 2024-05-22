@@ -2,8 +2,7 @@ use crate::modules::watch::events::{
     CompositionChangeOutputEvent, CursorChangeOutputEvent, InteractionModeChangeOutputEvent,
     InteractionToolChangeOutputEvent, SelectionChangeOutputEvent, WatchedEntityChangesOutputEvent,
 };
-use dyn_comp_bundles::events::CompCoreInputEvent;
-use dyn_comp_dtif::events::DtifInputEvent;
+use dyn_comp_bundles::events::CoreInputEvent;
 use dyn_comp_interaction::events::InteractionInputEvent;
 use dyn_comp_svg_builder::events::SvgElementChangesOutputEvent;
 
@@ -22,7 +21,6 @@ pub enum SvgCompOutputEvent {
 #[derive(Debug, Clone, serde::Deserialize, specta::Type)]
 #[serde(tag = "type")]
 pub enum SvgCompInputEvent {
-    Composition { event: CompCoreInputEvent },
+    Core { event: CoreInputEvent },
     Interaction { event: InteractionInputEvent },
-    Dtif { event: DtifInputEvent },
 }

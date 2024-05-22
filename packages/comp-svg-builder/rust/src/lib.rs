@@ -48,7 +48,11 @@ impl SvgCompHandle {
 
         // Register plugins
         app.add_plugins((
-            CompCorePlugin {},
+            CompCorePlugin {
+                version: dtif.version,
+                size: dtif.size,
+                viewport: dtif.viewport,
+            },
             CompWatchPlugin {
                 output_event_sender,
                 interactive,
@@ -60,7 +64,8 @@ impl SvgCompHandle {
         if interactive {
             app.add_plugins(CompInteractionPlugin);
         }
-        // insert_dtif_into_world(&mut app.world, &mut dtif_handler); // TODO
+
+        dtif.insert_into_world(&mut app.world);
 
         return Ok(Self {
             app,
@@ -77,20 +82,11 @@ impl SvgCompHandle {
         if let Ok(input_events) = maybe_input_events {
             for input_event in input_events {
                 match input_event {
-                    SvgCompInputEvent::Composition { event } => {
-                        event.send_into_ecs(&mut self.app.world);
+                    SvgCompInputEvent::Core { event } => {
+                        event.send_into_world(&mut self.app.world);
                     }
                     SvgCompInputEvent::Interaction { event } => {
-                        event.send_into_ecs(&mut self.app.world);
-                    }
-                    // TODO
-                    SvgCompInputEvent::Dtif { event } => {
-                        // if let Some(event) = event.to_comp_input_event(
-                        //     self.dtif_handler.get_sid_to_entity(),
-                        //     self.dtif_handler.get_sid_to_asset_id(),
-                        // ) {
-                        //     event.send_into_ecs(&mut self.app.world);
-                        // }
+                        event.send_into_world(&mut self.app.world);
                     }
                 }
             }

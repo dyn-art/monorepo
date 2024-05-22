@@ -830,6 +830,7 @@ dependencies = [
 name = "dyn-comp-bundles"
 version = "0.0.1"
 dependencies = [
+ "bevy_app",
  "bevy_ecs",
  "bevy_hierarchy",
  "bevy_transform",
@@ -873,14 +874,11 @@ dependencies = [
  "bevy_ecs",
  "bevy_hierarchy",
  "bevy_transform",
- "dyn-attributed-string",
- "dyn-comp-asset",
  "dyn-comp-bundles",
  "dyn-utils",
  "glam",
  "log",
  "serde",
- "smallvec",
  "specta",
  "tiny-skia-path",
 ]

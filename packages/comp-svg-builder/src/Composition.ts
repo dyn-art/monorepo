@@ -1,12 +1,11 @@
 import { shortId } from '@dyn/utils';
 import { SvgCompHandle } from '@/rust/dyn-comp-svg-builder-api';
 import type {
-	CompCoreInputEvent,
 	ComponentChange,
 	CompositionChangeOutputEvent,
+	CoreInputEvent,
 	CursorChangeOutputEvent,
 	DtifComposition,
-	DtifInputEvent,
 	Entity,
 	InteractionInputEvent,
 	InteractionModeChangeOutputEvent,
@@ -234,9 +233,8 @@ export interface TCompositionConfig {
 }
 
 export interface TInputEventTypeMap {
-	Composition: CompCoreInputEvent;
+	Composition: CoreInputEvent;
 	Interaction: InteractionInputEvent;
-	Dtif: DtifInputEvent;
 }
 
 export interface TOutputEventTypeMap {

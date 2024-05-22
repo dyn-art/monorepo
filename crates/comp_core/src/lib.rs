@@ -5,18 +5,14 @@ use bevy_app::{App, First, Last, Plugin, Update};
 use bevy_ecs::schedule::{IntoSystemConfigs, IntoSystemSetConfigs, SystemSet};
 use bevy_transform::TransformPlugin;
 use dyn_comp_asset::CompAssetPlugin;
-use dyn_comp_bundles::events::{
-    DeleteEntityInputEvent, FocusRootNodesInputEvent, MoveEntityInputEvent,
-    UpdateCompositionSizeInputEvent, UpdateCompositionViewportInputEvent,
-    UpdateDropShadowStyleInputEvent, UpdateEllipseNodeInputEvent, UpdateEntityBlendModeInputEvent,
-    UpdateEntityCornerRadiiInputEvent, UpdateEntityOpacityInputEvent,
-    UpdateEntityRotationInputEvent, UpdateEntitySizeInputEvent, UpdateEntityTransformInputEvent,
-    UpdateEntityVisibilityInputEvent, UpdateFillStyleInputEvent, UpdateFrameNodeInputEvent,
-    UpdateGradientPaintInputEvent, UpdateImagePaintInputEvent, UpdatePolygonNodeInputEvent,
-    UpdateSolidPaintInputEvent, UpdateStarNodeInputEvent, UpdateStorkeStyleInputEvent,
-    UpdateTextNodeInputEvent,
+use dyn_comp_bundles::{
+    events::{CoreInputEvent, InputEvent},
+    properties::{CompVersion, Viewport},
 };
-use resources::{layout::LayoutRes, tick::TickRes};
+use dyn_utils::properties::size::Size;
+use resources::{
+    composition::CompositionRes, layout::LayoutRes, referencer::ReferencerRes, tick::TickRes,
+};
 use systems::{
     events::{
         delete_entity_input_system, despawn_removed_entities_system, focus_root_nodes_input_system,
@@ -52,12 +48,9 @@ use systems::{
 };
 
 pub struct CompCorePlugin {
-    #[cfg(not(feature = "dtif"))]
+    pub version: Option<CompVersion>,
     pub size: Size,
-    #[cfg(not(feature = "dtif"))]
     pub viewport: Option<Viewport>,
-    #[cfg(not(feature = "dtif"))]
-    pub root_nodes: Vec<Entity>,
 }
 
 #[derive(SystemSet, Debug, Hash, PartialEq, Eq, Clone)]
@@ -90,36 +83,14 @@ impl Plugin for CompCorePlugin {
         app.add_plugins(TransformPlugin);
 
         // Register events
-        app.add_event::<UpdateCompositionSizeInputEvent>();
-        app.add_event::<UpdateCompositionViewportInputEvent>();
-        app.add_event::<FocusRootNodesInputEvent>();
-        app.add_event::<UpdateFrameNodeInputEvent>();
-        app.add_event::<UpdateEllipseNodeInputEvent>();
-        app.add_event::<UpdateStarNodeInputEvent>();
-        app.add_event::<UpdatePolygonNodeInputEvent>();
-        app.add_event::<UpdateTextNodeInputEvent>();
-        app.add_event::<UpdateFillStyleInputEvent>();
-        app.add_event::<UpdateStorkeStyleInputEvent>();
-        app.add_event::<UpdateDropShadowStyleInputEvent>();
-        app.add_event::<UpdateSolidPaintInputEvent>();
-        app.add_event::<UpdateGradientPaintInputEvent>();
-        app.add_event::<UpdateImagePaintInputEvent>();
-        app.add_event::<DeleteEntityInputEvent>();
-        app.add_event::<UpdateEntityTransformInputEvent>();
-        app.add_event::<UpdateEntitySizeInputEvent>();
-        app.add_event::<MoveEntityInputEvent>();
-        app.add_event::<UpdateEntityRotationInputEvent>();
-        app.add_event::<UpdateEntityVisibilityInputEvent>();
-        app.add_event::<UpdateEntityCornerRadiiInputEvent>();
-        app.add_event::<UpdateEntityBlendModeInputEvent>();
-        app.add_event::<UpdateEntityOpacityInputEvent>();
+        CoreInputEvent::register_events(app);
 
         // Register resources
         app.init_resource::<LayoutRes>();
         app.init_resource::<TickRes>();
-        #[cfg(not(feature = "dtif"))]
+        app.init_resource::<ReferencerRes>();
         app.insert_resource(CompositionRes {
-            root_nodes: self.root_nodes.clone(),
+            version: self.version.unwrap_or_default(),
             viewport: self.viewport.unwrap_or_default(),
             size: self.size,
         });
@@ -149,12 +120,6 @@ impl Plugin for CompCorePlugin {
                 update_hierarchy_levels.after(collect_first_tick),
             ),
         );
-        // TODO: Create Input Events
-        // Create Assets -> Enity & Components -> Created Output Event
-        // Create Paints -> Enity & Components -> Created Output Event
-        // Create Nodes (with Styles) -> Enity & Components -> Created Output Event
-        // Establish hierarchy
-        //
         app.add_systems(
             Update,
             (
@@ -244,38 +209,3 @@ impl Plugin for CompCorePlugin {
         app.add_systems(Last, despawn_removed_entities_system);
     }
 }
-
-// TODO
-// #[cfg(feature = "dtif")]
-// pub fn insert_dtif_into_world(
-//     world: &mut bevy_ecs::world::World,
-//     dtif_handler: &mut dyn_comp_dtif::dtif_handler::DtifHandler,
-// ) {
-//     use dyn_comp_asset::resources::AssetsRes;
-//     use dyn_comp_bundles::properties::Viewport;
-//     use glam::Vec2;
-
-//     // Load assets
-//     if let Some(mut asset_db) = world.get_resource_mut::<AssetsRes>() {
-//         dtif_handler.load_assets(asset_db.as_mut());
-//     }
-
-//     // Spawn nodes recursively
-//     let maybe_root_node_entity = dtif_handler.insert_into_world(world);
-//     if let Some(root_node_entity) = maybe_root_node_entity {
-//         if let Some(dtif) = dtif_handler.get_dtif() {
-//             world.insert_resource(CompositionRes {
-//                 root_nodes: vec![root_node_entity],
-//                 viewport: dtif.viewport.unwrap_or(Viewport {
-//                     physical_position: Vec2::default(),
-//                     physical_size: dtif.size,
-//                 }),
-//                 size: dtif.size,
-//             });
-//         } else {
-//             panic!("Failed to get DTIF from DTIF-Handler!");
-//         }
-//     } else {
-//         panic!("Failed to insert root node into world!");
-//     }
-// }

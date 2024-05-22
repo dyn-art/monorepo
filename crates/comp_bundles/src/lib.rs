@@ -2,6 +2,7 @@ pub mod components;
 pub mod events;
 pub mod mapper;
 pub mod properties;
+pub mod reference_id;
 pub mod utils;
 
 use crate::components::{
@@ -27,7 +28,10 @@ use components::{
 use dyn_attributed_string::layout::{
     HorizontalTextAlignment, LineWrap, TextSizingMode, VerticalTextAlignment,
 };
-use dyn_comp_asset::asset_id::AssetId;
+use dyn_comp_asset::{
+    asset::{Asset, AssetContent, AssetContentType},
+    asset_id::AssetId,
+};
 use dyn_utils::{
     properties::{color::Color, corner_radii::CornerRadii, opacity::Opacity, size::Size},
     serde::{default_as_false, default_as_true},
@@ -35,7 +39,8 @@ use dyn_utils::{
 };
 use glam::{Vec2, Vec3};
 use mapper::string_to_tiny_skia_path;
-use properties::{ReferenceId, ReferenceIdOrEntity, ReferenceIdOrImageId, TextAttributeInterval};
+use properties::TextAttributeInterval;
+use reference_id::{ReferenceId, ReferenceIdOrEntity, ReferenceIdOrImageId};
 use std::collections::HashMap;
 
 // =============================================================================
@@ -836,6 +841,32 @@ impl DropShadowStyle {
             visibility: VisibilityMixin(self.visible),
             blend_mode: BlendModeMixin(self.blend_mode),
             opacity: OpacityMixin(self.opacity),
+        }
+    }
+}
+
+// =============================================================================
+// Asset
+// =============================================================================
+
+#[derive(Debug, Clone)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type),
+    serde(rename_all = "camelCase")
+)]
+pub struct AssetWithId {
+    #[cfg_attr(feature = "serde_support", serde(default))]
+    pub id: Option<ReferenceId>,
+    pub content: AssetContent,
+    pub content_type: AssetContentType,
+}
+
+impl AssetWithId {
+    pub fn into_asset(self) -> Asset {
+        Asset {
+            content: self.content,
+            content_type: self.content_type,
         }
     }
 }

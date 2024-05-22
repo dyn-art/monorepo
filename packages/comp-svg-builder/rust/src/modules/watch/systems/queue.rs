@@ -47,7 +47,6 @@ pub fn queue_composition_changes(
         output_event_sender_res.push_event(SvgCompOutputEvent::CompositionChange(
             CompositionChangeOutputEvent {
                 size: comp_res.size,
-                root_nodes: comp_res.root_nodes.clone(),
                 viewport: comp_res.viewport,
             },
         ))

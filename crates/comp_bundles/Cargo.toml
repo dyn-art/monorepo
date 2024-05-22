@@ -23,6 +23,7 @@ tracing = []
 dyn-comp-asset = { path = "../comp_asset" }
 dyn-attributed-string = { path = "../attributed_string" }
 dyn-utils = { path = "../utils" }
+bevy_app = { workspace = true }
 bevy_ecs = { workspace = true }
 bevy_hierarchy = { workspace = true }
 bevy_transform = { workspace = true }

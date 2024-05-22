@@ -1,9 +1,9 @@
-use crate::resources::composition::CompositionRes;
+use crate::resources::{composition::CompositionRes, referencer::ReferencerRes};
 use bevy_ecs::{
     entity::Entity,
     event::EventReader,
     query::With,
-    system::{Commands, Query, ResMut},
+    system::{Commands, Query, Res, ResMut},
 };
 use bevy_hierarchy::{BuildChildren, Children, DespawnRecursiveExt};
 use bevy_transform::components::Transform;
@@ -131,91 +131,104 @@ pub fn focus_root_nodes_input_system(
 // =============================================================================
 
 pub fn update_frame_node_input_system(
+    referencer_res: Res<ReferencerRes>,
     mut event_reader: EventReader<UpdateFrameNodeInputEvent>,
     mut query: Query<&mut FrameCompNode>,
 ) {
     for UpdateFrameNodeInputEvent {
-        entity,
+        id,
         clip_content: maybe_clip_content,
     } in event_reader.read()
     {
-        if let Ok(mut frame_comp_node) = query.get_mut(*entity) {
-            if let Some(clip_content) = maybe_clip_content {
-                frame_comp_node.clip_content = *clip_content;
+        if let Some(entity) = id.get_entity(referencer_res.get_reference_id_to_entity_map()) {
+            if let Ok(mut frame_comp_node) = query.get_mut(entity) {
+                if let Some(clip_content) = maybe_clip_content {
+                    frame_comp_node.clip_content = *clip_content;
+                }
             }
         }
     }
 }
 
 pub fn update_ellipse_node_input_system(
+    referencer_res: Res<ReferencerRes>,
     mut event_reader: EventReader<UpdateEllipseNodeInputEvent>,
     mut query: Query<&mut EllipseCompNode>,
 ) {
     for UpdateEllipseNodeInputEvent {
-        entity,
+        id,
         starting_angle: maybe_starting_angle,
         ending_angle: maybe_ending_angle,
         inner_radius_ratio: maybe_inner_radius_ratio,
     } in event_reader.read()
     {
-        if let Ok(mut ellipse_comp_node) = query.get_mut(*entity) {
-            if let Some(starting_angle) = maybe_starting_angle {
-                ellipse_comp_node.arc_data.starting_angle = *starting_angle;
-            }
-            if let Some(ending_angle) = maybe_ending_angle {
-                ellipse_comp_node.arc_data.ending_angle = *ending_angle;
-            }
-            if let Some(inner_radius_ratio) = maybe_inner_radius_ratio {
-                ellipse_comp_node.arc_data.inner_radius_ratio = *inner_radius_ratio;
+        if let Some(entity) = id.get_entity(referencer_res.get_reference_id_to_entity_map()) {
+            if let Ok(mut ellipse_comp_node) = query.get_mut(entity) {
+                if let Some(starting_angle) = maybe_starting_angle {
+                    ellipse_comp_node.arc_data.starting_angle = *starting_angle;
+                }
+                if let Some(ending_angle) = maybe_ending_angle {
+                    ellipse_comp_node.arc_data.ending_angle = *ending_angle;
+                }
+                if let Some(inner_radius_ratio) = maybe_inner_radius_ratio {
+                    ellipse_comp_node.arc_data.inner_radius_ratio = *inner_radius_ratio;
+                }
             }
         }
     }
 }
 
 pub fn update_star_node_input_system(
+    referencer_res: Res<ReferencerRes>,
     mut event_reader: EventReader<UpdateStarNodeInputEvent>,
     mut query: Query<&mut StarCompNode>,
 ) {
     for UpdateStarNodeInputEvent {
-        entity,
+        id,
         point_count: maybe_point_count,
         inner_radius_ratio: maybe_inner_radius_ratio,
     } in event_reader.read()
     {
-        if let Ok(mut star_comp_node) = query.get_mut(*entity) {
-            if let Some(point_count) = maybe_point_count {
-                star_comp_node.point_count = *point_count;
-            }
-            if let Some(inner_radius_ratio) = maybe_inner_radius_ratio {
-                star_comp_node.inner_radius_ratio = *inner_radius_ratio;
+        if let Some(entity) = id.get_entity(referencer_res.get_reference_id_to_entity_map()) {
+            if let Ok(mut star_comp_node) = query.get_mut(entity) {
+                if let Some(point_count) = maybe_point_count {
+                    star_comp_node.point_count = *point_count;
+                }
+                if let Some(inner_radius_ratio) = maybe_inner_radius_ratio {
+                    star_comp_node.inner_radius_ratio = *inner_radius_ratio;
+                }
             }
         }
     }
 }
 
 pub fn update_polygon_node_input_system(
+    referencer_res: Res<ReferencerRes>,
     mut event_reader: EventReader<UpdatePolygonNodeInputEvent>,
     mut query: Query<&mut PolygonCompNode>,
 ) {
     for UpdatePolygonNodeInputEvent {
-        entity,
+        id,
         point_count: maybe_point_count,
     } in event_reader.read()
     {
-        if let Ok(mut polygon_comp_node) = query.get_mut(*entity) {
-            if let Some(point_count) = maybe_point_count {
-                polygon_comp_node.point_count = *point_count;
+        if let Some(entity) = id.get_entity(referencer_res.get_reference_id_to_entity_map()) {
+            if let Ok(mut polygon_comp_node) = query.get_mut(entity) {
+                if let Some(point_count) = maybe_point_count {
+                    polygon_comp_node.point_count = *point_count;
+                }
             }
         }
     }
 }
 
 pub fn update_text_node_input_system(
+    referencer_res: Res<ReferencerRes>,
     mut event_reader: EventReader<UpdateTextNodeInputEvent>,
     mut query: Query<&mut TextCompNode>,
 ) {
     for UpdateTextNodeInputEvent {
-        entity,
+        id,
         text: maybe_text,
         attributes: maybe_attributes,
         line_wrap: maybe_line_wrap,
@@ -224,24 +237,26 @@ pub fn update_text_node_input_system(
         sizing_mode: maybe_sizing_mode,
     } in event_reader.read()
     {
-        if let Ok(mut text_comp_node) = query.get_mut(*entity) {
-            if let Some(text) = maybe_text {
-                text_comp_node.text = text.clone();
-            }
-            if let Some(attributes) = maybe_attributes {
-                text_comp_node.attributes = SmallVec::from_vec(attributes.clone());
-            }
-            if let Some(line_wrap) = maybe_line_wrap {
-                text_comp_node.line_wrap = *line_wrap;
-            }
-            if let Some(horizontal_text_alignment) = maybe_horizontal_text_alignment {
-                text_comp_node.horizontal_text_alignment = *horizontal_text_alignment;
-            }
-            if let Some(vertical_text_alignment) = maybe_vertical_text_alignment {
-                text_comp_node.vertical_text_alignment = *vertical_text_alignment;
-            }
-            if let Some(sizing_mode) = maybe_sizing_mode {
-                text_comp_node.sizing_mode = *sizing_mode;
+        if let Some(entity) = id.get_entity(referencer_res.get_reference_id_to_entity_map()) {
+            if let Ok(mut text_comp_node) = query.get_mut(entity) {
+                if let Some(text) = maybe_text {
+                    text_comp_node.text = text.clone();
+                }
+                if let Some(attributes) = maybe_attributes {
+                    text_comp_node.attributes = SmallVec::from_vec(attributes.clone());
+                }
+                if let Some(line_wrap) = maybe_line_wrap {
+                    text_comp_node.line_wrap = *line_wrap;
+                }
+                if let Some(horizontal_text_alignment) = maybe_horizontal_text_alignment {
+                    text_comp_node.horizontal_text_alignment = *horizontal_text_alignment;
+                }
+                if let Some(vertical_text_alignment) = maybe_vertical_text_alignment {
+                    text_comp_node.vertical_text_alignment = *vertical_text_alignment;
+                }
+                if let Some(sizing_mode) = maybe_sizing_mode {
+                    text_comp_node.sizing_mode = *sizing_mode;
+                }
             }
         }
     }
@@ -252,67 +267,76 @@ pub fn update_text_node_input_system(
 // =============================================================================
 
 pub fn update_fill_style_input_system(
+    referencer_res: Res<ReferencerRes>,
     mut event_reader: EventReader<UpdateFillStyleInputEvent>,
     mut query: Query<&mut PaintChildMixin, With<FillCompStyle>>,
 ) {
     for UpdateFillStyleInputEvent {
-        entity,
+        id,
         paint_id: maybe_paint_id,
     } in event_reader.read()
     {
-        if let Ok(mut paint_child_mixin) = query.get_mut(*entity) {
-            if let Some(paint_id) = maybe_paint_id {
-                paint_child_mixin.0 = Some(*paint_id);
+        if let Some(entity) = id.get_entity(referencer_res.get_reference_id_to_entity_map()) {
+            if let Ok(mut paint_child_mixin) = query.get_mut(entity) {
+                if let Some(paint_id) = maybe_paint_id {
+                    paint_child_mixin.0 = Some(*paint_id);
+                }
             }
         }
     }
 }
 
 pub fn update_storke_style_input_system(
+    referencer_res: Res<ReferencerRes>,
     mut event_reader: EventReader<UpdateStorkeStyleInputEvent>,
     mut query: Query<(&mut StrokeCompStyle, &mut PaintChildMixin), With<StrokeCompStyle>>,
 ) {
     for UpdateStorkeStyleInputEvent {
-        entity,
+        id,
         paint_id: maybe_paint_id,
         width: maybe_width,
     } in event_reader.read()
     {
-        if let Ok((mut stroke_comp_style, mut paint_child_mixin)) = query.get_mut(*entity) {
-            if let Some(paint_id) = maybe_paint_id {
-                paint_child_mixin.0 = Some(*paint_id);
-            }
-            if let Some(width) = maybe_width {
-                stroke_comp_style.stroke.width = width.to_pt();
+        if let Some(entity) = id.get_entity(referencer_res.get_reference_id_to_entity_map()) {
+            if let Ok((mut stroke_comp_style, mut paint_child_mixin)) = query.get_mut(entity) {
+                if let Some(paint_id) = maybe_paint_id {
+                    paint_child_mixin.0 = Some(*paint_id);
+                }
+                if let Some(width) = maybe_width {
+                    stroke_comp_style.stroke.width = width.to_pt();
+                }
             }
         }
     }
 }
 
 pub fn update_drop_shadow_style_input_system(
+    referencer_res: Res<ReferencerRes>,
     mut event_reader: EventReader<UpdateDropShadowStyleInputEvent>,
     mut query: Query<&mut DropShadowCompStyle, With<StrokeCompStyle>>,
 ) {
     for UpdateDropShadowStyleInputEvent {
-        entity,
+        id,
         color: maybe_color,
         position: maybe_position,
         spread: maybe_spread,
         blur: maybe_blur,
     } in event_reader.read()
     {
-        if let Ok(mut drop_shadow_comp_style) = query.get_mut(*entity) {
-            if let Some(color) = maybe_color {
-                drop_shadow_comp_style.color = *color;
-            }
-            if let Some(position) = maybe_position {
-                drop_shadow_comp_style.position = *position;
-            }
-            if let Some(spread) = maybe_spread {
-                drop_shadow_comp_style.spread = *spread;
-            }
-            if let Some(blur) = maybe_blur {
-                drop_shadow_comp_style.blur = *blur;
+        if let Some(entity) = id.get_entity(referencer_res.get_reference_id_to_entity_map()) {
+            if let Ok(mut drop_shadow_comp_style) = query.get_mut(entity) {
+                if let Some(color) = maybe_color {
+                    drop_shadow_comp_style.color = *color;
+                }
+                if let Some(position) = maybe_position {
+                    drop_shadow_comp_style.position = *position;
+                }
+                if let Some(spread) = maybe_spread {
+                    drop_shadow_comp_style.spread = *spread;
+                }
+                if let Some(blur) = maybe_blur {
+                    drop_shadow_comp_style.blur = *blur;
+                }
             }
         }
     }
@@ -323,53 +347,62 @@ pub fn update_drop_shadow_style_input_system(
 // =============================================================================
 
 pub fn update_solid_paint_input_system(
+    referencer_res: Res<ReferencerRes>,
     mut event_reader: EventReader<UpdateSolidPaintInputEvent>,
     mut query: Query<&mut SolidCompPaint>,
 ) {
-    for UpdateSolidPaintInputEvent { entity, color } in event_reader.read() {
-        if let Ok(mut solid_comp_paint) = query.get_mut(*entity) {
-            solid_comp_paint.color = *color;
+    for UpdateSolidPaintInputEvent { id, color } in event_reader.read() {
+        if let Some(entity) = id.get_entity(referencer_res.get_reference_id_to_entity_map()) {
+            if let Ok(mut solid_comp_paint) = query.get_mut(entity) {
+                solid_comp_paint.color = *color;
+            }
         }
     }
 }
 
 pub fn update_image_paint_input_system(
+    referencer_res: Res<ReferencerRes>,
     mut event_reader: EventReader<UpdateImagePaintInputEvent>,
     mut query: Query<(&mut ImageCompPaint, &mut ImageAssetMixin)>,
 ) {
     for UpdateImagePaintInputEvent {
-        entity,
+        id,
         scale_mode: maybe_scale_mode,
         image_id: maybe_image_id,
     } in event_reader.read()
     {
-        if let Ok((mut image_comp_paint, mut image_asset_mixin)) = query.get_mut(*entity) {
-            if let Some(scale_mode) = maybe_scale_mode {
-                image_comp_paint.scale_mode = *scale_mode;
-            }
-            if let Some(image_id) = maybe_image_id {
-                image_asset_mixin.0 = Some(*image_id);
+        if let Some(entity) = id.get_entity(referencer_res.get_reference_id_to_entity_map()) {
+            if let Ok((mut image_comp_paint, mut image_asset_mixin)) = query.get_mut(entity) {
+                if let Some(scale_mode) = maybe_scale_mode {
+                    image_comp_paint.scale_mode = *scale_mode;
+                }
+                if let Some(image_id) = maybe_image_id {
+                    image_asset_mixin.0 = Some(*image_id);
+                }
             }
         }
     }
 }
 
 pub fn update_gradient_paint_input_system(
+    referencer_res: Res<ReferencerRes>,
     mut event_reader: EventReader<UpdateGradientPaintInputEvent>,
     mut query: Query<&mut GradientCompPaint>,
 ) {
     for UpdateGradientPaintInputEvent {
-        entity,
+        id,
         variant: maybe_variant,
         stops: maybe_stops,
     } in event_reader.read()
     {
-        if let Ok(mut gradient_comp_paint) = query.get_mut(*entity) {
-            if let Some(variant) = maybe_variant {
-                gradient_comp_paint.variant = *variant;
-            }
-            if let Some(stops) = maybe_stops {
-                gradient_comp_paint.stops = SmallVec::from_vec(stops.clone());
+        if let Some(entity) = id.get_entity(referencer_res.get_reference_id_to_entity_map()) {
+            if let Ok(mut gradient_comp_paint) = query.get_mut(entity) {
+                if let Some(variant) = maybe_variant {
+                    gradient_comp_paint.variant = *variant;
+                }
+                if let Some(stops) = maybe_stops {
+                    gradient_comp_paint.stops = SmallVec::from_vec(stops.clone());
+                }
             }
         }
     }
@@ -383,18 +416,18 @@ pub fn update_gradient_paint_input_system(
 // https://github.com/bevyengine/bevy/issues/5584
 pub fn delete_entity_input_system(
     mut commands: Commands,
+    referencer_res: Res<ReferencerRes>,
     mut event_reader: EventReader<DeleteEntityInputEvent>,
     children_query: Query<&Children>,
 ) {
-    for event in event_reader.read() {
-        commands
-            .entity(event.entity)
-            .insert(Removed)
-            .remove_parent();
+    for DeleteEntityInputEvent { id } in event_reader.read() {
+        if let Some(entity) = id.get_entity(referencer_res.get_reference_id_to_entity_map()) {
+            commands.entity(entity).insert(Removed).remove_parent();
 
-        if let Ok(children) = children_query.get(event.entity) {
-            for child in children.iter() {
-                commands.entity(*child).insert(Removed);
+            if let Ok(children) = children_query.get(entity) {
+                for child in children.iter() {
+                    commands.entity(*child).insert(Removed);
+                }
             }
         }
     }
@@ -410,135 +443,151 @@ pub fn despawn_removed_entities_system(
 }
 
 pub fn update_entity_transform_input_system(
+    referencer_res: Res<ReferencerRes>,
     mut event_reader: EventReader<UpdateEntityTransformInputEvent>,
     mut query: Query<&mut Transform>,
 ) {
     for UpdateEntityTransformInputEvent {
-        entity,
+        id,
         x: maybe_x,
         y: maybe_y,
         rotation_deg: maybe_rotation_deg,
     } in event_reader.read()
     {
-        if let Ok(mut transform) = query.get_mut(*entity) {
-            if let Some(x) = maybe_x {
-                transform.translation.x = *x;
-            }
-            if let Some(y) = maybe_y {
-                transform.translation.y = *y;
-            }
-            if let Some(rotation_deg) = maybe_rotation_deg {
-                transform.rotation = rotation_deg.to_quat();
+        if let Some(entity) = id.get_entity(referencer_res.get_reference_id_to_entity_map()) {
+            if let Ok(mut transform) = query.get_mut(entity) {
+                if let Some(x) = maybe_x {
+                    transform.translation.x = *x;
+                }
+                if let Some(y) = maybe_y {
+                    transform.translation.y = *y;
+                }
+                if let Some(rotation_deg) = maybe_rotation_deg {
+                    transform.rotation = rotation_deg.to_quat();
+                }
             }
         }
     }
 }
 
 pub fn update_entity_size_input_system(
+    referencer_res: Res<ReferencerRes>,
     mut event_reader: EventReader<UpdateEntitySizeInputEvent>,
     mut query: Query<&mut SizeMixin>,
 ) {
-    for UpdateEntitySizeInputEvent { entity, size } in event_reader.read() {
-        if let Ok(mut size_mixin) = query.get_mut(*entity) {
-            size_mixin.0 = *size;
+    for UpdateEntitySizeInputEvent { id, size } in event_reader.read() {
+        if let Some(entity) = id.get_entity(referencer_res.get_reference_id_to_entity_map()) {
+            if let Ok(mut size_mixin) = query.get_mut(entity) {
+                size_mixin.0 = *size;
+            }
         }
     }
 }
 
 pub fn move_entity_input_system(
+    referencer_res: Res<ReferencerRes>,
     mut event_reader: EventReader<MoveEntityInputEvent>,
     mut query: Query<&mut Transform>,
 ) {
     for MoveEntityInputEvent {
-        entity,
+        id,
         dx: maybe_dx,
         dy: maybe_dy,
     } in event_reader.read()
     {
-        if let Ok(mut transform) = query.get_mut(*entity) {
-            transform.translation +=
-                Vec3::new(maybe_dx.unwrap_or(0.0), maybe_dy.unwrap_or(0.0), 0.0);
+        if let Some(entity) = id.get_entity(referencer_res.get_reference_id_to_entity_map()) {
+            if let Ok(mut transform) = query.get_mut(entity) {
+                transform.translation +=
+                    Vec3::new(maybe_dx.unwrap_or(0.0), maybe_dy.unwrap_or(0.0), 0.0);
+            }
         }
     }
 }
 
 pub fn update_entity_rotation_input_system(
+    referencer_res: Res<ReferencerRes>,
     mut event_reader: EventReader<UpdateEntityRotationInputEvent>,
     mut query: Query<(&mut Transform, &SizeMixin)>,
 ) {
-    for UpdateEntityRotationInputEvent {
-        entity,
-        rotation_deg,
-    } in event_reader.read()
-    {
-        if let Ok((mut transform, SizeMixin(size))) = query.get_mut(*entity) {
-            let pivot_point = Vec3::new(size.width() / 2.0, size.height() / 2.0, 0.0);
-            let reset_rotation_transform_mat4 = rotate_around_point(
-                transform.compute_matrix(),
-                -transform_to_z_rotation_rad(&transform),
-                pivot_point,
-            );
-            let rotation_transform_mat4 = rotate_around_point(
-                reset_rotation_transform_mat4,
-                rotation_deg.to_rad(),
-                pivot_point,
-            );
-            *transform = Transform::from_matrix(rotation_transform_mat4);
+    for UpdateEntityRotationInputEvent { id, rotation_deg } in event_reader.read() {
+        if let Some(entity) = id.get_entity(referencer_res.get_reference_id_to_entity_map()) {
+            if let Ok((mut transform, SizeMixin(size))) = query.get_mut(entity) {
+                let pivot_point = Vec3::new(size.width() / 2.0, size.height() / 2.0, 0.0);
+                let reset_rotation_transform_mat4 = rotate_around_point(
+                    transform.compute_matrix(),
+                    -transform_to_z_rotation_rad(&transform),
+                    pivot_point,
+                );
+                let rotation_transform_mat4 = rotate_around_point(
+                    reset_rotation_transform_mat4,
+                    rotation_deg.to_rad(),
+                    pivot_point,
+                );
+                *transform = Transform::from_matrix(rotation_transform_mat4);
+            }
         }
     }
 }
 
 pub fn update_entity_visibility_input_system(
+    referencer_res: Res<ReferencerRes>,
     mut event_reader: EventReader<UpdateEntityVisibilityInputEvent>,
     mut query: Query<&mut VisibilityMixin>,
 ) {
-    for UpdateEntityVisibilityInputEvent { entity, visible } in event_reader.read() {
-        if let Ok(mut visibility_mixin) = query.get_mut(*entity) {
-            visibility_mixin.0 = *visible;
+    for UpdateEntityVisibilityInputEvent { id, visible } in event_reader.read() {
+        if let Some(entity) = id.get_entity(referencer_res.get_reference_id_to_entity_map()) {
+            if let Ok(mut visibility_mixin) = query.get_mut(entity) {
+                visibility_mixin.0 = *visible;
+            }
         }
     }
 }
 
 pub fn update_entity_corner_radii_input_system(
+    referencer_res: Res<ReferencerRes>,
     mut event_reader: EventReader<UpdateEntityCornerRadiiInputEvent>,
     mut query: Query<&mut CornerRadiiMixin>,
 ) {
-    for UpdateEntityCornerRadiiInputEvent {
-        entity,
-        corner_radii,
-    } in event_reader.read()
-    {
-        if let Ok(mut corner_radii_mixin) = query.get_mut(*entity) {
-            corner_radii_mixin.0 = *corner_radii;
+    for UpdateEntityCornerRadiiInputEvent { id, corner_radii } in event_reader.read() {
+        if let Some(entity) = id.get_entity(referencer_res.get_reference_id_to_entity_map()) {
+            if let Ok(mut corner_radii_mixin) = query.get_mut(entity) {
+                corner_radii_mixin.0 = *corner_radii;
+            }
         }
     }
 }
 
 pub fn update_entity_blend_mode_input_system(
+    referencer_res: Res<ReferencerRes>,
     mut event_reader: EventReader<UpdateEntityBlendModeInputEvent>,
     mut query: Query<&mut BlendModeMixin>,
 ) {
-    for UpdateEntityBlendModeInputEvent { entity, blend_mode } in event_reader.read() {
-        if let Ok(mut blend_mode_mixin) = query.get_mut(*entity) {
-            blend_mode_mixin.0 = *blend_mode;
+    for UpdateEntityBlendModeInputEvent { id, blend_mode } in event_reader.read() {
+        if let Some(entity) = id.get_entity(referencer_res.get_reference_id_to_entity_map()) {
+            if let Ok(mut blend_mode_mixin) = query.get_mut(entity) {
+                blend_mode_mixin.0 = *blend_mode;
+            }
         }
     }
 }
 
 pub fn update_entity_opacity_input_system(
+    referencer_res: Res<ReferencerRes>,
     mut event_reader: EventReader<UpdateEntityOpacityInputEvent>,
     mut query: Query<&mut OpacityMixin>,
     paint_query: Query<&PaintParentMixin, With<CompPaint>>,
 ) {
-    for UpdateEntityOpacityInputEvent { entity, opacity } in event_reader.read() {
-        if let Ok(mut opacity_mixin) = query.get_mut(*entity) {
-            opacity_mixin.0 = *opacity;
-        } else {
-            // TODO: Should Paint be able to update opacity of Style?
-            if let Ok(PaintParentMixin(paint_parent)) = paint_query.get(*entity) {
-                for parent in paint_parent {
-                    if let Ok(mut opacity_mixin) = query.get_mut(*parent) {
-                        opacity_mixin.0 = *opacity;
+    for UpdateEntityOpacityInputEvent { id, opacity } in event_reader.read() {
+        if let Some(entity) = id.get_entity(referencer_res.get_reference_id_to_entity_map()) {
+            if let Ok(mut opacity_mixin) = query.get_mut(entity) {
+                opacity_mixin.0 = *opacity;
+            } else {
+                // TODO: Should Paint be able to update opacity of Style?
+                if let Ok(PaintParentMixin(paint_parent)) = paint_query.get(entity) {
+                    for parent in paint_parent {
+                        if let Ok(mut opacity_mixin) = query.get_mut(*parent) {
+                            opacity_mixin.0 = *opacity;
+                        }
                     }
                 }
             }

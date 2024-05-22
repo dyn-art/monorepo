@@ -1,13 +1,13 @@
-pub mod conversion;
-pub mod events;
-
-use dyn_comp_asset::asset::Asset;
+use bevy_ecs::world::World;
 use dyn_comp_bundles::{
-    properties::{ReferenceIdOrEntity, Viewport},
-    Node, Paint,
+    events::{
+        CoreInputEvent, CreateAssetInputEvent, CreateNodeInputEvent, CreatePaintInputEvent,
+        InputEvent,
+    },
+    properties::{CompVersion, Viewport},
+    AssetWithId, Node, Paint,
 };
 use dyn_utils::properties::size::Size;
-use events::DtifInputEvent;
 
 /// DTIF (Design Tree Interchange Format) utilizes a flat structure for easy readability
 /// and efficient access & manipulation of design elements (Nodes, Paints, ..).
@@ -15,16 +15,15 @@ use events::DtifInputEvent;
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
 #[serde(rename_all = "camelCase")]
 pub struct DtifComposition {
-    /// The version of the composition type declaration.
     #[serde(default)]
-    pub version: Option<String>,
-    /// The size of the composition in pixels.
+    pub version: Option<CompVersion>,
+    /// The absolute size of the composition.
     pub size: Size,
-    /// The viewport defines the area on the render target to which the camera renders its image.
+    /// The viewport of the composition.
     #[serde(default)]
     pub viewport: Option<Viewport>,
     /// The identifier of the root node in the composition.
-    pub root_node_id: ReferenceIdOrEntity,
+    // pub root_node_ids: Vec<ReferenceIdOrEntity>, // TODO: Should be identified by system (e.g. when handling children events)
     /// A list of nodes.
     pub nodes: Vec<Node>,
     /// A list of paints.
@@ -32,8 +31,28 @@ pub struct DtifComposition {
     pub paints: Vec<Paint>,
     /// A list of assets.
     #[serde(default)]
-    pub assets: Vec<Asset>,
+    pub assets: Vec<AssetWithId>,
     // A list of input events.
     #[serde(default)]
-    pub events: Vec<DtifInputEvent>,
+    pub events: Vec<CoreInputEvent>,
+}
+
+impl DtifComposition {
+    pub fn insert_into_world(self, world: &mut World) {
+        for asset in self.assets {
+            world.send_event(CreateAssetInputEvent { asset });
+        }
+
+        for node in self.nodes {
+            world.send_event(CreateNodeInputEvent { node });
+        }
+
+        for paint in self.paints {
+            world.send_event(CreatePaintInputEvent { paint });
+        }
+
+        for event in self.events {
+            event.send_into_world(world);
+        }
+    }
 }
