@@ -22,8 +22,6 @@ pub struct DtifComposition {
     /// The viewport of the composition.
     #[serde(default)]
     pub viewport: Option<Viewport>,
-    /// The identifier of the root node in the composition.
-    // pub root_node_ids: Vec<ReferenceIdOrEntity>, // TODO: Should be identified by system (e.g. when handling children events)
     /// A list of nodes.
     pub nodes: Vec<Node>,
     /// A list of paints.

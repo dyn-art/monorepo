@@ -239,7 +239,6 @@ size: Size;
  */
 viewport?: Viewport | null; 
 /**
- * The identifier of the root node in the composition.
  * A list of nodes.
  */
 nodes: Node[]; 
