@@ -190,7 +190,7 @@ export type Constraint = "Start" | "Center" | "End" | "Stretch" | "Scale"
 
 export type Constraints = { horizontal: Constraint; vertical: Constraint }
 
-export type CoreInputEvent = ({ type: "UpdateCompositionSize" } & UpdateCompositionSizeInputEvent) | ({ type: "UpdateCompositionViewport" } & UpdateCompositionViewportInputEvent) | ({ type: "FocusRootNodes" }) | ({ type: "CreateNode" } & CreateNodeInputEvent) | ({ type: "UpdateFrameNode" } & UpdateFrameNodeInputEvent) | ({ type: "UpdateEllipseNode" } & UpdateEllipseNodeInputEvent) | ({ type: "UpdateStarNode" } & UpdateStarNodeInputEvent) | ({ type: "UpdatePolygonNode" } & UpdatePolygonNodeInputEvent) | ({ type: "UpdateTextNode" } & UpdateTextNodeInputEvent) | ({ type: "CreateStyle" } & CreateStyleInputEvent) | ({ type: "UpdateFillStyle" } & UpdateFillStyleInputEvent) | ({ type: "UpdateStrokeStyle" } & UpdateStorkeStyleInputEvent) | ({ type: "UpdateDropShadowStyle" } & UpdateDropShadowStyleInputEvent) | ({ type: "CreatePaint" } & CreatePaintInputEvent) | ({ type: "UpdateSolidPaint" } & UpdateSolidPaintInputEvent) | ({ type: "UpdateImagePaint" } & UpdateImagePaintInputEvent) | ({ type: "UpdateGradientPaint" } & UpdateGradientPaintInputEvent) | ({ type: "CreateAsset" } & CreateAssetInputEvent) | ({ type: "DeleteEntity" } & DeleteEntityInputEvent) | ({ type: "UpdateEntityTransform" } & UpdateEntityTransformInputEvent) | ({ type: "UpdateEntitySize" } & UpdateEntitySizeInputEvent) | ({ type: "MoveEntity" } & MoveEntityInputEvent) | ({ type: "UpdateEntityRotation" } & UpdateEntityRotationInputEvent) | ({ type: "UpdateEntityVisibility" } & UpdateEntityVisibilityInputEvent) | ({ type: "UpdateEntityCornerRadii" } & UpdateEntityCornerRadiiInputEvent) | ({ type: "UpdateEntityBlendMode" } & UpdateEntityBlendModeInputEvent) | ({ type: "UpdateEntityOpacity" } & UpdateEntityOpacityInputEvent)
+export type CoreInputEvent = ({ type: "UpdateCompositionSize" } & UpdateCompositionSizeInputEvent) | ({ type: "UpdateCompositionViewport" } & UpdateCompositionViewportInputEvent) | ({ type: "FocusRootNodes" }) | ({ type: "CreateNode" } & CreateNodeInputEvent) | ({ type: "UpdateFrameNode" } & UpdateFrameNodeInputEvent) | ({ type: "UpdateEllipseNode" } & UpdateEllipseNodeInputEvent) | ({ type: "UpdateStarNode" } & UpdateStarNodeInputEvent) | ({ type: "UpdatePolygonNode" } & UpdatePolygonNodeInputEvent) | ({ type: "UpdateTextNode" } & UpdateTextNodeInputEvent) | ({ type: "UpdateFillStyle" } & UpdateFillStyleInputEvent) | ({ type: "UpdateStrokeStyle" } & UpdateStorkeStyleInputEvent) | ({ type: "UpdateDropShadowStyle" } & UpdateDropShadowStyleInputEvent) | ({ type: "CreatePaint" } & CreatePaintInputEvent) | ({ type: "UpdateSolidPaint" } & UpdateSolidPaintInputEvent) | ({ type: "UpdateImagePaint" } & UpdateImagePaintInputEvent) | ({ type: "UpdateGradientPaint" } & UpdateGradientPaintInputEvent) | ({ type: "CreateAsset" } & CreateAssetInputEvent) | ({ type: "DeleteEntity" } & DeleteEntityInputEvent) | ({ type: "UpdateEntityTransform" } & UpdateEntityTransformInputEvent) | ({ type: "UpdateEntitySize" } & UpdateEntitySizeInputEvent) | ({ type: "MoveEntity" } & MoveEntityInputEvent) | ({ type: "UpdateEntityRotation" } & UpdateEntityRotationInputEvent) | ({ type: "UpdateEntityVisibility" } & UpdateEntityVisibilityInputEvent) | ({ type: "UpdateEntityCornerRadii" } & UpdateEntityCornerRadiiInputEvent) | ({ type: "UpdateEntityBlendMode" } & UpdateEntityBlendModeInputEvent) | ({ type: "UpdateEntityOpacity" } & UpdateEntityOpacityInputEvent) | ({ type: "UpdateEntityChildren" } & UpdateEntityChildrenInputEvent)
 
 export type CornerRadii = [Angle, Angle, Angle, Angle]
 
@@ -199,8 +199,6 @@ export type CreateAssetInputEvent = { asset: AssetWithId }
 export type CreateNodeInputEvent = { node: Node }
 
 export type CreatePaintInputEvent = { paint: Paint }
-
-export type CreateStyleInputEvent = { style: Style }
 
 export type Cursor = { type: "Default" } | { type: "Grabbing" } | { type: "Crosshair" } | { type: "Resize"; rotationDeg: number } | { type: "Rotate"; rotationDeg: number }
 
@@ -1519,9 +1517,9 @@ export type RectangleNode = { id?: ReferenceId | null; cornerRadii?: CornerRadii
 
 export type ReferenceId = string
 
-export type ReferenceIdOrEntity = { type: "Entity"; value: Entity } | { type: "ReferenceId"; value: ReferenceId }
+export type ReferenceIdOrEntity = { type: "Entity"; entity: Entity } | { type: "ReferenceId"; referenceId: ReferenceId }
 
-export type ReferenceIdOrImageId = { type: "ImageId"; value: { idx: number; version: number } } | { type: "ReferenceId"; value: ReferenceId }
+export type ReferenceIdOrImageId = { type: "ImageId"; imageId: { idx: number; version: number } } | { type: "ReferenceId"; referenceId: ReferenceId }
 
 /**
  * A 32-bit float that implements `Eq`, `Ord` and `Hash`.
@@ -1669,6 +1667,8 @@ export type UpdateDropShadowStyleInputEvent = { id: ReferenceIdOrEntity; color?:
 export type UpdateEllipseNodeInputEvent = { id: ReferenceIdOrEntity; startingAngle?: number | null; endingAngle?: number | null; innerRadiusRatio?: number | null }
 
 export type UpdateEntityBlendModeInputEvent = { id: ReferenceIdOrEntity; blendMode: BlendMode }
+
+export type UpdateEntityChildrenInputEvent = { id: ReferenceIdOrEntity; children: ReferenceIdOrEntity[] }
 
 export type UpdateEntityCornerRadiiInputEvent = { id: ReferenceIdOrEntity; cornerRadii: CornerRadii }
 

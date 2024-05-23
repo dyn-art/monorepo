@@ -39,31 +39,31 @@ type TMakeEventModifiable<T, K extends keyof T, GKey extends string, GValue> = {
 
 export type TMdtifInputEvent<GKey extends string, GValue> =
 	| ({ type: 'UpdateFrameNode' } & TMakeEventModifiable<
-			COMP.UpdateFrameNodeDtifInputEvent,
+			COMP.UpdateFrameNodeInputEvent,
 			'clipContent',
 			GKey,
 			GValue
 	  >)
 	| ({ type: 'UpdateEllipseNode' } & TMakeEventModifiable<
-			COMP.UpdateEllipseNodeDtifInputEvent,
+			COMP.UpdateEllipseNodeInputEvent,
 			'startingAngle' | 'endingAngle' | 'innerRadiusRatio',
 			GKey,
 			GValue
 	  >)
 	| ({ type: 'UpdateStarNode' } & TMakeEventModifiable<
-			COMP.UpdateStarNodeDtifInputEvent,
+			COMP.UpdateStarNodeInputEvent,
 			'pointCount' | 'innerRadiusRatio',
 			GKey,
 			GValue
 	  >)
 	| ({ type: 'UpdatePolygonNode' } & TMakeEventModifiable<
-			COMP.UpdatePolygonNodeDtifInputEvent,
+			COMP.UpdatePolygonNodeInputEvent,
 			'pointCount',
 			GKey,
 			GValue
 	  >)
 	| ({ type: 'UpdateTextNode' } & TMakeEventModifiable<
-			COMP.UpdateTextNodeDtifInputEvent,
+			COMP.UpdateTextNodeInputEvent,
 			| 'text'
 			| 'attributes'
 			| 'lineWrap'
@@ -74,38 +74,38 @@ export type TMdtifInputEvent<GKey extends string, GValue> =
 			GValue
 	  >)
 	| ({ type: 'UpdateSolidPaint' } & TMakeEventModifiable<
-			COMP.UpdateSolidPaintDtifInputEvent,
+			COMP.UpdateSolidPaintInputEvent,
 			'color',
 			GKey,
 			GValue
 	  >)
 	| ({ type: 'UpdateImagePaint' } & TMakeEventModifiable<
-			COMP.UpdateImagePaintDtifInputEvent,
-			'assetId' | 'scaleMode',
+			COMP.UpdateImagePaintInputEvent,
+			'imageId' | 'scaleMode',
 			GKey,
 			GValue
 	  >)
 	| ({ type: 'UpdateGradientPaint' } & TMakeEventModifiable<
-			COMP.UpdateGradientPaintDtifInputEvent,
+			COMP.UpdateGradientPaintInputEvent,
 			'variant' | 'stops',
 			GKey,
 			GValue
 	  >)
-	| ({ type: 'DeleteEntity' } & COMP.DeleteEntityDtifInputEvent)
+	| ({ type: 'DeleteEntity' } & COMP.DeleteEntityInputEvent)
 	| ({ type: 'UpdateEntityPosition' } & TMakeEventModifiable<
-			COMP.UpdateEntityTransformDtifInputEvent,
+			COMP.UpdateEntityTransformInputEvent,
 			'x' | 'y' | 'rotationDeg',
 			GKey,
 			GValue
 	  >)
 	| ({ type: 'MoveEntity' } & TMakeEventModifiable<
-			COMP.MoveEntityDtifInputEvent,
+			COMP.MoveEntityInputEvent,
 			'dx' | 'dy',
 			GKey,
 			GValue
 	  >)
 	| ({ type: 'UpdateEntityRotation' } & TMakeEventModifiable<
-			COMP.UpdateEntityRotationDtifInputEvent,
+			COMP.UpdateEntityRotationInputEvent,
 			'rotationDeg',
 			GKey,
 			GValue
@@ -117,19 +117,19 @@ export type TMdtifInputEvent<GKey extends string, GValue> =
 			GValue
 	  >)
 	| ({ type: 'UpdateEntityCornerRadii' } & TMakeEventModifiable<
-			COMP.UpdateEntityCornerRadiiDtifInputEvent,
+			COMP.UpdateEntityCornerRadiiInputEvent,
 			'cornerRadii',
 			GKey,
 			GValue
 	  >)
 	| ({ type: 'UpdateEntityBlendMode' } & TMakeEventModifiable<
-			COMP.UpdateEntityBlendModeDtifInputEvent,
+			COMP.UpdateEntityBlendModeInputEvent,
 			'blendMode',
 			GKey,
 			GValue
 	  >)
 	| ({ type: 'UpdateEntityOpacity' } & TMakeEventModifiable<
-			COMP.UpdateEntityOpacityDtifInputEvent,
+			COMP.UpdateEntityOpacityInputEvent,
 			'opacity',
 			GKey,
 			GValue

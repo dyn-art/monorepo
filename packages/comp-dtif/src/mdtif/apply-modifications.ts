@@ -61,16 +61,16 @@ export async function applyModifications<
 function toDtifInputEvent<GKey extends string, GValue>(
 	event: TMdtifInputEvent<GKey, GValue>,
 	data: Record<string, any>
-): COMP.DtifInputEvent {
+): COMP.CoreInputEvent {
 	const result = deepReplaceVar(event, data);
-	return result as COMP.DtifInputEvent;
+	return result as COMP.CoreInputEvent;
 }
 
 export type TProcessedFieldAction = TResolvedFieldAction | TUnresolvedFieldAction;
 
 export interface TResolvedFieldAction {
 	resolved: true;
-	events: COMP.DtifInputEvent[];
+	events: COMP.CoreInputEvent[];
 }
 
 export interface TUnresolvedFieldAction {
