@@ -121,13 +121,7 @@ impl Plugin for CompCorePlugin {
         );
 
         // Register systems
-        app.add_systems(
-            First,
-            (
-                collect_first_tick,
-                update_hierarchy_levels.after(collect_first_tick),
-            ),
-        );
+        app.add_systems(First, collect_first_tick);
         app.add_systems(
             Update,
             (
@@ -232,6 +226,7 @@ impl Plugin for CompCorePlugin {
             (
                 add_root_component_system.in_set(CompCoreSystemSet::Last),
                 remove_root_component_system.in_set(CompCoreSystemSet::Last),
+                update_hierarchy_levels.in_set(CompCoreSystemSet::Last),
             ),
         );
         app.add_systems(Last, despawn_removed_entities_system);

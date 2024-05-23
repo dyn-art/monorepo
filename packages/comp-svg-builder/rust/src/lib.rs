@@ -273,21 +273,8 @@ impl SvgCompHandle {
             };
             use dyn_comp_interaction::components::{Locked, Selected};
 
-            let mut system_state: SystemState<
-                Query<
-                    Entity,
-                    (
-                        With<CompNode>,
-                        Or<(
-                            (Without<Root>, With<FrameCompNode>),
-                            (With<Root>, Without<FrameCompNode>),
-                            (Without<Root>, Without<FrameCompNode>),
-                        )>,
-                        Without<Selected>,
-                        Without<Locked>,
-                    ),
-                >,
-            > = SystemState::new(&mut self.app.world);
+            let mut system_state: SystemState<Query<Entity>> =
+                SystemState::new(&mut self.app.world);
             let query = system_state.get(&mut self.app.world);
 
             let entities: Vec<Entity> = query.iter().collect();
