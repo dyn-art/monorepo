@@ -233,7 +233,7 @@ export interface TCompositionConfig {
 }
 
 export interface TInputEventTypeMap {
-	Composition: CoreInputEvent;
+	Core: CoreInputEvent;
 	Interaction: InteractionInputEvent;
 }
 

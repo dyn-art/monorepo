@@ -78,7 +78,8 @@ enum CompCoreSystemSet {
     /// After this label, the system has made modifications based on the outlined composition nodes.
     PostOutline,
 
-    Last,
+    Hierarchy,
+    PostHierarchy,
 }
 
 impl Plugin for CompCorePlugin {
@@ -115,7 +116,8 @@ impl Plugin for CompCorePlugin {
                 CompCoreSystemSet::Prepare,
                 CompCoreSystemSet::Outline,
                 CompCoreSystemSet::PostOutline,
-                CompCoreSystemSet::Last,
+                CompCoreSystemSet::Hierarchy,
+                CompCoreSystemSet::PostHierarchy,
             )
                 .chain(),
         );
@@ -139,9 +141,6 @@ impl Plugin for CompCorePlugin {
                 update_composition_size_input_system.in_set(CompCoreSystemSet::UpdateInputEvents),
                 update_composition_viewport_input_system
                     .in_set(CompCoreSystemSet::UpdateInputEvents),
-                focus_root_nodes_input_system
-                    .in_set(CompCoreSystemSet::UpdateInputEvents)
-                    .after(update_composition_size_input_system),
             ),
         );
         app.add_systems(
@@ -224,9 +223,10 @@ impl Plugin for CompCorePlugin {
         app.add_systems(
             Update,
             (
-                add_root_component_system.in_set(CompCoreSystemSet::Last),
-                remove_root_component_system.in_set(CompCoreSystemSet::Last),
-                update_hierarchy_levels.in_set(CompCoreSystemSet::Last),
+                add_root_component_system.in_set(CompCoreSystemSet::Hierarchy),
+                remove_root_component_system.in_set(CompCoreSystemSet::Hierarchy),
+                update_hierarchy_levels.in_set(CompCoreSystemSet::Hierarchy),
+                focus_root_nodes_input_system.in_set(CompCoreSystemSet::PostHierarchy),
             ),
         );
         app.add_systems(Last, despawn_removed_entities_system);
