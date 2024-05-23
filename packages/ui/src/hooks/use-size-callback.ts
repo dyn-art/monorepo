@@ -11,12 +11,21 @@ export function useSizeCallback<T extends HTMLElement = HTMLElement>(
 			return;
 		}
 
+		const previousSize: TSize = {
+			width: target.offsetWidth,
+			height: target.offsetHeight
+		};
+
 		const updateSize = (): void => {
 			const newSize: TSize = {
 				width: target.offsetWidth,
 				height: target.offsetHeight
 			};
-			callback(newSize);
+			if (newSize.width !== previousSize.width || newSize.height !== previousSize.height) {
+				previousSize.width = newSize.width;
+				previousSize.height = newSize.height;
+				callback(newSize);
+			}
 		};
 
 		updateSize();
