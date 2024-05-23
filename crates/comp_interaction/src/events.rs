@@ -2,6 +2,7 @@ use crate::{
     input::{keyboard::KeyCode, mouse::MouseButton},
     resources::comp_interaction::{InteractionTool, XYWH},
 };
+use bevy_app::App;
 use bevy_ecs::{entity::Entity, event::Event, world::World};
 use dyn_comp_bundles::events::InputEvent;
 use glam::Vec2;
@@ -33,7 +34,27 @@ pub enum InteractionInputEvent {
 }
 
 impl InputEvent for InteractionInputEvent {
-    fn send_into_ecs(self, world: &mut World) {
+    fn register_events(app: &mut App) {
+        // Composition
+        app.add_event::<KeyDownOnCompInputEvent>();
+        app.add_event::<KeyUpOnCompInputEvent>();
+        app.add_event::<CursorEnteredCompInputEvent>();
+        app.add_event::<CursorExitedCompInputEvent>();
+        app.add_event::<CursorMovedOnCompInputEvent>();
+        app.add_event::<CursorDownOnCompInputEvent>();
+        app.add_event::<CursorUpOnCompInputEvent>();
+        app.add_event::<MouseWheeledOnCompInputEvent>();
+
+        // Entity
+        app.add_event::<CursorDownOnEntityInputEvent>();
+
+        // UI
+        app.add_event::<CursorDownOnResizeHandleInputEvent>();
+        app.add_event::<CursorDownOnRotateHandleInputEvent>();
+        app.add_event::<InteractionToolChangedInputEvent>();
+    }
+
+    fn send_into_world(self, world: &mut World) {
         match self {
             // Composition
             Self::KeyDownOnComposition(event) => {

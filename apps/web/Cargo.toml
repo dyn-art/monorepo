@@ -25,7 +25,9 @@ tracing = [
 
 [dependencies]
 dyn-comp-asset = { path = "../../crates/comp_asset" }
-dyn-comp-core = { path = "../../crates/comp_core", features = ["dtif"] }
+dyn-comp-core = { path = "../../crates/comp_core", features = [
+    "serde_support",
+] }
 dyn-comp-dtif = { path = "../../crates/comp_dtif" }
 dyn-comp-bundles = { path = "../../crates/comp_bundles", features = [
     "serde_support",

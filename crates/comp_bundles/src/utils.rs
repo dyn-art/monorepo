@@ -1,4 +1,4 @@
-use bevy_ecs::{entity::Entity, system::Query};
+use bevy_ecs::system::Query;
 use bevy_hierarchy::Parent;
 use bevy_transform::components::{GlobalTransform, Transform};
 use dyn_utils::units::{auto_length::AutoLength, length::Length};

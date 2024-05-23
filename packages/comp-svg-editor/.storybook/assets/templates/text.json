@@ -1,31 +1,10 @@
 {
-	"version": "1.0",
+	"version": "V000001",
 	"size": [500, 500],
-	"rootNodeId": "1",
-	"nodes": {
-		"1": {
-			"type": "Frame",
-			"clipContent": false,
-			"layoutParent": null,
-			"visible": true,
-			"children": ["6", "2"],
-			"size": [500, 500],
-			"translation": [0, 0],
-			"rotationDeg": 0,
-			"cornerRadii": [0, 0, 0, 0],
-			"blendMode": "Normal",
-			"opacity": 1,
-			"layoutElement": {
-				"type": "Absolute",
-				"constraints": { "horizontal": "Start", "vertical": "Start" }
-			},
-			"styles": [
-				{ "type": "Fill", "paintId": "7", "blendMode": "Normal", "opacity": 1, "visible": true }
-			]
-		},
-		"2": {
+	"nodes": [
+		{
 			"type": "Text",
-			"text": "Hello there Jeff! Long line test testtestExtra small",
+			"text": "Hello there Jeff!Extra small",
 			"attributes": [
 				{
 					"start": 0,
@@ -53,7 +32,7 @@
 				},
 				{
 					"start": 16,
-					"end": 41,
+					"end": 17,
 					"attributes": {
 						"fontFamily": { "Named": "Inter" },
 						"fontStretch": 1,
@@ -64,8 +43,8 @@
 					}
 				},
 				{
-					"start": 41,
-					"end": 52,
+					"start": 17,
+					"end": 28,
 					"attributes": {
 						"fontFamily": { "Named": "Inter" },
 						"fontStretch": 1,
@@ -79,9 +58,9 @@
 			"lineWrap": "Word",
 			"horizontalTextAlignment": "Left",
 			"verticalTextAlignment": "Top",
-			"sizingMode": "Height",
+			"sizingMode": "Fixed",
 			"visible": true,
-			"size": [376, 223],
+			"size": [250, 231],
 			"translation": [0, 36],
 			"rotationDeg": 0,
 			"blendMode": "Normal",
@@ -91,34 +70,26 @@
 				"constraints": { "horizontal": "Start", "vertical": "Start" }
 			},
 			"styles": [
-				{ "type": "Fill", "paintId": "5", "blendMode": "Normal", "opacity": 1, "visible": true }
-			]
-		},
-		"6": {
-			"type": "Text",
-			"text": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.",
-			"attributes": [
 				{
-					"start": 0,
-					"end": 591,
-					"attributes": {
-						"fontFamily": { "Named": "Inter" },
-						"fontStretch": 1,
-						"fontStyle": "Normal",
-						"fontWeight": 400,
-						"fontSize": 14,
-						"letterSpacing": { "type": "Em", "value": 0 }
-					}
+					"type": "Fill",
+					"paintId": { "type": "ReferenceId", "referenceId": "p5" },
+					"blendMode": "Normal",
+					"opacity": 1,
+					"visible": true
 				}
 			],
-			"lineWrap": "Word",
-			"horizontalTextAlignment": "Left",
-			"verticalTextAlignment": "Top",
-			"sizingMode": "Height",
+			"id": "n2"
+		},
+		{
+			"type": "Frame",
+			"clipContent": false,
+			"layoutParent": null,
 			"visible": true,
-			"size": [376, 187],
-			"translation": [87, 236],
+			"children": [{ "type": "ReferenceId", "referenceId": "n2" }],
+			"size": [500, 500],
+			"translation": [0, 0],
 			"rotationDeg": 0,
+			"cornerRadii": [0, 0, 0, 0],
 			"blendMode": "Normal",
 			"opacity": 1,
 			"layoutElement": {
@@ -126,31 +97,40 @@
 				"constraints": { "horizontal": "Start", "vertical": "Start" }
 			},
 			"styles": [
-				{ "type": "Fill", "paintId": "5", "blendMode": "Normal", "opacity": 1, "visible": true }
-			]
+				{
+					"type": "Fill",
+					"paintId": { "type": "ReferenceId", "referenceId": "p6" },
+					"blendMode": "Normal",
+					"opacity": 1,
+					"visible": true
+				}
+			],
+			"id": "n1"
 		}
-	},
-	"paints": {
-		"5": { "type": "Solid", "color": [0, 0, 0] },
-		"7": { "type": "Solid", "color": [255, 248, 78] }
-	},
-	"assets": {
-		"3": {
+	],
+	"paints": [
+		{ "type": "Solid", "color": [0, 0, 0], "id": "p5" },
+		{ "type": "Solid", "color": [255, 248, 78], "id": "p6" }
+	],
+	"assets": [
+		{
 			"content": {
 				"type": "Url",
 				"url": "https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfMZhrib2Bg-4.ttf",
 				"contentType": { "mimeType": "font/ttf" }
 			},
-			"contentType": { "type": "Ttf" }
+			"contentType": { "type": "Ttf" },
+			"id": "a3"
 		},
-		"4": {
+		{
 			"content": {
 				"type": "Url",
 				"url": "https://fonts.gstatic.com/s/abeezee/v22/esDT31xSG-6AGleN2tCklZUCGpG-GQ.ttf",
 				"contentType": { "mimeType": "font/ttf" }
 			},
-			"contentType": { "type": "Ttf" }
+			"contentType": { "type": "Ttf" },
+			"id": "a4"
 		}
-	},
+	],
 	"viewport": { "physicalPosition": [0, 0], "physicalSize": [500, 500] }
 }

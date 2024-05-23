@@ -76,7 +76,7 @@ export const SolidPaintInputRow: React.FC<TProps> = (props) => {
 				</div>
 			</AdvancedInput>
 			<AdvancedInput
-				className="no-spinner ml-1 w-16  pl-6 shadow-none"
+				className="no-spinner ml-1 w-16 pl-6 shadow-none"
 				onChange={onAlphaChange}
 				type="number"
 				value={alphaValue}

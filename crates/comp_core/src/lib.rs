@@ -5,34 +5,31 @@ use bevy_app::{App, First, Last, Plugin, Update};
 use bevy_ecs::schedule::{IntoSystemConfigs, IntoSystemSetConfigs, SystemSet};
 use bevy_transform::TransformPlugin;
 use dyn_comp_asset::CompAssetPlugin;
-use dyn_comp_bundles::events::{
-    DeleteEntityInputEvent, FocusRootNodesInputEvent, MoveEntityInputEvent,
-    UpdateCompositionSizeInputEvent, UpdateCompositionViewportInputEvent,
-    UpdateDropShadowStyleInputEvent, UpdateEllipseNodeInputEvent, UpdateEntityBlendModeInputEvent,
-    UpdateEntityCornerRadiiInputEvent, UpdateEntityOpacityInputEvent,
-    UpdateEntityRotationInputEvent, UpdateEntitySizeInputEvent, UpdateEntityTransformInputEvent,
-    UpdateEntityVisibilityInputEvent, UpdateFillStyleInputEvent, UpdateFrameNodeInputEvent,
-    UpdateGradientPaintInputEvent, UpdateImagePaintInputEvent, UpdatePolygonNodeInputEvent,
-    UpdateSolidPaintInputEvent, UpdateStarNodeInputEvent, UpdateStorkeStyleInputEvent,
-    UpdateTextNodeInputEvent,
+use dyn_comp_bundles::{
+    events::{CoreInputEvent, InputEvent},
+    properties::{CompVersion, Viewport},
 };
-use resources::{composition::CompositionRes, layout::LayoutRes, tick::TickRes};
+use dyn_utils::properties::size::Size;
+use resources::{
+    composition::CompositionRes, layout::LayoutRes, referencer::ReferencerRes, tick::TickRes,
+};
 use systems::{
     events::{
+        create_asset_input_system, create_node_input_system, create_paint_input_system,
         delete_entity_input_system, despawn_removed_entities_system, focus_root_nodes_input_system,
         move_entity_input_system, update_composition_size_input_system,
         update_composition_viewport_input_system, update_drop_shadow_style_input_system,
         update_ellipse_node_input_system, update_entity_blend_mode_input_system,
-        update_entity_corner_radii_input_system, update_entity_opacity_input_system,
-        update_entity_rotation_input_system, update_entity_size_input_system,
-        update_entity_transform_input_system, update_entity_visibility_input_system,
-        update_fill_style_input_system, update_frame_node_input_system,
-        update_gradient_paint_input_system, update_image_paint_input_system,
-        update_polygon_node_input_system, update_solid_paint_input_system,
-        update_star_node_input_system, update_storke_style_input_system,
-        update_text_node_input_system,
+        update_entity_children_input_system, update_entity_corner_radii_input_system,
+        update_entity_opacity_input_system, update_entity_rotation_input_system,
+        update_entity_size_input_system, update_entity_transform_input_system,
+        update_entity_visibility_input_system, update_fill_style_input_system,
+        update_frame_node_input_system, update_gradient_paint_input_system,
+        update_image_paint_input_system, update_polygon_node_input_system,
+        update_solid_paint_input_system, update_star_node_input_system,
+        update_storke_style_input_system, update_text_node_input_system,
     },
-    hierarchy::update_hierarchy_levels,
+    hierarchy::{add_root_component_system, remove_root_component_system, update_hierarchy_levels},
     layout::{
         absolute_layout::{apply_pre_absolute_layout_properties, update_absolute_layout},
         static_layout::{
@@ -52,18 +49,17 @@ use systems::{
 };
 
 pub struct CompCorePlugin {
-    #[cfg(not(feature = "dtif"))]
+    pub version: Option<CompVersion>,
     pub size: Size,
-    #[cfg(not(feature = "dtif"))]
     pub viewport: Option<Viewport>,
-    #[cfg(not(feature = "dtif"))]
-    pub root_nodes: Vec<Entity>,
 }
 
 #[derive(SystemSet, Debug, Hash, PartialEq, Eq, Clone)]
 enum CompCoreSystemSet {
     /// After this label, the system has processed input events.
-    InputEvents,
+    PreCreateInputEvents,
+    CreateInputEvents,
+    UpdateInputEvents,
 
     PreCompute,
     Compute,
@@ -81,6 +77,9 @@ enum CompCoreSystemSet {
 
     /// After this label, the system has made modifications based on the outlined composition nodes.
     PostOutline,
+
+    Hierarchy,
+    PostHierarchy,
 }
 
 impl Plugin for CompCorePlugin {
@@ -90,36 +89,14 @@ impl Plugin for CompCorePlugin {
         app.add_plugins(TransformPlugin);
 
         // Register events
-        app.add_event::<UpdateCompositionSizeInputEvent>();
-        app.add_event::<UpdateCompositionViewportInputEvent>();
-        app.add_event::<FocusRootNodesInputEvent>();
-        app.add_event::<UpdateFrameNodeInputEvent>();
-        app.add_event::<UpdateEllipseNodeInputEvent>();
-        app.add_event::<UpdateStarNodeInputEvent>();
-        app.add_event::<UpdatePolygonNodeInputEvent>();
-        app.add_event::<UpdateTextNodeInputEvent>();
-        app.add_event::<UpdateFillStyleInputEvent>();
-        app.add_event::<UpdateStorkeStyleInputEvent>();
-        app.add_event::<UpdateDropShadowStyleInputEvent>();
-        app.add_event::<UpdateSolidPaintInputEvent>();
-        app.add_event::<UpdateGradientPaintInputEvent>();
-        app.add_event::<UpdateImagePaintInputEvent>();
-        app.add_event::<DeleteEntityInputEvent>();
-        app.add_event::<UpdateEntityTransformInputEvent>();
-        app.add_event::<UpdateEntitySizeInputEvent>();
-        app.add_event::<MoveEntityInputEvent>();
-        app.add_event::<UpdateEntityRotationInputEvent>();
-        app.add_event::<UpdateEntityVisibilityInputEvent>();
-        app.add_event::<UpdateEntityCornerRadiiInputEvent>();
-        app.add_event::<UpdateEntityBlendModeInputEvent>();
-        app.add_event::<UpdateEntityOpacityInputEvent>();
+        CoreInputEvent::register_events(app);
 
         // Register resources
         app.init_resource::<LayoutRes>();
         app.init_resource::<TickRes>();
-        #[cfg(not(feature = "dtif"))]
+        app.init_resource::<ReferencerRes>();
         app.insert_resource(CompositionRes {
-            root_nodes: self.root_nodes.clone(),
+            version: self.version.unwrap_or_default(),
             viewport: self.viewport.unwrap_or_default(),
             size: self.size,
         });
@@ -128,7 +105,9 @@ impl Plugin for CompCorePlugin {
         app.configure_sets(
             Update,
             (
-                CompCoreSystemSet::InputEvents,
+                CompCoreSystemSet::PreCreateInputEvents,
+                CompCoreSystemSet::CreateInputEvents,
+                CompCoreSystemSet::UpdateInputEvents,
                 CompCoreSystemSet::PreCompute,
                 CompCoreSystemSet::Compute,
                 CompCoreSystemSet::PreLayout,
@@ -137,71 +116,77 @@ impl Plugin for CompCorePlugin {
                 CompCoreSystemSet::Prepare,
                 CompCoreSystemSet::Outline,
                 CompCoreSystemSet::PostOutline,
+                CompCoreSystemSet::Hierarchy,
+                CompCoreSystemSet::PostHierarchy,
             )
                 .chain(),
         );
 
         // Register systems
+        app.add_systems(First, collect_first_tick);
         app.add_systems(
-            First,
+            Update,
             (
-                collect_first_tick,
-                update_hierarchy_levels.after(collect_first_tick),
+                create_asset_input_system.in_set(CompCoreSystemSet::PreCreateInputEvents),
+                create_paint_input_system
+                    .in_set(CompCoreSystemSet::PreCreateInputEvents)
+                    .after(create_asset_input_system),
+                create_node_input_system.in_set(CompCoreSystemSet::CreateInputEvents),
             ),
         );
         app.add_systems(
             Update,
             (
                 // Composition
-                update_composition_size_input_system.in_set(CompCoreSystemSet::InputEvents),
-                update_composition_viewport_input_system.in_set(CompCoreSystemSet::InputEvents),
-                focus_root_nodes_input_system
-                    .in_set(CompCoreSystemSet::InputEvents)
-                    .after(update_composition_size_input_system),
+                update_composition_size_input_system.in_set(CompCoreSystemSet::UpdateInputEvents),
+                update_composition_viewport_input_system
+                    .in_set(CompCoreSystemSet::UpdateInputEvents),
             ),
         );
         app.add_systems(
             Update,
             (
                 // Node
-                update_frame_node_input_system.in_set(CompCoreSystemSet::InputEvents),
-                update_ellipse_node_input_system.in_set(CompCoreSystemSet::InputEvents),
-                update_star_node_input_system.in_set(CompCoreSystemSet::InputEvents),
-                update_polygon_node_input_system.in_set(CompCoreSystemSet::InputEvents),
-                update_text_node_input_system.in_set(CompCoreSystemSet::InputEvents),
+                update_frame_node_input_system.in_set(CompCoreSystemSet::UpdateInputEvents),
+                update_ellipse_node_input_system.in_set(CompCoreSystemSet::UpdateInputEvents),
+                update_star_node_input_system.in_set(CompCoreSystemSet::UpdateInputEvents),
+                update_polygon_node_input_system.in_set(CompCoreSystemSet::UpdateInputEvents),
+                update_text_node_input_system.in_set(CompCoreSystemSet::UpdateInputEvents),
             ),
         );
         app.add_systems(
             Update,
             (
                 // Style
-                update_fill_style_input_system.in_set(CompCoreSystemSet::InputEvents),
-                update_storke_style_input_system.in_set(CompCoreSystemSet::InputEvents),
-                update_drop_shadow_style_input_system.in_set(CompCoreSystemSet::InputEvents),
+                update_fill_style_input_system.in_set(CompCoreSystemSet::UpdateInputEvents),
+                update_storke_style_input_system.in_set(CompCoreSystemSet::UpdateInputEvents),
+                update_drop_shadow_style_input_system.in_set(CompCoreSystemSet::UpdateInputEvents),
             ),
         );
         app.add_systems(
             Update,
             (
                 // Paint
-                update_solid_paint_input_system.in_set(CompCoreSystemSet::InputEvents),
-                update_image_paint_input_system.in_set(CompCoreSystemSet::InputEvents),
-                update_gradient_paint_input_system.in_set(CompCoreSystemSet::InputEvents),
+                update_solid_paint_input_system.in_set(CompCoreSystemSet::UpdateInputEvents),
+                update_image_paint_input_system.in_set(CompCoreSystemSet::UpdateInputEvents),
+                update_gradient_paint_input_system.in_set(CompCoreSystemSet::UpdateInputEvents),
             ),
         );
         app.add_systems(
             Update,
             (
                 // Entity
-                delete_entity_input_system.in_set(CompCoreSystemSet::InputEvents),
-                update_entity_transform_input_system.in_set(CompCoreSystemSet::InputEvents),
-                update_entity_size_input_system.in_set(CompCoreSystemSet::InputEvents),
-                move_entity_input_system.in_set(CompCoreSystemSet::InputEvents),
-                update_entity_rotation_input_system.in_set(CompCoreSystemSet::InputEvents),
-                update_entity_visibility_input_system.in_set(CompCoreSystemSet::InputEvents),
-                update_entity_corner_radii_input_system.in_set(CompCoreSystemSet::InputEvents),
-                update_entity_blend_mode_input_system.in_set(CompCoreSystemSet::InputEvents),
-                update_entity_opacity_input_system.in_set(CompCoreSystemSet::InputEvents),
+                delete_entity_input_system.in_set(CompCoreSystemSet::UpdateInputEvents),
+                update_entity_transform_input_system.in_set(CompCoreSystemSet::UpdateInputEvents),
+                update_entity_size_input_system.in_set(CompCoreSystemSet::UpdateInputEvents),
+                move_entity_input_system.in_set(CompCoreSystemSet::UpdateInputEvents),
+                update_entity_rotation_input_system.in_set(CompCoreSystemSet::UpdateInputEvents),
+                update_entity_visibility_input_system.in_set(CompCoreSystemSet::UpdateInputEvents),
+                update_entity_corner_radii_input_system
+                    .in_set(CompCoreSystemSet::UpdateInputEvents),
+                update_entity_blend_mode_input_system.in_set(CompCoreSystemSet::UpdateInputEvents),
+                update_entity_opacity_input_system.in_set(CompCoreSystemSet::UpdateInputEvents),
+                update_entity_children_input_system.in_set(CompCoreSystemSet::UpdateInputEvents),
             ),
         );
         app.add_systems(
@@ -235,40 +220,15 @@ impl Plugin for CompCorePlugin {
                 stroke_path_system.in_set(CompCoreSystemSet::PostOutline),
             ),
         );
+        app.add_systems(
+            Update,
+            (
+                add_root_component_system.in_set(CompCoreSystemSet::Hierarchy),
+                remove_root_component_system.in_set(CompCoreSystemSet::Hierarchy),
+                update_hierarchy_levels.in_set(CompCoreSystemSet::Hierarchy),
+                focus_root_nodes_input_system.in_set(CompCoreSystemSet::PostHierarchy),
+            ),
+        );
         app.add_systems(Last, despawn_removed_entities_system);
-    }
-}
-
-#[cfg(feature = "dtif")]
-pub fn insert_dtif_into_world(
-    world: &mut bevy_ecs::world::World,
-    dtif_handler: &mut dyn_comp_dtif::dtif_handler::DtifHandler,
-) {
-    use dyn_comp_asset::resources::AssetsRes;
-    use dyn_comp_bundles::properties::Viewport;
-    use glam::Vec2;
-
-    // Load assets
-    if let Some(mut asset_db) = world.get_resource_mut::<AssetsRes>() {
-        dtif_handler.load_assets(asset_db.as_mut());
-    }
-
-    // Spawn nodes recursively
-    let maybe_root_node_entity = dtif_handler.insert_into_world(world);
-    if let Some(root_node_entity) = maybe_root_node_entity {
-        if let Some(dtif) = dtif_handler.get_dtif() {
-            world.insert_resource(CompositionRes {
-                root_nodes: vec![root_node_entity],
-                viewport: dtif.viewport.unwrap_or(Viewport {
-                    physical_position: Vec2::default(),
-                    physical_size: dtif.size,
-                }),
-                size: dtif.size,
-            });
-        } else {
-            panic!("Failed to get DTIF from DTIF-Handler!");
-        }
-    } else {
-        panic!("Failed to insert root node into world!");
     }
 }

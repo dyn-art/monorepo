@@ -31,7 +31,6 @@ export const TextInput: React.FC<TProps> = (props) => {
 
 			// eslint-disable-next-line @typescript-eslint/no-floating-promises -- ok
 			(async () => {
-				// eslint-disable-next-line @typescript-eslint/await-thenable -- idk
 				const processedActions = await applyModifications(
 					field,
 					{
@@ -43,7 +42,7 @@ export const TextInput: React.FC<TProps> = (props) => {
 
 				for (const processedAction of processedActions) {
 					if (processedAction.resolved) {
-						composition.emitInputEvents('Dtif', processedAction.events);
+						composition.emitInputEvents('Core', processedAction.events);
 						composition.update();
 					} else {
 						setError(processedAction.notMetConditions[0]?.message ?? null);

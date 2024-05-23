@@ -10,14 +10,12 @@ export async function prepareDtifComposition(
 ): Promise<COMP.DtifComposition> {
 	return {
 		...dtif,
-		assets: await resolveAssets(dtif.assets ?? {})
+		assets: await resolveAssets(dtif.assets ?? [])
 	};
 }
 
-async function resolveAssets(
-	assets: Record<string, COMP.Asset>
-): Promise<Record<string, COMP.Asset>> {
-	for (const asset of Object.values(assets)) {
+async function resolveAssets(assets: COMP.Asset[]): Promise<COMP.Asset[]> {
+	for (const asset of assets) {
 		if (asset.content.type === 'Url') {
 			const content = await loadContent(asset.content.url);
 			asset.content = {

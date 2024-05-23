@@ -45,7 +45,7 @@ export const PositionInput: React.FC<TProps> = (props) => {
 
 				for (const processedAction of processedActions) {
 					if (processedAction.resolved) {
-						composition.emitInputEvents('Dtif', processedAction.events);
+						composition.emitInputEvents('Core', processedAction.events);
 						composition.update();
 					} else {
 						setError(processedAction.notMetConditions[0]?.message ?? null);

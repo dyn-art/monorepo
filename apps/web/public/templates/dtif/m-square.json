@@ -1,35 +1,14 @@
 {
 	"template": {
-		"version": "1.0",
+		"version": "V000001",
 		"size": [500, 500],
-		"rootNodeId": "1",
-		"nodes": {
-			"1": {
-				"type": "Frame",
-				"clipContent": false,
-				"layoutParent": null,
-				"visible": true,
-				"children": ["2"],
-				"size": [500, 500],
-				"translation": [0, 0],
-				"rotationDeg": 0,
-				"cornerRadii": [0, 0, 0, 0],
-				"blendMode": "Normal",
-				"opacity": 1,
-				"layoutElement": {
-					"type": "Absolute",
-					"constraints": { "horizontal": "Start", "vertical": "Start" }
-				},
-				"styles": [
-					{ "type": "Fill", "paintId": "5", "blendMode": "Normal", "opacity": 1, "visible": true }
-				]
-			},
-			"2": {
+		"nodes": [
+			{
 				"type": "Rectangle",
 				"visible": true,
 				"size": [100, 100],
 				"translation": [200, 200],
-				"rotationDeg": -3.1805546814635168e-15,
+				"rotationDeg": 0,
 				"cornerRadii": [0, 0, 0, 0],
 				"blendMode": "Normal",
 				"opacity": 1,
@@ -41,46 +20,106 @@
 					{
 						"type": "Stroke",
 						"width": 4,
-						"paintId": "4",
+						"paintId": { "type": "ReferenceId", "referenceId": "p4" },
 						"blendMode": "Normal",
 						"opacity": 1,
 						"visible": true
 					},
-					{ "type": "Fill", "paintId": "3", "blendMode": "Normal", "opacity": 1, "visible": true }
-				]
+					{
+						"type": "Fill",
+						"paintId": { "type": "ReferenceId", "referenceId": "p3" },
+						"blendMode": "Normal",
+						"opacity": 1,
+						"visible": true
+					}
+				],
+				"id": "n2"
+			},
+			{
+				"type": "Frame",
+				"clipContent": false,
+				"layoutParent": null,
+				"visible": true,
+				"children": [{ "type": "ReferenceId", "referenceId": "n2" }],
+				"size": [500, 500],
+				"translation": [0, 0],
+				"rotationDeg": 0,
+				"cornerRadii": [0, 0, 0, 0],
+				"blendMode": "Normal",
+				"opacity": 1,
+				"layoutElement": {
+					"type": "Absolute",
+					"constraints": { "horizontal": "Start", "vertical": "Start" }
+				},
+				"styles": [
+					{
+						"type": "Fill",
+						"paintId": { "type": "ReferenceId", "referenceId": "p5" },
+						"blendMode": "Normal",
+						"opacity": 1,
+						"visible": true
+					}
+				],
+				"id": "n1"
 			}
-		},
-		"paints": {
-			"3": { "type": "Solid", "color": [217, 217, 217] },
-			"4": { "type": "Solid", "color": [0, 0, 0] },
-			"5": { "type": "Solid", "color": [255, 219, 219] }
-		},
-		"assets": {},
+		],
+		"paints": [
+			{ "type": "Solid", "color": [217, 217, 217], "id": "p3" },
+			{ "type": "Solid", "color": [0, 0, 0], "id": "p4" },
+			{ "type": "Solid", "color": [255, 219, 219], "id": "p5" }
+		],
+		"assets": [],
 		"viewport": { "physicalPosition": [0, 0], "physicalSize": [500, 500] }
 	},
 	"modificationFields": [
 		{
 			"key": "pos",
 			"displayName": "Set Position",
-			"inputType": { "type": "POSITION", "default": [200, 200] },
+			"inputVariant": { "type": "POSITION", "default": [200, 200] },
 			"actions": [
 				{
 					"conditions": [
 						{
 							"condition": { ">=": [{ "var": "pos.0" }, 0] },
-							"notMetMessage": "x can not be negative!"
+							"notMetMessage": "X can not be negative!"
 						},
 						{
 							"condition": { ">=": [{ "var": "pos.1" }, 0] },
-							"notMetMessage": "y can not be negative!"
+							"notMetMessage": "Y can not be negative!"
 						}
 					],
 					"events": [
 						{
-							"type": "EntitySetPosition",
-							"entity": "2",
+							"type": "UpdateEntityTransform",
+							"id": { "type": "ReferenceId", "referenceId": "n2" },
 							"x": { "var": "pos.0" },
 							"y": { "var": "pos.1" }
+						}
+					]
+				}
+			]
+		},
+		{
+			"key": "rotation",
+			"displayName": "Set Rotation",
+			"inputVariant": { "type": "NUMBER", "default": 0 },
+			"actions": [
+				{
+					"conditions": [
+						{
+							"condition": { ">=": [{ "var": "rotation" }, 0] },
+							"notMetMessage": "Rotation can not be negative!"
+						},
+						{
+							"condition": { "<=": [{ "var": "rotation" }, 360] },
+							"notMetMessage": "Rotation can not be larger than 360!"
+						}
+					],
+					"events": [
+						{
+							"type": "UpdateEntityRotation",
+							"id": { "type": "ReferenceId", "referenceId": "n2" },
+							"rotationDeg": { "var": "rotation" }
 						}
 					]
 				}

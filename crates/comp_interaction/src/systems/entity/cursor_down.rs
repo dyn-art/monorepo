@@ -133,9 +133,9 @@ pub fn cursor_down_on_entity_system(
                 }
             });
 
-    // Find nodes that could be selected or preselected
-    for (entity, cursor_position) in raycast_entities.iter().rev().copied() {
-        log::info!("[cursor_down_on_entity_system] Entity {:?}", entity,);
+    // Find nodes that could be selected or preselected (from deepest to shallowest)
+    for (entity, cursor_position) in raycast_entities.iter().copied() {
+        log::info!("[cursor_down_on_entity_system] Entity {:?}", entity);
 
         if let Ok((maybe_parent, maybe_hierarchy_level)) = unselected_node_query.get(entity) {
             // Consider selecting preselected node

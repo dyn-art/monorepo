@@ -7,12 +7,8 @@ mod utils;
 
 use bevy_app::{App, Plugin, PreUpdate};
 use bevy_ecs::schedule::{IntoSystemConfigs, IntoSystemSetConfigs, SystemSet};
-use events::{
-    CursorDownOnCompInputEvent, CursorDownOnEntityInputEvent, CursorDownOnResizeHandleInputEvent,
-    CursorDownOnRotateHandleInputEvent, CursorEnteredCompInputEvent, CursorExitedCompInputEvent,
-    CursorMovedOnCompInputEvent, CursorUpOnCompInputEvent, InteractionToolChangedInputEvent,
-    KeyDownOnCompInputEvent, KeyUpOnCompInputEvent, MouseWheeledOnCompInputEvent,
-};
+use dyn_comp_bundles::events::InputEvent;
+use events::InteractionInputEvent;
 use input::{
     keyboard::KeyCodeButtonInput,
     mouse::{
@@ -70,18 +66,7 @@ enum CompInteractionSystemSet {
 impl Plugin for CompInteractionPlugin {
     fn build(&self, app: &mut App) {
         // Register events
-        app.add_event::<KeyDownOnCompInputEvent>();
-        app.add_event::<KeyUpOnCompInputEvent>();
-        app.add_event::<CursorEnteredCompInputEvent>();
-        app.add_event::<CursorExitedCompInputEvent>();
-        app.add_event::<CursorMovedOnCompInputEvent>();
-        app.add_event::<CursorDownOnCompInputEvent>();
-        app.add_event::<CursorUpOnCompInputEvent>();
-        app.add_event::<MouseWheeledOnCompInputEvent>();
-        app.add_event::<CursorDownOnEntityInputEvent>();
-        app.add_event::<CursorDownOnResizeHandleInputEvent>();
-        app.add_event::<CursorDownOnRotateHandleInputEvent>();
-        app.add_event::<InteractionToolChangedInputEvent>();
+        InteractionInputEvent::register_events(app);
 
         // Register resources
         app.init_resource::<CompInteractionRes>();

@@ -1,35 +1,14 @@
 {
 	"template": {
-		"version": "1.0",
+		"version": "V000001",
 		"size": [500, 500],
-		"rootNodeId": "container",
-		"nodes": {
-			"container": {
-				"type": "Frame",
-				"clipContent": false,
-				"layoutParent": null,
-				"visible": true,
-				"children": ["square", "text"],
-				"size": [500, 500],
-				"translation": [0, 0],
-				"rotationDeg": 0,
-				"cornerRadii": [0, 0, 0, 0],
-				"blendMode": "Normal",
-				"opacity": 1,
-				"layoutElement": {
-					"type": "Absolute",
-					"constraints": { "horizontal": "Start", "vertical": "Start" }
-				},
-				"styles": [
-					{ "type": "Fill", "paintId": "red", "blendMode": "Normal", "opacity": 1, "visible": true }
-				]
-			},
-			"square": {
+		"nodes": [
+			{
 				"type": "Rectangle",
 				"visible": true,
 				"size": [100, 100],
 				"translation": [200, 200],
-				"rotationDeg": -3.1805546814635168e-15,
+				"rotationDeg": 0,
 				"cornerRadii": [0, 0, 0, 0],
 				"blendMode": "Normal",
 				"opacity": 1,
@@ -41,46 +20,31 @@
 					{
 						"type": "Stroke",
 						"width": 4,
-						"paintId": "black",
+						"paintId": { "type": "ReferenceId", "referenceId": "p4" },
 						"blendMode": "Normal",
 						"opacity": 1,
 						"visible": true
 					},
 					{
 						"type": "Fill",
-						"paintId": "gray",
+						"paintId": { "type": "ReferenceId", "referenceId": "p3" },
 						"blendMode": "Normal",
 						"opacity": 1,
 						"visible": true
 					}
-				]
-			},
-			"text": {
-				"type": "Text",
-				"text": "Hello there",
-				"attributes": [
-					{
-						"start": 0,
-						"end": 11,
-						"attributes": {
-							"fontFamily": { "Named": "Inter" },
-							"fontStretch": 1,
-							"fontStyle": "Normal",
-							"fontWeight": 500,
-							"fontSize": 14,
-							"letterSpacing": { "type": "Em", "value": 0 },
-							"lineHeight": { "type": "Abs", "value": 24 }
-						}
-					}
 				],
-				"lineWrap": "Word",
-				"horizontalTextAlignment": "Center",
-				"verticalTextAlignment": "Top",
-				"sizingMode": "WidthAndHeight",
+				"id": "n2"
+			},
+			{
+				"type": "Frame",
+				"clipContent": false,
+				"layoutParent": null,
 				"visible": true,
-				"size": [74, 24],
-				"translation": [137, 362],
+				"children": [{ "type": "ReferenceId", "referenceId": "n2" }],
+				"size": [500, 500],
+				"translation": [0, 0],
 				"rotationDeg": 0,
+				"cornerRadii": [0, 0, 0, 0],
 				"blendMode": "Normal",
 				"opacity": 1,
 				"layoutElement": {
@@ -90,29 +54,21 @@
 				"styles": [
 					{
 						"type": "Fill",
-						"paintId": "black",
+						"paintId": { "type": "ReferenceId", "referenceId": "p5" },
 						"blendMode": "Normal",
 						"opacity": 1,
 						"visible": true
 					}
-				]
+				],
+				"id": "n1"
 			}
-		},
-		"paints": {
-			"gray": { "type": "Solid", "color": [217, 217, 217] },
-			"black": { "type": "Solid", "color": [0, 0, 0] },
-			"red": { "type": "Solid", "color": [255, 219, 219] }
-		},
-		"assets": {
-			"interFont": {
-				"content": {
-					"type": "Url",
-					"url": "https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuI6fMZhrib2Bg-4.ttf",
-					"contentType": { "mimeType": "font/ttf" }
-				},
-				"contentType": { "type": "Ttf" }
-			}
-		},
+		],
+		"paints": [
+			{ "type": "Solid", "color": [217, 217, 217], "id": "p3" },
+			{ "type": "Solid", "color": [0, 0, 0], "id": "p4" },
+			{ "type": "Solid", "color": [255, 219, 219], "id": "p5" }
+		],
+		"assets": [],
 		"viewport": { "physicalPosition": [0, 0], "physicalSize": [500, 500] }
 	},
 	"modificationFields": [
@@ -135,7 +91,7 @@
 					"events": [
 						{
 							"type": "UpdateEntityTransform",
-							"entity": "square",
+							"id": { "type": "ReferenceId", "referenceId": "n2" },
 							"x": { "var": "pos.0" },
 							"y": { "var": "pos.1" }
 						}
@@ -162,25 +118,8 @@
 					"events": [
 						{
 							"type": "UpdateEntityRotation",
-							"entity": "square",
+							"id": { "type": "ReferenceId", "referenceId": "n2" },
 							"rotationDeg": { "var": "rotation" }
-						}
-					]
-				}
-			]
-		},
-		{
-			"key": "text",
-			"displayName": "Set Text",
-			"inputVariant": { "type": "TEXT", "default": "Hello World" },
-			"actions": [
-				{
-					"conditions": [],
-					"events": [
-						{
-							"type": "UpdateTextNode",
-							"entity": "text",
-							"text": { "var": "text" }
 						}
 					]
 				}

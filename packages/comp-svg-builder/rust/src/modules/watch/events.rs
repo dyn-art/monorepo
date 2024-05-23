@@ -19,7 +19,6 @@ pub struct SelectionChangeOutputEvent {
 #[derive(Debug, Clone, serde::Serialize, specta::Type)]
 #[serde(rename_all = "camelCase")]
 pub struct CompositionChangeOutputEvent {
-    pub root_nodes: Vec<Entity>,
     pub viewport: Viewport,
     pub size: Size,
 }

@@ -1002,31 +1002,3 @@ pub fn apply_drop_shadow_changes(
         }
     }
 }
-
-#[cfg(test)]
-mod tests {
-    use glam::Vec2;
-
-    #[test]
-    fn it_works() {
-        let size = Vec2::new(1.0, 1.0);
-        let blur = 0.0;
-        let spread = 0.0;
-        let position = Vec2::new(0.0, 0.0);
-
-        let base_pos = Vec2::new(-15.0, -15.0);
-        let base_size = Vec2::new(30.0, 30.0);
-        let blur_pos_factor = blur * -3.0;
-        let blur_size_factor = blur * 6.0;
-        let spread_pos_factor = spread * -3.0;
-        let spread_size_factor = spread * 6.0;
-        let position_size_factor = position * 3.0;
-
-        let new_pos = (base_pos + blur_pos_factor + spread_pos_factor) / size;
-        let new_size =
-            (base_size + blur_size_factor + spread_size_factor + position_size_factor) / size + 1.0;
-
-        assert_eq!(new_pos, Vec2::new(-15.0, -15.0));
-        assert_eq!(new_size, Vec2::new(31.0, 31.0));
-    }
-}

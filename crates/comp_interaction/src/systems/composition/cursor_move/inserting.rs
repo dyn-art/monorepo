@@ -210,7 +210,7 @@ pub fn handle_inserting(
                 variant: CompStyleVariant::Fill,
             },
             fill: FillCompStyle,
-            paint: PaintChildMixin(Some(paint_entity)),
+            paint: PaintChildMixin(paint_entity),
             visibility: VisibilityMixin::default(),
             blend_mode: BlendModeMixin::default(),
             opacity: OpacityMixin::default(),
