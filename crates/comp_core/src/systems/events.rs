@@ -7,14 +7,13 @@ use bevy_ecs::{
 };
 use bevy_hierarchy::{BuildChildren, Children, DespawnRecursiveExt};
 use bevy_transform::components::Transform;
+use dyn_comp_asset::{asset::Asset, resources::AssetsRes};
 use dyn_comp_bundles::{
     components::{
         marker::{Removed, Root},
         mixins::{
-            AbsoluteLayoutElementMixin, BlendModeMixin, CornerRadiiMixin, ImageAssetMixin,
-            LayoutElement, OpacityMixin, PaintChildMixin, PaintParentMixin, SizeMixin,
-            StaticLayoutElementMixin, StaticLayoutParentMixin, StyleChildrenMixin,
-            StyleParentMixin, VisibilityMixin,
+            BlendModeMixin, CornerRadiiMixin, ImageAssetMixin, OpacityMixin, PaintChildMixin,
+            PaintParentMixin, SizeMixin, StyleChildrenMixin, StyleParentMixin, VisibilityMixin,
         },
         nodes::{
             CompNode, EllipseCompNode, FrameCompNode, PolygonCompNode, StarCompNode, TextCompNode,
@@ -23,7 +22,7 @@ use dyn_comp_bundles::{
         styles::{DropShadowCompStyle, FillCompStyle, StrokeCompStyle},
     },
     events::{
-        CreateNodeInputEvent, CreatePaintInputEvent, DeleteEntityInputEvent,
+        CreateAssetInputEvent, CreateNodeInputEvent, CreatePaintInputEvent, DeleteEntityInputEvent,
         FocusRootNodesInputEvent, MoveEntityInputEvent, UpdateCompositionSizeInputEvent,
         UpdateCompositionViewportInputEvent, UpdateDropShadowStyleInputEvent,
         UpdateEllipseNodeInputEvent, UpdateEntityBlendModeInputEvent,
@@ -569,6 +568,29 @@ pub fn update_gradient_paint_input_system(
 }
 
 // =============================================================================
+// Asset
+// =============================================================================
+
+pub fn create_asset_input_system(
+    mut referencer_res: ResMut<ReferencerRes>,
+    mut assets_res: ResMut<AssetsRes>,
+    mut event_reader: EventReader<CreateAssetInputEvent>,
+) {
+    for CreateAssetInputEvent { asset } in event_reader.read() {
+        let maybe_asset_id = assets_res.insert_asset(Asset {
+            content: asset.content.clone(),
+            content_type: asset.content_type,
+        });
+
+        if let Some(id) = asset.id.clone() {
+            if let Some(asset_id) = maybe_asset_id {
+                referencer_res.reference_asset_id(id, asset_id)
+            }
+        }
+    }
+}
+
+// =============================================================================
 // Entity
 // =============================================================================
 
@@ -750,6 +772,32 @@ pub fn update_entity_opacity_input_system(
                         }
                     }
                 }
+            }
+        }
+    }
+}
+
+pub fn update_entity_children_input_system(
+    mut commands: Commands,
+    referencer_res: Res<ReferencerRes>,
+    mut event_reader: EventReader<UpdateEntityChildrenInputEvent>,
+) {
+    for UpdateEntityChildrenInputEvent {
+        id,
+        children: new_children,
+    } in event_reader.read()
+    {
+        if let Some(entity) = id.get_entity(referencer_res.get_reference_id_to_entity_map()) {
+            if let Some(mut entity_commands) = commands.get_entity(entity) {
+                let new_child_entities: Vec<Entity> = new_children
+                    .iter()
+                    .flat_map(|child_id| {
+                        child_id.get_entity(referencer_res.get_reference_id_to_entity_map())
+                    })
+                    .collect();
+
+                entity_commands.clear_children();
+                entity_commands.push_children(&new_child_entities);
             }
         }
     }

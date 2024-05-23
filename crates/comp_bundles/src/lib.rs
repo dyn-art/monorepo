@@ -35,7 +35,7 @@ use dyn_attributed_string::layout::{
 };
 use dyn_comp_asset::{
     asset::{Asset, AssetContent, AssetContentType},
-    asset_id::{AssetId, ImageId},
+    asset_id::ImageId,
 };
 use dyn_utils::{
     properties::{color::Color, corner_radii::CornerRadii, opacity::Opacity, size::Size},
@@ -46,7 +46,6 @@ use glam::{Vec2, Vec3};
 use mapper::string_to_tiny_skia_path;
 use properties::TextAttributeInterval;
 use reference_id::{ReferenceId, ReferenceIdOrEntity, ReferenceIdOrImageId};
-use std::collections::HashMap;
 
 // =============================================================================
 // Node

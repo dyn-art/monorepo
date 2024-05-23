@@ -15,11 +15,12 @@ use resources::{
 };
 use systems::{
     events::{
-        create_node_input_system, create_paint_input_system, delete_entity_input_system,
-        despawn_removed_entities_system, focus_root_nodes_input_system, move_entity_input_system,
-        update_composition_size_input_system, update_composition_viewport_input_system,
-        update_drop_shadow_style_input_system, update_ellipse_node_input_system,
-        update_entity_blend_mode_input_system, update_entity_corner_radii_input_system,
+        create_asset_input_system, create_node_input_system, create_paint_input_system,
+        delete_entity_input_system, despawn_removed_entities_system, focus_root_nodes_input_system,
+        move_entity_input_system, update_composition_size_input_system,
+        update_composition_viewport_input_system, update_drop_shadow_style_input_system,
+        update_ellipse_node_input_system, update_entity_blend_mode_input_system,
+        update_entity_children_input_system, update_entity_corner_radii_input_system,
         update_entity_opacity_input_system, update_entity_rotation_input_system,
         update_entity_size_input_system, update_entity_transform_input_system,
         update_entity_visibility_input_system, update_fill_style_input_system,
@@ -28,7 +29,7 @@ use systems::{
         update_solid_paint_input_system, update_star_node_input_system,
         update_storke_style_input_system, update_text_node_input_system,
     },
-    hierarchy::update_hierarchy_levels,
+    hierarchy::{add_root_component_system, remove_root_component_system, update_hierarchy_levels},
     layout::{
         absolute_layout::{apply_pre_absolute_layout_properties, update_absolute_layout},
         static_layout::{
@@ -76,6 +77,8 @@ enum CompCoreSystemSet {
 
     /// After this label, the system has made modifications based on the outlined composition nodes.
     PostOutline,
+
+    Last,
 }
 
 impl Plugin for CompCorePlugin {
@@ -112,6 +115,7 @@ impl Plugin for CompCorePlugin {
                 CompCoreSystemSet::Prepare,
                 CompCoreSystemSet::Outline,
                 CompCoreSystemSet::PostOutline,
+                CompCoreSystemSet::Last,
             )
                 .chain(),
         );
@@ -127,7 +131,10 @@ impl Plugin for CompCorePlugin {
         app.add_systems(
             Update,
             (
-                create_paint_input_system.in_set(CompCoreSystemSet::PreCreateInputEvents),
+                create_asset_input_system.in_set(CompCoreSystemSet::PreCreateInputEvents),
+                create_paint_input_system
+                    .in_set(CompCoreSystemSet::PreCreateInputEvents)
+                    .after(create_asset_input_system),
                 create_node_input_system.in_set(CompCoreSystemSet::CreateInputEvents),
             ),
         );
@@ -186,6 +193,7 @@ impl Plugin for CompCorePlugin {
                     .in_set(CompCoreSystemSet::UpdateInputEvents),
                 update_entity_blend_mode_input_system.in_set(CompCoreSystemSet::UpdateInputEvents),
                 update_entity_opacity_input_system.in_set(CompCoreSystemSet::UpdateInputEvents),
+                update_entity_children_input_system.in_set(CompCoreSystemSet::UpdateInputEvents),
             ),
         );
         app.add_systems(
@@ -217,6 +225,13 @@ impl Plugin for CompCorePlugin {
                 outline_polygon.in_set(CompCoreSystemSet::Outline),
                 outline_text.in_set(CompCoreSystemSet::Outline),
                 stroke_path_system.in_set(CompCoreSystemSet::PostOutline),
+            ),
+        );
+        app.add_systems(
+            Update,
+            (
+                add_root_component_system.in_set(CompCoreSystemSet::Last),
+                remove_root_component_system.in_set(CompCoreSystemSet::Last),
             ),
         );
         app.add_systems(Last, despawn_removed_entities_system);
