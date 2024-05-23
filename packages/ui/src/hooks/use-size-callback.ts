@@ -11,9 +11,9 @@ export function useSizeCallback<T extends HTMLElement = HTMLElement>(
 			return;
 		}
 
-		const previousSize: TSize = {
-			width: target.offsetWidth,
-			height: target.offsetHeight
+		const previousSize: Partial<TSize> = {
+			width: undefined,
+			height: undefined
 		};
 
 		const updateSize = (): void => {
