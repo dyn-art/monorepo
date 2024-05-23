@@ -1,0 +1,200 @@
+{
+	"version": "V000001",
+	"size": [500, 500],
+	"nodes": [
+		{
+			"type": "Rectangle",
+			"visible": true,
+			"size": [62.3837890625, 57.83243179321289],
+			"translation": [-0.9683448076248169, 0.0026043120305985212],
+			"rotationDeg": -2.4848083448933725e-17,
+			"cornerRadii": [0, 0, 0, 0],
+			"blendMode": "Normal",
+			"opacity": 1,
+			"layoutElement": {
+				"type": "Absolute",
+				"constraints": { "horizontal": "Start", "vertical": "Start" }
+			},
+			"styles": [
+				{
+					"type": "Fill",
+					"paintId": { "type": "ReferenceId", "referenceId": "p5" },
+					"blendMode": "Normal",
+					"opacity": 1,
+					"visible": true
+				}
+			],
+			"id": "n4"
+		},
+		{
+			"type": "Rectangle",
+			"visible": true,
+			"size": [62.3837890625, 57.83243179321289],
+			"translation": [92.6166763305664, 74.75118255615234],
+			"rotationDeg": -2.4848083448933725e-17,
+			"cornerRadii": [0, 0, 0, 0],
+			"blendMode": "Normal",
+			"opacity": 1,
+			"layoutElement": {
+				"type": "Absolute",
+				"constraints": { "horizontal": "Start", "vertical": "Start" }
+			},
+			"styles": [
+				{
+					"type": "Fill",
+					"paintId": { "type": "ReferenceId", "referenceId": "p5" },
+					"blendMode": "Normal",
+					"opacity": 1,
+					"visible": true
+				}
+			],
+			"id": "n6"
+		},
+		{
+			"type": "Frame",
+			"clipContent": true,
+			"layoutParent": null,
+			"visible": true,
+			"children": [
+				{ "type": "ReferenceId", "referenceId": "n6" },
+				{ "type": "ReferenceId", "referenceId": "n4" }
+			],
+			"size": [177.68675231933594, 158.522705078125],
+			"translation": [0.7400339245796204, 0],
+			"rotationDeg": 0.15409359198708994,
+			"cornerRadii": [0, 0, 0, 0],
+			"blendMode": "Normal",
+			"opacity": 1,
+			"layoutElement": {
+				"type": "Absolute",
+				"constraints": { "horizontal": "Start", "vertical": "Start" }
+			},
+			"styles": [
+				{
+					"type": "Fill",
+					"paintId": { "type": "ReferenceId", "referenceId": "p7" },
+					"blendMode": "Normal",
+					"opacity": 1,
+					"visible": true
+				}
+			],
+			"id": "n3"
+		},
+		{
+			"type": "Rectangle",
+			"visible": true,
+			"size": [81.22559356689453, 83.8462905883789],
+			"translation": [-0.9683448076248169, 0.0026043120305985212],
+			"rotationDeg": -2.4848083448933725e-17,
+			"cornerRadii": [0, 0, 0, 0],
+			"blendMode": "Normal",
+			"opacity": 1,
+			"layoutElement": {
+				"type": "Absolute",
+				"constraints": { "horizontal": "Start", "vertical": "Start" }
+			},
+			"styles": [
+				{
+					"type": "Fill",
+					"paintId": { "type": "ReferenceId", "referenceId": "p5" },
+					"blendMode": "Normal",
+					"opacity": 1,
+					"visible": true
+				}
+			],
+			"id": "n9"
+		},
+		{
+			"type": "Frame",
+			"clipContent": true,
+			"layoutParent": null,
+			"visible": true,
+			"children": [{ "type": "ReferenceId", "referenceId": "n9" }],
+			"size": [177.68675231933594, 158.522705078125],
+			"translation": [190.42633056640625, 178],
+			"rotationDeg": 0.15409359198708994,
+			"cornerRadii": [0, 0, 0, 0],
+			"blendMode": "Normal",
+			"opacity": 1,
+			"layoutElement": {
+				"type": "Absolute",
+				"constraints": { "horizontal": "Start", "vertical": "Start" }
+			},
+			"styles": [
+				{
+					"type": "Fill",
+					"paintId": { "type": "ReferenceId", "referenceId": "p7" },
+					"blendMode": "Normal",
+					"opacity": 1,
+					"visible": true
+				}
+			],
+			"id": "n8"
+		},
+		{
+			"type": "Frame",
+			"clipContent": true,
+			"layoutParent": null,
+			"visible": true,
+			"children": [
+				{ "type": "ReferenceId", "referenceId": "n8" },
+				{ "type": "ReferenceId", "referenceId": "n3" }
+			],
+			"size": [394, 356],
+			"translation": [64, 65],
+			"rotationDeg": 0,
+			"cornerRadii": [0, 0, 0, 0],
+			"blendMode": "Normal",
+			"opacity": 1,
+			"layoutElement": {
+				"type": "Absolute",
+				"constraints": { "horizontal": "Start", "vertical": "Start" }
+			},
+			"styles": [
+				{
+					"type": "Fill",
+					"paintId": { "type": "ReferenceId", "referenceId": "p10" },
+					"blendMode": "Normal",
+					"opacity": 1,
+					"visible": true
+				}
+			],
+			"id": "n2"
+		},
+		{
+			"type": "Frame",
+			"clipContent": false,
+			"layoutParent": null,
+			"visible": true,
+			"children": [{ "type": "ReferenceId", "referenceId": "n2" }],
+			"size": [500, 500],
+			"translation": [0, 0],
+			"rotationDeg": 0,
+			"cornerRadii": [0, 0, 0, 0],
+			"blendMode": "Normal",
+			"opacity": 1,
+			"layoutElement": {
+				"type": "Absolute",
+				"constraints": { "horizontal": "Start", "vertical": "Start" }
+			},
+			"styles": [
+				{
+					"type": "Fill",
+					"paintId": { "type": "ReferenceId", "referenceId": "p11" },
+					"blendMode": "Normal",
+					"opacity": 1,
+					"visible": true
+				}
+			],
+			"id": "n1"
+		}
+	],
+	"paints": [
+		{ "type": "Solid", "color": [217, 217, 217], "id": "p5" },
+		{ "type": "Solid", "color": [6, 243, 30], "id": "p7" },
+		{ "type": "Solid", "color": [243, 6, 6], "id": "p10" },
+		{ "type": "Solid", "color": [255, 248, 78], "id": "p11" }
+	],
+	"assets": [],
+	"viewport": { "physicalPosition": [0, 0], "physicalSize": [500, 500] }
+}
