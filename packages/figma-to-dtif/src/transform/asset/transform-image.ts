@@ -9,7 +9,7 @@ export async function transformImageAsset(
 	asset: TToTransformImageAsset,
 	nodeIds: SceneNode['id'][],
 	config: TTransformImageAssetConfig
-): Promise<COMP.Asset> {
+): Promise<COMP.AssetWithId> {
 	const { export: exportConfig } = config;
 	const { hash: imageHash } = asset;
 

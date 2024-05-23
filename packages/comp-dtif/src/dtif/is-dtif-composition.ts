@@ -14,6 +14,6 @@ export function isDtifComposition(value: unknown): value is COMP.DtifComposition
 		Array.isArray(obj.nodes) &&
 		obj.nodes.every((node) => typeof node === 'object') &&
 		Array.isArray(obj.paints) &&
-		obj.paints.every((node) => typeof node === 'object')
+		obj.paints.every((paint) => typeof paint === 'object')
 	);
 }

@@ -17,7 +17,7 @@ export function createDtifStyles(
 		(fill) =>
 			({
 				type: 'Fill',
-				paintId: fill.paintId.toString(),
+				paintId: { type: 'ReferenceId', referenceId: `p${fill.paintId}` },
 				blendMode: mapFigmaBlendModeToDtif(fill.blendMode),
 				opacity: fill.opacity,
 				visible: fill.visible
@@ -30,7 +30,7 @@ export function createDtifStyles(
 		const strokeStyle: COMP.Style = {
 			type: 'Stroke',
 			width: stroke.width,
-			paintId: stroke.paintId.toString(),
+			paintId: { type: 'ReferenceId', referenceId: `p${stroke.paintId}` },
 			blendMode: mapFigmaBlendModeToDtif(stroke.blendMode),
 			opacity: stroke.opacity,
 			visible: stroke.visible

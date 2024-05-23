@@ -9,7 +9,7 @@ export async function transformFontAsset(
 	asset: TToTransformFontAsset,
 	nodeIds: SceneNode['id'][],
 	config: TTransformFontAssetConfig
-): Promise<COMP.Asset> {
+): Promise<COMP.AssetWithId> {
 	const { export: exportConfig, resolveFontContent } = config;
 	const { info: fontInfo } = asset;
 

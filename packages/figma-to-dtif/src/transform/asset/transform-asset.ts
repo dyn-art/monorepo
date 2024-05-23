@@ -7,7 +7,7 @@ import { transformImageAsset, type TTransformImageAssetConfig } from './transfor
 export async function transformAsset(
 	toTransformAsset: TToTransformAsset,
 	config: TTransformAssetConfig
-): Promise<COMP.Asset> {
+): Promise<COMP.AssetWithId> {
 	const asset = toTransformAsset.asset;
 	switch (asset.type) {
 		case 'Image':

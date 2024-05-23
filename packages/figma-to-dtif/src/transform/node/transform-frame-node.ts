@@ -25,7 +25,7 @@ export function transformFrameNode(
 		clipContent: node.clipsContent,
 		layoutParent: mapFigmaParentLayoutToDtif(node),
 		visible: node.visible,
-		children: childrenIds.map((childId) => childId.toString()),
+		children: childrenIds.map((childId) => ({ type: 'ReferenceId', referenceId: `n${childId}` })),
 		size: [node.width, node.height],
 		translation: mapFigmaTransformToTranslation(node.relativeTransform),
 		rotationDeg: mapFigmaTransformToRotation(node.relativeTransform),
