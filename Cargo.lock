@@ -857,7 +857,6 @@ dependencies = [
  "dyn-attributed-string",
  "dyn-comp-asset",
  "dyn-comp-bundles",
- "dyn-comp-dtif",
  "dyn-utils",
  "glam",
  "hashbrown",
