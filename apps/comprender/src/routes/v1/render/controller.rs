@@ -119,7 +119,7 @@ pub async fn render_composition(
 async fn prepare_dtif_composition(
     dtif_composition: &mut DtifComposition,
 ) -> Result<(), reqwest::Error> {
-    for asset in dtif_composition.assets.values_mut() {
+    for asset in dtif_composition.assets.iter_mut() {
         let mut maybe_content = None;
         if let AssetContent::Url { url } = &asset.content {
             maybe_content = Some(reqwest::get(url).await?.bytes().await?.to_vec());
@@ -136,7 +136,16 @@ fn build_svg_string(dtif: DtifComposition) -> Result<String, AppError> {
     let mut app = App::new();
 
     // Register plugins
-    app.add_plugins((CompCorePlugin { dtif }, CompSvgBuilderPlugin {}));
+    app.add_plugins((
+        CompCorePlugin {
+            version: dtif.version,
+            size: dtif.size,
+            viewport: dtif.viewport,
+        },
+        CompSvgBuilderPlugin {},
+    ));
+
+    dtif.insert_into_world(&mut app.world);
 
     // Update app once
     app.update();
