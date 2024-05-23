@@ -38,7 +38,7 @@ export const Viewport: React.FC<TViewportProps> = (props) => {
 					</Button>
 					<Button
 						onClick={() => {
-							composition.emitInputEvent('Composition', { type: 'FocusRootNodes' });
+							composition.emitInputEvent('Core', { type: 'FocusRootNodes' });
 							composition.update();
 						}}
 					>
