@@ -11,6 +11,7 @@ export interface TGradientPaint {
 	type: 'Gradient';
 	variant: TGradientVariant;
 	stops: TGradientColorStop[];
+	opacity: number;
 }
 
 export interface TGradientColorStop {

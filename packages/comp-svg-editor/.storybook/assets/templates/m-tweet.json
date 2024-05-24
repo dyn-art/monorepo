@@ -24,7 +24,8 @@
 					"paintId": { "type": "ReferenceId", "referenceId": "p6" },
 					"blendMode": "Normal",
 					"opacity": 1,
-					"visible": true
+					"visible": true,
+					"id": "s5"
 				}
 			],
 			"id": "n5"
@@ -758,6 +759,34 @@
 							"type": "UpdateEntityOpacity",
 							"id": { "type": "ReferenceId", "referenceId": "s1" },
 							"opacity": { "var": "backgroundColor.alpha" }
+						}
+					]
+				}
+			]
+		},
+		{
+			"key": "profilePicture",
+			"displayName": "Profile Picture",
+			"inputVariant": {
+				"type": "PAINT",
+				"default": { "paint": { "type": "Solid", "color": [255, 219, 219] }, "opacity": 1 }
+			},
+			"actions": [
+				{
+					"conditions": [],
+					"compute": {
+						"args": ["profilePicture"],
+						"body": "return { paint: { ...profilePicture.paint, id: 'p6' }, opacity: profilePicture.opacity }"
+					},
+					"events": [
+						{
+							"type": "CreatePaint",
+							"paint": { "var": "profilePicture.paint" }
+						},
+						{
+							"type": "UpdateEntityOpacity",
+							"id": { "type": "ReferenceId", "referenceId": "s5" },
+							"opacity": { "var": "profilePicture.opacity" }
 						}
 					]
 				}

@@ -15,6 +15,7 @@ export * from './is-rgb-color';
 export * from './is-valid-alpha';
 export * from './is-valid-u8';
 export * from './json-function';
+export * from './mat3-to-array';
 export * from './multiply-vec2';
 export * from './not-empty';
 export * from './pick-properties';

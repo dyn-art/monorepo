@@ -72,6 +72,12 @@ export type TMdtifInputEvent<GKey extends string, GValue> =
 			GKey,
 			GValue
 	  >)
+	| ({ type: 'CreatePaint' } & TMakeEventModifiable<
+			COMP.CreatePaintInputEvent,
+			'paint',
+			GKey,
+			GValue
+	  >)
 	| ({ type: 'UpdateSolidPaint' } & TMakeEventModifiable<
 			COMP.UpdateSolidPaintInputEvent,
 			'color',
@@ -139,6 +145,7 @@ export type TModificationInputVariant =
 	| TTextModificationInput
 	| TBooleanModificationInput
 	| TRangeModificationInput
+	| TPaintModificationInput
 	| TColorModificationInput
 	| TPositionModificationInput
 	| TDateTimeModificationInput;
@@ -179,18 +186,18 @@ export interface TColorModificationInput {
 	default: TRgbaColor;
 }
 
+export interface TPaintModificationInput {
+	type: 'PAINT';
+	_returnType?: { paint: COMP.Paint; opacity: number };
+	default: { paint: COMP.Paint; opacity: number };
+}
+
 export interface TPositionModificationInput {
 	type: 'POSITION';
 	_returnType?: TVec2;
 	default: TVec2;
 	max?: TVec2;
 	min?: TVec2;
-}
-
-export interface TImageModificationInput {
-	type: 'IMAGE';
-	_returnType?: string;
-	default?: string;
 }
 
 export interface TDateTimeModificationInput {

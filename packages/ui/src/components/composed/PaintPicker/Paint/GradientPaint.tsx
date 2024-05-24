@@ -5,7 +5,7 @@ import type { TGradientPaint } from '../types';
 
 export const GradientPaint: React.FC<TProps> = (props) => {
 	const {
-		paint: { variant, stops },
+		paint: { variant, stops, opacity },
 		size,
 		...other
 	} = props;
@@ -77,7 +77,7 @@ export const GradientPaint: React.FC<TProps> = (props) => {
 	return (
 		<svg {...other} height={size[1]} width={size[0]}>
 			<defs>{GradientElement}</defs>
-			<rect fill={`url(#${gradientId})`} height={size[1]} width={size[0]} />
+			<rect fill={`url(#${gradientId})`} height={size[1]} opacity={opacity} width={size[0]} />
 		</svg>
 	);
 };

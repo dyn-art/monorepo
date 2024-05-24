@@ -3,16 +3,17 @@
 import React from 'react';
 
 import { Popover, PopoverContent, PopoverTrigger } from '../../layout';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../primitive';
+import { Tabs, TabsList, TabsTrigger } from '../../primitive';
+import { GradientPaintTab } from './GradientPaintTab';
 import { InputRow } from './InputRow';
-import { Paint } from './Paint';
-import { GRADIENT_COLORS as GRADIENT_PAINTS } from './presets';
 import { SolidPaintTab } from './SolidPaintTab';
 import type { TPaint } from './types';
 
 export * from './ColorInputGrid';
 export * from './GradientPaintInputRow';
 export * from './SolidPaintInputRow';
+export * from './helper';
+export * from './presets';
 export * from './types';
 
 export const PaintPicker: React.FC<TPaintPickerProps> = (props) => {
@@ -43,24 +44,8 @@ export const PaintPicker: React.FC<TPaintPickerProps> = (props) => {
 						</TabsList>
 					) : null}
 
-					<SolidPaintTab onPaintUpdate={onPaintUpdate} paint={paint} />
-
-					<TabsContent className="mt-0 flex flex-wrap gap-1" value="Gradient">
-						<div className="flex flex-wrap gap-1">
-							{GRADIENT_PAINTS.map((gradientPaint) => (
-								<button
-									className="cursor-pointer overflow-hidden rounded-md active:scale-105"
-									key={gradientPaint.stops.map((stop) => stop.color).join('-')}
-									onClick={() => {
-										onPaintUpdate(gradientPaint);
-									}}
-									type="button"
-								>
-									<Paint paint={gradientPaint} size={[24, 24]} />
-								</button>
-							))}
-						</div>
-					</TabsContent>
+					<SolidPaintTab inheritOpacity onPaintUpdate={onPaintUpdate} paint={paint} />
+					<GradientPaintTab onPaintUpdate={onPaintUpdate} paint={paint} />
 				</Tabs>
 			</PopoverContent>
 		</Popover>

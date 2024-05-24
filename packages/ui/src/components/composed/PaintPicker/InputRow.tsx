@@ -21,7 +21,11 @@ export const InputRow = React.forwardRef<HTMLDivElement, TProps>((props, forward
 					paint={paint}
 				/>
 			) : (
-				<GradientPaintInputRow onPopoverTriggerClick={onClick} paint={paint} />
+				<GradientPaintInputRow
+					onPaintUpdate={onPaintUpdate}
+					onPopoverTriggerClick={onClick}
+					paint={paint}
+				/>
 			)}
 		</div>
 	);

@@ -5,6 +5,7 @@ import type {
 	TDateTimeModificationInput,
 	TModificationField,
 	TNumberModificationInput,
+	TPaintModificationInput,
 	TPositionModificationInput,
 	TRangeModificationInput,
 	TTextModificationInput
@@ -15,6 +16,7 @@ import { BooleanInput } from './BooleanInput';
 import { ColorInput } from './ColorInput';
 import { DateTimeInput } from './DateTimeInput';
 import { NumberInput } from './NumberInput';
+import { PaintInput } from './PaintInput';
 import { PositionInput } from './PositionInput';
 import { RangeInput } from './RangeInput';
 import { TextInput } from './TextInput';
@@ -79,6 +81,14 @@ export const ModificationField: React.FC<TProps> = (props) => {
 					key={field.key}
 				/>
 			);
+		case 'PAINT':
+			return (
+				<PaintInput
+					composition={composition}
+					field={field as TModificationField<string, TPaintModificationInput>}
+					key={field.key}
+				/>
+			);
 		case 'DATETIME':
 			return (
 				<DateTimeInput
@@ -87,8 +97,6 @@ export const ModificationField: React.FC<TProps> = (props) => {
 					key={field.key}
 				/>
 			);
-		default:
-			return <p>Coming Soon</p>;
 	}
 };
 
