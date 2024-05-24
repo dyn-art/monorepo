@@ -74,14 +74,34 @@ pub fn insert_style_svg_bundle(
                     if let Ok((paint, maybe_gradient_paint, maybe_image_paint)) =
                         paint_query.get(paint_entity)
                     {
-                        get_fill_style_bundle_variant(
-                            entity,
-                            &mut svg_context_res,
-                            style.variant,
-                            paint.variant,
-                            maybe_gradient_paint,
-                            maybe_image_paint,
-                        )
+                        match (style.variant, paint.variant) {
+                            (
+                                CompStyleVariant::Fill | CompStyleVariant::Stroke,
+                                CompPaintVariant::Solid,
+                            ) => Some(SvgBundleVariant::SolidFill(SolidFillStyleSvgBundle::new(
+                                entity,
+                                &mut svg_context_res,
+                            ))),
+                            (
+                                CompStyleVariant::Fill | CompStyleVariant::Stroke,
+                                CompPaintVariant::Gradient,
+                            ) => Some(SvgBundleVariant::GradientFill(
+                                GradientFillStyleSvgBundle::new(
+                                    entity,
+                                    maybe_gradient_paint.unwrap().variant,
+                                    &mut svg_context_res,
+                                ),
+                            )),
+                            (
+                                CompStyleVariant::Fill | CompStyleVariant::Stroke,
+                                CompPaintVariant::Image,
+                            ) => Some(SvgBundleVariant::ImageFill(ImageFillStyleSvgBundle::new(
+                                entity,
+                                maybe_image_paint.unwrap().scale_mode,
+                                &mut svg_context_res,
+                            ))),
+                            _ => None,
+                        }
                     } else {
                         None
                     }
@@ -102,36 +122,6 @@ pub fn insert_style_svg_bundle(
                 style.variant
             );
         }
-    }
-}
-
-pub fn get_fill_style_bundle_variant(
-    entity: Entity,
-    mut svg_context_res: &mut ResMut<SvgContextRes>,
-    style_variant: CompStyleVariant,
-    paint_variant: CompPaintVariant,
-    maybe_gradient_paint: Option<&GradientCompPaint>,
-    maybe_image_paint: Option<&ImageCompPaint>,
-) -> Option<SvgBundleVariant> {
-    match (style_variant, paint_variant) {
-        (CompStyleVariant::Fill | CompStyleVariant::Stroke, CompPaintVariant::Solid) => Some(
-            SvgBundleVariant::SolidFill(SolidFillStyleSvgBundle::new(entity, &mut svg_context_res)),
-        ),
-        (CompStyleVariant::Fill | CompStyleVariant::Stroke, CompPaintVariant::Gradient) => Some(
-            SvgBundleVariant::GradientFill(GradientFillStyleSvgBundle::new(
-                entity,
-                maybe_gradient_paint.unwrap().variant,
-                &mut svg_context_res,
-            )),
-        ),
-        (CompStyleVariant::Fill | CompStyleVariant::Stroke, CompPaintVariant::Image) => {
-            Some(SvgBundleVariant::ImageFill(ImageFillStyleSvgBundle::new(
-                entity,
-                maybe_image_paint.unwrap().scale_mode,
-                &mut svg_context_res,
-            )))
-        }
-        _ => None,
     }
 }
 
