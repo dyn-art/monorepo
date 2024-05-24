@@ -1,3 +1,4 @@
+mod debug;
 pub mod resources;
 mod systems;
 

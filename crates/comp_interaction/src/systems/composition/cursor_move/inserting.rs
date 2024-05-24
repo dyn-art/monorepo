@@ -210,12 +210,12 @@ pub fn handle_inserting(
                 variant: CompStyleVariant::Fill,
             },
             fill: FillCompStyle,
-            paint: PaintChildMixin(paint_entity),
             visibility: VisibilityMixin::default(),
             blend_mode: BlendModeMixin::default(),
             opacity: OpacityMixin::default(),
         });
-        fill_style_entity_commands.insert(StyleParentMixin(node_entity));
+        fill_style_entity_commands
+            .insert((StyleParentMixin(node_entity), PaintChildMixin(paint_entity)));
         let fill_style_entity = fill_style_entity_commands.id();
 
         // Reference style entity in paint

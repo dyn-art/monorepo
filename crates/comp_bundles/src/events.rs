@@ -348,22 +348,24 @@ pub struct UpdateTextNodeInputEvent {
 #[derive(Event, Debug, Clone)]
 #[cfg_attr(
     feature = "serde_support",
-    derive(serde::Serialize, serde::Deserialize, specta::Type)
+    derive(serde::Serialize, serde::Deserialize, specta::Type),
+    serde(rename_all = "camelCase")
 )]
 pub struct UpdateFillStyleInputEvent {
     pub id: ReferenceIdOrEntity,
-    pub paint_id: Option<Entity>,
+    pub paint_id: Option<ReferenceIdOrEntity>,
 }
 
 #[derive(Event, Debug, Clone)]
 #[cfg_attr(
     feature = "serde_support",
-    derive(serde::Serialize, serde::Deserialize, specta::Type)
+    derive(serde::Serialize, serde::Deserialize, specta::Type),
+    serde(rename_all = "camelCase")
 )]
 pub struct UpdateStorkeStyleInputEvent {
     pub id: ReferenceIdOrEntity,
     #[cfg_attr(feature = "serde_support", serde(default))]
-    pub paint_id: Option<Entity>,
+    pub paint_id: Option<ReferenceIdOrEntity>,
     #[cfg_attr(feature = "serde_support", serde(default))]
     pub width: Option<Abs>,
 }
