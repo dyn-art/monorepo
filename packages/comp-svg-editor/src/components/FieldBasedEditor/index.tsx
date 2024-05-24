@@ -10,7 +10,7 @@ export const FieldBasedEditor: React.FC<TFieldBasedEditorProps> = (props) => {
 	const { mdtif } = props;
 	const [composition, setComposition] = React.useState<Composition | null>(null);
 	const viewportRef = React.useRef<HTMLDivElement>(null);
-	const { data: preparedDtif, isLoading: isPreparingDtif } = usePreparedDtif(mdtif?.template);
+	const { data: preparedDtif, isLoading: isPreparingDtif } = usePreparedDtif(mdtif);
 
 	useSizeCallback(
 		viewportRef,

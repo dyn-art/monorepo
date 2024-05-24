@@ -12,8 +12,11 @@ export function isDtifComposition(value: unknown): value is COMP.DtifComposition
 		typeof obj.size[0] === 'number' &&
 		typeof obj.size[1] === 'number' &&
 		Array.isArray(obj.nodes) &&
+		obj.nodes.length > 0 &&
 		obj.nodes.every((node) => typeof node === 'object') &&
-		Array.isArray(obj.paints) &&
-		obj.paints.every((paint) => typeof paint === 'object')
+		(obj.paints == null ||
+			(Array.isArray(obj.paints) && obj.paints.every((paint) => typeof paint === 'object'))) &&
+		(obj.assets == null ||
+			(Array.isArray(obj.assets) && obj.assets.every((asset) => typeof asset === 'object')))
 	);
 }

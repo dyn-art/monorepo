@@ -3,8 +3,7 @@ import type { TJsonFunction, TRgbaColor, TVec2 } from '@dyn/utils';
 
 import type { COMP } from '../comp';
 
-export interface TMdtifComposition {
-	template: COMP.DtifComposition;
+export interface TMdtifComposition extends COMP.DtifComposition {
 	modificationFields: TModificationField[];
 }
 

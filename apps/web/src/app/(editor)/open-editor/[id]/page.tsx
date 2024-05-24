@@ -10,21 +10,14 @@ const Page = async (props: TProps): Promise<React.ReactNode> => {
 	} = props;
 	const dtif = await getStaticDtif(id);
 
-	if (isDtifComposition(dtif)) {
+	if (isMdtifComposition(dtif)) {
 		const preparedDtif = await prepareDtifComposition(dtif);
 		return <EditorWrapper dtif={preparedDtif} />;
 	}
 
-	if (isMdtifComposition(dtif)) {
-		const preparedDtif = await prepareDtifComposition(dtif.template);
-		return (
-			<EditorWrapper
-				dtif={{
-					...dtif,
-					template: preparedDtif
-				}}
-			/>
-		);
+	if (isDtifComposition(dtif)) {
+		const preparedDtif = await prepareDtifComposition(dtif);
+		return <EditorWrapper dtif={preparedDtif} />;
 	}
 
 	return (
