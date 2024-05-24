@@ -747,9 +747,12 @@
 					},
 					"events": [
 						{
-							"type": "UpdateSolidPaint",
-							"id": { "type": "ReferenceId", "referenceId": "p25" },
-							"color": { "var": "backgroundColor.rgb" }
+							"type": "CreatePaint",
+							"paint": {
+								"type": "Solid",
+								"id": "p25",
+								"color": { "var": "backgroundColor.rgb" }
+							}
 						},
 						{
 							"type": "UpdateEntityOpacity",

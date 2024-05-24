@@ -19,7 +19,7 @@ use dyn_comp_bundles::{
             CompNode, EllipseCompNode, FrameCompNode, PolygonCompNode, StarCompNode, TextCompNode,
         },
         paints::{CompPaint, GradientCompPaint, ImageCompPaint, SolidCompPaint},
-        styles::{CompStyle, DropShadowCompStyle, FillCompStyle, StrokeCompStyle},
+        styles::{DropShadowCompStyle, FillCompStyle, StrokeCompStyle},
     },
     events::{
         CreateAssetInputEvent, CreateNodeInputEvent, CreatePaintInputEvent, DeleteEntityInputEvent,
@@ -407,6 +407,7 @@ pub fn update_fill_style_input_system(
             if let Ok(mut paint_child_mixin) = query.get_mut(entity) {
                 if let Some(paint_id) = maybe_paint_id {
                     paint_child_mixin.0 = *paint_id;
+                    // TODO: Update paint parent mixin?
                 }
             }
         }
@@ -479,6 +480,38 @@ pub fn create_paint_input_system(
     mut event_reader: EventReader<CreatePaintInputEvent>,
 ) {
     for CreatePaintInputEvent { paint } in event_reader.read() {
+        let maybe_paint_id = match paint {
+            Paint::Solid(p) => p.id.clone(),
+            Paint::Gradient(p) => p.id.clone(),
+            Paint::Image(p) => p.id.clone(),
+        };
+
+        // Replace paint if it already exists
+        if let Some(prev_paint_entity) = maybe_paint_id
+            .as_ref()
+            .and_then(|paint_id| referencer_res.get_entity(paint_id))
+            .copied()
+        {
+            let mut entity_commands = commands.entity(prev_paint_entity);
+
+            // Remove components and only retain components to inherit
+            entity_commands.retain::<PaintParentMixin>();
+
+            // Insert new components
+            match paint {
+                Paint::Solid(p) => entity_commands.insert(p.to_bundle()),
+                Paint::Gradient(p) => entity_commands.insert(p.to_bundle()),
+                Paint::Image(p) => entity_commands.insert(
+                    p.to_bundle(
+                        p.image_id
+                            .get_image_id(referencer_res.get_reference_id_to_asset_id_map()),
+                    ),
+                ),
+            };
+
+            return;
+        }
+
         // Spawn paint
         let mut paint_entity_commands = match paint {
             Paint::Solid(p) => p.spawn(&mut commands),
@@ -494,11 +527,6 @@ pub fn create_paint_input_system(
         paint_entity_commands.insert(PaintParentMixin(SmallVec::new()));
 
         // Reference paint entity
-        let maybe_paint_id = match paint {
-            Paint::Solid(p) => p.id.clone(),
-            Paint::Gradient(p) => p.id.clone(),
-            Paint::Image(p) => p.id.clone(),
-        };
         if let Some(paint_id) = maybe_paint_id {
             referencer_res.reference_entity(paint_id, paint_entity);
         }

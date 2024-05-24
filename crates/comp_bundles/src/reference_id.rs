@@ -27,6 +27,14 @@ pub enum ReferenceIdOrEntity {
 }
 
 impl ReferenceIdOrEntity {
+    pub fn entity(entity: Entity) -> Self {
+        Self::Entity { entity }
+    }
+
+    pub fn reference_id(reference_id: ReferenceId) -> Self {
+        Self::ReferenceId { reference_id }
+    }
+
     pub fn get_entity(
         &self,
         reference_id_to_entity: &HashMap<ReferenceId, Entity>,
@@ -54,6 +62,14 @@ pub enum ReferenceIdOrImageId {
 }
 
 impl ReferenceIdOrImageId {
+    pub fn image_id(image_id: ImageId) -> Self {
+        Self::ImageId { image_id }
+    }
+
+    pub fn reference_id(reference_id: ReferenceId) -> Self {
+        Self::ReferenceId { reference_id }
+    }
+
     pub fn get_image_id(
         &self,
         reference_id_to_asset_id: &HashMap<ReferenceId, AssetId>,
