@@ -5,7 +5,7 @@ use bevy_ecs::{
     query::With,
     system::{Commands, Query, Res, ResMut},
 };
-use bevy_hierarchy::{BuildChildren, Children, DespawnRecursiveExt};
+use bevy_hierarchy::{BuildChildren, Children};
 use bevy_transform::components::Transform;
 use dyn_comp_asset::{asset::Asset, resources::AssetsRes};
 use dyn_comp_bundles::{
@@ -19,7 +19,7 @@ use dyn_comp_bundles::{
             CompNode, EllipseCompNode, FrameCompNode, PolygonCompNode, StarCompNode, TextCompNode,
         },
         paints::{CompPaint, GradientCompPaint, ImageCompPaint, SolidCompPaint},
-        styles::{DropShadowCompStyle, FillCompStyle, StrokeCompStyle},
+        styles::{CompStyle, DropShadowCompStyle, FillCompStyle, StrokeCompStyle},
     },
     events::{
         CreateAssetInputEvent, CreateNodeInputEvent, CreatePaintInputEvent, DeleteEntityInputEvent,
@@ -612,15 +612,6 @@ pub fn delete_entity_input_system(
                 }
             }
         }
-    }
-}
-
-pub fn despawn_removed_entities_system(
-    mut commands: Commands,
-    query: Query<Entity, With<Removed>>,
-) {
-    for entity in query.iter() {
-        commands.entity(entity).despawn_recursive();
     }
 }
 

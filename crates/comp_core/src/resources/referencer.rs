@@ -42,11 +42,11 @@ impl ReferencerRes {
         self.reference_id_to_asset_id.get(reference_id)
     }
 
-    pub fn remove_entity(&mut self, reference_id: &ReferenceId) {
-        self.reference_id_to_entity.remove(reference_id);
+    pub fn remove_by_entity(&mut self, entity: &Entity) {
+        self.reference_id_to_entity.retain(|_, v| *v != *entity);
     }
 
-    pub fn remove_asset_id(&mut self, reference_id: &ReferenceId) {
-        self.reference_id_to_asset_id.remove(reference_id);
+    pub fn remove_by_asset_id(&mut self, asset_id: &AssetId) {
+        self.reference_id_to_asset_id.retain(|_, v| *v != *asset_id);
     }
 }
