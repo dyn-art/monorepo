@@ -1,4 +1,6 @@
-import React, { useEffect, useState } from 'react';
+'use client';
+
+import React from 'react';
 import type { TVec2 } from '@dyn/utils';
 
 import type { TImagePaint } from '../types';
@@ -6,9 +8,9 @@ import type { TImagePaint } from '../types';
 export const ImagePaint: React.FC<TProps> = (props) => {
 	const { paint, size, ...other } = props;
 	const { content, opacity } = paint;
-	const [imageUrl, setImageUrl] = useState<string | null>(null);
+	const [imageUrl, setImageUrl] = React.useState<string | null>(null);
 
-	useEffect(() => {
+	React.useEffect(() => {
 		if (content != null) {
 			const blob = new Blob([new Uint8Array(content)], { type: 'image/png' });
 			const url = URL.createObjectURL(blob);

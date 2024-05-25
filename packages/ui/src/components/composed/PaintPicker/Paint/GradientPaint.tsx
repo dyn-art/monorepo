@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import { extractStartEndPointFromMat3, rgbaToRgb, shortId, type TVec2 } from '@dyn/utils';
 
