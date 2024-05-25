@@ -16,21 +16,21 @@ const queryClient = new QueryClient();
 export const EditorWrapper: React.FC<TProps> = (props) => {
 	const { dtif } = props;
 
-	if (isDtifComposition(dtif)) {
-		return (
-			<Container className="h-screen" size="full" tag="main">
-				<QueryClientProvider client={queryClient}>
-					<Editor dtif={dtif} />
-				</QueryClientProvider>
-			</Container>
-		);
-	}
-
 	if (isMdtifComposition(dtif)) {
 		return (
 			<Container size="default" tag="main">
 				<QueryClientProvider client={queryClient}>
 					<FieldBasedEditor mdtif={dtif} />
+				</QueryClientProvider>
+			</Container>
+		);
+	}
+
+	if (isDtifComposition(dtif)) {
+		return (
+			<Container className="h-screen" size="full" tag="main">
+				<QueryClientProvider client={queryClient}>
+					<Editor dtif={dtif} />
 				</QueryClientProvider>
 			</Container>
 		);
