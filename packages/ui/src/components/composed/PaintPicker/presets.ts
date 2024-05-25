@@ -14,7 +14,14 @@ export const SOLID_PAINTS: TSolidPaint[] = [
 export const GRADIENT_PAINTS: TGradientPaint[] = [
 	{
 		type: 'Gradient',
-		variant: { type: 'Linear' },
+		variant: {
+			type: 'Linear',
+			transform: [
+				[1, 0, 0],
+				[0, 1, 0],
+				[0, 0, 1]
+			]
+		},
 		stops: [
 			{ position: 0, color: [172, 203, 238, 1] }, // #accbee
 			{ position: 1, color: [231, 240, 253, 1] } // #e7f0fd
@@ -23,7 +30,14 @@ export const GRADIENT_PAINTS: TGradientPaint[] = [
 	},
 	{
 		type: 'Gradient',
-		variant: { type: 'Linear' },
+		variant: {
+			type: 'Linear',
+			transform: [
+				[1, 0, 0],
+				[0, 1, 0],
+				[0, 0, 1]
+			]
+		},
 		stops: [
 			{ position: 0, color: [213, 212, 208, 1] }, // #d5d4d0
 			{ position: 1, color: [238, 238, 236, 1] } // #eeeeec
@@ -32,7 +46,14 @@ export const GRADIENT_PAINTS: TGradientPaint[] = [
 	},
 	{
 		type: 'Gradient',
-		variant: { type: 'Linear' },
+		variant: {
+			type: 'Linear',
+			transform: [
+				[1, 0, 0],
+				[0, 1, 0],
+				[0, 0, 1]
+			]
+		},
 		stops: [
 			{ position: 0, color: [0, 0, 0, 1] }, // #000000
 			{ position: 1, color: [67, 67, 67, 1] } // #434343
@@ -41,7 +62,14 @@ export const GRADIENT_PAINTS: TGradientPaint[] = [
 	},
 	{
 		type: 'Gradient',
-		variant: { type: 'Linear' },
+		variant: {
+			type: 'Linear',
+			transform: [
+				[1, 0, 0],
+				[0, 1, 0],
+				[0, 0, 1]
+			]
+		},
 		stops: [
 			{ position: 0, color: [9, 32, 63, 1] }, // #09203f
 			{ position: 1, color: [83, 120, 149, 1] } // #537895
@@ -50,7 +78,14 @@ export const GRADIENT_PAINTS: TGradientPaint[] = [
 	},
 	{
 		type: 'Gradient',
-		variant: { type: 'Linear' },
+		variant: {
+			type: 'Linear',
+			transform: [
+				[1, 0, 0],
+				[0, 1, 0],
+				[0, 0, 1]
+			]
+		},
 		stops: [
 			{ position: 0, color: [172, 50, 228, 1] }, // #AC32E4
 			{ position: 1, color: [121, 24, 242, 1] }, // #7918F2
@@ -60,7 +95,14 @@ export const GRADIENT_PAINTS: TGradientPaint[] = [
 	},
 	{
 		type: 'Gradient',
-		variant: { type: 'Linear' },
+		variant: {
+			type: 'Linear',
+			transform: [
+				[1, 0, 0],
+				[0, 1, 0],
+				[0, 0, 1]
+			]
+		},
 		stops: [
 			{ position: 0, color: [249, 83, 198, 1] }, // #f953c6
 			{ position: 1, color: [185, 29, 115, 1] } // #b91d73
@@ -69,7 +111,14 @@ export const GRADIENT_PAINTS: TGradientPaint[] = [
 	},
 	{
 		type: 'Gradient',
-		variant: { type: 'Linear' },
+		variant: {
+			type: 'Linear',
+			transform: [
+				[1, 0, 0],
+				[0, 1, 0],
+				[0, 0, 1]
+			]
+		},
 		stops: [
 			{ position: 0, color: [238, 9, 121, 1] }, // #ee0979
 			{ position: 1, color: [255, 106, 0, 1] } // #ff6a00
@@ -78,7 +127,14 @@ export const GRADIENT_PAINTS: TGradientPaint[] = [
 	},
 	{
 		type: 'Gradient',
-		variant: { type: 'Linear' },
+		variant: {
+			type: 'Linear',
+			transform: [
+				[1, 0, 0],
+				[0, 1, 0],
+				[0, 0, 1]
+			]
+		},
 		stops: [
 			{ position: 0, color: [240, 0, 0, 1] }, // #F00000
 			{ position: 1, color: [220, 40, 30, 1] } // #DC281E
@@ -87,7 +143,14 @@ export const GRADIENT_PAINTS: TGradientPaint[] = [
 	},
 	{
 		type: 'Gradient',
-		variant: { type: 'Linear' },
+		variant: {
+			type: 'Linear',
+			transform: [
+				[1, 0, 0],
+				[0, 1, 0],
+				[0, 0, 1]
+			]
+		},
 		stops: [
 			{ position: 0, color: [0, 198, 255, 1] }, // #00c6ff
 			{ position: 1, color: [0, 114, 255, 1] } // #0072ff
@@ -96,7 +159,14 @@ export const GRADIENT_PAINTS: TGradientPaint[] = [
 	},
 	{
 		type: 'Gradient',
-		variant: { type: 'Linear' },
+		variant: {
+			type: 'Linear',
+			transform: [
+				[1, 0, 0],
+				[0, 1, 0],
+				[0, 0, 1]
+			]
+		},
 		stops: [
 			{ position: 0, color: [79, 172, 254, 1] }, // #4facfe
 			{ position: 1, color: [0, 242, 254, 1] } // #00f2fe
@@ -105,7 +175,14 @@ export const GRADIENT_PAINTS: TGradientPaint[] = [
 	},
 	{
 		type: 'Gradient',
-		variant: { type: 'Linear' },
+		variant: {
+			type: 'Linear',
+			transform: [
+				[1, 0, 0],
+				[0, 1, 0],
+				[0, 0, 1]
+			]
+		},
 		stops: [
 			{ position: 0, color: [11, 163, 96, 1] }, // #0ba360
 			{ position: 1, color: [60, 186, 146, 1] } // #3cba92
@@ -114,7 +191,14 @@ export const GRADIENT_PAINTS: TGradientPaint[] = [
 	},
 	{
 		type: 'Gradient',
-		variant: { type: 'Linear' },
+		variant: {
+			type: 'Linear',
+			transform: [
+				[1, 0, 0],
+				[0, 1, 0],
+				[0, 0, 1]
+			]
+		},
 		stops: [
 			{ position: 0, color: [253, 252, 71, 1] }, // #FDFC47
 			{ position: 1, color: [36, 254, 65, 1] } // #24FE41
@@ -123,7 +207,14 @@ export const GRADIENT_PAINTS: TGradientPaint[] = [
 	},
 	{
 		type: 'Gradient',
-		variant: { type: 'Linear' },
+		variant: {
+			type: 'Linear',
+			transform: [
+				[1, 0, 0],
+				[0, 1, 0],
+				[0, 0, 1]
+			]
+		},
 		stops: [
 			{ position: 0, color: [138, 43, 226, 1] }, // #8a2be2
 			{ position: 0.33, color: [0, 0, 205, 1] }, // #0000cd
@@ -134,7 +225,14 @@ export const GRADIENT_PAINTS: TGradientPaint[] = [
 	},
 	{
 		type: 'Gradient',
-		variant: { type: 'Linear' },
+		variant: {
+			type: 'Linear',
+			transform: [
+				[1, 0, 0],
+				[0, 1, 0],
+				[0, 0, 1]
+			]
+		},
 		stops: [
 			{ position: 0, color: [64, 224, 208, 1] }, // #40E0D0
 			{ position: 0.5, color: [255, 140, 0, 1] }, // #FF8C00
@@ -144,7 +242,14 @@ export const GRADIENT_PAINTS: TGradientPaint[] = [
 	},
 	{
 		type: 'Gradient',
-		variant: { type: 'Linear' },
+		variant: {
+			type: 'Linear',
+			transform: [
+				[1, 0, 0],
+				[0, 1, 0],
+				[0, 0, 1]
+			]
+		},
 		stops: [
 			{ position: 0, color: [252, 197, 228, 1] }, // #fcc5e4
 			{ position: 0.2, color: [253, 163, 75, 1] }, // #fda34b
@@ -158,7 +263,14 @@ export const GRADIENT_PAINTS: TGradientPaint[] = [
 	},
 	{
 		type: 'Gradient',
-		variant: { type: 'Linear' },
+		variant: {
+			type: 'Linear',
+			transform: [
+				[1, 0, 0],
+				[0, 1, 0],
+				[0, 0, 1]
+			]
+		},
 		stops: [
 			{ position: 0, color: [255, 117, 195, 1] }, // #ff75c3
 			{ position: 0.2, color: [255, 166, 71, 1] }, // #ffa647

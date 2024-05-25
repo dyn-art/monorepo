@@ -74,13 +74,13 @@ export type TMdtifInputEvent<GKey extends string, GValue> =
 	  >)
 	| ({ type: 'UpdateFillStyle' } & TMakeEventModifiable<
 			COMP.UpdateFillStyleInputEvent,
-			'id' | 'paint_id',
+			'id' | 'paintId',
 			GKey,
 			GValue
 	  >)
 	| ({ type: 'UpdateStorkeStyle' } & TMakeEventModifiable<
 			COMP.UpdateStorkeStyleInputEvent,
-			'id' | 'paint_id' | 'width',
+			'id' | 'paintId' | 'width',
 			GKey,
 			GValue
 	  >)

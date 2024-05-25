@@ -1,5 +1,5 @@
 use crate::{
-    resources::svg_context::SvgContextRes,
+    resources::{changed_svg_bundles::ChangedSvgBundlesRes, svg_context::SvgContextRes},
     svg::svg_bundle::{
         node::{frame::FrameNodeSvgBundle, shape::ShapeNodeSvgBundle},
         style::{
@@ -52,10 +52,18 @@ pub fn insert_node_svg_bundle(
 pub fn insert_style_svg_bundle(
     mut commands: Commands,
     mut svg_context_res: ResMut<SvgContextRes>,
-    query: Query<
-        (Entity, &CompStyle, Option<&PaintChildMixin>),
+    mut changed_svg_bundles_res: ResMut<ChangedSvgBundlesRes>,
+    mut query: Query<
+        (
+            Entity,
+            &CompStyle,
+            Option<&PaintChildMixin>,
+            Option<&StyleParentMixin>,
+            Option<&mut SvgBundleVariant>,
+        ),
         (
             With<CompStyle>,
+            Without<CompNode>,
             Or<(Without<SvgBundleVariant>, Changed<PaintChildMixin>)>,
         ),
     >,
@@ -64,9 +72,12 @@ pub fn insert_style_svg_bundle(
         Option<&GradientCompPaint>,
         Option<&ImageCompPaint>,
     )>,
+    mut svg_bundle_query: Query<&mut SvgBundleVariant, (Without<CompStyle>, With<CompNode>)>,
 ) {
-    for (entity, style, maybe_paint_mixin) in query.iter() {
-        let maybe_bundle_variant: Option<SvgBundleVariant> = match style.variant {
+    for (entity, style, maybe_paint_mixin, maybe_style_parent_mixin, maybe_svg_bundle_variant) in
+        query.iter_mut()
+    {
+        let maybe_new_svg_bundle_variant: Option<SvgBundleVariant> = match style.variant {
             CompStyleVariant::Fill | CompStyleVariant::Stroke => {
                 if let Some(paint_entity) =
                     maybe_paint_mixin.map(|paint_child_mixin| paint_child_mixin.0)
@@ -114,8 +125,45 @@ pub fn insert_style_svg_bundle(
             )),
         };
 
-        if let Some(bundle_variant) = maybe_bundle_variant {
-            commands.entity(entity).insert(bundle_variant);
+        // TODO: Very dirty (See README.md for future rewrite)
+        if let Some(mut new_svg_bundle_variant) = maybe_new_svg_bundle_variant {
+            if let Some(mut svg_bundle_variant) = maybe_svg_bundle_variant {
+                if let Some(parent_style_mixin) = maybe_style_parent_mixin {
+                    if let Ok(mut parent_svg_bundle) =
+                        svg_bundle_query.get_mut(parent_style_mixin.0)
+                    {
+                        if let Some(parent_style_wrapper_element) =
+                            parent_svg_bundle.get_styles_wrapper_element_mut()
+                        {
+                            parent_style_wrapper_element.append_child_in_bundle_context(
+                                new_svg_bundle_variant.get_root_element_mut(),
+                            );
+                            parent_style_wrapper_element.reorder_children_mut(|children| {
+                                if let (Some(idx), Some(new_idx)) = (
+                                    children.iter().position(|c| {
+                                        c.id == svg_bundle_variant.get_root_element().get_id()
+                                    }),
+                                    children.iter().position(|c| {
+                                        c.id == new_svg_bundle_variant.get_root_element().get_id()
+                                    }),
+                                ) {
+                                    let element = children.remove(new_idx);
+                                    children.insert(idx, element);
+                                }
+                            });
+                            parent_style_wrapper_element
+                                .remove_child_element(svg_bundle_variant.get_root_element_mut());
+
+                            // Already register changes because the old SvgBundleVariant is removed
+                            changed_svg_bundles_res.drain_removed_bundle_changes(
+                                svg_bundle_variant.get_svg_bundle_mut(),
+                            );
+                        }
+                    }
+                }
+            }
+
+            commands.entity(entity).insert(new_svg_bundle_variant);
         } else {
             log::warn!(
                 "Failed to create bundle for style variant: {:?}",

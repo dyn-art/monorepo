@@ -492,8 +492,7 @@ pub fn update_drop_shadow_style_input_system(
 pub fn create_paint_input_system(
     mut commands: Commands,
     mut referencer_res: ResMut<ReferencerRes>,
-    // mut update_fill_style_event_writer: EventWriter<UpdateFillStyleInputEvent>,
-    // mut delete_entity_event_writer: EventWriter<DeleteEntityInputEvent>,
+    mut delete_entity_event_writer: EventWriter<DeleteEntityInputEvent>,
     mut event_reader: EventReader<CreatePaintInputEvent>,
 ) {
     for CreatePaintInputEvent { paint } in event_reader.read() {
@@ -504,15 +503,15 @@ pub fn create_paint_input_system(
         };
 
         // Remove old paint
-        // if let Some(prev_paint_entity) = maybe_paint_id
-        //     .as_ref()
-        //     .and_then(|paint_id| referencer_res.get_entity(paint_id))
-        //     .copied()
-        // {
-        //     delete_entity_event_writer.send(DeleteEntityInputEvent {
-        //         id: ReferenceIdOrEntity::entity(prev_paint_entity),
-        //     });
-        // }
+        if let Some(prev_paint_entity) = maybe_paint_id
+            .as_ref()
+            .and_then(|paint_id| referencer_res.get_entity(paint_id))
+            .copied()
+        {
+            delete_entity_event_writer.send(DeleteEntityInputEvent {
+                id: ReferenceIdOrEntity::entity(prev_paint_entity),
+            });
+        }
 
         // Spawn paint
         let mut paint_entity_commands = match paint {
