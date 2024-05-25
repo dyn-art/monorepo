@@ -7,8 +7,9 @@ export function isMdtifComposition(value: unknown): value is TMdtifComposition {
 	}
 	const obj = value as Partial<TMdtifComposition>;
 	return (
-		isDtifComposition(obj.template) &&
 		Array.isArray(obj.modificationFields) &&
-		Object.values(obj.modificationFields).every((node) => typeof node === 'object')
+		obj.modificationFields.length > 0 &&
+		Object.values(obj.modificationFields).every((field) => typeof field === 'object') &&
+		isDtifComposition(value)
 	);
 }

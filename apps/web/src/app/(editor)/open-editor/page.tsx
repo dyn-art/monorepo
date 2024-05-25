@@ -8,6 +8,12 @@ const Page: React.FC = () => {
 				<Link href="open-editor/default">Default</Link>
 			</li>
 			<li>
+				<Link href="open-editor/tweet">Tweet</Link>
+			</li>
+			<li>
+				<Link href="open-editor/m-tweet">Modifiable Tweet</Link>
+			</li>
+			<li>
 				<Link href="open-editor/square">Sqare</Link>
 			</li>
 			<li>
@@ -17,16 +23,10 @@ const Page: React.FC = () => {
 				<Link href="open-editor/text">Text</Link>
 			</li>
 			<li>
-				<Link href="open-editor/screenshot">Screenshot</Link>
-			</li>
-			<li>
 				<Link href="open-editor/nested">Nested</Link>
 			</li>
 			<li>
 				<Link href="open-editor/constraints">Constraints</Link>
-			</li>
-			<li>
-				<Link href="open-editor/tweet">Tweet</Link>
 			</li>
 		</ul>
 	);

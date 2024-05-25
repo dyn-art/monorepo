@@ -14,12 +14,14 @@ serde_support = [
     "dep:serde",
     "dep:specta",
     "dyn-comp-bundles/serde_support",
+    "dyn-attributed-string/serde_support",
     "smol_str/serde",
 ]
 tracing = []
 
 [dependencies]
 dyn-comp-bundles = { path = "../comp_bundles" }
+dyn-attributed-string = { path = "../attributed_string" }
 dyn-comp-core = { path = "../comp_core" }
 dyn-utils = { path = "../utils" }
 bevy_app = { workspace = true }

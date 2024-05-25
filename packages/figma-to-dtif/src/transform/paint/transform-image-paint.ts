@@ -5,11 +5,11 @@ import { mapFigmaTransformToMat3 } from '../../utils';
 
 export function transformImagePaint(
 	paint: ImagePaint,
-	assetId: TContinuousId
+	imageId: TContinuousId
 ): { type: 'Image' } & COMP.ImagePaint {
 	return {
 		type: 'Image',
-		assetId: assetId.toString(),
+		imageId: { type: 'ReferenceId', referenceId: `a${imageId}` },
 		scaleMode: resolveScaleMode(paint)
 	};
 }

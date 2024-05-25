@@ -24,22 +24,22 @@ export class Transformer {
 	private _nodesFailedToTransform: TToTransformNode[] = [];
 
 	// DTIF Nodes
-	public readonly nodes = new Map<number, COMP.Node>();
-	private _rootNodeId: number;
+	public readonly nodes: COMP.Node[] = [];
+	private _rootNodeId: string;
 
 	// Figma Paints
 	private _toTransformPaints: TToTransformPaint[] = [];
 	private _paintsFailedToTransform: TToTransformPaint[] = [];
 
 	// DTIF Paints
-	public readonly paints = new Map<number, COMP.Paint>();
+	public readonly paints: COMP.Paint[] = [];
 
 	// Assets
 	private _toTransformAssets: TToTransformAsset[] = [];
 	private _assetsFailedToTransform: TToTransformAsset[] = [];
 
 	// DTIF Assets
-	public readonly assets = new Map<number, COMP.Asset>();
+	public readonly assets: COMP.AssetWithId[] = [];
 
 	// Callbacks
 	private _onTransformStatusUpdate: TOnTransformStatusUpdate | null = null;
@@ -66,7 +66,7 @@ export class Transformer {
 		// Walk Figma tree and discover to transform nodes, paints and assets
 		const { rootId, toTransformNodes, toTransformPaints, toTransformAssets } =
 			new FigmaNodeTreeProcessor(this._toTransformRootNode).processNodeTree();
-		this._rootNodeId = rootId;
+		this._rootNodeId = `n${rootId}`;
 		this._toTransformNodes = toTransformNodes;
 		this._toTransformPaints = toTransformPaints;
 		this._toTransformAssets = toTransformAssets;
@@ -91,7 +91,7 @@ export class Transformer {
 		await this.transformAssets(config.asset);
 
 		// Reset root node layout
-		const rootNode = this.nodes.get(this._rootNodeId);
+		const rootNode = this.nodes.find((node) => node.id === this._rootNodeId);
 		if (rootNode != null) {
 			resetDtifNodeTransform(rootNode);
 		} else {
@@ -101,12 +101,11 @@ export class Transformer {
 		// Construct composition
 		await this.onTransformStatusUpdate({ type: ETransformStatus.CONSTRUCTING_COMPOSITON });
 		const composition: COMP.DtifComposition = {
-			version: '1.0',
+			version: 'V000001',
 			size: [this._toTransformRootNode.width, this._toTransformRootNode.height],
-			rootNodeId: this._rootNodeId.toString(),
-			nodes: Object.fromEntries(this.nodes),
-			paints: Object.fromEntries(this.paints),
-			assets: Object.fromEntries(this.assets),
+			nodes: this.nodes,
+			paints: this.paints,
+			assets: this.assets,
 			viewport: {
 				physicalPosition: [0, 0],
 				physicalSize: [this._toTransformRootNode.width, this._toTransformRootNode.height]
@@ -147,7 +146,8 @@ export class Transformer {
 	}
 
 	public insertNode(id: number, node: COMP.Node): void {
-		this.nodes.set(id, node);
+		node.id = `n${id}`;
+		this.nodes.push(node);
 	}
 
 	private async transformPaints(): Promise<void> {
@@ -168,7 +168,8 @@ export class Transformer {
 	}
 
 	public insertPaint(id: number, paint: COMP.Paint): void {
-		this.paints.set(id, paint);
+		paint.id = `p${id}`;
+		this.paints.push(paint);
 	}
 
 	private async transformAssets(config: TTransformAssetConfig): Promise<void> {
@@ -188,8 +189,9 @@ export class Transformer {
 		}
 	}
 
-	public insertAsset(id: number, asset: COMP.Asset): void {
-		this.assets.set(id, asset);
+	public insertAsset(id: number, asset: COMP.AssetWithId): void {
+		asset.id = `a${id}`;
+		this.assets.push(asset);
 	}
 
 	private createExportContainerNode(name: string): FrameNode {

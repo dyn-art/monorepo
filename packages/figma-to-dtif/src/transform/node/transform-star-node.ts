@@ -8,7 +8,7 @@ import type {
 import {
 	createDtifStyles,
 	mapFigmaBlendModeToDtif,
-	mapFigmaConstraintsToDtif,
+	mapFigmaElementLayoutToDtif,
 	mapFigmaTransformToRotation,
 	mapFigmaTransformToTranslation
 } from '../../utils';
@@ -29,9 +29,7 @@ export function transformStarNode(
 		rotationDeg: mapFigmaTransformToRotation(node.relativeTransform),
 		blendMode: mapFigmaBlendModeToDtif(node.blendMode),
 		opacity: node.opacity,
-		layoutElement: autoLayout
-			? { type: 'Static' }
-			: { type: 'Absolute', constraints: mapFigmaConstraintsToDtif(node.constraints) },
+		layoutElement: mapFigmaElementLayoutToDtif(node, autoLayout),
 		styles: createDtifStyles(fills, strokes, effects)
 	};
 }

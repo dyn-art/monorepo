@@ -1,10 +1,10 @@
 use crate::{
-    attrs::Attrs,
     script::script_supports_letter_spacing,
     shape_tokens::{
         glyph::GlyphToken, linebreak::LinebreakToken, text_fragment::TextFragmentToken,
         word_separator::WordSeparatorToken, ShapeBuffer, ShapeToken, ShapeTokenVariant,
     },
+    text_attrs::TextAttrs,
     utils::is_range_within,
 };
 use dyn_fonts_book::FontsBook;
@@ -21,17 +21,17 @@ pub struct Span {
     dirty: bool,
     tokens: Vec<ShapeTokenVariant>,
     bidi_level: Option<unicode_bidi::Level>,
-    attrs: Attrs,
+    attrs: TextAttrs,
 }
 
 impl Span {
-    pub fn new(range: Range<usize>, attrs: Attrs) -> Self {
+    pub fn new(range: Range<usize>, attrs: TextAttrs) -> Self {
         Self::new_with_bidi(range, attrs, None)
     }
 
     pub fn new_with_bidi(
         range: Range<usize>,
-        attrs: Attrs,
+        attrs: TextAttrs,
         bidi_level: Option<unicode_bidi::Level>,
     ) -> Self {
         Self {
@@ -69,7 +69,7 @@ impl Span {
     }
 
     #[inline]
-    pub fn get_attrs(&self) -> &Attrs {
+    pub fn get_attrs(&self) -> &TextAttrs {
         &self.attrs
     }
 
@@ -227,13 +227,15 @@ impl Span {
                 // A space after the last cluster should be ignored,
                 // since it affects the bbox and text alignment.
                 if index != glyps_len - 1 {
-                    glyph_token.x_advance += letter_spacing.at(font_size);
+                    glyph_token.layout.x_advance += letter_spacing.at(font_size);
                 }
 
                 // If the cluster advance became negative - clear it.
                 // This is an UB so we can do whatever we want, and we mimic Chrome's behavior.
-                if !glyph_token.x_advance.is_finite() && glyph_token.x_advance < Abs::zero() {
-                    glyph_token.x_advance = Abs::zero();
+                if !glyph_token.layout.x_advance.is_finite()
+                    && glyph_token.layout.x_advance < Abs::zero()
+                {
+                    glyph_token.layout.x_advance = Abs::zero();
                 }
             }
         }
@@ -255,7 +257,7 @@ impl Span {
                         // Technically, word spacing 'should be applied half on each
                         // side of the character', but it doesn't affect us in any way,
                         // so we are ignoring this.
-                        glyph_token.x_advance += word_spacing.at(self.attrs.get_font_size());
+                        glyph_token.layout.x_advance += word_spacing.at(self.attrs.get_font_size());
                     }
                 }
                 _ => {}

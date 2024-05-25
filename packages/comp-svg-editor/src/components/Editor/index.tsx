@@ -25,9 +25,9 @@ export const Editor: React.FC<TEditorProps> = (props) => {
 		// Not passing the viewport size as prop to the Canvas or in the DTIF
 		// because React is kinda slow updating their states
 		(size) => {
-			composition?.emitInputEvents('Composition', [
+			composition?.emitInputEvents('Core', [
 				{
-					type: 'CompositionResized',
+					type: 'UpdateCompositionSize',
 					size: [size.width, size.height]
 				},
 				{ type: 'FocusRootNodes' }

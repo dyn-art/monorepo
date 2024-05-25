@@ -16,9 +16,9 @@ pub trait ShapeToken {
     /// Inclusive start, exclusive of stop (start <= x < end).
     fn get_range(&self) -> &Range<usize>;
     /// Get the absolute width of the token.
-    fn get_width(&self) -> Abs;
+    fn x_advance(&self) -> Abs;
     /// Get the absolute height of the token.
-    fn get_height(&self) -> Abs;
+    fn y_advance(&self) -> Abs;
 }
 
 #[derive(Debug, Clone)]

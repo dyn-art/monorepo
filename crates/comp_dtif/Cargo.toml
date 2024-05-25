@@ -13,18 +13,13 @@ default = []
 tracing = []
 
 [dependencies]
-dyn-comp-asset = { path = "../comp_asset", features = ["serde_support"] }
 dyn-comp-bundles = { path = "../comp_bundles", features = ["serde_support"] }
-dyn-attributed-string = { path = "../attributed_string", features = [
-    "serde_support",
-] }
 dyn-utils = { path = "../utils", features = ["serde_support"] }
 bevy_ecs = { workspace = true }
 bevy_hierarchy = { workspace = true }
 bevy_transform = { workspace = true }
 tiny-skia-path = { workspace = true }
 glam = { workspace = true }
-smallvec = { workspace = true }
 
 # Bindgen
 serde = { workspace = true, features = ["derive"] }

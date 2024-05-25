@@ -19,7 +19,7 @@ export function useDtifFromClipboard(): {
 			try {
 				const text = await navigator.clipboard.readText();
 				const maybeDtif: unknown = JSON.parse(text);
-				if (isDtifComposition(maybeDtif) || isMdtifComposition(maybeDtif)) {
+				if (isMdtifComposition(maybeDtif) || isDtifComposition(maybeDtif)) {
 					dtif = maybeDtif;
 				}
 			} catch (e) {

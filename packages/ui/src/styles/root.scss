@@ -71,9 +71,20 @@
 * {
 	@apply border-border min-w-0;
 }
+
 body {
 	@apply bg-background text-foreground;
 	font-feature-settings:
 		'rlig' 1,
 		'calt' 1;
+}
+
+.no-spinner {
+	-moz-appearance: textfield;
+}
+
+.no-spinner::-webkit-outer-spin-button,
+.no-spinner::-webkit-inner-spin-button {
+	margin: 0;
+	-webkit-appearance: none;
 }

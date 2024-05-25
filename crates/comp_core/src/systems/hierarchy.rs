@@ -1,11 +1,37 @@
 use bevy_ecs::{
     entity::Entity,
-    query::{Changed, With},
+    query::{Changed, With, Without},
     system::{Commands, Query},
 };
 use bevy_hierarchy::{Children, Parent};
-use dyn_comp_bundles::components::{mixins::HierarchyLevel, nodes::CompNode};
+use dyn_comp_bundles::components::{marker::Root, mixins::HierarchyLevel, nodes::CompNode};
 use std::collections::HashSet;
+
+pub fn add_root_component_system(
+    mut commands: Commands,
+    query: Query<
+        Entity,
+        (
+            With<Children>,
+            Without<Parent>,
+            With<CompNode>,
+            Without<Root>,
+        ),
+    >,
+) {
+    for entity in query.iter() {
+        commands.entity(entity).insert(Root);
+    }
+}
+
+pub fn remove_root_component_system(
+    mut commands: Commands,
+    query: Query<Entity, (With<Children>, With<Parent>, With<CompNode>, With<Root>)>,
+) {
+    for entity in query.iter() {
+        commands.entity(entity).remove::<Root>();
+    }
+}
 
 pub fn update_hierarchy_levels(
     mut commands: Commands,

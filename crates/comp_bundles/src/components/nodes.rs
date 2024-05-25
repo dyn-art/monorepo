@@ -1,6 +1,8 @@
 use crate::properties::TextAttributeInterval;
 use bevy_ecs::component::Component;
-use dyn_attributed_string::{HorizontalTextAlignment, LineWrap, VerticalTextAlignment};
+use dyn_attributed_string::layout::{
+    HorizontalTextAlignment, LineWrap, TextSizingMode, VerticalTextAlignment,
+};
 use smallvec::SmallVec;
 use std::f32::consts::PI;
 
@@ -96,6 +98,7 @@ pub struct TextCompNode {
     pub line_wrap: LineWrap,
     pub horizontal_text_alignment: HorizontalTextAlignment,
     pub vertical_text_alignment: VerticalTextAlignment,
+    pub sizing_mode: TextSizingMode,
 }
 
 /// A vector shape node.

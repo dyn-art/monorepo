@@ -8,14 +8,7 @@ use tiny_skia_path::Transform;
 #[derive(Debug, Clone)]
 pub struct GlyphToken {
     glyph: Glyph,
-    /// Cached transform after applying the layout.
-    // TODO: Should a glyph have multipe transforms? Like one for layout on line level, ..
-    // which are then combined when outlining?
-    pub transform: Transform,
-    /// Cached advance in horizontal direction after applying layout.
-    pub x_advance: Abs,
-    /// Cached advance in vertical direction after applying layout.
-    pub y_advance: Abs,
+    pub layout: GlyphLayout,
 }
 
 impl GlyphToken {
@@ -25,9 +18,7 @@ impl GlyphToken {
 
         Self {
             glyph,
-            transform: Transform::default(),
-            x_advance: x_advance.at(font_size),
-            y_advance: y_advance.at(font_size),
+            layout: GlyphLayout::new(x_advance.at(font_size), y_advance.at(font_size)),
         }
     }
 
@@ -41,11 +32,33 @@ impl ShapeToken for GlyphToken {
         &self.glyph.range
     }
 
-    fn get_width(&self) -> Abs {
-        self.x_advance
+    fn x_advance(&self) -> Abs {
+        self.layout.x_advance
     }
 
-    fn get_height(&self) -> Abs {
-        self.y_advance
+    fn y_advance(&self) -> Abs {
+        self.layout.y_advance
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct GlyphLayout {
+    /// Cached transform after applying the layout.
+    // TODO: Should a glyph have multipe transforms? Like one for layout on line, spacing, .. level
+    // which are then combined when outlining?
+    pub transform: Transform,
+    /// Cached advance in horizontal direction after applying layout.
+    pub x_advance: Abs,
+    /// Cached advance in vertical direction after applying layout.
+    pub y_advance: Abs,
+}
+
+impl GlyphLayout {
+    pub fn new(x_advance: Abs, y_advance: Abs) -> Self {
+        Self {
+            transform: Transform::default(),
+            x_advance,
+            y_advance,
+        }
     }
 }

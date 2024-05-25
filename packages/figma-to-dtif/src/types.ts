@@ -39,7 +39,6 @@ export type TFigmaNodeWithStrokes =
 	| TFigmaShapeNode
 	| TextNode
 	| VectorNode;
-
 export type TFigmaNodeWithEffects =
 	| FrameNode
 	| InstanceNode
@@ -47,5 +46,11 @@ export type TFigmaNodeWithEffects =
 	| TFigmaShapeNode
 	| TextNode
 	| VectorNode;
+export type TFigmaLayoutNode =
+	| TFigmaShapeNode
+	| TextNode
+	| FrameNode
+	| InstanceNode
+	| ComponentNode;
 
 export type TFigmaFormat = 'JPG' | 'PNG' | 'SVG' | 'PDF';

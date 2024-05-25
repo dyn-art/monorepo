@@ -1,11 +1,11 @@
-import type { TModificationField, TModificationInputType } from './types';
+import type { TModificationField, TModificationInputVariant } from './types';
 
 export function createModificationField<
 	GKey extends string,
-	GInputType extends TModificationInputType,
+	GInputVariant extends TModificationInputVariant,
 	GInferredKey extends GKey
 >(
-	field: TModificationField<GKey, GInputType, GInferredKey>
-): TModificationField<GKey, GInputType, GInferredKey> {
+	field: TModificationField<GKey, GInputVariant, GInferredKey>
+): TModificationField<GKey, GInputVariant, GInferredKey> {
 	return field;
 }

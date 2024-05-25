@@ -8,7 +8,7 @@ import type {
 import {
 	createDtifStyles,
 	mapFigmaBlendModeToDtif,
-	mapFigmaConstraintsToDtif,
+	mapFigmaElementLayoutToDtif,
 	mapFigmaParentLayoutToDtif,
 	mapFigmaTransformToRotation,
 	mapFigmaTransformToTranslation
@@ -25,7 +25,7 @@ export function transformFrameNode(
 		clipContent: node.clipsContent,
 		layoutParent: mapFigmaParentLayoutToDtif(node),
 		visible: node.visible,
-		children: childrenIds.map((childId) => childId.toString()),
+		children: childrenIds.map((childId) => ({ type: 'ReferenceId', referenceId: `n${childId}` })),
 		size: [node.width, node.height],
 		translation: mapFigmaTransformToTranslation(node.relativeTransform),
 		rotationDeg: mapFigmaTransformToRotation(node.relativeTransform),
@@ -37,9 +37,7 @@ export function transformFrameNode(
 		],
 		blendMode: mapFigmaBlendModeToDtif(node.blendMode),
 		opacity: node.opacity,
-		layoutElement: autoLayout
-			? { type: 'Static' }
-			: { type: 'Absolute', constraints: mapFigmaConstraintsToDtif(node.constraints) },
+		layoutElement: mapFigmaElementLayoutToDtif(node, autoLayout),
 		styles: createDtifStyles(fills, strokes, effects)
 	};
 }

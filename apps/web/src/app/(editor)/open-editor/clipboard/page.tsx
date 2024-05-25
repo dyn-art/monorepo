@@ -14,18 +14,18 @@ const Page: React.FC = () => {
 		return <Skeleton className="h-full w-full rounded-none" />;
 	}
 
-	if (isDtifComposition(dtif)) {
-		return (
-			<Container className="h-screen" size="full" tag="main">
-				<Editor dtif={dtif} />
-			</Container>
-		);
-	}
-
 	if (isMdtifComposition(dtif)) {
 		return (
 			<Container size="default" tag="main">
 				<FieldBasedEditor mdtif={dtif} />
+			</Container>
+		);
+	}
+
+	if (isDtifComposition(dtif)) {
+		return (
+			<Container className="h-screen" size="full" tag="main">
+				<Editor dtif={dtif} />
 			</Container>
 		);
 	}

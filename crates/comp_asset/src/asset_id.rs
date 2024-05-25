@@ -25,12 +25,35 @@ pub struct FontId(pub TinyVec<[ID; 8]>);
 ///
 /// [`KeyData`]: https://docs.rs/slotmap/latest/slotmap/struct.KeyData.html
 #[derive(Clone, Copy, Eq, Hash, Ord, PartialEq, PartialOrd, Debug, Default)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize)
+)]
 pub struct ImageId(pub(crate) InnerImageId);
 
 slotmap::new_key_type! {
     /// Internal ID type.
     pub(crate) struct InnerImageId;
 }
+
+#[cfg(feature = "serde_support")]
+const _: () = {
+    impl specta::Type for ImageId {
+        fn inline(_: &mut specta::TypeMap, _: specta::Generics) -> specta::DataType {
+            SpectaDataKey {
+                idx: specta::PrimitiveType::u32.into(),
+                version: specta::PrimitiveType::u32.into(),
+            }
+            .into()
+        }
+    }
+
+    #[derive(Clone, specta::DataTypeFrom)]
+    struct SpectaDataKey {
+        idx: specta::DataType,
+        version: specta::DataType,
+    }
+};
 
 impl core::fmt::Display for ImageId {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {

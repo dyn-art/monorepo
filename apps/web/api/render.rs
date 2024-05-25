@@ -2,10 +2,8 @@ use bevy_app::App;
 use bevy_ecs::query::{With, Without};
 use dyn_comp_asset::asset::AssetContent;
 use dyn_comp_bundles::components::marker::Root;
-use dyn_comp_core::{
-    insert_dtif_into_world, resources::composition::CompositionRes, CompCorePlugin,
-};
-use dyn_comp_dtif::{dtif_handler::DtifHandler, DtifComposition};
+use dyn_comp_core::{resources::composition::CompositionRes, CompCorePlugin};
+use dyn_comp_dtif::DtifComposition;
 use dyn_comp_svg_builder::{svg::svg_bundle::SvgBundleVariant, CompSvgBuilderPlugin};
 use dyn_web_api::{
     app_error,
@@ -121,7 +119,7 @@ pub async fn handler(_req: Request) -> Result<Response<Body>, Error> {
 async fn prepare_dtif_composition(
     dtif_composition: &mut DtifComposition,
 ) -> Result<(), reqwest::Error> {
-    for asset in dtif_composition.assets.values_mut() {
+    for asset in dtif_composition.assets.iter_mut() {
         let mut maybe_content = None;
         if let AssetContent::Url { url } = &asset.content {
             maybe_content = Some(reqwest::get(url).await?.bytes().await?.to_vec());
@@ -136,11 +134,18 @@ async fn prepare_dtif_composition(
 
 fn build_svg_string(dtif: DtifComposition) -> Result<String, AppError> {
     let mut app = App::new();
-    let mut dtif_handler = DtifHandler::new(dtif);
 
     // Register plugins
-    app.add_plugins((CompCorePlugin {}, CompSvgBuilderPlugin {}));
-    insert_dtif_into_world(&mut app.world, &mut dtif_handler);
+    app.add_plugins((
+        CompCorePlugin {
+            version: dtif.version,
+            size: dtif.size,
+            viewport: dtif.viewport,
+        },
+        CompSvgBuilderPlugin {},
+    ));
+
+    dtif.insert_into_world(&mut app.world);
 
     // Update app once
     app.update();

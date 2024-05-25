@@ -1,49 +1,8 @@
 {
-	"version": "1.0",
+	"version": "V000001",
 	"size": [500, 500],
-	"rootNodeId": "1",
-	"nodes": {
-		"1": {
-			"type": "Frame",
-			"clipContent": false,
-			"layoutParent": null,
-			"visible": true,
-			"children": ["12", "10", "8", "6", "2"],
-			"size": [500, 500],
-			"translation": [0, 0],
-			"rotationDeg": 0,
-			"cornerRadii": [0, 0, 0, 0],
-			"blendMode": "Normal",
-			"opacity": 1,
-			"layoutElement": {
-				"type": "Absolute",
-				"constraints": { "horizontal": "Start", "vertical": "Start" }
-			},
-			"styles": [
-				{ "type": "Fill", "paintId": "14", "blendMode": "Normal", "opacity": 1, "visible": true }
-			]
-		},
-		"2": {
-			"type": "Frame",
-			"clipContent": false,
-			"layoutParent": null,
-			"visible": true,
-			"children": ["3"],
-			"size": [100, 100],
-			"translation": [200, 100],
-			"rotationDeg": 0,
-			"cornerRadii": [0, 0, 0, 0],
-			"blendMode": "Normal",
-			"opacity": 1,
-			"layoutElement": {
-				"type": "Absolute",
-				"constraints": { "horizontal": "Start", "vertical": "Start" }
-			},
-			"styles": [
-				{ "type": "Fill", "paintId": "5", "blendMode": "Normal", "opacity": 1, "visible": true }
-			]
-		},
-		"3": {
+	"nodes": [
+		{
 			"type": "Rectangle",
 			"visible": true,
 			"size": [50, 50],
@@ -57,17 +16,24 @@
 				"constraints": { "horizontal": "Center", "vertical": "Center" }
 			},
 			"styles": [
-				{ "type": "Fill", "paintId": "4", "blendMode": "Normal", "opacity": 1, "visible": true }
-			]
+				{
+					"type": "Fill",
+					"paintId": { "type": "ReferenceId", "referenceId": "p4" },
+					"blendMode": "Normal",
+					"opacity": 1,
+					"visible": true
+				}
+			],
+			"id": "n3"
 		},
-		"6": {
+		{
 			"type": "Frame",
 			"clipContent": false,
 			"layoutParent": null,
 			"visible": true,
-			"children": ["7"],
+			"children": [{ "type": "ReferenceId", "referenceId": "n3" }],
 			"size": [100, 100],
-			"translation": [200, 0],
+			"translation": [200, 100],
 			"rotationDeg": 0,
 			"cornerRadii": [0, 0, 0, 0],
 			"blendMode": "Normal",
@@ -77,10 +43,17 @@
 				"constraints": { "horizontal": "Start", "vertical": "Start" }
 			},
 			"styles": [
-				{ "type": "Fill", "paintId": "5", "blendMode": "Normal", "opacity": 1, "visible": true }
-			]
+				{
+					"type": "Fill",
+					"paintId": { "type": "ReferenceId", "referenceId": "p5" },
+					"blendMode": "Normal",
+					"opacity": 1,
+					"visible": true
+				}
+			],
+			"id": "n2"
 		},
-		"7": {
+		{
 			"type": "Rectangle",
 			"visible": true,
 			"size": [50, 50],
@@ -94,17 +67,24 @@
 				"constraints": { "horizontal": "Start", "vertical": "Start" }
 			},
 			"styles": [
-				{ "type": "Fill", "paintId": "4", "blendMode": "Normal", "opacity": 1, "visible": true }
-			]
+				{
+					"type": "Fill",
+					"paintId": { "type": "ReferenceId", "referenceId": "p4" },
+					"blendMode": "Normal",
+					"opacity": 1,
+					"visible": true
+				}
+			],
+			"id": "n7"
 		},
-		"8": {
+		{
 			"type": "Frame",
 			"clipContent": false,
 			"layoutParent": null,
 			"visible": true,
-			"children": ["9"],
+			"children": [{ "type": "ReferenceId", "referenceId": "n7" }],
 			"size": [100, 100],
-			"translation": [200, 200],
+			"translation": [200, 0],
 			"rotationDeg": 0,
 			"cornerRadii": [0, 0, 0, 0],
 			"blendMode": "Normal",
@@ -114,10 +94,17 @@
 				"constraints": { "horizontal": "Start", "vertical": "Start" }
 			},
 			"styles": [
-				{ "type": "Fill", "paintId": "5", "blendMode": "Normal", "opacity": 1, "visible": true }
-			]
+				{
+					"type": "Fill",
+					"paintId": { "type": "ReferenceId", "referenceId": "p5" },
+					"blendMode": "Normal",
+					"opacity": 1,
+					"visible": true
+				}
+			],
+			"id": "n6"
 		},
-		"9": {
+		{
 			"type": "Rectangle",
 			"visible": true,
 			"size": [50, 50],
@@ -131,17 +118,24 @@
 				"constraints": { "horizontal": "End", "vertical": "End" }
 			},
 			"styles": [
-				{ "type": "Fill", "paintId": "4", "blendMode": "Normal", "opacity": 1, "visible": true }
-			]
+				{
+					"type": "Fill",
+					"paintId": { "type": "ReferenceId", "referenceId": "p4" },
+					"blendMode": "Normal",
+					"opacity": 1,
+					"visible": true
+				}
+			],
+			"id": "n9"
 		},
-		"10": {
+		{
 			"type": "Frame",
 			"clipContent": false,
 			"layoutParent": null,
 			"visible": true,
-			"children": ["11"],
+			"children": [{ "type": "ReferenceId", "referenceId": "n9" }],
 			"size": [100, 100],
-			"translation": [200, 300],
+			"translation": [200, 200],
 			"rotationDeg": 0,
 			"cornerRadii": [0, 0, 0, 0],
 			"blendMode": "Normal",
@@ -151,10 +145,17 @@
 				"constraints": { "horizontal": "Start", "vertical": "Start" }
 			},
 			"styles": [
-				{ "type": "Fill", "paintId": "5", "blendMode": "Normal", "opacity": 1, "visible": true }
-			]
+				{
+					"type": "Fill",
+					"paintId": { "type": "ReferenceId", "referenceId": "p5" },
+					"blendMode": "Normal",
+					"opacity": 1,
+					"visible": true
+				}
+			],
+			"id": "n8"
 		},
-		"11": {
+		{
 			"type": "Rectangle",
 			"visible": true,
 			"size": [50, 50],
@@ -168,17 +169,24 @@
 				"constraints": { "horizontal": "Stretch", "vertical": "Stretch" }
 			},
 			"styles": [
-				{ "type": "Fill", "paintId": "4", "blendMode": "Normal", "opacity": 1, "visible": true }
-			]
+				{
+					"type": "Fill",
+					"paintId": { "type": "ReferenceId", "referenceId": "p4" },
+					"blendMode": "Normal",
+					"opacity": 1,
+					"visible": true
+				}
+			],
+			"id": "n11"
 		},
-		"12": {
+		{
 			"type": "Frame",
 			"clipContent": false,
 			"layoutParent": null,
 			"visible": true,
-			"children": ["13"],
+			"children": [{ "type": "ReferenceId", "referenceId": "n11" }],
 			"size": [100, 100],
-			"translation": [200, 400],
+			"translation": [200, 300],
 			"rotationDeg": 0,
 			"cornerRadii": [0, 0, 0, 0],
 			"blendMode": "Normal",
@@ -188,10 +196,17 @@
 				"constraints": { "horizontal": "Start", "vertical": "Start" }
 			},
 			"styles": [
-				{ "type": "Fill", "paintId": "5", "blendMode": "Normal", "opacity": 1, "visible": true }
-			]
+				{
+					"type": "Fill",
+					"paintId": { "type": "ReferenceId", "referenceId": "p5" },
+					"blendMode": "Normal",
+					"opacity": 1,
+					"visible": true
+				}
+			],
+			"id": "n10"
 		},
-		"13": {
+		{
 			"type": "Rectangle",
 			"visible": true,
 			"size": [50, 50],
@@ -205,15 +220,82 @@
 				"constraints": { "horizontal": "Scale", "vertical": "Scale" }
 			},
 			"styles": [
-				{ "type": "Fill", "paintId": "4", "blendMode": "Normal", "opacity": 1, "visible": true }
-			]
+				{
+					"type": "Fill",
+					"paintId": { "type": "ReferenceId", "referenceId": "p4" },
+					"blendMode": "Normal",
+					"opacity": 1,
+					"visible": true
+				}
+			],
+			"id": "n13"
+		},
+		{
+			"type": "Frame",
+			"clipContent": false,
+			"layoutParent": null,
+			"visible": true,
+			"children": [{ "type": "ReferenceId", "referenceId": "n13" }],
+			"size": [100, 100],
+			"translation": [200, 400],
+			"rotationDeg": 0,
+			"cornerRadii": [0, 0, 0, 0],
+			"blendMode": "Normal",
+			"opacity": 1,
+			"layoutElement": {
+				"type": "Absolute",
+				"constraints": { "horizontal": "Start", "vertical": "Start" }
+			},
+			"styles": [
+				{
+					"type": "Fill",
+					"paintId": { "type": "ReferenceId", "referenceId": "p5" },
+					"blendMode": "Normal",
+					"opacity": 1,
+					"visible": true
+				}
+			],
+			"id": "n12"
+		},
+		{
+			"type": "Frame",
+			"clipContent": false,
+			"layoutParent": null,
+			"visible": true,
+			"children": [
+				{ "type": "ReferenceId", "referenceId": "n12" },
+				{ "type": "ReferenceId", "referenceId": "n10" },
+				{ "type": "ReferenceId", "referenceId": "n8" },
+				{ "type": "ReferenceId", "referenceId": "n6" },
+				{ "type": "ReferenceId", "referenceId": "n2" }
+			],
+			"size": [500, 500],
+			"translation": [0, 0],
+			"rotationDeg": 0,
+			"cornerRadii": [0, 0, 0, 0],
+			"blendMode": "Normal",
+			"opacity": 1,
+			"layoutElement": {
+				"type": "Absolute",
+				"constraints": { "horizontal": "Start", "vertical": "Start" }
+			},
+			"styles": [
+				{
+					"type": "Fill",
+					"paintId": { "type": "ReferenceId", "referenceId": "p14" },
+					"blendMode": "Normal",
+					"opacity": 1,
+					"visible": true
+				}
+			],
+			"id": "n1"
 		}
-	},
-	"paints": {
-		"4": { "type": "Solid", "color": [217, 217, 217] },
-		"5": { "type": "Solid", "color": [243, 6, 6] },
-		"14": { "type": "Solid", "color": [255, 248, 78] }
-	},
-	"assets": {},
+	],
+	"paints": [
+		{ "type": "Solid", "color": [217, 217, 217], "id": "p4" },
+		{ "type": "Solid", "color": [243, 6, 6], "id": "p5" },
+		{ "type": "Solid", "color": [255, 248, 78], "id": "p14" }
+	],
+	"assets": [],
 	"viewport": { "physicalPosition": [0, 0], "physicalSize": [500, 500] }
 }

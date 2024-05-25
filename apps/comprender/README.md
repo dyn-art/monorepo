@@ -1,5 +1,9 @@
 # `dyn_comprender`
 
+```
+cargo run --bin dyn_comprender --profile release
+```
+
 ## Load Testing
 - [API Load Testing (Stress, Spike, Load, Soak)](https://www.youtube.com/watch?v=r-Jte8Y8zag)
 - [Drill](https://github.com/fcsonline/drill/tree/master)

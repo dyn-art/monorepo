@@ -1,15 +1,25 @@
 use dyn_attributed_string::{
-    attrs::{Attrs, AttrsInterval},
     dyn_fonts_book::font::{
         info::FontFamily,
         variant::{FontStretch, FontStyle, FontWeight},
     },
+    text_attrs::{TextAttrs, TextAttrsInterval},
 };
 use dyn_utils::{
     properties::size::Size,
-    units::{abs::Abs, font_unit::FontUnit, length::Length},
+    units::{abs::Abs, font_unit::FontUnit},
 };
 use glam::Vec2;
+
+#[derive(Debug, Default, Copy, Clone)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type)
+)]
+pub enum CompVersion {
+    #[default]
+    V000001, // v0.0.1
+}
 
 #[derive(Debug, Default, Copy, Clone)]
 #[cfg_attr(
@@ -35,11 +45,11 @@ pub struct TextAttributeInterval {
 }
 
 impl TextAttributeInterval {
-    pub fn to_attrs_interval(&self) -> AttrsInterval {
-        AttrsInterval {
+    pub fn to_attrs_interval(&self) -> TextAttrsInterval {
+        TextAttrsInterval {
             start: self.start,
             stop: self.end,
-            val: Attrs {
+            val: TextAttrs {
                 font_id: None,
                 font_family: self.attributes.font_family.clone(),
                 font_style: self.attributes.font_style,

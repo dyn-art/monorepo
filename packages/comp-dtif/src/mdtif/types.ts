@@ -1,27 +1,29 @@
 import type { AdditionalOperation, RulesLogic } from 'json-logic-js';
-import type { TJsonFunction } from '@dyn/utils';
+import type { TJsonFunction, TRgbaColor, TVec2 } from '@dyn/utils';
 
 import type { COMP } from '../comp';
 
-export interface TMdtifComposition {
-	template: COMP.DtifComposition;
+export interface TMdtifComposition extends COMP.DtifComposition {
 	modificationFields: TModificationField[];
 }
 
 export interface TModificationField<
 	GKey extends string = string,
-	GInputType extends TModificationInputType = TModificationInputType,
+	GInputVariant extends TModificationInputVariant = TModificationInputVariant,
 	GInferredKey extends GKey = GKey
 > {
 	key: GKey;
-	inputType: GInputType;
+	inputVariant: GInputVariant;
 	displayName: string;
-	actions: TModificationAction<GInferredKey, TMapToDefaultType<GInputType>>[];
+	actions: TModificationAction<GInferredKey, TMapToReturnType<GInputVariant>>[];
+	// TODO: Map specified output events to this modification field,
+	// because for example if the rotation changes the position modification field changes too
+	// outputEventMapper?: TModificationOutputEventMapper<GInputVariant, any>[];
 }
 
 export interface TModificationAction<GKey extends string, GValue> {
 	conditions: TModificationCondition[];
-	compute?: TJsonFunction<[GKey]>;
+	compute?: TJsonFunction<[GKey]> & { resultName?: string };
 	events: TMdtifInputEvent<GKey, GValue>[];
 }
 
@@ -35,71 +37,240 @@ type TMakeEventModifiable<T, K extends keyof T, GKey extends string, GValue> = {
 };
 
 export type TMdtifInputEvent<GKey extends string, GValue> =
-	| ({ type: 'EntityMoved' } & TMakeEventModifiable<
-			COMP.DtifEntityMovedEvent,
+	| ({ type: 'UpdateFrameNode' } & TMakeEventModifiable<
+			COMP.UpdateFrameNodeInputEvent,
+			'clipContent',
+			GKey,
+			GValue
+	  >)
+	| ({ type: 'UpdateEllipseNode' } & TMakeEventModifiable<
+			COMP.UpdateEllipseNodeInputEvent,
+			'startingAngle' | 'endingAngle' | 'innerRadiusRatio',
+			GKey,
+			GValue
+	  >)
+	| ({ type: 'UpdateStarNode' } & TMakeEventModifiable<
+			COMP.UpdateStarNodeInputEvent,
+			'pointCount' | 'innerRadiusRatio',
+			GKey,
+			GValue
+	  >)
+	| ({ type: 'UpdatePolygonNode' } & TMakeEventModifiable<
+			COMP.UpdatePolygonNodeInputEvent,
+			'pointCount',
+			GKey,
+			GValue
+	  >)
+	| ({ type: 'UpdateTextNode' } & TMakeEventModifiable<
+			COMP.UpdateTextNodeInputEvent,
+			| 'text'
+			| 'attributes'
+			| 'lineWrap'
+			| 'horizontalTextAlignment'
+			| 'verticalTextAlignment'
+			| 'sizingMode',
+			GKey,
+			GValue
+	  >)
+	| ({ type: 'UpdateFillStyle' } & TMakeEventModifiable<
+			COMP.UpdateFillStyleInputEvent,
+			'id' | 'paintId',
+			GKey,
+			GValue
+	  >)
+	| ({ type: 'UpdateStorkeStyle' } & TMakeEventModifiable<
+			COMP.UpdateStorkeStyleInputEvent,
+			'id' | 'paintId' | 'width',
+			GKey,
+			GValue
+	  >)
+	| ({ type: 'UpdateDropShadowStyle' } & TMakeEventModifiable<
+			COMP.UpdateDropShadowStyleInputEvent,
+			'id' | 'blur' | 'color' | 'position' | 'spread',
+			GKey,
+			GValue
+	  >)
+	| ({ type: 'CreatePaint' } & TMakeEventModifiable<
+			COMP.CreatePaintInputEvent,
+			'paint',
+			GKey,
+			GValue
+	  >)
+	| ({ type: 'UpdateSolidPaint' } & TMakeEventModifiable<
+			COMP.UpdateSolidPaintInputEvent,
+			'color',
+			GKey,
+			GValue
+	  >)
+	| ({ type: 'UpdateImagePaint' } & TMakeEventModifiable<
+			COMP.UpdateImagePaintInputEvent,
+			'imageId' | 'scaleMode',
+			GKey,
+			GValue
+	  >)
+	| ({ type: 'UpdateGradientPaint' } & TMakeEventModifiable<
+			COMP.UpdateGradientPaintInputEvent,
+			'variant' | 'stops',
+			GKey,
+			GValue
+	  >)
+	| ({ type: 'DeleteEntity' } & COMP.DeleteEntityInputEvent)
+	| ({ type: 'UpdateEntityPosition' } & TMakeEventModifiable<
+			COMP.UpdateEntityTransformInputEvent,
+			'x' | 'y' | 'rotationDeg',
+			GKey,
+			GValue
+	  >)
+	| ({ type: 'MoveEntity' } & TMakeEventModifiable<
+			COMP.MoveEntityInputEvent,
 			'dx' | 'dy',
 			GKey,
 			GValue
 	  >)
-	| ({ type: 'EntitySetPosition' } & TMakeEventModifiable<
-			COMP.DtifEntitySetPositionEvent,
-			'x' | 'y',
+	| ({ type: 'UpdateEntityRotation' } & TMakeEventModifiable<
+			COMP.UpdateEntityRotationInputEvent,
+			'rotationDeg',
+			GKey,
+			GValue
+	  >)
+	| ({ type: 'UpdateEntityVisibility' } & TMakeEventModifiable<
+			COMP.UpdateEntityVisibilityInputEvent,
+			'visible',
+			GKey,
+			GValue
+	  >)
+	| ({ type: 'UpdateEntityCornerRadii' } & TMakeEventModifiable<
+			COMP.UpdateEntityCornerRadiiInputEvent,
+			'cornerRadii',
+			GKey,
+			GValue
+	  >)
+	| ({ type: 'UpdateEntityBlendMode' } & TMakeEventModifiable<
+			COMP.UpdateEntityBlendModeInputEvent,
+			'blendMode',
+			GKey,
+			GValue
+	  >)
+	| ({ type: 'UpdateEntityOpacity' } & TMakeEventModifiable<
+			COMP.UpdateEntityOpacityInputEvent,
+			'opacity',
 			GKey,
 			GValue
 	  >);
 
-export type TModificationInputType =
+export type TModificationInputVariant =
 	| TNumberModificationInput
-	| TStringModificationInput
+	| TTextModificationInput
 	| TBooleanModificationInput
 	| TRangeModificationInput
+	| TPaintModificationInput
 	| TColorModificationInput
-	| TPositionModificationInput;
+	| TPositionModificationInput
+	| TDateTimeModificationInput;
 
 export interface TNumberModificationInput {
 	type: 'NUMBER';
+	_returnType?: number;
 	default: number;
 	max?: number;
 	min?: number;
 }
 
-export interface TStringModificationInput {
-	type: 'STRING';
+export interface TTextModificationInput {
+	type: 'TEXT';
+	_returnType?: string;
 	default: string;
+	area: boolean;
 }
 
 export interface TBooleanModificationInput {
 	type: 'BOOLEAN';
+	_returnType?: boolean;
 	default: boolean;
 }
 
 export interface TRangeModificationInput {
 	type: 'RANGE';
+	_returnType?: number;
 	default: number;
-	start: number;
-	stop: number;
+	max: number;
+	min: number;
+	step?: number;
 }
 
 export interface TColorModificationInput {
 	type: 'COLOR';
-	default: { r: number; g: number; b: number };
+	_returnType?: TRgbaColor;
+	default: TRgbaColor;
+}
+
+export interface TPaintModificationInput {
+	type: 'PAINT';
+	_returnType?: TPaintModificationReturnType;
+	default: TPaintModificationReturnType;
+}
+
+export interface TPaintModificationReturnType {
+	paint: COMP.Paint;
+	opacity?: number;
+	content?: number[];
 }
 
 export interface TPositionModificationInput {
 	type: 'POSITION';
-	default: [number, number];
-	max?: [number, number];
-	min?: [number, number];
+	_returnType?: TVec2;
+	default: TVec2;
+	max?: TVec2;
+	min?: TVec2;
 }
 
-export type TMapToDefaultType<T> = T extends { default: infer U } ? U : never;
+export interface TDateTimeModificationInput {
+	type: 'DATETIME';
+	_returnType?: number;
+	default: number | 'NOW';
+	withTime?: boolean;
+}
 
-type TExpandKey<GKey extends string, GValue> = GValue extends any[]
-	? `${GKey}.${number}`
+export type TMapToReturnType<T> = T extends { _returnType?: infer U }
+	? Exclude<U, undefined>
+	: never;
+
+export type TExpandKey<GPrefix extends string, GValue> = GValue extends any[]
+	? `${GPrefix}.${number}`
 	: GValue extends object
-		? { [P in keyof GValue]: `${GKey}.${P & string}` }[keyof GValue]
-		: GKey;
+		?
+				| { [P in keyof GValue]: TExpandKey<`${GPrefix}.${P & string}`, GValue[P]> }[keyof GValue]
+				| GPrefix
+		: GPrefix;
 
-export type TFieldData<GKey extends string, GInputType extends TModificationInputType> = {
-	[key in GKey]: TMapToDefaultType<GInputType>;
+// export interface TModificationOutputEventMapper<
+// 	GKey extends string = string,
+// 	GInputVariant extends TModificationInputVariant = TModificationInputVariant,
+// 	GOutputEventType extends COMP.WatchableComponentVariant = COMP.WatchableComponentVariant,
+// 	GInferredOutputEventType extends GOutputEventType = GOutputEventType
+// > {
+// 	type: GOutputEventType;
+// 	entity: string;
+// 	map: Record<
+// 		GKey,
+// 		TInputToOutputPathMap<
+// 			TMapToDefaultType<GInputVariant>,
+// 			TExpandKey<GInferredOutputEventType, TComponent<GInferredOutputEventType>>
+// 		>
+// 	>;
+// }
+
+// export type TComponent<GComponentVariant extends COMP.WatchableComponentVariant> = Omit<
+// 	Extract<COMP.ComponentChange, { type: GComponentVariant }>,
+// 	'type'
+// >;
+
+// export type TInputToOutputPathMap<GInput, GOutputPath> = GInput extends any[]
+// 	? GOutputPath[]
+// 	: GInput extends object
+// 		? { [P in keyof GInput]?: GOutputPath }[keyof GInput]
+// 		: GOutputPath;
+
+export type TFieldData<GKey extends string, GInputVariant extends TModificationInputVariant> = {
+	[key in GKey]: TMapToReturnType<GInputVariant>;
 };

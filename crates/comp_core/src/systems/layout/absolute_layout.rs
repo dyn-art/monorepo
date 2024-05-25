@@ -57,6 +57,8 @@ pub fn apply_pre_absolute_layout_properties(
 pub fn update_absolute_layout(
     mut query_set: ParamSet<(
         Query<(&Children, &SizeMixin), Changed<SizeMixin>>,
+        Query<(Entity, &Parent), (With<AbsoluteLayoutElementMixin>, Changed<SizeMixin>)>,
+        Query<&SizeMixin, With<Children>>,
         Query<(
             &mut SizeMixin,
             &AbsoluteLayoutElementMixin,
@@ -65,12 +67,24 @@ pub fn update_absolute_layout(
         )>,
     )>,
 ) {
-    let mut to_update_children = Vec::new();
+    let mut to_update_children: Vec<(Entity, Size)> = Vec::new();
 
-    // Identify to update children
-    for (children, parent_size) in query_set.p0().iter() {
+    // Identify to update children from parent
+    for (children, SizeMixin(parent_size)) in query_set.p0().iter() {
         for child in children.iter() {
-            to_update_children.push((*child, parent_size.0))
+            to_update_children.push((*child, *parent_size));
+        }
+    }
+
+    // Identify to update children from child
+    let to_update_entity_with_parent: Vec<(Entity, Entity)> = query_set
+        .p1()
+        .iter()
+        .map(|(entity, parent)| (entity, parent.get()))
+        .collect();
+    for (entity, parent) in to_update_entity_with_parent {
+        if let Ok(SizeMixin(parent_size)) = query_set.p2().get(parent) {
+            to_update_children.push((entity, *parent_size));
         }
     }
 
@@ -81,7 +95,7 @@ pub fn update_absolute_layout(
             AbsoluteLayoutElementMixin(absolute_layout_element),
             mut transform,
             layout_metric,
-        )) = query_set.p1().get_mut(*child)
+        )) = query_set.p3().get_mut(*child)
         {
             apply_horizontal_constraint(
                 &absolute_layout_element.constraints,

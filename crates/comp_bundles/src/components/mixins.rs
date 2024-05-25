@@ -98,7 +98,7 @@ pub struct StyleChildrenMixin(pub SmallVec<[Entity; 2]>);
 pub struct StyleParentMixin(pub Entity);
 
 #[derive(Component, Debug, Clone)]
-pub struct PaintChildMixin(pub Option<Entity>);
+pub struct PaintChildMixin(pub Entity);
 
 #[derive(Component, Debug, Default, Clone)]
 pub struct PaintParentMixin(pub SmallVec<[Entity; 2]>);
@@ -132,6 +132,10 @@ pub struct StaticLayoutParent {
     pub padding: Rect<Length>,
     #[cfg_attr(feature = "serde_support", serde(default))]
     pub flex_direction: FlexDirection,
+    #[cfg_attr(feature = "serde_support", serde(default))]
+    pub horizontal_sizing_mode: LayoutParentSizingMode,
+    #[cfg_attr(feature = "serde_support", serde(default))]
+    pub vertical_sizing_mode: LayoutParentSizingMode,
 }
 
 impl StaticLayoutParent {
@@ -153,6 +157,17 @@ impl StaticLayoutParent {
             ..Default::default()
         }
     }
+}
+
+#[derive(Debug, Default, PartialEq, Eq, Copy, Clone)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type)
+)]
+pub enum LayoutParentSizingMode {
+    #[default]
+    Fixed,
+    Hug,
 }
 
 #[derive(Component, Debug, Default, Copy, Clone)]
@@ -207,6 +222,10 @@ pub struct StaticLayoutElement {
     justify_self: Option<JustifySelf>,
     #[cfg_attr(feature = "serde_support", serde(default))]
     margin: Rect<AutoLength>,
+    #[cfg_attr(feature = "serde_support", serde(default))]
+    pub horizontal_sizing_mode: LayoutElementSizingMode,
+    #[cfg_attr(feature = "serde_support", serde(default))]
+    pub vertical_sizing_mode: LayoutElementSizingMode,
 }
 
 impl StaticLayoutElement {
@@ -223,6 +242,17 @@ impl StaticLayoutElement {
             ..Default::default()
         }
     }
+}
+
+#[derive(Debug, Default, PartialEq, Eq, Copy, Clone)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type)
+)]
+pub enum LayoutElementSizingMode {
+    #[default]
+    Fixed,
+    Fill,
 }
 
 #[derive(Debug, Copy, Clone)]
