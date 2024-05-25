@@ -788,8 +788,8 @@
 							"type": "CreateAsset",
 							"asset": {
 								"id": "a99",
-								"content": { "var": "content" },
-								"contentType": "Png"
+								"content": { "type": "Binary", "content": { "var": "content" } },
+								"contentType": { "type": "Png" }
 							}
 						}
 					]

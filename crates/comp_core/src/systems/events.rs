@@ -502,6 +502,7 @@ pub fn create_paint_input_system(
             Paint::Image(p) => p.id.clone(),
         };
 
+        // TODO: Should we do this?
         // Remove old paint
         if let Some(prev_paint_entity) = maybe_paint_id
             .as_ref()

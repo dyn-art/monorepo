@@ -8,7 +8,7 @@ use crate::{
     AssetWithId, Node, Paint,
 };
 use bevy_app::App;
-use bevy_ecs::{entity::Entity, event::Event, world::World};
+use bevy_ecs::{event::Event, world::World};
 use dyn_attributed_string::layout::{
     HorizontalTextAlignment, LineWrap, TextSizingMode, VerticalTextAlignment,
 };
