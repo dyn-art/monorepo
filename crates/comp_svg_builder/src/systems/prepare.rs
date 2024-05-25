@@ -155,6 +155,7 @@ pub fn insert_style_svg_bundle(
                                 .remove_child_element(svg_bundle_variant.get_root_element_mut());
 
                             // Already register changes because the old SvgBundleVariant is removed
+                            #[cfg(feature = "output_svg_element_changes")]
                             changed_svg_bundles_res.drain_removed_bundle_changes(
                                 svg_bundle_variant.get_svg_bundle_mut(),
                             );

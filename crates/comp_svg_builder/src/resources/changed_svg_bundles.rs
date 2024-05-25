@@ -24,6 +24,7 @@ impl ChangedSvgBundlesRes {
         self.deferred_changes.push(change)
     }
 
+    #[cfg(feature = "output_svg_element_changes")]
     pub fn drain_removed_bundle_changes(&mut self, svg_bundle: &mut dyn SvgBundle) {
         let (deferred_changes, changes) = svg_bundle.drain_changes();
         self.deferred_changes.extend(changes);
