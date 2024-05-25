@@ -147,8 +147,8 @@ pub fn insert_style_svg_bundle(
                                         c.id == new_svg_bundle_variant.get_root_element().get_id()
                                     }),
                                 ) {
-                                    let element = children.remove(new_idx);
-                                    children.insert(idx, element);
+                                    children.swap(idx, new_idx);
+                                    children.remove(new_idx);
                                 }
                             });
                             parent_style_wrapper_element

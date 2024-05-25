@@ -788,7 +788,7 @@
 							"type": "CreateAsset",
 							"asset": {
 								"id": "a99",
-								"content": "content",
+								"content": { "var": "content" },
 								"contentType": "Png"
 							}
 						}
