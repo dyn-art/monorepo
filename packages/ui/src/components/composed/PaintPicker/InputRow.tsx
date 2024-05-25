@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { GradientPaintInputRow } from './GradientPaintInputRow';
+import { ImagePaintInputRow } from './ImagePaintInputRow';
 import { SolidPaintInputRow } from './SolidPaintInputRow';
 import type { TPaint } from './types';
 
@@ -14,14 +15,22 @@ export const InputRow = React.forwardRef<HTMLDivElement, TProps>((props, forward
 
 	return (
 		<div {...otherPopoverTriggerProps} ref={forwardedRef}>
-			{paint.type === 'Solid' ? (
+			{paint.type === 'Solid' && (
 				<SolidPaintInputRow
 					onPaintUpdate={onPaintUpdate}
 					onPopoverTriggerClick={onClick}
 					paint={paint}
 				/>
-			) : (
+			)}
+			{paint.type === 'Gradient' && (
 				<GradientPaintInputRow
+					onPaintUpdate={onPaintUpdate}
+					onPopoverTriggerClick={onClick}
+					paint={paint}
+				/>
+			)}
+			{paint.type === 'Image' && (
+				<ImagePaintInputRow
 					onPaintUpdate={onPaintUpdate}
 					onPopoverTriggerClick={onClick}
 					paint={paint}

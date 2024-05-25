@@ -5,6 +5,7 @@ import React from 'react';
 import { Popover, PopoverContent, PopoverTrigger } from '../../layout';
 import { Tabs, TabsList, TabsTrigger } from '../../primitive';
 import { GradientPaintTab } from './GradientPaintTab';
+import { ImagePaintTab } from './ImagePaintTab';
 import { InputRow } from './InputRow';
 import { SolidPaintTab } from './SolidPaintTab';
 import type { TPaint } from './types';
@@ -17,7 +18,7 @@ export * from './presets';
 export * from './types';
 
 export const PaintPicker: React.FC<TPaintPickerProps> = (props) => {
-	const { paint, onPaintUpdate, tabs = ['Solid', 'Gradient'] } = props;
+	const { paint, onPaintUpdate, tabs = ['Solid', 'Gradient', 'Image'] } = props;
 	const [activeTab, setActiveTab] = React.useState<TPaint['type']>(paint.type);
 
 	return (
@@ -46,6 +47,7 @@ export const PaintPicker: React.FC<TPaintPickerProps> = (props) => {
 
 					<SolidPaintTab inheritOpacity onPaintUpdate={onPaintUpdate} paint={paint} />
 					<GradientPaintTab onPaintUpdate={onPaintUpdate} paint={paint} />
+					<ImagePaintTab onPaintUpdate={onPaintUpdate} paint={paint} />
 				</Tabs>
 			</PopoverContent>
 		</Popover>

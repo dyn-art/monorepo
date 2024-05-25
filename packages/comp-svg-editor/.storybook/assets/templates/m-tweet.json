@@ -766,29 +766,69 @@
 			"displayName": "Profile Picture",
 			"inputVariant": {
 				"type": "PAINT",
-				"default": { "paint": { "type": "Solid", "color": [255, 219, 219] }, "opacity": 1 }
+				"default": {
+					"paint": { "type": "Solid", "color": [255, 219, 219] },
+					"opacity": 1
+				}
 			},
 			"actions": [
 				{
-					"conditions": [],
 					"compute": {
 						"args": ["profilePicture"],
-						"body": "return { paint: { ...profilePicture.paint, id: 'p6' }, opacity: profilePicture.opacity }"
+						"body": "return profilePicture.content",
+						"resultName": "content"
 					},
+					"conditions": [
+						{
+							"condition": { "!=": [{ "var": "content" }, null] }
+						}
+					],
+					"events": [
+						{
+							"type": "CreateAsset",
+							"asset": {
+								"id": "a99",
+								"content": "content",
+								"contentType": "Png"
+							}
+						}
+					]
+				},
+				{
+					"compute": {
+						"args": ["profilePicture"],
+						"body": "return { ...profilePicture.paint, id: 'p6', imageId: { type: 'ReferenceId', referenceId: 'a99' } }",
+						"resultName": "paint"
+					},
+					"conditions": [],
 					"events": [
 						{
 							"type": "CreatePaint",
-							"paint": { "var": "profilePicture.paint" }
+							"paint": { "var": "paint" }
 						},
 						{
 							"type": "UpdateFillStyle",
 							"id": { "type": "ReferenceId", "referenceId": "s5" },
 							"paintId": { "type": "ReferenceId", "referenceId": "p6" }
-						},
+						}
+					]
+				},
+				{
+					"compute": {
+						"args": ["profilePicture"],
+						"body": "return profilePicture.opacity",
+						"resultName": "opacity"
+					},
+					"conditions": [
+						{
+							"condition": { "!=": [{ "var": "opacity" }, null] }
+						}
+					],
+					"events": [
 						{
 							"type": "UpdateEntityOpacity",
 							"id": { "type": "ReferenceId", "referenceId": "s5" },
-							"opacity": { "var": "profilePicture.opacity" }
+							"opacity": { "var": "opacity" }
 						}
 					]
 				}

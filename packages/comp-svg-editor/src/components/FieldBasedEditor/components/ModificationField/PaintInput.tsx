@@ -3,10 +3,17 @@ import {
 	applyModifications,
 	type COMP,
 	type TModificationField,
-	type TPaintModificationInput
+	type TPaintModificationInput,
+	type TPaintModificationReturnType
 } from '@dyn/comp-dtif';
 import type { Composition } from '@dyn/comp-svg-builder';
-import { PaintPicker, type TGradientColorStop, type TGradientVariant, type TPaint } from '@dyn/ui';
+import {
+	PaintPicker,
+	type TGradientColorStop,
+	type TGradientVariant,
+	type TImageScaleMode,
+	type TPaint
+} from '@dyn/ui';
 import {
 	arrayToMat3,
 	getJsonFunctionExecutionEnv,
@@ -28,8 +35,6 @@ export const PaintInput: React.FC<TProps> = (props) => {
 		(paint: TPaint) => {
 			setValue(paint);
 			setError(null);
-
-			console.log({ paint: mapPaintToComp(paint) });
 
 			// eslint-disable-next-line @typescript-eslint/no-floating-promises -- ok
 			(async () => {
@@ -60,7 +65,11 @@ export const PaintInput: React.FC<TProps> = (props) => {
 			<legend className="-ml-1 px-1 text-sm font-medium">{field.displayName}</legend>
 			{/* TODO: PaintPicker (InputRow) takes full width although its children don't take full width 
 			and thus blocks tapping out of the popover at some unwanted places */}
-			<PaintPicker onPaintUpdate={onPaintUpdate} paint={value} tabs={['Solid', 'Gradient']} />
+			<PaintPicker
+				onPaintUpdate={onPaintUpdate}
+				paint={value}
+				tabs={['Solid', 'Gradient', 'Image']}
+			/>
 			{error != null ? (
 				<p className="mt-2 text-sm text-red-600" id="email-error">
 					{error}
@@ -75,7 +84,7 @@ interface TProps {
 	field: TModificationField<string, TPaintModificationInput>;
 }
 
-function mapPaintToComp(paint: TPaint): { paint: COMP.Paint; opacity: number } {
+function mapPaintToComp(paint: TPaint): TPaintModificationReturnType {
 	switch (paint.type) {
 		case 'Solid': {
 			const { rgb, alpha } = rgbaToRgb(paint.color);
@@ -95,6 +104,16 @@ function mapPaintToComp(paint: TPaint): { paint: COMP.Paint; opacity: number } {
 					stops: paint.stops.map(mapGradientColorStopToComp)
 				},
 				opacity: paint.opacity
+			};
+		case 'Image':
+			return {
+				paint: {
+					type: 'Image',
+					scaleMode: mapImageScaleModeToComp(paint.scaleMode),
+					imageId: { type: 'ReferenceId', referenceId: 'unknown' }
+				},
+				opacity: paint.opacity,
+				content: paint.content
 			};
 	}
 }
@@ -129,56 +148,105 @@ function mapGradientColorStopToComp(gradientColorStop: TGradientColorStop): COMP
 	};
 }
 
-function mapCompToPaint(compPaint: COMP.Paint, opacity = 1): TPaint {
+function mapImageScaleModeToComp(imageScaleMode: TImageScaleMode): COMP.ImageScaleMode {
+	switch (imageScaleMode.type) {
+		case 'Fill':
+			return { type: 'Fill' };
+		case 'Fit':
+			return { type: 'Fit' };
+		case 'Crop':
+			return {
+				type: 'Crop',
+				transform:
+					imageScaleMode.transform != null ? mat3ToArray(imageScaleMode.transform) : undefined
+			};
+		case 'Tile':
+			return {
+				type: 'Tile',
+				scalingFactor: imageScaleMode.scalingFactor,
+				rotation: imageScaleMode.rotation
+			};
+	}
+}
+
+function mapCompToPaint(compPaint: COMP.Paint, opacity = 1, content: number[] = []): TPaint {
 	switch (compPaint.type) {
 		case 'Solid':
 			return {
 				type: 'Solid',
 				color: rgbToRgba(compPaint.color, opacity)
 			};
-
 		case 'Gradient':
 			return {
 				type: 'Gradient',
-				variant: mapCompGradientVariantToTPaint(compPaint.variant),
-				stops: compPaint.stops.map(mapCompGradientColorStopToTPaint),
+				variant: mapCompGradientVariantToPaint(compPaint.variant),
+				stops: compPaint.stops.map(mapCompGradientColorStopToPaint),
 				opacity
 			};
-
 		case 'Image':
 			return {
-				type: 'Solid',
-				color: [0, 0, 0, 1]
+				type: 'Image',
+				scaleMode:
+					compPaint.scaleMode != null
+						? mapCompImageScaleModeToPaint(compPaint.scaleMode)
+						: { type: 'Fill' },
+				content,
+				opacity
 			};
 	}
 }
 
-function mapCompGradientVariantToTPaint(gradientVariant: COMP.GradientVariant): TGradientVariant {
-	switch (gradientVariant.type) {
+function mapCompGradientVariantToPaint(
+	compGradientVariant: COMP.GradientVariant
+): TGradientVariant {
+	switch (compGradientVariant.type) {
 		case 'Linear':
 			return {
 				type: 'Linear',
 				transform:
-					gradientVariant.transform != null
-						? arrayToMat3(gradientVariant.transform) ?? undefined
+					compGradientVariant.transform != null
+						? arrayToMat3(compGradientVariant.transform) ?? undefined
 						: undefined
 			};
 		case 'Radial':
 			return {
 				type: 'Radial',
 				transform:
-					gradientVariant.transform != null
-						? arrayToMat3(gradientVariant.transform) ?? undefined
+					compGradientVariant.transform != null
+						? arrayToMat3(compGradientVariant.transform) ?? undefined
 						: undefined
 			};
 	}
 }
 
-function mapCompGradientColorStopToTPaint(
-	gradientColorStop: COMP.GradientColorStop
+function mapCompGradientColorStopToPaint(
+	compGradientColorStop: COMP.GradientColorStop
 ): TGradientColorStop {
 	return {
-		position: gradientColorStop.position,
-		color: rgbToRgba(gradientColorStop.color, gradientColorStop.opacity || 1)
+		position: compGradientColorStop.position,
+		color: rgbToRgba(compGradientColorStop.color, compGradientColorStop.opacity || 1)
 	};
+}
+
+function mapCompImageScaleModeToPaint(compImageScaleMode: COMP.ImageScaleMode): TImageScaleMode {
+	switch (compImageScaleMode.type) {
+		case 'Fill':
+			return { type: 'Fill' };
+		case 'Fit':
+			return { type: 'Fit' };
+		case 'Crop':
+			return {
+				type: 'Crop',
+				transform:
+					compImageScaleMode.transform != null
+						? arrayToMat3(compImageScaleMode.transform) ?? undefined
+						: undefined
+			};
+		case 'Tile':
+			return {
+				type: 'Tile',
+				scalingFactor: compImageScaleMode.scalingFactor,
+				rotation: compImageScaleMode.rotation
+			};
+	}
 }

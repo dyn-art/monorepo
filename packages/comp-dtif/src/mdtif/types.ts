@@ -23,7 +23,7 @@ export interface TModificationField<
 
 export interface TModificationAction<GKey extends string, GValue> {
 	conditions: TModificationCondition[];
-	compute?: TJsonFunction<[GKey]>;
+	compute?: TJsonFunction<[GKey]> & { resultName?: string };
 	events: TMdtifInputEvent<GKey, GValue>[];
 }
 
@@ -206,8 +206,14 @@ export interface TColorModificationInput {
 
 export interface TPaintModificationInput {
 	type: 'PAINT';
-	_returnType?: { paint: COMP.Paint; opacity: number };
-	default: { paint: COMP.Paint; opacity: number };
+	_returnType?: TPaintModificationReturnType;
+	default: TPaintModificationReturnType;
+}
+
+export interface TPaintModificationReturnType {
+	paint: COMP.Paint;
+	opacity?: number;
+	content?: number[];
 }
 
 export interface TPositionModificationInput {

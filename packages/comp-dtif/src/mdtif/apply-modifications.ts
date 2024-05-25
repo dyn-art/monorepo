@@ -26,18 +26,18 @@ export async function applyModifications<
 
 	for (const action of actions) {
 		const { conditions, events, compute } = action;
+		const actionModifications = { ...modifications };
 
 		if (compute != null && runJsonFunction != null) {
-			// eslint-disable-next-line no-await-in-loop -- ok here
-			modifications[compute.args[0]] = await runJsonFunction(compute, [
-				modifications[compute.args[0]]
-			]);
+			actionModifications[
+				compute.resultName != null ? (compute.resultName as GKey) : compute.args[0]
+			] = await runJsonFunction(compute, [actionModifications[compute.args[0]]]);
 		}
 
 		// Check whether data matches conditions for action
 		const notMetConditions: TNotMetCondition[] = [];
 		for (const [index, condition] of conditions.entries()) {
-			const metCondition = apply(condition.condition, modifications);
+			const metCondition = apply(condition.condition, actionModifications);
 			if (!metCondition) {
 				notMetConditions.push({ index, message: condition.notMetMessage });
 			}
@@ -49,7 +49,7 @@ export async function applyModifications<
 			processedActions.push({
 				resolved: true,
 				events: events.map((event) =>
-					toDtifInputEvent<GKey, TMapToReturnType<GInputVariant>>(event, modifications)
+					toDtifInputEvent<GKey, TMapToReturnType<GInputVariant>>(event, actionModifications)
 				)
 			});
 		}

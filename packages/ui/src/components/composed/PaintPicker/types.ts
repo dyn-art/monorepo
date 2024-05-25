@@ -1,6 +1,6 @@
 import type { TMat3, TRgbaColor } from '@dyn/utils';
 
-export type TPaint = TSolidPaint | TGradientPaint;
+export type TPaint = TSolidPaint | TGradientPaint | TImagePaint;
 
 export interface TSolidPaint {
 	type: 'Solid';
@@ -28,3 +28,16 @@ export interface TGradientColorStop {
 export type TGradientVariant =
 	| { type: 'Linear'; transform?: TMat3 }
 	| { type: 'Radial'; transform?: TMat3 };
+
+export interface TImagePaint {
+	type: 'Image';
+	scaleMode: TImageScaleMode;
+	content?: number[];
+	opacity: number;
+}
+
+export type TImageScaleMode =
+	| { type: 'Fill' }
+	| { type: 'Fit' }
+	| { type: 'Crop'; transform?: TMat3 }
+	| { type: 'Tile'; rotation?: number; scalingFactor: number };

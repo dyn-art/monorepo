@@ -5,6 +5,7 @@ export function getPaintOpacity(paint: TPaint): number {
 		case 'Solid':
 			return paint.color[3];
 		case 'Gradient':
+		case 'Image':
 			return paint.opacity;
 	}
 }

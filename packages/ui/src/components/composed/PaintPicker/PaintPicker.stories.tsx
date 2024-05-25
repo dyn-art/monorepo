@@ -12,12 +12,7 @@ const meta: Meta<typeof PaintPicker> = {
 		const [paint, setPaint] = React.useState(args.paint);
 		return (
 			<div className="w-48">
-				<PaintPicker
-					{...args}
-					onPaintUpdate={setPaint}
-					paint={paint}
-					tabs={['Solid', 'Gradient']}
-				/>
+				<PaintPicker {...args} onPaintUpdate={setPaint} paint={paint} />
 			</div>
 		);
 	},
@@ -25,7 +20,8 @@ const meta: Meta<typeof PaintPicker> = {
 		layout: 'centered'
 	},
 	args: {
-		paint: { type: 'Solid', color: [240, 128, 128, 1] }
+		// paint: { type: 'Solid', color: [240, 128, 128, 1] }
+		paint: { type: 'Image', opacity: 1, scaleMode: { type: 'Fill' } }
 	}
 } satisfies Meta<typeof PaintPicker>;
 
