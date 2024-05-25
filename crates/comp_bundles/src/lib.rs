@@ -77,9 +77,6 @@ pub struct FrameCompNodeBundle {
     pub visibility: VisibilityMixin,
     pub blend_mode: BlendModeMixin,
     pub opacity: OpacityMixin,
-    // https://github.com/Nilirad/bevy_prototype_lyon/issues/207
-    // pub styles: StylesMixin,
-    // pub children: Children,
 }
 
 #[derive(Debug, Clone)]
@@ -168,8 +165,6 @@ pub struct RectangleCompNodeBundle {
     pub visibility: VisibilityMixin,
     pub blend_mode: BlendModeMixin,
     pub opacity: OpacityMixin,
-    // https://github.com/Nilirad/bevy_prototype_lyon/issues/207
-    // pub styles: StylesMixin,
 }
 
 #[derive(Debug, Clone)]
@@ -245,8 +240,6 @@ pub struct EllipseCompNodeBundle {
     pub visibility: VisibilityMixin,
     pub blend_mode: BlendModeMixin,
     pub opacity: OpacityMixin,
-    // https://github.com/Nilirad/bevy_prototype_lyon/issues/207
-    // pub styles: StylesMixin,
 }
 
 #[derive(Debug, Clone)]
@@ -331,8 +324,6 @@ pub struct StarCompNodeBundle {
     pub visibility: VisibilityMixin,
     pub blend_mode: BlendModeMixin,
     pub opacity: OpacityMixin,
-    // https://github.com/Nilirad/bevy_prototype_lyon/issues/207
-    // pub styles: StylesMixin,
 }
 
 #[derive(Debug, Clone)]
@@ -417,8 +408,6 @@ pub struct PolygonCompNodeBundle {
     pub visibility: VisibilityMixin,
     pub blend_mode: BlendModeMixin,
     pub opacity: OpacityMixin,
-    // https://github.com/Nilirad/bevy_prototype_lyon/issues/207
-    // pub styles: StylesMixin,
 }
 
 #[derive(Debug, Clone)]
@@ -503,8 +492,6 @@ pub struct TextCompNodeBundle {
     pub visibility: VisibilityMixin,
     pub blend_mode: BlendModeMixin,
     pub opacity: OpacityMixin,
-    // https://github.com/Nilirad/bevy_prototype_lyon/issues/207
-    // pub styles: StylesMixin,
 }
 
 #[derive(Debug, Clone)]
@@ -595,8 +582,6 @@ pub struct VectorNodeBundle {
     pub blend_mode: BlendModeMixin,
     pub opacity: OpacityMixin,
     pub path: PathMixin,
-    // https://github.com/Nilirad/bevy_prototype_lyon/issues/207
-    // pub styles: StylesMixin,
 }
 
 #[derive(Debug, Clone)]
@@ -686,8 +671,6 @@ pub enum Paint {
 pub struct SolidPaintBundle {
     pub paint: CompPaint,
     pub solid: SolidCompPaint,
-    // https://github.com/Nilirad/bevy_prototype_lyon/issues/207
-    // pub parent: PaintParentMixin,
 }
 
 #[derive(Debug, Clone)]
@@ -721,8 +704,6 @@ pub struct ImagePaintBundle {
     pub paint: CompPaint,
     pub image: ImageCompPaint,
     pub asset: ImageAssetMixin,
-    // https://github.com/Nilirad/bevy_prototype_lyon/issues/207
-    // pub parent: PaintParentMixin,
 }
 
 #[derive(Debug, Clone)]
@@ -765,8 +746,6 @@ impl ImagePaint {
 pub struct GradientPaintBundle {
     pub paint: CompPaint,
     pub gradient: GradientCompPaint,
-    // https://github.com/Nilirad/bevy_prototype_lyon/issues/207
-    // pub parent: PaintParentMixin,
 }
 
 #[derive(Debug, Clone)]
@@ -819,12 +798,9 @@ pub enum Style {
 pub struct FillStyleBundle {
     pub style: CompStyle,
     pub fill: FillCompStyle,
-    pub paint: PaintChildMixin,
     pub visibility: VisibilityMixin,
     pub blend_mode: BlendModeMixin,
     pub opacity: OpacityMixin,
-    // https://github.com/Nilirad/bevy_prototype_lyon/issues/207
-    // pub parent: StyleParentMixin,
 }
 
 #[derive(Debug, Clone)]
@@ -846,25 +822,20 @@ pub struct FillStyle {
 }
 
 impl FillStyle {
-    pub fn to_bundle(&self, paint_entity: Entity) -> FillStyleBundle {
+    pub fn to_bundle(&self) -> FillStyleBundle {
         FillStyleBundle {
             style: CompStyle {
                 variant: CompStyleVariant::Fill,
             },
             fill: FillCompStyle,
-            paint: PaintChildMixin(paint_entity),
             visibility: VisibilityMixin(self.visible),
             blend_mode: BlendModeMixin(self.blend_mode),
             opacity: OpacityMixin(self.opacity),
         }
     }
 
-    pub fn spawn<'a>(
-        &self,
-        commands: &'a mut Commands,
-        paint_entity: Entity,
-    ) -> EntityCommands<'a> {
-        commands.spawn(self.to_bundle(paint_entity))
+    pub fn spawn<'a>(&self, commands: &'a mut Commands) -> EntityCommands<'a> {
+        commands.spawn(self.to_bundle())
     }
 }
 
@@ -872,13 +843,9 @@ impl FillStyle {
 pub struct StrokeStyleBundle {
     pub style: CompStyle,
     pub stroke: StrokeCompStyle,
-    pub paint: PaintChildMixin,
     pub visibility: VisibilityMixin,
     pub blend_mode: BlendModeMixin,
     pub opacity: OpacityMixin,
-    // https://github.com/Nilirad/bevy_prototype_lyon/issues/207
-    // pub stroke_path: StrokePathMixin,
-    // pub parent: StyleParentMixin,
 }
 
 #[derive(Debug, Clone)]
@@ -901,7 +868,7 @@ pub struct StrokeStyle {
 }
 
 impl StrokeStyle {
-    pub fn to_bundle(&self, paint_entity: Entity) -> StrokeStyleBundle {
+    pub fn to_bundle(&self) -> StrokeStyleBundle {
         StrokeStyleBundle {
             style: CompStyle {
                 variant: CompStyleVariant::Fill,
@@ -912,19 +879,14 @@ impl StrokeStyle {
                     ..Default::default()
                 },
             },
-            paint: PaintChildMixin(paint_entity),
             visibility: VisibilityMixin(self.visible),
             blend_mode: BlendModeMixin(self.blend_mode),
             opacity: OpacityMixin(self.opacity),
         }
     }
 
-    pub fn spawn<'a>(
-        &self,
-        commands: &'a mut Commands,
-        paint_entity: Entity,
-    ) -> EntityCommands<'a> {
-        commands.spawn(self.to_bundle(paint_entity))
+    pub fn spawn<'a>(&self, commands: &'a mut Commands) -> EntityCommands<'a> {
+        commands.spawn(self.to_bundle())
     }
 }
 
@@ -935,8 +897,6 @@ pub struct DropShadowStyleBundle {
     pub visibility: VisibilityMixin,
     pub blend_mode: BlendModeMixin,
     pub opacity: OpacityMixin,
-    // https://github.com/Nilirad/bevy_prototype_lyon/issues/207
-    // pub parent: StyleParentMixin,
 }
 
 #[derive(Debug, Clone)]

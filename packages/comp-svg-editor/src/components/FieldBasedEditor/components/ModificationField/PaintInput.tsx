@@ -105,13 +105,17 @@ function mapGradientVariantToComp(gradientVariant: TGradientVariant): COMP.Gradi
 			return {
 				type: 'Linear',
 				transform:
-					gradientVariant.transform != null ? mat3ToArray(gradientVariant.transform) : undefined
+					gradientVariant.transform != null
+						? mat3ToArray(gradientVariant.transform)
+						: [1, 0, 0, 0, 1, 0, 0, 0, 1]
 			};
 		case 'Radial':
 			return {
 				type: 'Radial',
 				transform:
-					gradientVariant.transform != null ? mat3ToArray(gradientVariant.transform) : undefined
+					gradientVariant.transform != null
+						? mat3ToArray(gradientVariant.transform)
+						: [1, 0, 0, 0, 1, 0, 0, 0, 1]
 			};
 	}
 }

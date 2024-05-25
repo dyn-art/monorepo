@@ -197,20 +197,8 @@ pub fn create_node_input_system(
 
                 // Spawn style
                 let mut style_entity_commands = match style {
-                    Style::Fill(s) => {
-                        if let Some(paint_entity) = maybe_paint_entity {
-                            s.spawn(&mut commands, paint_entity)
-                        } else {
-                            continue;
-                        }
-                    }
-                    Style::Stroke(s) => {
-                        if let Some(paint_entity) = maybe_paint_entity {
-                            s.spawn(&mut commands, paint_entity)
-                        } else {
-                            continue;
-                        }
-                    }
+                    Style::Fill(s) => s.spawn(&mut commands),
+                    Style::Stroke(s) => s.spawn(&mut commands),
                     Style::DropShadow(s) => s.spawn(&mut commands),
                 };
                 let style_entity = style_entity_commands.id();
@@ -223,6 +211,7 @@ pub fn create_node_input_system(
                 if let Some(paint_entity) = maybe_paint_entity {
                     if let Ok(mut paint_parent_mixin) = paint_parent_query.get_mut(paint_entity) {
                         paint_parent_mixin.0.push(style_entity);
+                        style_entity_commands.insert(PaintChildMixin(paint_entity));
                     }
                 }
 
@@ -396,7 +385,8 @@ pub fn update_text_node_input_system(
 pub fn update_fill_style_input_system(
     referencer_res: Res<ReferencerRes>,
     mut event_reader: EventReader<UpdateFillStyleInputEvent>,
-    mut query: Query<&mut PaintChildMixin, With<FillCompStyle>>,
+    mut style_query: Query<&mut PaintChildMixin, With<FillCompStyle>>,
+    mut paint_query: Query<&mut PaintParentMixin, With<CompPaint>>,
 ) {
     for UpdateFillStyleInputEvent {
         id,
@@ -404,10 +394,21 @@ pub fn update_fill_style_input_system(
     } in event_reader.read()
     {
         if let Some(entity) = id.get_entity(referencer_res.get_reference_id_to_entity_map()) {
-            if let Ok(mut paint_child_mixin) = query.get_mut(entity) {
-                if let Some(paint_id) = maybe_paint_id {
-                    paint_child_mixin.0 = *paint_id;
-                    // TODO: Update paint parent mixin?
+            if let Ok(mut paint_child_mixin) = style_query.get_mut(entity) {
+                if let Some(paint_entity) = maybe_paint_id.as_ref().and_then(|paint_id| {
+                    paint_id.get_entity(referencer_res.get_reference_id_to_entity_map())
+                }) {
+                    // Dissolve old style-to-paint relationship
+                    if let Ok(mut old_paint_parent_mixin) = paint_query.get_mut(paint_child_mixin.0)
+                    {
+                        old_paint_parent_mixin.0.retain(|e| *e != entity);
+                    }
+
+                    // Establish new style-to-paint relationship
+                    if let Ok(mut new_paint_parent_mixin) = paint_query.get_mut(paint_entity) {
+                        new_paint_parent_mixin.0.push(entity);
+                        paint_child_mixin.0 = paint_entity;
+                    }
                 }
             }
         }
@@ -417,7 +418,8 @@ pub fn update_fill_style_input_system(
 pub fn update_storke_style_input_system(
     referencer_res: Res<ReferencerRes>,
     mut event_reader: EventReader<UpdateStorkeStyleInputEvent>,
-    mut query: Query<(&mut StrokeCompStyle, &mut PaintChildMixin), With<StrokeCompStyle>>,
+    mut style_query: Query<(&mut StrokeCompStyle, &mut PaintChildMixin), With<StrokeCompStyle>>,
+    mut paint_query: Query<&mut PaintParentMixin, With<CompPaint>>,
 ) {
     for UpdateStorkeStyleInputEvent {
         id,
@@ -426,9 +428,22 @@ pub fn update_storke_style_input_system(
     } in event_reader.read()
     {
         if let Some(entity) = id.get_entity(referencer_res.get_reference_id_to_entity_map()) {
-            if let Ok((mut stroke_comp_style, mut paint_child_mixin)) = query.get_mut(entity) {
-                if let Some(paint_id) = maybe_paint_id {
-                    paint_child_mixin.0 = *paint_id;
+            if let Ok((mut stroke_comp_style, mut paint_child_mixin)) = style_query.get_mut(entity)
+            {
+                if let Some(paint_entity) = maybe_paint_id.as_ref().and_then(|paint_id| {
+                    paint_id.get_entity(referencer_res.get_reference_id_to_entity_map())
+                }) {
+                    // Dissolve old style-to-paint relationship
+                    if let Ok(mut old_paint_parent_mixin) = paint_query.get_mut(paint_child_mixin.0)
+                    {
+                        old_paint_parent_mixin.0.retain(|e| *e != entity);
+                    }
+
+                    // Establish new style-to-paint relationship
+                    if let Ok(mut new_paint_parent_mixin) = paint_query.get_mut(paint_entity) {
+                        paint_child_mixin.0 = paint_entity;
+                        new_paint_parent_mixin.0.push(entity);
+                    }
                 }
                 if let Some(width) = maybe_width {
                     stroke_comp_style.stroke.width = width.to_pt();
@@ -477,6 +492,7 @@ pub fn update_drop_shadow_style_input_system(
 pub fn create_paint_input_system(
     mut commands: Commands,
     mut referencer_res: ResMut<ReferencerRes>,
+    mut delete_entity_event_writer: EventWriter<DeleteEntityInputEvent>,
     mut event_reader: EventReader<CreatePaintInputEvent>,
 ) {
     for CreatePaintInputEvent { paint } in event_reader.read() {
@@ -486,30 +502,15 @@ pub fn create_paint_input_system(
             Paint::Image(p) => p.id.clone(),
         };
 
-        // Replace paint if it already exists
+        // Remove old paint
         if let Some(prev_paint_entity) = maybe_paint_id
             .as_ref()
             .and_then(|paint_id| referencer_res.get_entity(paint_id))
             .copied()
         {
-            let mut entity_commands = commands.entity(prev_paint_entity);
-
-            // Remove components and only retain components to inherit
-            entity_commands.retain::<PaintParentMixin>();
-
-            // Insert new components
-            match paint {
-                Paint::Solid(p) => entity_commands.insert(p.to_bundle()),
-                Paint::Gradient(p) => entity_commands.insert(p.to_bundle()),
-                Paint::Image(p) => entity_commands.insert(
-                    p.to_bundle(
-                        p.image_id
-                            .get_image_id(referencer_res.get_reference_id_to_asset_id_map()),
-                    ),
-                ),
-            };
-
-            return;
+            delete_entity_event_writer.send(DeleteEntityInputEvent {
+                id: ReferenceIdOrEntity::entity(prev_paint_entity),
+            });
         }
 
         // Spawn paint

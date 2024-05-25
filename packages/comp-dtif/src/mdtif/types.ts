@@ -72,6 +72,24 @@ export type TMdtifInputEvent<GKey extends string, GValue> =
 			GKey,
 			GValue
 	  >)
+	| ({ type: 'UpdateFillStyle' } & TMakeEventModifiable<
+			COMP.UpdateFillStyleInputEvent,
+			'id' | 'paintId',
+			GKey,
+			GValue
+	  >)
+	| ({ type: 'UpdateStorkeStyle' } & TMakeEventModifiable<
+			COMP.UpdateStorkeStyleInputEvent,
+			'id' | 'paintId' | 'width',
+			GKey,
+			GValue
+	  >)
+	| ({ type: 'UpdateDropShadowStyle' } & TMakeEventModifiable<
+			COMP.UpdateDropShadowStyleInputEvent,
+			'id' | 'blur' | 'color' | 'position' | 'spread',
+			GKey,
+			GValue
+	  >)
 	| ({ type: 'CreatePaint' } & TMakeEventModifiable<
 			COMP.CreatePaintInputEvent,
 			'paint',

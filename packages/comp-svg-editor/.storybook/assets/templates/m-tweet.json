@@ -748,12 +748,9 @@
 					},
 					"events": [
 						{
-							"type": "CreatePaint",
-							"paint": {
-								"type": "Solid",
-								"id": "p25",
-								"color": { "var": "backgroundColor.rgb" }
-							}
+							"type": "UpdateSolidPaint",
+							"id": { "type": "ReferenceId", "referenceId": "p25" },
+							"color": { "var": "backgroundColor.rgb" }
 						},
 						{
 							"type": "UpdateEntityOpacity",
@@ -782,6 +779,11 @@
 						{
 							"type": "CreatePaint",
 							"paint": { "var": "profilePicture.paint" }
+						},
+						{
+							"type": "UpdateFillStyle",
+							"id": { "type": "ReferenceId", "referenceId": "s5" },
+							"paintId": { "type": "ReferenceId", "referenceId": "p6" }
 						},
 						{
 							"type": "UpdateEntityOpacity",

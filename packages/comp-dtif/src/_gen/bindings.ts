@@ -1681,7 +1681,7 @@ export type UpdateEntityTransformInputEvent = { id: ReferenceIdOrEntity; x?: num
 
 export type UpdateEntityVisibilityInputEvent = { id: ReferenceIdOrEntity; visible: boolean }
 
-export type UpdateFillStyleInputEvent = { id: ReferenceIdOrEntity; paint_id: Entity | null }
+export type UpdateFillStyleInputEvent = { id: ReferenceIdOrEntity; paintId: ReferenceIdOrEntity | null }
 
 export type UpdateFrameNodeInputEvent = { id: ReferenceIdOrEntity; clipContent?: boolean | null }
 
@@ -1695,7 +1695,7 @@ export type UpdateSolidPaintInputEvent = { id: ReferenceIdOrEntity; color?: Colo
 
 export type UpdateStarNodeInputEvent = { id: ReferenceIdOrEntity; pointCount?: number | null; innerRadiusRatio?: number | null }
 
-export type UpdateStorkeStyleInputEvent = { id: ReferenceIdOrEntity; paint_id?: Entity | null; width?: Abs | null }
+export type UpdateStorkeStyleInputEvent = { id: ReferenceIdOrEntity; paintId?: ReferenceIdOrEntity | null; width?: Abs | null }
 
 export type UpdateTextNodeInputEvent = { id: ReferenceIdOrEntity; text?: string | null; attributes?: TextAttributeInterval[] | null; lineWrap?: LineWrap | null; horizontalTextAlignment?: HorizontalTextAlignment | null; verticalTextAlignment?: VerticalTextAlignment | null; sizingMode?: TextSizingMode | null }
 
