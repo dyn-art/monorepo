@@ -1,13 +1,22 @@
 
 ## Rewrite
-Currently, each Entity represented by an SVG owns its own SVGBundle (a small SVG tree visualizing the Entity). Changes are applied at the end, which is a good concept for the ECS system 
-but right now is poorly implemented and restrictive.
 
-1. **Initialization**: Create the SVGBundle in the first step (Hierarchy doesn't matter here).
-2. **Update**: Update the SVGBundle, by applying changes from Components. 
-An SVGElement can have two types of children: an Entity (WorldContext) or another SVGElement. Given the small size of each subtree, finding the correct SVGElement to update should be quick.
-3. **Hierarchy Update**: During the update event, establish the hierarchy by checking which Entity is a child of another and update the SVGElement children.
-4. **Frontend Update (if applicable)**: Check which SVGBundles have changed, verify the HierarchyIndex and child index, and send the events in the correct order to the frontend.
+### Current
 
-As SVGBundle sub tree we could use [RCTree](https://github.com/RazrFalcon/rctree/blob/master/src/lib.rs) and use [SvgDom](https://github.com/RazrFalcon/svgdom/tree/master) as inspiration,
-this should make things more generic and flexible?
+The visual representation of Entities is currently done through a SVG-Bundle. 
+An SVG-Bundle is a part of the SVG-Tree made up of multiple SVG-Elements, 
+which are the actual SVG tags (e.g., rect, g).
+
+1. **Prepare:** Create SVG-Bundles with only the structural representation of SVG-Elements, without content.
+2. **Apply:** Apply changes from Entity Components to the SVG-Bundle. During the update, establish the hierarchy by identifying parent-child relationships among Entities and updating SVGElement children accordingly. An SVGElement can have two types of children: an Entity (WorldContext) or another SVGElement.
+3. **Extract & Queue:** Identify changed SVG-Bundles and establish an order for sending events to the frontend based on hierarchy and child indices, ensuring parents exist before their children.
+
+### New?
+
+A more maintainable, and expandable approach to syncing Entities into a fixed XML-Tree
+that can be synced with the frontend DOM.
+
+#### Idea 1
+In the new approach, we create a SVG-DOM with Nodes referenced in the SVG-Bundle via RC. Treating it like the frontend DOM should simplify synchronization between Rust and the frontend state.
+
+For the SVG-DOM, we could use [RCTree](https://github.com/RazrFalcon/rctree/blob/master/src/lib.rs) and take inspiration from [SvgDom](https://github.com/RazrFalcon/svgdom/tree/master)?
