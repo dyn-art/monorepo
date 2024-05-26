@@ -1,5 +1,5 @@
 use crate::{
-    resources::{changed_svg_bundles::ChangedSvgBundlesRes, svg_context::SvgContextRes},
+    resources::svg_context::SvgContextRes,
     svg::svg_bundle::{
         node::{frame::FrameNodeSvgBundle, shape::ShapeNodeSvgBundle},
         style::{
@@ -52,7 +52,9 @@ pub fn insert_node_svg_bundle(
 pub fn insert_style_svg_bundle(
     mut commands: Commands,
     mut svg_context_res: ResMut<SvgContextRes>,
-    mut changed_svg_bundles_res: ResMut<ChangedSvgBundlesRes>,
+    #[cfg(feature = "output_svg_element_changes")] mut changed_svg_bundles_res: ResMut<
+        crate::resources::changed_svg_bundles::ChangedSvgBundlesRes,
+    >,
     mut query: Query<
         (
             Entity,
