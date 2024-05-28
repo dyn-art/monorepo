@@ -20,11 +20,11 @@ import type {
 	WatchedEntityChangesOutputEvent
 } from '@/rust/dyn-comp-svg-builder-api/bindings';
 
-import type { Renderer } from './render';
+import { SvgBuilder, type TSvgRendererOptions as TSvgBuilderOptions } from './SvgBuilder';
 
 export class Composition {
 	private readonly _svgCompHandle: SvgCompHandle;
-	private _renderer: Renderer | null = null;
+	private _builder: SvgBuilder;
 
 	private _size: Size;
 	private _viewport: Viewport;
@@ -40,6 +40,7 @@ export class Composition {
 	constructor(config: TCompositionConfig) {
 		const { dtif, interactive = false } = config;
 		this._svgCompHandle = SvgCompHandle.create(dtif, interactive);
+		this._builder = new SvgBuilder(this, config);
 		this.watchOutputEvent('CompositionChange', (event) => {
 			this._size = event.size;
 			this._viewport = event.viewport;
@@ -65,12 +66,8 @@ export class Composition {
 		return this._selectedEntities;
 	}
 
-	public get renderer(): Renderer | null {
-		return this._renderer;
-	}
-
-	public set renderer(value: Renderer) {
-		this._renderer = value;
+	public get builder(): SvgBuilder {
+		return this._builder;
 	}
 
 	// =========================================================================
@@ -90,8 +87,7 @@ export class Composition {
 
 	public unmount(): void {
 		this._svgCompHandle.free();
-		this._renderer?.clear();
-		this._renderer = null;
+		this._builder.clear();
 		this._watchedOutputEventCallbackMap = {};
 		this._inputEventQueue = [];
 	}
@@ -182,7 +178,7 @@ export class Composition {
 		this._inputEventQueue.push({ type: eventType, event } as SvgCompInputEvent);
 
 		// Delay update call, resetting timer on new events within debounceDelay
-		if (eventType === 'Interaction' && this.renderer?.isCallbackBased) {
+		if (eventType === 'Interaction' && this.builder.isCallbackBased) {
 			if (this.debounceTimeout != null) {
 				clearTimeout(this.debounceTimeout);
 			}
@@ -227,7 +223,7 @@ export class Composition {
 	}
 }
 
-export interface TCompositionConfig {
+export interface TCompositionConfig extends TSvgBuilderOptions {
 	dtif: DtifComposition;
 	interactive?: boolean;
 }

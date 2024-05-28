@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import React from 'react';
 import type { COMP } from '@dyn/comp-dtif';
-import { createSvgComposition, type Composition } from '@dyn/comp-svg-builder';
+import { createComposition, type Composition } from '@dyn/comp-svg-builder';
 
 export function useSvgComposition(config: TUseCanvasConfig): {
 	composition: Composition | null;
@@ -27,11 +27,9 @@ export function useSvgComposition(config: TUseCanvasConfig): {
 			return;
 		}
 
-		const newComposition = createSvgComposition({
+		const newComposition = createComposition({
 			dtif,
-			renderer: {
-				domElement: target as HTMLElement
-			},
+			domElement: target as HTMLElement,
 			interactive
 		});
 		setComposition(newComposition);

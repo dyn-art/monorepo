@@ -7,14 +7,17 @@ import type {
 	Vec2
 } from '@/rust/dyn-comp-svg-builder-api/bindings';
 
-import type { Composition } from '../Composition';
-import { Renderer } from './Renderer';
+import type { Composition } from './Composition';
 
 export const VERSION = '1.1';
 export const NS = 'http://www.w3.org/2000/svg';
 export const XLINK = 'http://www.w3.org/1999/xlink';
 
-export class SvgRenderer extends Renderer {
+export class SvgBuilder {
+	private readonly _isCallbackBased: boolean;
+	private readonly _isInteractive: boolean;
+	private readonly _comp: () => Composition; // TODO: Bad practice?
+
 	private _domElement: HTMLElement;
 	private _svgElement: SVGElement;
 	private _svgElementId: string;
@@ -23,9 +26,11 @@ export class SvgRenderer extends Renderer {
 
 	private _cursorInCompBounds = false;
 
-	constructor(composition: Composition, options: TsvgRendererOptions = {}) {
-		super(composition, options.callbackBased ?? true, options.interactive ?? false);
-		const { domElement = document.body } = options;
+	constructor(composition: Composition, options: TSvgRendererOptions = {}) {
+		const { domElement = document.body, callbackBased = true, interactive = false } = options;
+		this._comp = () => composition;
+		this._isCallbackBased = callbackBased;
+		this._isInteractive = interactive;
 		this._domElement = domElement;
 		this._svgElementId = `svg-canvas_${shortId()}`;
 
@@ -36,6 +41,13 @@ export class SvgRenderer extends Renderer {
 		this._svgElement.style.setProperty('overflow', 'hidden');
 		this._svgElement.style.setProperty('pointer-events', 'none');
 		this._domElement.appendChild(this._svgElement);
+
+		composition.watchOutputEvent('SvgElementChange', (event) => {
+			this.applyElementChanges(event);
+		});
+		composition.watchOutputEvent('CompositionChange', (event) => {
+			this.applyCompositionChange(event);
+		});
 
 		// Register callbacks
 		// Note: To prevent blocking composition events, non-blocking elements
@@ -152,6 +164,18 @@ export class SvgRenderer extends Renderer {
 				}
 			});
 		}
+	}
+
+	protected get composition(): Composition {
+		return this._comp();
+	}
+
+	public get isCallbackBased(): boolean {
+		return this._isCallbackBased;
+	}
+
+	public get isInteractive(): boolean {
+		return this._isInteractive;
 	}
 
 	public applyElementChanges(event: SvgElementChangesOutputEvent): void {
@@ -315,6 +339,10 @@ export class SvgRenderer extends Renderer {
 		}
 	}
 
+	public pointerEventToCompPoint(event: PointerEvent | { clientX: number; clientY: number }): Vec2 {
+		return this.clientWindowPointToCompPoint([event.clientX, event.clientY]);
+	}
+
 	public clientWindowPointToCompPoint(clientPoint: Vec2): Vec2 {
 		const rect = this._svgElement.getBoundingClientRect();
 
@@ -325,7 +353,7 @@ export class SvgRenderer extends Renderer {
 	}
 }
 
-export interface TsvgRendererOptions {
+export interface TSvgRendererOptions {
 	domElement?: HTMLElement;
 	callbackBased?: boolean;
 	interactive?: boolean;
