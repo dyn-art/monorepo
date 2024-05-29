@@ -1,3 +1,5 @@
+mod lua;
+
 use bevy_ecs::world::World;
 use dyn_comp_bundles::{
     events::{

@@ -20,6 +20,8 @@ bevy_hierarchy = { workspace = true }
 bevy_transform = { workspace = true }
 tiny-skia-path = { workspace = true }
 glam = { workspace = true }
+piccolo = "0.3.1"
+gc-arena = { version = "0.5.3", features = ["allocator-api2", "hashbrown"] }
 
 # Bindgen
 serde = { workspace = true, features = ["derive"] }
@@ -27,3 +29,6 @@ specta = { workspace = true, features = ["serde", "glam"] }
 
 # Logging
 log = { workspace = true }
+
+[dev-dependencies]
+env_logger = "0.11.3"
