@@ -44,14 +44,14 @@ mod tests {
     }
 
     #[test]
-    fn test_lua_script_logging() {
+    fn e2e() {
         init();
 
         let code = r#"
             comp.log.warn("This is a warning")
             comp.log.info("This is an info message")
             comp.log.error("This is an error message")
-            local sum = comp.add(1, 2, 3)
+            local sum = comp.sum(1, 2, 3)
             comp.log.info("Sum of 1, 2, 3 is " .. sum)
         "#;
 

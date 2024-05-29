@@ -71,6 +71,35 @@
 	"viewport": { "physicalPosition": [0, 0], "physicalSize": [500, 500] },
 	"modificationFields": [
 		{
+			"key": "data",
+			"displayName": "Apply Data",
+			"inputVariant": { "type": "NUMBER", "default": 10 },
+			"actions": [
+				{
+					"lua": [
+						"function modifyPosition(pos)",
+						"  if pos[1] < 0 then",
+						"    return { error = 'X can not be negative!' }",
+						"  elseif pos[2] < 0 then",
+						"    return { error = 'Y can not be negative!' }",
+						"  else",
+						"    return {",
+						"      events = {",
+						"        {",
+						"          type = 'UpdateEntityTransform',",
+						"          id = { type = 'ReferenceId', referenceId = 'n2' },",
+						"          x = pos[1],",
+						"          y = pos[2]",
+						"        }",
+						"      }",
+						"    }",
+						"  end",
+						"end"
+					]
+				}
+			]
+		},
+		{
 			"key": "pos",
 			"displayName": "Set Position",
 			"inputVariant": { "type": "POSITION", "default": [200, 200] },

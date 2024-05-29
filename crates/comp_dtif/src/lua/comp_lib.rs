@@ -45,7 +45,7 @@ fn load_comp<'gc>(ctx: Context<'gc>) -> Table<'gc> {
         }
     });
 
-    comp.set(ctx, "add", add_callback).unwrap();
+    comp.set(ctx, "sum", add_callback).unwrap();
 
     let log_table = load_log(ctx);
     comp.set(ctx, "log", log_table).unwrap();
