@@ -1,3 +1,5 @@
+#![cfg(feature = "lua_scripts")]
+
 use super::script::FrozenWorld;
 use dyn_comp_bundles::events::{CoreInputEvent, InputEvent};
 use gc_arena::Mutation;

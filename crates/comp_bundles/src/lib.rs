@@ -16,15 +16,14 @@ use crate::components::{
 };
 use bevy_ecs::{
     bundle::Bundle,
-    entity::Entity,
     system::{Commands, EntityCommands},
 };
 use bevy_transform::{components::Transform, TransformBundle};
 use components::{
     mixins::{
         AbsoluteLayoutElementMixin, BlendMode, BlendModeMixin, LayoutElement, OpacityMixin,
-        PaintChildMixin, StaticLayoutElementMixin, StaticLayoutParent, StaticLayoutParentMixin,
-        VisibilityMixin, WindingRule,
+        StaticLayoutElementMixin, StaticLayoutParent, StaticLayoutParentMixin, VisibilityMixin,
+        WindingRule,
     },
     nodes::{CompNodeVariant, EllipseArcData},
     paints::{CompPaintVariant, GradientColorStop, GradientVariant, ImageScaleMode},

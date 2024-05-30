@@ -9,28 +9,37 @@ license = "Commercial License"
 authors = { workspace = true }
 
 [features]
-default = []
+default = ["lua_scripts"]
+serde_support = [
+    "dep:serde",
+    "dep:specta",
+    "dyn-utils/serde_support",
+    "dyn-comp-bundles/serde_support",
+]
+lua_scripts = ["dep:gc-arena", "dep:piccolo", "dep:serde_json", "serde_support"]
 tracing = []
 
 [dependencies]
-dyn-comp-bundles = { path = "../comp_bundles", features = ["serde_support"] }
-dyn-utils = { path = "../utils", features = ["serde_support"] }
+dyn-comp-bundles = { path = "../comp_bundles" }
+dyn-utils = { path = "../utils" }
 bevy_app = { workspace = true }
 bevy_ecs = { workspace = true }
-bevy_hierarchy = { workspace = true }
-bevy_transform = { workspace = true }
-tiny-skia-path = { workspace = true }
 glam = { workspace = true }
-piccolo = { git = "https://github.com/kyren/piccolo", rev = "df3e53e" }
-gc-arena = { version = "0.5.3", features = ["allocator-api2", "hashbrown"] }
-
-# Bindgen
-serde = { workspace = true, features = ["derive"] }
-serde_json = { workspace = true }
-specta = { workspace = true, features = ["serde", "glam"] }
 
 # Logging
 log = { workspace = true }
+
+# serde_support (feature)
+serde = { workspace = true, features = ["derive"], optional = true }
+specta = { workspace = true, features = ["serde", "glam"], optional = true }
+
+# lua_scripts (feature) 
+gc-arena = { version = "0.5.3", features = [
+    "allocator-api2",
+    "hashbrown",
+], optional = true }
+piccolo = { git = "https://github.com/kyren/piccolo", rev = "df3e53e", optional = true }
+serde_json = { workspace = true, optional = true }
 
 [dev-dependencies]
 env_logger = "0.11.3"

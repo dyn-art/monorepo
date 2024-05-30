@@ -872,8 +872,6 @@ version = "0.0.1"
 dependencies = [
  "bevy_app",
  "bevy_ecs",
- "bevy_hierarchy",
- "bevy_transform",
  "dyn-comp-bundles",
  "dyn-utils",
  "env_logger",
@@ -884,7 +882,6 @@ dependencies = [
  "serde",
  "serde_json",
  "specta",
- "tiny-skia-path",
 ]
 
 [[package]]

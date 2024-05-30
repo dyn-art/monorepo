@@ -1,16 +1,14 @@
-use std::collections::HashMap;
+#![cfg(feature = "lua_scripts")]
 
 use piccolo::{Context, Table};
+use std::collections::HashMap;
 
-// #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
-// #[serde(tag = "type")]
-// pub enum LuaScriptArgInputVariant {
-//     Number { default: f32 },
-//     String { defualt: String },
-// }
-
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
-#[serde(tag = "type")]
+#[derive(Debug, Clone)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type),
+    serde(tag = "type")
+)]
 pub enum LuaScriptArg {
     Number { value: f32 },
     String { value: String },

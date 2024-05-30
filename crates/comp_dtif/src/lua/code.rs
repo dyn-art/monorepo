@@ -1,3 +1,5 @@
+#![cfg(feature = "lua_scripts")]
+
 use piccolo::{Closure, Function, Lua, StashedExecutor, StaticError};
 
 pub fn run_code(lua: &mut Lua, executor: &StashedExecutor, code: &str) -> Result<(), StaticError> {

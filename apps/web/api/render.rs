@@ -145,7 +145,7 @@ fn build_svg_string(dtif: DtifComposition) -> Result<String, AppError> {
         CompSvgBuilderPlugin {},
     ));
 
-    dtif.insert_into_world(&mut app.world);
+    dtif.send_into_world(&mut app.world);
 
     // Update app once
     app.update();

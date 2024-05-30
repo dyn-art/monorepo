@@ -65,7 +65,7 @@ impl SvgCompHandle {
             app.add_plugins(CompInteractionPlugin);
         }
 
-        dtif.insert_into_world(&mut app.world);
+        dtif.send_into_world(&mut app.world);
 
         return Ok(Self {
             app,
