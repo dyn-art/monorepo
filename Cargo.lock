@@ -870,6 +870,7 @@ dependencies = [
 name = "dyn-comp-dtif"
 version = "0.0.1"
 dependencies = [
+ "bevy_app",
  "bevy_ecs",
  "bevy_hierarchy",
  "bevy_transform",
@@ -881,6 +882,7 @@ dependencies = [
  "log",
  "piccolo",
  "serde",
+ "serde_json",
  "specta",
  "tiny-skia-path",
 ]
@@ -2126,8 +2128,7 @@ dependencies = [
 [[package]]
 name = "piccolo"
 version = "0.3.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "93dd1815b42446904bb2689d1c5d7680e8c68113d5b15a5a3297ba6c7a5f84af"
+source = "git+https://github.com/kyren/piccolo?rev=df3e53e#df3e53e4527a23df761112b824100c932bf6e9e6"
 dependencies = [
  "ahash",
  "allocator-api2",

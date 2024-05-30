@@ -15,16 +15,18 @@ tracing = []
 [dependencies]
 dyn-comp-bundles = { path = "../comp_bundles", features = ["serde_support"] }
 dyn-utils = { path = "../utils", features = ["serde_support"] }
+bevy_app = { workspace = true }
 bevy_ecs = { workspace = true }
 bevy_hierarchy = { workspace = true }
 bevy_transform = { workspace = true }
 tiny-skia-path = { workspace = true }
 glam = { workspace = true }
-piccolo = "0.3.1"
+piccolo = { git = "https://github.com/kyren/piccolo", rev = "df3e53e" }
 gc-arena = { version = "0.5.3", features = ["allocator-api2", "hashbrown"] }
 
 # Bindgen
 serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
 specta = { workspace = true, features = ["serde", "glam"] }
 
 # Logging
