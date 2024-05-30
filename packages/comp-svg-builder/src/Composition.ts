@@ -21,7 +21,7 @@ import type {
 	WatchedEntityChangesOutputEvent
 } from '@/rust/dyn-comp-svg-builder-api/bindings';
 
-import { SvgBuilder, type TSvgRendererOptions as TSvgBuilderOptions } from './SvgBuilder';
+import { SvgBuilder, type TSvgBuilderOptions } from './SvgBuilder';
 
 export class Composition {
 	private readonly _svgCompHandle: SvgCompHandle;

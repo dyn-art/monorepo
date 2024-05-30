@@ -64,7 +64,7 @@ export const EntitySelectionBox: React.FC<TProps> = (props) => {
 	const handleOnResizeHandlePointerEvent = React.useCallback(
 		(side: EHandleSide, eventType: 'Up' | 'Down', event: React.PointerEvent<SVGGElement>) => {
 			event.stopPropagation();
-			if (sizeData == null || globalTransformData == null || composition.renderer == null) {
+			if (sizeData == null || globalTransformData == null) {
 				return;
 			}
 			const { size } = sizeData;
@@ -73,7 +73,7 @@ export const EntitySelectionBox: React.FC<TProps> = (props) => {
 			if (event.button === 0) {
 				switch (eventType) {
 					case 'Up':
-						onResizeHandlePointerUp(composition.renderer.pointerEventToCompPoint(event));
+						onResizeHandlePointerUp(composition.builder.pointerEventToCompPoint(event));
 						break;
 					case 'Down':
 						onResizeHandlePointerDown(
@@ -91,7 +91,7 @@ export const EntitySelectionBox: React.FC<TProps> = (props) => {
 		[
 			sizeData,
 			globalTransformData,
-			composition.renderer,
+			composition.builder,
 			onResizeHandlePointerUp,
 			onResizeHandlePointerDown
 		]
@@ -100,7 +100,7 @@ export const EntitySelectionBox: React.FC<TProps> = (props) => {
 	const handleOnRotateHandlePointerEvent = React.useCallback(
 		(side: EHandleSide, eventType: 'Up' | 'Down', event: React.PointerEvent<SVGGElement>) => {
 			event.stopPropagation();
-			if (globalTransformData == null || composition.renderer == null) {
+			if (globalTransformData == null) {
 				return;
 			}
 			const { rotationDeg } = globalTransformData;
@@ -108,7 +108,7 @@ export const EntitySelectionBox: React.FC<TProps> = (props) => {
 			if (event.button === 0) {
 				switch (eventType) {
 					case 'Up':
-						onRotateHandlePointerUp(composition.renderer.pointerEventToCompPoint(event));
+						onRotateHandlePointerUp(composition.builder.pointerEventToCompPoint(event));
 						break;
 					case 'Down':
 						onRotateHandlePointerDown(side, rotationDeg);
@@ -116,7 +116,7 @@ export const EntitySelectionBox: React.FC<TProps> = (props) => {
 				}
 			}
 		},
-		[globalTransformData, composition.renderer, onRotateHandlePointerUp, onRotateHandlePointerDown]
+		[globalTransformData, composition.builder, onRotateHandlePointerUp, onRotateHandlePointerDown]
 	);
 
 	// =========================================================================
