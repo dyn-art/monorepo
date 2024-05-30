@@ -4,13 +4,12 @@ use super::{
     freeze::{Freeze, Frozen},
 };
 use bevy_ecs::world::World;
-use piccolo::{Context, Executor, FromValue, Lua, UserData, Value};
+use piccolo::{Context, Executor, Lua, UserData};
 
 /// A frozen reference to the ECS [`World`].
 ///
 // This type can be converted into lua userdata for accessing the world from lua.
-#[derive(Clone)]
-pub struct WorldRef(pub Frozen<Freeze![&'freeze mut World]>);
+pub type WorldRef = Frozen<Freeze![&'freeze mut World]>;
 
 impl WorldRef {
     /// Convert this [`WorldRef`] into a Lua userdata.
@@ -36,19 +35,19 @@ impl LuaScript {
 
         let executor = lua.enter(|ctx| ctx.stash(Executor::new(ctx)));
 
-        lua.enter(|ctx| {
-            Frozen::<Freeze![&'freeze mut World]>::in_scope(world, |world| {
-                load_comp_global(ctx, WorldRef(world));
+        Frozen::<Freeze![&'freeze mut World]>::in_scope(world, |world| {
+            lua.enter(|ctx| {
+                load_comp_global(ctx, world);
                 //    WorldRef(world).load_global(ctx);
             });
-        });
 
-        return match run_code(&mut lua, &executor, &self.source) {
-            Ok(_) => log::info!("Lua code executed successfully"),
-            Err(err) => {
-                log::error!("Failed to execute Lua code by exception: {:?}", err);
-            }
-        };
+            return match run_code(&mut lua, &executor, &self.source) {
+                Ok(_) => log::info!("Lua code executed successfully"),
+                Err(err) => {
+                    log::error!("Failed to execute Lua code by exception: {:?}", err);
+                }
+            };
+        });
     }
 }
 
@@ -62,7 +61,9 @@ pub struct NumberArg {
 
 #[cfg(test)]
 mod tests {
-    use bevy_app::App;
+    use bevy_app::{App, Update};
+    use bevy_ecs::event::EventReader;
+    use dyn_comp_bundles::events::{CoreInputEvent, InputEvent, UpdateCompositionSizeInputEvent};
 
     use super::*;
 
@@ -77,6 +78,8 @@ mod tests {
         init();
 
         let mut app = App::new();
+        CoreInputEvent::register_events(&mut app);
+        app.add_systems(Update, event_listener_system);
 
         let code = r#"
             comp.log.warn("This is a warning")
@@ -85,7 +88,7 @@ mod tests {
             local sum = comp.sum(1, 2, 3)
             comp.log.info("Sum of 1, 2, 3 is " .. sum)
 
-            local my_event = '{"type":"UpdateCompositionSize","size":[100, 100]}'
+            local my_event = '{"type":"UpdateCompositionSize","size":[50, 100]}'
             comp.send_event(my_event)
         "#;
 
@@ -94,5 +97,13 @@ mod tests {
         };
 
         script.run(&mut app.world);
+
+        app.update();
+    }
+
+    fn event_listener_system(mut event_reader: EventReader<UpdateCompositionSizeInputEvent>) {
+        for event in event_reader.read() {
+            log::info!("Event: {:?}", event);
+        }
     }
 }

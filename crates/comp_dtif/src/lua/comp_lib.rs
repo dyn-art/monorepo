@@ -58,7 +58,7 @@ fn load_comp<'gc>(ctx: Context<'gc>, world_ref: WorldRef) -> Table<'gc> {
             match serde_json::from_str::<CoreInputEvent>(&s.to_str_lossy()) {
                 Ok(event) => {
                     // TODO: Doesn't work: called `Result::unwrap()` on an `Err` value: Expired
-                    world_ref.0.with_mut(|mut world| {
+                    world_ref.with_mut(|mut world| {
                         event.send_into_world(&mut world);
                     });
                     Some(Value::Nil)
