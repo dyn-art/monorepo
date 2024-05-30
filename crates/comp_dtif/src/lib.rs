@@ -10,6 +10,8 @@ use dyn_comp_bundles::{
     AssetWithId, Node, Paint,
 };
 use dyn_utils::properties::size::Size;
+use lua::script::LuaScript;
+use std::collections::HashMap;
 
 /// DTIF (Design Tree Interchange Format) utilizes a flat structure for easy readability
 /// and efficient access & manipulation of design elements (Nodes, Paints, ..).
@@ -32,9 +34,12 @@ pub struct DtifComposition {
     /// A list of assets.
     #[serde(default)]
     pub assets: Vec<AssetWithId>,
-    // A list of input events.
+    /// A list of input events.
     #[serde(default)]
     pub events: Vec<CoreInputEvent>,
+    /// A map of scripts.
+    #[serde(default)]
+    pub scripts: HashMap<String, LuaScript>,
 }
 
 impl DtifComposition {

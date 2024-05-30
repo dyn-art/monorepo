@@ -1,4 +1,4 @@
-use super::script::WorldRef;
+use super::script::FrozenWorld;
 use dyn_comp_bundles::events::{CoreInputEvent, InputEvent};
 use gc_arena::Mutation;
 use piccolo::{
@@ -22,13 +22,13 @@ where
     })
 }
 
-pub fn load_comp_global<'gc>(ctx: Context<'gc>, world_ref: WorldRef) {
-    let comp_table = load_comp(ctx, world_ref);
+pub fn load_comp_table_global<'gc>(ctx: Context<'gc>, frozen_world: FrozenWorld) {
+    let comp_table = create_comp_table(ctx, frozen_world);
     ctx.set_global("comp", comp_table).unwrap();
 }
 
-fn load_comp<'gc>(ctx: Context<'gc>, world_ref: WorldRef) -> Table<'gc> {
-    let comp = Table::new(&ctx);
+fn create_comp_table<'gc>(ctx: Context<'gc>, frozen_world: FrozenWorld) -> Table<'gc> {
+    let comp_table = Table::new(&ctx);
 
     let sum_callback = callback("sum", &ctx, |_, v: Variadic<Vec<Value>>| {
         if v.is_empty() {
@@ -47,18 +47,11 @@ fn load_comp<'gc>(ctx: Context<'gc>, world_ref: WorldRef) -> Table<'gc> {
         }
     });
 
-    let send_event_callback = callback("send_event", &ctx, move |ctx, v: Value| {
+    let send_event_callback = callback("send_event", &ctx, move |_, v: Value| {
         if let Value::String(s) = v {
-            // let world_value = ctx.get_global("world");
-            // let world_ref = match world_value {
-            //     Value::UserData(ud) => ud.downcast_static::<WorldRef>().ok(),
-            //     _ => None,
-            // }?;
-
             match serde_json::from_str::<CoreInputEvent>(&s.to_str_lossy()) {
                 Ok(event) => {
-                    // TODO: Doesn't work: called `Result::unwrap()` on an `Err` value: Expired
-                    world_ref.with_mut(|mut world| {
+                    frozen_world.with_mut(|mut world| {
                         event.send_into_world(&mut world);
                     });
                     Some(Value::Nil)
@@ -74,16 +67,18 @@ fn load_comp<'gc>(ctx: Context<'gc>, world_ref: WorldRef) -> Table<'gc> {
         }
     });
 
-    comp.set(ctx, "sum", sum_callback).unwrap();
-    comp.set(ctx, "send_event", send_event_callback).unwrap();
+    comp_table.set(ctx, "sum", sum_callback).unwrap();
+    comp_table
+        .set(ctx, "send_event", send_event_callback)
+        .unwrap();
 
-    let log_table = load_log(ctx);
-    comp.set(ctx, "log", log_table).unwrap();
+    let log_table = create_log_table(ctx);
+    comp_table.set(ctx, "log", log_table).unwrap();
 
-    return comp;
+    return comp_table;
 }
 
-fn load_log<'gc>(ctx: Context<'gc>) -> Table<'gc> {
+fn create_log_table<'gc>(ctx: Context<'gc>) -> Table<'gc> {
     let log_table = Table::new(&ctx);
 
     let warn_callback = callback("warn", &ctx, |_, v: Value| {

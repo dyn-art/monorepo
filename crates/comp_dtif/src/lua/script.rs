@@ -1,69 +1,50 @@
 use super::{
+    args::{load_args_table_global, LuaScriptArgsMap},
     code::run_code,
-    comp_lib::load_comp_global,
+    comp::load_comp_table_global,
     freeze::{Freeze, Frozen},
 };
 use bevy_ecs::world::World;
-use piccolo::{Context, Executor, Lua, UserData};
+use piccolo::{Executor, Lua};
 
 /// A frozen reference to the ECS [`World`].
-///
-// This type can be converted into lua userdata for accessing the world from lua.
-pub type WorldRef = Frozen<Freeze![&'freeze mut World]>;
+pub type FrozenWorld = Frozen<Freeze![&'freeze mut World]>;
 
-impl WorldRef {
-    /// Convert this [`WorldRef`] into a Lua userdata.
-    pub fn into_userdata(self, ctx: Context<'_>) -> UserData<'_> {
-        UserData::new_static(&ctx, self)
-    }
-
-    pub fn load_global<'gc>(&self, ctx: Context<'gc>) {
-        ctx.globals()
-            .set(ctx, "world", self.clone().into_userdata(ctx))
-            .unwrap();
-    }
-}
-
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, specta::Type)]
+#[serde(rename_all = "camelCase")]
 pub struct LuaScript {
     pub source: String,
-    // pub args: LuaScriptArgs,
 }
 
 impl LuaScript {
-    pub fn run(&self, world: &mut World) {
+    pub fn run(&self, world: FrozenWorld, args_map: LuaScriptArgsMap) {
         let mut lua = Lua::full();
 
         let executor = lua.enter(|ctx| ctx.stash(Executor::new(ctx)));
 
-        Frozen::<Freeze![&'freeze mut World]>::in_scope(world, |world| {
-            lua.enter(|ctx| {
-                load_comp_global(ctx, world);
-                //    WorldRef(world).load_global(ctx);
-            });
-
-            return match run_code(&mut lua, &executor, &self.source) {
-                Ok(_) => log::info!("Lua code executed successfully"),
-                Err(err) => {
-                    log::error!("Failed to execute Lua code by exception: {:?}", err);
-                }
-            };
+        lua.enter(|ctx| {
+            load_comp_table_global(ctx, world);
+            load_args_table_global(ctx, args_map);
         });
+
+        return match run_code(&mut lua, &executor, &self.source) {
+            Ok(_) => log::info!("Lua code executed successfully"),
+            Err(err) => {
+                log::error!("Failed to execute Lua code by exception: {:?}", err);
+            }
+        };
     }
-}
-
-pub enum LuaScriptArgs {
-    Number(NumberArg),
-}
-
-pub struct NumberArg {
-    default: f32,
 }
 
 #[cfg(test)]
 mod tests {
+    use std::collections::HashMap;
+
     use bevy_app::{App, Update};
     use bevy_ecs::event::EventReader;
     use dyn_comp_bundles::events::{CoreInputEvent, InputEvent, UpdateCompositionSizeInputEvent};
+
+    use crate::lua::args::LuaScriptArg;
 
     use super::*;
 
@@ -87,8 +68,9 @@ mod tests {
             comp.log.error("This is an error message")
             local sum = comp.sum(1, 2, 3)
             comp.log.info("Sum of 1, 2, 3 is " .. sum)
+            comp.log.info("Value of: " .. args.input)
 
-            local my_event = '{"type":"UpdateCompositionSize","size":[50, 100]}'
+            local my_event = '{"type":"UpdateCompositionSize","size":[' .. args.input .. ',100]}'
             comp.send_event(my_event)
         "#;
 
@@ -96,7 +78,12 @@ mod tests {
             source: code.to_string(),
         };
 
-        script.run(&mut app.world);
+        let mut args_map: LuaScriptArgsMap = HashMap::new();
+        args_map.insert(String::from("input"), LuaScriptArg::Number { value: 10.0 });
+
+        Frozen::in_scope(&mut app.world, |world| {
+            script.run(world, args_map);
+        });
 
         app.update();
     }
