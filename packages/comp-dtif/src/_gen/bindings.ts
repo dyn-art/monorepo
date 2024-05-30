@@ -249,7 +249,15 @@ paints?: Paint[];
 /**
  * A list of assets.
  */
-assets?: AssetWithId[]; events?: CoreInputEvent[] }
+assets?: AssetWithId[]; 
+/**
+ * A list of input events.
+ */
+events?: CoreInputEvent[]; 
+/**
+ * A map of scripts.
+ */
+scripts?: { [key in string]: LuaScript } }
 
 export type EllipseNode = { id?: ReferenceId | null; startingAngle?: number; endingAngle?: number; innerRadiusRatio?: number; translation?: Vec2; rotationDeg?: Angle; size: Size; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; layoutElement?: LayoutElement; styles?: Style[] }
 
@@ -1401,6 +1409,10 @@ export type LineWrap =
  */
 "Word"
 
+export type LuaScript = { source: string }
+
+export type LuaScriptArg = { type: "Number"; value: number } | { type: "String"; value: string }
+
 export type Mat3 = [number, number, number, number, number, number, number, number, number]
 
 /**
@@ -1656,6 +1668,10 @@ export type TextAttributes = { fontFamily?: FontFamily | null; fontStyle?: FontS
 export type TextNode = { id?: ReferenceId | null; text: string; attributes: TextAttributeInterval[]; lineWrap?: LineWrap; horizontalTextAlignment?: HorizontalTextAlignment; verticalTextAlignment?: VerticalTextAlignment; sizingMode?: TextSizingMode; translation?: Vec2; rotationDeg?: Angle; size: Size; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; layoutElement?: LayoutElement; styles?: Style[] }
 
 export type TextSizingMode = "WidthAndHeight" | "Height" | "Fixed"
+
+export type ToRunLuaScript = { key: string; argsMap: { [key in string]: LuaScriptArg } }
+
+export type ToRunLuaScripts = ToRunLuaScript[]
 
 export type UpdateCompositionSizeInputEvent = { size: Size }
 

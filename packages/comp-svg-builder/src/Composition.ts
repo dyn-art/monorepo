@@ -15,6 +15,7 @@ import type {
 	SvgCompInputEvent,
 	SvgCompOutputEvent,
 	SvgElementChangesOutputEvent,
+	ToRunLuaScripts,
 	Viewport,
 	WatchableComponentVariant,
 	WatchedEntityChangesOutputEvent
@@ -205,6 +206,10 @@ export class Composition {
 	// =========================================================================
 	// Other
 	// =========================================================================
+
+	public runScripts(toRunScripts: ToRunLuaScripts): void {
+		this._svgCompHandle.runScripts(toRunScripts);
+	}
 
 	public logEntityComponentsRaw(rawEntity: number): void {
 		this._svgCompHandle.logEntityComponentsRaw(rawEntity);

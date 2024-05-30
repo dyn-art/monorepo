@@ -19,14 +19,20 @@ use dyn_comp_bundles::{
     events::InputEvent,
 };
 use dyn_comp_core::{resources::composition::CompositionRes, CompCorePlugin};
-use dyn_comp_dtif::DtifComposition;
+use dyn_comp_dtif::{
+    lua::script::{LuaScript, ToRunLuaScripts},
+    DtifComposition,
+};
 use dyn_comp_interaction::CompInteractionPlugin;
 use dyn_comp_svg_builder::{
     events::SvgBuilderOutputEvent, svg::svg_bundle::SvgBundleVariant, CompSvgBuilderPlugin,
 };
 use events::{SvgCompInputEvent, SvgCompOutputEvent};
 use modules::watch::{resources::watched_entities::WatchedEntitiesRes, CompWatchPlugin};
-use std::sync::mpsc::{channel, Receiver};
+use std::{
+    collections::HashMap,
+    sync::mpsc::{channel, Receiver},
+};
 use wasm_bindgen::{prelude::wasm_bindgen, JsValue};
 
 #[wasm_bindgen]
@@ -34,12 +40,13 @@ pub struct SvgCompHandle {
     app: App,
     svg_builder_output_event_receiver: Receiver<SvgBuilderOutputEvent>,
     output_event_receiver: Receiver<SvgCompOutputEvent>,
+    lua_scripts: HashMap<String, LuaScript>,
 }
 
 #[wasm_bindgen]
 impl SvgCompHandle {
     pub fn create(js_dtif: JsValue, interactive: bool) -> Result<SvgCompHandle, JsValue> {
-        let dtif: DtifComposition = serde_wasm_bindgen::from_value(js_dtif)?;
+        let mut dtif: DtifComposition = serde_wasm_bindgen::from_value(js_dtif)?;
         let mut app = App::new();
 
         let (svg_builder_output_event_sender, svg_builder_output_event_receiver) =
@@ -71,7 +78,18 @@ impl SvgCompHandle {
             app,
             svg_builder_output_event_receiver,
             output_event_receiver,
+            lua_scripts: std::mem::take(&mut dtif.scripts),
         });
+    }
+
+    #[wasm_bindgen(js_name = runScripts)]
+    pub fn run_scripts(&mut self, js_script_args_maps: JsValue) {
+        let maybe_to_run_lua_scripts: Result<ToRunLuaScripts, _> =
+            serde_wasm_bindgen::from_value(js_script_args_maps);
+
+        if let Ok(to_run_lua_scripts) = maybe_to_run_lua_scripts {
+            to_run_lua_scripts.run_batch(&self.lua_scripts, &mut self.app.world);
+        }
     }
 
     pub fn update(&mut self, js_input_events: JsValue) -> Result<JsValue, JsValue> {

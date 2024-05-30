@@ -24,8 +24,8 @@ pub fn load_args_table_global<'gc>(ctx: Context<'gc>, args_map: LuaScriptArgsMap
 fn create_args_table<'gc>(ctx: Context<'gc>, args_map: LuaScriptArgsMap) -> Table<'gc> {
     let args_table = Table::new(&ctx);
 
-    for (key, value) in args_map {
-        match value {
+    for (key, arg) in args_map {
+        match arg {
             LuaScriptArg::Number { value } => {
                 args_table.set(ctx, key, value).unwrap();
             }
