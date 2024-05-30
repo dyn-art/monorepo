@@ -35,9 +35,9 @@ impl LuaScript {
         });
 
         return match Self::run_code(&mut lua, &executor, &self.source) {
-            Ok(_) => log::info!("Lua code executed successfully"),
+            Ok(_) => log::info!("[run] Lua code executed successfully"),
             Err(err) => {
-                log::error!("Failed to execute Lua code by exception: {:?}", err);
+                log::error!("[run] Failed to execute Lua code by exception: {:?}", err);
             }
         };
     }

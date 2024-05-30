@@ -59,12 +59,19 @@ fn create_comp_table<'gc>(ctx: Context<'gc>, frozen_world: FrozenWorld) -> Table
                     Some(Value::Nil)
                 }
                 Err(err) => {
-                    log::error!("Failed to deserialize event: {}", err);
+                    log::error!(
+                        "[send_event_callback] Failed to deserialize event '{}' by exception: {}",
+                        s,
+                        err
+                    );
                     None
                 }
             }
         } else {
-            log::error!("Invalid argument type for 'send_event': {}", v);
+            log::error!(
+                "[send_event_callback] Invalid argument type for 'send_event': {}",
+                v
+            );
             None
         }
     });

@@ -15,7 +15,10 @@ mod tests {
     };
     use bevy_app::{App, Update};
     use bevy_ecs::event::EventReader;
-    use dyn_comp_bundles::events::{CoreInputEvent, InputEvent, UpdateCompositionSizeInputEvent};
+    use dyn_comp_bundles::events::{
+        CoreInputEvent, InputEvent, UpdateCompositionSizeInputEvent,
+        UpdateEntityTransformInputEvent,
+    };
     use std::collections::HashMap;
 
     fn init() {
@@ -30,7 +33,13 @@ mod tests {
 
         let mut app = App::new();
         CoreInputEvent::register_events(&mut app);
-        app.add_systems(Update, event_listener_system);
+        app.add_systems(
+            Update,
+            (
+                update_composition_size_input_system,
+                update_entity_transform_input_system,
+            ),
+        );
 
         let code = r#"
             comp.log.warn("This is a warning")
@@ -42,6 +51,8 @@ mod tests {
 
             local my_event = '{"type":"UpdateCompositionSize","size":[' .. args.input .. ',100]}'
             comp.send_event(my_event)
+
+            comp.send_event('{"type":"UpdateEntityTransform","id":{"type":"ReferenceId","referenceId":"' .. args.nodeId .. '"},"x":' .. args.x .. ',"y":' .. args.y .. '}')
         "#;
 
         let script = LuaScript {
@@ -50,6 +61,14 @@ mod tests {
 
         let mut args_map: LuaScriptArgsMap = HashMap::new();
         args_map.insert(String::from("input"), LuaScriptArg::Number { value: 10.0 });
+        args_map.insert(
+            String::from("nodeId"),
+            LuaScriptArg::String {
+                value: String::from("n2"),
+            },
+        );
+        args_map.insert(String::from("x"), LuaScriptArg::Number { value: 10.0 });
+        args_map.insert(String::from("y"), LuaScriptArg::Number { value: 10.0 });
 
         Frozen::in_scope(&mut app.world, |world| {
             script.run(world, args_map);
@@ -58,9 +77,19 @@ mod tests {
         app.update();
     }
 
-    fn event_listener_system(mut event_reader: EventReader<UpdateCompositionSizeInputEvent>) {
+    fn update_composition_size_input_system(
+        mut event_reader: EventReader<UpdateCompositionSizeInputEvent>,
+    ) {
         for event in event_reader.read() {
-            log::info!("Event: {:?}", event);
+            log::info!("[update_composition_size_input_system] {:?}", event);
+        }
+    }
+
+    fn update_entity_transform_input_system(
+        mut event_reader: EventReader<UpdateEntityTransformInputEvent>,
+    ) {
+        for event in event_reader.read() {
+            log::info!("[update_entity_transform_input_system] {:?}", event);
         }
     }
 }
