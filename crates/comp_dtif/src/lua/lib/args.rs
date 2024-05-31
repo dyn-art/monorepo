@@ -12,6 +12,7 @@ use std::collections::HashMap;
 pub enum LuaScriptArg {
     Number(LuaScriptNumberArg),
     String(LuaScriptStringArg),
+    Boolean(LuaScriptBooleanArg),
 }
 
 #[derive(Debug, Clone)]
@@ -32,6 +33,15 @@ pub struct LuaScriptStringArg {
     pub value: String,
 }
 
+#[derive(Debug, Clone)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type)
+)]
+pub struct LuaScriptBooleanArg {
+    pub value: bool,
+}
+
 pub type LuaScriptArgsMap = HashMap<String, LuaScriptArg>;
 
 pub fn load_args_table_global<'gc>(ctx: Context<'gc>, args_map: LuaScriptArgsMap) {
@@ -48,6 +58,9 @@ fn create_args_table<'gc>(ctx: Context<'gc>, args_map: LuaScriptArgsMap) -> Tabl
                 args_table.set(ctx, key, value).unwrap();
             }
             LuaScriptArg::String(LuaScriptStringArg { value }) => {
+                args_table.set(ctx, key, value).unwrap();
+            }
+            LuaScriptArg::Boolean(LuaScriptBooleanArg { value }) => {
                 args_table.set(ctx, key, value).unwrap();
             }
         }
