@@ -500,6 +500,8 @@ export type InteractionToolChangeOutputEvent = { interactionTool: InteractionToo
 
 export type InteractionToolChangedInputEvent = { tool: InteractionTool }
 
+export type JsonValue = null | boolean | number | string | JsonValue[] | { [key in string]: JsonValue }
+
 /**
  * The key code of a [`KeyboardInput`].
  * 
@@ -1411,12 +1413,6 @@ export type LineWrap =
 
 export type LuaScript = { source: string }
 
-export type LuaScriptArg = ({ type: "Number" } & LuaScriptNumberArg) | ({ type: "String" } & LuaScriptStringArg)
-
-export type LuaScriptNumberArg = { value: number }
-
-export type LuaScriptStringArg = { value: string }
-
 export type Mat3 = [number, number, number, number, number, number, number, number, number]
 
 /**
@@ -1673,7 +1669,7 @@ export type TextNode = { id?: ReferenceId | null; text: string; attributes: Text
 
 export type TextSizingMode = "WidthAndHeight" | "Height" | "Fixed"
 
-export type ToRunLuaScript = { key: string; argsMap: { [key in string]: LuaScriptArg } }
+export type ToRunLuaScript = { key: string; argsMap: { [key in string]: JsonValue } }
 
 export type ToRunLuaScripts = ToRunLuaScript[]
 

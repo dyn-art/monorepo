@@ -42,9 +42,9 @@ export const Viewport: React.FC<TViewportProps> = (props) => {
 								{
 									key: 'test',
 									argsMap: {
-										x: { type: 'Number', value: 200 },
-										y: { type: 'Number', value: 200 },
-										nodeId: { type: 'String', value: 'n30' }
+										x: 100,
+										y: 100,
+										nodeId: 'n30'
 									}
 								}
 							]);

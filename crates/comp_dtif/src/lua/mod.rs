@@ -8,17 +8,14 @@ pub mod serde;
 
 #[cfg(test)]
 mod tests {
-    use super::{
-        freeze::Frozen,
-        lib::args::{LuaScriptArg, LuaScriptArgsMap, LuaScriptNumberArg, LuaScriptStringArg},
-        script::LuaScript,
-    };
+    use super::{freeze::Frozen, lib::args::LuaScriptArgsMap, script::LuaScript};
     use bevy_app::{App, Update};
     use bevy_ecs::event::EventReader;
     use dyn_comp_bundles::events::{
         CoreInputEvent, InputEvent, UpdateCompositionSizeInputEvent,
         UpdateEntityTransformInputEvent,
     };
+    use serde_json::json;
     use std::collections::HashMap;
 
     fn init() {
@@ -68,24 +65,10 @@ mod tests {
         };
 
         let mut args_map: LuaScriptArgsMap = HashMap::new();
-        args_map.insert(
-            String::from("input"),
-            LuaScriptArg::Number(LuaScriptNumberArg { value: 10.0 }),
-        );
-        args_map.insert(
-            String::from("nodeId"),
-            LuaScriptArg::String(LuaScriptStringArg {
-                value: String::from("n2"),
-            }),
-        );
-        args_map.insert(
-            String::from("x"),
-            LuaScriptArg::Number(LuaScriptNumberArg { value: 10.0 }),
-        );
-        args_map.insert(
-            String::from("y"),
-            LuaScriptArg::Number(LuaScriptNumberArg { value: 10.0 }),
-        );
+        args_map.insert(String::from("input"), json!(10.0));
+        args_map.insert(String::from("nodeId"), json!("n2"));
+        args_map.insert(String::from("x"), json!(20.0));
+        args_map.insert(String::from("y"), json!(30.0));
 
         Frozen::in_scope(&mut app.world, |world| {
             script.run(world, args_map);

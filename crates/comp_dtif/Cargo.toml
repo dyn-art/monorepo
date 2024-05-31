@@ -37,7 +37,11 @@ log = { workspace = true }
 
 # serde_support (feature)
 serde = { workspace = true, features = ["derive"], optional = true }
-specta = { workspace = true, features = ["serde", "glam"], optional = true }
+specta = { workspace = true, features = [
+    "serde",
+    "glam",
+    "serde_json",
+], optional = true }
 
 # lua_scripts (feature) 
 gc-arena = { version = "0.5.3", features = [

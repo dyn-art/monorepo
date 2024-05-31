@@ -2765,6 +2765,7 @@ dependencies = [
  "once_cell",
  "paste",
  "serde",
+ "serde_json",
  "specta-macros",
  "thiserror",
 ]
