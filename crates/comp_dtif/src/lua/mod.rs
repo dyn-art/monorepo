@@ -46,6 +46,8 @@ mod tests {
             comp.log.info("Sum of 1, 2, 3 is " .. sum)
             comp.log.info("Value of: " .. args.input)
 
+            -- error("A message?")
+
             local update_composition_size_event = {
                 type = "UpdateCompositionSize",
                 size = { args.input, 100 }
@@ -71,7 +73,7 @@ mod tests {
         args_map.insert(String::from("y"), json!(30.0));
 
         Frozen::in_scope(&mut app.world, |world| {
-            script.run(world, args_map);
+            script.run(world, args_map).unwrap();
         });
 
         app.update();
