@@ -135,7 +135,7 @@ pub struct ToRunLuaScript {
 }
 
 impl ToRunLuaScript {
-    pub fn run(
+    pub fn find_and_run(
         self,
         scripts: &HashMap<String, LuaScript>,
         frozen_world: FrozenWorld,
@@ -156,11 +156,25 @@ impl ToRunLuaScript {
 pub struct ToRunLuaScripts(pub Vec<ToRunLuaScript>);
 
 impl ToRunLuaScripts {
-    pub fn run_batch(self, scripts: &HashMap<String, LuaScript>, world: &mut World) {
+    pub fn find_and_run_batch(
+        self,
+        scripts: &HashMap<String, LuaScript>,
+        world: &mut World,
+    ) -> HashMap<String, LuaScriptError> {
+        let mut error_map: HashMap<String, LuaScriptError> = HashMap::new();
+
         Frozen::in_scope(world, |world| {
             for to_run_script in self.0 {
-                to_run_script.run(scripts, world.clone());
+                let id = to_run_script.id.clone();
+                match to_run_script.find_and_run(scripts, world.clone()) {
+                    Ok(_) => {}
+                    Err(e) => {
+                        error_map.insert(id, e);
+                    }
+                }
             }
         });
+
+        return error_map;
     }
 }

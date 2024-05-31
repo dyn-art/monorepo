@@ -87,13 +87,16 @@ impl SvgCompHandle {
     }
 
     #[wasm_bindgen(js_name = runScripts)]
-    pub fn run_scripts(&mut self, js_script_args_maps: JsValue) {
+    pub fn run_scripts(&mut self, js_script_args_maps: JsValue) -> Result<JsValue, JsValue> {
         let maybe_to_run_lua_scripts: Result<ToRunLuaScripts, _> =
             serde_wasm_bindgen::from_value(js_script_args_maps);
 
-        if let Ok(to_run_lua_scripts) = maybe_to_run_lua_scripts {
-            to_run_lua_scripts.run_batch(&self.lua_scripts, &mut self.app.world);
-        }
+        return match maybe_to_run_lua_scripts {
+            Ok(to_run_lua_scripts) => Ok(serde_wasm_bindgen::to_value(
+                &to_run_lua_scripts.find_and_run_batch(&self.lua_scripts, &mut self.app.world),
+            )?),
+            Err(_) => Err(JsValue::from_str("Failed to run scripts!")),
+        };
     }
 
     pub fn update(&mut self, js_input_events: JsValue) -> Result<JsValue, JsValue> {
