@@ -3,7 +3,7 @@
  * This file includes code derived from the project keyren/piccolo by @kyren.
  * Project Repository: https://github.com/kyren/piccolo/blob/master/util/src/freeze.rs
  *
- * Date of Import: 30 May 2024
+ * Date of Import: 31 May 2024
  * -----------------------------------------------------------------------------
  * The code included in this file is licensed under the MIT License,
  * as per the original project by @kyren.
@@ -11,10 +11,13 @@
  * -----------------------------------------------------------------------------
  */
 use std::{cell::RefCell, marker::PhantomData, mem, rc::Rc};
+use thiserror::Error;
 
-#[derive(Debug, Copy, Clone, Eq, PartialEq)]
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Error)]
 pub enum AccessError {
+    #[error("frozen value accessed outside of enclosing scope")]
     Expired,
+    #[error("already borrowed incompatibly")]
     BadBorrow,
 }
 

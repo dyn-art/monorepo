@@ -16,7 +16,13 @@ serde_support = [
     "dyn-utils/serde_support",
     "dyn-comp-bundles/serde_support",
 ]
-lua_scripts = ["dep:gc-arena", "dep:piccolo", "dep:serde_json", "serde_support"]
+lua_scripts = [
+    "dep:gc-arena",
+    "dep:piccolo",
+    "dep:serde_json",
+    "dep:thiserror",
+    "serde_support",
+]
 tracing = []
 
 [dependencies]
@@ -40,6 +46,7 @@ gc-arena = { version = "0.5.3", features = [
 ], optional = true }
 piccolo = { git = "https://github.com/kyren/piccolo", rev = "df3e53e", optional = true }
 serde_json = { workspace = true, optional = true }
+thiserror = { version = "1.0.61", optional = true }
 
 [dev-dependencies]
 env_logger = "0.11.3"

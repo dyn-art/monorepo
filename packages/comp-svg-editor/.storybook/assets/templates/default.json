@@ -757,7 +757,7 @@
 	"viewport": { "physicalPosition": [0, 0], "physicalSize": [1920, 1080] },
 	"scripts": {
 		"test": {
-			"source": "comp.send_event('{\"type\":\"UpdateEntityTransform\",\"id\":{\"type\":\"ReferenceId\",\"referenceId\":\"' .. args.nodeId .. '\"},\"x\":' .. args.x .. ',\"y\":' .. args.y .. '}')"
+			"source": "comp.sendEvent({ type = \"UpdateEntityTransform\", id = { type = \"ReferenceId\", referenceId = args.nodeId }, x = args.x, y = args.y })"
 		}
 	}
 }

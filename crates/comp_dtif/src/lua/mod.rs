@@ -5,6 +5,7 @@ pub mod comp;
 pub mod freeze;
 pub mod args;
 pub mod script;
+pub mod serde;
 
 #[cfg(test)]
 mod tests {
@@ -49,10 +50,18 @@ mod tests {
             comp.log.info("Sum of 1, 2, 3 is " .. sum)
             comp.log.info("Value of: " .. args.input)
 
-            local my_event = '{"type":"UpdateCompositionSize","size":[' .. args.input .. ',100]}'
-            comp.send_event(my_event)
+            local update_composition_size_event = {
+                type = "UpdateCompositionSize",
+                size = { args.input, 100 }
+            }
+            local update_entity_transform_event = {
+                type = "UpdateEntityTransform",
+                id = { type = "ReferenceId", referenceId = args.nodeId },
+                x = args.x,
+                y = args.y
+            }
 
-            comp.send_event('{"type":"UpdateEntityTransform","id":{"type":"ReferenceId","referenceId":"' .. args.nodeId .. '"},"x":' .. args.x .. ',"y":' .. args.y .. '}')
+            comp.sendEvents({ update_composition_size_event, update_entity_transform_event })
         "#;
 
         let script = LuaScript {

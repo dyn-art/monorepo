@@ -1,6 +1,6 @@
 #![cfg(feature = "lua_scripts")]
 
-use super::script::FrozenWorld;
+use super::{script::FrozenWorld, serde::from_value};
 use dyn_comp_bundles::events::{CoreInputEvent, InputEvent};
 use gc_arena::Mutation;
 use piccolo::{
@@ -49,36 +49,59 @@ fn create_comp_table<'gc>(ctx: Context<'gc>, frozen_world: FrozenWorld) -> Table
         }
     });
 
-    let send_event_callback = callback("send_event", &ctx, move |_, v: Value| {
-        if let Value::String(s) = v {
-            match serde_json::from_str::<CoreInputEvent>(&s.to_str_lossy()) {
-                Ok(event) => {
-                    frozen_world.with_mut(|mut world| {
-                        event.send_into_world(&mut world);
-                    });
-                    Some(Value::Nil)
-                }
-                Err(err) => {
-                    log::error!(
-                        "[send_event_callback] Failed to deserialize event '{}' by exception: {}",
-                        s,
-                        err
-                    );
-                    None
+    let movable_frozen_world = frozen_world.clone();
+    let send_event_callback = callback("sendEvent", &ctx, move |_, v: Value| {
+        match from_value::<CoreInputEvent>(v) {
+            Ok(event) => {
+                movable_frozen_world.with_mut(|mut world| {
+                    event.send_into_world(&mut world);
+                });
+                Some(Value::Nil)
+            }
+            Err(err) => {
+                log::error!(
+                    "[send_event_callback] Failed to parse value '{}' as event by exception: {}",
+                    v,
+                    err
+                );
+                None
+            }
+        }
+    });
+
+    let movable_frozen_world = frozen_world.clone();
+    let send_events_callback = callback("sendEvents", &ctx, move |_, v: Value| match v {
+        Value::Table(events_table) => {
+            for (_, event_value) in events_table.iter() {
+                match from_value::<CoreInputEvent>(event_value) {
+                    Ok(event) => {
+                        movable_frozen_world.with_mut(|mut world| {
+                            event.send_into_world(&mut world);
+                        });
+                    }
+                    Err(err) => {
+                        log::error!(
+                                "[send_events_callback] Failed to parse value '{}' as event by exception: {}",
+                                event_value,
+                                err
+                            );
+                    }
                 }
             }
-        } else {
-            log::error!(
-                "[send_event_callback] Invalid argument type for 'send_event': {}",
-                v
-            );
+            Some(Value::Nil)
+        }
+        _ => {
+            log::error!("[send_events_callback] Expected a table of events");
             None
         }
     });
 
     comp_table.set(ctx, "sum", sum_callback).unwrap();
     comp_table
-        .set(ctx, "send_event", send_event_callback)
+        .set(ctx, "sendEvent", send_event_callback)
+        .unwrap();
+    comp_table
+        .set(ctx, "sendEvents", send_events_callback)
         .unwrap();
 
     let log_table = create_log_table(ctx);
