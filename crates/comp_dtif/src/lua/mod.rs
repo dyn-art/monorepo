@@ -1,17 +1,16 @@
 #![cfg(feature = "lua_scripts")]
 
-pub mod comp;
 #[macro_use]
 pub mod freeze;
-pub mod args;
+pub mod lib;
 pub mod script;
 pub mod serde;
 
 #[cfg(test)]
 mod tests {
     use super::{
-        args::{LuaScriptArg, LuaScriptArgsMap},
         freeze::Frozen,
+        lib::args::{LuaScriptArg, LuaScriptArgsMap, LuaScriptNumberArg, LuaScriptStringArg},
         script::LuaScript,
     };
     use bevy_app::{App, Update};
@@ -69,15 +68,24 @@ mod tests {
         };
 
         let mut args_map: LuaScriptArgsMap = HashMap::new();
-        args_map.insert(String::from("input"), LuaScriptArg::Number { value: 10.0 });
+        args_map.insert(
+            String::from("input"),
+            LuaScriptArg::Number(LuaScriptNumberArg { value: 10.0 }),
+        );
         args_map.insert(
             String::from("nodeId"),
-            LuaScriptArg::String {
+            LuaScriptArg::String(LuaScriptStringArg {
                 value: String::from("n2"),
-            },
+            }),
         );
-        args_map.insert(String::from("x"), LuaScriptArg::Number { value: 10.0 });
-        args_map.insert(String::from("y"), LuaScriptArg::Number { value: 10.0 });
+        args_map.insert(
+            String::from("x"),
+            LuaScriptArg::Number(LuaScriptNumberArg { value: 10.0 }),
+        );
+        args_map.insert(
+            String::from("y"),
+            LuaScriptArg::Number(LuaScriptNumberArg { value: 10.0 }),
+        );
 
         Frozen::in_scope(&mut app.world, |world| {
             script.run(world, args_map);

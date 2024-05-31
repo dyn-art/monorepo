@@ -1411,7 +1411,11 @@ export type LineWrap =
 
 export type LuaScript = { source: string }
 
-export type LuaScriptArg = { type: "Number"; value: number } | { type: "String"; value: string }
+export type LuaScriptArg = ({ type: "Number" } & LuaScriptNumberArg) | ({ type: "String" } & LuaScriptStringArg)
+
+export type LuaScriptNumberArg = { value: number }
+
+export type LuaScriptStringArg = { value: string }
 
 export type Mat3 = [number, number, number, number, number, number, number, number, number]
 

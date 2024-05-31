@@ -1,9 +1,11 @@
 #![cfg(feature = "lua_scripts")]
 
 use super::{
-    args::{load_args_table_global, LuaScriptArgsMap},
-    comp::load_comp_table_global,
     freeze::{Freeze, Frozen},
+    lib::{
+        args::{load_args_table_global, LuaScriptArgsMap},
+        comp::load_comp_table_global,
+    },
 };
 use bevy_ecs::world::World;
 use piccolo::{Closure, Executor, Function, Lua, StashedExecutor, StaticError};

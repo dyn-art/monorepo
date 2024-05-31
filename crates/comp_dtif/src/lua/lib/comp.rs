@@ -1,6 +1,6 @@
 #![cfg(feature = "lua_scripts")]
 
-use super::{script::FrozenWorld, serde::from_value};
+use crate::lua::{script::FrozenWorld, serde::from_value};
 use dyn_comp_bundles::events::{CoreInputEvent, InputEvent};
 use gc_arena::Mutation;
 use piccolo::{
