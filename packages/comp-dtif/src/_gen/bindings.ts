@@ -1671,7 +1671,7 @@ export type TextNode = { id?: ReferenceId | null; text: string; attributes: Text
 
 export type TextSizingMode = "WidthAndHeight" | "Height" | "Fixed"
 
-export type ToRunLuaScript = { key: string; argsMap: { [key in string]: JsonValue } }
+export type ToRunLuaScript = { id: string; argsMap: { [key in string]: JsonValue } }
 
 export type ToRunLuaScripts = ToRunLuaScript[]
 

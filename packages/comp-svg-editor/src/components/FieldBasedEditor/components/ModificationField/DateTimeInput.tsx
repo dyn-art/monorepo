@@ -2,7 +2,7 @@ import React from 'react';
 import {
 	applyModifications,
 	type TDateTimeModificationInput,
-	type TModificationField
+	type TInputLuaScript
 } from '@dyn/comp-dtif';
 import type { Composition } from '@dyn/comp-svg-builder';
 import { DateTimePicker } from '@dyn/ui';
@@ -81,5 +81,5 @@ export const DateTimeInput: React.FC<TProps> = (props) => {
 
 interface TProps {
 	composition: Composition;
-	field: TModificationField<string, TDateTimeModificationInput>;
+	field: TInputLuaScript<string, TDateTimeModificationInput>;
 }

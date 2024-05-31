@@ -40,7 +40,7 @@ export const Viewport: React.FC<TViewportProps> = (props) => {
 						onClick={() => {
 							composition.runScripts([
 								{
-									key: 'test',
+									id: 'test',
 									argsMap: {
 										x: 100,
 										y: 100,

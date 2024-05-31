@@ -1,7 +1,7 @@
 import React from 'react';
 import {
 	applyModifications,
-	type TModificationField,
+	type TInputLuaScript,
 	type TNumberModificationInput
 } from '@dyn/comp-dtif';
 import type { Composition } from '@dyn/comp-svg-builder';
@@ -79,5 +79,5 @@ export const NumberInput: React.FC<TProps> = (props) => {
 
 interface TProps {
 	composition: Composition;
-	field: TModificationField<string, TNumberModificationInput>;
+	field: TInputLuaScript<string, TNumberModificationInput>;
 }

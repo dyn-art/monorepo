@@ -1,53 +1,40 @@
 import React from 'react';
-import {
-	applyModifications,
-	type TBooleanModificationInput,
-	type TModificationField
-} from '@dyn/comp-dtif';
+import type { TArgsMapType, TBooleanModificationInput, TModificationScript } from '@dyn/comp-dtif';
 import type { Composition } from '@dyn/comp-svg-builder';
 import { Switch } from '@dyn/ui';
-import { getJsonFunctionExecutionEnv } from '@dyn/utils';
-
-import { runJsonFunction } from '../run-json-function';
 
 export const BooleanInput: React.FC<TProps> = (props) => {
-	const { composition, field } = props;
-	const [value, setValue] = React.useState<boolean>(field.inputVariant.default);
+	const { composition, script } = props;
+	const [argsMap, setArgsMap] = React.useState<TArgsMapType<TBooleanModificationInput>>(
+		script.inputVariant.default
+	);
 	const [error, setError] = React.useState<string | null>(null);
 
 	const onCheckedChange = React.useCallback(
 		(checked: boolean) => {
-			setValue(checked);
+			setArgsMap({ input: checked });
 			setError(null);
 
 			// eslint-disable-next-line @typescript-eslint/no-floating-promises -- ok
 			(async () => {
-				const processedActions = await applyModifications(
-					field,
+				composition.runScripts([
 					{
-						[field.key]: checked
-					},
-					async (jsonFunction, args) =>
-						runJsonFunction(jsonFunction, args, getJsonFunctionExecutionEnv(jsonFunction))
-				);
-
-				for (const processedAction of processedActions) {
-					if (processedAction.resolved) {
-						composition.emitInputEvents('Core', processedAction.events);
-						composition.update();
-					} else {
-						setError(processedAction.notMetConditions[0]?.message ?? null);
+						id: script.id,
+						argsMap
 					}
-				}
+				]);
+				composition.update();
+
+				// TODO: Handle error
 			})();
 		},
-		[field, composition]
+		[composition, script.id, argsMap]
 	);
 
 	return (
 		<fieldset className="w-full rounded-lg border p-4">
-			<legend className="-ml-1 px-1 text-sm font-medium">{field.displayName}</legend>
-			<Switch checked={value} onCheckedChange={onCheckedChange} />
+			<legend className="-ml-1 px-1 text-sm font-medium">{script.displayName}</legend>
+			<Switch checked={argsMap.input} onCheckedChange={onCheckedChange} />
 			{error != null ? (
 				<p className="mt-2 text-sm text-red-600" id="email-error">
 					{error}
@@ -59,5 +46,5 @@ export const BooleanInput: React.FC<TProps> = (props) => {
 
 interface TProps {
 	composition: Composition;
-	field: TModificationField<string, TBooleanModificationInput>;
+	script: TModificationScript<TBooleanModificationInput>;
 }

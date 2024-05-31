@@ -1,7 +1,7 @@
 import React from 'react';
 import {
 	applyModifications,
-	type TModificationField,
+	type TInputLuaScript,
 	type TPositionModificationInput
 } from '@dyn/comp-dtif';
 import type { Composition } from '@dyn/comp-svg-builder';
@@ -33,7 +33,6 @@ export const PositionInput: React.FC<TProps> = (props) => {
 
 			// eslint-disable-next-line @typescript-eslint/no-floating-promises -- ok
 			(async () => {
-				// eslint-disable-next-line @typescript-eslint/await-thenable -- idk
 				const processedActions = await applyModifications(
 					field,
 					{
@@ -115,5 +114,5 @@ export const PositionInput: React.FC<TProps> = (props) => {
 
 interface TProps {
 	composition: Composition;
-	field: TModificationField<string, TPositionModificationInput>;
+	field: TInputLuaScript<string, TPositionModificationInput>;
 }

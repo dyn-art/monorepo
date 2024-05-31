@@ -3,7 +3,7 @@ import type {
 	TBooleanModificationInput,
 	TColorModificationInput,
 	TDateTimeModificationInput,
-	TModificationField,
+	TInputLuaScript,
 	TNumberModificationInput,
 	TPaintModificationInput,
 	TPositionModificationInput,
@@ -37,7 +37,7 @@ export const ModificationField: React.FC<TProps> = (props) => {
 			return (
 				<PositionInput
 					composition={composition}
-					field={field as TModificationField<string, TPositionModificationInput>}
+					field={field as TInputLuaScript<string, TPositionModificationInput>}
 					key={field.key}
 				/>
 			);
@@ -45,7 +45,7 @@ export const ModificationField: React.FC<TProps> = (props) => {
 			return (
 				<NumberInput
 					composition={composition}
-					field={field as TModificationField<string, TNumberModificationInput>}
+					field={field as TInputLuaScript<string, TNumberModificationInput>}
 					key={field.key}
 				/>
 			);
@@ -53,7 +53,7 @@ export const ModificationField: React.FC<TProps> = (props) => {
 			return (
 				<TextInput
 					composition={composition}
-					field={field as TModificationField<string, TTextModificationInput>}
+					field={field as TInputLuaScript<string, TTextModificationInput>}
 					key={field.key}
 				/>
 			);
@@ -61,7 +61,7 @@ export const ModificationField: React.FC<TProps> = (props) => {
 			return (
 				<BooleanInput
 					composition={composition}
-					field={field as TModificationField<string, TBooleanModificationInput>}
+					script={field as TInputLuaScript<string, TBooleanModificationInput>}
 					key={field.key}
 				/>
 			);
@@ -69,7 +69,7 @@ export const ModificationField: React.FC<TProps> = (props) => {
 			return (
 				<RangeInput
 					composition={composition}
-					field={field as TModificationField<string, TRangeModificationInput>}
+					field={field as TInputLuaScript<string, TRangeModificationInput>}
 					key={field.key}
 				/>
 			);
@@ -77,7 +77,7 @@ export const ModificationField: React.FC<TProps> = (props) => {
 			return (
 				<ColorInput
 					composition={composition}
-					field={field as TModificationField<string, TColorModificationInput>}
+					field={field as TInputLuaScript<string, TColorModificationInput>}
 					key={field.key}
 				/>
 			);
@@ -85,7 +85,7 @@ export const ModificationField: React.FC<TProps> = (props) => {
 			return (
 				<PaintInput
 					composition={composition}
-					field={field as TModificationField<string, TPaintModificationInput>}
+					field={field as TInputLuaScript<string, TPaintModificationInput>}
 					key={field.key}
 				/>
 			);
@@ -93,7 +93,7 @@ export const ModificationField: React.FC<TProps> = (props) => {
 			return (
 				<DateTimeInput
 					composition={composition}
-					field={field as TModificationField<string, TDateTimeModificationInput>}
+					field={field as TInputLuaScript<string, TDateTimeModificationInput>}
 					key={field.key}
 				/>
 			);
@@ -101,6 +101,6 @@ export const ModificationField: React.FC<TProps> = (props) => {
 };
 
 interface TProps {
-	field: TModificationField;
+	field: TInputLuaScript;
 	composition: Composition;
 }

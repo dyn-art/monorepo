@@ -86,7 +86,7 @@ impl LuaScriptWithId {
     serde(rename_all = "camelCase")
 )]
 pub struct ToRunLuaScript {
-    pub key: String,
+    pub id: String,
     pub args_map: LuaScriptArgsMap,
 }
 
@@ -100,12 +100,8 @@ pub struct ToRunLuaScripts(pub Vec<ToRunLuaScript>);
 impl ToRunLuaScripts {
     pub fn run_batch(self, scripts: &HashMap<String, LuaScript>, world: &mut World) {
         Frozen::in_scope(world, |world| {
-            for ToRunLuaScript {
-                key,
-                args_map: args,
-            } in self.0
-            {
-                if let Some(script) = scripts.get(&key) {
+            for ToRunLuaScript { id, args_map: args } in self.0 {
+                if let Some(script) = scripts.get(&id) {
                     script.run(world.clone(), args);
                 }
             }

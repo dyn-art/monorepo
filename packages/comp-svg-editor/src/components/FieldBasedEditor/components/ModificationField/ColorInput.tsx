@@ -2,7 +2,7 @@ import React from 'react';
 import {
 	applyModifications,
 	type TColorModificationInput,
-	type TModificationField
+	type TInputLuaScript
 } from '@dyn/comp-dtif';
 import type { Composition } from '@dyn/comp-svg-builder';
 import { PaintPicker, type TPaint } from '@dyn/ui';
@@ -66,5 +66,5 @@ export const ColorInput: React.FC<TProps> = (props) => {
 
 interface TProps {
 	composition: Composition;
-	field: TModificationField<string, TColorModificationInput>;
+	field: TInputLuaScript<string, TColorModificationInput>;
 }

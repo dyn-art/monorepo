@@ -19,6 +19,6 @@ export function isDtifComposition(value: unknown): value is COMP.DtifComposition
 		(obj.assets == null ||
 			(Array.isArray(obj.assets) && obj.assets.every((asset) => typeof asset === 'object'))) &&
 		(obj.scripts == null ||
-			(Array.isArray(obj.scripts) && obj.scripts.every((asset) => typeof asset === 'object')))
+			(Array.isArray(obj.scripts) && obj.scripts.every((script) => typeof script === 'object')))
 	);
 }

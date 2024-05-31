@@ -2,7 +2,7 @@ import React from 'react';
 import {
 	applyModifications,
 	type COMP,
-	type TModificationField,
+	type TInputLuaScript,
 	type TPaintModificationInput,
 	type TPaintModificationReturnType
 } from '@dyn/comp-dtif';
@@ -81,7 +81,7 @@ export const PaintInput: React.FC<TProps> = (props) => {
 
 interface TProps {
 	composition: Composition;
-	field: TModificationField<string, TPaintModificationInput>;
+	field: TInputLuaScript<string, TPaintModificationInput>;
 }
 
 function mapPaintToComp(paint: TPaint): TPaintModificationReturnType {

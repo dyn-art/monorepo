@@ -1,7 +1,7 @@
 import React from 'react';
 import {
 	applyModifications,
-	type TModificationField,
+	type TInputLuaScript,
 	type TRangeModificationInput
 } from '@dyn/comp-dtif';
 import type { Composition } from '@dyn/comp-svg-builder';
@@ -65,5 +65,5 @@ export const RangeInput: React.FC<TProps> = (props) => {
 
 interface TProps {
 	composition: Composition;
-	field: TModificationField<string, TRangeModificationInput>;
+	field: TInputLuaScript<string, TRangeModificationInput>;
 }
