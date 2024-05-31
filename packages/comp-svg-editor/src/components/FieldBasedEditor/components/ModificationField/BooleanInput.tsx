@@ -15,18 +15,15 @@ export const BooleanInput: React.FC<TProps> = (props) => {
 			setArgsMap({ input: checked });
 			setError(null);
 
-			// eslint-disable-next-line @typescript-eslint/no-floating-promises -- ok
-			(async () => {
-				composition.runScripts([
-					{
-						id: script.id,
-						argsMap
-					}
-				]);
-				composition.update();
+			composition.runScripts([
+				{
+					id: script.id,
+					argsMap
+				}
+			]);
+			composition.update();
 
-				// TODO: Handle error
-			})();
+			// TODO: Handle error
 		},
 		[composition, script.id, argsMap]
 	);
