@@ -255,9 +255,9 @@ assets?: AssetWithId[];
  */
 events?: CoreInputEvent[]; 
 /**
- * A map of scripts.
+ * A list of scripts.
  */
-scripts?: { [key in string]: LuaScript } }
+scripts?: LuaScriptWithId[] }
 
 export type EllipseNode = { id?: ReferenceId | null; startingAngle?: number; endingAngle?: number; innerRadiusRatio?: number; translation?: Vec2; rotationDeg?: Angle; size: Size; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; layoutElement?: LayoutElement; styles?: Style[] }
 
@@ -1412,6 +1412,8 @@ export type LineWrap =
 "Word"
 
 export type LuaScript = { source: string }
+
+export type LuaScriptWithId = { id: string; source: string }
 
 export type Mat3 = [number, number, number, number, number, number, number, number, number]
 

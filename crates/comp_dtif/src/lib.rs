@@ -39,10 +39,10 @@ pub struct DtifComposition {
     /// A list of input events.
     #[cfg_attr(feature = "serde_support", serde(default))]
     pub events: Vec<CoreInputEvent>,
-    /// A map of scripts.
+    /// A list of scripts.
     #[cfg(feature = "lua_scripts")]
     #[cfg_attr(feature = "serde_support", serde(default))]
-    pub scripts: std::collections::HashMap<String, lua::script::LuaScript>,
+    pub scripts: Vec<lua::script::LuaScriptWithId>,
 }
 
 impl DtifComposition {

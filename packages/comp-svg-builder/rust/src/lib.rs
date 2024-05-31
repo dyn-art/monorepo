@@ -78,7 +78,11 @@ impl SvgCompHandle {
             app,
             svg_builder_output_event_receiver,
             output_event_receiver,
-            lua_scripts: std::mem::take(&mut dtif.scripts),
+            lua_scripts: dtif
+                .scripts
+                .drain(..)
+                .map(|script_with_id| script_with_id.into_lua_script())
+                .collect(),
         });
     }
 

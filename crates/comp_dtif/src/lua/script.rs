@@ -36,6 +36,7 @@ impl LuaScript {
             load_args_table_global(ctx, args_map);
         });
 
+        // TODO: Return the error
         return match Self::run_code(&mut lua, &executor, &self.source) {
             Ok(_) => log::info!("[run] Lua code executed successfully"),
             Err(err) => {
@@ -53,6 +54,28 @@ impl LuaScript {
         })?;
 
         return lua.execute::<()>(executor);
+    }
+}
+
+#[derive(Debug, Clone)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type),
+    serde(rename_all = "camelCase")
+)]
+pub struct LuaScriptWithId {
+    pub id: String,
+    pub source: String,
+}
+
+impl LuaScriptWithId {
+    pub fn into_lua_script(self) -> (String, LuaScript) {
+        (
+            self.id,
+            LuaScript {
+                source: self.source,
+            },
+        )
     }
 }
 

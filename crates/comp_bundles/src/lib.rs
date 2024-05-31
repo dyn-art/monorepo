@@ -962,10 +962,13 @@ pub struct AssetWithId {
 }
 
 impl AssetWithId {
-    pub fn into_asset(self) -> Asset {
-        Asset {
-            content: self.content,
-            content_type: self.content_type,
-        }
+    pub fn into_asset(self) -> (Option<ReferenceId>, Asset) {
+        (
+            self.id,
+            Asset {
+                content: self.content,
+                content_type: self.content_type,
+            },
+        )
     }
 }

@@ -607,10 +607,7 @@ pub fn create_asset_input_system(
     mut event_reader: EventReader<CreateAssetInputEvent>,
 ) {
     for CreateAssetInputEvent { asset } in event_reader.read() {
-        let maybe_asset_id = assets_res.insert_asset(Asset {
-            content: asset.content.clone(),
-            content_type: asset.content_type,
-        });
+        let maybe_asset_id = assets_res.insert_asset(asset.clone().into_asset().1);
 
         if let Some(id) = asset.id.clone() {
             if let Some(asset_id) = maybe_asset_id {
