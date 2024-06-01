@@ -14,7 +14,7 @@ mod tests {
     use bevy_ecs::event::EventReader;
     use dyn_comp_bundles::events::{
         CoreInputEvent, InputEvent, UpdateCompositionSizeInputEvent,
-        UpdateEntityTransformInputEvent,
+        UpdateEntityTransformInputEvent, UpdateTextNodeInputEvent,
     };
     use serde_json::json;
     use std::collections::HashMap;
@@ -36,6 +36,7 @@ mod tests {
             (
                 update_composition_size_input_system,
                 update_entity_transform_input_system,
+                update_text_node_input_system,
             ),
         );
 
@@ -63,6 +64,24 @@ mod tests {
             comp.log.info("Table Log:", update_entity_transform_event, {10, 20, 30})
 
             comp.sendEvents({ update_composition_size_event, update_entity_transform_event })
+
+            local date = args.date
+            local dateObj = comp.date.parse(date)
+            local hours = dateObj.hour
+            local minutes = dateObj.minute
+            local ampm = hours >= 12 and 'PM' or 'AM'
+            hours = hours % 12
+            hours = hours ~= 0 and hours or 12
+            local minutesStr = minutes < 10 and '0' .. minutes or minutes
+            local timeStr = hours .. ":" .. minutesStr .. " " .. ampm
+            local dateStr = comp.date.format('%b %d, %Y', date)
+            local combinedStr = timeStr .. " · " .. dateStr
+
+            comp.sendEvent({
+                type = "UpdateTextNode",
+                id = { type = "ReferenceId", referenceId = "n19" },
+                text = combinedStr
+            })
         "#;
 
         let script = LuaScript {
@@ -74,6 +93,7 @@ mod tests {
         args_map.insert(String::from("nodeId"), json!("n2"));
         args_map.insert(String::from("x"), json!(20.0));
         args_map.insert(String::from("y"), json!(30.0));
+        args_map.insert(String::from("date"), json!(1717252549107 as i64));
 
         Frozen::in_scope(&mut app.world, |world| {
             script.run(world, args_map).unwrap();
@@ -95,6 +115,12 @@ mod tests {
     ) {
         for event in event_reader.read() {
             log::info!("[update_entity_transform_input_system] {:?}", event);
+        }
+    }
+
+    fn update_text_node_input_system(mut event_reader: EventReader<UpdateTextNodeInputEvent>) {
+        for event in event_reader.read() {
+            log::info!("[update_text_node_input_system] {:?}", event);
         }
     }
 }

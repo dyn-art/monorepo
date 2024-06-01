@@ -787,6 +787,30 @@
 				"    })",
 				"end"
 			]
+		},
+		{
+			"id": "date",
+			"displayName": "Date",
+			"inputVariant": { "type": "DATETIME", "default": "NOW", "withTime": true },
+			"source": [
+				"local date = args.input",
+				"local dateObj = comp.date.parse(date)",
+				"local hours = dateObj.hour",
+				"local minutes = dateObj.minute",
+				"local ampm = hours >= 12 and 'PM' or 'AM'",
+				"hours = hours % 12",
+				"hours = hours ~= 0 and hours or 12",
+				"local minutesStr = minutes < 10 and '0' .. minutes or minutes",
+				"local timeStr = hours .. \":\" .. minutesStr .. \" \" .. ampm",
+				"local dateStr = comp.date.format('%b %d, %Y', date)",
+				"local combinedStr = timeStr .. \" · \" .. dateStr",
+				"",
+				"comp.sendEvent({",
+				"    type = \"UpdateTextNode\",",
+				"    id = { type = \"ReferenceId\", referenceId = \"n19\" },",
+				"    text = combinedStr",
+				"})"
+			]
 		}
 	]
 }
