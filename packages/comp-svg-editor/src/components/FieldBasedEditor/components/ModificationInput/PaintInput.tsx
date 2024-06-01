@@ -1,10 +1,10 @@
 import React from 'react';
-import {
-	applyModifications,
-	type COMP,
-	type TInputLuaScript,
-	type TPaintModificationInput,
-	type TPaintModificationReturnType
+import type {
+	COMP,
+	TArgsMapType,
+	TModificationScript,
+	TPaintModificationInput,
+	TPaintModificationReturnType
 } from '@dyn/comp-dtif';
 import type { Composition } from '@dyn/comp-svg-builder';
 import {
@@ -14,20 +14,12 @@ import {
 	type TImageScaleMode,
 	type TPaint
 } from '@dyn/ui';
-import {
-	arrayToMat3,
-	getJsonFunctionExecutionEnv,
-	mat3ToArray,
-	rgbaToRgb,
-	rgbToRgba
-} from '@dyn/utils';
-
-import { runJsonFunction } from '../run-json-function';
+import { arrayToMat3, mat3ToArray, rgbaToRgb, rgbToRgba } from '@dyn/utils';
 
 export const PaintInput: React.FC<TProps> = (props) => {
-	const { composition, field } = props;
+	const { composition, script } = props;
 	const [value, setValue] = React.useState<TPaint>(
-		mapCompToPaint(field.inputVariant.default.paint, field.inputVariant.default.opacity)
+		mapCompToPaint(script.inputVariant.default.paint, script.inputVariant.default.opacity)
 	);
 	const [error, setError] = React.useState<string | null>(null);
 
@@ -36,33 +28,27 @@ export const PaintInput: React.FC<TProps> = (props) => {
 			setValue(paint);
 			setError(null);
 
-			// eslint-disable-next-line @typescript-eslint/no-floating-promises -- ok
-			(async () => {
-				const processedActions = await applyModifications(
-					field,
-					{
-						[field.key]: mapPaintToComp(paint)
-					},
-					async (jsonFunction, args) =>
-						runJsonFunction(jsonFunction, args, getJsonFunctionExecutionEnv(jsonFunction))
-				);
-
-				for (const processedAction of processedActions) {
-					if (processedAction.resolved) {
-						composition.emitInputEvents('Core', processedAction.events);
-						composition.update();
-					} else {
-						setError(processedAction.notMetConditions[0]?.message ?? null);
-					}
+			const argsMap: TArgsMapType<TPaintModificationInput> = mapPaintToComp(paint);
+			const scriptError = composition.runScript({
+				id: script.id,
+				argsMap: argsMap as any // TODO: Make typesafe
+			});
+			if (scriptError != null) {
+				if (scriptError.type === 'Lua') {
+					setError(scriptError.message);
+				} else {
+					// TODO: Handle Runtime and other errors
 				}
-			})();
+			} else {
+				composition.update();
+			}
 		},
-		[field, composition]
+		[composition, script.id]
 	);
 
 	return (
 		<fieldset className="w-full rounded-lg border p-4">
-			<legend className="-ml-1 px-1 text-sm font-medium">{field.displayName}</legend>
+			<legend className="-ml-1 px-1 text-sm font-medium">{script.displayName}</legend>
 			{/* TODO: PaintPicker (InputRow) takes full width although its children don't take full width 
 			and thus blocks tapping out of the popover at some unwanted places */}
 			<PaintPicker
@@ -81,7 +67,7 @@ export const PaintInput: React.FC<TProps> = (props) => {
 
 interface TProps {
 	composition: Composition;
-	field: TInputLuaScript<string, TPaintModificationInput>;
+	script: TModificationScript<TPaintModificationInput>;
 }
 
 function mapPaintToComp(paint: TPaint): TPaintModificationReturnType {

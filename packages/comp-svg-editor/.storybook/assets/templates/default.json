@@ -758,7 +758,9 @@
 	"scripts": [
 		{
 			"id": "test",
-			"source": "comp.sendEvent({ type = \"UpdateEntityTransform\", id = { type = \"ReferenceId\", referenceId = args.nodeId }, x = args.x, y = args.y })"
+			"source": [
+				"comp.sendEvent({ type = \"UpdateEntityTransform\", id = { type = \"ReferenceId\", referenceId = args.nodeId }, x = args.x, y = args.y })"
+			]
 		}
 	]
 }

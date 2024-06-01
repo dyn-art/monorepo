@@ -75,7 +75,9 @@ impl LuaScript {
 )]
 pub struct LuaScriptWithId {
     pub id: String,
-    pub source: String,
+    // TODO: Using Vec for better JSON readability, because JSON doesn't support multiline String.
+    // Should we prioritize readability?
+    pub source: Vec<String>,
 }
 
 impl LuaScriptWithId {
@@ -83,7 +85,7 @@ impl LuaScriptWithId {
         (
             self.id,
             LuaScript {
-                source: self.source,
+                source: self.source.join("\n"),
             },
         )
     }
@@ -135,7 +137,7 @@ pub struct ToRunLuaScript {
 }
 
 impl ToRunLuaScript {
-    pub fn find_and_run(
+    pub fn find_and_run_frozen(
         self,
         scripts: &HashMap<String, LuaScript>,
         frozen_world: FrozenWorld,
@@ -145,6 +147,14 @@ impl ToRunLuaScript {
         } else {
             Err(LuaScriptError::NotFound)
         }
+    }
+
+    pub fn find_and_run(
+        self,
+        scripts: &HashMap<String, LuaScript>,
+        world: &mut World,
+    ) -> Result<(), LuaScriptError> {
+        Frozen::in_scope(world, |world| self.find_and_run_frozen(scripts, world))
     }
 }
 
@@ -166,7 +176,7 @@ impl ToRunLuaScripts {
         Frozen::in_scope(world, |world| {
             for to_run_script in self.0 {
                 let id = to_run_script.id.clone();
-                match to_run_script.find_and_run(scripts, world.clone()) {
+                match to_run_script.find_and_run_frozen(scripts, world.clone()) {
                     Ok(_) => {}
                     Err(e) => {
                         error_map.insert(id, e);

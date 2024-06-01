@@ -20,7 +20,7 @@ use dyn_comp_bundles::{
 };
 use dyn_comp_core::{resources::composition::CompositionRes, CompCorePlugin};
 use dyn_comp_dtif::{
-    lua::script::{LuaScript, ToRunLuaScripts},
+    lua::script::{LuaScript, ToRunLuaScript, ToRunLuaScripts},
     DtifComposition,
 };
 use dyn_comp_interaction::CompInteractionPlugin;
@@ -87,15 +87,34 @@ impl SvgCompHandle {
     }
 
     #[wasm_bindgen(js_name = runScripts)]
-    pub fn run_scripts(&mut self, js_script_args_maps: JsValue) -> Result<JsValue, JsValue> {
+    pub fn run_scripts(&mut self, js_to_run_lua_scripts: JsValue) -> Result<JsValue, JsValue> {
         let maybe_to_run_lua_scripts: Result<ToRunLuaScripts, _> =
-            serde_wasm_bindgen::from_value(js_script_args_maps);
+            serde_wasm_bindgen::from_value(js_to_run_lua_scripts);
 
         return match maybe_to_run_lua_scripts {
             Ok(to_run_lua_scripts) => Ok(serde_wasm_bindgen::to_value(
                 &to_run_lua_scripts.find_and_run_batch(&self.lua_scripts, &mut self.app.world),
             )?),
             Err(_) => Err(JsValue::from_str("Failed to run scripts!")),
+        };
+    }
+
+    #[wasm_bindgen(js_name = runScript)]
+    pub fn run_script(&mut self, js_to_run_lua_script: JsValue) -> Result<JsValue, JsValue> {
+        let maybe_to_run_lua_script: Result<ToRunLuaScript, _> =
+            serde_wasm_bindgen::from_value(js_to_run_lua_script);
+
+        return match maybe_to_run_lua_script {
+            Ok(to_run_lua_script) => {
+                if let Err(e) =
+                    to_run_lua_script.find_and_run(&self.lua_scripts, &mut self.app.world)
+                {
+                    Ok(serde_wasm_bindgen::to_value(&e)?)
+                } else {
+                    Ok(JsValue::NULL)
+                }
+            }
+            Err(_) => Err(JsValue::from_str("Failed to run script!")),
         };
     }
 

@@ -5,33 +5,36 @@ import { Switch } from '@dyn/ui';
 
 export const BooleanInput: React.FC<TProps> = (props) => {
 	const { composition, script } = props;
-	const [argsMap, setArgsMap] = React.useState<TArgsMapType<TBooleanModificationInput>>(
-		script.inputVariant.default
-	);
+	const [value, setValue] = React.useState<boolean>(script.inputVariant.default.input);
 	const [error, setError] = React.useState<string | null>(null);
 
 	const onCheckedChange = React.useCallback(
 		(checked: boolean) => {
-			setArgsMap({ input: checked });
+			setValue(checked);
 			setError(null);
 
-			composition.runScripts([
-				{
-					id: script.id,
-					argsMap
+			const argsMap: TArgsMapType<TBooleanModificationInput> = { input: checked };
+			const scriptError = composition.runScript({
+				id: script.id,
+				argsMap
+			});
+			if (scriptError != null) {
+				if (scriptError.type === 'Lua') {
+					setError(scriptError.message);
+				} else {
+					// TODO: Handle Runtime and other errors
 				}
-			]);
-			composition.update();
-
-			// TODO: Handle error
+			} else {
+				composition.update();
+			}
 		},
-		[composition, script.id, argsMap]
+		[composition, script.id]
 	);
 
 	return (
 		<fieldset className="w-full rounded-lg border p-4">
 			<legend className="-ml-1 px-1 text-sm font-medium">{script.displayName}</legend>
-			<Switch checked={argsMap.input} onCheckedChange={onCheckedChange} />
+			<Switch checked={value} onCheckedChange={onCheckedChange} />
 			{error != null ? (
 				<p className="mt-2 text-sm text-red-600" id="email-error">
 					{error}

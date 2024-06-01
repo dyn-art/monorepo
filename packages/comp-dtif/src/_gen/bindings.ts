@@ -1433,7 +1433,7 @@ export type LuaScriptError =
  */
 { type: "NotFound" }
 
-export type LuaScriptWithId = { id: string; source: string }
+export type LuaScriptWithId = { id: string; source: string[] }
 
 export type Mat3 = [number, number, number, number, number, number, number, number, number]
 

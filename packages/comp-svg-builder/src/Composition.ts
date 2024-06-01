@@ -10,11 +10,13 @@ import type {
 	InteractionInputEvent,
 	InteractionModeChangeOutputEvent,
 	InteractionToolChangeOutputEvent,
+	LuaScriptError,
 	SelectionChangeOutputEvent,
 	Size,
 	SvgCompInputEvent,
 	SvgCompOutputEvent,
 	SvgElementChangesOutputEvent,
+	ToRunLuaScript,
 	ToRunLuaScripts,
 	Viewport,
 	WatchableComponentVariant,
@@ -207,8 +209,12 @@ export class Composition {
 	// Other
 	// =========================================================================
 
-	public runScripts(toRunScripts: ToRunLuaScripts): void {
-		this._svgCompHandle.runScripts(toRunScripts);
+	public runScripts(toRunScripts: ToRunLuaScripts): Record<string, LuaScriptError> {
+		return this._svgCompHandle.runScripts(toRunScripts);
+	}
+
+	public runScript(toRunScript: ToRunLuaScript): LuaScriptError | null {
+		return this._svgCompHandle.runScript(toRunScript);
 	}
 
 	public logEntityComponentsRaw(rawEntity: number): void {
