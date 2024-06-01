@@ -2,6 +2,7 @@
 
 #[macro_use]
 pub mod freeze;
+pub mod json;
 pub mod lib;
 pub mod script;
 pub mod serde;
@@ -58,6 +59,8 @@ mod tests {
                 x = args.x,
                 y = args.y
             }
+
+            comp.log.info("Table Log:", update_entity_transform_event, {10, 20, 30})
 
             comp.sendEvents({ update_composition_size_event, update_entity_transform_event })
         "#;

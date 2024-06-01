@@ -1,6 +1,6 @@
 #![cfg(feature = "lua_scripts")]
 
-use crate::lua::{script::FrozenWorld, serde::from_value};
+use crate::lua::{json::lua_value_to_json, script::FrozenWorld, serde::from_value};
 use dyn_comp_bundles::events::{CoreInputEvent, InputEvent};
 use gc_arena::Mutation;
 use piccolo::{
@@ -113,31 +113,34 @@ fn create_comp_table<'gc>(ctx: Context<'gc>, frozen_world: FrozenWorld) -> Table
 fn create_log_table<'gc>(ctx: Context<'gc>) -> Table<'gc> {
     let log_table = Table::new(&ctx);
 
-    let warn_callback = callback("warn", &ctx, |_, v: Value| {
-        if let Value::String(s) = v {
-            log::warn!("{}", s.to_str_lossy());
-            Some(Value::Nil)
-        } else {
-            None
-        }
+    // Helper function to concatenate multiple Lua values into a single log message
+    fn concatenate_log_message<'gc>(ctx: Context<'gc>, v: Variadic<Vec<Value<'gc>>>) -> String {
+        v.into_iter()
+            .map(|arg| {
+                lua_value_to_json(ctx, arg)
+                    .unwrap_or(serde_json::Value::Null)
+                    .to_string()
+            })
+            .collect::<Vec<_>>()
+            .join(" ")
+    }
+
+    let warn_callback = callback("warn", &ctx, |ctx, v: Variadic<Vec<Value>>| {
+        let log_message = concatenate_log_message(ctx, v);
+        log::warn!("{}", log_message);
+        Some(Value::Nil)
     });
 
-    let info_callback = callback("info", &ctx, |_, v: Value| {
-        if let Value::String(s) = v {
-            log::info!("{}", s.to_str_lossy());
-            Some(Value::Nil)
-        } else {
-            None
-        }
+    let info_callback = callback("info", &ctx, |ctx, v: Variadic<Vec<Value>>| {
+        let log_message = concatenate_log_message(ctx, v);
+        log::info!("{}", log_message);
+        Some(Value::Nil)
     });
 
-    let error_callback = callback("error", &ctx, |_, v: Value| {
-        if let Value::String(s) = v {
-            log::error!("{}", s.to_str_lossy());
-            Some(Value::Nil)
-        } else {
-            None
-        }
+    let error_callback = callback("error", &ctx, |ctx, v: Variadic<Vec<Value>>| {
+        let log_message = concatenate_log_message(ctx, v);
+        log::error!("{}", log_message);
+        Some(Value::Nil)
     });
 
     log_table.set(ctx, "warn", warn_callback).unwrap();

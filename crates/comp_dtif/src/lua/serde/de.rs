@@ -606,7 +606,7 @@ impl<'de> de::VariantAccess<'de> for UnitVariant {
     }
 }
 
-fn is_sequence<'gc>(table: Table<'gc>) -> bool {
+pub fn is_sequence<'gc>(table: Table<'gc>) -> bool {
     let mut key = match table.next(Value::Nil) {
         NextValue::Found { key, value: _ } => key,
         NextValue::Last => return true,
