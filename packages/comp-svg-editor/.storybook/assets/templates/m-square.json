@@ -1,5 +1,6 @@
 {
 	"version": "V000001",
+	"extension": "MDTIF",
 	"size": [500, 500],
 	"nodes": [
 		{
@@ -108,61 +109,6 @@
 				"    id = { type = \"ReferenceId\", referenceId = \"n2\" },",
 				"    rotationDeg = rotation",
 				"})"
-			]
-		}
-	],
-	"modificationFields": [
-		{
-			"key": "pos",
-			"displayName": "Set Position",
-			"inputVariant": { "type": "POSITION", "default": [200, 200] },
-			"actions": [
-				{
-					"conditions": [
-						{
-							"condition": { ">=": [{ "var": "pos.0" }, 0] },
-							"notMetMessage": "X can not be negative!"
-						},
-						{
-							"condition": { ">=": [{ "var": "pos.1" }, 0] },
-							"notMetMessage": "Y can not be negative!"
-						}
-					],
-					"events": [
-						{
-							"type": "UpdateEntityTransform",
-							"id": { "type": "ReferenceId", "referenceId": "n2" },
-							"x": { "var": "pos.0" },
-							"y": { "var": "pos.1" }
-						}
-					]
-				}
-			]
-		},
-		{
-			"key": "rotation",
-			"displayName": "Set Rotation",
-			"inputVariant": { "type": "NUMBER", "default": 0 },
-			"actions": [
-				{
-					"conditions": [
-						{
-							"condition": { ">=": [{ "var": "rotation" }, 0] },
-							"notMetMessage": "Rotation can not be negative!"
-						},
-						{
-							"condition": { "<=": [{ "var": "rotation" }, 360] },
-							"notMetMessage": "Rotation can not be larger than 360!"
-						}
-					],
-					"events": [
-						{
-							"type": "UpdateEntityRotation",
-							"id": { "type": "ReferenceId", "referenceId": "n2" },
-							"rotationDeg": { "var": "rotation" }
-						}
-					]
-				}
 			]
 		}
 	]

@@ -1,5 +1,6 @@
 {
 	"version": "V000001",
+	"extension": "MDTIF",
 	"size": [1155, 870],
 	"nodes": [
 		{
@@ -24,7 +25,8 @@
 					"paintId": { "type": "ReferenceId", "referenceId": "p6" },
 					"blendMode": "Normal",
 					"opacity": 1,
-					"visible": true
+					"visible": true,
+					"id": "s5"
 				}
 			],
 			"id": "n5"
@@ -627,162 +629,104 @@
 		}
 	],
 	"viewport": { "physicalPosition": [0, 0], "physicalSize": [1155, 870] },
-	"modificationFields": [
+	"scripts": [
 		{
-			"key": "userName",
+			"id": "userName",
 			"displayName": "User Name",
-			"inputVariant": { "type": "TEXT", "default": "John Kappa" },
-			"actions": [
-				{
-					"conditions": [],
-					"events": [
-						{
-							"type": "UpdateTextNode",
-							"id": { "type": "ReferenceId", "referenceId": "n9" },
-							"text": { "var": "userName" }
-						}
-					]
-				}
+			"inputVariant": { "type": "TEXT", "default": { "input": "John Kappa" } },
+			"source": [
+				"local userName = args.input",
+				"comp.sendEvent({",
+				"    type = \"UpdateTextNode\",",
+				"    id = { type = \"ReferenceId\", referenceId = \"n9\" },",
+				"    text = userName",
+				"})"
 			]
 		},
 		{
-			"key": "userHandle",
+			"id": "userHandle",
 			"displayName": "User Handle",
-			"inputVariant": { "type": "TEXT", "default": "johnkappa" },
-			"actions": [
-				{
-					"conditions": [],
-					"compute": { "args": ["userHandle"], "body": "return '@' + userHandle" },
-					"events": [
-						{
-							"type": "UpdateTextNode",
-							"id": { "type": "ReferenceId", "referenceId": "n14" },
-							"text": { "var": "userHandle" }
-						}
-					]
-				}
+			"inputVariant": { "type": "TEXT", "default": { "input": "johnkappa" } },
+			"source": [
+				"local userHandle = '@' .. args.input",
+				"comp.sendEvent({",
+				"    type = \"UpdateTextNode\",",
+				"    id = { type = \"ReferenceId\", referenceId = \"n14\" },",
+				"    text = userHandle",
+				"})"
 			]
 		},
 		{
-			"key": "tweetText",
+			"id": "tweetText",
 			"displayName": "Tweet Text",
 			"inputVariant": {
 				"type": "TEXT",
-				"default": "This is the original component. Edit me to\nmake global changes to allasdf. 🎉",
+				"default": {
+					"input": "This is the original component. Edit me to\nmake global changes to allasdf. 🎉"
+				},
 				"area": true
 			},
-			"actions": [
-				{
-					"conditions": [],
-					"events": [
-						{
-							"type": "UpdateTextNode",
-							"id": { "type": "ReferenceId", "referenceId": "n17" },
-							"text": { "var": "tweetText" }
-						}
-					]
-				}
+			"source": [
+				"local tweetText = args.input",
+				"comp.sendEvent({",
+				"    type = \"UpdateTextNode\",",
+				"    id = { type = \"ReferenceId\", referenceId = \"n17\" },",
+				"    text = tweetText",
+				"})"
 			]
 		},
 		{
-			"key": "verifiedBadge",
+			"id": "verifiedBadge",
 			"displayName": "Verified Badge",
-			"inputVariant": {
-				"type": "BOOLEAN",
-				"default": true
-			},
-			"actions": [
-				{
-					"conditions": [],
-					"events": [
-						{
-							"type": "UpdateEntityVisibility",
-							"id": { "type": "ReferenceId", "referenceId": "n12" },
-							"visible": { "var": "verifiedBadge" }
-						}
-					]
-				}
+			"inputVariant": { "type": "BOOLEAN", "default": { "input": true } },
+			"source": [
+				"local verifiedBadge = args.input",
+				"comp.sendEvent({",
+				"    type = \"UpdateEntityVisibility\",",
+				"    id = { type = \"ReferenceId\", referenceId = \"n12\" },",
+				"    visible = verifiedBadge",
+				"})"
 			]
 		},
 		{
-			"key": "cornerRadius",
+			"id": "cornerRadius",
 			"displayName": "Corner Radius",
 			"inputVariant": {
 				"type": "RANGE",
-				"default": 10,
+				"default": { "input": 10 },
 				"min": 0,
 				"max": 30,
 				"step": 1
 			},
-			"actions": [
-				{
-					"conditions": [],
-					"compute": {
-						"args": ["cornerRadius"],
-						"body": "return [cornerRadius, cornerRadius, cornerRadius, cornerRadius]"
-					},
-					"events": [
-						{
-							"type": "UpdateEntityCornerRadii",
-							"id": { "type": "ReferenceId", "referenceId": "n2" },
-							"cornerRadii": { "var": "cornerRadius" }
-						}
-					]
-				}
+			"source": [
+				"local cornerRadius = args.input",
+				"local cornerRadii = { cornerRadius, cornerRadius, cornerRadius, cornerRadius }",
+				"comp.sendEvent({",
+				"    type = \"UpdateEntityCornerRadii\",",
+				"    id = { type = \"ReferenceId\", referenceId = \"n2\" },",
+				"    cornerRadii = cornerRadii",
+				"})"
 			]
 		},
 		{
-			"key": "backgroundColor",
+			"id": "backgroundColor",
 			"displayName": "Background Color",
-			"inputVariant": {
-				"type": "COLOR",
-				"default": [255, 219, 219, 1]
-			},
-			"actions": [
-				{
-					"conditions": [],
-					"compute": {
-						"args": ["backgroundColor"],
-						"body": "return { rgb: [backgroundColor[0], backgroundColor[1], backgroundColor[2]], alpha: backgroundColor[3] }"
-					},
-					"events": [
-						{
-							"type": "UpdateSolidPaint",
-							"id": { "type": "ReferenceId", "referenceId": "p25" },
-							"color": { "var": "backgroundColor.rgb" }
-						},
-						{
-							"type": "UpdateEntityOpacity",
-							"id": { "type": "ReferenceId", "referenceId": "s1" },
-							"opacity": { "var": "backgroundColor.alpha" }
-						}
-					]
-				}
-			]
-		},
-		{
-			"key": "date",
-			"displayName": "Date",
-			"inputVariant": {
-				"type": "DATETIME",
-				"default": "NOW",
-				"withTime": true
-			},
-			"actions": [
-				{
-					"conditions": [],
-					"compute": {
-						"args": ["date"],
-						"body": "const dateObj = new Date(date);\n\n// Format the time\nlet hours = dateObj.getHours();\nconst minutes = dateObj.getMinutes();\nconst ampm = hours >= 12 ? 'PM' : 'AM';\nhours = hours % 12;\nhours = hours ? hours : 12; // the hour '0' should be '12'\nconst minutesStr = minutes < 10 ? '0' + minutes : minutes;\nconst timeStr = hours + ':' + minutesStr + ' ' + ampm;\n\n// Format the date\nconst options = { month: 'short', day: 'numeric', year: 'numeric' };\nconst dateStr = dateObj.toLocaleDateString('en-US', options);\n\n// Combine time and date\nreturn timeStr + ' · ' + dateStr;"
-					},
-					"events": [
-						{
-							"type": "UpdateTextNode",
-							"id": { "type": "ReferenceId", "referenceId": "n19" },
-							"text": { "var": "date" }
-						}
-					]
-				}
+			"inputVariant": { "type": "COLOR", "default": { "r": 255, "g": 219, "b": 219, "a": 1 } },
+			"source": [
+				"local rgb = { args.r, args.g, args.b }",
+				"local alpha = args.a",
+				"comp.sendEvents({",
+				"    {",
+				"        type = \"UpdateSolidPaint\",",
+				"        id = { type = \"ReferenceId\", referenceId = \"p25\" },",
+				"        color = rgb",
+				"    },",
+				"    {",
+				"        type = \"UpdateEntityOpacity\",",
+				"        id = { type = \"ReferenceId\", referenceId = \"s1\" },",
+				"        opacity = alpha",
+				"    }",
+				"})"
 			]
 		}
 	]
