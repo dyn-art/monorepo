@@ -132,7 +132,7 @@ async fn prepare_dtif_composition(
     return Ok(());
 }
 
-fn build_svg_string(dtif: DtifComposition) -> Result<String, AppError> {
+fn build_svg_string(mut dtif: DtifComposition) -> Result<String, AppError> {
     let mut app = App::new();
 
     // Register plugins
