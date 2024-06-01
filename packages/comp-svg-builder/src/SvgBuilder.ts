@@ -26,7 +26,7 @@ export class SvgBuilder {
 
 	private _cursorInCompBounds = false;
 
-	constructor(composition: Composition, options: TSvgRendererOptions = {}) {
+	constructor(composition: Composition, options: TSvgBuilderOptions = {}) {
 		const { domElement = document.body, callbackBased = true, interactive = false } = options;
 		this._comp = () => composition;
 		this._isCallbackBased = callbackBased;
@@ -353,7 +353,7 @@ export class SvgBuilder {
 	}
 }
 
-export interface TSvgRendererOptions {
+export interface TSvgBuilderOptions {
 	domElement?: HTMLElement;
 	callbackBased?: boolean;
 	interactive?: boolean;

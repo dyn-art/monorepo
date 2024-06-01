@@ -16,15 +16,14 @@ use crate::components::{
 };
 use bevy_ecs::{
     bundle::Bundle,
-    entity::Entity,
     system::{Commands, EntityCommands},
 };
 use bevy_transform::{components::Transform, TransformBundle};
 use components::{
     mixins::{
         AbsoluteLayoutElementMixin, BlendMode, BlendModeMixin, LayoutElement, OpacityMixin,
-        PaintChildMixin, StaticLayoutElementMixin, StaticLayoutParent, StaticLayoutParentMixin,
-        VisibilityMixin, WindingRule,
+        StaticLayoutElementMixin, StaticLayoutParent, StaticLayoutParentMixin, VisibilityMixin,
+        WindingRule,
     },
     nodes::{CompNodeVariant, EllipseArcData},
     paints::{CompPaintVariant, GradientColorStop, GradientVariant, ImageScaleMode},
@@ -963,10 +962,13 @@ pub struct AssetWithId {
 }
 
 impl AssetWithId {
-    pub fn into_asset(self) -> Asset {
-        Asset {
-            content: self.content,
-            content_type: self.content_type,
-        }
+    pub fn into_asset(self) -> (Option<ReferenceId>, Asset) {
+        (
+            self.id,
+            Asset {
+                content: self.content,
+                content_type: self.content_type,
+            },
+        )
     }
 }

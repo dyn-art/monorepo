@@ -10,17 +10,20 @@ import type {
 	InteractionInputEvent,
 	InteractionModeChangeOutputEvent,
 	InteractionToolChangeOutputEvent,
+	LuaScriptError,
 	SelectionChangeOutputEvent,
 	Size,
 	SvgCompInputEvent,
 	SvgCompOutputEvent,
 	SvgElementChangesOutputEvent,
+	ToRunLuaScript,
+	ToRunLuaScripts,
 	Viewport,
 	WatchableComponentVariant,
 	WatchedEntityChangesOutputEvent
 } from '@/rust/dyn-comp-svg-builder-api/bindings';
 
-import { SvgBuilder, type TSvgRendererOptions as TSvgBuilderOptions } from './SvgBuilder';
+import { SvgBuilder, type TSvgBuilderOptions } from './SvgBuilder';
 
 export class Composition {
 	private readonly _svgCompHandle: SvgCompHandle;
@@ -205,6 +208,14 @@ export class Composition {
 	// =========================================================================
 	// Other
 	// =========================================================================
+
+	public runScripts(toRunScripts: ToRunLuaScripts): Record<string, LuaScriptError> {
+		return this._svgCompHandle.runScripts(toRunScripts);
+	}
+
+	public runScript(toRunScript: ToRunLuaScript): LuaScriptError | null {
+		return this._svgCompHandle.runScript(toRunScript);
+	}
 
 	public logEntityComponentsRaw(rawEntity: number): void {
 		this._svgCompHandle.logEntityComponentsRaw(rawEntity);

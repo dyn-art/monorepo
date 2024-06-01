@@ -6,10 +6,5 @@ export function isMdtifComposition(value: unknown): value is TMdtifComposition {
 		return false;
 	}
 	const obj = value as Partial<TMdtifComposition>;
-	return (
-		Array.isArray(obj.modificationFields) &&
-		obj.modificationFields.length > 0 &&
-		Object.values(obj.modificationFields).every((field) => typeof field === 'object') &&
-		isDtifComposition(value)
-	);
+	return obj.extension === 'MDTIF' && isDtifComposition(value);
 }

@@ -3,7 +3,7 @@ import type {
 	TBooleanModificationInput,
 	TColorModificationInput,
 	TDateTimeModificationInput,
-	TModificationField,
+	TModificationScript,
 	TNumberModificationInput,
 	TPaintModificationInput,
 	TPositionModificationInput,
@@ -29,78 +29,78 @@ export * from './PositionInput';
 export * from './RangeInput';
 export * from './TextInput';
 
-export const ModificationField: React.FC<TProps> = (props) => {
-	const { field, composition } = props;
+export const ModificationInput: React.FC<TProps> = (props) => {
+	const { script, composition } = props;
 
-	switch (field.inputVariant.type) {
+	switch (script.inputVariant.type) {
 		case 'POSITION':
 			return (
 				<PositionInput
 					composition={composition}
-					field={field as TModificationField<string, TPositionModificationInput>}
-					key={field.key}
+					key={script.id}
+					script={script as TModificationScript<TPositionModificationInput>}
 				/>
 			);
 		case 'NUMBER':
 			return (
 				<NumberInput
 					composition={composition}
-					field={field as TModificationField<string, TNumberModificationInput>}
-					key={field.key}
+					key={script.id}
+					script={script as TModificationScript<TNumberModificationInput>}
 				/>
 			);
 		case 'TEXT':
 			return (
 				<TextInput
 					composition={composition}
-					field={field as TModificationField<string, TTextModificationInput>}
-					key={field.key}
+					key={script.id}
+					script={script as TModificationScript<TTextModificationInput>}
 				/>
 			);
 		case 'BOOLEAN':
 			return (
 				<BooleanInput
 					composition={composition}
-					field={field as TModificationField<string, TBooleanModificationInput>}
-					key={field.key}
+					key={script.id}
+					script={script as TModificationScript<TBooleanModificationInput>}
 				/>
 			);
 		case 'RANGE':
 			return (
 				<RangeInput
 					composition={composition}
-					field={field as TModificationField<string, TRangeModificationInput>}
-					key={field.key}
+					key={script.id}
+					script={script as TModificationScript<TRangeModificationInput>}
 				/>
 			);
 		case 'COLOR':
 			return (
 				<ColorInput
 					composition={composition}
-					field={field as TModificationField<string, TColorModificationInput>}
-					key={field.key}
+					key={script.id}
+					script={script as TModificationScript<TColorModificationInput>}
 				/>
 			);
 		case 'PAINT':
 			return (
 				<PaintInput
 					composition={composition}
-					field={field as TModificationField<string, TPaintModificationInput>}
-					key={field.key}
+					key={script.id}
+					script={script as TModificationScript<TPaintModificationInput>}
 				/>
 			);
 		case 'DATETIME':
 			return (
 				<DateTimeInput
 					composition={composition}
-					field={field as TModificationField<string, TDateTimeModificationInput>}
-					key={field.key}
+					key={script.id}
+					script={script as TModificationScript<TDateTimeModificationInput>}
 				/>
 			);
 	}
 };
 
 interface TProps {
-	field: TModificationField;
+	script: TModificationScript;
 	composition: Composition;
 }

@@ -34,7 +34,10 @@ tracing = [
 dyn-comp-core = { path = "../../../crates/comp_core", features = [
     "serde_support",
 ] }
-dyn-comp-dtif = { path = "../../../crates/comp_dtif" }
+dyn-comp-dtif = { path = "../../../crates/comp_dtif", features = [
+    "serde_support",
+    "lua_scripts",
+] }
 dyn-comp-bundles = { path = "../../../crates/comp_bundles", features = [
     "serde_support",
 ] }

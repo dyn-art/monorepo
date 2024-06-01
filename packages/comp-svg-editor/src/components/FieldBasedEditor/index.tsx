@@ -4,7 +4,7 @@ import type { Composition } from '@dyn/comp-svg-builder';
 import { Badge, Skeleton, useSizeCallback } from '@dyn/ui';
 import { usePreparedDtif } from '@/hooks';
 
-import { ModificationField, Viewport } from './components';
+import { ModificationInput, Viewport } from './components';
 
 export const FieldBasedEditor: React.FC<TFieldBasedEditorProps> = (props) => {
 	const { mdtif } = props;
@@ -31,10 +31,10 @@ export const FieldBasedEditor: React.FC<TFieldBasedEditorProps> = (props) => {
 
 	return (
 		<div className="grid flex-1 gap-4 overflow-auto p-4 md:grid-cols-2 lg:grid-cols-3">
-			{composition != null && mdtif != null ? (
+			{composition != null && mdtif?.scripts != null ? (
 				<form className="flex w-full flex-col items-start gap-6">
-					{mdtif.modificationFields.map((field) => (
-						<ModificationField composition={composition} field={field} key={field.key} />
+					{mdtif.scripts.map((script) => (
+						<ModificationInput composition={composition} key={script.id} script={script} />
 					))}
 				</form>
 			) : (

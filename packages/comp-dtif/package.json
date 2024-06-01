@@ -28,12 +28,10 @@
 	},
 	"homepage": "https://dyn.art/?source=github",
 	"dependencies": {
-		"@dyn/utils": "workspace:*",
-		"json-logic-js": "^2.0.2"
+		"@dyn/utils": "workspace:*"
 	},
 	"devDependencies": {
 		"@dyn/config": "workspace:*",
-		"@types/json-logic-js": "^2.0.7",
 		"@types/node": "^20.8.10"
 	},
 	"files": [

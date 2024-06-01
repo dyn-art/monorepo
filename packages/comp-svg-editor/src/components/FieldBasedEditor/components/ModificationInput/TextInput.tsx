@@ -1,18 +1,11 @@
 import React from 'react';
-import {
-	applyModifications,
-	type TModificationField,
-	type TTextModificationInput
-} from '@dyn/comp-dtif';
+import type { TArgsMapType, TModificationScript, TTextModificationInput } from '@dyn/comp-dtif';
 import type { Composition } from '@dyn/comp-svg-builder';
 import { AdvancedInput, AdvancedTextarea } from '@dyn/ui';
-import { getJsonFunctionExecutionEnv } from '@dyn/utils';
-
-import { runJsonFunction } from '../run-json-function';
 
 export const TextInput: React.FC<TProps> = (props) => {
-	const { composition, field } = props;
-	const [value, setValue] = React.useState<string>(field.inputVariant.default);
+	const { composition, script } = props;
+	const [value, setValue] = React.useState<string>(script.inputVariant.default.input);
 	const [error, setError] = React.useState<string | null>(null);
 
 	const onChange = React.useCallback(
@@ -29,34 +22,28 @@ export const TextInput: React.FC<TProps> = (props) => {
 			}
 			setError(null);
 
-			// eslint-disable-next-line @typescript-eslint/no-floating-promises -- ok
-			(async () => {
-				const processedActions = await applyModifications(
-					field,
-					{
-						[field.key]: value
-					},
-					async (jsonFunction, args) =>
-						runJsonFunction(jsonFunction, args, getJsonFunctionExecutionEnv(jsonFunction))
-				);
-
-				for (const processedAction of processedActions) {
-					if (processedAction.resolved) {
-						composition.emitInputEvents('Core', processedAction.events);
-						composition.update();
-					} else {
-						setError(processedAction.notMetConditions[0]?.message ?? null);
-					}
+			const argsMap: TArgsMapType<TTextModificationInput> = { input: value };
+			const scriptError = composition.runScript({
+				id: script.id,
+				argsMap
+			});
+			if (scriptError != null) {
+				if (scriptError.type === 'Lua') {
+					setError(scriptError.message);
+				} else {
+					// TODO: Handle Runtime and other errors
 				}
-			})();
+			} else {
+				composition.update();
+			}
 		},
-		[value, field, composition]
+		[composition, value, script.id]
 	);
 
 	return (
 		<fieldset className="w-full rounded-lg border p-4">
-			<legend className="-ml-1 px-1 text-sm font-medium">{field.displayName}</legend>
-			{field.inputVariant.area ? (
+			<legend className="-ml-1 px-1 text-sm font-medium">{script.displayName}</legend>
+			{script.inputVariant.area ? (
 				<AdvancedTextarea
 					childrenAfter={<div />}
 					defaultValue={value}
@@ -94,5 +81,5 @@ export const TextInput: React.FC<TProps> = (props) => {
 
 interface TProps {
 	composition: Composition;
-	field: TModificationField<string, TTextModificationInput>;
+	script: TModificationScript<TTextModificationInput>;
 }
