@@ -728,6 +728,65 @@
 				"    }",
 				"})"
 			]
+		},
+		{
+			"id": "profilePicture",
+			"displayName": "Profile Picture",
+			"inputVariant": {
+				"type": "PAINT",
+				"default": { "paint": { "type": "Solid", "color": [255, 219, 219] }, "opacity": 1 }
+			},
+			"source": [
+				"function mergeTables(dest, source)",
+				"    if source ~= nil then",
+				"        for key, value in pairs(source) do",
+				"            dest[key] = value",
+				"        end",
+				"    end",
+				"    return dest",
+				"end",
+
+				"local paint = {",
+				"    id = \"p6\",",
+				"}",
+
+				"-- Merge args.paint into paint",
+				"paint = mergeTables(paint, args.paint)",
+
+				"local content = args.content",
+				"if content ~= nil then",
+				"    comp.sendEvent({",
+				"        type = \"CreateAsset\",",
+				"        asset = {",
+				"            id = \"a99\",",
+				"            content = { type = \"Binary\", content = content },",
+				"            contentType = { type = \"Png\" }",
+				"        }",
+				"    })",
+				"    paint.imageId = { type = \"ReferenceId\", referenceId = \"a99\" }",
+				"end",
+
+				"comp.sendEvents({",
+				"    {",
+				"        type = \"CreatePaint\",",
+				"        paint = paint",
+				"    },",
+				"    {",
+				"        type = \"UpdateFillStyle\",",
+				"        id = { type = \"ReferenceId\", referenceId = \"s5\" },",
+				"        paintId = { type = \"ReferenceId\", referenceId = \"p6\" }",
+				"    }",
+				"})",
+
+				"local opacity = args.opacity",
+				"if opacity ~= nil then",
+				"    comp.sendEvent({",
+				"        type = \"UpdateEntityOpacity\",",
+				"        id = { type = \"ReferenceId\", referenceId = \"s5\" },",
+				"        opacity = opacity",
+				"    })",
+				"end"
+			]
 		}
 	]
 }
