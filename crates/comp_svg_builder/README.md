@@ -20,3 +20,5 @@ that can be synced with the frontend DOM.
 In the new approach, we create a SVG-DOM with Nodes referenced in the SVG-Bundle via RC. Treating it like the frontend DOM should simplify synchronization between Rust and the frontend state.
 
 For the SVG-DOM, we could use [RCTree](https://github.com/RazrFalcon/rctree/blob/master/src/lib.rs) and take inspiration from [SvgDom](https://github.com/RazrFalcon/svgdom/tree/master)?
+
+- https://two.js.org/
