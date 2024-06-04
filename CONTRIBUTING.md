@@ -25,7 +25,6 @@ The structure of the `package.json` file in this project should adhere to a spec
 	"description": "Description of the package",
 	"version": "0.0.1",
 	"private": true,
-	// "type": "module",
 	"scripts": {
 		"build": "shx rm -rf dist && ../../scripts/cli.sh bundle",
 		"start:dev": "tsc -w",
@@ -37,15 +36,15 @@ The structure of the `package.json` file in this project should adhere to a spec
 	},
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/dyndotart/monorepo.git"
+		"url": "https://github.com/dyn-art/monorepo.git"
 	},
 	"keywords": [],
-	"author": "@yourgithubname",
+	"author": "@bennoinbeta",
 	"license": "AGPL-3.0-or-later",
 	"bugs": {
-		"url": "https://github.com/dyndotart/monorepo/issues"
+		"url": "https://github.com/dyn-art/monorepo/issues"
 	},
-	"homepage": "https://dyn.art/?source=github",
+	"homepage": "https://dyn.art/?source=package-json",
 	"dependencies": {
 		// Project dependencies here
 	},
@@ -83,10 +82,10 @@ name = "dyn_example"
 version = "0.0.1"
 edition = "2021"
 description = "Description of the package"
-homepage = "https://dyn.art/?source=github"
-repository = "https://github.com/dyndotart/monorepo"
+homepage = "https://dyn.art/?source=package-json"
+repository = "https://github.com/dyn-art/monorepo"
 license = "AGPL-3.0-or-later"
-authors = ["@yourgithubname"]
+authors = ["@bennoinbeta"]
 
 [features]
 default = []

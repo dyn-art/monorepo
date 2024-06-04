@@ -1,10 +1,12 @@
 {
-	// Editor
+	// Editor settings
 	"editor.formatOnSave": true,
 	"editor.formatOnPaste": false,
 	"editor.codeActionsOnSave": {
 		"source.fixAll.eslint": "explicit"
 	},
+
+	// Search settings
 	"search.exclude": {
 		"**/node_modules": true,
 		"**/dist": true,
@@ -12,13 +14,15 @@
 		"**/target": true,
 		"**/_deprecated": true
 	},
+
+	// File associations
 	"files.associations": {
 		"*.scss": "postcss",
 		"*.ts": "typescript",
-		// Allow comments in tsconfig.json by associating it with jsonc.
-		// TypeScript permits comments in tsconfig.json even though standard JSON does not.
-		"*.tsconfig.json": "jsonc"
+		"*.tsconfig.json": "jsonc" // Allows comments in tsconfig.json
 	},
+
+	// File nesting in explorer
 	"explorer.fileNesting.enabled": true,
 	"explorer.fileNesting.patterns": {
 		"*.ts": "${capture}.js, ${capture}.test.ts",
@@ -34,21 +38,20 @@
 		"tsconfig.json": "tsconfig.*.json"
 	},
 
-	// Eslint
+	// ESLint settings
 	"eslint.workingDirectories": [
 		{
 			"mode": "auto"
 		}
 	],
 
-	// Tailwind
-	// https://cva.style/docs/getting-started/installation#intellisense
+	// Tailwind CSS settings
 	"tailwindCSS.experimental.classRegex": [
 		["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"],
 		["cx\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)"]
 	],
 
-	// Rust
+	// Rust settings
 	"[rust]": {
 		"editor.defaultFormatter": "rust-lang.rust-analyzer"
 	},

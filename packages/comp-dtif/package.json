@@ -18,15 +18,15 @@
 	"types": "./dist/types/index.d.ts",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/dyndotart/monorepo.git"
+		"url": "https://github.com/dyn-art/monorepo.git"
 	},
 	"keywords": [],
 	"author": "@bennoinbeta",
 	"license": "Commercial License",
 	"bugs": {
-		"url": "https://github.com/dyndotart/monorepo/issues"
+		"url": "https://github.com/dyn-art/monorepo/issues"
 	},
-	"homepage": "https://dyn.art/?source=github",
+	"homepage": "https://dyn.art/?source=package-json",
 	"dependencies": {
 		"@ibg/utils": "^0.0.2"
 	},
