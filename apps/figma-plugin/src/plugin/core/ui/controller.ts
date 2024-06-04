@@ -1,4 +1,4 @@
-import { createState } from '@dyn/state';
+import { createState } from 'feature-state';
 
 import type { EAppRoutes } from '../../../types';
 

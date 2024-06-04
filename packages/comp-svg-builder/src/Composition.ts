@@ -1,4 +1,4 @@
-import { shortId } from '@dyn/utils';
+import { shortId } from '@ibg/utils';
 import { SvgCompHandle } from '@/rust/dyn-comp-svg-builder-api';
 import type {
 	ComponentChange,

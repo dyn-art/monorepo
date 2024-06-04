@@ -3,5 +3,5 @@
  */
 module.exports = {
 	root: true,
-	extends: [require.resolve('@dyn/config/eslint/react-internal'), 'plugin:storybook/recommended']
+	extends: [require.resolve('@ibg/config/eslint/react-internal'), 'plugin:storybook/recommended']
 };

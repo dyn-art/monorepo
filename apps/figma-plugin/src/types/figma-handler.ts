@@ -1,9 +1,9 @@
-import type { FigmaAppHandler } from '@dyn/figma-handler/app';
+import type { FigmaAppHandler } from 'figma-connect/app';
 import type {
 	FigmaPluginHandler,
 	TAppCallbackRegistration,
 	TPluginCallbackRegistration
-} from '@dyn/figma-handler/plugin';
+} from 'figma-connect/plugin';
 
 import type { TAppMessageEvents } from './app-events';
 import type { TPluginMessageEvents } from './plugin-events';

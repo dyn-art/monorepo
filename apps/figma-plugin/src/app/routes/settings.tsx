@@ -1,7 +1,7 @@
+import { createState, withUndo } from 'feature-state';
+import { useDynState } from 'feature-state-react';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { createState, withUndo } from '@dyn/state';
-import { useDynState } from '@dyn/state-react';
 import { Button } from '@dyn/ui';
 
 import { Footer, Navbar } from '../components';

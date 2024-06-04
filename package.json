@@ -17,7 +17,7 @@
 		"install:clean": "pnpm run clean && pnpm install",
 		"lint": "turbo run lint",
 		"format": "prettier --write \"**/*.{ts,tsx,md,json,js,jsx}\"",
-		"update:deps": "turbo run update:deps",
+		"update:latest": "turbo run update:latest",
 		"cli:hello": "sh ./scripts/cli.sh hello"
 	},
 	"repository": {
@@ -32,8 +32,8 @@
 	},
 	"homepage": "https://dyn.art/?source=github",
 	"devDependencies": {
-		"@dyn/cli": "workspace:*",
-		"@dyn/config": "workspace:*",
+		"@ibg/cli": "^0.0.7",
+		"@ibg/config": "^0.0.7",
 		"@ianvs/prettier-plugin-sort-imports": "^4.2.1",
 		"concurrently": "^8.2.2",
 		"eslint": "^8.57.0",
@@ -45,5 +45,8 @@
 		"vercel": "^34.2.2",
 		"vitest": "^1.5.0"
 	},
-	"packageManager": "pnpm@9.0.6"
+	"packageManager": "pnpm@9.0.6",
+	"engines": {
+		"node": ">=18"
+	}
 }

@@ -28,7 +28,7 @@ MONOREPO_ROOT=$(find_monorepo_root)
 echo "👉 Monorepo root found at: $MONOREPO_ROOT"
 
 # Get the absolute path to the CLI's bin directory
-CLI_BIN_PATH="$MONOREPO_ROOT/packages/cli/bin"
+CLI_BIN_PATH="$MONOREPO_ROOT/node_modules/@ibg/cli/bin"
 
 # Making sure the run.sh script is executable
 chmod +x "$CLI_BIN_PATH/run.sh"

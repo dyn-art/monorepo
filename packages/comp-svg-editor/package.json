@@ -16,7 +16,7 @@
 		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
 		"install:clean": "pnpm run clean && pnpm install",
 		"test": "echo \"Error: no test specified\" && exit 1",
-		"update:deps": "pnpm update --latest"
+		"update:latest": "pnpm update --latest"
 	},
 	"source": "./src/index.ts",
 	"main": "./dist/cjs/index.js",
@@ -37,14 +37,14 @@
 		"@dyn/comp-dtif": "workspace:*",
 		"@dyn/comp-svg-builder": "workspace:*",
 		"@dyn/ui": "workspace:*",
-		"@dyn/utils": "workspace:*"
+		"@ibg/utils": "^0.0.2"
 	},
 	"peerDependencies": {
 		"@tanstack/react-query": "^5.35.1",
 		"react": "^18.2.0"
 	},
 	"devDependencies": {
-		"@dyn/config": "workspace:*",
+		"@ibg/config": "^0.0.7",
 		"@storybook/addon-essentials": "^8.1.0-alpha.8",
 		"@storybook/addon-interactions": "^8.1.0-alpha.8",
 		"@storybook/addon-links": "^8.1.0-alpha.8",

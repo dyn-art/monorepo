@@ -1,4 +1,4 @@
-import { extractErrorData } from '@dyn/utils';
+import { extractErrorData } from '@ibg/utils';
 
 import { NodeException } from './NodeException';
 

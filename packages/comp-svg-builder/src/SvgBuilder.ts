@@ -1,5 +1,5 @@
+import { shortId } from '@ibg/utils';
 import { toKeyCode, toMouseButton } from '@dyn/comp-dtif';
-import { shortId } from '@dyn/utils';
 import type {
 	CompositionChangeOutputEvent,
 	SvgElementChangesOutputEvent,

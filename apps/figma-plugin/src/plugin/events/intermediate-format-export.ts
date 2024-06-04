@@ -1,5 +1,5 @@
+import { extractErrorData, notEmpty, sleep } from '@ibg/utils';
 import { NodeException, Transformer, type COMP } from '@dyn/figma-to-dtif';
-import { extractErrorData, notEmpty, sleep } from '@dyn/utils';
 
 import type { TCustomPluginCallbackRegistration, TPluginHandler } from '../../types';
 import { googleClient } from '../fetch-client';

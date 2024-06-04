@@ -41,7 +41,7 @@ RUN --mount=type=cache,id=pnpm,target=~/.pnpm-store pnpm install --frozen-lockfi
 
 # Copy source code from isolated pruned subworkspace and build
 COPY --from=pruner /app/out/full/ ./
-RUN turbo build --filter=@dyn/cli
+RUN turbo build --filter=@ibg/cli
 RUN turbo build --filter=@dyn/${PROJECT}
 RUN --mount=type=cache,id=pnpm,target=~/.pnpm-store pnpm prune --prod --no-optional
 

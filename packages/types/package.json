@@ -8,7 +8,7 @@
 		"lint": "eslint --ext .js,.ts src/",
 		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
 		"install:clean": "pnpm run clean && pnpm install",
-		"update:deps": "pnpm update --latest"
+		"update:latest": "pnpm update --latest"
 	},
 	"exports": {
 		"./comprender": {
@@ -18,10 +18,6 @@
 		"./core": {
 			"source": "./src/core/index.ts",
 			"types": "./dist/core/index.d.ts"
-		},
-		"./utility": {
-			"source": "./src/utility.ts",
-			"types": "./dist/utility.d.ts"
 		}
 	},
 	"typesVersions": {
@@ -49,7 +45,7 @@
 	},
 	"homepage": "https://dyn.art/?source=github",
 	"devDependencies": {
-		"@dyn/config": "workspace:*"
+		"@ibg/config": "^0.0.7"
 	},
 	"files": [
 		"dist",

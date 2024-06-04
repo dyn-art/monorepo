@@ -10,7 +10,7 @@
 		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
 		"install:clean": "pnpm run clean && pnpm install",
 		"test": "vitest run",
-		"update:deps": "pnpm update --latest"
+		"update:latest": "pnpm update --latest"
 	},
 	"exports": {
 		"rectangle-eater": {
@@ -32,12 +32,12 @@
 	},
 	"homepage": "https://dyn.art/?source=github",
 	"dependencies": {
-		"@dyn/utils": "workspace:*",
+		"@ibg/utils": "^0.0.2",
 		"bitecs": "^0.3.40",
 		"piecs": "^0.4.0"
 	},
 	"devDependencies": {
-		"@dyn/config": "workspace:*",
+		"@ibg/config": "^0.0.7",
 		"@types/node": "^20.8.10"
 	},
 	"files": [

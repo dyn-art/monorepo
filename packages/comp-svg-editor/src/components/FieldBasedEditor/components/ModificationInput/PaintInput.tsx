@@ -1,3 +1,4 @@
+import { arrayToMat3, mat3ToArray, rgbaToRgb, rgbToRgba } from '@ibg/utils';
 import React from 'react';
 import type {
 	COMP,
@@ -14,7 +15,6 @@ import {
 	type TImageScaleMode,
 	type TPaint
 } from '@dyn/ui';
-import { arrayToMat3, mat3ToArray, rgbaToRgb, rgbToRgba } from '@dyn/utils';
 
 export const PaintInput: React.FC<TProps> = (props) => {
 	const { composition, script } = props;

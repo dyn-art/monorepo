@@ -1,5 +1,5 @@
+import { ContinuousId } from '@ibg/utils';
 import type { COMP } from '@dyn/comp-dtif';
-import { ContinuousId } from '@dyn/utils';
 
 import type { Transformer } from '../../Transformer';
 import type { TFigmaFormat } from '../../types';

@@ -1,4 +1,4 @@
-import { FigmaAppHandler } from '@dyn/figma-handler/app';
+import { FigmaAppHandler } from 'figma-connect/app';
 
 import type { TAppHandler } from '../types';
 

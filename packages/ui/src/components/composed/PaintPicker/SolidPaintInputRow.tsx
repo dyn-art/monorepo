@@ -1,5 +1,5 @@
+import { hexToRgb, isHexColor, isValidAlpha, rgbaToRgb, rgbToHex } from '@ibg/utils';
 import React from 'react';
-import { hexToRgb, isHexColor, isValidAlpha, rgbaToRgb, rgbToHex } from '@dyn/utils';
 import { AdvancedInput } from '@/components/primitive';
 
 import { Paint } from './Paint';

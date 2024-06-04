@@ -1,7 +1,7 @@
 const { wasm } = require('@rollup/plugin-wasm');
 
 /**
- * @type {import('@dyn/cli').TDynConfig}
+ * @type {import('@ibg/cli').TDynConfig}
  */
 module.exports = {
 	rust: {

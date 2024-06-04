@@ -1,4 +1,4 @@
-import type { TMat3, TRgbaColor } from '@dyn/utils';
+import type { TMat3, TRgbaColor } from '@ibg/utils';
 
 export type TPaint = TSolidPaint | TGradientPaint | TImagePaint;
 

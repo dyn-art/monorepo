@@ -1,7 +1,7 @@
 'use client';
 
+import { extractStartEndPointFromMat3, rgbaToRgb, shortId, type TVec2 } from '@ibg/utils';
 import React from 'react';
-import { extractStartEndPointFromMat3, rgbaToRgb, shortId, type TVec2 } from '@dyn/utils';
 
 import type { TGradientPaint } from '../types';
 

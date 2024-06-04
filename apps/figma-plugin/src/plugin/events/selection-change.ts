@@ -1,4 +1,4 @@
-import { pickProperties } from '@dyn/utils';
+import { pickProperties } from '@ibg/utils';
 
 import {
 	EAppRoutes,

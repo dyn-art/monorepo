@@ -1,4 +1,4 @@
-import { toArray } from '@dyn/utils';
+import { toArray } from '@ibg/utils';
 
 export class NodeException extends Error {
 	public readonly nodeIds: SceneNode['id'][];

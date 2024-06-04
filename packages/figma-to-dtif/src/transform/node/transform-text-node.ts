@@ -1,5 +1,5 @@
+import { calculateBytes } from '@ibg/utils';
 import type { COMP } from '@dyn/comp-dtif';
-import { calculateBytes } from '@dyn/utils';
 
 import type {
 	TToTransformEffect,

@@ -1,4 +1,4 @@
-import { FigmaPluginHandler } from '@dyn/figma-handler/plugin';
+import { FigmaPluginHandler } from 'figma-connect/plugin';
 
 import type { TAppMessageEvents, TPluginHandler, TPluginMessageEvents } from '../types';
 import {

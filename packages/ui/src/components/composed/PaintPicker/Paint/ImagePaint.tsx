@@ -1,7 +1,7 @@
 'use client';
 
+import type { TVec2 } from '@ibg/utils';
 import React from 'react';
-import type { TVec2 } from '@dyn/utils';
 
 import type { TImagePaint } from '../types';
 

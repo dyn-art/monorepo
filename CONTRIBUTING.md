@@ -33,7 +33,7 @@ The structure of the `package.json` file in this project should adhere to a spec
 		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
 		"install:clean": "pnpm run clean && pnpm install",
 		"test": "echo \"Error: no test specified\" && exit 1",
-		"update:deps": "pnpm update --latest"
+		"update:latest": "pnpm update --latest"
 	},
 	"repository": {
 		"type": "git",
