@@ -10,7 +10,7 @@
 		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
 		"install:clean": "pnpm run clean && pnpm install",
 		"test": "vitest run",
-		"update:deps": "pnpm update --latest"
+		"update:latest": "pnpm update --latest"
 	},
 	"source": "./src/index.ts",
 	"main": "./dist/cjs/index.js",
@@ -18,24 +18,24 @@
 	"types": "./dist/types/index.d.ts",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/dyndotart/monorepo.git"
+		"url": "https://github.com/dyn-art/monorepo.git"
 	},
 	"keywords": [],
 	"author": "@bennoinbeta",
 	"license": "AGPL-3.0-or-later",
 	"bugs": {
-		"url": "https://github.com/dyndotart/monorepo/issues"
+		"url": "https://github.com/dyn-art/monorepo/issues"
 	},
-	"homepage": "https://dyn.art/?source=github",
+	"homepage": "https://dyn.art/?source=package-json",
 	"dependencies": {
-		"@dyn/utils": "workspace:*",
+		"@ibg/utils": "^0.0.2",
 		"object-hash": "^3.0.0"
 	},
 	"devDependencies": {
 		"@dyn/comp-dtif": "workspace:*",
-		"@dyn/config": "workspace:*",
-		"@figma/plugin-typings": "^1.88.0",
-		"@types/node": "^20.11.25",
+		"@figma/plugin-typings": "^1.94.0",
+		"@ibg/config": "^0.0.7",
+		"@types/node": "^20.14.1",
 		"@types/object-hash": "^3.0.6"
 	},
 	"files": [

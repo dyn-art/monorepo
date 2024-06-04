@@ -1,5 +1,5 @@
+import { pickProperties } from '@ibg/utils';
 import { isFigmaRemovedNode } from '@dyn/figma-to-dtif';
-import { pickProperties } from '@dyn/utils';
 
 import { EAppRoutes, type TPluginHandler } from '../../../../types';
 import { ACTIVE_APP_ROUTE, SELECTED_NODE_IDS } from '../../../core/ui';

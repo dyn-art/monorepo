@@ -1,1 +1,0 @@
-# `@dyn/figma-handler`

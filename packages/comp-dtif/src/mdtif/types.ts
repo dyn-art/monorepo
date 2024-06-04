@@ -1,4 +1,4 @@
-import type { TVec2 } from '@dyn/utils';
+import type { TVec2 } from '@ibg/utils';
 
 import type { COMP } from '../comp';
 

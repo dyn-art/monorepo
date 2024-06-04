@@ -1,5 +1,5 @@
+import { isValidAlpha } from '@ibg/utils';
 import React from 'react';
-import { isValidAlpha } from '@dyn/utils';
 import { AdvancedInput } from '@/components/primitive';
 
 import { Paint } from './Paint';

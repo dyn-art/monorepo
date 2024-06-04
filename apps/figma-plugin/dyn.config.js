@@ -1,5 +1,5 @@
 /**
- * @type {import('@dyn/cli').TDynConfig}
+ * @type {import('@ibg/cli').TDynConfig}
  */
 module.exports = {
 	figma: ({ isWatchMode }) => ({

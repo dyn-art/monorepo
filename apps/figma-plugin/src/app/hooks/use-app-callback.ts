@@ -1,5 +1,5 @@
+import type { FigmaAppHandler, TAppCallbackRegistration } from 'figma-connect/app';
 import React from 'react';
-import type { FigmaAppHandler, TAppCallbackRegistration } from '@dyn/figma-handler/app';
 
 export function useAppCallback<GFigmaAppHandler extends FigmaAppHandler>(
 	appHandler: GFigmaAppHandler,

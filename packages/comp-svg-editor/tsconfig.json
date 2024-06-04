@@ -1,5 +1,5 @@
 {
-	"extends": "@dyn/config/react-library.tsconfig.json",
+	"extends": "@ibg/config/react-library.tsconfig.json",
 	"compilerOptions": {
 		"outDir": "./dist",
 		"rootDir": "./src",

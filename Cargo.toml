@@ -10,8 +10,8 @@ exclude = ["crates/_deprecated"]
 
 [workspace.package]
 edition = "2021"
-homepage = "https://dyn.art/?source=github"
-repository = "https://github.com/dyndotart/monorepo"
+homepage = "https://dyn.art/?source=package-json"
+repository = "https://github.com/dyn-art/monorepo"
 license = "AGPL-3.0-or-later"
 authors = ["@bennoinbeta"]
 

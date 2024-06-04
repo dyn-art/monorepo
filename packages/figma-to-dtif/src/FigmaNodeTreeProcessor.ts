@@ -1,6 +1,6 @@
+import { ContinuousId, notEmpty, type TContinuousId } from '@ibg/utils';
 import { MD5 } from 'object-hash';
 import type { COMP } from '@dyn/comp-dtif';
-import { ContinuousId, notEmpty, type TContinuousId } from '@dyn/utils';
 
 import { UnsupportedFigmaNodeException } from './exceptions';
 import type {

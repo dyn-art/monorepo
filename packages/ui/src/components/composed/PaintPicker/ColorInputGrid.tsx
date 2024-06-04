@@ -7,9 +7,8 @@ import {
 	rgbToHex,
 	type TRgbaColor,
 	type TRgbColor
-} from '@dyn/utils';
+} from '@ibg/utils';
 import React from 'react';
-
 import { AdvancedInput } from '@/components/primitive';
 
 export const ColorInputGrid: React.FC<TProps> = ({ rgba, onRgbaUpdate }) => {

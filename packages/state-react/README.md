@@ -1,1 +1,0 @@
-# `@dyn/state-react`

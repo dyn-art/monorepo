@@ -1,5 +1,5 @@
+import type { TContinuousId } from '@ibg/utils';
 import type { COMP } from '@dyn/comp-dtif';
-import type { TContinuousId } from '@dyn/utils';
 
 import { mapFigmaTransformToMat3 } from '../../utils';
 

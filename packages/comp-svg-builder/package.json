@@ -18,7 +18,7 @@
 		"clean": "pnpm run clean:ts && shx rm -rf node_modules && pnpm run clean:rust && shx rm -rf rust/target && shx rm -rf .turbo",
 		"install:clean": "pnpm run clean && pnpm install",
 		"test": "vitest run",
-		"update:deps": "pnpm update --latest"
+		"update:latest": "pnpm update --latest"
 	},
 	"source": "./src/index.ts",
 	"main": "./dist/cjs/index.js",
@@ -26,21 +26,21 @@
 	"types": "./dist/types/index.d.ts",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/dyndotart/monorepo.git"
+		"url": "https://github.com/dyn-art/monorepo.git"
 	},
 	"keywords": [],
 	"author": "@bennoinbeta",
 	"license": "Commercial License",
 	"bugs": {
-		"url": "https://github.com/dyndotart/monorepo/issues"
+		"url": "https://github.com/dyn-art/monorepo/issues"
 	},
-	"homepage": "https://dyn.art/?source=github",
+	"homepage": "https://dyn.art/?source=package-json",
 	"dependencies": {
 		"@dyn/comp-dtif": "workspace:*",
-		"@dyn/utils": "workspace:*"
+		"@ibg/utils": "^0.0.2"
 	},
 	"devDependencies": {
-		"@dyn/config": "workspace:*",
+		"@ibg/config": "^0.0.7",
 		"@dyn/types": "workspace:*",
 		"@rollup/plugin-wasm": "^6.2.2",
 		"@types/node": "^20.8.10",

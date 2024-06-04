@@ -1,4 +1,4 @@
-import type { TAppMessageEvent } from '@dyn/figma-handler/app';
+import type { TAppMessageEvent } from 'figma-connect/app';
 
 import type { EAppRoutes } from './app';
 

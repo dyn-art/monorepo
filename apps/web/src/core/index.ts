@@ -1,4 +1,4 @@
-import { createApiFetchClient } from '@dyn/fetch-client';
+import { createApiFetchClient } from 'feature-fetch';
 
 import { appConfnig } from '../environment';
 

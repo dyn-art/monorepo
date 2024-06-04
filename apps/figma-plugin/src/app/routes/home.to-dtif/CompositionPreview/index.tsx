@@ -1,9 +1,9 @@
+import { deepCopy } from '@ibg/utils';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
 import { ReadonlyEditor } from '@dyn/comp-svg-editor';
 import { prepareDtifComposition, type COMP } from '@dyn/figma-to-dtif';
 import { Button, ClipboardCopyIcon, FrameIcon, ScrollArea, Skeleton } from '@dyn/ui';
-import { deepCopy } from '@dyn/utils';
 
 import { appHandler } from '../../../app-handler';
 import { copyToClipboard } from '../../../core/utils';

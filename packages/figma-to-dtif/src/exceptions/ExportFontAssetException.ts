@@ -1,5 +1,5 @@
+import { extractErrorData } from '@ibg/utils';
 import type { COMP } from '@dyn/comp-dtif';
-import { extractErrorData } from '@dyn/utils';
 
 import { NodeException } from './NodeException';
 

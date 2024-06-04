@@ -1,6 +1,6 @@
-import { LOG_LEVEL, Logger } from '@dyn/logger';
+import { LOG_LEVEL, Logger } from 'feature-logger';
 
 export const logger = new Logger({
-	prefix: '@dyn/gateway',
+	prefix: '@dyn/core',
 	level: LOG_LEVEL.INFO
 });

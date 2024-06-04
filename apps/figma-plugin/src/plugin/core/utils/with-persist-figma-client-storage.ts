@@ -5,7 +5,7 @@ import {
 	type TEnforceFeatures,
 	type TFeatureKeys,
 	type TState
-} from '@dyn/state';
+} from 'feature-state';
 
 class FigmaClientStorageInterface<GValue> implements StorageInterface<GValue> {
 	async save(key: string, value: GValue): Promise<boolean> {

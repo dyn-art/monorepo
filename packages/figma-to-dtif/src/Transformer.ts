@@ -1,5 +1,5 @@
+import { ContinuousId, sleep } from '@ibg/utils';
 import type { COMP } from '@dyn/comp-dtif';
-import { ContinuousId, sleep } from '@dyn/utils';
 
 import { FailedToResolveRootNodeException } from './exceptions';
 import {

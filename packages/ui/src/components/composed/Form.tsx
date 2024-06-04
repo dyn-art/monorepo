@@ -27,8 +27,6 @@ import {
 import { Label } from '@/components/primitive';
 import { cn } from '@/utils';
 
-const Form = FormProvider;
-
 interface FormFieldContextValue<
 	TFieldValues extends FieldValues = FieldValues,
 	TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
@@ -114,7 +112,7 @@ const FormControl = React.forwardRef<
 
 	return (
 		<Slot
-			aria-describedby={!error ? `${formDescriptionId}` : `${formDescriptionId} ${formMessageId}`}
+			aria-describedby={!error ? formDescriptionId : `${formDescriptionId} ${formMessageId}`}
 			aria-invalid={Boolean(error)}
 			id={formItemId}
 			ref={ref}
@@ -166,7 +164,7 @@ const FormMessage = React.forwardRef<
 FormMessage.displayName = 'FormMessage';
 
 export {
-	Form,
+	FormProvider as Form,
 	FormControl,
 	FormDescription,
 	FormField,

@@ -1,4 +1,4 @@
-import type { TPluginMessageEvent } from '@dyn/figma-handler/app';
+import type { TPluginMessageEvent } from 'figma-connect/app';
 import type { COMP, TTransformStatusUpdate } from '@dyn/figma-to-dtif';
 
 export interface TOnSelectFrameEvent extends TPluginMessageEvent {
