@@ -3,13 +3,13 @@
     
   </a>
   <p align="center">
-   <img width="150" height="150" src="./docs/resources/images/logo-rounded.png" alt="Logo">
+   <img width="150" height="150" src="./.github/assets/logo-rounded.png" alt="Logo">
   </p>
   <h1 align="center"><b>dyn.art</b></h1>
   <p align="center">
   Leave the repetitive design to us.
     <br />
-    <a href="https://dyn.art/?source=package-json"><strong>dyn.art »</strong></a>
+    <a href="https://dyn.art/?source=github"><strong>dyn.art »</strong></a>
     <br />
     <br />
     <b>Check us out on </b>
@@ -31,6 +31,6 @@
   </p>
 </p>
 
-[dyn.art](https://dyn.art/?source=package-json) is an open source image generation API powered by [Rust](https://www.rust-lang.org/) & [SVG](https://www.w3.org/TR/SVG2/).
+[dyn.art](https://dyn.art/?source=github) is an open source image generation API powered by [Rust](https://www.rust-lang.org/) & [SVG](https://www.w3.org/TR/SVG2/).
 
-> 🆕 UPDATE: [dyn.art](https://dyn.art/?source=package-json) is under active development, we are in the alpha stage and some features might be missing or disabled.
+> 🆕 UPDATE: [dyn.art](https://dyn.art/?source=github is under active development, we are in the alpha stage and some features might be missing or disabled.
