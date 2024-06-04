@@ -4,7 +4,7 @@
 	"private": true,
 	"scripts": {
 		"build": "turbo run build",
-		"prebuild:vercel": "chmod +x ./scripts/vercel/setup.sh && sh ./scripts/vercel/setup.sh && pnpm run build:cli",
+		"prebuild:vercel": "chmod +x ./scripts/vercel/setup.sh && sh ./scripts/vercel/setup.sh",
 		"start:dev": "turbo run start:dev",
 		"d:build:core": "docker build . -t dyn-core:latest -f ./devops/docker/base/node/Dockerfile --build-arg PROJECT=core --build-arg PORT=3001",
 		"d:build:comprender": "docker build . -t dyn-comprender:latest -f ./devops/docker/base/rust/Dockerfile --build-arg PROJECT=comprender --build-arg PORT=3002",
