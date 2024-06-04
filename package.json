@@ -3,8 +3,7 @@
 	"description": "Monorepo for dyn.art",
 	"private": true,
 	"scripts": {
-		"build": "pnpm build:cli && turbo run build",
-		"build:cli": "turbo run build --filter=cli && chmod +x ./scripts/cli.sh && pnpm run cli:hello",
+		"build": "turbo run build",
 		"prebuild:vercel": "chmod +x ./scripts/vercel/setup.sh && sh ./scripts/vercel/setup.sh && pnpm run build:cli",
 		"start:dev": "turbo run start:dev",
 		"d:build:core": "docker build . -t dyn-core:latest -f ./devops/docker/base/node/Dockerfile --build-arg PROJECT=core --build-arg PORT=3001",
@@ -17,8 +16,7 @@
 		"install:clean": "pnpm run clean && pnpm install",
 		"lint": "turbo run lint",
 		"format": "prettier --write \"**/*.{ts,tsx,md,json,js,jsx}\"",
-		"update:latest": "turbo run update:latest",
-		"cli:hello": "sh ./scripts/cli.sh hello"
+		"update:latest": "turbo run update:latest"
 	},
 	"repository": {
 		"type": "git",
