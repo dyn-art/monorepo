@@ -1,29 +1,29 @@
-import type { TPluginMessageEvent } from 'figma-connect/app';
 import type { COMP, TTransformStatusUpdate } from '@dyn/figma-to-dtif';
+import type { TFromPluginMessageEvent } from 'figma-connect/app';
 
-export interface TOnSelectFrameEvent extends TPluginMessageEvent {
+export interface TOnSelectFrameEvent extends TFromPluginMessageEvent {
 	key: 'on-select-frame';
 	args: {
 		selected: Pick<FrameNode | ComponentNode | InstanceNode, 'name' | 'id'>[];
 	};
 }
 
-export interface TOnSelectNodeEvent extends TPluginMessageEvent {
+export interface TOnSelectNodeEvent extends TFromPluginMessageEvent {
 	key: 'on-select-node';
 	args: { selected: Pick<SceneNode, 'name' | 'id'>[] };
 }
 
-export interface TOnSelectNodePropertiesEvent extends TPluginMessageEvent {
+export interface TOnSelectNodePropertiesEvent extends TFromPluginMessageEvent {
 	key: 'on-select-node-properties';
 	args: { selected: SceneNode[] };
 }
 
-export interface TOnChangeSelectedNodePropertiesEvent extends TPluginMessageEvent {
+export interface TOnChangeSelectedNodePropertiesEvent extends TFromPluginMessageEvent {
 	key: 'on-change-selected-node-properties';
 	args: { changed: SceneNode };
 }
 
-export interface TOnTransformStatusUpdateEvent extends TPluginMessageEvent {
+export interface TOnTransformStatusUpdateEvent extends TFromPluginMessageEvent {
 	key: 'on-transform-status-update';
 	args:
 		| { type: 'Start' }
@@ -32,7 +32,7 @@ export interface TOnTransformStatusUpdateEvent extends TPluginMessageEvent {
 		| { type: 'End' };
 }
 
-export interface TIntermediateFormatExportResultEvent extends TPluginMessageEvent {
+export interface TIntermediateFormatExportResultEvent extends TFromPluginMessageEvent {
 	key: 'intermediate-format-export-result';
 	args:
 		| {
@@ -41,11 +41,11 @@ export interface TIntermediateFormatExportResultEvent extends TPluginMessageEven
 		  }
 		| {
 				type: 'success';
-				content: COMP.DTIFComposition;
+				content: COMP.DtifComposition;
 		  };
 }
 
-export type TPluginMessageEvents =
+export type TFromPluginMessageEvents =
 	| TOnSelectFrameEvent
 	| TOnSelectNodeEvent
 	| TOnSelectNodePropertiesEvent

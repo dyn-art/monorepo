@@ -18,6 +18,6 @@ find_monorepo_root() {
         fi
         cwd=$(dirname "$cwd")
     done
-    echo "No monorepo root could be found upwards from the directory $1" >&2
+    echo "❌ No monorepo root could be found upwards from the directory $1" >&2
     exit 1
 }

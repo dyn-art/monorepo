@@ -1,6 +1,6 @@
 import { FigmaPluginHandler } from 'figma-connect/plugin';
 
-import type { TAppMessageEvents, TPluginHandler, TPluginMessageEvents } from '../types';
+import type { TFromAppMessageEvents, TFromPluginMessageEvents } from '../types';
 import {
 	documentChangeEvent,
 	intermediateFormatExport,
@@ -8,9 +8,9 @@ import {
 	uiRouteChange
 } from './events';
 
-export const pluginHandler: TPluginHandler = new FigmaPluginHandler<
-	TAppMessageEvents,
-	TPluginMessageEvents
+export const pluginHandler = new FigmaPluginHandler<
+	TFromAppMessageEvents,
+	TFromPluginMessageEvents
 >(figma, {
 	events: [documentChangeEvent, intermediateFormatExport, selectionChange, uiRouteChange]
 });

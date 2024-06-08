@@ -1,8 +1,8 @@
-import { extractErrorData, notEmpty, sleep } from '@ibg/utils';
 import { NodeException, Transformer, type COMP } from '@dyn/figma-to-dtif';
+import { extractErrorData, notEmpty, sleep } from '@ibg/utils';
 
 import type { TCustomPluginCallbackRegistration, TPluginHandler } from '../../types';
-import { googleClient } from '../fetch-client';
+import { googleWebfontsClient } from '../fetch-client';
 
 export const intermediateFormatExport: TCustomPluginCallbackRegistration = {
 	type: 'app.message',
@@ -38,7 +38,7 @@ async function processNode(node: FrameNode, instance: TPluginHandler): Promise<v
 				font: {
 					export: { mode: 'Inline' },
 					resolveFontContent: async (fontInfo) => {
-						const urlResponse = await googleClient.getFontFileUrl(
+						const urlResponse = await googleWebfontsClient.getFontFileUrl(
 							typeof fontInfo.family === 'string' ? fontInfo.family : fontInfo.family.Named,
 							{
 								fontWeight: fontInfo.variant.weight,

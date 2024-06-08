@@ -5,11 +5,11 @@ import type {
 	TPluginCallbackRegistration
 } from 'figma-connect/plugin';
 
-import type { TAppMessageEvents } from './app-events';
-import type { TPluginMessageEvents } from './plugin-events';
+import type { TFromAppMessageEvents } from './app-events';
+import type { TFromPluginMessageEvents } from './plugin-events';
 
-export type TCustomAppCallbackRegistration = TAppCallbackRegistration<TPluginMessageEvents>;
-export type TAppHandler = FigmaAppHandler<TPluginMessageEvents, TAppMessageEvents>;
+export type TCustomAppCallbackRegistration = TAppCallbackRegistration<TFromPluginMessageEvents>;
+export type TAppHandler = FigmaAppHandler<TFromPluginMessageEvents, TFromAppMessageEvents>;
 
-export type TCustomPluginCallbackRegistration = TPluginCallbackRegistration<TAppMessageEvents>;
-export type TPluginHandler = FigmaPluginHandler<TAppMessageEvents, TPluginMessageEvents>;
+export type TCustomPluginCallbackRegistration = TPluginCallbackRegistration<TFromAppMessageEvents>;
+export type TPluginHandler = FigmaPluginHandler<TFromAppMessageEvents, TFromPluginMessageEvents>;

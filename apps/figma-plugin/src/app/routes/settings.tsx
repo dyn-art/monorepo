@@ -1,16 +1,16 @@
+import { Button } from '@dyn/ui';
 import { createState, withUndo } from 'feature-state';
-import { useDynState } from 'feature-state-react';
+import { useGlobalState } from 'feature-state-react';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button } from '@dyn/ui';
 
 import { Footer, Navbar } from '../components';
 
-const MY_STATE = withUndo(createState(0));
+const $myState = withUndo(createState(0));
 
 const Settings: React.FC = () => {
 	const navigate = useNavigate();
-	const myState = useDynState(MY_STATE);
+	const myState = useGlobalState($myState);
 
 	return (
 		<>
@@ -27,14 +27,14 @@ const Settings: React.FC = () => {
 			<p>Settings</p>
 			<Button
 				onClick={() => {
-					MY_STATE.set(MY_STATE.get() + 1);
+					$myState.set($myState.get() + 1);
 				}}
 			>
 				{myState}
 			</Button>
 			<Button
 				onClick={() => {
-					MY_STATE.undo();
+					$myState.undo();
 				}}
 			>
 				Undo

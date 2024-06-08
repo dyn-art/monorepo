@@ -1,7 +1,7 @@
-import { createGoogleClient } from 'google-webfonts-client';
+import { createGoogleWebfontsClient } from 'google-webfonts-client';
 
 import { googleConfig } from './environment';
 
-export const googleClient = createGoogleClient({
+export const googleWebfontsClient = createGoogleWebfontsClient({
 	apiKey: googleConfig.fontApiToken
 });
