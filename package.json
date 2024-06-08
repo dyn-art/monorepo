@@ -43,8 +43,8 @@
 		"vercel": "^34.2.6",
 		"vitest": "^1.6.0"
 	},
-	"packageManager": "pnpm@9.0.6",
+	"packageManager": "pnpm@9.2.0",
 	"engines": {
-		"node": ">=18"
+		"node": ">=20"
 	}
 }
