@@ -1,7 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Alegreya+Sans:ital,wght@0,100;0,300;0,400;0,500;0,700;0,800;0,900;1,100;1,300;1,400;1,500;1,700;1,800;1,900&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Alegreya+Sans:ital,wght@0,100;0,300;0,400;0,500;0,700;0,800;0,900;1,100;1,300;1,400;1,500;1,700;1,800;1,900&display=swap');
 
 :root {
-	--font-sans: 'Inter', sans-serif;
+	--font-sans: 'Lato', sans-serif;
+	--font-display: 'Alegreya Sans', sans-serif;
+	--font-body: 'Lato', sans-serif;
 
 	--background: 0 0% 100%;
 	--foreground: 222.2 47.4% 11.2%;
@@ -73,7 +76,7 @@
 }
 
 body {
-	@apply bg-background text-foreground;
+	@apply bg-background text-foreground h-full;
 	font-feature-settings:
 		'rlig' 1,
 		'calt' 1;

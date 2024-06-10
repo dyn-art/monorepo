@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { Mail } from 'lucide-react';
 
 import { AdvancedInput } from './AdvancedInput';
+import { Button } from './Button';
 
 /**
  * Displays a input or a component that looks like a input.
@@ -83,6 +84,31 @@ export const Large: Story = {
 	args: {
 		size: 'lg'
 	}
+};
+
+/**
+ * Use the `xl` size for a larger button, offering better visibility and
+ * easier interaction for users.
+ */
+export const Xl: Story = {
+	args: {
+		size: 'xl'
+	}
+};
+
+export const WithButton: Story = {
+	render: (args) => (
+		<AdvancedInput
+			{...args}
+			className="pr-16"
+			size={'xl'}
+			childrenAfter={
+				<div className="absolute inset-y-0 right-0 flex items-center pr-3">
+					<Button size={'sm'}>Test</Button>
+				</div>
+			}
+		/>
+	)
 };
 
 /**

@@ -1,5 +1,6 @@
-// https://gist.github.com/Sh4yy/0300299ae60af4910bcb341703946330
+'use client';
 
+// https://gist.github.com/Sh4yy/0300299ae60af4910bcb341703946330
 import React from 'react';
 
 export const ScreenSize: React.FC = () => {

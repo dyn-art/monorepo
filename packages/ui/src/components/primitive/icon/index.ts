@@ -1,11 +1,14 @@
+// Custom Icons
 export * from './AppleIcon';
 export * from './GithubIcon';
 export * from './GoogleIcon';
 export * from './LogoIcon';
 export * from './PaypalIcon';
+export * from './ScribbleRepeatIcon';
 export * from './SpinnerIcon';
 export * from './TwitterIcon';
 
+// Third Party Icons
 export {
 	CheckIcon,
 	ChevronDownIcon,
@@ -19,6 +22,7 @@ export {
 	ExternalLinkIcon,
 	FrameIcon,
 	GearIcon,
+	HamburgerMenuIcon,
 	InfoCircledIcon,
 	SquareIcon,
 	StarIcon,
@@ -26,21 +30,21 @@ export {
 	VercelLogoIcon
 } from '@radix-ui/react-icons';
 export {
-	Bird,
-	Book,
-	Bot,
-	Code2,
-	CornerDownLeft,
-	LifeBuoy,
-	Mic,
-	Paperclip,
-	Rabbit,
-	Settings2,
-	Share,
-	SquareTerminal,
-	SquareUser,
-	Triangle,
-	Turtle
+	Bird as BirdIcon,
+	Book as BookIcon,
+	Bot as BotIcon,
+	Code2 as Code2Icon,
+	CornerDownLeft as CornerDownLeftIcon,
+	LifeBuoy as LifeBuoyIcon,
+	Mic as MicIcon,
+	Paperclip as PaperclipIcon,
+	Rabbit as RabbitIcon,
+	Settings2 as Settings2Icon,
+	Share as ShareIcon,
+	SquareTerminal as SquareTerminalIcon,
+	SquareUser as SquareUserIcon,
+	Triangle as TriangleIcon,
+	Turtle as TurtleIcon
 } from 'lucide-react';
 
 // TODO: Not doing it like that (altough it would be neat)
@@ -48,8 +52,3 @@ export {
 // export const Icons = {
 // 	Apple: AppleIcon
 // };
-
-// Apparently also not tree shakable
-// https://github.com/evanw/esbuild/issues/1420
-// export * as RadixIcon from '@radix-ui/react-icons';
-// export * as LucideIcon from 'lucide-react';
