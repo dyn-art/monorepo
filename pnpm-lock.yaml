@@ -490,6 +490,9 @@ importers:
       '@radix-ui/react-tooltip':
         specifier: ^1.0.7
         version: 1.0.7(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      canvas-confetti:
+        specifier: ^1.9.3
+        version: 1.9.3
       class-variance-authority:
         specifier: ^0.7.0
         version: 0.7.0
@@ -499,6 +502,9 @@ importers:
       date-fns:
         specifier: ^3.6.0
         version: 3.6.0
+      framer-motion:
+        specifier: ^11.2.10
+        version: 11.2.10(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       lucide-react:
         specifier: ^0.367.0
         version: 0.367.0(react@18.3.1)
@@ -548,6 +554,9 @@ importers:
       '@storybook/test':
         specifier: ^8.1.5
         version: 8.1.5(vitest@1.6.0(@edge-runtime/vm@3.2.0)(@types/node@20.14.1)(sass@1.77.0))
+      '@types/canvas-confetti':
+        specifier: ^1.6.4
+        version: 1.6.4
       '@types/node':
         specifier: ^20.14.1
         version: 20.14.1
@@ -3572,6 +3581,9 @@ packages:
   '@types/body-parser@1.19.5':
     resolution: {integrity: sha512-fB3Zu92ucau0iQ0JMCFQE7b/dv8Ot07NI3KaZIkIUNXq82k4eBAqUaneXfleGY9JWskeS9y+u0nXMyspcuQrCg==}
 
+  '@types/canvas-confetti@1.6.4':
+    resolution: {integrity: sha512-fNyZ/Fdw/Y92X0vv7B+BD6ysHL4xVU5dJcgzgxLdGbn8O3PezZNIJpml44lKM0nsGur+o/6+NZbZeNTt00U1uA==}
+
   '@types/cli-progress@3.11.5':
     resolution: {integrity: sha512-D4PbNRbviKyppS5ivBGyFO29POlySLmA2HyUFE4p5QGazAMM3CwkKWcvTl8gvElSuxRh6FPKL8XmidX873ou4g==}
 
@@ -4318,6 +4330,9 @@ packages:
 
   caniuse-lite@1.0.30001629:
     resolution: {integrity: sha512-c3dl911slnQhmxUIT4HhYzT7wnBK/XYpGnYLOj4nJBaRiw52Ibe7YxlDaAeRECvA786zCuExhxIUJ2K7nHMrBw==}
+
+  canvas-confetti@1.9.3:
+    resolution: {integrity: sha512-rFfTURMvmVEX1gyXFgn5QMn81bYk70qa0HLzcIOSVEyl57n6o9ItHeBtUSWdvKAPY0xlvBHno4/v3QPrT83q9g==}
 
   cardinal@2.1.1:
     resolution: {integrity: sha512-JSr5eOgoEymtYHBjNWyjrMqet9Am2miJhlfKNdqLp6zoeAh0KN5dRAcxlecj5mAJrmQomgiOBj35xHLrFjqBpw==}
@@ -12773,6 +12788,8 @@ snapshots:
       '@types/connect': 3.4.38
       '@types/node': 20.14.1
 
+  '@types/canvas-confetti@1.6.4': {}
+
   '@types/cli-progress@3.11.5':
     dependencies:
       '@types/node': 20.14.2
@@ -13786,6 +13803,8 @@ snapshots:
       lodash.uniq: 4.5.0
 
   caniuse-lite@1.0.30001629: {}
+
+  canvas-confetti@1.9.3: {}
 
   cardinal@2.1.1:
     dependencies:
