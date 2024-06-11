@@ -168,8 +168,8 @@ export const Preview: React.FC = () => {
 							/>
 						</div>
 					</div>
-					<p className="text-md mt-4 text-gray-600">
-						To auto-generate designs, select a template and dataset.
+					<p className="text-md mt-2 text-gray-600">
+						Select a template and dataset to auto-generate designs.
 					</p>
 				</div>
 			</div>
