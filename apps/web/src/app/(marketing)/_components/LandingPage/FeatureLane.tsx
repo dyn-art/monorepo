@@ -31,7 +31,7 @@ export const FeatureLane: React.FC<TProps> = (props) => {
 				className="flex w-full flex-shrink-0 justify-between"
 			>
 				{items.map((item, index) => (
-					<FeatureLaneItem item={item} index={index} />
+					<FeatureLaneItem key={index} item={item} index={index} />
 				))}
 				<div />
 			</motion.div>
@@ -43,7 +43,7 @@ export const FeatureLane: React.FC<TProps> = (props) => {
 				className="flex w-full flex-shrink-0 justify-between"
 			>
 				{items.map((item, index) => (
-					<FeatureLaneItem item={item} index={index} />
+					<FeatureLaneItem key={index} item={item} index={index} />
 				))}
 				<div />
 			</motion.div>

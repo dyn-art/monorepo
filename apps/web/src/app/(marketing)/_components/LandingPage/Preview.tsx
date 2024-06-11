@@ -139,11 +139,9 @@ export const Preview: React.FC = () => {
 									<SelectValue placeholder="Select template" />
 								</SelectTrigger>
 								<SelectContent>
-									<SelectItem value="apple">Apple</SelectItem>
-									<SelectItem value="banana">Banana</SelectItem>
-									<SelectItem value="blueberry">Blueberry</SelectItem>
-									<SelectItem value="grapes">Grapes</SelectItem>
-									<SelectItem value="pineapple">Pineapple</SelectItem>
+									<SelectItem value="best-places">Best Places</SelectItem>
+									<SelectItem value="hotel-ad">Hotel Ad</SelectItem>
+									<SelectItem value="weather">Weather</SelectItem>
 								</SelectContent>
 							</Select>
 							<div className="absolute left-0 right-0 top-0 mx-auto h-2 w-2" ref={templateRef} />
@@ -155,11 +153,10 @@ export const Preview: React.FC = () => {
 									<SelectValue placeholder="Select dataset" />
 								</SelectTrigger>
 								<SelectContent>
-									<SelectItem value="apple">Apple</SelectItem>
-									<SelectItem value="banana">Banana</SelectItem>
-									<SelectItem value="blueberry">Blueberry</SelectItem>
-									<SelectItem value="grapes">Grapes</SelectItem>
-									<SelectItem value="pineapple">Pineapple</SelectItem>
+									<SelectItem value="europe">Europe</SelectItem>
+									<SelectItem value="asia">Asia</SelectItem>
+									<SelectItem value="africa">Africa</SelectItem>
+									<SelectItem value="america">Australia</SelectItem>
 								</SelectContent>
 							</Select>
 							<div

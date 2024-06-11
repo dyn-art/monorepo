@@ -47,25 +47,25 @@ export const LandingPage: React.FC = () => {
 
 			<FeatureLane
 				items={[
-					{ type: 'Icon', name: 'Photoshop Integration', icon: '🖌️' },
-					{ type: 'Icon', name: 'Etsy Integration', icon: '🛒' },
-					{ type: 'Text', text: 'INTEGRATE' },
-					// { type: 'Icon', name: 'Photoshop Integration', icon: '🖌️' },
-					{ type: 'Icon', name: 'Figma Plugin', icon: '🎨' },
-					{ type: 'Text', text: 'INTEGRATE' }
+					{ type: 'Icon', name: 'Photoshop Integration (soon)', icon: '🖌️' },
+					{ type: 'Icon', name: 'Inhouse Design Editor', icon: '🛠️' },
+					{ type: 'Text', text: 'DESIGN' },
+					{ type: 'Icon', name: 'Figma Integration', icon: '🔌' },
+					{ type: 'Text', text: 'DESIGN' }
 				]}
 				backgroundColor="#FE3863"
 				rotationInDeg={1}
 				duration={60}
 				leftToRight={false}
 			/>
+
 			<FeatureLane
 				items={[
-					{ type: 'Icon', name: 'Zappier Integration', icon: '🖌️' },
-					{ type: 'Icon', name: 'REST API', icon: '🛒' },
+					{ type: 'Icon', name: 'Zapier Integration (soon)', icon: '🔗' },
+					{ type: 'Icon', name: 'REST API', icon: '🌐' },
 					{ type: 'Text', text: 'AUTOMATE' },
-					// { type: 'Icon', name: 'Zappier Integration', icon: '🖌️' },
-					{ type: 'Icon', name: 'AirTable Integration', icon: '🎨' },
+					{ type: 'Icon', name: 'Airtable Integration (soon)', icon: '📊' },
+					{ type: 'Icon', name: 'Etsy Integration (soon)', icon: '🛍️' },
 					{ type: 'Text', text: 'AUTOMATE' }
 				]}
 				backgroundColor="#01D3B1"
@@ -74,13 +74,13 @@ export const LandingPage: React.FC = () => {
 				leftToRight={true}
 				className="mt-10"
 			/>
+
 			<FeatureLane
 				items={[
-					{ type: 'Icon', name: 'Pay what you use', icon: '🖌️' },
-					{ type: 'Icon', name: 'Self Hosting', icon: '🛒' },
+					{ type: 'Icon', name: 'Pay what you use', icon: '💳' },
+					{ type: 'Icon', name: 'Self Hosting', icon: '🏠' },
 					{ type: 'Text', text: 'SCALE' },
-					// { type: 'Icon', name: 'Pay what you use', icon: '🖌️' },
-					{ type: 'Icon', name: 'Custom Buckets', icon: '🎨' },
+					{ type: 'Icon', name: 'Custom Buckets', icon: '🗂️' },
 					{ type: 'Text', text: 'SCALE' }
 				]}
 				backgroundColor="#FCB600"
@@ -90,7 +90,7 @@ export const LandingPage: React.FC = () => {
 				className="mt-8"
 			/>
 
-			<div className="mx-auto max-w-screen-xl px-6 pt-32 lg:px-8">todo</div>
+			<div className="mx-auto max-w-screen-xl px-6 pt-32 lg:px-8">{/* <p>todo</p> */}</div>
 		</>
 	);
 };
