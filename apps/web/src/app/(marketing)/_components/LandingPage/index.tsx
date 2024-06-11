@@ -45,13 +45,12 @@ export const LandingPage: React.FC = () => {
 				</div>
 			</div>
 
-			{/* <p>TODO</p> */}
 			<FeatureLane
 				items={[
 					{ type: 'Icon', name: 'Photoshop Integration', icon: '🖌️' },
 					{ type: 'Icon', name: 'Etsy Integration', icon: '🛒' },
 					{ type: 'Text', text: 'INTEGRATE' },
-					{ type: 'Icon', name: 'Photoshop Integration', icon: '🖌️' },
+					// { type: 'Icon', name: 'Photoshop Integration', icon: '🖌️' },
 					{ type: 'Icon', name: 'Figma Plugin', icon: '🎨' },
 					{ type: 'Text', text: 'INTEGRATE' }
 				]}
@@ -65,7 +64,7 @@ export const LandingPage: React.FC = () => {
 					{ type: 'Icon', name: 'Zappier Integration', icon: '🖌️' },
 					{ type: 'Icon', name: 'REST API', icon: '🛒' },
 					{ type: 'Text', text: 'AUTOMATE' },
-					{ type: 'Icon', name: 'Zappier Integration', icon: '🖌️' },
+					// { type: 'Icon', name: 'Zappier Integration', icon: '🖌️' },
 					{ type: 'Icon', name: 'AirTable Integration', icon: '🎨' },
 					{ type: 'Text', text: 'AUTOMATE' }
 				]}
@@ -80,7 +79,7 @@ export const LandingPage: React.FC = () => {
 					{ type: 'Icon', name: 'Pay what you use', icon: '🖌️' },
 					{ type: 'Icon', name: 'Self Hosting', icon: '🛒' },
 					{ type: 'Text', text: 'SCALE' },
-					{ type: 'Icon', name: 'Pay what you use', icon: '🖌️' },
+					// { type: 'Icon', name: 'Pay what you use', icon: '🖌️' },
 					{ type: 'Icon', name: 'Custom Buckets', icon: '🎨' },
 					{ type: 'Text', text: 'SCALE' }
 				]}

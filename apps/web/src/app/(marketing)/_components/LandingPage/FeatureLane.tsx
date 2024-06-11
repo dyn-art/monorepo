@@ -19,7 +19,7 @@ export const FeatureLane: React.FC<TProps> = (props) => {
 	return (
 		<div
 			className={cn(
-				'flex w-[100%] overflow-hidden border-b-2 border-t-2 border-black py-2',
+				'flex w-[200%] overflow-hidden border-b-2 border-t-2 border-black py-2 md:w-[150%] lg:w-[120%]',
 				className
 			)}
 			style={{ backgroundColor, transform: `rotate(${rotationInDeg}deg)` }}
