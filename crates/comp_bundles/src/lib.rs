@@ -972,3 +972,29 @@ impl AssetWithId {
         )
     }
 }
+
+#[derive(Debug, Clone)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type),
+    serde(rename_all = "camelCase")
+)]
+#[cfg(feature = "lua_scripts")]
+pub struct LuaScriptWithId {
+    pub id: ReferenceId,
+    // TODO: Using Vec for better JSON readability, because JSON doesn't support multiline String.
+    // Should we prioritize readability?
+    pub source: Vec<String>,
+}
+
+#[cfg(feature = "lua_scripts")]
+impl LuaScriptWithId {
+    pub fn into_lua_script(self) -> (ReferenceId, dyn_comp_lua::script::LuaScript) {
+        (
+            self.id,
+            dyn_comp_lua::script::LuaScript {
+                source: self.source.join("\n"),
+            },
+        )
+    }
+}

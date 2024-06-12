@@ -14,9 +14,9 @@ export const BooleanInput: React.FC<TProps> = (props) => {
 			setError(null);
 
 			const argsMap: TArgsMapType<TBooleanModificationInput> = { input: checked };
-			const scriptError = composition.runScript({
+			const scriptError = composition.executeScript({
 				id: script.id,
-				argsMap
+				argsMap: argsMap
 			});
 			if (scriptError != null) {
 				if (scriptError.type === 'Lua') {

@@ -6,7 +6,6 @@
 	"scripts": {
 		"build": "shx rm -rf dist && ../../scripts/cli.sh bundle node",
 		"start:dev": "nodemon --config ./nodemon.json",
-		"gen:openapi": "npx openapi-typescript ./resources/openapi-v1.yaml -o ../../packages/types/src/core/gen/v1.ts",
 		"lint": "eslint --ext .js,.ts src/",
 		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
 		"install:clean": "pnpm run clean && pnpm install",

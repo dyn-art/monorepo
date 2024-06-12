@@ -3,11 +3,12 @@ use bevy_ecs::{
     entity::Entity,
     event::{EventReader, EventWriter},
     query::With,
-    system::{Commands, Query, Res, ResMut},
+    system::{Commands, Query, Res, ResMut, SystemState},
+    world::World,
 };
 use bevy_hierarchy::{BuildChildren, Children};
 use bevy_transform::components::Transform;
-use dyn_comp_asset::{asset::Asset, resources::AssetsRes};
+use dyn_comp_asset::resources::AssetsRes;
 use dyn_comp_bundles::{
     components::{
         marker::{Removed, Root},
@@ -819,4 +820,57 @@ pub fn update_entity_children_input_system(
             }
         }
     }
+}
+
+// =============================================================================
+// Script
+// =============================================================================
+
+#[cfg(feature = "lua_scripts")]
+pub fn register_lua_script_input_system(
+    mut lua_res: ResMut<crate::resources::lua::LuaRes>,
+    mut event_reader: EventReader<dyn_comp_bundles::events::RegisterLuaScriptInputEvent>,
+) {
+    use dyn_comp_bundles::events::RegisterLuaScriptInputEvent;
+
+    for RegisterLuaScriptInputEvent { script } in event_reader.read() {
+        let (id, script) = script.clone().into_lua_script();
+        lua_res.register_script(id, script)
+    }
+}
+
+// https://bevy-cheatbook.github.io/programming/exclusive.html
+#[cfg(feature = "lua_scripts")]
+pub fn execute_lua_script_input_system(
+    world: &mut World,
+    system_state: &mut SystemState<(
+        Res<crate::resources::lua::LuaRes>,
+        EventReader<dyn_comp_bundles::events::ExecuteLuaScriptInputEvent>,
+    )>,
+) {
+    use crate::resources::lua::{comp_table::FrozenWorld, LuaRes};
+    use dyn_comp_bundles::events::ExecuteLuaScriptInputEvent;
+    use dyn_comp_lua::freeze::Frozen;
+    use piccolo::{Lua, StashedExecutor};
+
+    Frozen::in_scope(world, |frozen_world: FrozenWorld| {
+        let mut to_execute_lua: Vec<(Lua, StashedExecutor)> = Vec::new();
+
+        frozen_world.clone().with_mut(|inner_world| {
+            let (lua_res, mut event_reader) = system_state.get_mut(inner_world);
+            for ExecuteLuaScriptInputEvent { id, args_map } in event_reader.read() {
+                match lua_res.setup_lua(id, frozen_world.clone(), args_map.clone()) {
+                    Ok((lua, executor)) => to_execute_lua.push((lua, executor)),
+                    Err(_) => {
+                        // TODO: Handle error
+                    }
+                };
+            }
+        });
+
+        for (mut lua, executor) in to_execute_lua {
+            // TODO: Handle error
+            let _ = LuaRes::execute_lua(&mut lua, &executor);
+        }
+    });
 }

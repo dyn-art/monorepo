@@ -38,16 +38,14 @@ export const Viewport: React.FC<TViewportProps> = (props) => {
 					</Button>
 					<Button
 						onClick={() => {
-							composition.runScripts([
-								{
-									id: 'test',
-									argsMap: {
-										x: 100,
-										y: 100,
-										nodeId: 'n30'
-									}
+							composition.executeScript({
+								id: 'test',
+								argsMap: {
+									x: 100,
+									y: 100,
+									nodeId: 'n30'
 								}
-							]);
+							});
 							composition.update();
 						}}
 					>

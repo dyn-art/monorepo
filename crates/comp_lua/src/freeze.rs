@@ -47,12 +47,12 @@ impl<'f, T: ?Sized + for<'a> Freeze<'a>> Freeze<'f> for DynFreeze<T> {
 #[doc(hidden)]
 macro_rules! __scripting_Freeze {
     ($f:lifetime => $frozen:ty) => {
-        $crate::lua::freeze::DynFreeze::<
-            dyn for<$f> $crate::lua::freeze::Freeze<$f, Frozen = $frozen>,
+        $crate::freeze::DynFreeze::<
+            dyn for<$f> $crate::freeze::Freeze<$f, Frozen = $frozen>,
         >
     };
     ($frozen:ty) => {
-        $crate::lua::freeze::Freeze!['freeze => $frozen]
+        $crate::freeze::Freeze!['freeze => $frozen]
     };
 }
 

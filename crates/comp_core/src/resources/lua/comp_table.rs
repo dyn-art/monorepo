@@ -1,13 +1,21 @@
 #![cfg(feature = "lua_scripts")]
 
-use crate::lua::{json::lua_value_to_json, script::FrozenWorld, serde::from_value};
+use bevy_ecs::world::World;
 use chrono::{DateTime, Datelike, FixedOffset, Local, TimeZone, Timelike};
 use dyn_comp_bundles::events::{CoreInputEvent, InputEvent};
+use dyn_comp_lua::{
+    freeze::{Freeze, Frozen},
+    json::lua_value_to_json,
+    serde::from_value,
+};
 use gc_arena::Mutation;
 use piccolo::{
     Callback, CallbackReturn, Context, FromMultiValue, IntoMultiValue, IntoValue, Table, Value,
     Variadic,
 };
+
+/// A frozen reference to the ECS [`World`].
+pub type FrozenWorld = Frozen<Freeze![&'freeze mut World]>;
 
 fn callback<'gc, F, A, R>(name: &'static str, mc: &Mutation<'gc>, f: F) -> Callback<'gc>
 where

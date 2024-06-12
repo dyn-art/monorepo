@@ -25,7 +25,7 @@ export const PositionInput: React.FC<TProps> = (props) => {
 			setError(null);
 
 			const argsMap: TArgsMapType<TPositionModificationInput> = { x: xValue, y: yValue };
-			const scriptError = composition.runScript({
+			const scriptError = composition.executeScript({
 				id: script.id,
 				argsMap
 			});

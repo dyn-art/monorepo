@@ -7,6 +7,7 @@ import type {
 	CursorChangeOutputEvent,
 	DtifComposition,
 	Entity,
+	ExecuteLuaScriptInputEvent,
 	InteractionInputEvent,
 	InteractionModeChangeOutputEvent,
 	InteractionToolChangeOutputEvent,
@@ -16,8 +17,6 @@ import type {
 	SvgCompInputEvent,
 	SvgCompOutputEvent,
 	SvgElementChangesOutputEvent,
-	ToRunLuaScript,
-	ToRunLuaScripts,
 	Viewport,
 	WatchableComponentVariant,
 	WatchedEntityChangesOutputEvent
@@ -209,12 +208,8 @@ export class Composition {
 	// Other
 	// =========================================================================
 
-	public runScripts(toRunScripts: ToRunLuaScripts): Record<string, LuaScriptError> {
-		return this._svgCompHandle.runScripts(toRunScripts);
-	}
-
-	public runScript(toRunScript: ToRunLuaScript): LuaScriptError | null {
-		return this._svgCompHandle.runScript(toRunScript);
+	public executeScript(script: ExecuteLuaScriptInputEvent): LuaScriptError | null {
+		return this._svgCompHandle.executeScript(script);
 	}
 
 	public logEntityComponentsRaw(rawEntity: number): void {

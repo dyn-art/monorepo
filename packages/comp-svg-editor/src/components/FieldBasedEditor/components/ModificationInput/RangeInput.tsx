@@ -14,7 +14,7 @@ export const RangeInput: React.FC<TProps> = (props) => {
 			setError(null);
 
 			const argsMap: TArgsMapType<TRangeModificationInput> = { input: newValue[0] ?? 0 };
-			const scriptError = composition.runScript({
+			const scriptError = composition.executeScript({
 				id: script.id,
 				argsMap
 			});

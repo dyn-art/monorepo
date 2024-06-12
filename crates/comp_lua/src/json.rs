@@ -1,5 +1,3 @@
-#![cfg(feature = "lua_scripts")]
-
 use super::serde::de::is_sequence;
 use piccolo::{Context, Table, Value};
 use serde_json::Value as JsonValue;

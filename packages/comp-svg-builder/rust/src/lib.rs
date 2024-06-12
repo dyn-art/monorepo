@@ -11,28 +11,29 @@ use bevy_app::App;
 use bevy_ecs::{
     entity::Entity,
     query::{With, Without},
-    system::{Query, SystemState},
+    system::{Query, Res, SystemState},
 };
 use bevy_transform::components::{GlobalTransform, Transform};
 use dyn_comp_bundles::{
     components::{marker::Root, mixins::SizeMixin},
-    events::InputEvent,
+    events::{ExecuteLuaScriptInputEvent, InputEvent},
 };
-use dyn_comp_core::{resources::composition::CompositionRes, CompCorePlugin};
-use dyn_comp_dtif::{
-    lua::script::{LuaScript, ToRunLuaScript, ToRunLuaScripts},
-    DtifComposition,
+use dyn_comp_core::{
+    resources::{
+        composition::CompositionRes,
+        lua::{comp_table::FrozenWorld, LuaRes},
+    },
+    CompCorePlugin,
 };
+use dyn_comp_dtif::DtifComposition;
 use dyn_comp_interaction::CompInteractionPlugin;
+use dyn_comp_lua::{freeze::Frozen, script::LuaScriptError};
 use dyn_comp_svg_builder::{
     events::SvgBuilderOutputEvent, svg::svg_bundle::SvgBundleVariant, CompSvgBuilderPlugin,
 };
 use events::{SvgCompInputEvent, SvgCompOutputEvent};
 use modules::watch::{resources::watched_entities::WatchedEntitiesRes, CompWatchPlugin};
-use std::{
-    collections::HashMap,
-    sync::mpsc::{channel, Receiver},
-};
+use std::sync::mpsc::{channel, Receiver};
 use wasm_bindgen::{prelude::wasm_bindgen, JsValue};
 
 #[wasm_bindgen]
@@ -40,7 +41,6 @@ pub struct SvgCompHandle {
     app: App,
     svg_builder_output_event_receiver: Receiver<SvgBuilderOutputEvent>,
     output_event_receiver: Receiver<SvgCompOutputEvent>,
-    lua_scripts: HashMap<String, LuaScript>,
 }
 
 #[wasm_bindgen]
@@ -78,44 +78,7 @@ impl SvgCompHandle {
             app,
             svg_builder_output_event_receiver,
             output_event_receiver,
-            lua_scripts: dtif
-                .scripts
-                .drain(..)
-                .map(|script_with_id| script_with_id.into_lua_script())
-                .collect(),
         });
-    }
-
-    #[wasm_bindgen(js_name = runScripts)]
-    pub fn run_scripts(&mut self, js_to_run_lua_scripts: JsValue) -> Result<JsValue, JsValue> {
-        let maybe_to_run_lua_scripts: Result<ToRunLuaScripts, _> =
-            serde_wasm_bindgen::from_value(js_to_run_lua_scripts);
-
-        return match maybe_to_run_lua_scripts {
-            Ok(to_run_lua_scripts) => Ok(serde_wasm_bindgen::to_value(
-                &to_run_lua_scripts.find_and_run_batch(&self.lua_scripts, &mut self.app.world),
-            )?),
-            Err(_) => Err(JsValue::from_str("Failed to run scripts!")),
-        };
-    }
-
-    #[wasm_bindgen(js_name = runScript)]
-    pub fn run_script(&mut self, js_to_run_lua_script: JsValue) -> Result<JsValue, JsValue> {
-        let maybe_to_run_lua_script: Result<ToRunLuaScript, _> =
-            serde_wasm_bindgen::from_value(js_to_run_lua_script);
-
-        return match maybe_to_run_lua_script {
-            Ok(to_run_lua_script) => {
-                if let Err(e) =
-                    to_run_lua_script.find_and_run(&self.lua_scripts, &mut self.app.world)
-                {
-                    Ok(serde_wasm_bindgen::to_value(&e)?)
-                } else {
-                    Ok(JsValue::NULL)
-                }
-            }
-            Err(_) => Err(JsValue::from_str("Failed to run script!")),
-        };
     }
 
     pub fn update(&mut self, js_input_events: JsValue) -> Result<JsValue, JsValue> {
@@ -216,6 +179,48 @@ impl SvgCompHandle {
         return match self.app.world.get_resource_mut::<WatchedEntitiesRes>() {
             Some(mut watched_entities_res) => Ok(watched_entities_res.unregister_entity(entity)),
             None => Ok(false),
+        };
+    }
+
+    #[wasm_bindgen(js_name = executeScript)]
+    pub fn execute_script(&mut self, js_lua_script: JsValue) -> Result<JsValue, JsValue> {
+        let lua_script: ExecuteLuaScriptInputEvent = serde_wasm_bindgen::from_value(js_lua_script)?;
+
+        let mut system_state: SystemState<Res<LuaRes>> = SystemState::new(&mut self.app.world);
+
+        let lua_execute_result =
+            Frozen::in_scope(&mut self.app.world, |frozen_world: FrozenWorld| {
+                let mut to_execute_lua = Vec::with_capacity(1);
+
+                let lua_setup_result = frozen_world.clone().with_mut(|inner_world| {
+                    let lua_res = system_state.get_mut(inner_world);
+                    return match lua_res.setup_lua(
+                        &lua_script.id,
+                        frozen_world.clone(),
+                        lua_script.args_map,
+                    ) {
+                        Ok((lua, executor)) => {
+                            to_execute_lua.push((lua, executor));
+                            Ok(())
+                        }
+                        Err(err) => Err(err),
+                    };
+                });
+
+                return match lua_setup_result {
+                    Ok(_) => {
+                        for (mut lua, executor) in to_execute_lua {
+                            return LuaRes::execute_lua(&mut lua, &executor);
+                        }
+                        return Err(LuaScriptError::NotFound);
+                    }
+                    Err(err) => Err(err),
+                };
+            });
+
+        return match lua_execute_result {
+            Ok(_) => Ok(JsValue::NULL),
+            Err(err) => Ok(serde_wasm_bindgen::to_value(&err)?),
         };
     }
 

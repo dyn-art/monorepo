@@ -69,6 +69,12 @@ pub enum CoreInputEvent {
     UpdateEntityBlendMode(UpdateEntityBlendModeInputEvent),
     UpdateEntityOpacity(UpdateEntityOpacityInputEvent),
     UpdateEntityChildren(UpdateEntityChildrenInputEvent),
+
+    // Script
+    #[cfg(feature = "lua_scripts")]
+    RegisterLuaScript(RegisterLuaScriptInputEvent),
+    #[cfg(feature = "lua_scripts")]
+    ExecuteLuaScript(ExecuteLuaScriptInputEvent),
 }
 
 impl InputEvent for CoreInputEvent {
@@ -111,6 +117,12 @@ impl InputEvent for CoreInputEvent {
         app.add_event::<UpdateEntityBlendModeInputEvent>();
         app.add_event::<UpdateEntityOpacityInputEvent>();
         app.add_event::<UpdateEntityChildrenInputEvent>();
+
+        // Script
+        #[cfg(feature = "lua_scripts")]
+        app.add_event::<RegisterLuaScriptInputEvent>();
+        #[cfg(feature = "lua_scripts")]
+        app.add_event::<ExecuteLuaScriptInputEvent>();
     }
 
     fn send_into_world(self, world: &mut World) {
@@ -205,6 +217,16 @@ impl InputEvent for CoreInputEvent {
                 world.send_event(event);
             }
             CoreInputEvent::UpdateEntityChildren(event) => {
+                world.send_event(event);
+            }
+
+            // Script
+            #[cfg(feature = "lua_scripts")]
+            CoreInputEvent::RegisterLuaScript(event) => {
+                world.send_event(event);
+            }
+            #[cfg(feature = "lua_scripts")]
+            CoreInputEvent::ExecuteLuaScript(event) => {
                 world.send_event(event);
             }
         }
@@ -565,4 +587,31 @@ pub struct UpdateEntityOpacityInputEvent {
 pub struct UpdateEntityChildrenInputEvent {
     pub id: ReferenceIdOrEntity,
     pub children: Vec<ReferenceIdOrEntity>,
+}
+
+// =============================================================================
+// Script
+// =============================================================================
+
+#[derive(Event, Debug, Clone)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type),
+    serde(rename_all = "camelCase")
+)]
+#[cfg(feature = "lua_scripts")]
+pub struct RegisterLuaScriptInputEvent {
+    pub script: crate::LuaScriptWithId,
+}
+
+#[derive(Event, Debug, Clone)]
+#[cfg_attr(
+    feature = "serde_support",
+    derive(serde::Serialize, serde::Deserialize, specta::Type),
+    serde(rename_all = "camelCase")
+)]
+#[cfg(feature = "lua_scripts")]
+pub struct ExecuteLuaScriptInputEvent {
+    pub id: crate::reference_id::ReferenceId,
+    pub args_map: dyn_comp_lua::tables::args_table::LuaScriptArgsMap,
 }

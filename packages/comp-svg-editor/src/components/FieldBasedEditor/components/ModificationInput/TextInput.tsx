@@ -23,7 +23,7 @@ export const TextInput: React.FC<TProps> = (props) => {
 			setError(null);
 
 			const argsMap: TArgsMapType<TTextModificationInput> = { input: value };
-			const scriptError = composition.runScript({
+			const scriptError = composition.executeScript({
 				id: script.id,
 				argsMap
 			});

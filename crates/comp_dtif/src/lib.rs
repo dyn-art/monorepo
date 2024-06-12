@@ -1,5 +1,3 @@
-pub mod lua;
-
 use bevy_ecs::world::World;
 use dyn_comp_bundles::{
     events::{
@@ -42,7 +40,7 @@ pub struct DtifComposition {
     /// A list of scripts.
     #[cfg(feature = "lua_scripts")]
     #[cfg_attr(feature = "serde_support", serde(default))]
-    pub scripts: Vec<lua::script::LuaScriptWithId>,
+    pub scripts: Vec<dyn_comp_bundles::LuaScriptWithId>,
 }
 
 impl DtifComposition {
@@ -61,6 +59,11 @@ impl DtifComposition {
 
         for event in std::mem::take(&mut self.events) {
             event.send_into_world(world);
+        }
+
+        #[cfg(feature = "lua_scripts")]
+        for script in std::mem::take(&mut self.scripts) {
+            world.send_event(dyn_comp_bundles::events::RegisterLuaScriptInputEvent { script });
         }
     }
 }

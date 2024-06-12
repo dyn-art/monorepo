@@ -9,14 +9,16 @@ license = "Commercial License"
 authors = { workspace = true }
 
 [features]
-default = []
+default = ["lua_scripts"]
 serde_support = [
     "dep:serde",
     "dep:specta",
     "dyn-comp-asset/serde_support",
+    "dyn-comp-lua/serde_support",
     "dyn-attributed-string/serde_support",
     "dyn-utils/serde_support",
 ]
+lua_scripts = ["dep:dyn-comp-lua"]
 tracing = []
 
 [dependencies]
@@ -30,7 +32,7 @@ bevy_transform = { workspace = true }
 glam = { workspace = true }
 smallvec = { workspace = true }
 tiny-skia-path = { workspace = true }
-taffy = "0.4.3"
+taffy = "0.5.1"
 
 # Logging
 log = { workspace = true }
@@ -42,3 +44,6 @@ specta = { workspace = true, features = [
     "bevy_ecs",
 ], optional = true }
 serde = { workspace = true, features = ["derive"], optional = true }
+
+# lua_scripts (feature) 
+dyn-comp-lua = { path = "../comp_lua", optional = true }

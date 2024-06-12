@@ -10,6 +10,12 @@ use std::collections::HashMap;
 )]
 pub struct ReferenceId(String);
 
+impl ReferenceId {
+    pub fn new(id: String) -> Self {
+        Self(id)
+    }
+}
+
 #[derive(Debug, Clone)]
 #[cfg_attr(
     feature = "serde_support",

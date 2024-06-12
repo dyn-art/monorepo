@@ -9,11 +9,19 @@ license = "Commercial License"
 authors = { workspace = true }
 
 [features]
-default = []
+default = ["lua_scripts"]
 serde_support = [
     "dyn-comp-bundles/serde_support",
+    "dyn-comp-lua/serde_support",
     "dyn-utils/serde_support",
     "dyn-attributed-string/serde_support",
+]
+lua_scripts = [
+    "dep:dyn-comp-lua",
+    "dep:gc-arena",
+    "dep:chrono",
+    "dep:piccolo",
+    "dep:serde_json",
 ]
 tracing = []
 
@@ -29,8 +37,21 @@ bevy_transform = { workspace = true }
 glam = { workspace = true }
 smallvec = { workspace = true }
 tiny-skia-path = { workspace = true }
-taffy = "0.4.3"
+taffy = "0.5.1"
 hashbrown = "0.14.5"
 
 # Logging
 log = { workspace = true }
+
+# lua_scripts (feature)
+dyn-comp-lua = { path = "../comp_lua", optional = true }
+gc-arena = { version = "0.5.3", features = [
+    "allocator-api2",
+    "hashbrown",
+], optional = true }
+chrono = { version = "0.4.38", optional = true }
+piccolo = { git = "https://github.com/kyren/piccolo", rev = "df3e53e", optional = true }
+serde_json = { workspace = true, optional = true }
+
+[dev-dependencies]
+env_logger = { workspace = true }

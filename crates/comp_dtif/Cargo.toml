@@ -13,17 +13,11 @@ default = ["lua_scripts"]
 serde_support = [
     "dep:serde",
     "dep:specta",
-    "dyn-utils/serde_support",
     "dyn-comp-bundles/serde_support",
+    "dyn-comp-lua/serde_support",
+    "dyn-utils/serde_support",
 ]
-lua_scripts = [
-    "dep:gc-arena",
-    "dep:piccolo",
-    "dep:serde_json",
-    "dep:thiserror",
-    "dep:chrono",
-    "serde_support",
-]
+lua_scripts = ["dep:dyn-comp-lua"]
 tracing = []
 
 [dependencies]
@@ -44,15 +38,5 @@ specta = { workspace = true, features = [
     "serde_json",
 ], optional = true }
 
-# lua_scripts (feature) 
-gc-arena = { version = "0.5.3", features = [
-    "allocator-api2",
-    "hashbrown",
-], optional = true }
-piccolo = { git = "https://github.com/kyren/piccolo", rev = "df3e53e", optional = true }
-serde_json = { workspace = true, optional = true }
-thiserror = { version = "1.0.61", optional = true }
-chrono = { version = "0.4.38", optional = true }
-
-[dev-dependencies]
-env_logger = "0.11.3"
+# lua_scripts (feature)
+dyn-comp-lua = { path = "../comp_lua", optional = true }

@@ -190,7 +190,7 @@ export type Constraint = "Start" | "Center" | "End" | "Stretch" | "Scale"
 
 export type Constraints = { horizontal: Constraint; vertical: Constraint }
 
-export type CoreInputEvent = ({ type: "UpdateCompositionSize" } & UpdateCompositionSizeInputEvent) | ({ type: "UpdateCompositionViewport" } & UpdateCompositionViewportInputEvent) | ({ type: "FocusRootNodes" }) | ({ type: "CreateNode" } & CreateNodeInputEvent) | ({ type: "UpdateFrameNode" } & UpdateFrameNodeInputEvent) | ({ type: "UpdateEllipseNode" } & UpdateEllipseNodeInputEvent) | ({ type: "UpdateStarNode" } & UpdateStarNodeInputEvent) | ({ type: "UpdatePolygonNode" } & UpdatePolygonNodeInputEvent) | ({ type: "UpdateTextNode" } & UpdateTextNodeInputEvent) | ({ type: "UpdateFillStyle" } & UpdateFillStyleInputEvent) | ({ type: "UpdateStrokeStyle" } & UpdateStorkeStyleInputEvent) | ({ type: "UpdateDropShadowStyle" } & UpdateDropShadowStyleInputEvent) | ({ type: "CreatePaint" } & CreatePaintInputEvent) | ({ type: "UpdateSolidPaint" } & UpdateSolidPaintInputEvent) | ({ type: "UpdateImagePaint" } & UpdateImagePaintInputEvent) | ({ type: "UpdateGradientPaint" } & UpdateGradientPaintInputEvent) | ({ type: "CreateAsset" } & CreateAssetInputEvent) | ({ type: "DeleteEntity" } & DeleteEntityInputEvent) | ({ type: "UpdateEntityTransform" } & UpdateEntityTransformInputEvent) | ({ type: "UpdateEntitySize" } & UpdateEntitySizeInputEvent) | ({ type: "MoveEntity" } & MoveEntityInputEvent) | ({ type: "UpdateEntityRotation" } & UpdateEntityRotationInputEvent) | ({ type: "UpdateEntityVisibility" } & UpdateEntityVisibilityInputEvent) | ({ type: "UpdateEntityCornerRadii" } & UpdateEntityCornerRadiiInputEvent) | ({ type: "UpdateEntityBlendMode" } & UpdateEntityBlendModeInputEvent) | ({ type: "UpdateEntityOpacity" } & UpdateEntityOpacityInputEvent) | ({ type: "UpdateEntityChildren" } & UpdateEntityChildrenInputEvent)
+export type CoreInputEvent = ({ type: "UpdateCompositionSize" } & UpdateCompositionSizeInputEvent) | ({ type: "UpdateCompositionViewport" } & UpdateCompositionViewportInputEvent) | ({ type: "FocusRootNodes" }) | ({ type: "CreateNode" } & CreateNodeInputEvent) | ({ type: "UpdateFrameNode" } & UpdateFrameNodeInputEvent) | ({ type: "UpdateEllipseNode" } & UpdateEllipseNodeInputEvent) | ({ type: "UpdateStarNode" } & UpdateStarNodeInputEvent) | ({ type: "UpdatePolygonNode" } & UpdatePolygonNodeInputEvent) | ({ type: "UpdateTextNode" } & UpdateTextNodeInputEvent) | ({ type: "UpdateFillStyle" } & UpdateFillStyleInputEvent) | ({ type: "UpdateStrokeStyle" } & UpdateStorkeStyleInputEvent) | ({ type: "UpdateDropShadowStyle" } & UpdateDropShadowStyleInputEvent) | ({ type: "CreatePaint" } & CreatePaintInputEvent) | ({ type: "UpdateSolidPaint" } & UpdateSolidPaintInputEvent) | ({ type: "UpdateImagePaint" } & UpdateImagePaintInputEvent) | ({ type: "UpdateGradientPaint" } & UpdateGradientPaintInputEvent) | ({ type: "CreateAsset" } & CreateAssetInputEvent) | ({ type: "DeleteEntity" } & DeleteEntityInputEvent) | ({ type: "UpdateEntityTransform" } & UpdateEntityTransformInputEvent) | ({ type: "UpdateEntitySize" } & UpdateEntitySizeInputEvent) | ({ type: "MoveEntity" } & MoveEntityInputEvent) | ({ type: "UpdateEntityRotation" } & UpdateEntityRotationInputEvent) | ({ type: "UpdateEntityVisibility" } & UpdateEntityVisibilityInputEvent) | ({ type: "UpdateEntityCornerRadii" } & UpdateEntityCornerRadiiInputEvent) | ({ type: "UpdateEntityBlendMode" } & UpdateEntityBlendModeInputEvent) | ({ type: "UpdateEntityOpacity" } & UpdateEntityOpacityInputEvent) | ({ type: "UpdateEntityChildren" } & UpdateEntityChildrenInputEvent) | ({ type: "RegisterLuaScript" } & RegisterLuaScriptInputEvent) | ({ type: "ExecuteLuaScript" } & ExecuteLuaScriptInputEvent)
 
 export type CornerRadii = [Angle, Angle, Angle, Angle]
 
@@ -269,6 +269,8 @@ export type EllipseNode = { id?: ReferenceId | null; startingAngle?: number; end
 export type Em = Scalar
 
 export type Entity = number
+
+export type ExecuteLuaScriptInputEvent = { id: ReferenceId; argsMap: { [key in string]: JsonValue } }
 
 export type FillStyle = { id?: ReferenceId | null; paintId: ReferenceIdOrEntity; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity }
 
@@ -1433,7 +1435,7 @@ export type LuaScriptError =
  */
 { type: "NotFound" }
 
-export type LuaScriptWithId = { id: string; source: string[] }
+export type LuaScriptWithId = { id: ReferenceId; source: string[] }
 
 export type Mat3 = [number, number, number, number, number, number, number, number, number]
 
@@ -1553,6 +1555,8 @@ export type ReferenceId = string
 export type ReferenceIdOrEntity = { type: "Entity"; entity: Entity } | { type: "ReferenceId"; referenceId: ReferenceId }
 
 export type ReferenceIdOrImageId = { type: "ImageId"; imageId: { idx: number; version: number } } | { type: "ReferenceId"; referenceId: ReferenceId }
+
+export type RegisterLuaScriptInputEvent = { script: LuaScriptWithId }
 
 /**
  * A 32-bit float that implements `Eq`, `Ord` and `Hash`.
@@ -1690,10 +1694,6 @@ export type TextAttributes = { fontFamily?: FontFamily | null; fontStyle?: FontS
 export type TextNode = { id?: ReferenceId | null; text: string; attributes: TextAttributeInterval[]; lineWrap?: LineWrap; horizontalTextAlignment?: HorizontalTextAlignment; verticalTextAlignment?: VerticalTextAlignment; sizingMode?: TextSizingMode; translation?: Vec2; rotationDeg?: Angle; size: Size; visible?: boolean; blendMode?: BlendMode; opacity?: Opacity; layoutElement?: LayoutElement; styles?: Style[] }
 
 export type TextSizingMode = "WidthAndHeight" | "Height" | "Fixed"
-
-export type ToRunLuaScript = { id: string; argsMap: { [key in string]: JsonValue } }
-
-export type ToRunLuaScripts = ToRunLuaScript[]
 
 export type UpdateCompositionSizeInputEvent = { size: Size }
 

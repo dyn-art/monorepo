@@ -1,6 +1,4 @@
-#![cfg(feature = "lua_scripts")]
-
-use crate::lua::json::json_to_lua_value;
+use crate::json::json_to_lua_value;
 use piccolo::{Context, Table};
 use std::collections::HashMap;
 

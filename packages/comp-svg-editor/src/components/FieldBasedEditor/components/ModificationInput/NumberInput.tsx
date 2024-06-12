@@ -20,7 +20,7 @@ export const NumberInput: React.FC<TProps> = (props) => {
 			setError(null);
 
 			const argsMap: TArgsMapType<TNumberModificationInput> = { input: value };
-			const scriptError = composition.runScript({
+			const scriptError = composition.executeScript({
 				id: script.id,
 				argsMap
 			});

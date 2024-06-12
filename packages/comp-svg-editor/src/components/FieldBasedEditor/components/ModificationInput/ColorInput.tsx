@@ -31,7 +31,7 @@ export const ColorInput: React.FC<TProps> = (props) => {
 				b: paint.color[2],
 				a: paint.color[3]
 			};
-			const scriptError = composition.runScript({
+			const scriptError = composition.executeScript({
 				id: script.id,
 				argsMap
 			});

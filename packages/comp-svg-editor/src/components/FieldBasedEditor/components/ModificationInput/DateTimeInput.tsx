@@ -32,7 +32,7 @@ export const DateTimeInput: React.FC<TProps> = (props) => {
 			}
 
 			const argsMap: TArgsMapType<TDateTimeModificationInput> = { input: date.getTime() };
-			const scriptError = composition.runScript({
+			const scriptError = composition.executeScript({
 				id: script.id,
 				argsMap
 			});

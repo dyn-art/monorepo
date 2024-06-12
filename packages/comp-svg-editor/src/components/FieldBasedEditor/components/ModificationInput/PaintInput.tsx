@@ -29,7 +29,7 @@ export const PaintInput: React.FC<TProps> = (props) => {
 			setError(null);
 
 			const argsMap: TArgsMapType<TPaintModificationInput> = mapPaintToComp(paint);
-			const scriptError = composition.runScript({
+			const scriptError = composition.executeScript({
 				id: script.id,
 				argsMap: argsMap as any // TODO: Make typesafe
 			});

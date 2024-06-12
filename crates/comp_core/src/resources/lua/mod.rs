@@ -1,21 +1,90 @@
 #![cfg(feature = "lua_scripts")]
 
-#[macro_use]
-pub mod freeze;
-pub mod json;
-pub mod lib;
-pub mod script;
-pub mod serde;
+pub mod comp_table;
+
+use bevy_ecs::system::Resource;
+use comp_table::{load_comp_table_global, FrozenWorld};
+use dyn_comp_bundles::reference_id::ReferenceId;
+use dyn_comp_lua::{
+    script::{LuaScript, LuaScriptError},
+    tables::args_table::LuaScriptArgsMap,
+};
+use piccolo::{Closure, Executor, Function, Lua, StashedExecutor, StaticError};
+use std::collections::HashMap;
+
+#[derive(Resource, Default)]
+pub struct LuaRes {
+    scripts: HashMap<ReferenceId, LuaScript>,
+}
+
+impl LuaRes {
+    pub fn register_script(&mut self, id: ReferenceId, script: LuaScript) {
+        self.scripts.insert(id, script);
+    }
+
+    fn load_code(lua: &mut Lua, executor: &StashedExecutor, code: &str) -> Result<(), StaticError> {
+        lua.try_enter(|ctx| {
+            let closure = Closure::load(ctx, None, code.as_bytes())?;
+            let function = Function::compose(&ctx, [closure.into()]);
+            ctx.fetch(executor).restart(ctx, function, ());
+            Ok(())
+        })
+    }
+
+    pub fn setup_lua(
+        &self,
+        id: &ReferenceId,
+        frozen_world: FrozenWorld,
+        args_map: LuaScriptArgsMap,
+    ) -> Result<(Lua, StashedExecutor), LuaScriptError> {
+        if let Some(LuaScript { source }) = self.scripts.get(id) {
+            let mut lua = LuaScript::full_lua(args_map);
+
+            let executor = lua.enter(|ctx| ctx.stash(Executor::new(ctx)));
+
+            lua.enter(|ctx| {
+                load_comp_table_global(ctx, frozen_world);
+            });
+
+            match LuaRes::load_code(&mut lua, &executor, &source) {
+                Ok(_) => {}
+                Err(err) => {
+                    return Err(LuaScriptError::from_static_error(err));
+                }
+            };
+
+            return Ok((lua, executor));
+        }
+
+        return Err(LuaScriptError::NotFound);
+    }
+
+    pub fn execute_lua(lua: &mut Lua, executor: &StashedExecutor) -> Result<(), LuaScriptError> {
+        return match lua.execute::<()>(executor) {
+            Ok(_) => Ok(()),
+            Err(err) => Err(LuaScriptError::from_static_error(err)),
+        };
+    }
+}
 
 #[cfg(test)]
 mod tests {
-    use super::{freeze::Frozen, lib::args::LuaScriptArgsMap, script::LuaScript};
-    use bevy_app::{App, Update};
-    use bevy_ecs::event::EventReader;
-    use dyn_comp_bundles::events::{
-        CoreInputEvent, InputEvent, UpdateCompositionSizeInputEvent,
-        UpdateEntityTransformInputEvent, UpdateTextNodeInputEvent,
+    use super::LuaRes;
+    use crate::systems::events::{
+        execute_lua_script_input_system, register_lua_script_input_system,
     };
+    use bevy_app::{App, First, Update};
+    use bevy_ecs::{event::EventReader, schedule::IntoSystemConfigs};
+    use dyn_comp_bundles::{
+        events::{
+            CoreInputEvent, ExecuteLuaScriptInputEvent, InputEvent, RegisterLuaScriptInputEvent,
+            UpdateCompositionSizeInputEvent, UpdateEntityTransformInputEvent,
+            UpdateTextNodeInputEvent,
+        },
+        reference_id::ReferenceId,
+        LuaScriptWithId,
+    };
+    use dyn_comp_lua::tables::args_table::LuaScriptArgsMap;
     use serde_json::json;
     use std::collections::HashMap;
 
@@ -31,6 +100,14 @@ mod tests {
 
         let mut app = App::new();
         CoreInputEvent::register_events(&mut app);
+        app.init_resource::<LuaRes>();
+        app.add_systems(
+            First,
+            (
+                register_lua_script_input_system,
+                execute_lua_script_input_system.after(register_lua_script_input_system),
+            ),
+        );
         app.add_systems(
             Update,
             (
@@ -84,9 +161,13 @@ mod tests {
             })
         "#;
 
-        let script = LuaScript {
-            source: code.to_string(),
+        let script_id = ReferenceId::new(String::from("1"));
+        let script = LuaScriptWithId {
+            id: script_id.clone(),
+            source: vec![code.to_string()],
         };
+
+        app.world.send_event(RegisterLuaScriptInputEvent { script });
 
         let mut args_map: LuaScriptArgsMap = HashMap::new();
         args_map.insert(String::from("input"), json!(10.0));
@@ -95,8 +176,9 @@ mod tests {
         args_map.insert(String::from("y"), json!(30.0));
         args_map.insert(String::from("date"), json!(1717252549107 as i64));
 
-        Frozen::in_scope(&mut app.world, |world| {
-            script.run(world, args_map).unwrap();
+        app.world.send_event(ExecuteLuaScriptInputEvent {
+            id: script_id,
+            args_map,
         });
 
         app.update();

@@ -102,6 +102,8 @@ impl Plugin for CompCorePlugin {
             viewport: self.viewport.unwrap_or_default(),
             size: self.size,
         });
+        #[cfg(feature = "lua_scripts")]
+        app.init_resource::<resources::lua::LuaRes>();
 
         // Register system sets
         app.configure_sets(
@@ -125,7 +127,17 @@ impl Plugin for CompCorePlugin {
         );
 
         // Register systems
-        app.add_systems(First, collect_first_tick);
+        app.add_systems(
+            First,
+            (
+                collect_first_tick,
+                #[cfg(feature = "lua_scripts")]
+                systems::events::register_lua_script_input_system,
+                #[cfg(feature = "lua_scripts")]
+                systems::events::execute_lua_script_input_system
+                    .after(systems::events::register_lua_script_input_system),
+            ),
+        );
         app.add_systems(
             Update,
             (
