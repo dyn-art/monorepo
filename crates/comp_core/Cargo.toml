@@ -10,11 +10,11 @@ authors = { workspace = true }
 
 [features]
 default = ["lua_scripts"]
-serde_support = [
-    "dyn-comp-bundles/serde_support",
-    "dyn-comp-lua/serde_support",
-    "dyn-utils/serde_support",
-    "dyn-attributed-string/serde_support",
+specta_support = [
+    "dyn-comp-bundles/specta_support",
+    "dyn-comp-lua/specta_support",
+    "dyn-utils/specta_support",
+    "dyn-attributed-string/specta_support",
 ]
 lua_scripts = [
     "dep:dyn-comp-lua",

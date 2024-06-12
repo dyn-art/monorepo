@@ -13,9 +13,10 @@ use glam::Vec2;
 
 #[derive(Debug, Default, Copy, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub enum CompVersion {
     #[default]
     V000001, // v0.0.1
@@ -23,10 +24,11 @@ pub enum CompVersion {
 
 #[derive(Debug, Default, Copy, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type),
     serde(rename_all = "camelCase")
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub struct Viewport {
     pub physical_position: Vec2,
     pub physical_size: Size,
@@ -34,10 +36,11 @@ pub struct Viewport {
 
 #[derive(Debug, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type),
     serde(rename_all = "camelCase")
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub struct TextAttributeInterval {
     pub start: usize,
     pub end: usize,
@@ -68,30 +71,31 @@ impl TextAttributeInterval {
 
 #[derive(Debug, Default, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type),
     serde(rename_all = "camelCase")
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub struct TextAttributes {
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub font_family: Option<FontFamily>,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub font_style: Option<FontStyle>,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub font_stretch: Option<FontStretch>,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub font_weight: Option<FontWeight>,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub font_size: Option<Abs>,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub small_caps: Option<bool>,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub apply_kerning: Option<bool>,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub letter_spacing: Option<FontUnit>,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub word_spacing: Option<FontUnit>,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub line_height: Option<FontUnit>,
 }
 
@@ -102,9 +106,10 @@ pub struct TextAttributes {
 /// [MDN](https://developer.mozilla.org/en-US/docs/Web/CSS/align-items)
 #[derive(Debug, Default, PartialEq, Eq, Copy, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub enum AlignItems {
     /// Items are packed toward the start of the axis
     #[default]
@@ -173,9 +178,10 @@ pub type JustifySelf = AlignItems;
 /// [MDN](https://developer.mozilla.org/en-US/docs/Web/CSS/align-content)
 #[derive(Debug, Default, PartialEq, Eq, Copy, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub enum AlignContent {
     /// Items are packed toward the start of the axis
     #[default]
@@ -243,9 +249,10 @@ pub type JustifyContent = AlignContent;
 /// [Specification](https://www.w3.org/TR/css-flexbox-1/#flex-direction-property)
 #[derive(Debug, Default, PartialEq, Eq, Copy, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub enum FlexDirection {
     /// Defines +x as the main axis
     ///

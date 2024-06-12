@@ -4,10 +4,11 @@ use super::{abs::Abs, em::Em, Numeric};
 /// https://fonts.google.com/knowledge/glossary/unit
 #[derive(Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Clone, Copy)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type),
     serde(tag = "type")
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub enum FontUnit {
     Abs { value: Abs },
     Em { value: Em },

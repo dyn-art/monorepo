@@ -6,7 +6,8 @@ const MAX_OPACITY: f32 = 1.0;
 
 /// An opacity.
 #[derive(Eq, PartialEq, Ord, PartialOrd, Hash, Clone, Copy)]
-#[cfg_attr(feature = "serde_support", derive(serde::Serialize, specta::Type))]
+#[cfg_attr(feature = "specta_support", derive(serde::Serialize, specta::Type))]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub struct Opacity(Ratio);
 
 impl Opacity {
@@ -43,7 +44,7 @@ impl Default for Opacity {
     }
 }
 
-#[cfg(feature = "serde_support")]
+#[cfg(feature = "specta_support")]
 impl<'de> serde::Deserialize<'de> for Opacity {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where

@@ -3,7 +3,7 @@ use piccolo::{Lua, StaticError};
 
 #[derive(Debug, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type),
     serde(rename_all = "camelCase")
 )]
@@ -25,7 +25,7 @@ impl LuaScript {
 
 #[derive(Debug, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type),
     serde(tag = "type")
 )]

@@ -18,8 +18,8 @@ mod cli {
 
     #[derive(Parser, Debug)]
     struct GenerateOpenAPI {
-        /// Path to save the generated OpenAPI file, defaults to "./openapi.json"
-        #[clap(long, default_value = "./openapi.json")]
+        /// Path to save the generated OpenAPI file, defaults to "./openapi.yaml"
+        #[clap(long, default_value = "./openapi.yaml")]
         output_path: String,
     }
 

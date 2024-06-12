@@ -3,9 +3,10 @@ use std::fmt::Debug;
 /// Properties that distinguish a font from other fonts in the same family.
 #[derive(Default, Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Clone, Copy)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub struct FontVariant {
     /// The style of the font (normal / italic / oblique).
     pub style: FontStyle,
@@ -29,9 +30,10 @@ impl FontVariant {
 /// The style of a font.
 #[derive(Default, Debug, Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub enum FontStyle {
     /// The default, typically upright style.
     #[default]
@@ -45,9 +47,10 @@ pub enum FontStyle {
 /// The weight of a font.
 #[derive(Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Clone, Copy)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub struct FontWeight(u16);
 
 impl FontWeight {
@@ -109,9 +112,10 @@ impl Default for FontWeight {
 /// The width of a font.
 #[derive(Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Clone, Copy)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub struct FontStretch(u16);
 
 impl FontStretch {

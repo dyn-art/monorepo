@@ -10,13 +10,19 @@ authors = { workspace = true }
 
 [features]
 default = ["lua_scripts"]
-serde_support = [
+specta_support = [
     "dep:serde",
     "dep:specta",
-    "dyn-comp-asset/serde_support",
-    "dyn-comp-lua/serde_support",
-    "dyn-attributed-string/serde_support",
-    "dyn-utils/serde_support",
+    "dyn-comp-asset/specta_support",
+    "dyn-comp-lua/specta_support",
+    "dyn-attributed-string/specta_support",
+    "dyn-utils/specta_support",
+]
+utoipa_support = [
+    "dep:utoipa",
+    "dyn-comp-asset/utoipa_support",
+    "dyn-attributed-string/utoipa_support",
+    "dyn-utils/utoipa_support",
 ]
 lua_scripts = ["dep:dyn-comp-lua"]
 tracing = []
@@ -37,13 +43,16 @@ taffy = "0.5.1"
 # Logging
 log = { workspace = true }
 
-# serde_support (feature)
+# specta_support (feature)
 specta = { workspace = true, features = [
     "serde",
     "glam",
     "bevy_ecs",
 ], optional = true }
 serde = { workspace = true, features = ["derive"], optional = true }
+
+# utoipa_support (feature)
+utoipa = { workspace = true, optional = true }
 
 # lua_scripts (feature) 
 dyn-comp-lua = { path = "../comp_lua", optional = true }

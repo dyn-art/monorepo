@@ -46,8 +46,8 @@ pub async fn simplify_svg(body: String) -> Result<Response, AppError> {
     post,
     path = "/v1/render",
     responses(
-        (status = 200, description = "Generation success", body = DTIFComposition),
-        (status = BAD_REQUEST, description = "Bad Request")
+        (status = 200, description = "Generation success", body = DtifComposition),
+        (status = BAD_REQUEST, description = "Bad Request", body = AppError)
     ),
     params(
         QueryParams,

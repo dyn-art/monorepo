@@ -32,26 +32,26 @@ tracing = [
 
 [dependencies]
 dyn-comp-core = { path = "../../../crates/comp_core", features = [
-    "serde_support",
+    "specta_support",
 ] }
 dyn-comp-dtif = { path = "../../../crates/comp_dtif", features = [
-    "serde_support",
+    "specta_support",
     "lua_scripts",
 ] }
 dyn-comp-bundles = { path = "../../../crates/comp_bundles", features = [
-    "serde_support",
+    "specta_support",
 ] }
 dyn-comp-interaction = { path = "../../../crates/comp_interaction", features = [
-    "serde_support",
+    "specta_support",
 ] }
 dyn-comp-svg-builder = { path = "../../../crates/comp_svg_builder", features = [
-    "serde_support",
+    "specta_support",
     "output_svg_element_changes",
 ] }
 dyn-comp-lua = { path = "../../../crates/comp_lua", features = [
-    "serde_support",
+    "specta_support",
 ] }
-dyn-utils = { path = "../../../crates/utils", features = ["serde_support"] }
+dyn-utils = { path = "../../../crates/utils", features = ["specta_support"] }
 bevy_app = { workspace = true }
 bevy_ecs = { workspace = true }
 bevy_transform = { workspace = true }

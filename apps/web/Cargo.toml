@@ -26,14 +26,14 @@ tracing = [
 [dependencies]
 dyn-comp-asset = { path = "../../crates/comp_asset" }
 dyn-comp-core = { path = "../../crates/comp_core", features = [
-    "serde_support",
+    "specta_support",
 ] }
 dyn-comp-dtif = { path = "../../crates/comp_dtif" }
 dyn-comp-bundles = { path = "../../crates/comp_bundles", features = [
-    "serde_support",
+    "specta_support",
 ] }
 dyn-comp-svg-builder = { path = "../../crates/comp_svg_builder", features = [
-    "serde_support",
+    "specta_support",
 ] }
 bevy_app = { workspace = true }
 bevy_ecs = { workspace = true }

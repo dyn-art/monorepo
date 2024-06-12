@@ -37,10 +37,11 @@ pub struct ImageCompPaint {
 
 #[derive(Debug, Default, Copy, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type),
     serde(tag = "type")
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub enum ImageScaleMode {
     /// Fills the area completely with the image.
     #[default]
@@ -51,14 +52,14 @@ pub enum ImageScaleMode {
 
     /// Crops the image to fill the area.
     Crop {
-        #[cfg_attr(feature = "serde_support", serde(default))]
+        #[cfg_attr(feature = "specta_support", serde(default))]
         transform: Mat3,
     },
 
     /// Tiles the image within the area.
-    #[cfg_attr(feature = "serde_support", serde(rename_all = "camelCase"))]
+    #[cfg_attr(feature = "specta_support", serde(rename_all = "camelCase"))]
     Tile {
-        #[cfg_attr(feature = "serde_support", serde(default))]
+        #[cfg_attr(feature = "specta_support", serde(default))]
         rotation: f32,
         scaling_factor: f32,
     },
@@ -72,26 +73,28 @@ pub struct GradientCompPaint {
 
 #[derive(Debug, Copy, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type),
     serde(tag = "type")
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub enum GradientVariant {
     Linear {
-        #[cfg_attr(feature = "serde_support", serde(default))]
+        #[cfg_attr(feature = "specta_support", serde(default))]
         transform: Mat3,
     },
     Radial {
-        #[cfg_attr(feature = "serde_support", serde(default))]
+        #[cfg_attr(feature = "specta_support", serde(default))]
         transform: Mat3,
     },
 }
 
 #[derive(Debug, Default, Copy, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub struct GradientColorStop {
     /// The position of the color stop in the gradient, ranging from 0.0 to 1.0.
     pub position: Ratio,
@@ -100,6 +103,6 @@ pub struct GradientColorStop {
     pub color: Color,
 
     /// The opacity of the stop.
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub opacity: Opacity,
 }

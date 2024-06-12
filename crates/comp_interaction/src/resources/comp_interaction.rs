@@ -11,7 +11,7 @@ pub struct CompInteractionRes {
 
 #[derive(Debug, Default, PartialEq, Eq, Copy, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type),
     serde(tag = "type")
 )]
@@ -25,7 +25,7 @@ pub enum InteractionTool {
 
 #[derive(Debug, Default, PartialEq, Eq, Copy, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
 pub enum ShapeVariant {
@@ -38,7 +38,7 @@ pub enum ShapeVariant {
 
 #[derive(Debug, Default, Copy, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Deserialize, specta::Type),
     serde(tag = "type")
 )]
@@ -73,14 +73,14 @@ pub enum InteractionMode {
 }
 
 #[derive(Debug, Copy, Clone)]
-#[cfg_attr(feature = "serde_support", derive(serde::Deserialize, specta::Type))]
+#[cfg_attr(feature = "specta_support", derive(serde::Deserialize, specta::Type))]
 pub struct XYWH {
     pub position: Vec2,
     pub size: Size,
 }
 
 #[derive(Debug, Copy, Clone)]
-#[cfg_attr(feature = "serde_support", derive(serde::Deserialize, specta::Type))]
+#[cfg_attr(feature = "specta_support", derive(serde::Deserialize, specta::Type))]
 pub enum HandleSide {
     Top = 1,
     Bottom = 2,

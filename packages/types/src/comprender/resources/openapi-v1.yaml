@@ -1,0 +1,2041 @@
+openapi: 3.0.3
+info:
+  title: Composition Render API
+  description: todo
+  contact:
+    name: dyn.art
+    url: https://dyn.art/?source=apidocs
+  license:
+    name: AGPL-3.0-or-later
+  version: 1.0.0
+paths:
+  /v1/render:
+    post:
+      tags:
+      - crate::routes::v1::render::controller
+      operationId: render_composition
+      parameters:
+      - name: format
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: '#/components/schemas/DtifComposition'
+              nullable: true
+        required: false
+      responses:
+        '200':
+          description: Generation success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DtifComposition'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppError'
+components:
+  schemas:
+    Abs:
+      $ref: '#/components/schemas/Scalar'
+    AbsoluteLayoutElement:
+      type: object
+      required:
+      - constraints
+      properties:
+        constraints:
+          $ref: '#/components/schemas/Constraints'
+    AlignContent:
+      type: string
+      description: |-
+        Sets the distribution of space between and around content items
+        For Flexbox it controls alignment in the cross axis
+        For Grid it controls alignment in the block axis
+
+        [MDN](https://developer.mozilla.org/en-US/docs/Web/CSS/align-content)
+      enum:
+      - Start
+      - End
+      - FlexStart
+      - FlexEnd
+      - Center
+      - Stretch
+      - SpaceBetween
+      - SpaceEvenly
+      - SpaceAround
+    AlignItems:
+      type: string
+      description: |-
+        Used to control how child nodes are aligned.
+        For Flexbox it controls alignment in the cross axis
+        For Grid it controls alignment in the block axis
+
+        [MDN](https://developer.mozilla.org/en-US/docs/Web/CSS/align-items)
+      enum:
+      - Start
+      - End
+      - FlexStart
+      - FlexEnd
+      - Center
+      - Baseline
+      - Stretch
+    Angle:
+      $ref: '#/components/schemas/Scalar'
+    AppError:
+      type: object
+      required:
+      - status
+      - code
+      properties:
+        additionalErrors:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+          description: An array of additional error details or nested errors that occurred during the process.
+        code:
+          $ref: '#/components/schemas/ErrorCode'
+        description:
+          type: string
+          description: |-
+            A detailed, human-readable description of the error. Provides additional context
+            and, if applicable, steps to resolve the issue.
+          nullable: true
+        status:
+          type: integer
+          format: int32
+          description: HTTP status code associated with the error, indicating the nature of the failure.
+          minimum: 0
+        uri:
+          type: string
+          description: An optional URI linking to a document or resource with more information about the error.
+          nullable: true
+    Asset:
+      type: object
+      required:
+      - content
+      - contentType
+      properties:
+        content:
+          $ref: '#/components/schemas/AssetContent'
+        contentType:
+          $ref: '#/components/schemas/AssetContentType'
+    AssetContent:
+      oneOf:
+      - type: object
+        description: Content stored as binary data.
+        required:
+        - content
+        - type
+        properties:
+          content:
+            type: string
+            format: binary
+          type:
+            type: string
+            enum:
+            - Binary
+      - type: object
+        description: Content referenced by a URL.
+        required:
+        - url
+        - type
+        properties:
+          type:
+            type: string
+            enum:
+            - Url
+          url:
+            type: string
+      discriminator:
+        propertyName: type
+    AssetContentType:
+      oneOf:
+      - type: object
+        required:
+        - type
+        properties:
+          type:
+            type: string
+            enum:
+            - Unknown
+      - type: object
+        required:
+        - type
+        properties:
+          type:
+            type: string
+            enum:
+            - Jpeg
+      - type: object
+        required:
+        - type
+        properties:
+          type:
+            type: string
+            enum:
+            - Png
+      - type: object
+        required:
+        - width
+        - height
+        - type
+        properties:
+          height:
+            type: integer
+            format: int32
+            minimum: 0
+          type:
+            type: string
+            enum:
+            - Svg
+          width:
+            type: integer
+            format: int32
+            minimum: 0
+      - type: object
+        required:
+        - type
+        properties:
+          type:
+            type: string
+            enum:
+            - Ttf
+      discriminator:
+        propertyName: type
+    AssetWithId:
+      type: object
+      required:
+      - content
+      - contentType
+      properties:
+        content:
+          $ref: '#/components/schemas/AssetContent'
+        contentType:
+          $ref: '#/components/schemas/AssetContentType'
+        id:
+          allOf:
+          - $ref: '#/components/schemas/ReferenceId'
+          nullable: true
+    AutoLength:
+      oneOf:
+      - type: object
+        required:
+        - value
+        - type
+        properties:
+          type:
+            type: string
+            enum:
+            - Abs
+          value:
+            $ref: '#/components/schemas/Abs'
+      - type: object
+        required:
+        - value
+        - type
+        properties:
+          type:
+            type: string
+            enum:
+            - Ratio
+          value:
+            $ref: '#/components/schemas/Ratio'
+      - type: object
+        required:
+        - type
+        properties:
+          type:
+            type: string
+            enum:
+            - Auto
+      discriminator:
+        propertyName: type
+    Axes:
+      type: object
+      required:
+      - x
+      - y
+      properties:
+        x:
+          type: number
+          format: float
+        y:
+          type: number
+          format: float
+    BlendMode:
+      type: string
+      enum:
+      - Normal
+      - Multiply
+      - Screen
+      - Overlay
+      - Darken
+      - Lighten
+      - ColorDodge
+      - ColorBurn
+      - HardLight
+      - SoftLight
+      - Difference
+      - Exclusion
+      - Hue
+      - Saturation
+      - Color
+      - Luminosity
+    Color:
+      type: array
+      items:
+        type: integer
+        format: int32
+        minimum: 0
+      description: ''
+      maxItems: 3
+      minItems: 3
+    CompVersion:
+      type: string
+      enum:
+      - V000001
+    Constraint:
+      type: string
+      enum:
+      - Start
+      - Center
+      - End
+      - Stretch
+      - Scale
+    Constraints:
+      type: object
+      required:
+      - horizontal
+      - vertical
+      properties:
+        horizontal:
+          $ref: '#/components/schemas/Constraint'
+        vertical:
+          $ref: '#/components/schemas/Constraint'
+    CoreInputEvent:
+      oneOf:
+      - allOf:
+        - $ref: '#/components/schemas/UpdateCompositionSizeInputEvent'
+        - type: object
+          required:
+          - type
+          properties:
+            type:
+              type: string
+              enum:
+              - UpdateCompositionSize
+      - allOf:
+        - $ref: '#/components/schemas/UpdateCompositionViewportInputEvent'
+        - type: object
+          required:
+          - type
+          properties:
+            type:
+              type: string
+              enum:
+              - UpdateCompositionViewport
+      - allOf:
+        - $ref: '#/components/schemas/FocusRootNodesInputEvent'
+        - type: object
+          required:
+          - type
+          properties:
+            type:
+              type: string
+              enum:
+              - FocusRootNodes
+      - allOf:
+        - $ref: '#/components/schemas/CreateNodeInputEvent'
+        - type: object
+          required:
+          - type
+          properties:
+            type:
+              type: string
+              enum:
+              - CreateNode
+      - allOf:
+        - $ref: '#/components/schemas/UpdateFrameNodeInputEvent'
+        - type: object
+          required:
+          - type
+          properties:
+            type:
+              type: string
+              enum:
+              - UpdateFrameNode
+      - allOf:
+        - $ref: '#/components/schemas/UpdateEllipseNodeInputEvent'
+        - type: object
+          required:
+          - type
+          properties:
+            type:
+              type: string
+              enum:
+              - UpdateEllipseNode
+      - allOf:
+        - $ref: '#/components/schemas/UpdateStarNodeInputEvent'
+        - type: object
+          required:
+          - type
+          properties:
+            type:
+              type: string
+              enum:
+              - UpdateStarNode
+      - allOf:
+        - $ref: '#/components/schemas/UpdatePolygonNodeInputEvent'
+        - type: object
+          required:
+          - type
+          properties:
+            type:
+              type: string
+              enum:
+              - UpdatePolygonNode
+      - allOf:
+        - $ref: '#/components/schemas/UpdateTextNodeInputEvent'
+        - type: object
+          required:
+          - type
+          properties:
+            type:
+              type: string
+              enum:
+              - UpdateTextNode
+      - allOf:
+        - $ref: '#/components/schemas/UpdateFillStyleInputEvent'
+        - type: object
+          required:
+          - type
+          properties:
+            type:
+              type: string
+              enum:
+              - UpdateFillStyle
+      - allOf:
+        - $ref: '#/components/schemas/UpdateStorkeStyleInputEvent'
+        - type: object
+          required:
+          - type
+          properties:
+            type:
+              type: string
+              enum:
+              - UpdateStrokeStyle
+      - allOf:
+        - $ref: '#/components/schemas/UpdateDropShadowStyleInputEvent'
+        - type: object
+          required:
+          - type
+          properties:
+            type:
+              type: string
+              enum:
+              - UpdateDropShadowStyle
+      - allOf:
+        - $ref: '#/components/schemas/CreatePaintInputEvent'
+        - type: object
+          required:
+          - type
+          properties:
+            type:
+              type: string
+              enum:
+              - CreatePaint
+      - allOf:
+        - $ref: '#/components/schemas/UpdateSolidPaintInputEvent'
+        - type: object
+          required:
+          - type
+          properties:
+            type:
+              type: string
+              enum:
+              - UpdateSolidPaint
+      - allOf:
+        - $ref: '#/components/schemas/UpdateImagePaintInputEvent'
+        - type: object
+          required:
+          - type
+          properties:
+            type:
+              type: string
+              enum:
+              - UpdateImagePaint
+      - allOf:
+        - $ref: '#/components/schemas/UpdateGradientPaintInputEvent'
+        - type: object
+          required:
+          - type
+          properties:
+            type:
+              type: string
+              enum:
+              - UpdateGradientPaint
+      - allOf:
+        - $ref: '#/components/schemas/CreateAssetInputEvent'
+        - type: object
+          required:
+          - type
+          properties:
+            type:
+              type: string
+              enum:
+              - CreateAsset
+      - allOf:
+        - $ref: '#/components/schemas/DeleteEntityInputEvent'
+        - type: object
+          required:
+          - type
+          properties:
+            type:
+              type: string
+              enum:
+              - DeleteEntity
+      - allOf:
+        - $ref: '#/components/schemas/UpdateEntityTransformInputEvent'
+        - type: object
+          required:
+          - type
+          properties:
+            type:
+              type: string
+              enum:
+              - UpdateEntityTransform
+      - allOf:
+        - $ref: '#/components/schemas/UpdateEntitySizeInputEvent'
+        - type: object
+          required:
+          - type
+          properties:
+            type:
+              type: string
+              enum:
+              - UpdateEntitySize
+      - allOf:
+        - $ref: '#/components/schemas/MoveEntityInputEvent'
+        - type: object
+          required:
+          - type
+          properties:
+            type:
+              type: string
+              enum:
+              - MoveEntity
+      - allOf:
+        - $ref: '#/components/schemas/UpdateEntityRotationInputEvent'
+        - type: object
+          required:
+          - type
+          properties:
+            type:
+              type: string
+              enum:
+              - UpdateEntityRotation
+      - allOf:
+        - $ref: '#/components/schemas/UpdateEntityVisibilityInputEvent'
+        - type: object
+          required:
+          - type
+          properties:
+            type:
+              type: string
+              enum:
+              - UpdateEntityVisibility
+      - allOf:
+        - $ref: '#/components/schemas/UpdateEntityCornerRadiiInputEvent'
+        - type: object
+          required:
+          - type
+          properties:
+            type:
+              type: string
+              enum:
+              - UpdateEntityCornerRadii
+      - allOf:
+        - $ref: '#/components/schemas/UpdateEntityBlendModeInputEvent'
+        - type: object
+          required:
+          - type
+          properties:
+            type:
+              type: string
+              enum:
+              - UpdateEntityBlendMode
+      - allOf:
+        - $ref: '#/components/schemas/UpdateEntityOpacityInputEvent'
+        - type: object
+          required:
+          - type
+          properties:
+            type:
+              type: string
+              enum:
+              - UpdateEntityOpacity
+      - allOf:
+        - $ref: '#/components/schemas/UpdateEntityChildrenInputEvent'
+        - type: object
+          required:
+          - type
+          properties:
+            type:
+              type: string
+              enum:
+              - UpdateEntityChildren
+      - allOf:
+        - $ref: '#/components/schemas/RegisterLuaScriptInputEvent'
+        - type: object
+          required:
+          - type
+          properties:
+            type:
+              type: string
+              enum:
+              - RegisterLuaScript
+      - allOf:
+        - $ref: '#/components/schemas/ExecuteLuaScriptInputEvent'
+        - type: object
+          required:
+          - type
+          properties:
+            type:
+              type: string
+              enum:
+              - ExecuteLuaScript
+      discriminator:
+        propertyName: type
+    CornerRadii:
+      type: array
+      items:
+        $ref: '#/components/schemas/Angle'
+      description: ''
+      maxItems: 4
+      minItems: 4
+    CreateAssetInputEvent:
+      type: object
+      required:
+      - asset
+      properties:
+        asset:
+          $ref: '#/components/schemas/AssetWithId'
+    CreateNodeInputEvent:
+      type: object
+      required:
+      - node
+      properties:
+        node:
+          $ref: '#/components/schemas/Node'
+    CreatePaintInputEvent:
+      type: object
+      required:
+      - paint
+      properties:
+        paint:
+          $ref: '#/components/schemas/Paint'
+    DeleteEntityInputEvent:
+      type: object
+      required:
+      - id
+      properties:
+        id:
+          $ref: '#/components/schemas/ReferenceIdOrEntity'
+    DropShadowStyle:
+      type: object
+      required:
+      - position
+      - blur
+      properties:
+        blendMode:
+          $ref: '#/components/schemas/BlendMode'
+        blur:
+          $ref: '#/components/schemas/Abs'
+        color:
+          $ref: '#/components/schemas/Color'
+        id:
+          allOf:
+          - $ref: '#/components/schemas/ReferenceId'
+          nullable: true
+        opacity:
+          $ref: '#/components/schemas/Opacity'
+        position:
+          $ref: '#/components/schemas/Vec2'
+        spread:
+          $ref: '#/components/schemas/Abs'
+        visible:
+          type: boolean
+    DtifComposition:
+      type: object
+      description: |-
+        DTIF (Design Tree Interchange Format) utilizes a flat structure for easy readability
+        and efficient access & manipulation of design elements (Nodes, Paints, ..).
+        https://softwareengineering.stackexchange.com/questions/350623/flat-or-nested-json-for-hierarchal-data
+      required:
+      - size
+      - nodes
+      properties:
+        assets:
+          type: array
+          items:
+            $ref: '#/components/schemas/AssetWithId'
+          description: A list of assets.
+        events:
+          type: array
+          items:
+            $ref: '#/components/schemas/CoreInputEvent'
+          description: A list of input events.
+        nodes:
+          type: array
+          items:
+            $ref: '#/components/schemas/Node'
+          description: A list of nodes.
+        paints:
+          type: array
+          items:
+            $ref: '#/components/schemas/Paint'
+          description: A list of paints.
+        scripts:
+          type: array
+          items:
+            $ref: '#/components/schemas/dyn_comp_bundles.LuaScriptWithId'
+          description: A list of scripts.
+        size:
+          $ref: '#/components/schemas/Size'
+        version:
+          allOf:
+          - $ref: '#/components/schemas/CompVersion'
+          nullable: true
+        viewport:
+          allOf:
+          - $ref: '#/components/schemas/Viewport'
+          nullable: true
+    EllipseNode:
+      type: object
+      required:
+      - size
+      properties:
+        blendMode:
+          $ref: '#/components/schemas/BlendMode'
+        endingAngle:
+          type: number
+          format: float
+        id:
+          allOf:
+          - $ref: '#/components/schemas/ReferenceId'
+          nullable: true
+        innerRadiusRatio:
+          type: number
+          format: float
+        layoutElement:
+          $ref: '#/components/schemas/LayoutElement'
+        opacity:
+          $ref: '#/components/schemas/Opacity'
+        rotationDeg:
+          $ref: '#/components/schemas/Angle'
+        size:
+          $ref: '#/components/schemas/Size'
+        startingAngle:
+          type: number
+          format: float
+        styles:
+          type: array
+          items:
+            $ref: '#/components/schemas/Style'
+        translation:
+          $ref: '#/components/schemas/Vec2'
+        visible:
+          type: boolean
+    Em:
+      $ref: '#/components/schemas/Scalar'
+    Entity:
+      type: number
+      format: float
+    ErrorCode:
+      type: string
+    ExecuteLuaScriptInputEvent:
+      type: object
+      required:
+      - id
+      - argsMap
+      properties:
+        argsMap:
+          $ref: '#/components/schemas/dyn_comp_lua.tables.args_table.LuaScriptArgsMap'
+        id:
+          $ref: '#/components/schemas/crate.reference_id.ReferenceId'
+    FillStyle:
+      type: object
+      required:
+      - paintId
+      properties:
+        blendMode:
+          $ref: '#/components/schemas/BlendMode'
+        id:
+          allOf:
+          - $ref: '#/components/schemas/ReferenceId'
+          nullable: true
+        opacity:
+          $ref: '#/components/schemas/Opacity'
+        paintId:
+          $ref: '#/components/schemas/ReferenceIdOrEntity'
+        visible:
+          type: boolean
+    FlexDirection:
+      type: string
+      description: |-
+        The direction of the flexbox layout main axis.
+
+        There are always two perpendicular layout axes: main (or primary) and cross (or secondary).
+        Adding items will cause them to be positioned adjacent to each other along the main axis.
+        By varying this value throughout your tree, you can create complex axis-aligned layouts.
+
+        Items are always aligned relative to the cross axis, and justified relative to the main axis.
+
+        The default behavior is [`FlexDirection::Row`].
+
+        [Specification](https://www.w3.org/TR/css-flexbox-1/#flex-direction-property)
+      enum:
+      - Row
+      - Column
+      - RowReverse
+      - ColumnReverse
+    FocusRootNodesInputEvent:
+      default: null
+      nullable: true
+    FontFamily:
+      oneOf:
+      - type: string
+        description: A serif font.
+        enum:
+        - Serif
+      - type: string
+        description: A sans-serif font.
+        enum:
+        - SansSerif
+      - type: string
+        description: A cursive font.
+        enum:
+        - Cursive
+      - type: string
+        description: A fantasy font.
+        enum:
+        - Fantasy
+      - type: string
+        description: A monospace font.
+        enum:
+        - Monospace
+      - type: object
+        required:
+        - Named
+        properties:
+          Named:
+            type: string
+            description: A custom named font.
+      description: A typographic font family.
+    FontInfo:
+      type: object
+      description: Properties of a single font.
+      required:
+      - family
+      - variant
+      properties:
+        family:
+          $ref: '#/components/schemas/FontFamily'
+        variant:
+          $ref: '#/components/schemas/FontVariant'
+    FontStretch:
+      type: integer
+      format: int32
+      description: The width of a font.
+      minimum: 0
+    FontStyle:
+      type: string
+      description: The style of a font.
+      enum:
+      - Normal
+      - Italic
+      - Oblique
+    FontUnit:
+      oneOf:
+      - type: object
+        required:
+        - value
+        - type
+        properties:
+          type:
+            type: string
+            enum:
+            - Abs
+          value:
+            $ref: '#/components/schemas/Abs'
+      - type: object
+        required:
+        - value
+        - type
+        properties:
+          type:
+            type: string
+            enum:
+            - Em
+          value:
+            $ref: '#/components/schemas/Em'
+      description: |-
+        A font unit.
+        https://fonts.google.com/knowledge/glossary/unit
+      discriminator:
+        propertyName: type
+    FontVariant:
+      type: object
+      description: Properties that distinguish a font from other fonts in the same family.
+      required:
+      - style
+      - weight
+      - stretch
+      properties:
+        stretch:
+          $ref: '#/components/schemas/FontStretch'
+        style:
+          $ref: '#/components/schemas/FontStyle'
+        weight:
+          $ref: '#/components/schemas/FontWeight'
+    FontWeight:
+      type: integer
+      format: int32
+      description: The weight of a font.
+      minimum: 0
+    FrameNode:
+      type: object
+      required:
+      - size
+      properties:
+        blendMode:
+          $ref: '#/components/schemas/BlendMode'
+        children:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReferenceIdOrEntity'
+        clipContent:
+          type: boolean
+        cornerRadii:
+          $ref: '#/components/schemas/CornerRadii'
+        id:
+          allOf:
+          - $ref: '#/components/schemas/ReferenceId'
+          nullable: true
+        layoutElement:
+          $ref: '#/components/schemas/LayoutElement'
+        layoutParent:
+          allOf:
+          - $ref: '#/components/schemas/StaticLayoutParent'
+          nullable: true
+        opacity:
+          $ref: '#/components/schemas/Opacity'
+        rotationDeg:
+          $ref: '#/components/schemas/Angle'
+        size:
+          $ref: '#/components/schemas/Size'
+        styles:
+          type: array
+          items:
+            $ref: '#/components/schemas/Style'
+        translation:
+          $ref: '#/components/schemas/Vec2'
+        visible:
+          type: boolean
+    GradientColorStop:
+      type: object
+      required:
+      - position
+      - color
+      properties:
+        color:
+          $ref: '#/components/schemas/Color'
+        opacity:
+          $ref: '#/components/schemas/Opacity'
+        position:
+          $ref: '#/components/schemas/Ratio'
+    GradientPaint:
+      type: object
+      required:
+      - variant
+      - stops
+      properties:
+        id:
+          allOf:
+          - $ref: '#/components/schemas/ReferenceId'
+          nullable: true
+        stops:
+          type: array
+          items:
+            $ref: '#/components/schemas/GradientColorStop'
+        variant:
+          $ref: '#/components/schemas/GradientVariant'
+    GradientVariant:
+      oneOf:
+      - type: object
+        required:
+        - type
+        properties:
+          transform:
+            $ref: '#/components/schemas/Mat3'
+          type:
+            type: string
+            enum:
+            - Linear
+      - type: object
+        required:
+        - type
+        properties:
+          transform:
+            $ref: '#/components/schemas/Mat3'
+          type:
+            type: string
+            enum:
+            - Radial
+      discriminator:
+        propertyName: type
+    HorizontalTextAlignment:
+      type: string
+      enum:
+      - Start
+      - End
+      - Left
+      - Right
+      - Center
+    ImageId:
+      type: object
+      required:
+      - idx
+      - version
+      properties:
+        idx:
+          type: integer
+          format: int32
+          minimum: 0
+        version:
+          type: integer
+          format: int32
+          minimum: 0
+    ImagePaint:
+      type: object
+      required:
+      - imageId
+      properties:
+        id:
+          allOf:
+          - $ref: '#/components/schemas/ReferenceId'
+          nullable: true
+        imageId:
+          $ref: '#/components/schemas/ReferenceIdOrImageId'
+        scaleMode:
+          $ref: '#/components/schemas/ImageScaleMode'
+    ImageScaleMode:
+      oneOf:
+      - type: object
+        required:
+        - type
+        properties:
+          type:
+            type: string
+            enum:
+            - Fill
+      - type: object
+        required:
+        - type
+        properties:
+          type:
+            type: string
+            enum:
+            - Fit
+      - type: object
+        description: Crops the image to fill the area.
+        required:
+        - type
+        properties:
+          transform:
+            $ref: '#/components/schemas/Mat3'
+          type:
+            type: string
+            enum:
+            - Crop
+      - type: object
+        description: Tiles the image within the area.
+        required:
+        - scalingFactor
+        - type
+        properties:
+          rotation:
+            type: number
+            format: float
+          scalingFactor:
+            type: number
+            format: float
+          type:
+            type: string
+            enum:
+            - Tile
+      discriminator:
+        propertyName: type
+    LayoutElement:
+      oneOf:
+      - allOf:
+        - $ref: '#/components/schemas/AbsoluteLayoutElement'
+        - type: object
+          required:
+          - type
+          properties:
+            type:
+              type: string
+              enum:
+              - Absolute
+      - allOf:
+        - $ref: '#/components/schemas/StaticLayoutElement'
+        - type: object
+          required:
+          - type
+          properties:
+            type:
+              type: string
+              enum:
+              - Static
+      discriminator:
+        propertyName: type
+    LayoutElementSizingMode:
+      type: string
+      enum:
+      - Fixed
+      - Fill
+    LayoutParentSizingMode:
+      type: string
+      enum:
+      - Fixed
+      - Hug
+    Length:
+      oneOf:
+      - type: object
+        required:
+        - value
+        - type
+        properties:
+          type:
+            type: string
+            enum:
+            - Abs
+          value:
+            $ref: '#/components/schemas/Abs'
+      - type: object
+        required:
+        - value
+        - type
+        properties:
+          type:
+            type: string
+            enum:
+            - Ratio
+          value:
+            $ref: '#/components/schemas/Ratio'
+      discriminator:
+        propertyName: type
+    LineWrap:
+      type: string
+      enum:
+      - None
+      - Word
+    LuaScriptWithId:
+      type: object
+      required:
+      - id
+      - source
+      properties:
+        id:
+          $ref: '#/components/schemas/ReferenceId'
+        source:
+          type: array
+          items:
+            type: string
+    Mat3:
+      type: array
+      items:
+        type: number
+        format: float
+      description: ''
+      maxItems: 9
+      minItems: 9
+    MoveEntityInputEvent:
+      type: object
+      required:
+      - id
+      properties:
+        dx:
+          type: number
+          format: float
+          nullable: true
+        dy:
+          type: number
+          format: float
+          nullable: true
+        id:
+          $ref: '#/components/schemas/ReferenceIdOrEntity'
+    Node:
+      oneOf:
+      - allOf:
+        - $ref: '#/components/schemas/FrameNode'
+        - type: object
+          required:
+          - type
+          properties:
+            type:
+              type: string
+              enum:
+              - Frame
+      - allOf:
+        - $ref: '#/components/schemas/RectangleNode'
+        - type: object
+          required:
+          - type
+          properties:
+            type:
+              type: string
+              enum:
+              - Rectangle
+      - allOf:
+        - $ref: '#/components/schemas/EllipseNode'
+        - type: object
+          required:
+          - type
+          properties:
+            type:
+              type: string
+              enum:
+              - Ellipse
+      - allOf:
+        - $ref: '#/components/schemas/StarNode'
+        - type: object
+          required:
+          - type
+          properties:
+            type:
+              type: string
+              enum:
+              - Star
+      - allOf:
+        - $ref: '#/components/schemas/PolygonNode'
+        - type: object
+          required:
+          - type
+          properties:
+            type:
+              type: string
+              enum:
+              - Polygon
+      - allOf:
+        - $ref: '#/components/schemas/TextNode'
+        - type: object
+          required:
+          - type
+          properties:
+            type:
+              type: string
+              enum:
+              - Text
+      - allOf:
+        - $ref: '#/components/schemas/VectorNode'
+        - type: object
+          required:
+          - type
+          properties:
+            type:
+              type: string
+              enum:
+              - Vector
+      discriminator:
+        propertyName: type
+    Opacity:
+      $ref: '#/components/schemas/Ratio'
+    Paint:
+      oneOf:
+      - allOf:
+        - $ref: '#/components/schemas/SolidPaint'
+        - type: object
+          required:
+          - type
+          properties:
+            type:
+              type: string
+              enum:
+              - Solid
+      - allOf:
+        - $ref: '#/components/schemas/ImagePaint'
+        - type: object
+          required:
+          - type
+          properties:
+            type:
+              type: string
+              enum:
+              - Image
+      - allOf:
+        - $ref: '#/components/schemas/GradientPaint'
+        - type: object
+          required:
+          - type
+          properties:
+            type:
+              type: string
+              enum:
+              - Gradient
+      discriminator:
+        propertyName: type
+    PolygonNode:
+      type: object
+      required:
+      - size
+      properties:
+        blendMode:
+          $ref: '#/components/schemas/BlendMode'
+        id:
+          allOf:
+          - $ref: '#/components/schemas/ReferenceId'
+          nullable: true
+        layoutElement:
+          $ref: '#/components/schemas/LayoutElement'
+        opacity:
+          $ref: '#/components/schemas/Opacity'
+        pointCount:
+          type: integer
+          format: int32
+          minimum: 0
+        rotationDeg:
+          $ref: '#/components/schemas/Angle'
+        size:
+          $ref: '#/components/schemas/Size'
+        styles:
+          type: array
+          items:
+            $ref: '#/components/schemas/Style'
+        translation:
+          $ref: '#/components/schemas/Vec2'
+        visible:
+          type: boolean
+    Ratio:
+      $ref: '#/components/schemas/Scalar'
+    Rect:
+      type: object
+      required:
+      - left
+      - right
+      - top
+      - bottom
+      properties:
+        bottom:
+          type: number
+          format: float
+        left:
+          type: number
+          format: float
+        right:
+          type: number
+          format: float
+        top:
+          type: number
+          format: float
+    RectangleNode:
+      type: object
+      required:
+      - size
+      properties:
+        blendMode:
+          $ref: '#/components/schemas/BlendMode'
+        cornerRadii:
+          $ref: '#/components/schemas/CornerRadii'
+        id:
+          allOf:
+          - $ref: '#/components/schemas/ReferenceId'
+          nullable: true
+        layoutElement:
+          $ref: '#/components/schemas/LayoutElement'
+        opacity:
+          $ref: '#/components/schemas/Opacity'
+        rotationDeg:
+          $ref: '#/components/schemas/Angle'
+        size:
+          $ref: '#/components/schemas/Size'
+        styles:
+          type: array
+          items:
+            $ref: '#/components/schemas/Style'
+        translation:
+          $ref: '#/components/schemas/Vec2'
+        visible:
+          type: boolean
+    ReferenceId:
+      type: string
+    ReferenceIdOrEntity:
+      oneOf:
+      - type: object
+        required:
+        - entity
+        - type
+        properties:
+          entity:
+            $ref: '#/components/schemas/Entity'
+          type:
+            type: string
+            enum:
+            - Entity
+      - type: object
+        required:
+        - referenceId
+        - type
+        properties:
+          referenceId:
+            $ref: '#/components/schemas/ReferenceId'
+          type:
+            type: string
+            enum:
+            - ReferenceId
+      discriminator:
+        propertyName: type
+    ReferenceIdOrImageId:
+      oneOf:
+      - type: object
+        required:
+        - imageId
+        - type
+        properties:
+          imageId:
+            $ref: '#/components/schemas/ImageId'
+          type:
+            type: string
+            enum:
+            - ImageId
+      - type: object
+        required:
+        - referenceId
+        - type
+        properties:
+          referenceId:
+            $ref: '#/components/schemas/ReferenceId'
+          type:
+            type: string
+            enum:
+            - ReferenceId
+      discriminator:
+        propertyName: type
+    RegisterLuaScriptInputEvent:
+      type: object
+      required:
+      - script
+      properties:
+        script:
+          $ref: '#/components/schemas/crate.LuaScriptWithId'
+    Scalar:
+      type: number
+      format: float
+      description: |-
+        A 32-bit float that implements `Eq`, `Ord` and `Hash`.
+
+        Panics if it's `NaN` during any of those operations.
+    Size:
+      type: array
+      items:
+        type: number
+        format: float
+      description: ''
+      maxItems: 2
+      minItems: 2
+    SolidPaint:
+      type: object
+      required:
+      - color
+      properties:
+        color:
+          $ref: '#/components/schemas/Color'
+        id:
+          allOf:
+          - $ref: '#/components/schemas/ReferenceId'
+          nullable: true
+    StarNode:
+      type: object
+      required:
+      - size
+      properties:
+        blendMode:
+          $ref: '#/components/schemas/BlendMode'
+        id:
+          allOf:
+          - $ref: '#/components/schemas/ReferenceId'
+          nullable: true
+        innerRadiusRatio:
+          type: number
+          format: float
+        layoutElement:
+          $ref: '#/components/schemas/LayoutElement'
+        opacity:
+          $ref: '#/components/schemas/Opacity'
+        pointCount:
+          type: integer
+          format: int32
+          minimum: 0
+        rotationDeg:
+          $ref: '#/components/schemas/Angle'
+        size:
+          $ref: '#/components/schemas/Size'
+        styles:
+          type: array
+          items:
+            $ref: '#/components/schemas/Style'
+        translation:
+          $ref: '#/components/schemas/Vec2'
+        visible:
+          type: boolean
+    StaticLayoutElement:
+      type: object
+      properties:
+        alignSelf:
+          allOf:
+          - $ref: '#/components/schemas/AlignSelf'
+          nullable: true
+        horizontalSizingMode:
+          $ref: '#/components/schemas/LayoutElementSizingMode'
+        justifySelf:
+          allOf:
+          - $ref: '#/components/schemas/JustifySelf'
+          nullable: true
+        margin:
+          $ref: '#/components/schemas/Rect'
+        verticalSizingMode:
+          $ref: '#/components/schemas/LayoutElementSizingMode'
+    StaticLayoutParent:
+      type: object
+      properties:
+        alignItems:
+          allOf:
+          - $ref: '#/components/schemas/AlignItems'
+          nullable: true
+        flexDirection:
+          $ref: '#/components/schemas/FlexDirection'
+        gap:
+          $ref: '#/components/schemas/Axes'
+        horizontalSizingMode:
+          $ref: '#/components/schemas/LayoutParentSizingMode'
+        justifyContent:
+          allOf:
+          - $ref: '#/components/schemas/JustifyContent'
+          nullable: true
+        padding:
+          $ref: '#/components/schemas/Rect'
+        verticalSizingMode:
+          $ref: '#/components/schemas/LayoutParentSizingMode'
+    StrokeStyle:
+      type: object
+      required:
+      - width
+      - paintId
+      properties:
+        blendMode:
+          $ref: '#/components/schemas/BlendMode'
+        id:
+          allOf:
+          - $ref: '#/components/schemas/ReferenceId'
+          nullable: true
+        opacity:
+          $ref: '#/components/schemas/Opacity'
+        paintId:
+          $ref: '#/components/schemas/ReferenceIdOrEntity'
+        visible:
+          type: boolean
+        width:
+          $ref: '#/components/schemas/Abs'
+    Style:
+      oneOf:
+      - allOf:
+        - $ref: '#/components/schemas/FillStyle'
+        - type: object
+          required:
+          - type
+          properties:
+            type:
+              type: string
+              enum:
+              - Fill
+      - allOf:
+        - $ref: '#/components/schemas/StrokeStyle'
+        - type: object
+          required:
+          - type
+          properties:
+            type:
+              type: string
+              enum:
+              - Stroke
+      - allOf:
+        - $ref: '#/components/schemas/DropShadowStyle'
+        - type: object
+          required:
+          - type
+          properties:
+            type:
+              type: string
+              enum:
+              - DropShadow
+      discriminator:
+        propertyName: type
+    TextAttributeInterval:
+      type: object
+      required:
+      - start
+      - end
+      - attributes
+      properties:
+        attributes:
+          $ref: '#/components/schemas/TextAttributes'
+        end:
+          type: integer
+          minimum: 0
+        start:
+          type: integer
+          minimum: 0
+    TextAttributes:
+      type: object
+      properties:
+        applyKerning:
+          type: boolean
+          nullable: true
+        fontFamily:
+          allOf:
+          - $ref: '#/components/schemas/FontFamily'
+          nullable: true
+        fontSize:
+          allOf:
+          - $ref: '#/components/schemas/Abs'
+          nullable: true
+        fontStretch:
+          allOf:
+          - $ref: '#/components/schemas/FontStretch'
+          nullable: true
+        fontStyle:
+          allOf:
+          - $ref: '#/components/schemas/FontStyle'
+          nullable: true
+        fontWeight:
+          allOf:
+          - $ref: '#/components/schemas/FontWeight'
+          nullable: true
+        letterSpacing:
+          allOf:
+          - $ref: '#/components/schemas/FontUnit'
+          nullable: true
+        lineHeight:
+          allOf:
+          - $ref: '#/components/schemas/FontUnit'
+          nullable: true
+        smallCaps:
+          type: boolean
+          nullable: true
+        wordSpacing:
+          allOf:
+          - $ref: '#/components/schemas/FontUnit'
+          nullable: true
+    TextNode:
+      type: object
+      required:
+      - text
+      - attributes
+      - size
+      properties:
+        attributes:
+          type: array
+          items:
+            $ref: '#/components/schemas/TextAttributeInterval'
+        blendMode:
+          $ref: '#/components/schemas/BlendMode'
+        horizontalTextAlignment:
+          $ref: '#/components/schemas/HorizontalTextAlignment'
+        id:
+          allOf:
+          - $ref: '#/components/schemas/ReferenceId'
+          nullable: true
+        layoutElement:
+          $ref: '#/components/schemas/LayoutElement'
+        lineWrap:
+          $ref: '#/components/schemas/LineWrap'
+        opacity:
+          $ref: '#/components/schemas/Opacity'
+        rotationDeg:
+          $ref: '#/components/schemas/Angle'
+        size:
+          $ref: '#/components/schemas/Size'
+        sizingMode:
+          $ref: '#/components/schemas/TextSizingMode'
+        styles:
+          type: array
+          items:
+            $ref: '#/components/schemas/Style'
+        text:
+          type: string
+        translation:
+          $ref: '#/components/schemas/Vec2'
+        verticalTextAlignment:
+          $ref: '#/components/schemas/VerticalTextAlignment'
+        visible:
+          type: boolean
+    TextSizingMode:
+      type: string
+      enum:
+      - WidthAndHeight
+      - Height
+      - Fixed
+    UpdateCompositionSizeInputEvent:
+      type: object
+      required:
+      - size
+      properties:
+        size:
+          $ref: '#/components/schemas/Size'
+    UpdateCompositionViewportInputEvent:
+      type: object
+      required:
+      - viewport
+      properties:
+        viewport:
+          $ref: '#/components/schemas/Viewport'
+    UpdateDropShadowStyleInputEvent:
+      type: object
+      required:
+      - id
+      properties:
+        blur:
+          allOf:
+          - $ref: '#/components/schemas/Abs'
+          nullable: true
+        color:
+          allOf:
+          - $ref: '#/components/schemas/Color'
+          nullable: true
+        id:
+          $ref: '#/components/schemas/ReferenceIdOrEntity'
+        position:
+          allOf:
+          - $ref: '#/components/schemas/Vec2'
+          nullable: true
+        spread:
+          allOf:
+          - $ref: '#/components/schemas/Abs'
+          nullable: true
+    UpdateEllipseNodeInputEvent:
+      type: object
+      required:
+      - id
+      properties:
+        endingAngle:
+          type: number
+          format: float
+          nullable: true
+        id:
+          $ref: '#/components/schemas/ReferenceIdOrEntity'
+        innerRadiusRatio:
+          type: number
+          format: float
+          nullable: true
+        startingAngle:
+          type: number
+          format: float
+          nullable: true
+    UpdateEntityBlendModeInputEvent:
+      type: object
+      required:
+      - id
+      - blendMode
+      properties:
+        blendMode:
+          $ref: '#/components/schemas/BlendMode'
+        id:
+          $ref: '#/components/schemas/ReferenceIdOrEntity'
+    UpdateEntityChildrenInputEvent:
+      type: object
+      required:
+      - id
+      - children
+      properties:
+        children:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReferenceIdOrEntity'
+        id:
+          $ref: '#/components/schemas/ReferenceIdOrEntity'
+    UpdateEntityCornerRadiiInputEvent:
+      type: object
+      required:
+      - id
+      - cornerRadii
+      properties:
+        cornerRadii:
+          $ref: '#/components/schemas/CornerRadii'
+        id:
+          $ref: '#/components/schemas/ReferenceIdOrEntity'
+    UpdateEntityOpacityInputEvent:
+      type: object
+      required:
+      - id
+      - opacity
+      properties:
+        id:
+          $ref: '#/components/schemas/ReferenceIdOrEntity'
+        opacity:
+          $ref: '#/components/schemas/Opacity'
+    UpdateEntityRotationInputEvent:
+      type: object
+      required:
+      - id
+      - rotationDeg
+      properties:
+        id:
+          $ref: '#/components/schemas/ReferenceIdOrEntity'
+        rotationDeg:
+          $ref: '#/components/schemas/Angle'
+    UpdateEntitySizeInputEvent:
+      type: object
+      required:
+      - id
+      - size
+      properties:
+        id:
+          $ref: '#/components/schemas/ReferenceIdOrEntity'
+        size:
+          $ref: '#/components/schemas/Size'
+    UpdateEntityTransformInputEvent:
+      type: object
+      required:
+      - id
+      properties:
+        id:
+          $ref: '#/components/schemas/ReferenceIdOrEntity'
+        rotationDeg:
+          allOf:
+          - $ref: '#/components/schemas/Angle'
+          nullable: true
+        x:
+          type: number
+          format: float
+          nullable: true
+        y:
+          type: number
+          format: float
+          nullable: true
+    UpdateEntityVisibilityInputEvent:
+      type: object
+      required:
+      - id
+      - visible
+      properties:
+        id:
+          $ref: '#/components/schemas/ReferenceIdOrEntity'
+        visible:
+          type: boolean
+    UpdateFillStyleInputEvent:
+      type: object
+      required:
+      - id
+      properties:
+        id:
+          $ref: '#/components/schemas/ReferenceIdOrEntity'
+        paintId:
+          allOf:
+          - $ref: '#/components/schemas/ReferenceIdOrEntity'
+          nullable: true
+    UpdateFrameNodeInputEvent:
+      type: object
+      required:
+      - id
+      properties:
+        clipContent:
+          type: boolean
+          nullable: true
+        id:
+          $ref: '#/components/schemas/ReferenceIdOrEntity'
+    UpdateGradientPaintInputEvent:
+      type: object
+      required:
+      - id
+      properties:
+        id:
+          $ref: '#/components/schemas/ReferenceIdOrEntity'
+        stops:
+          type: array
+          items:
+            $ref: '#/components/schemas/GradientColorStop'
+          nullable: true
+        variant:
+          allOf:
+          - $ref: '#/components/schemas/GradientVariant'
+          nullable: true
+    UpdateImagePaintInputEvent:
+      type: object
+      required:
+      - id
+      properties:
+        id:
+          $ref: '#/components/schemas/ReferenceIdOrEntity'
+        imageId:
+          allOf:
+          - $ref: '#/components/schemas/ImageId'
+          nullable: true
+        scaleMode:
+          allOf:
+          - $ref: '#/components/schemas/ImageScaleMode'
+          nullable: true
+    UpdatePolygonNodeInputEvent:
+      type: object
+      required:
+      - id
+      properties:
+        id:
+          $ref: '#/components/schemas/ReferenceIdOrEntity'
+        pointCount:
+          type: integer
+          format: int32
+          nullable: true
+          minimum: 0
+    UpdateSolidPaintInputEvent:
+      type: object
+      required:
+      - id
+      properties:
+        color:
+          $ref: '#/components/schemas/Color'
+        id:
+          $ref: '#/components/schemas/ReferenceIdOrEntity'
+    UpdateStarNodeInputEvent:
+      type: object
+      required:
+      - id
+      properties:
+        id:
+          $ref: '#/components/schemas/ReferenceIdOrEntity'
+        innerRadiusRatio:
+          type: number
+          format: float
+          nullable: true
+        pointCount:
+          type: integer
+          format: int32
+          nullable: true
+          minimum: 0
+    UpdateStorkeStyleInputEvent:
+      type: object
+      required:
+      - id
+      properties:
+        id:
+          $ref: '#/components/schemas/ReferenceIdOrEntity'
+        paintId:
+          allOf:
+          - $ref: '#/components/schemas/ReferenceIdOrEntity'
+          nullable: true
+        width:
+          allOf:
+          - $ref: '#/components/schemas/Abs'
+          nullable: true
+    UpdateTextNodeInputEvent:
+      type: object
+      required:
+      - id
+      properties:
+        attributes:
+          type: array
+          items:
+            $ref: '#/components/schemas/TextAttributeInterval'
+          nullable: true
+        horizontalTextAlignment:
+          allOf:
+          - $ref: '#/components/schemas/HorizontalTextAlignment'
+          nullable: true
+        id:
+          $ref: '#/components/schemas/ReferenceIdOrEntity'
+        lineWrap:
+          allOf:
+          - $ref: '#/components/schemas/LineWrap'
+          nullable: true
+        sizingMode:
+          allOf:
+          - $ref: '#/components/schemas/TextSizingMode'
+          nullable: true
+        text:
+          type: string
+          nullable: true
+        verticalTextAlignment:
+          allOf:
+          - $ref: '#/components/schemas/VerticalTextAlignment'
+          nullable: true
+    Vec2:
+      type: array
+      items:
+        type: number
+        format: float
+      description: ''
+      maxItems: 2
+      minItems: 2
+    VectorNode:
+      type: object
+      required:
+      - path
+      - windingRule
+      - size
+      properties:
+        blendMode:
+          $ref: '#/components/schemas/BlendMode'
+        id:
+          allOf:
+          - $ref: '#/components/schemas/ReferenceId'
+          nullable: true
+        layoutElement:
+          $ref: '#/components/schemas/LayoutElement'
+        opacity:
+          $ref: '#/components/schemas/Opacity'
+        path:
+          type: string
+        rotationDeg:
+          $ref: '#/components/schemas/Angle'
+        size:
+          $ref: '#/components/schemas/Size'
+        styles:
+          type: array
+          items:
+            $ref: '#/components/schemas/Style'
+        translation:
+          $ref: '#/components/schemas/Vec2'
+        visible:
+          type: boolean
+        windingRule:
+          $ref: '#/components/schemas/WindingRule'
+    VerticalTextAlignment:
+      type: string
+      enum:
+      - Top
+      - Bottom
+      - Center
+    Viewport:
+      type: object
+      required:
+      - physicalPosition
+      - physicalSize
+      properties:
+        physicalPosition:
+          $ref: '#/components/schemas/Vec2'
+        physicalSize:
+          $ref: '#/components/schemas/Size'
+    WindingRule:
+      type: string
+      enum:
+      - Nonzero
+      - Evenodd

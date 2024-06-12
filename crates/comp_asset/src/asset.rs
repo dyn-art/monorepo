@@ -2,10 +2,11 @@ use imagesize::ImageType;
 
 #[derive(Debug, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type),
     serde(rename_all = "camelCase")
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub struct Asset {
     pub content: AssetContent,
     pub content_type: AssetContentType,
@@ -13,10 +14,11 @@ pub struct Asset {
 
 #[derive(Debug, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type),
     serde(tag = "type")
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub enum AssetContent {
     /// Content stored as binary data.
     Binary { content: Vec<u8> },
@@ -26,10 +28,11 @@ pub enum AssetContent {
 
 #[derive(Debug, Default, Copy, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type),
     serde(tag = "type")
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub enum AssetContentType {
     #[default]
     Unknown,

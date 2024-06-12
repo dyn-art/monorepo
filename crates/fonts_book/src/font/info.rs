@@ -4,9 +4,10 @@ use std::fmt::{Display, Formatter};
 /// Properties of a single font.
 #[derive(Debug, Clone, Eq, PartialEq, Hash)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub struct FontInfo {
     /// The typographic font family this font is part of.
     pub family: FontFamily,
@@ -25,9 +26,10 @@ impl FontInfo {
 /// A typographic font family.
 #[derive(Clone, PartialEq, Eq, Debug, Hash)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub enum FontFamily {
     /// A serif font.
     Serif,

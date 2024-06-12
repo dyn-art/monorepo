@@ -836,11 +836,11 @@ dependencies = [
  "dyn-utils",
  "either",
  "env_logger",
- "fontdb 0.16.2",
+ "fontdb 0.18.0",
  "glam",
  "log",
  "rust-lapper",
- "rustybuzz 0.13.0",
+ "rustybuzz 0.14.0",
  "serde",
  "smallvec",
  "specta",
@@ -850,6 +850,7 @@ dependencies = [
  "unicode-linebreak",
  "unicode-script",
  "unicode-vo",
+ "utoipa",
 ]
 
 [[package]]
@@ -859,13 +860,14 @@ dependencies = [
  "bevy_app",
  "bevy_ecs",
  "dyn-fonts-book",
- "fontdb 0.16.2",
+ "fontdb 0.18.0",
  "imagesize",
  "log",
  "serde",
  "slotmap",
  "specta",
  "tinyvec",
+ "utoipa",
 ]
 
 [[package]]
@@ -887,6 +889,7 @@ dependencies = [
  "specta",
  "taffy",
  "tiny-skia-path",
+ "utoipa",
 ]
 
 [[package]]
@@ -928,6 +931,7 @@ dependencies = [
  "log",
  "serde",
  "specta",
+ "utoipa",
 ]
 
 [[package]]
@@ -1026,11 +1030,13 @@ dependencies = [
  "clap",
  "dotenv_config",
  "dotenvy",
+ "dyn-attributed-string",
  "dyn-comp-asset",
  "dyn-comp-bundles",
  "dyn-comp-core",
  "dyn-comp-dtif",
  "dyn-comp-svg-builder",
+ "dyn-utils",
  "fontdb 0.18.0",
  "log",
  "reqwest",
@@ -1043,6 +1049,7 @@ dependencies = [
  "tokio",
  "usvg 0.42.0",
  "utoipa",
+ "utoipauto",
 ]
 
 [[package]]
@@ -1051,12 +1058,13 @@ version = "0.0.1"
 dependencies = [
  "dyn-utils",
  "env_logger",
- "fontdb 0.16.2",
+ "fontdb 0.18.0",
  "log",
- "rustybuzz 0.13.0",
+ "rustybuzz 0.14.0",
  "self_cell",
  "serde",
  "specta",
+ "utoipa",
 ]
 
 [[package]]
@@ -1068,6 +1076,7 @@ dependencies = [
  "log",
  "serde",
  "specta",
+ "utoipa",
 ]
 
 [[package]]
@@ -2631,22 +2640,6 @@ dependencies = [
 
 [[package]]
 name = "rustybuzz"
-version = "0.13.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "88117946aa1bfb53c2ae0643ceac6506337f44887f8c9fbfb43587b1cc52ba49"
-dependencies = [
- "bitflags 2.5.0",
- "bytemuck",
- "smallvec",
- "ttf-parser 0.20.0",
- "unicode-bidi-mirroring 0.2.0",
- "unicode-ccc 0.2.0",
- "unicode-properties",
- "unicode-script",
-]
-
-[[package]]
-name = "rustybuzz"
 version = "0.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7730060ad401b0d1807c904ea56735288af101430aa0d2ab8358b789f5f37002"
@@ -2713,9 +2706,9 @@ dependencies = [
 
 [[package]]
 name = "self_cell"
-version = "1.0.3"
+version = "1.0.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "58bf37232d3bb9a2c4e641ca2a11d83b5062066f88df7fed36c28772046d65ba"
+checksum = "d369a96f978623eb3dc28807c4852d6cc617fed53da5d3c400feff1ef34a714a"
 
 [[package]]
 name = "serde"
@@ -2779,6 +2772,19 @@ dependencies = [
  "itoa",
  "ryu",
  "serde",
+]
+
+[[package]]
+name = "serde_yaml"
+version = "0.9.34+deprecated"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6a8b1a1a2ebf674015cc02edccce75287f1a0130d394307b36743c2f5d504b47"
+dependencies = [
+ "indexmap",
+ "itoa",
+ "ryu",
+ "serde",
+ "unsafe-libyaml",
 ]
 
 [[package]]
@@ -3472,6 +3478,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b1d386ff53b415b7fe27b50bb44679e2cc4660272694b7b6f3326d8480823a94"
 
 [[package]]
+name = "unsafe-libyaml"
+version = "0.2.11"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "673aac59facbab8a9007c7f6108d11f63b603f7cabff99fabf650fea5c32b861"
+
+[[package]]
 name = "url"
 version = "2.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3604,27 +3616,60 @@ checksum = "711b9620af191e0cdc7468a8d14e709c3dcdb115b36f838e601583af800a370a"
 
 [[package]]
 name = "utoipa"
-version = "4.2.0"
+version = "4.2.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "272ebdfbc99111033031d2f10e018836056e4d2c8e2acda76450ec7974269fa7"
+checksum = "c5afb1a60e207dca502682537fefcfd9921e71d0b83e9576060f09abc6efab23"
 dependencies = [
  "indexmap",
  "serde",
  "serde_json",
+ "serde_yaml",
  "utoipa-gen",
 ]
 
 [[package]]
 name = "utoipa-gen"
-version = "4.2.0"
+version = "4.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d3c9f4d08338c1bfa70dde39412a040a884c6f318b3d09aaaf3437a1e52027fc"
+checksum = "7bf0e16c02bc4bf5322ab65f10ab1149bdbcaa782cba66dc7057370a3f8190be"
 dependencies = [
  "proc-macro-error",
  "proc-macro2",
  "quote",
  "regex",
  "syn 2.0.55",
+]
+
+[[package]]
+name = "utoipauto"
+version = "0.1.11"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8f07b41f3b7ce61fb6435d1d3e9b98b9e98e5233075726473676c5187d06ec0b"
+dependencies = [
+ "utoipauto-macro",
+]
+
+[[package]]
+name = "utoipauto-core"
+version = "0.1.11"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "855accb167fff4ea3d31f31a9090ef801bfe8c7d59fcc6180f5d1af727cc3897"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.55",
+]
+
+[[package]]
+name = "utoipauto-macro"
+version = "0.1.11"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3815cdcf6e647710b0333329337da3b177b9631a8b9e3c7913468a9064573774"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.55",
+ "utoipauto-core",
 ]
 
 [[package]]

@@ -52,10 +52,11 @@ use reference_id::{ReferenceId, ReferenceIdOrEntity, ReferenceIdOrImageId};
 
 #[derive(Debug, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type),
     serde(tag = "type")
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub enum Node {
     Frame(FrameNode),
     Rectangle(RectangleNode),
@@ -80,35 +81,36 @@ pub struct FrameCompNodeBundle {
 
 #[derive(Debug, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type),
     serde(rename_all = "camelCase")
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub struct FrameNode {
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub id: Option<ReferenceId>,
-    #[cfg_attr(feature = "serde_support", serde(default = "default_as_false"))]
+    #[cfg_attr(feature = "specta_support", serde(default = "default_as_false"))]
     pub clip_content: bool,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub layout_parent: Option<StaticLayoutParent>,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub corner_radii: CornerRadii,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub translation: Vec2,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub rotation_deg: Angle,
     pub size: Size,
-    #[cfg_attr(feature = "serde_support", serde(default = "default_as_true"))]
+    #[cfg_attr(feature = "specta_support", serde(default = "default_as_true"))]
     pub visible: bool,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub blend_mode: BlendMode,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub opacity: Opacity,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub layout_element: LayoutElement,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub styles: Vec<Style>,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub children: Vec<ReferenceIdOrEntity>,
 }
 
@@ -168,29 +170,30 @@ pub struct RectangleCompNodeBundle {
 
 #[derive(Debug, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type),
     serde(rename_all = "camelCase")
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub struct RectangleNode {
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub id: Option<ReferenceId>,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub corner_radii: CornerRadii,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub translation: Vec2,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub rotation_deg: Angle,
     pub size: Size,
-    #[cfg_attr(feature = "serde_support", serde(default = "default_as_true"))]
+    #[cfg_attr(feature = "specta_support", serde(default = "default_as_true"))]
     pub visible: bool,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub blend_mode: BlendMode,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub opacity: Opacity,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub layout_element: LayoutElement,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub styles: Vec<Style>,
 }
 
@@ -243,33 +246,34 @@ pub struct EllipseCompNodeBundle {
 
 #[derive(Debug, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type),
     serde(rename_all = "camelCase")
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub struct EllipseNode {
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub id: Option<ReferenceId>,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub starting_angle: f32,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub ending_angle: f32,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub inner_radius_ratio: f32,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub translation: Vec2,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub rotation_deg: Angle,
     pub size: Size,
-    #[cfg_attr(feature = "serde_support", serde(default = "default_as_true"))]
+    #[cfg_attr(feature = "specta_support", serde(default = "default_as_true"))]
     pub visible: bool,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub blend_mode: BlendMode,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub opacity: Opacity,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub layout_element: LayoutElement,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub styles: Vec<Style>,
 }
 
@@ -327,31 +331,35 @@ pub struct StarCompNodeBundle {
 
 #[derive(Debug, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type),
     serde(rename_all = "camelCase")
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub struct StarNode {
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub id: Option<ReferenceId>,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub inner_radius_ratio: f32,
-    #[cfg_attr(feature = "serde_support", serde(default = "default_star_point_count"))]
+    #[cfg_attr(
+        feature = "specta_support",
+        serde(default = "default_star_point_count")
+    )]
     pub point_count: u8,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub translation: Vec2,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub rotation_deg: Angle,
     pub size: Size,
-    #[cfg_attr(feature = "serde_support", serde(default = "default_as_true"))]
+    #[cfg_attr(feature = "specta_support", serde(default = "default_as_true"))]
     pub visible: bool,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub blend_mode: BlendMode,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub opacity: Opacity,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub layout_element: LayoutElement,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub styles: Vec<Style>,
 }
 
@@ -411,32 +419,33 @@ pub struct PolygonCompNodeBundle {
 
 #[derive(Debug, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type),
     serde(rename_all = "camelCase")
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub struct PolygonNode {
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub id: Option<ReferenceId>,
     #[cfg_attr(
-        feature = "serde_support",
+        feature = "specta_support",
         serde(default = "default_polygon_point_count")
     )]
     pub point_count: u8,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub translation: Vec2,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub rotation_deg: Angle,
     pub size: Size,
-    #[cfg_attr(feature = "serde_support", serde(default = "default_as_true"))]
+    #[cfg_attr(feature = "specta_support", serde(default = "default_as_true"))]
     pub visible: bool,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub blend_mode: BlendMode,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub opacity: Opacity,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub layout_element: LayoutElement,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub styles: Vec<Style>,
 }
 
@@ -495,37 +504,38 @@ pub struct TextCompNodeBundle {
 
 #[derive(Debug, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type),
     serde(rename_all = "camelCase")
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub struct TextNode {
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub id: Option<ReferenceId>,
     pub text: String,
     pub attributes: Vec<TextAttributeInterval>,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub line_wrap: LineWrap,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub horizontal_text_alignment: HorizontalTextAlignment,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub vertical_text_alignment: VerticalTextAlignment,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub sizing_mode: TextSizingMode,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub translation: Vec2,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub rotation_deg: Angle,
     pub size: Size,
-    #[cfg_attr(feature = "serde_support", serde(default = "default_as_true"))]
+    #[cfg_attr(feature = "specta_support", serde(default = "default_as_true"))]
     pub visible: bool,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub blend_mode: BlendMode,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub opacity: Opacity,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub layout_element: LayoutElement,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub styles: Vec<Style>,
 }
 
@@ -585,29 +595,30 @@ pub struct VectorNodeBundle {
 
 #[derive(Debug, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type),
     serde(rename_all = "camelCase")
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub struct VectorNode {
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub id: Option<ReferenceId>,
     pub path: String,
     pub winding_rule: WindingRule,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub translation: Vec2,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub rotation_deg: Angle,
     pub size: Size,
-    #[cfg_attr(feature = "serde_support", serde(default = "default_as_true"))]
+    #[cfg_attr(feature = "specta_support", serde(default = "default_as_true"))]
     pub visible: bool,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub blend_mode: BlendMode,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub opacity: Opacity,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub layout_element: LayoutElement,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub styles: Vec<Style>,
 }
 
@@ -656,10 +667,11 @@ impl VectorNode {
 
 #[derive(Debug, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type),
     serde(tag = "type")
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub enum Paint {
     Solid(SolidPaint),
     Image(ImagePaint),
@@ -674,11 +686,12 @@ pub struct SolidPaintBundle {
 
 #[derive(Debug, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub struct SolidPaint {
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub id: Option<ReferenceId>,
     pub color: Color,
 }
@@ -707,15 +720,16 @@ pub struct ImagePaintBundle {
 
 #[derive(Debug, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type),
     serde(rename_all = "camelCase")
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub struct ImagePaint {
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub id: Option<ReferenceId>,
     pub image_id: ReferenceIdOrImageId,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub scale_mode: ImageScaleMode,
 }
 
@@ -749,11 +763,12 @@ pub struct GradientPaintBundle {
 
 #[derive(Debug, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub struct GradientPaint {
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub id: Option<ReferenceId>,
     pub variant: GradientVariant,
     pub stops: Vec<GradientColorStop>,
@@ -783,10 +798,11 @@ impl GradientPaint {
 
 #[derive(Debug, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type),
     serde(tag = "type")
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub enum Style {
     Fill(FillStyle),
     Stroke(StrokeStyle),
@@ -804,19 +820,20 @@ pub struct FillStyleBundle {
 
 #[derive(Debug, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type),
     serde(rename_all = "camelCase")
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub struct FillStyle {
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub id: Option<ReferenceId>,
     pub paint_id: ReferenceIdOrEntity,
-    #[cfg_attr(feature = "serde_support", serde(default = "default_as_true"))]
+    #[cfg_attr(feature = "specta_support", serde(default = "default_as_true"))]
     pub visible: bool,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub blend_mode: BlendMode,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub opacity: Opacity,
 }
 
@@ -849,20 +866,21 @@ pub struct StrokeStyleBundle {
 
 #[derive(Debug, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type),
     serde(rename_all = "camelCase")
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub struct StrokeStyle {
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub id: Option<ReferenceId>,
     pub width: Abs,
     pub paint_id: ReferenceIdOrEntity,
-    #[cfg_attr(feature = "serde_support", serde(default = "default_as_true"))]
+    #[cfg_attr(feature = "specta_support", serde(default = "default_as_true"))]
     pub visible: bool,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub blend_mode: BlendMode,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub opacity: Opacity,
 }
 
@@ -900,24 +918,25 @@ pub struct DropShadowStyleBundle {
 
 #[derive(Debug, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type),
     serde(rename_all = "camelCase")
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub struct DropShadowStyle {
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub id: Option<ReferenceId>,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub color: Color,
     pub position: Vec2,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub spread: Abs,
     pub blur: Abs,
-    #[cfg_attr(feature = "serde_support", serde(default = "default_as_true"))]
+    #[cfg_attr(feature = "specta_support", serde(default = "default_as_true"))]
     pub visible: bool,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub blend_mode: BlendMode,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub opacity: Opacity,
 }
 
@@ -950,12 +969,13 @@ impl DropShadowStyle {
 
 #[derive(Debug, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type),
     serde(rename_all = "camelCase")
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub struct AssetWithId {
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub id: Option<ReferenceId>,
     pub content: AssetContent,
     pub content_type: AssetContentType,
@@ -975,10 +995,11 @@ impl AssetWithId {
 
 #[derive(Debug, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type),
     serde(rename_all = "camelCase")
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 #[cfg(feature = "lua_scripts")]
 pub struct LuaScriptWithId {
     pub id: ReferenceId,

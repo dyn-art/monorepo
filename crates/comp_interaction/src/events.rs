@@ -9,7 +9,7 @@ use glam::Vec2;
 
 #[derive(Debug, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Deserialize, specta::Type),
     serde(tag = "type")
 )]
@@ -103,7 +103,7 @@ impl InputEvent for InteractionInputEvent {
 
 #[derive(Event, Debug, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Deserialize, specta::Type),
     serde(rename_all = "camelCase")
 )]
@@ -116,7 +116,7 @@ pub struct KeyDownOnCompInputEvent {
 
 #[derive(Event, Debug, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Deserialize, specta::Type),
     serde(rename_all = "camelCase")
 )]
@@ -128,21 +128,21 @@ pub struct KeyUpOnCompInputEvent {
 }
 
 #[derive(Event, Debug, Copy, Clone)]
-#[cfg_attr(feature = "serde_support", derive(serde::Deserialize, specta::Type))]
+#[cfg_attr(feature = "specta_support", derive(serde::Deserialize, specta::Type))]
 pub struct CursorMovedOnCompInputEvent {
     pub position: Vec2,
 }
 
 #[derive(Event, Debug, Copy, Clone)]
-#[cfg_attr(feature = "serde_support", derive(serde::Deserialize, specta::Type))]
+#[cfg_attr(feature = "specta_support", derive(serde::Deserialize, specta::Type))]
 pub struct CursorEnteredCompInputEvent;
 
 #[derive(Event, Debug, Copy, Clone)]
-#[cfg_attr(feature = "serde_support", derive(serde::Deserialize, specta::Type))]
+#[cfg_attr(feature = "specta_support", derive(serde::Deserialize, specta::Type))]
 pub struct CursorExitedCompInputEvent;
 
 #[derive(Event, Debug, Copy, Clone)]
-#[cfg_attr(feature = "serde_support", derive(serde::Deserialize, specta::Type))]
+#[cfg_attr(feature = "specta_support", derive(serde::Deserialize, specta::Type))]
 pub struct CursorDownOnEntityInputEvent {
     pub entity: Entity,
     pub position: Vec2,
@@ -150,14 +150,14 @@ pub struct CursorDownOnEntityInputEvent {
 }
 
 #[derive(Event, Debug, Copy, Clone)]
-#[cfg_attr(feature = "serde_support", derive(serde::Deserialize, specta::Type))]
+#[cfg_attr(feature = "specta_support", derive(serde::Deserialize, specta::Type))]
 pub struct CursorDownOnCompInputEvent {
     pub position: Vec2,
     pub button: MouseButton,
 }
 
 #[derive(Event, Debug, Copy, Clone)]
-#[cfg_attr(feature = "serde_support", derive(serde::Deserialize, specta::Type))]
+#[cfg_attr(feature = "specta_support", derive(serde::Deserialize, specta::Type))]
 pub struct CursorUpOnCompInputEvent {
     pub position: Vec2,
     pub button: MouseButton,
@@ -165,7 +165,7 @@ pub struct CursorUpOnCompInputEvent {
 
 #[derive(Event, Debug, Copy, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Deserialize, specta::Type),
     serde(rename_all = "camelCase")
 )]
@@ -176,7 +176,7 @@ pub struct MouseWheeledOnCompInputEvent {
 
 #[derive(Event, Debug, Copy, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Deserialize, specta::Type),
     serde(rename_all = "camelCase")
 )]
@@ -188,7 +188,7 @@ pub struct CursorDownOnResizeHandleInputEvent {
 
 #[derive(Event, Debug, Copy, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Deserialize, specta::Type),
     serde(rename_all = "camelCase")
 )]
@@ -198,7 +198,7 @@ pub struct CursorDownOnRotateHandleInputEvent {
 }
 
 #[derive(Event, Debug, Copy, Clone)]
-#[cfg_attr(feature = "serde_support", derive(serde::Deserialize, specta::Type))]
+#[cfg_attr(feature = "specta_support", derive(serde::Deserialize, specta::Type))]
 pub struct InteractionToolChangedInputEvent {
     pub tool: InteractionTool,
 }

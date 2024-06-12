@@ -3,7 +3,7 @@ use dyn_comp_bundles::components::mixins::WindingRule;
 
 #[derive(Debug, PartialEq, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type),
     serde(tag = "type")
 )]
@@ -62,7 +62,7 @@ pub enum SvgAttribute {
     Transform {
         transform: SvgTransformAttribute,
     },
-    #[cfg_attr(feature = "serde_support", serde(rename_all = "camelCase"))]
+    #[cfg_attr(feature = "specta_support", serde(rename_all = "camelCase"))]
     PatternTransform {
         pattern_transform: SvgTransformAttribute,
     },
@@ -71,7 +71,7 @@ pub enum SvgAttribute {
     Fill {
         fill: SvgAttributeColor,
     },
-    #[cfg_attr(feature = "serde_support", serde(rename_all = "camelCase"))]
+    #[cfg_attr(feature = "specta_support", serde(rename_all = "camelCase"))]
     FillRule {
         fill_rule: WindingRule,
     },
@@ -81,47 +81,47 @@ pub enum SvgAttribute {
     D {
         d: SvgPathAttribute,
     },
-    #[cfg_attr(feature = "serde_support", serde(rename_all = "camelCase"))]
+    #[cfg_attr(feature = "specta_support", serde(rename_all = "camelCase"))]
     ClipPath {
         clip_path: SvgElementId,
     },
-    #[cfg_attr(feature = "serde_support", serde(rename_all = "camelCase"))]
+    #[cfg_attr(feature = "specta_support", serde(rename_all = "camelCase"))]
     PatternUnits {
         pattern_units: SvgUnits,
     },
-    #[cfg_attr(feature = "serde_support", serde(rename_all = "camelCase"))]
+    #[cfg_attr(feature = "specta_support", serde(rename_all = "camelCase"))]
     GradientUnits {
         gradient_units: SvgUnits,
     },
-    #[cfg_attr(feature = "serde_support", serde(rename_all = "camelCase"))]
+    #[cfg_attr(feature = "specta_support", serde(rename_all = "camelCase"))]
     FilterUnits {
         filter_units: SvgUnits,
     },
-    #[cfg_attr(feature = "serde_support", serde(rename_all = "camelCase"))]
+    #[cfg_attr(feature = "specta_support", serde(rename_all = "camelCase"))]
     PreserveAspectRatio {
         preserve_aspect_ratio: String,
     },
-    #[cfg_attr(feature = "serde_support", serde(rename_all = "camelCase"))]
+    #[cfg_attr(feature = "specta_support", serde(rename_all = "camelCase"))]
     StopColor {
         stop_color: SvgAttributeColor,
     },
-    #[cfg_attr(feature = "serde_support", serde(rename_all = "camelCase"))]
+    #[cfg_attr(feature = "specta_support", serde(rename_all = "camelCase"))]
     StopOpacity {
         stop_opacity: f32,
     },
-    #[cfg_attr(feature = "serde_support", serde(rename_all = "camelCase"))]
+    #[cfg_attr(feature = "specta_support", serde(rename_all = "camelCase"))]
     FloodOpacity {
         flood_opacity: f32,
     },
-    #[cfg_attr(feature = "serde_support", serde(rename_all = "camelCase"))]
+    #[cfg_attr(feature = "specta_support", serde(rename_all = "camelCase"))]
     ColorInterpolationFilters {
         color_interpolation_filters: String,
     },
-    #[cfg_attr(feature = "serde_support", serde(rename_all = "camelCase"))]
+    #[cfg_attr(feature = "specta_support", serde(rename_all = "camelCase"))]
     NumOctaves {
         num_octaves: u8,
     },
-    #[cfg_attr(feature = "serde_support", serde(rename_all = "camelCase"))]
+    #[cfg_attr(feature = "specta_support", serde(rename_all = "camelCase"))]
     BaseFrequency {
         base_frequency: f32,
     },
@@ -142,11 +142,11 @@ pub enum SvgAttribute {
     Slope {
         slope: f32,
     },
-    #[cfg_attr(feature = "serde_support", serde(rename_all = "camelCase"))]
+    #[cfg_attr(feature = "specta_support", serde(rename_all = "camelCase"))]
     StdDeviation {
         std_deviation: f32,
     },
-    #[cfg_attr(feature = "serde_support", serde(rename_all = "camelCase"))]
+    #[cfg_attr(feature = "specta_support", serde(rename_all = "camelCase"))]
     TableValues {
         table_values: Vec<f32>,
     },
@@ -356,7 +356,7 @@ impl SvgAttribute {
 
 #[derive(Debug, PartialEq, Copy, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type),
     serde(tag = "type")
 )]
@@ -376,11 +376,11 @@ pub enum SvgTransformAttribute {
 
 #[derive(Debug, PartialEq, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
 pub enum SvgHrefAttribute {
-    #[cfg_attr(feature = "serde_support", serde(rename_all = "camelCase"))]
+    #[cfg_attr(feature = "specta_support", serde(rename_all = "camelCase"))]
     Base64 {
         content: String,
         content_type: SvgHrefContentType,
@@ -392,7 +392,7 @@ pub enum SvgHrefAttribute {
 
 #[derive(Debug, PartialEq, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
 pub enum SvgHrefContentType {
@@ -413,14 +413,14 @@ impl SvgHrefContentType {
 
 #[derive(Debug, Default, PartialEq, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
 pub struct SvgPathAttribute(pub String);
 
 #[derive(Debug, Default, PartialEq, Copy, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
 pub enum SvgMeasurementUnit {
@@ -431,7 +431,7 @@ pub enum SvgMeasurementUnit {
 
 #[derive(Debug, Default, PartialEq, Copy, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
 pub enum SvgUnits {
@@ -442,7 +442,7 @@ pub enum SvgUnits {
 
 #[derive(Debug, PartialEq, Copy, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
 pub enum SvgAttributeColor {
@@ -465,7 +465,7 @@ pub enum SvgAttributeColor {
 
 #[derive(Debug, PartialEq, Copy, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
 pub enum SvgAttributeFilter {
@@ -475,7 +475,7 @@ pub enum SvgAttributeFilter {
 
 #[derive(Debug, PartialEq, Copy, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
 pub enum SvgAttributeValues {
@@ -484,7 +484,7 @@ pub enum SvgAttributeValues {
 
 #[derive(Debug, PartialEq, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
 pub enum SvgAttributeIn {
@@ -495,7 +495,7 @@ pub enum SvgAttributeIn {
 
 #[derive(Debug, PartialEq, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
 pub enum SvgAttributeOperator {
@@ -505,7 +505,7 @@ pub enum SvgAttributeOperator {
 
 #[derive(Debug, PartialEq, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
 pub enum SvgAttributeType {
@@ -515,7 +515,7 @@ pub enum SvgAttributeType {
 
 #[derive(Debug, PartialEq, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
 pub enum SvgAttributeMode {
@@ -530,7 +530,7 @@ pub enum SvgAttributeMode {
 // [0,0,0,1], // multiplyer
 #[derive(Debug, PartialEq, Copy, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
 pub struct ColorMatrix {

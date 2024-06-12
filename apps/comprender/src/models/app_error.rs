@@ -60,7 +60,7 @@ pub struct AppErrorOptions {
     pub additional_errors: Option<Vec<HashMap<String, serde_json::Value>>>,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, ToSchema)]
 pub struct ErrorCode(String);
 
 impl ErrorCode {

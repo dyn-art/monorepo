@@ -29,9 +29,10 @@ pub struct BlendModeMixin(pub BlendMode);
 
 #[derive(Debug, Default, Copy, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub enum BlendMode {
     #[default]
     Normal,
@@ -75,9 +76,10 @@ pub struct PathMixin {
 
 #[derive(Debug, Default, PartialEq, Eq, Clone, Copy)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub enum WindingRule {
     #[default]
     Nonzero,
@@ -117,24 +119,25 @@ pub struct StaticLayoutParentMixin(pub StaticLayoutParent);
 
 #[derive(Debug, Default, Copy, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type),
     serde(rename_all = "camelCase")
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub struct StaticLayoutParent {
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub align_items: Option<AlignItems>,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub justify_content: Option<JustifyContent>,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub gap: Axes<Length>,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub padding: Rect<Length>,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub flex_direction: FlexDirection,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub horizontal_sizing_mode: LayoutParentSizingMode,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub vertical_sizing_mode: LayoutParentSizingMode,
 }
 
@@ -161,9 +164,10 @@ impl StaticLayoutParent {
 
 #[derive(Debug, Default, PartialEq, Eq, Copy, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub enum LayoutParentSizingMode {
     #[default]
     Fixed,
@@ -175,18 +179,20 @@ pub struct AbsoluteLayoutElementMixin(pub AbsoluteLayoutElement);
 
 #[derive(Debug, Default, Copy, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub struct AbsoluteLayoutElement {
     pub constraints: Constraints,
 }
 
 #[derive(Debug, Default, Copy, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub struct Constraints {
     pub horizontal: Constraint,
     pub vertical: Constraint,
@@ -194,9 +200,10 @@ pub struct Constraints {
 
 #[derive(Debug, Default, PartialEq, Eq, Copy, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub enum Constraint {
     #[default]
     Start,
@@ -211,20 +218,21 @@ pub struct StaticLayoutElementMixin(pub StaticLayoutElement);
 
 #[derive(Debug, Default, Copy, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type),
     serde(rename_all = "camelCase")
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub struct StaticLayoutElement {
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     align_self: Option<AlignSelf>,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     justify_self: Option<JustifySelf>,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     margin: Rect<AutoLength>,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub horizontal_sizing_mode: LayoutElementSizingMode,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub vertical_sizing_mode: LayoutElementSizingMode,
 }
 
@@ -246,9 +254,10 @@ impl StaticLayoutElement {
 
 #[derive(Debug, Default, PartialEq, Eq, Copy, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub enum LayoutElementSizingMode {
     #[default]
     Fixed,
@@ -257,10 +266,11 @@ pub enum LayoutElementSizingMode {
 
 #[derive(Debug, Copy, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type),
     serde(tag = "type")
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub enum LayoutElement {
     Absolute(AbsoluteLayoutElement),
     Static(StaticLayoutElement),

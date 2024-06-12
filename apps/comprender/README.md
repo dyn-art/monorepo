@@ -1,7 +1,13 @@
 # `dyn_comprender`
 
+### Run Locally
 ```
 cargo run --bin dyn_comprender --profile release
+```
+
+### Create OpenAPI
+```
+cargo run --bin cli --features cli generate-open-api --output-path ../../packages/types/src/comprender/resources/openapi-v1.yaml
 ```
 
 ## Load Testing

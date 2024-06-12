@@ -8,9 +8,10 @@ pub type LayoutSize = Axes<AutoLength>;
 
 #[derive(Debug, Default, Clone, Copy)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub enum LineWrap {
     /// No wrapping
     #[default]
@@ -25,9 +26,10 @@ pub enum LineWrap {
 
 #[derive(Debug, Default, Clone, Copy)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub enum HorizontalTextAlignment {
     #[default]
     Start,
@@ -40,9 +42,10 @@ pub enum HorizontalTextAlignment {
 
 #[derive(Debug, Default, Clone, Copy)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub enum VerticalTextAlignment {
     #[default]
     Top,
@@ -53,9 +56,10 @@ pub enum VerticalTextAlignment {
 
 #[derive(Debug, Default, PartialEq, Eq, Copy, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub enum TextSizingMode {
     #[default]
     WidthAndHeight,

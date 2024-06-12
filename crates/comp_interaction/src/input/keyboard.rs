@@ -25,7 +25,7 @@ use super::button_input::ButtonInput;
 /// - On non-web platforms, support assigning keybinds to virtually any key through a UI.
 #[derive(Debug, Clone, Ord, PartialOrd, Copy, PartialEq, Eq, Hash)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Deserialize, specta::Type),
     serde(rename_all = "camelCase")
 )]
@@ -61,7 +61,7 @@ pub enum NativeKeyCode {
 ///
 /// The resource is updated inside of the [`keyboard_input_system`].
 #[derive(Debug, Hash, Ord, PartialOrd, PartialEq, Eq, Clone, Copy)]
-#[cfg_attr(feature = "serde_support", derive(serde::Deserialize, specta::Type))]
+#[cfg_attr(feature = "specta_support", derive(serde::Deserialize, specta::Type))]
 #[repr(u32)]
 pub enum KeyCode {
     /// This variant is used when the key cannot be translated to any other variant.

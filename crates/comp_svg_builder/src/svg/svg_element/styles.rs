@@ -2,7 +2,7 @@ use super::SvgElementId;
 
 #[derive(Debug, PartialEq, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type),
     serde(tag = "type")
 )]
@@ -10,7 +10,7 @@ pub enum SvgStyle {
     Display {
         display: SvgDisplayStyle,
     },
-    #[cfg_attr(feature = "serde_support", serde(rename_all = "camelCase"))]
+    #[cfg_attr(feature = "specta_support", serde(rename_all = "camelCase"))]
     BlendMode {
         blend_mode: SvgBlendModeStyle,
     },
@@ -23,15 +23,15 @@ pub enum SvgStyle {
     Stroke {
         stroke: SvgStyleColor,
     },
-    #[cfg_attr(feature = "serde_support", serde(rename_all = "camelCase"))]
+    #[cfg_attr(feature = "specta_support", serde(rename_all = "camelCase"))]
     StrokeWidth {
         stroke_width: f32,
     },
-    #[cfg_attr(feature = "serde_support", serde(rename_all = "camelCase"))]
+    #[cfg_attr(feature = "specta_support", serde(rename_all = "camelCase"))]
     StrokeOpacity {
         stroke_opacity: f32,
     },
-    #[cfg_attr(feature = "serde_support", serde(rename_all = "camelCase"))]
+    #[cfg_attr(feature = "specta_support", serde(rename_all = "camelCase"))]
     PointerEvents {
         pointer_events: SvgPointerEventsStyle,
     },
@@ -107,7 +107,7 @@ impl SvgStyle {
 
 #[derive(Debug, Default, PartialEq, Copy, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
 pub enum SvgDisplayStyle {
@@ -118,7 +118,7 @@ pub enum SvgDisplayStyle {
 
 #[derive(Debug, Default, PartialEq, Copy, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
 pub enum SvgBlendModeStyle {
@@ -143,7 +143,7 @@ pub enum SvgBlendModeStyle {
 
 #[derive(Debug, Default, PartialEq, Copy, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
 pub enum SvgPointerEventsStyle {
@@ -154,7 +154,7 @@ pub enum SvgPointerEventsStyle {
 
 #[derive(Debug, PartialEq, Copy, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
 pub enum SvgStyleColor {

@@ -9,7 +9,7 @@ pub struct SvgElementChanges {
 
 #[derive(Debug, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, specta::Type),
     serde(tag = "type")
 )]
@@ -27,7 +27,7 @@ pub enum SvgElementChange {
 /// Emitted when a new SvgElement is created.
 #[derive(Debug, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, specta::Type),
     serde(rename_all = "camelCase")
 )]
@@ -41,13 +41,13 @@ pub struct SvgElementCreatedChange {
 
 /// Emitted when a new SvgElement is deleted.
 #[derive(Debug, Clone)]
-#[cfg_attr(feature = "serde_support", derive(serde::Serialize, specta::Type))]
+#[cfg_attr(feature = "specta_support", derive(serde::Serialize, specta::Type))]
 pub struct SvgElementDeletedChange {}
 
 /// Emitted when a SvgElement (child) is append to another SvgElement (parent).
 #[derive(Debug, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, specta::Type),
     serde(rename_all = "camelCase")
 )]
@@ -58,7 +58,7 @@ pub struct SvgElementAppendedChange {
 /// Emitted when an attribute of an SvgElement is updated.
 #[derive(Debug, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, specta::Type),
     serde(rename_all = "camelCase")
 )]
@@ -69,7 +69,7 @@ pub struct SvgAttributeUpdatedChange {
 
 /// Emitted when an attribute of a SvgElement is removed.
 #[derive(Debug, Clone)]
-#[cfg_attr(feature = "serde_support", derive(serde::Serialize, specta::Type))]
+#[cfg_attr(feature = "specta_support", derive(serde::Serialize, specta::Type))]
 pub struct SvgAttributeRemovedChange {
     pub key: &'static str,
 }
@@ -77,7 +77,7 @@ pub struct SvgAttributeRemovedChange {
 /// Emitted when a style property of a SvgElement is updated.
 #[derive(Debug, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, specta::Type),
     serde(rename_all = "camelCase")
 )]
@@ -88,7 +88,7 @@ pub struct SvgStyleUpdatedChange {
 
 /// Emitted when a style property of a SvgElement is removed.
 #[derive(Debug, Clone)]
-#[cfg_attr(feature = "serde_support", derive(serde::Serialize, specta::Type))]
+#[cfg_attr(feature = "specta_support", derive(serde::Serialize, specta::Type))]
 pub struct SvgStyleRemovedChange {
     pub key: &'static str,
 }
@@ -96,7 +96,7 @@ pub struct SvgStyleRemovedChange {
 /// Emitted when children of a SvgElement are reordered.
 #[derive(Debug, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, specta::Type),
     serde(rename_all = "camelCase")
 )]

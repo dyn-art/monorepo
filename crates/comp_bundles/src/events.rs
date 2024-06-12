@@ -26,10 +26,11 @@ pub trait InputEvent {
 
 #[derive(Debug, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type),
     serde(tag = "type")
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub enum CoreInputEvent {
     // Composition
     UpdateCompositionSize(UpdateCompositionSizeInputEvent),
@@ -239,28 +240,31 @@ impl InputEvent for CoreInputEvent {
 
 #[derive(Event, Debug, Default, Copy, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub struct UpdateCompositionSizeInputEvent {
     pub size: Size,
 }
 
 #[derive(Event, Debug, Default, Copy, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub struct UpdateCompositionViewportInputEvent {
     pub viewport: Viewport,
 }
 
 #[derive(Event, Debug, Copy, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type),
     serde(rename_all = "camelCase")
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub struct FocusRootNodesInputEvent;
 
 // =============================================================================
@@ -269,86 +273,92 @@ pub struct FocusRootNodesInputEvent;
 
 #[derive(Event, Debug, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub struct CreateNodeInputEvent {
     pub node: Node,
 }
 
 #[derive(Event, Debug, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type),
     serde(rename_all = "camelCase")
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub struct UpdateFrameNodeInputEvent {
     pub id: ReferenceIdOrEntity,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub clip_content: Option<bool>,
 }
 
 #[derive(Event, Debug, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type),
     serde(rename_all = "camelCase")
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub struct UpdateEllipseNodeInputEvent {
     pub id: ReferenceIdOrEntity,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub starting_angle: Option<f32>,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub ending_angle: Option<f32>,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub inner_radius_ratio: Option<f32>,
 }
 
 #[derive(Event, Debug, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type),
     serde(rename_all = "camelCase")
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub struct UpdateStarNodeInputEvent {
     pub id: ReferenceIdOrEntity,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub point_count: Option<u8>,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub inner_radius_ratio: Option<f32>,
 }
 
 #[derive(Event, Debug, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type),
     serde(rename_all = "camelCase")
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub struct UpdatePolygonNodeInputEvent {
     pub id: ReferenceIdOrEntity,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub point_count: Option<u8>,
 }
 
 #[derive(Event, Debug, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type),
     serde(rename_all = "camelCase")
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub struct UpdateTextNodeInputEvent {
     pub id: ReferenceIdOrEntity,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub text: Option<String>,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub attributes: Option<Vec<TextAttributeInterval>>,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub line_wrap: Option<LineWrap>,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub horizontal_text_alignment: Option<HorizontalTextAlignment>,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub vertical_text_alignment: Option<VerticalTextAlignment>,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub sizing_mode: Option<TextSizingMode>,
 }
 
@@ -360,7 +370,7 @@ pub struct UpdateTextNodeInputEvent {
 //
 // #[derive(Event, Debug, Clone)]
 // #[cfg_attr(
-//     feature = "serde_support",
+//     feature = "specta_support",
 //     derive(serde::Serialize, serde::Deserialize, specta::Type)
 // )]
 // pub struct CreateStyleInputEvent {
@@ -369,10 +379,11 @@ pub struct UpdateTextNodeInputEvent {
 
 #[derive(Event, Debug, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type),
     serde(rename_all = "camelCase")
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub struct UpdateFillStyleInputEvent {
     pub id: ReferenceIdOrEntity,
     pub paint_id: Option<ReferenceIdOrEntity>,
@@ -380,32 +391,34 @@ pub struct UpdateFillStyleInputEvent {
 
 #[derive(Event, Debug, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type),
     serde(rename_all = "camelCase")
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub struct UpdateStorkeStyleInputEvent {
     pub id: ReferenceIdOrEntity,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub paint_id: Option<ReferenceIdOrEntity>,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub width: Option<Abs>,
 }
 
 #[derive(Event, Debug, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub struct UpdateDropShadowStyleInputEvent {
     pub id: ReferenceIdOrEntity,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub color: Option<Color>,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub position: Option<Vec2>,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub spread: Option<Abs>,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub blur: Option<Abs>,
 }
 
@@ -415,48 +428,52 @@ pub struct UpdateDropShadowStyleInputEvent {
 
 #[derive(Event, Debug, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub struct CreatePaintInputEvent {
     pub paint: Paint,
 }
 
 #[derive(Event, Debug, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub struct UpdateSolidPaintInputEvent {
     pub id: ReferenceIdOrEntity,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub color: Color,
 }
 
 #[derive(Event, Debug, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type),
     serde(rename_all = "camelCase")
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub struct UpdateImagePaintInputEvent {
     pub id: ReferenceIdOrEntity,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub scale_mode: Option<ImageScaleMode>,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub image_id: Option<ImageId>,
 }
 
 #[derive(Event, Debug, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub struct UpdateGradientPaintInputEvent {
     pub id: ReferenceIdOrEntity,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub variant: Option<GradientVariant>,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub stops: Option<Vec<GradientColorStop>>,
 }
 
@@ -466,10 +483,11 @@ pub struct UpdateGradientPaintInputEvent {
 
 #[derive(Event, Debug, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type),
     serde(rename_all = "camelCase")
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub struct CreateAssetInputEvent {
     pub asset: AssetWithId,
 }
@@ -480,34 +498,37 @@ pub struct CreateAssetInputEvent {
 
 #[derive(Event, Debug, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub struct DeleteEntityInputEvent {
     pub id: ReferenceIdOrEntity,
 }
 
 #[derive(Event, Debug, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type),
     serde(rename_all = "camelCase")
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub struct UpdateEntityTransformInputEvent {
     pub id: ReferenceIdOrEntity,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub x: Option<f32>,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub y: Option<f32>,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub rotation_deg: Option<Angle>,
 }
 
 #[derive(Event, Debug, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub struct UpdateEntitySizeInputEvent {
     pub id: ReferenceIdOrEntity,
     pub size: Size,
@@ -515,23 +536,25 @@ pub struct UpdateEntitySizeInputEvent {
 
 #[derive(Event, Debug, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub struct MoveEntityInputEvent {
     pub id: ReferenceIdOrEntity,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub dx: Option<f32>,
-    #[cfg_attr(feature = "serde_support", serde(default))]
+    #[cfg_attr(feature = "specta_support", serde(default))]
     pub dy: Option<f32>,
 }
 
 #[derive(Event, Debug, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type),
     serde(rename_all = "camelCase")
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub struct UpdateEntityRotationInputEvent {
     pub id: ReferenceIdOrEntity,
     pub rotation_deg: Angle,
@@ -539,9 +562,10 @@ pub struct UpdateEntityRotationInputEvent {
 
 #[derive(Event, Debug, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub struct UpdateEntityVisibilityInputEvent {
     pub id: ReferenceIdOrEntity,
     pub visible: bool,
@@ -549,10 +573,11 @@ pub struct UpdateEntityVisibilityInputEvent {
 
 #[derive(Event, Debug, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type),
     serde(rename_all = "camelCase")
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub struct UpdateEntityCornerRadiiInputEvent {
     pub id: ReferenceIdOrEntity,
     pub corner_radii: CornerRadii,
@@ -560,10 +585,11 @@ pub struct UpdateEntityCornerRadiiInputEvent {
 
 #[derive(Event, Debug, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type),
     serde(rename_all = "camelCase")
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub struct UpdateEntityBlendModeInputEvent {
     pub id: ReferenceIdOrEntity,
     pub blend_mode: BlendMode,
@@ -571,9 +597,10 @@ pub struct UpdateEntityBlendModeInputEvent {
 
 #[derive(Event, Debug, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub struct UpdateEntityOpacityInputEvent {
     pub id: ReferenceIdOrEntity,
     pub opacity: Opacity,
@@ -581,9 +608,10 @@ pub struct UpdateEntityOpacityInputEvent {
 
 #[derive(Event, Debug, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub struct UpdateEntityChildrenInputEvent {
     pub id: ReferenceIdOrEntity,
     pub children: Vec<ReferenceIdOrEntity>,
@@ -595,10 +623,11 @@ pub struct UpdateEntityChildrenInputEvent {
 
 #[derive(Event, Debug, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type),
     serde(rename_all = "camelCase")
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 #[cfg(feature = "lua_scripts")]
 pub struct RegisterLuaScriptInputEvent {
     pub script: crate::LuaScriptWithId,
@@ -606,10 +635,11 @@ pub struct RegisterLuaScriptInputEvent {
 
 #[derive(Event, Debug, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type),
     serde(rename_all = "camelCase")
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 #[cfg(feature = "lua_scripts")]
 pub struct ExecuteLuaScriptInputEvent {
     pub id: crate::reference_id::ReferenceId,

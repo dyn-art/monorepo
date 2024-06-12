@@ -10,7 +10,7 @@ authors = { workspace = true }
 
 [features]
 default = []
-serde_support = ["dep:specta"]
+specta_support = ["dep:specta"]
 tracing = []
 
 [dependencies]
@@ -21,7 +21,7 @@ serde_json = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
 thiserror = { version = "1.0.61" }
 
-# serde_support (feature)
+# specta_support (feature)
 specta = { workspace = true, features = [
     "serde",
     "glam",

@@ -1,6 +1,6 @@
 #[derive(Debug, Default, PartialEq, Eq, Copy, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
 pub struct Rect<T> {

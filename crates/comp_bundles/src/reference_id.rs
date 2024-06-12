@@ -4,10 +4,11 @@ use std::collections::HashMap;
 
 #[derive(Debug, Hash, PartialEq, Eq, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type),
     serde(rename_all = "camelCase")
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub struct ReferenceId(String);
 
 impl ReferenceId {
@@ -18,15 +19,16 @@ impl ReferenceId {
 
 #[derive(Debug, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type),
     serde(tag = "type")
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub enum ReferenceIdOrEntity {
     Entity {
         entity: Entity,
     },
-    #[cfg_attr(feature = "serde_support", serde(rename_all = "camelCase"))]
+    #[cfg_attr(feature = "specta_support", serde(rename_all = "camelCase"))]
     ReferenceId {
         reference_id: ReferenceId,
     },
@@ -56,14 +58,15 @@ impl ReferenceIdOrEntity {
 
 #[derive(Debug, Clone)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type),
     serde(tag = "type")
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub enum ReferenceIdOrImageId {
-    #[cfg_attr(feature = "serde_support", serde(rename_all = "camelCase"))]
+    #[cfg_attr(feature = "specta_support", serde(rename_all = "camelCase"))]
     ImageId { image_id: ImageId },
-    #[cfg_attr(feature = "serde_support", serde(rename_all = "camelCase"))]
+    #[cfg_attr(feature = "specta_support", serde(rename_all = "camelCase"))]
     ReferenceId { reference_id: ReferenceId },
 }
 

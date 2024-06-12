@@ -30,18 +30,26 @@ tracing = [
 ]
 
 [dependencies]
-dyn-comp-asset = { path = "../../crates/comp_asset" }
+dyn-comp-asset = { path = "../../crates/comp_asset", features = [
+    "utoipa_support",
+] }
 dyn-comp-core = { path = "../../crates/comp_core", features = [
-    "serde_support",
+    "specta_support",
 ] }
 dyn-comp-dtif = { path = "../../crates/comp_dtif", features = [
-    "serde_support",
+    "specta_support",
+    "utoipa_support",
 ] }
 dyn-comp-bundles = { path = "../../crates/comp_bundles", features = [
-    "serde_support",
+    "specta_support",
+    "utoipa_support",
 ] }
 dyn-comp-svg-builder = { path = "../../crates/comp_svg_builder", features = [
-    "serde_support",
+    "specta_support",
+] }
+dyn-utils = { path = "../../crates/utils", features = ["utoipa_support"] }
+dyn-attributed-string = { path = "../../crates/attributed_string", features = [
+    "utoipa_support",
 ] }
 bevy_app = { workspace = true }
 bevy_ecs = { workspace = true }
@@ -67,7 +75,9 @@ log = { workspace = true }
 
 # cli (feature)
 clap = { version = "4.5.1", features = ["derive"], optional = true }
-utoipa = { version = "4.2.0", features = ["axum_extras"] }
+utoipa = { workspace = true, features = ["axum_extras", "yaml"] }
+utoipauto = "0.1.11"
+# utoipauto = "0.1.11" # Currenlty can't be used due: https://github.com/ProbablyClem/utoipauto/issues/13
 
 [profile.release]
 opt-level = "s"
