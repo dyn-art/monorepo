@@ -34,7 +34,9 @@ dyn-comp-asset = { path = "../../crates/comp_asset" }
 dyn-comp-core = { path = "../../crates/comp_core", features = [
     "serde_support",
 ] }
-dyn-comp-dtif = { path = "../../crates/comp_dtif" }
+dyn-comp-dtif = { path = "../../crates/comp_dtif", features = [
+    "serde_support",
+] }
 dyn-comp-bundles = { path = "../../crates/comp_bundles", features = [
     "serde_support",
 ] }
@@ -44,16 +46,16 @@ dyn-comp-svg-builder = { path = "../../crates/comp_svg_builder", features = [
 bevy_app = { workspace = true }
 bevy_ecs = { workspace = true }
 bevy_transform = { workspace = true }
-axum = "0.7.3"
-tokio = { version = "1.35.1", features = ["full"] }
+axum = { version = "0.7.5", features = ["macros"] }
+tokio = { version = "1.38.0", features = ["full"] }
 dotenv_config = "0.1.9"
 dotenvy = "0.15.7"
-resvg = "0.40.0"
-usvg = "0.40.0"
-fontdb = "0.16.2"
+resvg = "0.42.0"
+usvg = "0.42.0"
+fontdb = "0.18.0"
 tiny-skia = "0.11.4"
-reqwest = "0.11.26"
-svg2pdf = "0.10.0"
+reqwest = "0.12.4"
+svg2pdf = "0.11.0"
 
 # Bindgen
 serde = { workspace = true, features = ["derive"] }

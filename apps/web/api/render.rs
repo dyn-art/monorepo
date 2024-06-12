@@ -4,12 +4,14 @@ use dyn_comp_asset::asset::AssetContent;
 use dyn_comp_bundles::components::marker::Root;
 use dyn_comp_core::{resources::composition::CompositionRes, CompCorePlugin};
 use dyn_comp_dtif::DtifComposition;
-use dyn_comp_svg_builder::{svg::svg_bundle::SvgBundleVariant, CompSvgBuilderPlugin};
+use dyn_comp_svg_builder::{
+    events::SvgBuilderOutputEvent, svg::svg_bundle::SvgBundleVariant, CompSvgBuilderPlugin,
+};
 use dyn_web_api::{
     app_error,
     models::app_error::{AppError, ErrorCode, IntoVercelResponse},
 };
-use std::collections::HashMap;
+use std::{collections::HashMap, sync::mpsc::channel};
 use url::Url;
 use vercel_runtime::{run, Body, Error, Request, Response, StatusCode};
 
@@ -135,6 +137,8 @@ async fn prepare_dtif_composition(
 fn build_svg_string(mut dtif: DtifComposition) -> Result<String, AppError> {
     let mut app = App::new();
 
+    let (svg_builder_output_event_sender, _) = channel::<SvgBuilderOutputEvent>();
+
     // Register plugins
     app.add_plugins((
         CompCorePlugin {
@@ -142,7 +146,9 @@ fn build_svg_string(mut dtif: DtifComposition) -> Result<String, AppError> {
             size: dtif.size,
             viewport: dtif.viewport,
         },
-        CompSvgBuilderPlugin {},
+        CompSvgBuilderPlugin {
+            output_event_sender: svg_builder_output_event_sender,
+        },
     ));
 
     dtif.send_into_world(&mut app.world);

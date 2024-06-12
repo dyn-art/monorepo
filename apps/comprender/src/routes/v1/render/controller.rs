@@ -15,9 +15,12 @@ use dyn_comp_asset::asset::AssetContent;
 use dyn_comp_bundles::components::marker::Root;
 use dyn_comp_core::{resources::composition::CompositionRes, CompCorePlugin};
 use dyn_comp_dtif::DtifComposition;
-use dyn_comp_svg_builder::{svg::svg_bundle::SvgBundleVariant, CompSvgBuilderPlugin};
+use dyn_comp_svg_builder::{
+    events::SvgBuilderOutputEvent, svg::svg_bundle::SvgBundleVariant, CompSvgBuilderPlugin,
+};
 use resvg::usvg::Options;
 use serde::Deserialize;
+use std::sync::mpsc::channel;
 use usvg::WriteOptions;
 
 #[derive(Deserialize, utoipa::IntoParams)]
@@ -27,9 +30,8 @@ pub struct QueryParams {
 
 pub async fn simplify_svg(body: String) -> Result<Response, AppError> {
     let opts = Options::default();
-    let fontdb = fontdb::Database::new();
 
-    let tree = usvg::Tree::from_str(&body, &opts, &fontdb).unwrap();
+    let tree = usvg::Tree::from_str(&body, &opts).unwrap();
 
     Ok(Response::builder()
         .status(StatusCode::OK)
@@ -51,6 +53,7 @@ pub async fn simplify_svg(body: String) -> Result<Response, AppError> {
         QueryParams,
     )
 )]
+#[axum::debug_handler]
 pub async fn render_composition(
     maybe_query: Option<Query<QueryParams>>,
     maybe_body: Option<Json<DtifComposition>>,
@@ -64,10 +67,9 @@ pub async fn render_composition(
     // Determine response format from query parameter
     match params.format.as_str() {
         "png" => {
-            let fontdb = fontdb::Database::new();
             let opts = Options::default();
 
-            let tree = usvg::Tree::from_str(&svg_string, &opts, &fontdb).unwrap();
+            let tree = usvg::Tree::from_str(&svg_string, &opts).unwrap();
 
             let pixmap_size = tree.size().to_int_size();
             let mut pixmap =
@@ -83,9 +85,8 @@ pub async fn render_composition(
         }
         "svg" => {
             let opts = Options::default();
-            let fontdb = fontdb::Database::new();
 
-            let tree = usvg::Tree::from_str(&svg_string, &opts, &fontdb).unwrap();
+            let tree = usvg::Tree::from_str(&svg_string, &opts).unwrap();
 
             Ok(Response::builder()
                 .status(StatusCode::OK)
@@ -101,7 +102,13 @@ pub async fn render_composition(
             .body(Body::from(svg_string.into_bytes()))
             .unwrap()),
         "pdf" => {
-            let pdf_data = svg2pdf::convert_str(&svg_string, svg2pdf::Options::default()).unwrap();
+            let opts = Options::default();
+            let tree = usvg::Tree::from_str(&svg_string, &opts).unwrap();
+            let pdf_data = svg2pdf::to_pdf(
+                &tree,
+                svg2pdf::ConversionOptions::default(),
+                svg2pdf::PageOptions::default(),
+            );
 
             Ok(Response::builder()
                 .status(StatusCode::OK)
@@ -135,6 +142,8 @@ async fn prepare_dtif_composition(
 fn build_svg_string(mut dtif: DtifComposition) -> Result<String, AppError> {
     let mut app = App::new();
 
+    let (svg_builder_output_event_sender, _) = channel::<SvgBuilderOutputEvent>();
+
     // Register plugins
     app.add_plugins((
         CompCorePlugin {
@@ -142,7 +151,9 @@ fn build_svg_string(mut dtif: DtifComposition) -> Result<String, AppError> {
             size: dtif.size,
             viewport: dtif.viewport,
         },
-        CompSvgBuilderPlugin {},
+        CompSvgBuilderPlugin {
+            output_event_sender: svg_builder_output_event_sender,
+        },
     ));
 
     dtif.send_into_world(&mut app.world);

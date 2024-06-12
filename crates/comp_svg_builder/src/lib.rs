@@ -18,7 +18,8 @@ use systems::{
 };
 
 pub struct CompSvgBuilderPlugin {
-    #[cfg(any(feature = "output_svg_element_changes", feature = "output_svg_string"))]
+    // TODO: Figure out why "rust-analyzer" doesn't check that "output_event_sender" is behind a feature
+    // #[cfg(any(feature = "output_svg_element_changes", feature = "output_svg_string"))]
     pub output_event_sender: std::sync::mpsc::Sender<crate::events::SvgBuilderOutputEvent>,
 }
 
