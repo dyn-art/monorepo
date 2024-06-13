@@ -71,10 +71,8 @@ impl ErrorCode {
 impl IntoResponse for AppError {
     fn into_response(self) -> Response {
         let status = StatusCode::from_u16(self.status).unwrap_or(StatusCode::INTERNAL_SERVER_ERROR);
-
         let body = Json(self);
-
-        (status, body).into_response()
+        return (status, body).into_response();
     }
 }
 
@@ -82,7 +80,7 @@ impl From<std::io::Error> for AppError {
     fn from(err: std::io::Error) -> Self {
         AppError::new_with_options(
             StatusCode::INTERNAL_SERVER_ERROR,
-            ErrorCode::new("INTERNAL_SERVER_ERROR"),
+            ErrorCode::new("INTERNAL_SERVER"),
             AppErrorOptions {
                 description: Some(err.to_string()),
                 uri: None,

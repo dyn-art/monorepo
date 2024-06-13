@@ -1,6 +1,9 @@
 use crate::{
-    core::de::{deserialize_json_body, deserialize_query_params},
-    error::app_error::{AppError, ErrorCode},
+    environment::app_state::AppState,
+    error::{
+        app_error::{AppError, ErrorCode},
+        extract::{extract_json_body, extract_query_params, AppJson, AppQuery},
+    },
 };
 use axum::{
     body::Body,
@@ -24,7 +27,7 @@ use serde::Deserialize;
 use std::sync::mpsc::channel;
 use usvg::WriteOptions;
 
-pub fn routes() -> Router {
+pub fn router() -> Router<AppState> {
     Router::new().route("/", post(handler))
 }
 
@@ -55,11 +58,11 @@ pub enum FileFormat {
 )]
 #[axum::debug_handler]
 async fn handler(
-    maybe_query: Option<Query<QueryParams>>,
-    maybe_body: Option<Json<DtifComposition>>,
+    maybe_query: AppQuery<QueryParams>,
+    maybe_body: AppJson<DtifComposition>,
 ) -> Result<Response, AppError> {
-    let params = deserialize_query_params(maybe_query)?;
-    let mut body = deserialize_json_body(maybe_body)?;
+    let params = extract_query_params(maybe_query)?;
+    let mut body = extract_json_body(maybe_body)?;
 
     let _ = prepare_dtif_composition(&mut body).await;
     let svg_string = build_svg_string(body)?;

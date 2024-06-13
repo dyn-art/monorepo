@@ -3,11 +3,13 @@ pub mod v1;
 
 use axum::{http::StatusCode, response::IntoResponse, routing::get, Json, Router};
 
-pub fn routes() -> Router {
+use crate::environment::app_state::AppState;
+
+pub fn router() -> Router<AppState> {
     Router::new()
         .route("/", get(handler))
-        .nest("/v1", v1::routes())
-        .nest("/health", health::routes())
+        .nest("/v1", v1::router())
+        .nest("/health", health::router())
 }
 
 async fn handler() -> impl IntoResponse {

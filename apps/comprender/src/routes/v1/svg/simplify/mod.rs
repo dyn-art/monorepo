@@ -1,4 +1,7 @@
-use crate::error::app_error::{AppError, AppErrorOptions, ErrorCode};
+use crate::{
+    environment::app_state::AppState,
+    error::app_error::{AppError, AppErrorOptions, ErrorCode},
+};
 use axum::{
     body::Body,
     http::{header, StatusCode},
@@ -7,7 +10,7 @@ use axum::{
 use axum::{routing::post, Router};
 use usvg::{Options, Tree, WriteOptions};
 
-pub fn routes() -> Router {
+pub fn router() -> Router<AppState> {
     Router::new().route("/", post(handler))
 }
 
