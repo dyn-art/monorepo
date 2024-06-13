@@ -250,7 +250,7 @@ export interface components {
       /** @description A list of paints. */
       paints?: components["schemas"]["Paint"][];
       /** @description A list of scripts. */
-      scripts?: components["schemas"]["dyn_comp_bundles.LuaScriptWithId"][];
+      scripts?: components["schemas"]["LuaScriptWithId"][];
       size: components["schemas"]["Size"];
       version?: components["schemas"]["CompVersion"] | null;
       viewport?: components["schemas"]["Viewport"] | null;
@@ -277,8 +277,8 @@ export interface components {
     Entity: number;
     ErrorCode: string;
     ExecuteLuaScriptInputEvent: {
-      argsMap: components["schemas"]["dyn_comp_lua.tables.args_table.LuaScriptArgsMap"];
-      id: components["schemas"]["crate.reference_id.ReferenceId"];
+      argsMap: Record<string, never>;
+      id: components["schemas"]["ReferenceId"];
     };
     FillStyle: {
       blendMode?: components["schemas"]["BlendMode"];
@@ -536,7 +536,7 @@ export interface components {
       type: "ReferenceId";
     };
     RegisterLuaScriptInputEvent: {
-      script: components["schemas"]["crate.LuaScriptWithId"];
+      script: components["schemas"]["LuaScriptWithId"];
     };
     /**
      * Format: float
@@ -566,9 +566,9 @@ export interface components {
       visible?: boolean;
     };
     StaticLayoutElement: {
-      alignSelf?: components["schemas"]["AlignSelf"] | null;
+      alignSelf?: components["schemas"]["AlignItems"] | null;
       horizontalSizingMode?: components["schemas"]["LayoutElementSizingMode"];
-      justifySelf?: components["schemas"]["JustifySelf"] | null;
+      justifySelf?: components["schemas"]["AlignItems"] | null;
       margin?: components["schemas"]["Rect"];
       verticalSizingMode?: components["schemas"]["LayoutElementSizingMode"];
     };
@@ -577,7 +577,7 @@ export interface components {
       flexDirection?: components["schemas"]["FlexDirection"];
       gap?: components["schemas"]["Axes"];
       horizontalSizingMode?: components["schemas"]["LayoutParentSizingMode"];
-      justifyContent?: components["schemas"]["JustifyContent"] | null;
+      justifyContent?: components["schemas"]["AlignContent"] | null;
       padding?: components["schemas"]["Rect"];
       verticalSizingMode?: components["schemas"]["LayoutParentSizingMode"];
     };

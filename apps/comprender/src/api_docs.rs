@@ -48,7 +48,14 @@ use dyn_utils::{
 };
 use utoipa::{OpenApi, ToSchema};
 
-// TODO: Write Specta extension for OpenApi because Utoipa doesn't work that good
+// TODO:
+// Write Specta extension for OpenApi because Utoipa misses some relevant parts:
+// - No support for type aliases: https://github.com/juhaku/utoipa?tab=readme-ov-file#how-to-use-rusts-type-aliases
+// - No support for auto discovering types: https://github.com/juhaku/utoipa?tab=readme-ov-file#auto-discover-for-openapi-schemas-and-paths
+// - No support for glam, bevy, ..
+// - No support for inline imports
+//
+// Specta experiment:
 // https://github.com/oscartbeaumont/specta/blob/main/src/lang/openapi.rs
 #[derive(OpenApi)]
 #[openapi(

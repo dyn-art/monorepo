@@ -128,6 +128,7 @@ pub struct StaticLayoutParent {
     #[cfg_attr(feature = "specta_support", serde(default))]
     pub align_items: Option<AlignItems>,
     #[cfg_attr(feature = "specta_support", serde(default))]
+    #[cfg_attr(feature = "utoipa_support", schema(value_type = Option<AlignContent>))]
     pub justify_content: Option<JustifyContent>,
     #[cfg_attr(feature = "specta_support", serde(default))]
     pub gap: Axes<Length>,
@@ -225,8 +226,10 @@ pub struct StaticLayoutElementMixin(pub StaticLayoutElement);
 #[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub struct StaticLayoutElement {
     #[cfg_attr(feature = "specta_support", serde(default))]
+    #[cfg_attr(feature = "utoipa_support", schema(value_type = Option<AlignItems>))]
     align_self: Option<AlignSelf>,
     #[cfg_attr(feature = "specta_support", serde(default))]
+    #[cfg_attr(feature = "utoipa_support", schema(value_type = Option<AlignItems>))]
     justify_self: Option<JustifySelf>,
     #[cfg_attr(feature = "specta_support", serde(default))]
     margin: Rect<AutoLength>,

@@ -707,7 +707,7 @@ components:
         scripts:
           type: array
           items:
-            $ref: '#/components/schemas/dyn_comp_bundles.LuaScriptWithId'
+            $ref: '#/components/schemas/LuaScriptWithId'
           description: A list of scripts.
         size:
           $ref: '#/components/schemas/Size'
@@ -769,9 +769,9 @@ components:
       - argsMap
       properties:
         argsMap:
-          $ref: '#/components/schemas/dyn_comp_lua.tables.args_table.LuaScriptArgsMap'
+          type: object
         id:
-          $ref: '#/components/schemas/crate.reference_id.ReferenceId'
+          $ref: '#/components/schemas/ReferenceId'
     FillStyle:
       type: object
       required:
@@ -1437,7 +1437,7 @@ components:
       - script
       properties:
         script:
-          $ref: '#/components/schemas/crate.LuaScriptWithId'
+          $ref: '#/components/schemas/LuaScriptWithId'
     Scalar:
       type: number
       format: float
@@ -1503,13 +1503,13 @@ components:
       properties:
         alignSelf:
           allOf:
-          - $ref: '#/components/schemas/AlignSelf'
+          - $ref: '#/components/schemas/AlignItems'
           nullable: true
         horizontalSizingMode:
           $ref: '#/components/schemas/LayoutElementSizingMode'
         justifySelf:
           allOf:
-          - $ref: '#/components/schemas/JustifySelf'
+          - $ref: '#/components/schemas/AlignItems'
           nullable: true
         margin:
           $ref: '#/components/schemas/Rect'
@@ -1530,7 +1530,7 @@ components:
           $ref: '#/components/schemas/LayoutParentSizingMode'
         justifyContent:
           allOf:
-          - $ref: '#/components/schemas/JustifyContent'
+          - $ref: '#/components/schemas/AlignContent'
           nullable: true
         padding:
           $ref: '#/components/schemas/Rect'

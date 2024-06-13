@@ -9,6 +9,11 @@ use dyn_comp_bundles::{
 };
 use dyn_utils::properties::size::Size;
 
+// Note: Cannot be inlined because of Utoipa lack of renaming Schema references
+// https://github.com/juhaku/utoipa/issues/894#issuecomment-2164362189
+#[cfg(feature = "lua_scripts")]
+use dyn_comp_bundles::LuaScriptWithId;
+
 /// DTIF (Design Tree Interchange Format) utilizes a flat structure for easy readability
 /// and efficient access & manipulation of design elements (Nodes, Paints, ..).
 /// https://softwareengineering.stackexchange.com/questions/350623/flat-or-nested-json-for-hierarchal-data
@@ -41,7 +46,7 @@ pub struct DtifComposition {
     /// A list of scripts.
     #[cfg(feature = "lua_scripts")]
     #[cfg_attr(feature = "specta_support", serde(default))]
-    pub scripts: Vec<dyn_comp_bundles::LuaScriptWithId>,
+    pub scripts: Vec<LuaScriptWithId>,
 }
 
 impl DtifComposition {

@@ -621,6 +621,13 @@ pub struct UpdateEntityChildrenInputEvent {
 // Script
 // =============================================================================
 
+// Note: Cannot be inlined because of Utoipa lack of renaming Schema references
+// https://github.com/juhaku/utoipa/issues/894#issuecomment-2164362189
+#[cfg(feature = "lua_scripts")]
+use crate::{reference_id::ReferenceId, LuaScriptWithId};
+#[cfg(feature = "lua_scripts")]
+use dyn_comp_lua::tables::args_table::LuaScriptArgsMap;
+
 #[derive(Event, Debug, Clone)]
 #[cfg_attr(
     feature = "specta_support",
@@ -630,7 +637,7 @@ pub struct UpdateEntityChildrenInputEvent {
 #[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 #[cfg(feature = "lua_scripts")]
 pub struct RegisterLuaScriptInputEvent {
-    pub script: crate::LuaScriptWithId,
+    pub script: LuaScriptWithId,
 }
 
 #[derive(Event, Debug, Clone)]
@@ -642,6 +649,7 @@ pub struct RegisterLuaScriptInputEvent {
 #[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 #[cfg(feature = "lua_scripts")]
 pub struct ExecuteLuaScriptInputEvent {
-    pub id: crate::reference_id::ReferenceId,
-    pub args_map: dyn_comp_lua::tables::args_table::LuaScriptArgsMap,
+    pub id: ReferenceId,
+    #[cfg_attr(feature = "utoipa_support", schema(value_type = Object))]
+    pub args_map: LuaScriptArgsMap,
 }
