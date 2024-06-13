@@ -21,6 +21,7 @@ specta_support = [
 utoipa_support = [
     "dep:utoipa",
     "dyn-comp-asset/utoipa_support",
+    "dyn-comp-lua/utoipa_support",
     "dyn-attributed-string/utoipa_support",
     "dyn-utils/utoipa_support",
 ]

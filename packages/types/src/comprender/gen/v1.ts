@@ -5,8 +5,14 @@
 
 
 export interface paths {
-  "/v1/render": {
-    post: operations["render_composition"];
+  "/health": {
+    get: operations["get_health_handler"];
+  };
+  "/v1/comp/render": {
+    post: operations["post_v1_comp_render_handler"];
+  };
+  "/v1/svg/simplify": {
+    post: operations["post_v1_svg_simplify"];
   };
 }
 
@@ -280,6 +286,8 @@ export interface components {
       argsMap: Record<string, never>;
       id: components["schemas"]["ReferenceId"];
     };
+    /** @enum {string} */
+    FileFormat: "png" | "svg" | "pdf" | "raw-svg";
     FillStyle: {
       blendMode?: components["schemas"]["BlendMode"];
       id?: components["schemas"]["ReferenceId"] | null;
@@ -382,6 +390,12 @@ export interface components {
       /** @enum {string} */
       type: "Radial";
     };
+    HealthDto: {
+      message: string;
+      status: components["schemas"]["HealthStatus"];
+    };
+    /** @enum {string} */
+    HealthStatus: "Up";
     /** @enum {string} */
     HorizontalTextAlignment: "Start" | "End" | "Left" | "Right" | "Center";
     ImageId: {
@@ -435,6 +449,9 @@ export interface components {
     };
     /** @enum {string} */
     LineWrap: "None" | "Word";
+    LuaScriptArgsMap: {
+      [key: string]: unknown;
+    };
     LuaScriptWithId: {
       id: components["schemas"]["ReferenceId"];
       source: string[];
@@ -791,28 +808,69 @@ export type external = Record<string, never>;
 
 export interface operations {
 
-  render_composition: {
-    parameters: {
-      path: {
-        format: string;
+  get_health_handler: {
+    responses: {
+      /** @description Server is up and running */
+      200: {
+        content: {
+          "application/json": components["schemas"]["HealthDto"];
+        };
       };
     };
-    requestBody?: {
+  };
+  post_v1_comp_render_handler: {
+    parameters: {
+      path: {
+        format: components["schemas"]["FileFormat"] | null;
+        scriptArgs: {
+          [key: string]: components["schemas"]["LuaScriptArgsMap"];
+        } | null;
+      };
+    };
+    requestBody: {
       content: {
-        "application/json": components["schemas"]["DtifComposition"] | null;
+        "application/json": components["schemas"]["DtifComposition"];
       };
     };
     responses: {
       /** @description Generation success */
       200: {
         content: {
-          "application/json": components["schemas"]["DtifComposition"];
+          "text/plain": string;
         };
       };
       /** @description Bad Request */
       400: {
         content: {
           "application/json": components["schemas"]["AppError"];
+        };
+      };
+    };
+  };
+  post_v1_svg_simplify: {
+    /** @description SVG input as string */
+    requestBody: {
+      content: {
+        "text/plain": string;
+      };
+    };
+    responses: {
+      /** @description Generated SVG */
+      200: {
+        content: {
+          "text/plain": string;
+        };
+      };
+      /** @description Invalid SVG input */
+      400: {
+        content: {
+          "text/plain": string;
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          "text/plain": string;
         };
       };
     };

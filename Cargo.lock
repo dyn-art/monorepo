@@ -968,6 +968,7 @@ dependencies = [
  "serde_json",
  "specta",
  "thiserror",
+ "utoipa",
 ]
 
 [[package]]
@@ -1035,8 +1036,10 @@ dependencies = [
  "dyn-comp-bundles",
  "dyn-comp-core",
  "dyn-comp-dtif",
+ "dyn-comp-lua",
  "dyn-comp-svg-builder",
  "dyn-utils",
+ "env_logger",
  "fontdb 0.18.0",
  "log",
  "reqwest",

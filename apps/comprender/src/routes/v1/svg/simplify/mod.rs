@@ -17,6 +17,7 @@ pub fn router() -> Router<AppState> {
 #[utoipa::path(
     post,
     path = "/v1/svg/simplify",
+    operation_id = "post_v1_svg_simplify",
     request_body(content = String, description = "SVG input as string"),
     responses(
         (status = 200, description = "Generated SVG", body = String),

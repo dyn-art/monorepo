@@ -16,21 +16,23 @@ pub struct HealthDto {
 
 #[derive(Serialize, utoipa::ToSchema)]
 pub enum HealthStatus {
-    Running,
+    Up,
+    // Down,
 }
 
 #[utoipa::path(
     get,
     path = "/health",
+    operation_id = "get_health_handler",
     responses(
-        (status = 200, description = "Success", body = HealthDto),
+        (status = 200, description = "Server is up and running", body = HealthDto),
     ),
 )]
 async fn handler(State(app_state): State<AppState>) -> impl IntoResponse {
     (
         StatusCode::OK,
         Json(HealthDto {
-            status: HealthStatus::Running,
+            status: HealthStatus::Up,
             message: format!(
                 "Server at version v{} is up and running!",
                 app_state.config.pkg_version

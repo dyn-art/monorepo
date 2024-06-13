@@ -35,17 +35,24 @@ dyn-comp-asset = { path = "../../crates/comp_asset", features = [
 ] }
 dyn-comp-core = { path = "../../crates/comp_core", features = [
     "specta_support",
+    "lua_scripts",
 ] }
 dyn-comp-dtif = { path = "../../crates/comp_dtif", features = [
     "specta_support",
     "utoipa_support",
+    "lua_scripts",
 ] }
 dyn-comp-bundles = { path = "../../crates/comp_bundles", features = [
     "specta_support",
     "utoipa_support",
+    "lua_scripts",
 ] }
 dyn-comp-svg-builder = { path = "../../crates/comp_svg_builder", features = [
     "specta_support",
+] }
+dyn-comp-lua = { path = "../../crates/comp_lua", features = [
+    "specta_support",
+    "utoipa_support",
 ] }
 dyn-utils = { path = "../../crates/utils", features = ["utoipa_support"] }
 dyn-attributed-string = { path = "../../crates/attributed_string", features = [
@@ -72,6 +79,7 @@ specta = { workspace = true }
 
 # Logging
 log = { workspace = true }
+env_logger = { workspace = true }
 
 # cli (feature)
 clap = { version = "4.5.1", features = ["derive"], optional = true }

@@ -1,30 +1,33 @@
 use crate::{
     environment::app_state::AppState,
     error::{
-        app_error::{AppError, ErrorCode},
-        extract::{extract_json_body, extract_query_params, AppJson, AppQuery},
+        app_error::{AppError, AppErrorOptions, ErrorCode},
+        extract::{extract_json_body, extract_query_params, AppJsonBody, AppQueryParams},
     },
 };
 use axum::{
     body::Body,
-    extract::Query,
     http::{header, StatusCode},
     response::Response,
-    Json,
 };
 use axum::{routing::post, Router};
 use bevy_app::App;
 use bevy_ecs::query::{With, Without};
 use dyn_comp_asset::asset::AssetContent;
-use dyn_comp_bundles::components::marker::Root;
+use dyn_comp_bundles::{
+    components::marker::Root,
+    events::{CoreInputEvent, ExecuteLuaScriptInputEvent},
+    reference_id::ReferenceId,
+};
 use dyn_comp_core::{resources::composition::CompositionRes, CompCorePlugin};
 use dyn_comp_dtif::DtifComposition;
+use dyn_comp_lua::tables::args_table::LuaScriptArgsMap;
 use dyn_comp_svg_builder::{
     events::SvgBuilderOutputEvent, svg::svg_bundle::SvgBundleVariant, CompSvgBuilderPlugin,
 };
 use resvg::usvg::Options;
 use serde::Deserialize;
-use std::sync::mpsc::channel;
+use std::{collections::HashMap, sync::mpsc::channel};
 use usvg::WriteOptions;
 
 pub fn router() -> Router<AppState> {
@@ -32,8 +35,10 @@ pub fn router() -> Router<AppState> {
 }
 
 #[derive(Deserialize, utoipa::IntoParams)]
+#[serde(rename_all = "camelCase")]
 struct QueryParams {
-    format: FileFormat,
+    format: Option<FileFormat>,
+    script_args: Option<HashMap<ReferenceId, LuaScriptArgsMap>>,
 }
 
 #[derive(Deserialize, utoipa::ToSchema)]
@@ -48,27 +53,58 @@ pub enum FileFormat {
 #[utoipa::path(
     post,
     path = "/v1/comp/render",
+    operation_id = "post_v1_comp_render_handler",
+    params(
+        QueryParams,
+    ),
+    request_body =DtifComposition,
     responses(
         (status = 200, description = "Generation success", body = String),
         (status = BAD_REQUEST, description = "Bad Request", body = AppError)
     ),
-    params(
-        QueryParams,
-    )
 )]
 #[axum::debug_handler]
 async fn handler(
-    maybe_query: AppQuery<QueryParams>,
-    maybe_body: AppJson<DtifComposition>,
+    app_query: AppQueryParams<QueryParams>,
+    app_body: AppJsonBody<DtifComposition>,
 ) -> Result<Response, AppError> {
-    let params = extract_query_params(maybe_query)?;
-    let mut body = extract_json_body(maybe_body)?;
+    let QueryParams {
+        format: maybe_format,
+        script_args: maybe_script_args,
+    } = extract_query_params(app_query)?;
+    let mut dtif = extract_json_body(app_body)?;
 
-    let _ = prepare_dtif_composition(&mut body).await;
-    let svg_string = build_svg_string(body)?;
+    log::info!("QueryParams: {:?}", maybe_script_args);
+
+    if let Some(script_args) = maybe_script_args {
+        for (id, args) in script_args {
+            println!(
+                "Event: {:?}",
+                CoreInputEvent::ExecuteLuaScript(ExecuteLuaScriptInputEvent {
+                    id: id.clone(),
+                    args_map: args.clone()
+                },)
+            );
+            dtif.events.push(CoreInputEvent::ExecuteLuaScript(
+                ExecuteLuaScriptInputEvent { id, args_map: args },
+            ))
+        }
+    }
+
+    prepare_dtif_composition(&mut dtif).await.map_err(|err| {
+        AppError::new_with_options(
+            StatusCode::INTERNAL_SERVER_ERROR,
+            ErrorCode::new("PREPARE_DTIF"),
+            AppErrorOptions {
+                description: Some(err.to_string()),
+                ..Default::default()
+            },
+        )
+    })?;
+    let svg_string = build_svg_string(dtif)?;
 
     // Determine response format from query parameter
-    match params.format {
+    match maybe_format.unwrap_or(FileFormat::Png) {
         FileFormat::Png => {
             let opts = Options::default();
 
@@ -156,8 +192,6 @@ fn build_svg_string(mut dtif: DtifComposition) -> Result<String, AppError> {
     ));
 
     dtif.send_into_world(&mut app.world);
-
-    // Update app once
     app.update();
 
     let mut result = String::new();

@@ -9,39 +9,89 @@ info:
     name: AGPL-3.0-or-later
   version: 1.0.0
 paths:
-  /v1/render:
+  /health:
+    get:
+      tags:
+      - crate::routes::health
+      operationId: get_health_handler
+      responses:
+        '200':
+          description: Server is up and running
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthDto'
+  /v1/comp/render:
     post:
       tags:
-      - crate::routes::v1::render::controller
-      operationId: render_composition
+      - crate::routes::v1::comp::render
+      operationId: post_v1_comp_render_handler
       parameters:
       - name: format
         in: path
         required: true
         schema:
-          type: string
+          allOf:
+          - $ref: '#/components/schemas/FileFormat'
+          nullable: true
+      - name: scriptArgs
+        in: path
+        required: true
+        schema:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/LuaScriptArgsMap'
+          nullable: true
       requestBody:
-        description: ''
         content:
           application/json:
             schema:
-              allOf:
-              - $ref: '#/components/schemas/DtifComposition'
-              nullable: true
-        required: false
+              $ref: '#/components/schemas/DtifComposition'
+        required: true
       responses:
         '200':
           description: Generation success
           content:
-            application/json:
+            text/plain:
               schema:
-                $ref: '#/components/schemas/DtifComposition'
+                type: string
         '400':
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AppError'
+  /v1/svg/simplify:
+    post:
+      tags:
+      - crate::routes::v1::svg::simplify
+      operationId: post_v1_svg_simplify
+      requestBody:
+        description: SVG input as string
+        content:
+          text/plain:
+            schema:
+              type: string
+        required: true
+      responses:
+        '200':
+          description: Generated SVG
+          content:
+            text/plain:
+              schema:
+                type: string
+        '400':
+          description: Invalid SVG input
+          content:
+            text/plain:
+              schema:
+                type: string
+        '500':
+          description: Internal server error
+          content:
+            text/plain:
+              schema:
+                type: string
 components:
   schemas:
     Abs:
@@ -772,6 +822,13 @@ components:
           type: object
         id:
           $ref: '#/components/schemas/ReferenceId'
+    FileFormat:
+      type: string
+      enum:
+      - png
+      - svg
+      - pdf
+      - raw-svg
     FillStyle:
       type: object
       required:
@@ -1003,6 +1060,20 @@ components:
             - Radial
       discriminator:
         propertyName: type
+    HealthDto:
+      type: object
+      required:
+      - status
+      - message
+      properties:
+        message:
+          type: string
+        status:
+          $ref: '#/components/schemas/HealthStatus'
+    HealthStatus:
+      type: string
+      enum:
+      - Up
     HorizontalTextAlignment:
       type: string
       enum:
@@ -1150,6 +1221,9 @@ components:
       enum:
       - None
       - Word
+    LuaScriptArgsMap:
+      type: object
+      additionalProperties: {}
     LuaScriptWithId:
       type: object
       required:

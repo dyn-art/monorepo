@@ -20,6 +20,7 @@ specta_support = [
 utoipa_support = [
     "dep:utoipa",
     "dyn-comp-bundles/utoipa_support",
+    "dyn-comp-lua/utoipa_support",
     "dyn-utils/utoipa_support",
 ]
 lua_scripts = ["dep:dyn-comp-lua"]

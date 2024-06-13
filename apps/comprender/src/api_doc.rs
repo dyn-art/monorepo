@@ -1,6 +1,8 @@
+use std::collections::HashMap;
+
 use crate::{
     error::app_error::{AppError, ErrorCode},
-    routes::health::{HealthDto, HealthStatus},
+    routes::{health::{HealthDto, HealthStatus}, v1::comp::render::FileFormat},
 };
 use dyn_attributed_string::{
     dyn_fonts_book::font::{
@@ -80,6 +82,8 @@ use utoipa::{OpenApi, ToSchema};
 
         schemas(HealthDto),
         schemas(HealthStatus),
+
+        schemas(FileFormat),
 
        // dyn_comp_dtif
 
@@ -216,6 +220,7 @@ use utoipa::{OpenApi, ToSchema};
         schemas(Size),
         schemas(Mat3),
         schemas(Entity),
+        schemas(LuaScriptArgsMap),
         schemas(Axes),
         schemas(Rect),
     )
@@ -250,6 +255,10 @@ struct Mat3(f32, f32, f32, f32, f32, f32, f32, f32, f32);
 #[derive(ToSchema)]
 #[allow(dead_code)]
 struct Entity(f32);
+
+#[derive(ToSchema)]
+#[allow(dead_code)]
+struct LuaScriptArgsMap(HashMap<String, serde_json::Value>);
 
 #[derive(ToSchema)]
 #[allow(dead_code)]

@@ -13,13 +13,13 @@ impl AppConfig {
     pub fn from_env() -> Result<Self, &'static str> {
         // Load .env file into environment
         match dotenv() {
-            Ok(path) => println!(
-                "⬜️ Loaded .env file from: {}",
+            Ok(path) => log::info!(
+                "🟩 Loaded .env file from: {}",
                 path.into_os_string()
                     .into_string()
                     .unwrap_or("unkown".to_string())
             ),
-            Err(_) => println!("🟨 No .env file found!"),
+            Err(_) => log::warn!("🟨 No .env file found!"),
         }
 
         // Load required environment variables into a struct

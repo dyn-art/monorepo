@@ -10,10 +10,10 @@ use axum::{
 
 use super::app_error::AppErrorOptions;
 
-pub type AppQuery<G> = Result<Query<G>, QueryRejection>;
+pub type AppQueryParams<G> = Result<Query<G>, QueryRejection>;
 
-pub fn extract_query_params<G>(app_query: AppQuery<G>) -> Result<G, AppError> {
-    match app_query {
+pub fn extract_query_params<G>(app_query_params: AppQueryParams<G>) -> Result<G, AppError> {
+    match app_query_params {
         Ok(Query(params)) => Ok(params),
         Err(err) => Err(AppError::new_with_options(
             StatusCode::BAD_REQUEST,
@@ -26,10 +26,10 @@ pub fn extract_query_params<G>(app_query: AppQuery<G>) -> Result<G, AppError> {
     }
 }
 
-pub type AppJson<G> = Result<Json<G>, JsonRejection>;
+pub type AppJsonBody<G> = Result<Json<G>, JsonRejection>;
 
-pub fn extract_json_body<G>(app_body: AppJson<G>) -> Result<G, AppError> {
-    match app_body {
+pub fn extract_json_body<G>(app_json_body: AppJsonBody<G>) -> Result<G, AppError> {
+    match app_json_body {
         Ok(Json(body)) => Ok(body),
         Err(err) => Err(AppError::new_with_options(
             StatusCode::BAD_REQUEST,

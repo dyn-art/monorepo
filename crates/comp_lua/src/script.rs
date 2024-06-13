@@ -7,6 +7,7 @@ use piccolo::{Lua, StaticError};
     derive(serde::Serialize, serde::Deserialize, specta::Type),
     serde(rename_all = "camelCase")
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub struct LuaScript {
     pub source: String,
 }
@@ -29,6 +30,7 @@ impl LuaScript {
     derive(serde::Serialize, serde::Deserialize, specta::Type),
     serde(tag = "type")
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub enum LuaScriptError {
     /// An error originating from within the Lua script.
     ///
