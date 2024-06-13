@@ -1,6 +1,6 @@
 use crate::{
-    core::utils::{extract_json_body, extract_query_params},
-    models::app_error::{AppError, ErrorCode},
+    core::de::{deserialize_json_body, deserialize_query_params},
+    error::app_error::{AppError, ErrorCode},
 };
 use axum::{
     body::Body,
@@ -9,6 +9,7 @@ use axum::{
     response::Response,
     Json,
 };
+use axum::{routing::post, Router};
 use bevy_app::App;
 use bevy_ecs::query::{With, Without};
 use dyn_comp_asset::asset::AssetContent;
@@ -23,30 +24,29 @@ use serde::Deserialize;
 use std::sync::mpsc::channel;
 use usvg::WriteOptions;
 
-#[derive(Deserialize, utoipa::IntoParams)]
-pub struct QueryParams {
-    format: String,
+pub fn routes() -> Router {
+    Router::new().route("/", post(handler))
 }
 
-pub async fn simplify_svg(body: String) -> Result<Response, AppError> {
-    let opts = Options::default();
+#[derive(Deserialize, utoipa::IntoParams)]
+struct QueryParams {
+    format: FileFormat,
+}
 
-    let tree = usvg::Tree::from_str(&body, &opts).unwrap();
-
-    Ok(Response::builder()
-        .status(StatusCode::OK)
-        .header(header::CONTENT_TYPE, "image/svg+xml")
-        .body(Body::from(
-            tree.to_string(&WriteOptions::default()).into_bytes(),
-        ))
-        .unwrap())
+#[derive(Deserialize, utoipa::ToSchema)]
+#[serde(rename_all = "kebab-case")]
+pub enum FileFormat {
+    Png,
+    Svg,
+    Pdf,
+    RawSvg,
 }
 
 #[utoipa::path(
     post,
-    path = "/v1/render",
+    path = "/v1/comp/render",
     responses(
-        (status = 200, description = "Generation success", body = DtifComposition),
+        (status = 200, description = "Generation success", body = String),
         (status = BAD_REQUEST, description = "Bad Request", body = AppError)
     ),
     params(
@@ -54,19 +54,19 @@ pub async fn simplify_svg(body: String) -> Result<Response, AppError> {
     )
 )]
 #[axum::debug_handler]
-pub async fn render_composition(
+async fn handler(
     maybe_query: Option<Query<QueryParams>>,
     maybe_body: Option<Json<DtifComposition>>,
 ) -> Result<Response, AppError> {
-    let params = extract_query_params(maybe_query)?;
-    let mut body = extract_json_body(maybe_body)?;
+    let params = deserialize_query_params(maybe_query)?;
+    let mut body = deserialize_json_body(maybe_body)?;
 
     let _ = prepare_dtif_composition(&mut body).await;
     let svg_string = build_svg_string(body)?;
 
     // Determine response format from query parameter
-    match params.format.as_str() {
-        "png" => {
+    match params.format {
+        FileFormat::Png => {
             let opts = Options::default();
 
             let tree = usvg::Tree::from_str(&svg_string, &opts).unwrap();
@@ -83,7 +83,7 @@ pub async fn render_composition(
                 .body(Body::from(png_data))
                 .unwrap())
         }
-        "svg" => {
+        FileFormat::Svg => {
             let opts = Options::default();
 
             let tree = usvg::Tree::from_str(&svg_string, &opts).unwrap();
@@ -96,12 +96,12 @@ pub async fn render_composition(
                 ))
                 .unwrap())
         }
-        "comp-svg" => Ok(Response::builder()
+        FileFormat::RawSvg => Ok(Response::builder()
             .status(StatusCode::OK)
             .header(header::CONTENT_TYPE, "image/svg+xml")
             .body(Body::from(svg_string.into_bytes()))
             .unwrap()),
-        "pdf" => {
+        FileFormat::Pdf => {
             let opts = Options::default();
             let tree = usvg::Tree::from_str(&svg_string, &opts).unwrap();
             let pdf_data = svg2pdf::to_pdf(
@@ -116,10 +116,6 @@ pub async fn render_composition(
                 .body(Body::from(pdf_data))
                 .unwrap())
         }
-        _ => Err(AppError::new(
-            StatusCode::BAD_REQUEST,
-            ErrorCode::new("INVALID_FORMAT"),
-        )),
     }
 }
 

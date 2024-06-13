@@ -1,6 +1,6 @@
-pub mod api_docs;
+pub mod api_doc;
 pub mod app;
 mod core;
 pub mod environment;
-mod models;
+mod error;
 mod routes;

@@ -1,11 +1,10 @@
-use std::collections::HashMap;
-
 use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
     Json,
 };
 use serde::Serialize;
+use std::collections::HashMap;
 use utoipa::ToSchema;
 
 #[derive(Debug, Serialize, ToSchema)]
@@ -53,7 +52,7 @@ impl AppError {
     }
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Default, Serialize)]
 pub struct AppErrorOptions {
     pub uri: Option<String>,
     pub description: Option<String>,

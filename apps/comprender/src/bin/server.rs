@@ -1,10 +1,10 @@
 use std::net::{Ipv4Addr, SocketAddr};
 
-use dyn_comprender::{app, environment::config::Config};
+use dyn_comprender::{app, environment::app_config::AppConfig};
 
 #[tokio::main]
 async fn main() {
-    let config = Config::new().expect("Failed to load configuration");
+    let config = AppConfig::new().expect("Failed to load configuration");
 
     // Run app with hyper, listening globally on specified port
     let addr = SocketAddr::from((Ipv4Addr::UNSPECIFIED, config.port));

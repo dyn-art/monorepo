@@ -1,21 +1,24 @@
-use axum::{routing::get, Router};
-
-use self::controller::health_checker_handler;
-
-pub mod controller;
+pub mod health;
 pub mod v1;
+
+use axum::{http::StatusCode, response::IntoResponse, routing::get, Json, Router};
 
 pub fn routes() -> Router {
     Router::new()
-        .route(
-            "/",
-            get(|| async {
-                format!(
-                    "dyn_comprender (v{}) is up and running!",
-                    env!("CARGO_PKG_VERSION")
-                )
-            }),
-        )
+        .route("/", get(handler))
         .nest("/v1", v1::routes())
-        .route("/health", get(health_checker_handler))
+        .nest("/health", health::routes())
+}
+
+async fn handler() -> impl IntoResponse {
+    (
+        StatusCode::OK,
+        Json(serde_json::json!({
+            "status": "Success",
+            "message": format!(
+                "dyn_comprender (v{}) is up and running!",
+                env!("CARGO_PKG_VERSION")
+            )
+        })),
+    )
 }

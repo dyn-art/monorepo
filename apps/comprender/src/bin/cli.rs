@@ -1,7 +1,7 @@
 #[cfg(feature = "cli")]
 mod cli {
     use clap::Parser;
-    use dyn_comprender::api_docs::ApiDocs;
+    use dyn_comprender::api_doc::ApiDocs;
     use std::fs;
 
     #[derive(Parser, Debug)]

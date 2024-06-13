@@ -1,4 +1,7 @@
-use crate::models::app_error::{AppError, ErrorCode};
+use crate::{
+    error::app_error::{AppError, ErrorCode},
+    routes::health::{HealthDto, HealthStatus},
+};
 use dyn_attributed_string::{
     dyn_fonts_book::font::{
         info::{FontFamily, FontInfo},
@@ -65,11 +68,18 @@ use utoipa::{OpenApi, ToSchema};
         contact(name = "dyn.art", url = "https://dyn.art/?source=apidocs"),
         version = "1.0.0"
     ),
-    paths(crate::routes::v1::render::controller::render_composition),
+    paths(
+        crate::routes::health::handler,
+        crate::routes::v1::comp::render::handler, 
+        crate::routes::v1::svg::simplify::handler, 
+    ),
     components(
         // App Error
         schemas(AppError),
         schemas(ErrorCode),
+
+        schemas(HealthDto),
+        schemas(HealthStatus),
 
        // dyn_comp_dtif
 
