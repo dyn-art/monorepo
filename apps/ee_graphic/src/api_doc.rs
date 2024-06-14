@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use crate::{
     error::app_error::{AppError, ErrorCode},
-    routes::{health::{HealthDto, HealthStatus}, v1::cnv::render::FileFormat},
+    routes::{health::{HealthDto, HealthStatus}, v1::arb::render::FileFormat},
 };
 use dyn_attributed_string::{
     dyn_fonts_book::font::{
@@ -11,8 +11,8 @@ use dyn_attributed_string::{
     },
     layout::{HorizontalTextAlignment, LineWrap, TextSizingMode, VerticalTextAlignment},
 };
-use dyn_cnv_asset::asset::{Asset, AssetContent, AssetContentType};
-use dyn_cnv_bundles::{
+use dyn_arb_asset::asset::{Asset, AssetContent, AssetContentType};
+use dyn_arb_bundles::{
     components::{
         mixins::{
             AbsoluteLayoutElement, BlendMode, Constraint, Constraints, LayoutElement,
@@ -24,8 +24,8 @@ use dyn_cnv_bundles::{
     events::{
         CoreInputEvent, CreateAssetInputEvent, CreateNodeInputEvent, CreatePaintInputEvent,
         DeleteEntityInputEvent, ExecuteLuaScriptInputEvent, FocusRootNodesInputEvent,
-        MoveEntityInputEvent, RegisterLuaScriptInputEvent, UpdateCanvasSizeInputEvent,
-        UpdateCanvasViewportInputEvent, UpdateDropShadowStyleInputEvent,
+        MoveEntityInputEvent, RegisterLuaScriptInputEvent, UpdateArtboardSizeInputEvent,
+        UpdateArtboardViewportInputEvent, UpdateDropShadowStyleInputEvent,
         UpdateEllipseNodeInputEvent, UpdateEntityBlendModeInputEvent,
         UpdateEntityChildrenInputEvent, UpdateEntityCornerRadiiInputEvent,
         UpdateEntityOpacityInputEvent, UpdateEntityRotationInputEvent, UpdateEntitySizeInputEvent,
@@ -35,7 +35,7 @@ use dyn_cnv_bundles::{
         UpdateStarNodeInputEvent, UpdateStorkeStyleInputEvent, UpdateTextNodeInputEvent,
     },
     properties::{
-        AlignContent, AlignItems, AlignSelf, CnvVersion, FlexDirection, JustifyContent,
+        AlignContent, AlignItems, AlignSelf, ArbVersion, FlexDirection, JustifyContent,
         JustifyItems, JustifySelf, TextAttributeInterval, TextAttributes, Viewport,
     },
     reference_id::{ReferenceId, ReferenceIdOrEntity, ReferenceIdOrImageId},
@@ -43,7 +43,7 @@ use dyn_cnv_bundles::{
     LuaScriptWithId, Node, Paint, PolygonNode, RectangleNode, SolidPaint, StarNode, StrokeStyle,
     Style, TextNode, VectorNode,
 };
-use dyn_cnv_dtif::DtifCanvas;
+use dyn_arb_dtif::DtifArtboard;
 use dyn_utils::{
     properties::{color::Color, corner_radii::CornerRadii, opacity::Opacity},
     units::{
@@ -65,14 +65,14 @@ use utoipa::{OpenApi, ToSchema};
 #[derive(OpenApi)]
 #[openapi(
     info(
-        title = "Canvas Render API",
+        title = "Artboard Render API",
         description = "todo",
         contact(name = "dyn.art", url = "https://dyn.art/?source=apidocs"),
         version = "1.0.0"
     ),
     paths(
         crate::routes::health::handler,
-        crate::routes::v1::cnv::render::handler, 
+        crate::routes::v1::arb::render::handler, 
         crate::routes::v1::svg::simplify::handler, 
     ),
     components(
@@ -85,11 +85,11 @@ use utoipa::{OpenApi, ToSchema};
 
         schemas(FileFormat),
 
-       // dyn_cnv_dtif
+       // dyn_arb_dtif
 
-        schemas(DtifCanvas),
+        schemas(DtifArtboard),
 
-        // dyn_cnv_bundles
+        // dyn_arb_bundles
 
         // src/lib.rs
         schemas(Node),
@@ -112,7 +112,7 @@ use utoipa::{OpenApi, ToSchema};
         schemas(LuaScriptWithId),
 
         // src/properties.rs
-        schemas(CnvVersion),
+        schemas(ArbVersion),
         schemas(Viewport),
         schemas(TextAttributeInterval),
         schemas(TextAttributes),
@@ -131,8 +131,8 @@ use utoipa::{OpenApi, ToSchema};
 
         // src/events.rs
         schemas(CoreInputEvent),
-        schemas(UpdateCanvasSizeInputEvent),
-        schemas(UpdateCanvasViewportInputEvent),
+        schemas(UpdateArtboardSizeInputEvent),
+        schemas(UpdateArtboardViewportInputEvent),
         schemas(FocusRootNodesInputEvent),
         schemas(CreateNodeInputEvent),
         schemas(UpdateFrameNodeInputEvent),
@@ -178,7 +178,7 @@ use utoipa::{OpenApi, ToSchema};
         schemas(GradientVariant),
         schemas(GradientColorStop),
 
-        // dyn_cnv_asset
+        // dyn_arb_asset
 
          schemas(Asset),
          schemas(AssetContent),

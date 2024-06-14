@@ -1,8 +1,8 @@
 'use client';
 
 import React from 'react';
-import { isDtif, isMdtif } from '@dyn/cnv-dtif';
-import { Editor, FieldBasedEditor } from '@dyn/cnv-svg-editor';
+import { isDtif, isMdtif } from '@dyn/arb-dtif';
+import { Editor, FieldBasedEditor } from '@dyn/arb-svg-editor';
 import { Container, Skeleton } from '@dyn/ui';
 
 import { useDtifFromClipboard } from './_hooks';

@@ -1,4 +1,4 @@
-import type { CNV } from '@dyn/cnv-dtif';
+import type { ARB } from '@dyn/arb-dtif';
 
 import { ExportFontAssetException } from '../../exceptions';
 import type { TToTransformFontAsset } from '../../FigmaNodeTreeProcessor';
@@ -9,7 +9,7 @@ export async function transformFontAsset(
 	asset: TToTransformFontAsset,
 	nodeIds: SceneNode['id'][],
 	config: TTransformFontAssetConfig
-): Promise<CNV.AssetWithId> {
+): Promise<ARB.AssetWithId> {
 	const { export: exportConfig, resolveFontContent } = config;
 	const { info: fontInfo } = asset;
 
@@ -48,7 +48,7 @@ export interface TTransformFontAssetConfig {
 	resolveFontContent: TResolveFontContent;
 }
 
-export type TResolveFontContent = (fontInfo: CNV.FontInfo) => Promise<TFontContent>;
+export type TResolveFontContent = (fontInfo: ARB.FontInfo) => Promise<TFontContent>;
 
 type TFontContent =
 	| { type: 'Binary'; content: Uint8Array; contentType: TContentType }

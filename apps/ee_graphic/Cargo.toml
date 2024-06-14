@@ -24,33 +24,33 @@ path = "src/bin/cli.rs"
 default = []
 cli = ["dep:clap"]
 tracing = [
-    "dyn-cnv-core/tracing",
-    "dyn-cnv-svg-builder/tracing",
-    "dyn-cnv-dtif/tracing",
+    "dyn-arb-core/tracing",
+    "dyn-arb-svg-builder/tracing",
+    "dyn-arb-dtif/tracing",
 ]
 
 [dependencies]
-dyn-cnv-asset = { path = "../../crates/cnv_asset", features = [
+dyn-arb-asset = { path = "../../crates/arb_asset", features = [
     "utoipa_support",
 ] }
-dyn-cnv-core = { path = "../../crates/cnv_core", features = [
+dyn-arb-core = { path = "../../crates/arb_core", features = [
     "specta_support",
     "lua_scripts",
 ] }
-dyn-cnv-dtif = { path = "../../crates/cnv_dtif", features = [
-    "specta_support",
-    "utoipa_support",
-    "lua_scripts",
-] }
-dyn-cnv-bundles = { path = "../../crates/cnv_bundles", features = [
+dyn-arb-dtif = { path = "../../crates/arb_dtif", features = [
     "specta_support",
     "utoipa_support",
     "lua_scripts",
 ] }
-dyn-cnv-svg-builder = { path = "../../crates/cnv_svg_builder", features = [
+dyn-arb-bundles = { path = "../../crates/arb_bundles", features = [
+    "specta_support",
+    "utoipa_support",
+    "lua_scripts",
+] }
+dyn-arb-svg-builder = { path = "../../crates/arb_svg_builder", features = [
     "specta_support",
 ] }
-dyn-cnv-lua = { path = "../../crates/cnv_lua", features = [
+dyn-arb-lua = { path = "../../crates/arb_lua", features = [
     "specta_support",
     "utoipa_support",
 ] }

@@ -1,4 +1,4 @@
-import type { CNV } from '@dyn/cnv-dtif';
+import type { ARB } from '@dyn/arb-dtif';
 
 import { UnsupportedFigmaNodeException } from '../../exceptions';
 import type { TToTransformShapeNode } from '../../FigmaNodeTreeProcessor';
@@ -10,7 +10,7 @@ import { transformVectorNode } from './transform-vector-node';
 
 export async function transformShapeNode(
 	toTransformNode: TToTransformShapeNode
-): Promise<CNV.Node> {
+): Promise<ARB.Node> {
 	switch (toTransformNode.node.type) {
 		case 'RECTANGLE':
 			return transformRectangleNode(toTransformNode.node, {

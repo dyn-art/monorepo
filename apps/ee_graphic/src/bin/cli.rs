@@ -5,7 +5,7 @@ mod cli {
     use std::fs;
 
     #[derive(Parser, Debug)]
-    #[clap(name = "Canvas Render CLI")]
+    #[clap(name = "Artboard Render CLI")]
     struct Cli {
         #[clap(subcommand)]
         pub cmd: SubCommand,

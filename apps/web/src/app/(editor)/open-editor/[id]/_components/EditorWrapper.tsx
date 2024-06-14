@@ -2,8 +2,8 @@
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
-import { isDtif, isMdtif, type CNV, type TMdtifCanvas } from '@dyn/cnv-dtif';
-import { Editor, FieldBasedEditor } from '@dyn/cnv-svg-editor';
+import { isDtif, isMdtif, type ARB, type TMdtifArtboard } from '@dyn/arb-dtif';
+import { Editor, FieldBasedEditor } from '@dyn/arb-svg-editor';
 import { Container } from '@dyn/ui';
 
 const queryClient = new QueryClient();
@@ -35,5 +35,5 @@ export const EditorWrapper: React.FC<TProps> = (props) => {
 };
 
 interface TProps {
-	dtif: CNV.DtifCanvas | TMdtifCanvas;
+	dtif: ARB.DtifArtboard | TMdtifArtboard;
 }

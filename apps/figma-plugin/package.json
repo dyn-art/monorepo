@@ -27,8 +27,8 @@
 	},
 	"homepage": "https://dyn.art/?source=package-json",
 	"dependencies": {
-		"@dyn/cnv-svg-builder": "workspace:*",
-		"@dyn/cnv-svg-editor": "workspace:*",
+		"@dyn/arb-svg-builder": "workspace:*",
+		"@dyn/arb-svg-editor": "workspace:*",
 		"@dyn/figma-to-dtif": "workspace:*",
 		"@dyn/ui": "workspace:*",
 		"@ibg/utils": "^0.0.6",

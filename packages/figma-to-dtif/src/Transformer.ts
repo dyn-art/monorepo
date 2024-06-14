@@ -1,5 +1,5 @@
 import { ContinuousId, sleep } from '@ibg/utils';
-import type { CNV } from '@dyn/cnv-dtif';
+import type { ARB } from '@dyn/arb-dtif';
 
 import { FailedToResolveRootNodeException } from './exceptions';
 import {
@@ -24,7 +24,7 @@ export class Transformer {
 	private _nodesFailedToTransform: TToTransformNode[] = [];
 
 	// DTIF Nodes
-	public readonly nodes: CNV.Node[] = [];
+	public readonly nodes: ARB.Node[] = [];
 	private _rootNodeId: string;
 
 	// Figma Paints
@@ -32,14 +32,14 @@ export class Transformer {
 	private _paintsFailedToTransform: TToTransformPaint[] = [];
 
 	// DTIF Paints
-	public readonly paints: CNV.Paint[] = [];
+	public readonly paints: ARB.Paint[] = [];
 
 	// Assets
 	private _toTransformAssets: TToTransformAsset[] = [];
 	private _assetsFailedToTransform: TToTransformAsset[] = [];
 
 	// DTIF Assets
-	public readonly assets: CNV.AssetWithId[] = [];
+	public readonly assets: ARB.AssetWithId[] = [];
 
 	// Callbacks
 	private _onTransformStatusUpdate: TOnTransformStatusUpdate | null = null;
@@ -50,7 +50,7 @@ export class Transformer {
 		this._onTransformStatusUpdate = onTransformStatusUpdate;
 	}
 
-	public async transform(config: TTransformConfig): Promise<CNV.DtifCanvas> {
+	public async transform(config: TTransformConfig): Promise<ARB.DtifArtboard> {
 		ContinuousId.ZERO;
 		const nodeConfig: TTransformNodeConfig = {
 			includeInvisible: true,
@@ -100,7 +100,7 @@ export class Transformer {
 
 		// Construct canvas
 		await this.onTransformStatusUpdate({ type: ETransformStatus.CONSTRUCTING_CANVAS });
-		const canvas: CNV.DtifCanvas = {
+		const canvas: ARB.DtifArtboard = {
 			version: 'V000001',
 			size: [this._toTransformRootNode.width, this._toTransformRootNode.height],
 			nodes: this.nodes,
@@ -145,7 +145,7 @@ export class Transformer {
 		}
 	}
 
-	public insertNode(id: number, node: CNV.Node): void {
+	public insertNode(id: number, node: ARB.Node): void {
 		node.id = `n${id}`;
 		this.nodes.push(node);
 	}
@@ -167,7 +167,7 @@ export class Transformer {
 		}
 	}
 
-	public insertPaint(id: number, paint: CNV.Paint): void {
+	public insertPaint(id: number, paint: ARB.Paint): void {
 		paint.id = `p${id}`;
 		this.paints.push(paint);
 	}
@@ -189,7 +189,7 @@ export class Transformer {
 		}
 	}
 
-	public insertAsset(id: number, asset: CNV.AssetWithId): void {
+	public insertAsset(id: number, asset: ARB.AssetWithId): void {
 		asset.id = `a${id}`;
 		this.assets.push(asset);
 	}

@@ -1,6 +1,6 @@
-import type { CNV } from '@dyn/cnv-dtif';
+import type { ARB } from '@dyn/arb-dtif';
 
-export function mapFigmaBlendModeToDtif(figmaBlendMode?: BlendMode): CNV.BlendMode {
+export function mapFigmaBlendModeToDtif(figmaBlendMode?: BlendMode): ARB.BlendMode {
 	switch (figmaBlendMode) {
 		case 'NORMAL':
 			return 'Normal';

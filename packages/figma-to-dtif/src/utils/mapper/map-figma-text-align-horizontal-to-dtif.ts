@@ -1,8 +1,8 @@
-import type { CNV } from '@dyn/cnv-dtif';
+import type { ARB } from '@dyn/arb-dtif';
 
 export function mapFigmaTextAlignHorizontalToDtif(
 	align: TextNode['textAlignHorizontal']
-): CNV.HorizontalTextAlignment {
+): ARB.HorizontalTextAlignment {
 	switch (align) {
 		case 'LEFT':
 			return 'Left';

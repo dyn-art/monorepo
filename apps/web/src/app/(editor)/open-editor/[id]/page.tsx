@@ -1,5 +1,5 @@
 import React from 'react';
-import { isDtif, isMdtif, prepareDtif } from '@dyn/cnv-dtif';
+import { isDtif, isMdtif, prepareDtif } from '@dyn/arb-dtif';
 
 import { EditorWrapper } from './_components';
 import { getStaticDtif } from './_helper';

@@ -11,17 +11,17 @@ use axum::{
 use axum::{routing::post, Router};
 use bevy_app::App;
 use bevy_ecs::query::{With, Without};
-use dyn_cnv_asset::asset::AssetContent;
-use dyn_cnv_bundles::{
+use dyn_arb_asset::asset::AssetContent;
+use dyn_arb_bundles::{
     components::marker::Root,
     events::{CoreInputEvent, ExecuteLuaScriptInputEvent},
     reference_id::ReferenceId,
 };
-use dyn_cnv_core::{resources::canvas::CanvasRes, CnvCorePlugin};
-use dyn_cnv_dtif::DtifCanvas;
-use dyn_cnv_lua::tables::args_table::LuaScriptArgsMap;
-use dyn_cnv_svg_builder::{
-    events::SvgBuilderOutputEvent, svg::svg_bundle::SvgBundleVariant, CnvSvgBuilderPlugin,
+use dyn_arb_core::{resources::canvas::ArtboardRes, ArbCorePlugin};
+use dyn_arb_dtif::DtifArtboard;
+use dyn_arb_lua::tables::args_table::LuaScriptArgsMap;
+use dyn_arb_svg_builder::{
+    events::SvgBuilderOutputEvent, svg::svg_bundle::SvgBundleVariant, ArbSvgBuilderPlugin,
 };
 use resvg::usvg::Options;
 use serde::Deserialize;
@@ -51,12 +51,12 @@ pub enum FileFormat {
 
 #[utoipa::path(
     post,
-    path = "/v1/cnv/render",
-    operation_id = "post_v1_cnv_render_handler",
+    path = "/v1/arb/render",
+    operation_id = "post_v1_arb_render_handler",
     params(
         QueryParams,
     ),
-    request_body =DtifCanvas,
+    request_body =DtifArtboard,
     responses(
         (status = 200, description = "Generation success", body = String),
         (status = BAD_REQUEST, description = "Bad Request", body = AppError)
@@ -65,7 +65,7 @@ pub enum FileFormat {
 #[axum::debug_handler]
 async fn handler(
     app_query: AppQuery<QueryParams>,
-    app_body: AppJson<DtifCanvas>,
+    app_body: AppJson<DtifArtboard>,
 ) -> Result<Response, AppError> {
     let QueryParams {
         format: maybe_format,
@@ -151,7 +151,7 @@ async fn handler(
     }
 }
 
-async fn prepare_dtif_canvas(dtif_canvas: &mut DtifCanvas) -> Result<(), reqwest::Error> {
+async fn prepare_dtif_canvas(dtif_canvas: &mut DtifArtboard) -> Result<(), reqwest::Error> {
     for asset in dtif_canvas.assets.iter_mut() {
         let mut maybe_content = None;
         if let AssetContent::Url { url } = &asset.content {
@@ -165,19 +165,19 @@ async fn prepare_dtif_canvas(dtif_canvas: &mut DtifCanvas) -> Result<(), reqwest
     return Ok(());
 }
 
-fn build_svg_string(mut dtif: DtifCanvas) -> Result<String, AppError> {
+fn build_svg_string(mut dtif: DtifArtboard) -> Result<String, AppError> {
     let mut app = App::new();
 
     let (svg_builder_output_event_sender, _) = channel::<SvgBuilderOutputEvent>();
 
     // Register plugins
     app.add_plugins((
-        CnvCorePlugin {
+        ArbCorePlugin {
             version: dtif.version,
             size: dtif.size,
             viewport: dtif.viewport,
         },
-        CnvSvgBuilderPlugin {
+        ArbSvgBuilderPlugin {
             output_event_sender: svg_builder_output_event_sender,
         },
     ));
@@ -186,16 +186,19 @@ fn build_svg_string(mut dtif: DtifCanvas) -> Result<String, AppError> {
     app.update();
 
     let mut result = String::new();
-    let cnv_res = app.world.get_resource::<CanvasRes>().ok_or(AppError::new(
-        StatusCode::INTERNAL_SERVER_ERROR,
-        ErrorCode::new("CANVAS_RES_NOT_FOUND"),
-    ))?;
+    let arb_res = app
+        .world
+        .get_resource::<ArtboardRes>()
+        .ok_or(AppError::new(
+            StatusCode::INTERNAL_SERVER_ERROR,
+            ErrorCode::new("CANVAS_RES_NOT_FOUND"),
+        ))?;
 
     // Open SVG tag
     result.push_str(&format!(
         "<svg width=\"{}\" height=\"{}\" xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\">",
-        cnv_res.size.width(),
-        cnv_res.size.height()
+        arb_res.size.width(),
+        arb_res.size.height()
     ));
 
     let mut system_state: bevy_ecs::system::SystemState<(

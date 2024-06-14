@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  title: Canvas Render API
+  title: Artboard Render API
   description: todo
   contact:
     name: dyn.art
@@ -12,7 +12,7 @@ paths:
   /health:
     get:
       tags:
-      - crate::routes::health
+        - crate::routes::health
       operationId: get_health_handler
       responses:
         '200':
@@ -21,32 +21,32 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HealthDto'
-  /v1/cnv/render:
+  /v1/arb/render:
     post:
       tags:
-      - crate::routes::v1::cnv::render
-      operationId: post_v1_cnv_render_handler
+        - crate::routes::v1::arb::render
+      operationId: post_v1_arb_render_handler
       parameters:
-      - name: format
-        in: path
-        required: true
-        schema:
-          allOf:
-          - $ref: '#/components/schemas/FileFormat'
-          nullable: true
-      - name: scriptArgs
-        in: path
-        required: true
-        schema:
-          type: object
-          additionalProperties:
-            $ref: '#/components/schemas/LuaScriptArgsMap'
-          nullable: true
+        - name: format
+          in: path
+          required: true
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/FileFormat'
+            nullable: true
+        - name: scriptArgs
+          in: path
+          required: true
+          schema:
+            type: object
+            additionalProperties:
+              $ref: '#/components/schemas/LuaScriptArgsMap'
+            nullable: true
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/DtifCanvas'
+              $ref: '#/components/schemas/DtifArtboard'
         required: true
       responses:
         '200':
@@ -64,7 +64,7 @@ paths:
   /v1/svg/simplify:
     post:
       tags:
-      - crate::routes::v1::svg::simplify
+        - crate::routes::v1::svg::simplify
       operationId: post_v1_svg_simplify
       requestBody:
         description: SVG input as string
@@ -99,7 +99,7 @@ components:
     AbsoluteLayoutElement:
       type: object
       required:
-      - constraints
+        - constraints
       properties:
         constraints:
           $ref: '#/components/schemas/Constraints'
@@ -112,15 +112,15 @@ components:
 
         [MDN](https://developer.mozilla.org/en-US/docs/Web/CSS/align-content)
       enum:
-      - Start
-      - End
-      - FlexStart
-      - FlexEnd
-      - Center
-      - Stretch
-      - SpaceBetween
-      - SpaceEvenly
-      - SpaceAround
+        - Start
+        - End
+        - FlexStart
+        - FlexEnd
+        - Center
+        - Stretch
+        - SpaceBetween
+        - SpaceEvenly
+        - SpaceAround
     AlignItems:
       type: string
       description: |-
@@ -130,20 +130,20 @@ components:
 
         [MDN](https://developer.mozilla.org/en-US/docs/Web/CSS/align-items)
       enum:
-      - Start
-      - End
-      - FlexStart
-      - FlexEnd
-      - Center
-      - Baseline
-      - Stretch
+        - Start
+        - End
+        - FlexStart
+        - FlexEnd
+        - Center
+        - Baseline
+        - Stretch
     Angle:
       $ref: '#/components/schemas/Scalar'
     AppError:
       type: object
       required:
-      - status
-      - code
+        - status
+        - code
       properties:
         additionalErrors:
           type: array
@@ -171,8 +171,8 @@ components:
     Asset:
       type: object
       required:
-      - content
-      - contentType
+        - content
+        - contentType
       properties:
         content:
           $ref: '#/components/schemas/AssetContent'
@@ -180,92 +180,92 @@ components:
           $ref: '#/components/schemas/AssetContentType'
     AssetContent:
       oneOf:
-      - type: object
-        description: Content stored as binary data.
-        required:
-        - content
-        - type
-        properties:
-          content:
-            type: string
-            format: binary
-          type:
-            type: string
-            enum:
-            - Binary
-      - type: object
-        description: Content referenced by a URL.
-        required:
-        - url
-        - type
-        properties:
-          type:
-            type: string
-            enum:
-            - Url
-          url:
-            type: string
+        - type: object
+          description: Content stored as binary data.
+          required:
+            - content
+            - type
+          properties:
+            content:
+              type: string
+              format: binary
+            type:
+              type: string
+              enum:
+                - Binary
+        - type: object
+          description: Content referenced by a URL.
+          required:
+            - url
+            - type
+          properties:
+            type:
+              type: string
+              enum:
+                - Url
+            url:
+              type: string
       discriminator:
         propertyName: type
     AssetContentType:
       oneOf:
-      - type: object
-        required:
-        - type
-        properties:
-          type:
-            type: string
-            enum:
-            - Unknown
-      - type: object
-        required:
-        - type
-        properties:
-          type:
-            type: string
-            enum:
-            - Jpeg
-      - type: object
-        required:
-        - type
-        properties:
-          type:
-            type: string
-            enum:
-            - Png
-      - type: object
-        required:
-        - width
-        - height
-        - type
-        properties:
-          height:
-            type: integer
-            format: int32
-            minimum: 0
-          type:
-            type: string
-            enum:
-            - Svg
-          width:
-            type: integer
-            format: int32
-            minimum: 0
-      - type: object
-        required:
-        - type
-        properties:
-          type:
-            type: string
-            enum:
-            - Ttf
+        - type: object
+          required:
+            - type
+          properties:
+            type:
+              type: string
+              enum:
+                - Unknown
+        - type: object
+          required:
+            - type
+          properties:
+            type:
+              type: string
+              enum:
+                - Jpeg
+        - type: object
+          required:
+            - type
+          properties:
+            type:
+              type: string
+              enum:
+                - Png
+        - type: object
+          required:
+            - width
+            - height
+            - type
+          properties:
+            height:
+              type: integer
+              format: int32
+              minimum: 0
+            type:
+              type: string
+              enum:
+                - Svg
+            width:
+              type: integer
+              format: int32
+              minimum: 0
+        - type: object
+          required:
+            - type
+          properties:
+            type:
+              type: string
+              enum:
+                - Ttf
       discriminator:
         propertyName: type
     AssetWithId:
       type: object
       required:
-      - content
-      - contentType
+        - content
+        - contentType
       properties:
         content:
           $ref: '#/components/schemas/AssetContent'
@@ -273,47 +273,47 @@ components:
           $ref: '#/components/schemas/AssetContentType'
         id:
           allOf:
-          - $ref: '#/components/schemas/ReferenceId'
+            - $ref: '#/components/schemas/ReferenceId'
           nullable: true
     AutoLength:
       oneOf:
-      - type: object
-        required:
-        - value
-        - type
-        properties:
-          type:
-            type: string
-            enum:
-            - Abs
-          value:
-            $ref: '#/components/schemas/Abs'
-      - type: object
-        required:
-        - value
-        - type
-        properties:
-          type:
-            type: string
-            enum:
-            - Ratio
-          value:
-            $ref: '#/components/schemas/Ratio'
-      - type: object
-        required:
-        - type
-        properties:
-          type:
-            type: string
-            enum:
-            - Auto
+        - type: object
+          required:
+            - value
+            - type
+          properties:
+            type:
+              type: string
+              enum:
+                - Abs
+            value:
+              $ref: '#/components/schemas/Abs'
+        - type: object
+          required:
+            - value
+            - type
+          properties:
+            type:
+              type: string
+              enum:
+                - Ratio
+            value:
+              $ref: '#/components/schemas/Ratio'
+        - type: object
+          required:
+            - type
+          properties:
+            type:
+              type: string
+              enum:
+                - Auto
       discriminator:
         propertyName: type
     Axes:
       type: object
       required:
-      - x
-      - y
+        - x
+        - y
       properties:
         x:
           type: number
@@ -324,22 +324,22 @@ components:
     BlendMode:
       type: string
       enum:
-      - Normal
-      - Multiply
-      - Screen
-      - Overlay
-      - Darken
-      - Lighten
-      - ColorDodge
-      - ColorBurn
-      - HardLight
-      - SoftLight
-      - Difference
-      - Exclusion
-      - Hue
-      - Saturation
-      - Color
-      - Luminosity
+        - Normal
+        - Multiply
+        - Screen
+        - Overlay
+        - Darken
+        - Lighten
+        - ColorDodge
+        - ColorBurn
+        - HardLight
+        - SoftLight
+        - Difference
+        - Exclusion
+        - Hue
+        - Saturation
+        - Color
+        - Luminosity
     Color:
       type: array
       items:
@@ -349,23 +349,23 @@ components:
       description: ''
       maxItems: 3
       minItems: 3
-    CnvVersion:
+    ArbVersion:
       type: string
       enum:
-      - V000001
+        - V000001
     Constraint:
       type: string
       enum:
-      - Start
-      - Center
-      - End
-      - Stretch
-      - Scale
+        - Start
+        - Center
+        - End
+        - Stretch
+        - Scale
     Constraints:
       type: object
       required:
-      - horizontal
-      - vertical
+        - horizontal
+        - vertical
       properties:
         horizontal:
           $ref: '#/components/schemas/Constraint'
@@ -373,296 +373,296 @@ components:
           $ref: '#/components/schemas/Constraint'
     CoreInputEvent:
       oneOf:
-      - allOf:
-        - $ref: '#/components/schemas/UpdateCanvasSizeInputEvent'
-        - type: object
-          required:
-          - type
-          properties:
-            type:
-              type: string
-              enum:
-              - UpdateCanvasSize
-      - allOf:
-        - $ref: '#/components/schemas/UpdateCanvasViewportInputEvent'
-        - type: object
-          required:
-          - type
-          properties:
-            type:
-              type: string
-              enum:
-              - UpdateCanvasViewport
-      - allOf:
-        - $ref: '#/components/schemas/FocusRootNodesInputEvent'
-        - type: object
-          required:
-          - type
-          properties:
-            type:
-              type: string
-              enum:
-              - FocusRootNodes
-      - allOf:
-        - $ref: '#/components/schemas/CreateNodeInputEvent'
-        - type: object
-          required:
-          - type
-          properties:
-            type:
-              type: string
-              enum:
-              - CreateNode
-      - allOf:
-        - $ref: '#/components/schemas/UpdateFrameNodeInputEvent'
-        - type: object
-          required:
-          - type
-          properties:
-            type:
-              type: string
-              enum:
-              - UpdateFrameNode
-      - allOf:
-        - $ref: '#/components/schemas/UpdateEllipseNodeInputEvent'
-        - type: object
-          required:
-          - type
-          properties:
-            type:
-              type: string
-              enum:
-              - UpdateEllipseNode
-      - allOf:
-        - $ref: '#/components/schemas/UpdateStarNodeInputEvent'
-        - type: object
-          required:
-          - type
-          properties:
-            type:
-              type: string
-              enum:
-              - UpdateStarNode
-      - allOf:
-        - $ref: '#/components/schemas/UpdatePolygonNodeInputEvent'
-        - type: object
-          required:
-          - type
-          properties:
-            type:
-              type: string
-              enum:
-              - UpdatePolygonNode
-      - allOf:
-        - $ref: '#/components/schemas/UpdateTextNodeInputEvent'
-        - type: object
-          required:
-          - type
-          properties:
-            type:
-              type: string
-              enum:
-              - UpdateTextNode
-      - allOf:
-        - $ref: '#/components/schemas/UpdateFillStyleInputEvent'
-        - type: object
-          required:
-          - type
-          properties:
-            type:
-              type: string
-              enum:
-              - UpdateFillStyle
-      - allOf:
-        - $ref: '#/components/schemas/UpdateStorkeStyleInputEvent'
-        - type: object
-          required:
-          - type
-          properties:
-            type:
-              type: string
-              enum:
-              - UpdateStrokeStyle
-      - allOf:
-        - $ref: '#/components/schemas/UpdateDropShadowStyleInputEvent'
-        - type: object
-          required:
-          - type
-          properties:
-            type:
-              type: string
-              enum:
-              - UpdateDropShadowStyle
-      - allOf:
-        - $ref: '#/components/schemas/CreatePaintInputEvent'
-        - type: object
-          required:
-          - type
-          properties:
-            type:
-              type: string
-              enum:
-              - CreatePaint
-      - allOf:
-        - $ref: '#/components/schemas/UpdateSolidPaintInputEvent'
-        - type: object
-          required:
-          - type
-          properties:
-            type:
-              type: string
-              enum:
-              - UpdateSolidPaint
-      - allOf:
-        - $ref: '#/components/schemas/UpdateImagePaintInputEvent'
-        - type: object
-          required:
-          - type
-          properties:
-            type:
-              type: string
-              enum:
-              - UpdateImagePaint
-      - allOf:
-        - $ref: '#/components/schemas/UpdateGradientPaintInputEvent'
-        - type: object
-          required:
-          - type
-          properties:
-            type:
-              type: string
-              enum:
-              - UpdateGradientPaint
-      - allOf:
-        - $ref: '#/components/schemas/CreateAssetInputEvent'
-        - type: object
-          required:
-          - type
-          properties:
-            type:
-              type: string
-              enum:
-              - CreateAsset
-      - allOf:
-        - $ref: '#/components/schemas/DeleteEntityInputEvent'
-        - type: object
-          required:
-          - type
-          properties:
-            type:
-              type: string
-              enum:
-              - DeleteEntity
-      - allOf:
-        - $ref: '#/components/schemas/UpdateEntityTransformInputEvent'
-        - type: object
-          required:
-          - type
-          properties:
-            type:
-              type: string
-              enum:
-              - UpdateEntityTransform
-      - allOf:
-        - $ref: '#/components/schemas/UpdateEntitySizeInputEvent'
-        - type: object
-          required:
-          - type
-          properties:
-            type:
-              type: string
-              enum:
-              - UpdateEntitySize
-      - allOf:
-        - $ref: '#/components/schemas/MoveEntityInputEvent'
-        - type: object
-          required:
-          - type
-          properties:
-            type:
-              type: string
-              enum:
-              - MoveEntity
-      - allOf:
-        - $ref: '#/components/schemas/UpdateEntityRotationInputEvent'
-        - type: object
-          required:
-          - type
-          properties:
-            type:
-              type: string
-              enum:
-              - UpdateEntityRotation
-      - allOf:
-        - $ref: '#/components/schemas/UpdateEntityVisibilityInputEvent'
-        - type: object
-          required:
-          - type
-          properties:
-            type:
-              type: string
-              enum:
-              - UpdateEntityVisibility
-      - allOf:
-        - $ref: '#/components/schemas/UpdateEntityCornerRadiiInputEvent'
-        - type: object
-          required:
-          - type
-          properties:
-            type:
-              type: string
-              enum:
-              - UpdateEntityCornerRadii
-      - allOf:
-        - $ref: '#/components/schemas/UpdateEntityBlendModeInputEvent'
-        - type: object
-          required:
-          - type
-          properties:
-            type:
-              type: string
-              enum:
-              - UpdateEntityBlendMode
-      - allOf:
-        - $ref: '#/components/schemas/UpdateEntityOpacityInputEvent'
-        - type: object
-          required:
-          - type
-          properties:
-            type:
-              type: string
-              enum:
-              - UpdateEntityOpacity
-      - allOf:
-        - $ref: '#/components/schemas/UpdateEntityChildrenInputEvent'
-        - type: object
-          required:
-          - type
-          properties:
-            type:
-              type: string
-              enum:
-              - UpdateEntityChildren
-      - allOf:
-        - $ref: '#/components/schemas/RegisterLuaScriptInputEvent'
-        - type: object
-          required:
-          - type
-          properties:
-            type:
-              type: string
-              enum:
-              - RegisterLuaScript
-      - allOf:
-        - $ref: '#/components/schemas/ExecuteLuaScriptInputEvent'
-        - type: object
-          required:
-          - type
-          properties:
-            type:
-              type: string
-              enum:
-              - ExecuteLuaScript
+        - allOf:
+            - $ref: '#/components/schemas/UpdateArtboardSizeInputEvent'
+            - type: object
+              required:
+                - type
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - UpdateArtboardSize
+        - allOf:
+            - $ref: '#/components/schemas/UpdateArtboardViewportInputEvent'
+            - type: object
+              required:
+                - type
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - UpdateArtboardViewport
+        - allOf:
+            - $ref: '#/components/schemas/FocusRootNodesInputEvent'
+            - type: object
+              required:
+                - type
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - FocusRootNodes
+        - allOf:
+            - $ref: '#/components/schemas/CreateNodeInputEvent'
+            - type: object
+              required:
+                - type
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - CreateNode
+        - allOf:
+            - $ref: '#/components/schemas/UpdateFrameNodeInputEvent'
+            - type: object
+              required:
+                - type
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - UpdateFrameNode
+        - allOf:
+            - $ref: '#/components/schemas/UpdateEllipseNodeInputEvent'
+            - type: object
+              required:
+                - type
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - UpdateEllipseNode
+        - allOf:
+            - $ref: '#/components/schemas/UpdateStarNodeInputEvent'
+            - type: object
+              required:
+                - type
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - UpdateStarNode
+        - allOf:
+            - $ref: '#/components/schemas/UpdatePolygonNodeInputEvent'
+            - type: object
+              required:
+                - type
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - UpdatePolygonNode
+        - allOf:
+            - $ref: '#/components/schemas/UpdateTextNodeInputEvent'
+            - type: object
+              required:
+                - type
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - UpdateTextNode
+        - allOf:
+            - $ref: '#/components/schemas/UpdateFillStyleInputEvent'
+            - type: object
+              required:
+                - type
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - UpdateFillStyle
+        - allOf:
+            - $ref: '#/components/schemas/UpdateStorkeStyleInputEvent'
+            - type: object
+              required:
+                - type
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - UpdateStrokeStyle
+        - allOf:
+            - $ref: '#/components/schemas/UpdateDropShadowStyleInputEvent'
+            - type: object
+              required:
+                - type
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - UpdateDropShadowStyle
+        - allOf:
+            - $ref: '#/components/schemas/CreatePaintInputEvent'
+            - type: object
+              required:
+                - type
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - CreatePaint
+        - allOf:
+            - $ref: '#/components/schemas/UpdateSolidPaintInputEvent'
+            - type: object
+              required:
+                - type
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - UpdateSolidPaint
+        - allOf:
+            - $ref: '#/components/schemas/UpdateImagePaintInputEvent'
+            - type: object
+              required:
+                - type
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - UpdateImagePaint
+        - allOf:
+            - $ref: '#/components/schemas/UpdateGradientPaintInputEvent'
+            - type: object
+              required:
+                - type
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - UpdateGradientPaint
+        - allOf:
+            - $ref: '#/components/schemas/CreateAssetInputEvent'
+            - type: object
+              required:
+                - type
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - CreateAsset
+        - allOf:
+            - $ref: '#/components/schemas/DeleteEntityInputEvent'
+            - type: object
+              required:
+                - type
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - DeleteEntity
+        - allOf:
+            - $ref: '#/components/schemas/UpdateEntityTransformInputEvent'
+            - type: object
+              required:
+                - type
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - UpdateEntityTransform
+        - allOf:
+            - $ref: '#/components/schemas/UpdateEntitySizeInputEvent'
+            - type: object
+              required:
+                - type
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - UpdateEntitySize
+        - allOf:
+            - $ref: '#/components/schemas/MoveEntityInputEvent'
+            - type: object
+              required:
+                - type
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - MoveEntity
+        - allOf:
+            - $ref: '#/components/schemas/UpdateEntityRotationInputEvent'
+            - type: object
+              required:
+                - type
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - UpdateEntityRotation
+        - allOf:
+            - $ref: '#/components/schemas/UpdateEntityVisibilityInputEvent'
+            - type: object
+              required:
+                - type
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - UpdateEntityVisibility
+        - allOf:
+            - $ref: '#/components/schemas/UpdateEntityCornerRadiiInputEvent'
+            - type: object
+              required:
+                - type
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - UpdateEntityCornerRadii
+        - allOf:
+            - $ref: '#/components/schemas/UpdateEntityBlendModeInputEvent'
+            - type: object
+              required:
+                - type
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - UpdateEntityBlendMode
+        - allOf:
+            - $ref: '#/components/schemas/UpdateEntityOpacityInputEvent'
+            - type: object
+              required:
+                - type
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - UpdateEntityOpacity
+        - allOf:
+            - $ref: '#/components/schemas/UpdateEntityChildrenInputEvent'
+            - type: object
+              required:
+                - type
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - UpdateEntityChildren
+        - allOf:
+            - $ref: '#/components/schemas/RegisterLuaScriptInputEvent'
+            - type: object
+              required:
+                - type
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - RegisterLuaScript
+        - allOf:
+            - $ref: '#/components/schemas/ExecuteLuaScriptInputEvent'
+            - type: object
+              required:
+                - type
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - ExecuteLuaScript
       discriminator:
         propertyName: type
     CornerRadii:
@@ -675,36 +675,36 @@ components:
     CreateAssetInputEvent:
       type: object
       required:
-      - asset
+        - asset
       properties:
         asset:
           $ref: '#/components/schemas/AssetWithId'
     CreateNodeInputEvent:
       type: object
       required:
-      - node
+        - node
       properties:
         node:
           $ref: '#/components/schemas/Node'
     CreatePaintInputEvent:
       type: object
       required:
-      - paint
+        - paint
       properties:
         paint:
           $ref: '#/components/schemas/Paint'
     DeleteEntityInputEvent:
       type: object
       required:
-      - id
+        - id
       properties:
         id:
           $ref: '#/components/schemas/ReferenceIdOrEntity'
     DropShadowStyle:
       type: object
       required:
-      - position
-      - blur
+        - position
+        - blur
       properties:
         blendMode:
           $ref: '#/components/schemas/BlendMode'
@@ -714,7 +714,7 @@ components:
           $ref: '#/components/schemas/Color'
         id:
           allOf:
-          - $ref: '#/components/schemas/ReferenceId'
+            - $ref: '#/components/schemas/ReferenceId'
           nullable: true
         opacity:
           $ref: '#/components/schemas/Opacity'
@@ -724,15 +724,15 @@ components:
           $ref: '#/components/schemas/Abs'
         visible:
           type: boolean
-    DtifCanvas:
+    DtifArtboard:
       type: object
       description: |-
         DTIF (Design Tree Interchange Format) utilizes a flat structure for easy readability
         and efficient access & manipulation of design elements (Nodes, Paints, ..).
         https://softwareengineering.stackexchange.com/questions/350623/flat-or-nested-json-for-hierarchal-data
       required:
-      - size
-      - nodes
+        - size
+        - nodes
       properties:
         assets:
           type: array
@@ -763,16 +763,16 @@ components:
           $ref: '#/components/schemas/Size'
         version:
           allOf:
-          - $ref: '#/components/schemas/CnvVersion'
+            - $ref: '#/components/schemas/ArbVersion'
           nullable: true
         viewport:
           allOf:
-          - $ref: '#/components/schemas/Viewport'
+            - $ref: '#/components/schemas/Viewport'
           nullable: true
     EllipseNode:
       type: object
       required:
-      - size
+        - size
       properties:
         blendMode:
           $ref: '#/components/schemas/BlendMode'
@@ -781,7 +781,7 @@ components:
           format: float
         id:
           allOf:
-          - $ref: '#/components/schemas/ReferenceId'
+            - $ref: '#/components/schemas/ReferenceId'
           nullable: true
         innerRadiusRatio:
           type: number
@@ -815,8 +815,8 @@ components:
     ExecuteLuaScriptInputEvent:
       type: object
       required:
-      - id
-      - argsMap
+        - id
+        - argsMap
       properties:
         argsMap:
           type: object
@@ -825,20 +825,20 @@ components:
     FileFormat:
       type: string
       enum:
-      - png
-      - svg
-      - pdf
-      - raw-svg
+        - png
+        - svg
+        - pdf
+        - raw-svg
     FillStyle:
       type: object
       required:
-      - paintId
+        - paintId
       properties:
         blendMode:
           $ref: '#/components/schemas/BlendMode'
         id:
           allOf:
-          - $ref: '#/components/schemas/ReferenceId'
+            - $ref: '#/components/schemas/ReferenceId'
           nullable: true
         opacity:
           $ref: '#/components/schemas/Opacity'
@@ -861,49 +861,49 @@ components:
 
         [Specification](https://www.w3.org/TR/css-flexbox-1/#flex-direction-property)
       enum:
-      - Row
-      - Column
-      - RowReverse
-      - ColumnReverse
+        - Row
+        - Column
+        - RowReverse
+        - ColumnReverse
     FocusRootNodesInputEvent:
       default: null
       nullable: true
     FontFamily:
       oneOf:
-      - type: string
-        description: A serif font.
-        enum:
-        - Serif
-      - type: string
-        description: A sans-serif font.
-        enum:
-        - SansSerif
-      - type: string
-        description: A cursive font.
-        enum:
-        - Cursive
-      - type: string
-        description: A fantasy font.
-        enum:
-        - Fantasy
-      - type: string
-        description: A monospace font.
-        enum:
-        - Monospace
-      - type: object
-        required:
-        - Named
-        properties:
-          Named:
-            type: string
-            description: A custom named font.
+        - type: string
+          description: A serif font.
+          enum:
+            - Serif
+        - type: string
+          description: A sans-serif font.
+          enum:
+            - SansSerif
+        - type: string
+          description: A cursive font.
+          enum:
+            - Cursive
+        - type: string
+          description: A fantasy font.
+          enum:
+            - Fantasy
+        - type: string
+          description: A monospace font.
+          enum:
+            - Monospace
+        - type: object
+          required:
+            - Named
+          properties:
+            Named:
+              type: string
+              description: A custom named font.
       description: A typographic font family.
     FontInfo:
       type: object
       description: Properties of a single font.
       required:
-      - family
-      - variant
+        - family
+        - variant
       properties:
         family:
           $ref: '#/components/schemas/FontFamily'
@@ -918,33 +918,33 @@ components:
       type: string
       description: The style of a font.
       enum:
-      - Normal
-      - Italic
-      - Oblique
+        - Normal
+        - Italic
+        - Oblique
     FontUnit:
       oneOf:
-      - type: object
-        required:
-        - value
-        - type
-        properties:
-          type:
-            type: string
-            enum:
-            - Abs
-          value:
-            $ref: '#/components/schemas/Abs'
-      - type: object
-        required:
-        - value
-        - type
-        properties:
-          type:
-            type: string
-            enum:
-            - Em
-          value:
-            $ref: '#/components/schemas/Em'
+        - type: object
+          required:
+            - value
+            - type
+          properties:
+            type:
+              type: string
+              enum:
+                - Abs
+            value:
+              $ref: '#/components/schemas/Abs'
+        - type: object
+          required:
+            - value
+            - type
+          properties:
+            type:
+              type: string
+              enum:
+                - Em
+            value:
+              $ref: '#/components/schemas/Em'
       description: |-
         A font unit.
         https://fonts.google.com/knowledge/glossary/unit
@@ -954,9 +954,9 @@ components:
       type: object
       description: Properties that distinguish a font from other fonts in the same family.
       required:
-      - style
-      - weight
-      - stretch
+        - style
+        - weight
+        - stretch
       properties:
         stretch:
           $ref: '#/components/schemas/FontStretch'
@@ -972,7 +972,7 @@ components:
     FrameNode:
       type: object
       required:
-      - size
+        - size
       properties:
         blendMode:
           $ref: '#/components/schemas/BlendMode'
@@ -986,13 +986,13 @@ components:
           $ref: '#/components/schemas/CornerRadii'
         id:
           allOf:
-          - $ref: '#/components/schemas/ReferenceId'
+            - $ref: '#/components/schemas/ReferenceId'
           nullable: true
         layoutElement:
           $ref: '#/components/schemas/LayoutElement'
         layoutParent:
           allOf:
-          - $ref: '#/components/schemas/StaticLayoutParent'
+            - $ref: '#/components/schemas/StaticLayoutParent'
           nullable: true
         opacity:
           $ref: '#/components/schemas/Opacity'
@@ -1011,8 +1011,8 @@ components:
     GradientColorStop:
       type: object
       required:
-      - position
-      - color
+        - position
+        - color
       properties:
         color:
           $ref: '#/components/schemas/Color'
@@ -1023,12 +1023,12 @@ components:
     GradientPaint:
       type: object
       required:
-      - variant
-      - stops
+        - variant
+        - stops
       properties:
         id:
           allOf:
-          - $ref: '#/components/schemas/ReferenceId'
+            - $ref: '#/components/schemas/ReferenceId'
           nullable: true
         stops:
           type: array
@@ -1038,33 +1038,33 @@ components:
           $ref: '#/components/schemas/GradientVariant'
     GradientVariant:
       oneOf:
-      - type: object
-        required:
-        - type
-        properties:
-          transform:
-            $ref: '#/components/schemas/Mat3'
-          type:
-            type: string
-            enum:
-            - Linear
-      - type: object
-        required:
-        - type
-        properties:
-          transform:
-            $ref: '#/components/schemas/Mat3'
-          type:
-            type: string
-            enum:
-            - Radial
+        - type: object
+          required:
+            - type
+          properties:
+            transform:
+              $ref: '#/components/schemas/Mat3'
+            type:
+              type: string
+              enum:
+                - Linear
+        - type: object
+          required:
+            - type
+          properties:
+            transform:
+              $ref: '#/components/schemas/Mat3'
+            type:
+              type: string
+              enum:
+                - Radial
       discriminator:
         propertyName: type
     HealthDto:
       type: object
       required:
-      - status
-      - message
+        - status
+        - message
       properties:
         message:
           type: string
@@ -1073,20 +1073,20 @@ components:
     HealthStatus:
       type: string
       enum:
-      - Up
+        - Up
     HorizontalTextAlignment:
       type: string
       enum:
-      - Start
-      - End
-      - Left
-      - Right
-      - Center
+        - Start
+        - End
+        - Left
+        - Right
+        - Center
     ImageId:
       type: object
       required:
-      - idx
-      - version
+        - idx
+        - version
       properties:
         idx:
           type: integer
@@ -1099,11 +1099,11 @@ components:
     ImagePaint:
       type: object
       required:
-      - imageId
+        - imageId
       properties:
         id:
           allOf:
-          - $ref: '#/components/schemas/ReferenceId'
+            - $ref: '#/components/schemas/ReferenceId'
           nullable: true
         imageId:
           $ref: '#/components/schemas/ReferenceIdOrImageId'
@@ -1111,124 +1111,124 @@ components:
           $ref: '#/components/schemas/ImageScaleMode'
     ImageScaleMode:
       oneOf:
-      - type: object
-        required:
-        - type
-        properties:
-          type:
-            type: string
-            enum:
-            - Fill
-      - type: object
-        required:
-        - type
-        properties:
-          type:
-            type: string
-            enum:
-            - Fit
-      - type: object
-        description: Crops the image to fill the area.
-        required:
-        - type
-        properties:
-          transform:
-            $ref: '#/components/schemas/Mat3'
-          type:
-            type: string
-            enum:
-            - Crop
-      - type: object
-        description: Tiles the image within the area.
-        required:
-        - scalingFactor
-        - type
-        properties:
-          rotation:
-            type: number
-            format: float
-          scalingFactor:
-            type: number
-            format: float
-          type:
-            type: string
-            enum:
-            - Tile
+        - type: object
+          required:
+            - type
+          properties:
+            type:
+              type: string
+              enum:
+                - Fill
+        - type: object
+          required:
+            - type
+          properties:
+            type:
+              type: string
+              enum:
+                - Fit
+        - type: object
+          description: Crops the image to fill the area.
+          required:
+            - type
+          properties:
+            transform:
+              $ref: '#/components/schemas/Mat3'
+            type:
+              type: string
+              enum:
+                - Crop
+        - type: object
+          description: Tiles the image within the area.
+          required:
+            - scalingFactor
+            - type
+          properties:
+            rotation:
+              type: number
+              format: float
+            scalingFactor:
+              type: number
+              format: float
+            type:
+              type: string
+              enum:
+                - Tile
       discriminator:
         propertyName: type
     LayoutElement:
       oneOf:
-      - allOf:
-        - $ref: '#/components/schemas/AbsoluteLayoutElement'
-        - type: object
-          required:
-          - type
-          properties:
-            type:
-              type: string
-              enum:
-              - Absolute
-      - allOf:
-        - $ref: '#/components/schemas/StaticLayoutElement'
-        - type: object
-          required:
-          - type
-          properties:
-            type:
-              type: string
-              enum:
-              - Static
+        - allOf:
+            - $ref: '#/components/schemas/AbsoluteLayoutElement'
+            - type: object
+              required:
+                - type
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - Absolute
+        - allOf:
+            - $ref: '#/components/schemas/StaticLayoutElement'
+            - type: object
+              required:
+                - type
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - Static
       discriminator:
         propertyName: type
     LayoutElementSizingMode:
       type: string
       enum:
-      - Fixed
-      - Fill
+        - Fixed
+        - Fill
     LayoutParentSizingMode:
       type: string
       enum:
-      - Fixed
-      - Hug
+        - Fixed
+        - Hug
     Length:
       oneOf:
-      - type: object
-        required:
-        - value
-        - type
-        properties:
-          type:
-            type: string
-            enum:
-            - Abs
-          value:
-            $ref: '#/components/schemas/Abs'
-      - type: object
-        required:
-        - value
-        - type
-        properties:
-          type:
-            type: string
-            enum:
-            - Ratio
-          value:
-            $ref: '#/components/schemas/Ratio'
+        - type: object
+          required:
+            - value
+            - type
+          properties:
+            type:
+              type: string
+              enum:
+                - Abs
+            value:
+              $ref: '#/components/schemas/Abs'
+        - type: object
+          required:
+            - value
+            - type
+          properties:
+            type:
+              type: string
+              enum:
+                - Ratio
+            value:
+              $ref: '#/components/schemas/Ratio'
       discriminator:
         propertyName: type
     LineWrap:
       type: string
       enum:
-      - None
-      - Word
+        - None
+        - Word
     LuaScriptArgsMap:
       type: object
       additionalProperties: {}
     LuaScriptWithId:
       type: object
       required:
-      - id
-      - source
+        - id
+        - source
       properties:
         id:
           $ref: '#/components/schemas/ReferenceId'
@@ -1247,7 +1247,7 @@ components:
     MoveEntityInputEvent:
       type: object
       required:
-      - id
+        - id
       properties:
         dx:
           type: number
@@ -1261,124 +1261,124 @@ components:
           $ref: '#/components/schemas/ReferenceIdOrEntity'
     Node:
       oneOf:
-      - allOf:
-        - $ref: '#/components/schemas/FrameNode'
-        - type: object
-          required:
-          - type
-          properties:
-            type:
-              type: string
-              enum:
-              - Frame
-      - allOf:
-        - $ref: '#/components/schemas/RectangleNode'
-        - type: object
-          required:
-          - type
-          properties:
-            type:
-              type: string
-              enum:
-              - Rectangle
-      - allOf:
-        - $ref: '#/components/schemas/EllipseNode'
-        - type: object
-          required:
-          - type
-          properties:
-            type:
-              type: string
-              enum:
-              - Ellipse
-      - allOf:
-        - $ref: '#/components/schemas/StarNode'
-        - type: object
-          required:
-          - type
-          properties:
-            type:
-              type: string
-              enum:
-              - Star
-      - allOf:
-        - $ref: '#/components/schemas/PolygonNode'
-        - type: object
-          required:
-          - type
-          properties:
-            type:
-              type: string
-              enum:
-              - Polygon
-      - allOf:
-        - $ref: '#/components/schemas/TextNode'
-        - type: object
-          required:
-          - type
-          properties:
-            type:
-              type: string
-              enum:
-              - Text
-      - allOf:
-        - $ref: '#/components/schemas/VectorNode'
-        - type: object
-          required:
-          - type
-          properties:
-            type:
-              type: string
-              enum:
-              - Vector
+        - allOf:
+            - $ref: '#/components/schemas/FrameNode'
+            - type: object
+              required:
+                - type
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - Frame
+        - allOf:
+            - $ref: '#/components/schemas/RectangleNode'
+            - type: object
+              required:
+                - type
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - Rectangle
+        - allOf:
+            - $ref: '#/components/schemas/EllipseNode'
+            - type: object
+              required:
+                - type
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - Ellipse
+        - allOf:
+            - $ref: '#/components/schemas/StarNode'
+            - type: object
+              required:
+                - type
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - Star
+        - allOf:
+            - $ref: '#/components/schemas/PolygonNode'
+            - type: object
+              required:
+                - type
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - Polygon
+        - allOf:
+            - $ref: '#/components/schemas/TextNode'
+            - type: object
+              required:
+                - type
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - Text
+        - allOf:
+            - $ref: '#/components/schemas/VectorNode'
+            - type: object
+              required:
+                - type
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - Vector
       discriminator:
         propertyName: type
     Opacity:
       $ref: '#/components/schemas/Ratio'
     Paint:
       oneOf:
-      - allOf:
-        - $ref: '#/components/schemas/SolidPaint'
-        - type: object
-          required:
-          - type
-          properties:
-            type:
-              type: string
-              enum:
-              - Solid
-      - allOf:
-        - $ref: '#/components/schemas/ImagePaint'
-        - type: object
-          required:
-          - type
-          properties:
-            type:
-              type: string
-              enum:
-              - Image
-      - allOf:
-        - $ref: '#/components/schemas/GradientPaint'
-        - type: object
-          required:
-          - type
-          properties:
-            type:
-              type: string
-              enum:
-              - Gradient
+        - allOf:
+            - $ref: '#/components/schemas/SolidPaint'
+            - type: object
+              required:
+                - type
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - Solid
+        - allOf:
+            - $ref: '#/components/schemas/ImagePaint'
+            - type: object
+              required:
+                - type
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - Image
+        - allOf:
+            - $ref: '#/components/schemas/GradientPaint'
+            - type: object
+              required:
+                - type
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - Gradient
       discriminator:
         propertyName: type
     PolygonNode:
       type: object
       required:
-      - size
+        - size
       properties:
         blendMode:
           $ref: '#/components/schemas/BlendMode'
         id:
           allOf:
-          - $ref: '#/components/schemas/ReferenceId'
+            - $ref: '#/components/schemas/ReferenceId'
           nullable: true
         layoutElement:
           $ref: '#/components/schemas/LayoutElement'
@@ -1405,10 +1405,10 @@ components:
     Rect:
       type: object
       required:
-      - left
-      - right
-      - top
-      - bottom
+        - left
+        - right
+        - top
+        - bottom
       properties:
         bottom:
           type: number
@@ -1425,7 +1425,7 @@ components:
     RectangleNode:
       type: object
       required:
-      - size
+        - size
       properties:
         blendMode:
           $ref: '#/components/schemas/BlendMode'
@@ -1433,7 +1433,7 @@ components:
           $ref: '#/components/schemas/CornerRadii'
         id:
           allOf:
-          - $ref: '#/components/schemas/ReferenceId'
+            - $ref: '#/components/schemas/ReferenceId'
           nullable: true
         layoutElement:
           $ref: '#/components/schemas/LayoutElement'
@@ -1455,60 +1455,60 @@ components:
       type: string
     ReferenceIdOrEntity:
       oneOf:
-      - type: object
-        required:
-        - entity
-        - type
-        properties:
-          entity:
-            $ref: '#/components/schemas/Entity'
-          type:
-            type: string
-            enum:
-            - Entity
-      - type: object
-        required:
-        - referenceId
-        - type
-        properties:
-          referenceId:
-            $ref: '#/components/schemas/ReferenceId'
-          type:
-            type: string
-            enum:
-            - ReferenceId
+        - type: object
+          required:
+            - entity
+            - type
+          properties:
+            entity:
+              $ref: '#/components/schemas/Entity'
+            type:
+              type: string
+              enum:
+                - Entity
+        - type: object
+          required:
+            - referenceId
+            - type
+          properties:
+            referenceId:
+              $ref: '#/components/schemas/ReferenceId'
+            type:
+              type: string
+              enum:
+                - ReferenceId
       discriminator:
         propertyName: type
     ReferenceIdOrImageId:
       oneOf:
-      - type: object
-        required:
-        - imageId
-        - type
-        properties:
-          imageId:
-            $ref: '#/components/schemas/ImageId'
-          type:
-            type: string
-            enum:
-            - ImageId
-      - type: object
-        required:
-        - referenceId
-        - type
-        properties:
-          referenceId:
-            $ref: '#/components/schemas/ReferenceId'
-          type:
-            type: string
-            enum:
-            - ReferenceId
+        - type: object
+          required:
+            - imageId
+            - type
+          properties:
+            imageId:
+              $ref: '#/components/schemas/ImageId'
+            type:
+              type: string
+              enum:
+                - ImageId
+        - type: object
+          required:
+            - referenceId
+            - type
+          properties:
+            referenceId:
+              $ref: '#/components/schemas/ReferenceId'
+            type:
+              type: string
+              enum:
+                - ReferenceId
       discriminator:
         propertyName: type
     RegisterLuaScriptInputEvent:
       type: object
       required:
-      - script
+        - script
       properties:
         script:
           $ref: '#/components/schemas/LuaScriptWithId'
@@ -1530,24 +1530,24 @@ components:
     SolidPaint:
       type: object
       required:
-      - color
+        - color
       properties:
         color:
           $ref: '#/components/schemas/Color'
         id:
           allOf:
-          - $ref: '#/components/schemas/ReferenceId'
+            - $ref: '#/components/schemas/ReferenceId'
           nullable: true
     StarNode:
       type: object
       required:
-      - size
+        - size
       properties:
         blendMode:
           $ref: '#/components/schemas/BlendMode'
         id:
           allOf:
-          - $ref: '#/components/schemas/ReferenceId'
+            - $ref: '#/components/schemas/ReferenceId'
           nullable: true
         innerRadiusRatio:
           type: number
@@ -1577,13 +1577,13 @@ components:
       properties:
         alignSelf:
           allOf:
-          - $ref: '#/components/schemas/AlignItems'
+            - $ref: '#/components/schemas/AlignItems'
           nullable: true
         horizontalSizingMode:
           $ref: '#/components/schemas/LayoutElementSizingMode'
         justifySelf:
           allOf:
-          - $ref: '#/components/schemas/AlignItems'
+            - $ref: '#/components/schemas/AlignItems'
           nullable: true
         margin:
           $ref: '#/components/schemas/Rect'
@@ -1594,7 +1594,7 @@ components:
       properties:
         alignItems:
           allOf:
-          - $ref: '#/components/schemas/AlignItems'
+            - $ref: '#/components/schemas/AlignItems'
           nullable: true
         flexDirection:
           $ref: '#/components/schemas/FlexDirection'
@@ -1604,7 +1604,7 @@ components:
           $ref: '#/components/schemas/LayoutParentSizingMode'
         justifyContent:
           allOf:
-          - $ref: '#/components/schemas/AlignContent'
+            - $ref: '#/components/schemas/AlignContent'
           nullable: true
         padding:
           $ref: '#/components/schemas/Rect'
@@ -1613,14 +1613,14 @@ components:
     StrokeStyle:
       type: object
       required:
-      - width
-      - paintId
+        - width
+        - paintId
       properties:
         blendMode:
           $ref: '#/components/schemas/BlendMode'
         id:
           allOf:
-          - $ref: '#/components/schemas/ReferenceId'
+            - $ref: '#/components/schemas/ReferenceId'
           nullable: true
         opacity:
           $ref: '#/components/schemas/Opacity'
@@ -1632,44 +1632,44 @@ components:
           $ref: '#/components/schemas/Abs'
     Style:
       oneOf:
-      - allOf:
-        - $ref: '#/components/schemas/FillStyle'
-        - type: object
-          required:
-          - type
-          properties:
-            type:
-              type: string
-              enum:
-              - Fill
-      - allOf:
-        - $ref: '#/components/schemas/StrokeStyle'
-        - type: object
-          required:
-          - type
-          properties:
-            type:
-              type: string
-              enum:
-              - Stroke
-      - allOf:
-        - $ref: '#/components/schemas/DropShadowStyle'
-        - type: object
-          required:
-          - type
-          properties:
-            type:
-              type: string
-              enum:
-              - DropShadow
+        - allOf:
+            - $ref: '#/components/schemas/FillStyle'
+            - type: object
+              required:
+                - type
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - Fill
+        - allOf:
+            - $ref: '#/components/schemas/StrokeStyle'
+            - type: object
+              required:
+                - type
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - Stroke
+        - allOf:
+            - $ref: '#/components/schemas/DropShadowStyle'
+            - type: object
+              required:
+                - type
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - DropShadow
       discriminator:
         propertyName: type
     TextAttributeInterval:
       type: object
       required:
-      - start
-      - end
-      - attributes
+        - start
+        - end
+        - attributes
       properties:
         attributes:
           $ref: '#/components/schemas/TextAttributes'
@@ -1687,45 +1687,45 @@ components:
           nullable: true
         fontFamily:
           allOf:
-          - $ref: '#/components/schemas/FontFamily'
+            - $ref: '#/components/schemas/FontFamily'
           nullable: true
         fontSize:
           allOf:
-          - $ref: '#/components/schemas/Abs'
+            - $ref: '#/components/schemas/Abs'
           nullable: true
         fontStretch:
           allOf:
-          - $ref: '#/components/schemas/FontStretch'
+            - $ref: '#/components/schemas/FontStretch'
           nullable: true
         fontStyle:
           allOf:
-          - $ref: '#/components/schemas/FontStyle'
+            - $ref: '#/components/schemas/FontStyle'
           nullable: true
         fontWeight:
           allOf:
-          - $ref: '#/components/schemas/FontWeight'
+            - $ref: '#/components/schemas/FontWeight'
           nullable: true
         letterSpacing:
           allOf:
-          - $ref: '#/components/schemas/FontUnit'
+            - $ref: '#/components/schemas/FontUnit'
           nullable: true
         lineHeight:
           allOf:
-          - $ref: '#/components/schemas/FontUnit'
+            - $ref: '#/components/schemas/FontUnit'
           nullable: true
         smallCaps:
           type: boolean
           nullable: true
         wordSpacing:
           allOf:
-          - $ref: '#/components/schemas/FontUnit'
+            - $ref: '#/components/schemas/FontUnit'
           nullable: true
     TextNode:
       type: object
       required:
-      - text
-      - attributes
-      - size
+        - text
+        - attributes
+        - size
       properties:
         attributes:
           type: array
@@ -1737,7 +1737,7 @@ components:
           $ref: '#/components/schemas/HorizontalTextAlignment'
         id:
           allOf:
-          - $ref: '#/components/schemas/ReferenceId'
+            - $ref: '#/components/schemas/ReferenceId'
           nullable: true
         layoutElement:
           $ref: '#/components/schemas/LayoutElement'
@@ -1766,50 +1766,50 @@ components:
     TextSizingMode:
       type: string
       enum:
-      - WidthAndHeight
-      - Height
-      - Fixed
-    UpdateCanvasSizeInputEvent:
+        - WidthAndHeight
+        - Height
+        - Fixed
+    UpdateArtboardSizeInputEvent:
       type: object
       required:
-      - size
+        - size
       properties:
         size:
           $ref: '#/components/schemas/Size'
-    UpdateCanvasViewportInputEvent:
+    UpdateArtboardViewportInputEvent:
       type: object
       required:
-      - viewport
+        - viewport
       properties:
         viewport:
           $ref: '#/components/schemas/Viewport'
     UpdateDropShadowStyleInputEvent:
       type: object
       required:
-      - id
+        - id
       properties:
         blur:
           allOf:
-          - $ref: '#/components/schemas/Abs'
+            - $ref: '#/components/schemas/Abs'
           nullable: true
         color:
           allOf:
-          - $ref: '#/components/schemas/Color'
+            - $ref: '#/components/schemas/Color'
           nullable: true
         id:
           $ref: '#/components/schemas/ReferenceIdOrEntity'
         position:
           allOf:
-          - $ref: '#/components/schemas/Vec2'
+            - $ref: '#/components/schemas/Vec2'
           nullable: true
         spread:
           allOf:
-          - $ref: '#/components/schemas/Abs'
+            - $ref: '#/components/schemas/Abs'
           nullable: true
     UpdateEllipseNodeInputEvent:
       type: object
       required:
-      - id
+        - id
       properties:
         endingAngle:
           type: number
@@ -1828,8 +1828,8 @@ components:
     UpdateEntityBlendModeInputEvent:
       type: object
       required:
-      - id
-      - blendMode
+        - id
+        - blendMode
       properties:
         blendMode:
           $ref: '#/components/schemas/BlendMode'
@@ -1838,8 +1838,8 @@ components:
     UpdateEntityChildrenInputEvent:
       type: object
       required:
-      - id
-      - children
+        - id
+        - children
       properties:
         children:
           type: array
@@ -1850,8 +1850,8 @@ components:
     UpdateEntityCornerRadiiInputEvent:
       type: object
       required:
-      - id
-      - cornerRadii
+        - id
+        - cornerRadii
       properties:
         cornerRadii:
           $ref: '#/components/schemas/CornerRadii'
@@ -1860,8 +1860,8 @@ components:
     UpdateEntityOpacityInputEvent:
       type: object
       required:
-      - id
-      - opacity
+        - id
+        - opacity
       properties:
         id:
           $ref: '#/components/schemas/ReferenceIdOrEntity'
@@ -1870,8 +1870,8 @@ components:
     UpdateEntityRotationInputEvent:
       type: object
       required:
-      - id
-      - rotationDeg
+        - id
+        - rotationDeg
       properties:
         id:
           $ref: '#/components/schemas/ReferenceIdOrEntity'
@@ -1880,8 +1880,8 @@ components:
     UpdateEntitySizeInputEvent:
       type: object
       required:
-      - id
-      - size
+        - id
+        - size
       properties:
         id:
           $ref: '#/components/schemas/ReferenceIdOrEntity'
@@ -1890,13 +1890,13 @@ components:
     UpdateEntityTransformInputEvent:
       type: object
       required:
-      - id
+        - id
       properties:
         id:
           $ref: '#/components/schemas/ReferenceIdOrEntity'
         rotationDeg:
           allOf:
-          - $ref: '#/components/schemas/Angle'
+            - $ref: '#/components/schemas/Angle'
           nullable: true
         x:
           type: number
@@ -1909,8 +1909,8 @@ components:
     UpdateEntityVisibilityInputEvent:
       type: object
       required:
-      - id
-      - visible
+        - id
+        - visible
       properties:
         id:
           $ref: '#/components/schemas/ReferenceIdOrEntity'
@@ -1919,18 +1919,18 @@ components:
     UpdateFillStyleInputEvent:
       type: object
       required:
-      - id
+        - id
       properties:
         id:
           $ref: '#/components/schemas/ReferenceIdOrEntity'
         paintId:
           allOf:
-          - $ref: '#/components/schemas/ReferenceIdOrEntity'
+            - $ref: '#/components/schemas/ReferenceIdOrEntity'
           nullable: true
     UpdateFrameNodeInputEvent:
       type: object
       required:
-      - id
+        - id
       properties:
         clipContent:
           type: boolean
@@ -1940,7 +1940,7 @@ components:
     UpdateGradientPaintInputEvent:
       type: object
       required:
-      - id
+        - id
       properties:
         id:
           $ref: '#/components/schemas/ReferenceIdOrEntity'
@@ -1951,27 +1951,27 @@ components:
           nullable: true
         variant:
           allOf:
-          - $ref: '#/components/schemas/GradientVariant'
+            - $ref: '#/components/schemas/GradientVariant'
           nullable: true
     UpdateImagePaintInputEvent:
       type: object
       required:
-      - id
+        - id
       properties:
         id:
           $ref: '#/components/schemas/ReferenceIdOrEntity'
         imageId:
           allOf:
-          - $ref: '#/components/schemas/ImageId'
+            - $ref: '#/components/schemas/ImageId'
           nullable: true
         scaleMode:
           allOf:
-          - $ref: '#/components/schemas/ImageScaleMode'
+            - $ref: '#/components/schemas/ImageScaleMode'
           nullable: true
     UpdatePolygonNodeInputEvent:
       type: object
       required:
-      - id
+        - id
       properties:
         id:
           $ref: '#/components/schemas/ReferenceIdOrEntity'
@@ -1983,7 +1983,7 @@ components:
     UpdateSolidPaintInputEvent:
       type: object
       required:
-      - id
+        - id
       properties:
         color:
           $ref: '#/components/schemas/Color'
@@ -1992,7 +1992,7 @@ components:
     UpdateStarNodeInputEvent:
       type: object
       required:
-      - id
+        - id
       properties:
         id:
           $ref: '#/components/schemas/ReferenceIdOrEntity'
@@ -2008,22 +2008,22 @@ components:
     UpdateStorkeStyleInputEvent:
       type: object
       required:
-      - id
+        - id
       properties:
         id:
           $ref: '#/components/schemas/ReferenceIdOrEntity'
         paintId:
           allOf:
-          - $ref: '#/components/schemas/ReferenceIdOrEntity'
+            - $ref: '#/components/schemas/ReferenceIdOrEntity'
           nullable: true
         width:
           allOf:
-          - $ref: '#/components/schemas/Abs'
+            - $ref: '#/components/schemas/Abs'
           nullable: true
     UpdateTextNodeInputEvent:
       type: object
       required:
-      - id
+        - id
       properties:
         attributes:
           type: array
@@ -2032,24 +2032,24 @@ components:
           nullable: true
         horizontalTextAlignment:
           allOf:
-          - $ref: '#/components/schemas/HorizontalTextAlignment'
+            - $ref: '#/components/schemas/HorizontalTextAlignment'
           nullable: true
         id:
           $ref: '#/components/schemas/ReferenceIdOrEntity'
         lineWrap:
           allOf:
-          - $ref: '#/components/schemas/LineWrap'
+            - $ref: '#/components/schemas/LineWrap'
           nullable: true
         sizingMode:
           allOf:
-          - $ref: '#/components/schemas/TextSizingMode'
+            - $ref: '#/components/schemas/TextSizingMode'
           nullable: true
         text:
           type: string
           nullable: true
         verticalTextAlignment:
           allOf:
-          - $ref: '#/components/schemas/VerticalTextAlignment'
+            - $ref: '#/components/schemas/VerticalTextAlignment'
           nullable: true
     Vec2:
       type: array
@@ -2062,15 +2062,15 @@ components:
     VectorNode:
       type: object
       required:
-      - path
-      - windingRule
-      - size
+        - path
+        - windingRule
+        - size
       properties:
         blendMode:
           $ref: '#/components/schemas/BlendMode'
         id:
           allOf:
-          - $ref: '#/components/schemas/ReferenceId'
+            - $ref: '#/components/schemas/ReferenceId'
           nullable: true
         layoutElement:
           $ref: '#/components/schemas/LayoutElement'
@@ -2095,14 +2095,14 @@ components:
     VerticalTextAlignment:
       type: string
       enum:
-      - Top
-      - Bottom
-      - Center
+        - Top
+        - Bottom
+        - Center
     Viewport:
       type: object
       required:
-      - physicalPosition
-      - physicalSize
+        - physicalPosition
+        - physicalSize
       properties:
         physicalPosition:
           $ref: '#/components/schemas/Vec2'
@@ -2111,5 +2111,5 @@ components:
     WindingRule:
       type: string
       enum:
-      - Nonzero
-      - Evenodd
+        - Nonzero
+        - Evenodd

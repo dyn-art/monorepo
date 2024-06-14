@@ -2,7 +2,7 @@
 resolver = "2"
 members = [
     "crates/*",
-    "packages/cnv-svg-builder/rust",
+    "packages/arb-svg-builder/rust",
     "apps/ee_graphic",
     "apps/web",
 ]

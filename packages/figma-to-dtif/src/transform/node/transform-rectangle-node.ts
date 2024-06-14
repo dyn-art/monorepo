@@ -1,4 +1,4 @@
-import type { CNV } from '@dyn/cnv-dtif';
+import type { ARB } from '@dyn/arb-dtif';
 
 import type {
 	TToTransformEffect,
@@ -16,7 +16,7 @@ import {
 export function transformRectangleNode(
 	node: RectangleNode,
 	config: TTransformRectangleNodeConfig
-): { type: 'Rectangle' } & CNV.RectangleNode {
+): { type: 'Rectangle' } & ARB.RectangleNode {
 	const { fills, strokes, effects, autoLayout } = config;
 
 	return {

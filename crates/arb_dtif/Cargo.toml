@@ -1,0 +1,51 @@
+[package]
+name = "dyn-arb-dtif"
+version = "0.0.1"
+description = ""
+edition = { workspace = true }
+homepage = { workspace = true }
+repository = { workspace = true }
+license = "Commercial License"
+authors = { workspace = true }
+
+[features]
+default = ["lua_scripts"]
+specta_support = [
+    "dep:serde",
+    "dep:specta",
+    "dyn-arb-bundles/specta_support",
+    "dyn-arb-lua/specta_support",
+    "dyn-utils/specta_support",
+]
+utoipa_support = [
+    "dep:utoipa",
+    "dyn-arb-bundles/utoipa_support",
+    "dyn-arb-lua/utoipa_support",
+    "dyn-utils/utoipa_support",
+]
+lua_scripts = ["specta_support", "dep:dyn-arb-lua"]
+tracing = []
+
+[dependencies]
+dyn-arb-bundles = { path = "../arb_bundles" }
+dyn-utils = { path = "../utils" }
+bevy_app = { workspace = true }
+bevy_ecs = { workspace = true }
+glam = { workspace = true }
+
+# Logging
+log = { workspace = true }
+
+# specta_support (feature)
+serde = { workspace = true, features = ["derive"], optional = true }
+specta = { workspace = true, features = [
+    "serde",
+    "glam",
+    "serde_json",
+], optional = true }
+
+# utoipa_support (feature)
+utoipa = { workspace = true, optional = true }
+
+# lua_scripts (feature)
+dyn-arb-lua = { path = "../arb_lua", optional = true }

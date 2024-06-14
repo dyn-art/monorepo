@@ -1,12 +1,12 @@
 import type { TContinuousId } from '@ibg/utils';
-import type { CNV } from '@dyn/cnv-dtif';
+import type { ARB } from '@dyn/arb-dtif';
 
 import { mapFigmaTransformToMat3 } from '../../utils';
 
 export function transformImagePaint(
 	paint: ImagePaint,
 	imageId: TContinuousId
-): { type: 'Image' } & CNV.ImagePaint {
+): { type: 'Image' } & ARB.ImagePaint {
 	return {
 		type: 'Image',
 		imageId: { type: 'ReferenceId', referenceId: `a${imageId}` },
@@ -14,7 +14,7 @@ export function transformImagePaint(
 	};
 }
 
-function resolveScaleMode(paint: ImagePaint): CNV.ImagePaint['scaleMode'] {
+function resolveScaleMode(paint: ImagePaint): ARB.ImagePaint['scaleMode'] {
 	switch (paint.scaleMode) {
 		case 'CROP':
 			return {

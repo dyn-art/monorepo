@@ -852,6 +852,172 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9ea835d29036a4087793836fa931b08837ad5e957da9e23886b29586fb9b6650"
 
 [[package]]
+name = "dyn-arb-asset"
+version = "0.0.1"
+dependencies = [
+ "bevy_app",
+ "bevy_ecs",
+ "dyn-fonts-book",
+ "fontdb 0.18.0",
+ "imagesize",
+ "log",
+ "serde",
+ "slotmap",
+ "specta",
+ "tinyvec",
+ "utoipa",
+]
+
+[[package]]
+name = "dyn-arb-bundles"
+version = "0.0.1"
+dependencies = [
+ "bevy_app",
+ "bevy_ecs",
+ "bevy_hierarchy",
+ "bevy_transform",
+ "dyn-arb-asset",
+ "dyn-arb-lua",
+ "dyn-attributed-string",
+ "dyn-utils",
+ "glam",
+ "log",
+ "serde",
+ "smallvec",
+ "specta",
+ "taffy",
+ "tiny-skia-path",
+ "utoipa",
+]
+
+[[package]]
+name = "dyn-arb-core"
+version = "0.0.1"
+dependencies = [
+ "bevy_app",
+ "bevy_ecs",
+ "bevy_hierarchy",
+ "bevy_transform",
+ "dyn-arb-asset",
+ "dyn-arb-bundles",
+ "dyn-arb-lua",
+ "dyn-attributed-string",
+ "dyn-utils",
+ "env_logger",
+ "gc-arena",
+ "glam",
+ "hashbrown",
+ "log",
+ "piccolo",
+ "serde_json",
+ "smallvec",
+ "taffy",
+ "tiny-skia-path",
+]
+
+[[package]]
+name = "dyn-arb-dtif"
+version = "0.0.1"
+dependencies = [
+ "bevy_app",
+ "bevy_ecs",
+ "dyn-arb-bundles",
+ "dyn-arb-lua",
+ "dyn-utils",
+ "glam",
+ "log",
+ "serde",
+ "specta",
+ "utoipa",
+]
+
+[[package]]
+name = "dyn-arb-interaction"
+version = "0.0.1"
+dependencies = [
+ "bevy_app",
+ "bevy_ecs",
+ "bevy_hierarchy",
+ "bevy_transform",
+ "dyn-arb-bundles",
+ "dyn-arb-core",
+ "dyn-attributed-string",
+ "dyn-utils",
+ "glam",
+ "log",
+ "serde",
+ "smallvec",
+ "smol_str",
+ "specta",
+ "web-time 1.1.0",
+]
+
+[[package]]
+name = "dyn-arb-lua"
+version = "0.0.1"
+dependencies = [
+ "chrono",
+ "env_logger",
+ "gc-arena",
+ "log",
+ "piccolo",
+ "serde",
+ "serde_json",
+ "specta",
+ "thiserror",
+ "utoipa",
+]
+
+[[package]]
+name = "dyn-arb-svg-builder"
+version = "0.0.1"
+dependencies = [
+ "base64 0.22.0",
+ "bevy_app",
+ "bevy_ecs",
+ "bevy_hierarchy",
+ "bevy_transform",
+ "dyn-arb-asset",
+ "dyn-arb-bundles",
+ "dyn-utils",
+ "glam",
+ "imagesize",
+ "log",
+ "serde",
+ "smallvec",
+ "specta",
+ "tiny-skia-path",
+]
+
+[[package]]
+name = "dyn-arb-svg-builder-api"
+version = "0.0.1"
+dependencies = [
+ "bevy_app",
+ "bevy_ecs",
+ "bevy_transform",
+ "clap",
+ "console_error_panic_hook",
+ "dyn-arb-bundles",
+ "dyn-arb-core",
+ "dyn-arb-dtif",
+ "dyn-arb-interaction",
+ "dyn-arb-lua",
+ "dyn-arb-svg-builder",
+ "dyn-utils",
+ "glam",
+ "js-sys",
+ "log",
+ "once_cell",
+ "serde",
+ "serde-wasm-bindgen",
+ "serde_json",
+ "specta",
+ "wasm-bindgen",
+ "wasm-bindgen-test",
+]
+
+[[package]]
 name = "dyn-attributed-string"
 version = "0.0.1"
 dependencies = [
@@ -874,172 +1040,6 @@ dependencies = [
  "unicode-script",
  "unicode-vo",
  "utoipa",
-]
-
-[[package]]
-name = "dyn-cnv-asset"
-version = "0.0.1"
-dependencies = [
- "bevy_app",
- "bevy_ecs",
- "dyn-fonts-book",
- "fontdb 0.18.0",
- "imagesize",
- "log",
- "serde",
- "slotmap",
- "specta",
- "tinyvec",
- "utoipa",
-]
-
-[[package]]
-name = "dyn-cnv-bundles"
-version = "0.0.1"
-dependencies = [
- "bevy_app",
- "bevy_ecs",
- "bevy_hierarchy",
- "bevy_transform",
- "dyn-attributed-string",
- "dyn-cnv-asset",
- "dyn-cnv-lua",
- "dyn-utils",
- "glam",
- "log",
- "serde",
- "smallvec",
- "specta",
- "taffy",
- "tiny-skia-path",
- "utoipa",
-]
-
-[[package]]
-name = "dyn-cnv-core"
-version = "0.0.1"
-dependencies = [
- "bevy_app",
- "bevy_ecs",
- "bevy_hierarchy",
- "bevy_transform",
- "dyn-attributed-string",
- "dyn-cnv-asset",
- "dyn-cnv-bundles",
- "dyn-cnv-lua",
- "dyn-utils",
- "env_logger",
- "gc-arena",
- "glam",
- "hashbrown",
- "log",
- "piccolo",
- "serde_json",
- "smallvec",
- "taffy",
- "tiny-skia-path",
-]
-
-[[package]]
-name = "dyn-cnv-dtif"
-version = "0.0.1"
-dependencies = [
- "bevy_app",
- "bevy_ecs",
- "dyn-cnv-bundles",
- "dyn-cnv-lua",
- "dyn-utils",
- "glam",
- "log",
- "serde",
- "specta",
- "utoipa",
-]
-
-[[package]]
-name = "dyn-cnv-interaction"
-version = "0.0.1"
-dependencies = [
- "bevy_app",
- "bevy_ecs",
- "bevy_hierarchy",
- "bevy_transform",
- "dyn-attributed-string",
- "dyn-cnv-bundles",
- "dyn-cnv-core",
- "dyn-utils",
- "glam",
- "log",
- "serde",
- "smallvec",
- "smol_str",
- "specta",
- "web-time 1.1.0",
-]
-
-[[package]]
-name = "dyn-cnv-lua"
-version = "0.0.1"
-dependencies = [
- "chrono",
- "env_logger",
- "gc-arena",
- "log",
- "piccolo",
- "serde",
- "serde_json",
- "specta",
- "thiserror",
- "utoipa",
-]
-
-[[package]]
-name = "dyn-cnv-svg-builder"
-version = "0.0.1"
-dependencies = [
- "base64 0.22.0",
- "bevy_app",
- "bevy_ecs",
- "bevy_hierarchy",
- "bevy_transform",
- "dyn-cnv-asset",
- "dyn-cnv-bundles",
- "dyn-utils",
- "glam",
- "imagesize",
- "log",
- "serde",
- "smallvec",
- "specta",
- "tiny-skia-path",
-]
-
-[[package]]
-name = "dyn-cnv-svg-builder-api"
-version = "0.0.1"
-dependencies = [
- "bevy_app",
- "bevy_ecs",
- "bevy_transform",
- "clap",
- "console_error_panic_hook",
- "dyn-cnv-bundles",
- "dyn-cnv-core",
- "dyn-cnv-dtif",
- "dyn-cnv-interaction",
- "dyn-cnv-lua",
- "dyn-cnv-svg-builder",
- "dyn-utils",
- "glam",
- "js-sys",
- "log",
- "once_cell",
- "serde",
- "serde-wasm-bindgen",
- "serde_json",
- "specta",
- "wasm-bindgen",
- "wasm-bindgen-test",
 ]
 
 [[package]]
@@ -1069,13 +1069,13 @@ dependencies = [
  "clap",
  "dotenv_config",
  "dotenvy",
+ "dyn-arb-asset",
+ "dyn-arb-bundles",
+ "dyn-arb-core",
+ "dyn-arb-dtif",
+ "dyn-arb-lua",
+ "dyn-arb-svg-builder",
  "dyn-attributed-string",
- "dyn-cnv-asset",
- "dyn-cnv-bundles",
- "dyn-cnv-core",
- "dyn-cnv-dtif",
- "dyn-cnv-lua",
- "dyn-cnv-svg-builder",
  "dyn-utils",
  "env_logger",
  "fontdb 0.18.0",
@@ -1113,11 +1113,11 @@ dependencies = [
  "bevy_app",
  "bevy_ecs",
  "bevy_transform",
- "dyn-cnv-asset",
- "dyn-cnv-bundles",
- "dyn-cnv-core",
- "dyn-cnv-dtif",
- "dyn-cnv-svg-builder",
+ "dyn-arb-asset",
+ "dyn-arb-bundles",
+ "dyn-arb-core",
+ "dyn-arb-dtif",
+ "dyn-arb-svg-builder",
  "fontdb 0.16.2",
  "log",
  "reqwest",

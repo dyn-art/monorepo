@@ -1,4 +1,4 @@
-import type { CNV } from '@dyn/cnv-dtif';
+import type { ARB } from '@dyn/arb-dtif';
 
 import type {
 	TToTransformEffect,
@@ -16,7 +16,7 @@ import {
 export function transformEllipseNode(
 	node: EllipseNode,
 	config: TTransformEllipseNodeConfig
-): { type: 'Ellipse' } & CNV.EllipseNode {
+): { type: 'Ellipse' } & ARB.EllipseNode {
 	const { fills, strokes, effects, autoLayout } = config;
 
 	return {

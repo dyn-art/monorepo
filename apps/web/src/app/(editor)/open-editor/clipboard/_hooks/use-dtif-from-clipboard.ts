@@ -1,14 +1,14 @@
 import { useQuery } from '@tanstack/react-query';
-import { isDtif, isMdtif, type CNV, type TMdtifCanvas } from '@dyn/cnv-dtif';
+import { isDtif, isMdtif, type ARB, type TMdtifArtboard } from '@dyn/arb-dtif';
 
 export function useDtifFromClipboard(): {
-	data?: CNV.DtifCanvas | TMdtifCanvas;
+	data?: ARB.DtifArtboard | TMdtifArtboard;
 	isLoading: boolean;
 } {
 	const { data, isLoading } = useQuery({
 		queryKey: ['clipboard-dtif'],
 		queryFn: async () => {
-			let dtif: CNV.DtifCanvas | TMdtifCanvas | undefined;
+			let dtif: ARB.DtifArtboard | TMdtifArtboard | undefined;
 
 			// Try to load Dtif from clipboard
 			try {

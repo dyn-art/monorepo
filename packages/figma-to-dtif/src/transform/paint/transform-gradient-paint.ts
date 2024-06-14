@@ -1,4 +1,4 @@
-import type { CNV } from '@dyn/cnv-dtif';
+import type { ARB } from '@dyn/arb-dtif';
 
 import { UnsupportedFigmaPaintException } from '../../exceptions';
 import { mapFigmaRGBToDtif, mapFigmaTransformToMat3 } from '../../utils';
@@ -6,7 +6,7 @@ import { mapFigmaRGBToDtif, mapFigmaTransformToMat3 } from '../../utils';
 export function transformGradientPaint(
 	paint: GradientPaint,
 	nodeIds: SceneNode['id'][]
-): { type: 'Gradient' } & CNV.GradientPaint {
+): { type: 'Gradient' } & ARB.GradientPaint {
 	return {
 		type: 'Gradient',
 		variant: mapFigmaGradientTypeToDTIF(paint, nodeIds),
@@ -20,7 +20,7 @@ export function transformGradientPaint(
 function mapFigmaGradientTypeToDTIF(
 	paint: GradientPaint,
 	nodeIds: SceneNode['id'][]
-): CNV.GradientVariant {
+): ARB.GradientVariant {
 	switch (paint.type) {
 		case 'GRADIENT_LINEAR':
 			return {

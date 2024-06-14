@@ -1,4 +1,4 @@
-import type { CNV } from '@dyn/cnv-dtif';
+import type { ARB } from '@dyn/arb-dtif';
 
 import type {
 	TToTransformEffect,
@@ -16,7 +16,7 @@ import {
 export function transformStarNode(
 	node: StarNode,
 	config: TTransformStarNodeConfig
-): { type: 'Star' } & CNV.StarNode {
+): { type: 'Star' } & ARB.StarNode {
 	const { fills, strokes, effects, autoLayout } = config;
 
 	return {

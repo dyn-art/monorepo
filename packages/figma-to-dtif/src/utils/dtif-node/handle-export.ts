@@ -1,4 +1,4 @@
-import type { CNV } from '@dyn/cnv-dtif';
+import type { ARB } from '@dyn/arb-dtif';
 
 import { UploadStaticDataException } from '../../exceptions';
 import type { TContentType, TExportConfig } from '../../types';
@@ -6,7 +6,7 @@ import type { TContentType, TExportConfig } from '../../types';
 export async function handleExport(
 	binary: Uint8Array,
 	config: TUploadStaticDataConfig
-): Promise<CNV.AssetContent> {
+): Promise<ARB.AssetContent> {
 	const { contentType, key, export: exportConfig, nodeIds = [] } = config;
 
 	if (exportConfig.mode === 'External') {

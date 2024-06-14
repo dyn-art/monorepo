@@ -1,6 +1,6 @@
-import type { CNV } from '@dyn/cnv-dtif';
+import type { ARB } from '@dyn/arb-dtif';
 
-export function mapFigmaConstraintToDtif(figmaConstraint?: ConstraintType): CNV.Constraint {
+export function mapFigmaConstraintToDtif(figmaConstraint?: ConstraintType): ARB.Constraint {
 	switch (figmaConstraint) {
 		case 'MIN':
 			return 'Start';

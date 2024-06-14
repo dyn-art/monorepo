@@ -8,8 +8,8 @@ export interface paths {
   "/health": {
     get: operations["get_health_handler"];
   };
-  "/v1/cnv/render": {
-    post: operations["post_v1_cnv_render_handler"];
+  "/v1/arb/render": {
+    post: operations["post_v1_arb_render_handler"];
   };
   "/v1/svg/simplify": {
     post: operations["post_v1_svg_simplify"];
@@ -123,19 +123,19 @@ export interface components {
     BlendMode: "Normal" | "Multiply" | "Screen" | "Overlay" | "Darken" | "Lighten" | "ColorDodge" | "ColorBurn" | "HardLight" | "SoftLight" | "Difference" | "Exclusion" | "Hue" | "Saturation" | "Color" | "Luminosity";
     Color: number[];
     /** @enum {string} */
-    CnvVersion: "V000001";
+    ArbVersion: "V000001";
     /** @enum {string} */
     Constraint: "Start" | "Center" | "End" | "Stretch" | "Scale";
     Constraints: {
       horizontal: components["schemas"]["Constraint"];
       vertical: components["schemas"]["Constraint"];
     };
-    CoreInputEvent: (components["schemas"]["UpdateCanvasSizeInputEvent"] & {
+    CoreInputEvent: (components["schemas"]["UpdateArtboardSizeInputEvent"] & {
       /** @enum {string} */
-      type: "UpdateCanvasSize";
-    }) | (components["schemas"]["UpdateCanvasViewportInputEvent"] & {
+      type: "UpdateArtboardSize";
+    }) | (components["schemas"]["UpdateArtboardViewportInputEvent"] & {
       /** @enum {string} */
-      type: "UpdateCanvasViewport";
+      type: "UpdateArtboardViewport";
     }) | (components["schemas"]["FocusRootNodesInputEvent"] & {
       /** @enum {string} */
       type: "FocusRootNodes";
@@ -246,7 +246,7 @@ export interface components {
      * and efficient access & manipulation of design elements (Nodes, Paints, ..).
      * https://softwareengineering.stackexchange.com/questions/350623/flat-or-nested-json-for-hierarchal-data
      */
-    DtifCanvas: {
+    DtifArtboard: {
       /** @description A list of assets. */
       assets?: components["schemas"]["AssetWithId"][];
       /** @description A list of input events. */
@@ -258,7 +258,7 @@ export interface components {
       /** @description A list of scripts. */
       scripts?: components["schemas"]["LuaScriptWithId"][];
       size: components["schemas"]["Size"];
-      version?: components["schemas"]["CnvVersion"] | null;
+      version?: components["schemas"]["ArbVersion"] | null;
       viewport?: components["schemas"]["Viewport"] | null;
     };
     EllipseNode: {
@@ -658,10 +658,10 @@ export interface components {
     };
     /** @enum {string} */
     TextSizingMode: "WidthAndHeight" | "Height" | "Fixed";
-    UpdateCanvasSizeInputEvent: {
+    UpdateArtboardSizeInputEvent: {
       size: components["schemas"]["Size"];
     };
-    UpdateCanvasViewportInputEvent: {
+    UpdateArtboardViewportInputEvent: {
       viewport: components["schemas"]["Viewport"];
     };
     UpdateDropShadowStyleInputEvent: {
@@ -818,7 +818,7 @@ export interface operations {
       };
     };
   };
-  post_v1_cnv_render_handler: {
+  post_v1_arb_render_handler: {
     parameters: {
       path: {
         format: components["schemas"]["FileFormat"] | null;
@@ -829,7 +829,7 @@ export interface operations {
     };
     requestBody: {
       content: {
-        "application/json": components["schemas"]["DtifCanvas"];
+        "application/json": components["schemas"]["DtifArtboard"];
       };
     };
     responses: {

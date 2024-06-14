@@ -1,8 +1,8 @@
-import type { CNV } from '@dyn/cnv-dtif';
+import type { ARB } from '@dyn/arb-dtif';
 
 export function mapFigmaTextSizingModeToDtif(
 	sizingMode: 'NONE' | 'WIDTH_AND_HEIGHT' | 'HEIGHT' | 'TRUNCATE'
-): CNV.TextSizingMode {
+): ARB.TextSizingMode {
 	switch (sizingMode) {
 		case 'WIDTH_AND_HEIGHT':
 			return 'WidthAndHeight';

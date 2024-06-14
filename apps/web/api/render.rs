@@ -1,11 +1,11 @@
 use bevy_app::App;
 use bevy_ecs::query::{With, Without};
-use dyn_cnv_asset::asset::AssetContent;
-use dyn_cnv_bundles::components::marker::Root;
-use dyn_cnv_core::{resources::canvas::CanvasRes, CnvCorePlugin};
-use dyn_cnv_dtif::DtifCanvas;
-use dyn_cnv_svg_builder::{
-    events::SvgBuilderOutputEvent, svg::svg_bundle::SvgBundleVariant, CnvSvgBuilderPlugin,
+use dyn_arb_asset::asset::AssetContent;
+use dyn_arb_bundles::components::marker::Root;
+use dyn_arb_core::{resources::canvas::ArtboardRes, ArbCorePlugin};
+use dyn_arb_dtif::DtifArtboard;
+use dyn_arb_svg_builder::{
+    events::SvgBuilderOutputEvent, svg::svg_bundle::SvgBundleVariant, ArbSvgBuilderPlugin,
 };
 use dyn_web_api::{
     app_error,
@@ -37,7 +37,7 @@ pub async fn handler(_req: Request) -> Result<Response<Body>, Error> {
         .unwrap_or("svg");
 
     // Parse body
-    let mut body: DtifCanvas = match serde_json::from_slice(_req.body()) {
+    let mut body: DtifArtboard = match serde_json::from_slice(_req.body()) {
         Ok(v) => v,
         Err(_) => {
             return app_error!(StatusCode::BAD_REQUEST, ErrorCode::new("INVALID_BODY"))
@@ -118,7 +118,7 @@ pub async fn handler(_req: Request) -> Result<Response<Body>, Error> {
     };
 }
 
-async fn prepare_dtif_canvas(dtif_canvas: &mut DtifCanvas) -> Result<(), reqwest::Error> {
+async fn prepare_dtif_canvas(dtif_canvas: &mut DtifArtboard) -> Result<(), reqwest::Error> {
     for asset in dtif_canvas.assets.iter_mut() {
         let mut maybe_content = None;
         if let AssetContent::Url { url } = &asset.content {
@@ -132,19 +132,19 @@ async fn prepare_dtif_canvas(dtif_canvas: &mut DtifCanvas) -> Result<(), reqwest
     return Ok(());
 }
 
-fn build_svg_string(mut dtif: DtifCanvas) -> Result<String, AppError> {
+fn build_svg_string(mut dtif: DtifArtboard) -> Result<String, AppError> {
     let mut app = App::new();
 
     let (svg_builder_output_event_sender, _) = channel::<SvgBuilderOutputEvent>();
 
     // Register plugins
     app.add_plugins((
-        CnvCorePlugin {
+        ArbCorePlugin {
             version: dtif.version,
             size: dtif.size,
             viewport: dtif.viewport,
         },
-        CnvSvgBuilderPlugin {
+        ArbSvgBuilderPlugin {
             output_event_sender: svg_builder_output_event_sender,
         },
     ));
@@ -155,16 +155,19 @@ fn build_svg_string(mut dtif: DtifCanvas) -> Result<String, AppError> {
     app.update();
 
     let mut result = String::new();
-    let cnv_res = app.world.get_resource::<CanvasRes>().ok_or(AppError::new(
-        StatusCode::INTERNAL_SERVER_ERROR,
-        ErrorCode::new("CANVAS_RES_NOT_FOUND"),
-    ))?;
+    let arb_res = app
+        .world
+        .get_resource::<ArtboardRes>()
+        .ok_or(AppError::new(
+            StatusCode::INTERNAL_SERVER_ERROR,
+            ErrorCode::new("CANVAS_RES_NOT_FOUND"),
+        ))?;
 
     // Open SVG tag
     result.push_str(&format!(
         "<svg width=\"{}\" height=\"{}\" xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\">",
-        cnv_res.size.width(),
-        cnv_res.size.height()
+        arb_res.size.width(),
+        arb_res.size.height()
     ));
 
     let mut system_state: bevy_ecs::system::SystemState<(

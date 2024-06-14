@@ -1,8 +1,8 @@
-import type { CNV } from '@dyn/cnv-dtif';
+import type { ARB } from '@dyn/arb-dtif';
 
 export function mapFigmaTextAlignVerticalToDtif(
 	align: TextNode['textAlignVertical']
-): CNV.VerticalTextAlignment {
+): ARB.VerticalTextAlignment {
 	switch (align) {
 		case 'TOP':
 			return 'Top';

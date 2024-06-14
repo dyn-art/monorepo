@@ -1,4 +1,4 @@
-import type { CNV } from '@dyn/cnv-dtif';
+import type { ARB } from '@dyn/arb-dtif';
 
 import type {
 	TToTransformEffect,
@@ -12,7 +12,7 @@ export function createDtifStyles(
 	fills: TToTransformFill[],
 	strokes: TToTransformStroke[],
 	effects: TToTransformEffect[]
-): CNV.Style[] {
+): ARB.Style[] {
 	const fillStyles = fills.map(
 		(fill) =>
 			({
@@ -21,13 +21,13 @@ export function createDtifStyles(
 				blendMode: mapFigmaBlendModeToDtif(fill.blendMode),
 				opacity: fill.opacity,
 				visible: fill.visible
-			}) as CNV.Style
+			}) as ARB.Style
 	);
 
-	const centerStrokeStyles: CNV.Style[] = [];
-	const outsideStrokeStyles: CNV.Style[] = [];
+	const centerStrokeStyles: ARB.Style[] = [];
+	const outsideStrokeStyles: ARB.Style[] = [];
 	for (const stroke of strokes) {
-		const strokeStyle: CNV.Style = {
+		const strokeStyle: ARB.Style = {
 			type: 'Stroke',
 			width: stroke.width,
 			paintId: { type: 'ReferenceId', referenceId: `p${stroke.paintId}` },
@@ -47,7 +47,7 @@ export function createDtifStyles(
 		}
 	}
 
-	const effectStyles: CNV.Style[] = [];
+	const effectStyles: ARB.Style[] = [];
 	for (const effect of effects) {
 		switch (effect.variant.type) {
 			case 'DROP_SHADOW': {

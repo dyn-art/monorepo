@@ -1,5 +1,5 @@
 import { ContinuousId } from '@ibg/utils';
-import type { CNV } from '@dyn/cnv-dtif';
+import type { ARB } from '@dyn/arb-dtif';
 
 import type { Transformer } from '../../Transformer';
 import type { TFigmaFormat } from '../../types';
@@ -14,7 +14,7 @@ export async function transformNodeToImage(
 	node: SceneNode,
 	cx: Transformer,
 	config: TTransformNodeToImageConfig
-): Promise<{ type: 'Rectangle' } & CNV.RectangleNode> {
+): Promise<{ type: 'Rectangle' } & ARB.RectangleNode> {
 	const { format } = config;
 
 	// Export node as image

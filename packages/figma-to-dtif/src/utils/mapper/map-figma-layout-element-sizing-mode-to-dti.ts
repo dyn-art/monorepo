@@ -1,8 +1,8 @@
-import type { CNV } from '@dyn/cnv-dtif';
+import type { ARB } from '@dyn/arb-dtif';
 
 export function mapFigmaLayoutElementSizingModeToDtif(
 	sizingMode: 'FIXED' | 'HUG' | 'FILL'
-): CNV.LayoutElementSizingMode {
+): ARB.LayoutElementSizingMode {
 	switch (sizingMode) {
 		case 'FIXED':
 		case 'HUG':

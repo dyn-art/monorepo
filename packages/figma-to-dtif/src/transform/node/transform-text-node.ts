@@ -1,5 +1,5 @@
 import { calculateBytes } from '@ibg/utils';
-import type { CNV } from '@dyn/cnv-dtif';
+import type { ARB } from '@dyn/arb-dtif';
 
 import type {
 	TToTransformEffect,
@@ -22,7 +22,7 @@ export function transformTextNode(
 	node: TextNode,
 	attributes: TToTransformTextNode['attributes'],
 	config: TTransformTextNodeNodeConfig
-): { type: 'Text' } & CNV.TextNode {
+): { type: 'Text' } & ARB.TextNode {
 	const { fills, strokes, effects, autoLayout } = config;
 
 	let nextStart = 0;
