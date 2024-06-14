@@ -1,9 +1,7 @@
 use crate::{
     environment::app_state::AppState,
-    error::{
-        app_error::{AppError, AppErrorOptions, ErrorCode},
-        extract::{extract_json_body, extract_query_params, AppJsonBody, AppQueryParams},
-    },
+    error::app_error::{AppError, AppErrorOptions, ErrorCode},
+    middlewares::extract::{AppJson, AppQuery},
 };
 use axum::{
     body::Body,
@@ -38,7 +36,7 @@ pub fn router() -> Router<AppState> {
 #[serde(rename_all = "camelCase")]
 struct QueryParams {
     format: Option<FileFormat>,
-    script_args: Option<HashMap<ReferenceId, LuaScriptArgsMap>>,
+    script_args: Option<HashMap<String, LuaScriptArgsMap>>,
 }
 
 #[derive(Deserialize, utoipa::ToSchema)]
@@ -65,28 +63,24 @@ pub enum FileFormat {
 )]
 #[axum::debug_handler]
 async fn handler(
-    app_query: AppQueryParams<QueryParams>,
-    app_body: AppJsonBody<DtifComposition>,
+    app_query: AppQuery<QueryParams>,
+    app_body: AppJson<DtifComposition>,
 ) -> Result<Response, AppError> {
     let QueryParams {
         format: maybe_format,
         script_args: maybe_script_args,
-    } = extract_query_params(app_query)?;
-    let mut dtif = extract_json_body(app_body)?;
+    } = app_query.extract();
+    let mut dtif = app_body.extract();
 
     log::info!("QueryParams: {:?}", maybe_script_args);
 
     if let Some(script_args) = maybe_script_args {
         for (id, args) in script_args {
-            println!(
-                "Event: {:?}",
-                CoreInputEvent::ExecuteLuaScript(ExecuteLuaScriptInputEvent {
-                    id: id.clone(),
-                    args_map: args.clone()
-                },)
-            );
             dtif.events.push(CoreInputEvent::ExecuteLuaScript(
-                ExecuteLuaScriptInputEvent { id, args_map: args },
+                ExecuteLuaScriptInputEvent {
+                    id: ReferenceId::new(id),
+                    args_map: args,
+                },
             ))
         }
     }

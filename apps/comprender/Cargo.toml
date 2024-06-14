@@ -62,6 +62,7 @@ bevy_app = { workspace = true }
 bevy_ecs = { workspace = true }
 bevy_transform = { workspace = true }
 axum = { version = "0.7.5", features = ["macros"] }
+axum-extra = { version = "0.9.3", features = ["query"] }
 tokio = { version = "1.38.0", features = ["full"] }
 dotenv_config = "0.1.9"
 dotenvy = "0.15.7"
@@ -71,10 +72,9 @@ fontdb = "0.18.0"
 tiny-skia = "0.11.4"
 reqwest = "0.12.4"
 svg2pdf = "0.11.0"
-
-# Bindgen
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
+serde_qs = "0.13.0"
 specta = { workspace = true }
 
 # Logging
