@@ -69,8 +69,8 @@ async fn handler(
     let QueryParams {
         format: maybe_format,
         script_args: maybe_script_args,
-    } = app_query.extract();
-    let mut dtif = app_body.extract();
+    } = app_query.get();
+    let mut dtif = app_body.get();
 
     log::info!("QueryParams: {:?}", maybe_script_args);
 

@@ -14,7 +14,7 @@ use serde::de::DeserializeOwned;
 pub struct AppQuery<T>(T);
 
 impl<T> AppQuery<T> {
-    pub fn extract(self) -> T {
+    pub fn get(self) -> T {
         self.0
     }
 }
@@ -61,7 +61,7 @@ impl IntoResponse for AppQueryRejection {
 pub struct AppJson<T>(Json<T>);
 
 impl<T> AppJson<T> {
-    pub fn extract(self) -> T {
+    pub fn get(self) -> T {
         self.0 .0
     }
 }

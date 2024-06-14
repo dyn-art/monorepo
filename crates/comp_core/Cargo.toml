@@ -17,11 +17,10 @@ specta_support = [
     "dyn-attributed-string/specta_support",
 ]
 lua_scripts = [
+    "specta_support",
     "dep:dyn-comp-lua",
     "dep:gc-arena",
-    "dep:chrono",
     "dep:piccolo",
-    "dep:serde_json",
 ]
 tracing = []
 
@@ -49,9 +48,8 @@ gc-arena = { version = "0.5.3", features = [
     "allocator-api2",
     "hashbrown",
 ], optional = true }
-chrono = { version = "0.4.38", optional = true }
 piccolo = { git = "https://github.com/kyren/piccolo", rev = "df3e53e", optional = true }
-serde_json = { workspace = true, optional = true }
 
 [dev-dependencies]
 env_logger = { workspace = true }
+serde_json = { workspace = true }

@@ -118,12 +118,12 @@ mod tests {
         );
 
         let code = r#"
-            comp.log.warn("This is a warning")
-            comp.log.info("This is an info message")
-            comp.log.error("This is an error message")
-            local sum = comp.sum(1, 2, 3)
-            comp.log.info("Sum of 1, 2, 3 is " .. sum)
-            comp.log.info("Value of: " .. args.input)
+            dyn.log.warn("This is a warning")
+            dyn.log.info("This is an info message")
+            dyn.log.error("This is an error message")
+            local sum = dyn.sum(1, 2, 3)
+            dyn.log.info("Sum of 1, 2, 3 is " .. sum)
+            dyn.log.info("Value of: " .. args.input)
 
             -- error("A message?")
 
@@ -138,12 +138,12 @@ mod tests {
                 y = args.y
             }
 
-            comp.log.info("Table Log:", update_entity_transform_event, {10, 20, 30})
+            dyn.log.info("Table Log:", update_entity_transform_event, {10, 20, 30})
 
             comp.sendEvents({ update_composition_size_event, update_entity_transform_event })
 
             local date = args.date
-            local dateObj = comp.date.parse(date)
+            local dateObj = dyn.date.parse(date)
             local hours = dateObj.hour
             local minutes = dateObj.minute
             local ampm = hours >= 12 and 'PM' or 'AM'
@@ -151,7 +151,7 @@ mod tests {
             hours = hours ~= 0 and hours or 12
             local minutesStr = minutes < 10 and '0' .. minutes or minutes
             local timeStr = hours .. ":" .. minutesStr .. " " .. ampm
-            local dateStr = comp.date.format('%b %d, %Y', date)
+            local dateStr = dyn.date.format('%b %d, %Y', date)
             local combinedStr = timeStr .. " · " .. dateStr
 
             comp.sendEvent({

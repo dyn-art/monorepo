@@ -1,4 +1,5 @@
 use super::tables::args_table::{load_args_table_global, LuaScriptArgsMap};
+use crate::tables::dyn_table::load_dyn_table_global;
 use piccolo::{Lua, StaticError};
 
 #[derive(Debug, Clone)]
@@ -18,6 +19,7 @@ impl LuaScript {
 
         lua.enter(|ctx| {
             load_args_table_global(ctx, args_map);
+            load_dyn_table_global(ctx);
         });
 
         return lua;

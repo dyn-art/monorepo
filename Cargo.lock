@@ -923,7 +923,6 @@ dependencies = [
  "bevy_ecs",
  "bevy_hierarchy",
  "bevy_transform",
- "chrono",
  "dyn-attributed-string",
  "dyn-comp-asset",
  "dyn-comp-bundles",

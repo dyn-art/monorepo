@@ -23,7 +23,7 @@ utoipa_support = [
     "dyn-comp-lua/utoipa_support",
     "dyn-utils/utoipa_support",
 ]
-lua_scripts = ["dep:dyn-comp-lua"]
+lua_scripts = ["specta_support", "dep:dyn-comp-lua"]
 tracing = []
 
 [dependencies]
