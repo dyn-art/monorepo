@@ -877,7 +877,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "dyn-comp-asset"
+name = "dyn-cnv-asset"
 version = "0.0.1"
 dependencies = [
  "bevy_app",
@@ -894,7 +894,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "dyn-comp-bundles"
+name = "dyn-cnv-bundles"
 version = "0.0.1"
 dependencies = [
  "bevy_app",
@@ -902,8 +902,8 @@ dependencies = [
  "bevy_hierarchy",
  "bevy_transform",
  "dyn-attributed-string",
- "dyn-comp-asset",
- "dyn-comp-lua",
+ "dyn-cnv-asset",
+ "dyn-cnv-lua",
  "dyn-utils",
  "glam",
  "log",
@@ -916,7 +916,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "dyn-comp-core"
+name = "dyn-cnv-core"
 version = "0.0.1"
 dependencies = [
  "bevy_app",
@@ -924,9 +924,9 @@ dependencies = [
  "bevy_hierarchy",
  "bevy_transform",
  "dyn-attributed-string",
- "dyn-comp-asset",
- "dyn-comp-bundles",
- "dyn-comp-lua",
+ "dyn-cnv-asset",
+ "dyn-cnv-bundles",
+ "dyn-cnv-lua",
  "dyn-utils",
  "env_logger",
  "gc-arena",
@@ -941,13 +941,13 @@ dependencies = [
 ]
 
 [[package]]
-name = "dyn-comp-dtif"
+name = "dyn-cnv-dtif"
 version = "0.0.1"
 dependencies = [
  "bevy_app",
  "bevy_ecs",
- "dyn-comp-bundles",
- "dyn-comp-lua",
+ "dyn-cnv-bundles",
+ "dyn-cnv-lua",
  "dyn-utils",
  "glam",
  "log",
@@ -957,7 +957,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "dyn-comp-interaction"
+name = "dyn-cnv-interaction"
 version = "0.0.1"
 dependencies = [
  "bevy_app",
@@ -965,8 +965,8 @@ dependencies = [
  "bevy_hierarchy",
  "bevy_transform",
  "dyn-attributed-string",
- "dyn-comp-bundles",
- "dyn-comp-core",
+ "dyn-cnv-bundles",
+ "dyn-cnv-core",
  "dyn-utils",
  "glam",
  "log",
@@ -978,7 +978,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "dyn-comp-lua"
+name = "dyn-cnv-lua"
 version = "0.0.1"
 dependencies = [
  "chrono",
@@ -994,7 +994,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "dyn-comp-svg-builder"
+name = "dyn-cnv-svg-builder"
 version = "0.0.1"
 dependencies = [
  "base64 0.22.0",
@@ -1002,8 +1002,8 @@ dependencies = [
  "bevy_ecs",
  "bevy_hierarchy",
  "bevy_transform",
- "dyn-comp-asset",
- "dyn-comp-bundles",
+ "dyn-cnv-asset",
+ "dyn-cnv-bundles",
  "dyn-utils",
  "glam",
  "imagesize",
@@ -1015,7 +1015,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "dyn-comp-svg-builder-api"
+name = "dyn-cnv-svg-builder-api"
 version = "0.0.1"
 dependencies = [
  "bevy_app",
@@ -1023,12 +1023,12 @@ dependencies = [
  "bevy_transform",
  "clap",
  "console_error_panic_hook",
- "dyn-comp-bundles",
- "dyn-comp-core",
- "dyn-comp-dtif",
- "dyn-comp-interaction",
- "dyn-comp-lua",
- "dyn-comp-svg-builder",
+ "dyn-cnv-bundles",
+ "dyn-cnv-core",
+ "dyn-cnv-dtif",
+ "dyn-cnv-interaction",
+ "dyn-cnv-lua",
+ "dyn-cnv-svg-builder",
  "dyn-utils",
  "glam",
  "js-sys",
@@ -1043,7 +1043,22 @@ dependencies = [
 ]
 
 [[package]]
-name = "dyn-comprender"
+name = "dyn-fonts-book"
+version = "0.0.1"
+dependencies = [
+ "dyn-utils",
+ "env_logger",
+ "fontdb 0.18.0",
+ "log",
+ "rustybuzz 0.14.0",
+ "self_cell",
+ "serde",
+ "specta",
+ "utoipa",
+]
+
+[[package]]
+name = "dyn-graphic"
 version = "0.0.1"
 dependencies = [
  "axum",
@@ -1055,12 +1070,12 @@ dependencies = [
  "dotenv_config",
  "dotenvy",
  "dyn-attributed-string",
- "dyn-comp-asset",
- "dyn-comp-bundles",
- "dyn-comp-core",
- "dyn-comp-dtif",
- "dyn-comp-lua",
- "dyn-comp-svg-builder",
+ "dyn-cnv-asset",
+ "dyn-cnv-bundles",
+ "dyn-cnv-core",
+ "dyn-cnv-dtif",
+ "dyn-cnv-lua",
+ "dyn-cnv-svg-builder",
  "dyn-utils",
  "env_logger",
  "fontdb 0.18.0",
@@ -1077,21 +1092,6 @@ dependencies = [
  "usvg 0.42.0",
  "utoipa",
  "utoipauto",
-]
-
-[[package]]
-name = "dyn-fonts-book"
-version = "0.0.1"
-dependencies = [
- "dyn-utils",
- "env_logger",
- "fontdb 0.18.0",
- "log",
- "rustybuzz 0.14.0",
- "self_cell",
- "serde",
- "specta",
- "utoipa",
 ]
 
 [[package]]
@@ -1113,11 +1113,11 @@ dependencies = [
  "bevy_app",
  "bevy_ecs",
  "bevy_transform",
- "dyn-comp-asset",
- "dyn-comp-bundles",
- "dyn-comp-core",
- "dyn-comp-dtif",
- "dyn-comp-svg-builder",
+ "dyn-cnv-asset",
+ "dyn-cnv-bundles",
+ "dyn-cnv-core",
+ "dyn-cnv-dtif",
+ "dyn-cnv-svg-builder",
  "fontdb 0.16.2",
  "log",
  "reqwest",

@@ -1,8 +1,8 @@
-import type { COMP } from '@dyn/comp-dtif';
+import type { CNV } from '@dyn/cnv-dtif';
 
 export function mapFigmaTextAlignVerticalToDtif(
 	align: TextNode['textAlignVertical']
-): COMP.VerticalTextAlignment {
+): CNV.VerticalTextAlignment {
 	switch (align) {
 		case 'TOP':
 			return 'Top';

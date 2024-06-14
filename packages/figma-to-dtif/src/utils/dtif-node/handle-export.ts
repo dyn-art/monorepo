@@ -1,4 +1,4 @@
-import type { COMP } from '@dyn/comp-dtif';
+import type { CNV } from '@dyn/cnv-dtif';
 
 import { UploadStaticDataException } from '../../exceptions';
 import type { TContentType, TExportConfig } from '../../types';
@@ -6,7 +6,7 @@ import type { TContentType, TExportConfig } from '../../types';
 export async function handleExport(
 	binary: Uint8Array,
 	config: TUploadStaticDataConfig
-): Promise<COMP.AssetContent> {
+): Promise<CNV.AssetContent> {
 	const { contentType, key, export: exportConfig, nodeIds = [] } = config;
 
 	if (exportConfig.mode === 'External') {

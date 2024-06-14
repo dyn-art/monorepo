@@ -1,4 +1,4 @@
-import type { COMP } from '@dyn/comp-dtif';
+import type { CNV } from '@dyn/cnv-dtif';
 
 import type { TToTransformAsset } from '../../FigmaNodeTreeProcessor';
 import { transformFontAsset, type TTransformFontAssetConfig } from './transform-font';
@@ -7,7 +7,7 @@ import { transformImageAsset, type TTransformImageAssetConfig } from './transfor
 export async function transformAsset(
 	toTransformAsset: TToTransformAsset,
 	config: TTransformAssetConfig
-): Promise<COMP.AssetWithId> {
+): Promise<CNV.AssetWithId> {
 	const asset = toTransformAsset.asset;
 	switch (asset.type) {
 		case 'Image':

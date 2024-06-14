@@ -35,7 +35,7 @@ export const GradientPaintInputRow: React.FC<TProps> = (props) => {
 			>
 				<div className="absolute inset-y-0 left-2 flex items-center">
 					<button
-						className="cursor-pointer overflow-hidden rounded-sm border-[1px] border-black  hover:border-2 active:scale-105"
+						className="cursor-pointer overflow-hidden rounded-sm border-[1px] border-black hover:border-2 active:scale-105"
 						onClick={onPopoverTriggerClick}
 						type="button"
 					>

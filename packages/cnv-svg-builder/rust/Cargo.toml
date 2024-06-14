@@ -1,0 +1,93 @@
+[package]
+name = "dyn-cnv-svg-builder-api"
+version = "0.0.1"
+description = ""
+edition = { workspace = true }
+homepage = { workspace = true }
+repository = { workspace = true }
+license = { workspace = true }
+authors = { workspace = true }
+
+[lib]
+name = "dyn_cnv_svg_builder_api"
+path = "src/lib.rs"
+crate-type = ["cdylib", "rlib"]
+
+[[bin]]
+name = "cli"
+path = "src/bin/cli.rs"
+required-features = ["cli"]
+
+[features]
+default = []
+console_log = ["dep:console_error_panic_hook", "dep:once_cell"]
+cli = ["dep:clap", "specta/export"]
+tracing = [
+    "console_log",
+    "dyn-cnv-core/tracing",
+    "dyn-cnv-interaction/tracing",
+    "dyn-cnv-svg-builder/tracing",
+    "dyn-cnv-dtif/tracing",
+]
+
+[dependencies]
+dyn-cnv-core = { path = "../../../crates/cnv_core", features = [
+    "specta_support",
+] }
+dyn-cnv-dtif = { path = "../../../crates/cnv_dtif", features = [
+    "specta_support",
+    "lua_scripts",
+] }
+dyn-cnv-bundles = { path = "../../../crates/cnv_bundles", features = [
+    "specta_support",
+] }
+dyn-cnv-interaction = { path = "../../../crates/cnv_interaction", features = [
+    "specta_support",
+] }
+dyn-cnv-svg-builder = { path = "../../../crates/cnv_svg_builder", features = [
+    "specta_support",
+    "output_svg_element_changes",
+] }
+dyn-cnv-lua = { path = "../../../crates/cnv_lua", features = [
+    "specta_support",
+] }
+dyn-utils = { path = "../../../crates/utils", features = ["specta_support"] }
+bevy_app = { workspace = true }
+bevy_ecs = { workspace = true }
+bevy_transform = { workspace = true }
+glam = { workspace = true }
+
+# Bindgen
+wasm-bindgen = "0.2.92"
+js-sys = "0.3.69"
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+serde-wasm-bindgen = "0.6.5"
+specta = { workspace = true, features = [
+    "typescript",
+    "serde",
+    "glam",
+    "bevy_ecs",
+] }
+
+# Logging
+log = { workspace = true }
+
+# console_log (feature)
+console_error_panic_hook = { version = "0.1.7", optional = true }
+once_cell = { version = "1.19.0", optional = true }
+
+# cli (feature)
+clap = { version = "4.5.7", features = ["derive"], optional = true }
+
+[dev-dependencies]
+wasm-bindgen-test = "0.3.42"
+
+[profile.release]
+opt-level = "s"
+lto = true
+strip = true
+panic = "abort" # Without console_error_panic_hook in debug mode, the panic's stack trace is useless anway
+
+[profile.dev.package."*"]
+opt-level = 3

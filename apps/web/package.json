@@ -24,9 +24,9 @@
 	},
 	"homepage": "https://dyn.art/?source=package-json",
 	"dependencies": {
-		"@dyn/comp-dtif": "workspace:*",
-		"@dyn/comp-svg-builder": "workspace:*",
-		"@dyn/comp-svg-editor": "workspace:*",
+		"@dyn/cnv-dtif": "workspace:*",
+		"@dyn/cnv-svg-builder": "workspace:*",
+		"@dyn/cnv-svg-editor": "workspace:*",
 		"@dyn/ui": "workspace:*",
 		"@tanstack/react-query": "^5.35.1",
 		"@vercel/analytics": "^1.2.2",

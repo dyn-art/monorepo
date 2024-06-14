@@ -1,8 +1,8 @@
-import { Button } from '@dyn/ui';
 import { createState, withUndo } from 'feature-state';
 import { useGlobalState } from 'feature-state-react';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Button } from '@dyn/ui';
 
 import { Footer, Navbar } from '../components';
 

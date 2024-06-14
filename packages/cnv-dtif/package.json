@@ -1,0 +1,41 @@
+{
+	"name": "@dyn/cnv-dtif",
+	"description": "Design Tree Interchange Format (DTIF) type declarations and utility functions",
+	"version": "0.0.1",
+	"private": true,
+	"scripts": {
+		"build": "shx rm -rf dist && ../../scripts/cli.sh bundle",
+		"start:dev": "tsc -w",
+		"lint": "eslint --ext .js,.ts src/",
+		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
+		"install:clean": "pnpm run clean && pnpm install",
+		"test": "vitest run",
+		"update:latest": "pnpm update --latest"
+	},
+	"source": "./src/index.ts",
+	"main": "./dist/cjs/index.js",
+	"module": "./dist/esm/index.js",
+	"types": "./dist/types/index.d.ts",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/dyn-art/monorepo.git"
+	},
+	"keywords": [],
+	"author": "@bennoinbeta",
+	"license": "Commercial License",
+	"bugs": {
+		"url": "https://github.com/dyn-art/monorepo/issues"
+	},
+	"homepage": "https://dyn.art/?source=package-json",
+	"dependencies": {
+		"@ibg/utils": "^0.0.6"
+	},
+	"devDependencies": {
+		"@ibg/config": "^0.0.11",
+		"@types/node": "^20.8.10"
+	},
+	"files": [
+		"dist",
+		"README.md"
+	]
+}

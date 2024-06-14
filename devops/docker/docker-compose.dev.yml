@@ -1,12 +1,12 @@
 version: '3.8'
 
 services:
-  comprender:
+  graphic:
     build:
       context: ../.. # Root of monorepo
       dockerfile: ./devops/docker/base/rust/Dockerfile
       args:
-        PROJECT: comprender
+        PROJECT: graphic
         APP_PORT: 3000
     ports:
       - '3001:3000'

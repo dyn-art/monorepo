@@ -1,4 +1,4 @@
-import type { COMP } from '@dyn/comp-dtif';
+import type { CNV } from '@dyn/cnv-dtif';
 
 import { UnsupportedFigmaNodeException } from '../../exceptions';
 import type { TToTransformShapeNode } from '../../FigmaNodeTreeProcessor';
@@ -10,7 +10,7 @@ import { transformVectorNode } from './transform-vector-node';
 
 export async function transformShapeNode(
 	toTransformNode: TToTransformShapeNode
-): Promise<COMP.Node> {
+): Promise<CNV.Node> {
 	switch (toTransformNode.node.type) {
 		case 'RECTANGLE':
 			return transformRectangleNode(toTransformNode.node, {

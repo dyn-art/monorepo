@@ -1,5 +1,5 @@
 import React from 'react';
-import { isDtifComposition, isMdtifComposition, prepareDtifComposition } from '@dyn/comp-dtif';
+import { isDtif, isMdtif, prepareDtif } from '@dyn/cnv-dtif';
 
 import { EditorWrapper } from './_components';
 import { getStaticDtif } from './_helper';
@@ -10,13 +10,13 @@ const Page = async (props: TProps): Promise<React.ReactNode> => {
 	} = props;
 	const dtif = await getStaticDtif(id);
 
-	if (isMdtifComposition(dtif)) {
-		const preparedDtif = await prepareDtifComposition(dtif);
+	if (isMdtif(dtif)) {
+		const preparedDtif = await prepareDtif(dtif);
 		return <EditorWrapper dtif={preparedDtif} />;
 	}
 
-	if (isDtifComposition(dtif)) {
-		const preparedDtif = await prepareDtifComposition(dtif);
+	if (isDtif(dtif)) {
+		const preparedDtif = await prepareDtif(dtif);
 		return <EditorWrapper dtif={preparedDtif} />;
 	}
 

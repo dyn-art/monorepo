@@ -2,7 +2,7 @@ import React from 'react';
 
 import { appHandler } from '../../app-handler';
 import { useAppCallback } from '../../hooks';
-import { CompositionPreview } from './CompositionPreview';
+import { CanvasPreview } from './CanvasPreview';
 import { ToTransformSelection } from './ToTransformSelection';
 import { TransformLoadingIndicator } from './TransformLoadingIndicator';
 
@@ -42,7 +42,7 @@ const ToDTIFPlugin: React.FC = () => {
 		<div className="flex h-full w-full flex-col px-4">
 			<ToTransformSelection isTransforming={isTransforming} />
 			<TransformLoadingIndicator isTransforming={isTransforming} />
-			<CompositionPreview isTransforming={isTransforming} />
+			<CanvasPreview isTransforming={isTransforming} />
 		</div>
 	);
 };

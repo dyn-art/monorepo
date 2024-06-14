@@ -1,4 +1,4 @@
-import type { COMP } from '@dyn/comp-dtif';
+import type { CNV } from '@dyn/cnv-dtif';
 
 import type {
 	TToTransformEffect,
@@ -16,7 +16,7 @@ import {
 export function transformVectorNode(
 	node: VectorNode,
 	config: TTransformVectorNodeConfig
-): { type: 'Vector' } & COMP.VectorNode {
+): { type: 'Vector' } & CNV.VectorNode {
 	const { fills, strokes, effects, autoLayout } = config;
 
 	return {

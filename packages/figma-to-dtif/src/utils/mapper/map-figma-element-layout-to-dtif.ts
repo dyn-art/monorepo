@@ -1,4 +1,4 @@
-import type { COMP } from '@dyn/comp-dtif';
+import type { CNV } from '@dyn/cnv-dtif';
 
 import type { TFigmaLayoutNode } from '../../types';
 import { mapFigmaConstraintsToDtif } from './map-figma-constraints-to-dtif';
@@ -7,7 +7,7 @@ import { mapFigmaLayoutElementSizingModeToDtif } from './map-figma-layout-elemen
 export function mapFigmaElementLayoutToDtif(
 	node: TFigmaLayoutNode,
 	autoLayout: boolean
-): COMP.LayoutElement {
+): CNV.LayoutElement {
 	if (autoLayout) {
 		return {
 			type: 'Static',

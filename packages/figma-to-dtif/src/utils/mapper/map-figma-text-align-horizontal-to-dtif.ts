@@ -1,8 +1,8 @@
-import type { COMP } from '@dyn/comp-dtif';
+import type { CNV } from '@dyn/cnv-dtif';
 
 export function mapFigmaTextAlignHorizontalToDtif(
 	align: TextNode['textAlignHorizontal']
-): COMP.HorizontalTextAlignment {
+): CNV.HorizontalTextAlignment {
 	switch (align) {
 		case 'LEFT':
 			return 'Left';

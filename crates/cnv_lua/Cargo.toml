@@ -1,0 +1,39 @@
+[package]
+name = "dyn-cnv-lua"
+version = "0.0.1"
+description = ""
+edition = { workspace = true }
+homepage = { workspace = true }
+repository = { workspace = true }
+license = "Commercial License"
+authors = { workspace = true }
+
+[features]
+default = []
+specta_support = ["dep:specta"]
+utoipa_support = ["dep:utoipa"]
+tracing = []
+
+[dependencies]
+gc-arena = { version = "0.5.3", features = ["allocator-api2", "hashbrown"] }
+chrono = { version = "0.4.38" }
+piccolo = { git = "https://github.com/kyren/piccolo", rev = "df3e53e" }
+serde_json = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+thiserror = { version = "1.0.61" }
+
+# Logging
+log = { workspace = true }
+
+# specta_support (feature)
+specta = { workspace = true, features = [
+    "serde",
+    "glam",
+    "serde_json",
+], optional = true }
+
+# utoipa_support (feature)
+utoipa = { workspace = true, optional = true }
+
+[dev-dependencies]
+env_logger = { workspace = true }

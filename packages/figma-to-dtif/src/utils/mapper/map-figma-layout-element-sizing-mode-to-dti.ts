@@ -1,8 +1,8 @@
-import type { COMP } from '@dyn/comp-dtif';
+import type { CNV } from '@dyn/cnv-dtif';
 
 export function mapFigmaLayoutElementSizingModeToDtif(
 	sizingMode: 'FIXED' | 'HUG' | 'FILL'
-): COMP.LayoutElementSizingMode {
+): CNV.LayoutElementSizingMode {
 	switch (sizingMode) {
 		case 'FIXED':
 		case 'HUG':

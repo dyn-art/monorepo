@@ -40,7 +40,7 @@ export const DateTimePicker: React.FC<TProps> = (props) => {
 			>
 				<PopoverTrigger asChild>
 					<button
-						className="absolute inset-y-0 left-0 flex cursor-pointer items-center pl-3 "
+						className="absolute inset-y-0 left-0 flex cursor-pointer items-center pl-3"
 						type="button"
 					>
 						<CalendarIcon className="h-4 w-4" />

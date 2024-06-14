@@ -1,6 +1,6 @@
-import type { COMP } from '@dyn/comp-dtif';
+import type { CNV } from '@dyn/cnv-dtif';
 
-export function resetDtifNodeTransform(node: COMP.Node): COMP.Node {
+export function resetDtifNodeTransform(node: CNV.Node): CNV.Node {
 	node.translation = [0, 0];
 	node.rotationDeg = 0;
 	return node;

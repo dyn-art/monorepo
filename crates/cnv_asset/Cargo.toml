@@ -1,0 +1,34 @@
+[package]
+name = "dyn-cnv-asset"
+version = "0.0.1"
+description = ""
+edition = { workspace = true }
+homepage = { workspace = true }
+repository = { workspace = true }
+license = "Commercial License"
+authors = { workspace = true }
+
+[features]
+default = []
+specta_support = ["dep:serde", "dep:specta", "slotmap/serde"]
+utoipa_support = ["dep:utoipa"]
+tracing = []
+
+[dependencies]
+dyn-fonts-book = { path = "../fonts_book" }
+bevy_app = { workspace = true }
+bevy_ecs = { workspace = true }
+fontdb = "0.18.0"
+slotmap = { workspace = true }
+tinyvec = { workspace = true }
+imagesize = "0.12"
+
+# Logging
+log = { workspace = true }
+
+# specta_support (feature)
+specta = { workspace = true, features = ["serde"], optional = true }
+serde = { workspace = true, features = ["derive"], optional = true }
+
+# utoipa_support (feature)
+utoipa = { workspace = true, optional = true }

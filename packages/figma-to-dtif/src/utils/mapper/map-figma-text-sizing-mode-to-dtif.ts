@@ -1,8 +1,8 @@
-import type { COMP } from '@dyn/comp-dtif';
+import type { CNV } from '@dyn/cnv-dtif';
 
 export function mapFigmaTextSizingModeToDtif(
 	sizingMode: 'NONE' | 'WIDTH_AND_HEIGHT' | 'HEIGHT' | 'TRUNCATE'
-): COMP.TextSizingMode {
+): CNV.TextSizingMode {
 	switch (sizingMode) {
 		case 'WIDTH_AND_HEIGHT':
 			return 'WidthAndHeight';

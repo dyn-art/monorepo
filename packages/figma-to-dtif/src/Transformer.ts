@@ -1,5 +1,5 @@
 import { ContinuousId, sleep } from '@ibg/utils';
-import type { COMP } from '@dyn/comp-dtif';
+import type { CNV } from '@dyn/cnv-dtif';
 
 import { FailedToResolveRootNodeException } from './exceptions';
 import {
@@ -24,7 +24,7 @@ export class Transformer {
 	private _nodesFailedToTransform: TToTransformNode[] = [];
 
 	// DTIF Nodes
-	public readonly nodes: COMP.Node[] = [];
+	public readonly nodes: CNV.Node[] = [];
 	private _rootNodeId: string;
 
 	// Figma Paints
@@ -32,14 +32,14 @@ export class Transformer {
 	private _paintsFailedToTransform: TToTransformPaint[] = [];
 
 	// DTIF Paints
-	public readonly paints: COMP.Paint[] = [];
+	public readonly paints: CNV.Paint[] = [];
 
 	// Assets
 	private _toTransformAssets: TToTransformAsset[] = [];
 	private _assetsFailedToTransform: TToTransformAsset[] = [];
 
 	// DTIF Assets
-	public readonly assets: COMP.AssetWithId[] = [];
+	public readonly assets: CNV.AssetWithId[] = [];
 
 	// Callbacks
 	private _onTransformStatusUpdate: TOnTransformStatusUpdate | null = null;
@@ -50,7 +50,7 @@ export class Transformer {
 		this._onTransformStatusUpdate = onTransformStatusUpdate;
 	}
 
-	public async transform(config: TTransformConfig): Promise<COMP.DtifComposition> {
+	public async transform(config: TTransformConfig): Promise<CNV.DtifCanvas> {
 		ContinuousId.ZERO;
 		const nodeConfig: TTransformNodeConfig = {
 			includeInvisible: true,
@@ -98,9 +98,9 @@ export class Transformer {
 			throw new FailedToResolveRootNodeException();
 		}
 
-		// Construct composition
-		await this.onTransformStatusUpdate({ type: ETransformStatus.CONSTRUCTING_COMPOSITON });
-		const composition: COMP.DtifComposition = {
+		// Construct canvas
+		await this.onTransformStatusUpdate({ type: ETransformStatus.CONSTRUCTING_CANVAS });
+		const canvas: CNV.DtifCanvas = {
 			version: 'V000001',
 			size: [this._toTransformRootNode.width, this._toTransformRootNode.height],
 			nodes: this.nodes,
@@ -114,7 +114,7 @@ export class Transformer {
 
 		nodeConfig.exportContainerNode.remove();
 		await this.onTransformStatusUpdate({ type: ETransformStatus.END });
-		return composition;
+		return canvas;
 	}
 
 	private async onTransformStatusUpdate(status: TTransformStatusUpdate): Promise<void> {
@@ -145,7 +145,7 @@ export class Transformer {
 		}
 	}
 
-	public insertNode(id: number, node: COMP.Node): void {
+	public insertNode(id: number, node: CNV.Node): void {
 		node.id = `n${id}`;
 		this.nodes.push(node);
 	}
@@ -167,7 +167,7 @@ export class Transformer {
 		}
 	}
 
-	public insertPaint(id: number, paint: COMP.Paint): void {
+	public insertPaint(id: number, paint: CNV.Paint): void {
 		paint.id = `p${id}`;
 		this.paints.push(paint);
 	}
@@ -189,7 +189,7 @@ export class Transformer {
 		}
 	}
 
-	public insertAsset(id: number, asset: COMP.AssetWithId): void {
+	public insertAsset(id: number, asset: CNV.AssetWithId): void {
 		asset.id = `a${id}`;
 		this.assets.push(asset);
 	}
@@ -225,7 +225,7 @@ export type TTransformStatusUpdate =
 	| { type: ETransformStatus.TRANSFORMING_NODES }
 	| { type: ETransformStatus.TRANSFORMING_PAINTS }
 	| { type: ETransformStatus.TRANSFORMING_ASSETS }
-	| { type: ETransformStatus.CONSTRUCTING_COMPOSITON }
+	| { type: ETransformStatus.CONSTRUCTING_CANVAS }
 	| { type: ETransformStatus.END };
 
 export enum ETransformStatus {
@@ -234,6 +234,6 @@ export enum ETransformStatus {
 	TRANSFORMING_NODES,
 	TRANSFORMING_PAINTS,
 	TRANSFORMING_ASSETS,
-	CONSTRUCTING_COMPOSITON,
+	CONSTRUCTING_CANVAS,
 	END
 }

@@ -2,13 +2,8 @@
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
-import {
-	isDtifComposition,
-	isMdtifComposition,
-	type COMP,
-	type TMdtifComposition
-} from '@dyn/comp-dtif';
-import { Editor, FieldBasedEditor } from '@dyn/comp-svg-editor';
+import { isDtif, isMdtif, type CNV, type TMdtifCanvas } from '@dyn/cnv-dtif';
+import { Editor, FieldBasedEditor } from '@dyn/cnv-svg-editor';
 import { Container } from '@dyn/ui';
 
 const queryClient = new QueryClient();
@@ -16,7 +11,7 @@ const queryClient = new QueryClient();
 export const EditorWrapper: React.FC<TProps> = (props) => {
 	const { dtif } = props;
 
-	if (isMdtifComposition(dtif)) {
+	if (isMdtif(dtif)) {
 		return (
 			<Container size="default" tag="main">
 				<QueryClientProvider client={queryClient}>
@@ -26,7 +21,7 @@ export const EditorWrapper: React.FC<TProps> = (props) => {
 		);
 	}
 
-	if (isDtifComposition(dtif)) {
+	if (isDtif(dtif)) {
 		return (
 			<Container className="h-screen" size="full" tag="main">
 				<QueryClientProvider client={queryClient}>
@@ -40,5 +35,5 @@ export const EditorWrapper: React.FC<TProps> = (props) => {
 };
 
 interface TProps {
-	dtif: COMP.DtifComposition | TMdtifComposition;
+	dtif: CNV.DtifCanvas | TMdtifCanvas;
 }

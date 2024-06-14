@@ -1,4 +1,4 @@
-import type { COMP } from '@dyn/comp-dtif';
+import type { CNV } from '@dyn/cnv-dtif';
 
 import type { TFigmaFormat } from '../../types';
 
@@ -6,7 +6,7 @@ export function mapFigmaFormatToDtifContentType(
 	format: TFigmaFormat,
 	width: number,
 	height: number
-): COMP.AssetContentType {
+): CNV.AssetContentType {
 	switch (format) {
 		case 'JPG':
 			return { type: 'Jpeg' };

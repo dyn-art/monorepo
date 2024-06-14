@@ -1,12 +1,12 @@
 import type { TContinuousId } from '@ibg/utils';
-import type { COMP } from '@dyn/comp-dtif';
+import type { CNV } from '@dyn/cnv-dtif';
 
 import { mapFigmaTransformToMat3 } from '../../utils';
 
 export function transformImagePaint(
 	paint: ImagePaint,
 	imageId: TContinuousId
-): { type: 'Image' } & COMP.ImagePaint {
+): { type: 'Image' } & CNV.ImagePaint {
 	return {
 		type: 'Image',
 		imageId: { type: 'ReferenceId', referenceId: `a${imageId}` },
@@ -14,7 +14,7 @@ export function transformImagePaint(
 	};
 }
 
-function resolveScaleMode(paint: ImagePaint): COMP.ImagePaint['scaleMode'] {
+function resolveScaleMode(paint: ImagePaint): CNV.ImagePaint['scaleMode'] {
 	switch (paint.scaleMode) {
 		case 'CROP':
 			return {

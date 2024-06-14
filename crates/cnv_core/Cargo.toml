@@ -1,0 +1,55 @@
+[package]
+name = "dyn-cnv-core"
+version = "0.0.1"
+description = ""
+edition = { workspace = true }
+homepage = { workspace = true }
+repository = { workspace = true }
+license = "Commercial License"
+authors = { workspace = true }
+
+[features]
+default = ["lua_scripts"]
+specta_support = [
+    "dyn-cnv-bundles/specta_support",
+    "dyn-cnv-lua/specta_support",
+    "dyn-utils/specta_support",
+    "dyn-attributed-string/specta_support",
+]
+lua_scripts = [
+    "specta_support",
+    "dep:dyn-cnv-lua",
+    "dep:gc-arena",
+    "dep:piccolo",
+]
+tracing = []
+
+[dependencies]
+dyn-cnv-asset = { path = "../cnv_asset" }
+dyn-cnv-bundles = { path = "../cnv_bundles" }
+dyn-attributed-string = { path = "../attributed_string" }
+dyn-utils = { path = "../utils" }
+bevy_app = { workspace = true }
+bevy_ecs = { workspace = true }
+bevy_hierarchy = { workspace = true }
+bevy_transform = { workspace = true }
+glam = { workspace = true }
+smallvec = { workspace = true }
+tiny-skia-path = { workspace = true }
+taffy = "0.5.1"
+hashbrown = "0.14.5"
+
+# Logging
+log = { workspace = true }
+
+# lua_scripts (feature)
+dyn-cnv-lua = { path = "../cnv_lua", optional = true }
+gc-arena = { version = "0.5.3", features = [
+    "allocator-api2",
+    "hashbrown",
+], optional = true }
+piccolo = { git = "https://github.com/kyren/piccolo", rev = "df3e53e", optional = true }
+
+[dev-dependencies]
+env_logger = { workspace = true }
+serde_json = { workspace = true }

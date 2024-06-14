@@ -1,10 +1,10 @@
-import type { COMP } from '@dyn/comp-dtif';
+import type { CNV } from '@dyn/cnv-dtif';
 
 import { mapFigmaLayoutParentSizingModeToDtif } from './map-figma-layout-parent-sizing-mode-to-dtif';
 
 export function mapFigmaParentLayoutToDtif(
 	node: FrameNode | ComponentNode | InstanceNode
-): COMP.StaticLayoutParent | null {
+): CNV.StaticLayoutParent | null {
 	const flexDirection = mapLayoutModeToDtif(node.layoutMode);
 	if (flexDirection == null) {
 		return null;
@@ -31,7 +31,7 @@ export function mapFigmaParentLayoutToDtif(
 
 function mapLayoutModeToDtif(
 	layoutMode: 'NONE' | 'HORIZONTAL' | 'VERTICAL'
-): COMP.FlexDirection | null {
+): CNV.FlexDirection | null {
 	switch (layoutMode) {
 		case 'HORIZONTAL':
 			return 'Row';
@@ -44,7 +44,7 @@ function mapLayoutModeToDtif(
 
 function mapCounterAxisAlignItemsToDtif(
 	counterAxisAlignItems: 'MIN' | 'MAX' | 'CENTER' | 'BASELINE'
-): COMP.AlignItems {
+): CNV.AlignItems {
 	switch (counterAxisAlignItems) {
 		case 'MIN':
 			return 'Start';
@@ -59,7 +59,7 @@ function mapCounterAxisAlignItemsToDtif(
 
 function mapPrimaryAxisAlignItemsToDtif(
 	primaryAxisAlignItems: 'MIN' | 'MAX' | 'CENTER' | 'SPACE_BETWEEN'
-): COMP.AlignContent {
+): CNV.AlignContent {
 	switch (primaryAxisAlignItems) {
 		case 'MIN':
 			return 'Start';

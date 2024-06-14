@@ -1,7 +1,7 @@
 const withDynUi = require('@dyn/ui/with-tailwind');
-const withDynCompSvgEditor = require('@dyn/comp-svg-editor/with-tailwind');
+const withDynCnvSvgEditor = require('@dyn/cnv-svg-editor/with-tailwind');
 
-module.exports = withDynCompSvgEditor(
+module.exports = withDynCnvSvgEditor(
 	withDynUi(
 		/** @type {import('tailwindcss').Config} */
 		{

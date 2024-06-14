@@ -1,4 +1,4 @@
-export * from './CompositionException';
+export * from './CanvasException';
 export * from './ExportFontAssetException';
 export * from './ExportImageAssetException';
 export * from './ExportNodeException';

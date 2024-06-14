@@ -1,6 +1,6 @@
 import { ContinuousId, notEmpty, type TContinuousId } from '@ibg/utils';
 import { MD5 } from 'object-hash';
-import type { COMP } from '@dyn/comp-dtif';
+import type { CNV } from '@dyn/cnv-dtif';
 
 import { UnsupportedFigmaNodeException } from './exceptions';
 import type {
@@ -241,7 +241,7 @@ export class FigmaNodeTreeProcessor {
 	// Helper to extract font metadata from a text node segment
 	private extractFontInfo(
 		segment: Omit<Omit<TTextNodeAttributeInterval, 'fontId'>, 'fontInfo'>
-	): COMP.FontInfo {
+	): CNV.FontInfo {
 		return {
 			family: { Named: segment.fontName.family },
 			variant: {
@@ -300,7 +300,7 @@ export type TTextNodeAttributeInterval = Pick<
 	| 'characters'
 	| 'start'
 	| 'end'
-> & { fontId: number; fontInfo: COMP.FontInfo };
+> & { fontId: number; fontInfo: CNV.FontInfo };
 
 export interface TToTransformFrameNode extends TToTransformBaseNode {
 	type: 'Frame';
@@ -365,7 +365,7 @@ export interface TToTransformImageAsset {
 
 export interface TToTransformFontAsset {
 	type: 'Font';
-	info: COMP.FontInfo;
+	info: CNV.FontInfo;
 }
 
 export interface TToTransformFill {

@@ -2,8 +2,8 @@
 resolver = "2"
 members = [
     "crates/*",
-    "packages/comp-svg-builder/rust",
-    "apps/comprender",
+    "packages/cnv-svg-builder/rust",
+    "apps/ee_graphic",
     "apps/web",
 ]
 exclude = ["crates/_deprecated"]

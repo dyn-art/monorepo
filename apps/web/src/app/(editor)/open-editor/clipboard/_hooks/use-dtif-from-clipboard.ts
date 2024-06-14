@@ -1,25 +1,20 @@
 import { useQuery } from '@tanstack/react-query';
-import {
-	isDtifComposition,
-	isMdtifComposition,
-	type COMP,
-	type TMdtifComposition
-} from '@dyn/comp-dtif';
+import { isDtif, isMdtif, type CNV, type TMdtifCanvas } from '@dyn/cnv-dtif';
 
 export function useDtifFromClipboard(): {
-	data?: COMP.DtifComposition | TMdtifComposition;
+	data?: CNV.DtifCanvas | TMdtifCanvas;
 	isLoading: boolean;
 } {
 	const { data, isLoading } = useQuery({
 		queryKey: ['clipboard-dtif'],
 		queryFn: async () => {
-			let dtif: COMP.DtifComposition | TMdtifComposition | undefined;
+			let dtif: CNV.DtifCanvas | TMdtifCanvas | undefined;
 
 			// Try to load Dtif from clipboard
 			try {
 				const text = await navigator.clipboard.readText();
 				const maybeDtif: unknown = JSON.parse(text);
-				if (isMdtifComposition(maybeDtif) || isDtifComposition(maybeDtif)) {
+				if (isMdtif(maybeDtif) || isDtif(maybeDtif)) {
 					dtif = maybeDtif;
 				}
 			} catch (e) {

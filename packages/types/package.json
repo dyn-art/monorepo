@@ -5,18 +5,18 @@
 	"private": true,
 	"scripts": {
 		"build": "shx rm -rf dist && pnpm run generate:openapi && ../../scripts/cli.sh bundle -b typesonly",
-		"generate:openapi": "pnpm run generate:openapi:core && pnpm run generate:openapi:comprender",
+		"generate:openapi": "pnpm run generate:openapi:core && pnpm run generate:openapi:graphic",
 		"generate:openapi:core": "npx openapi-typescript ./src/core/resources/openapi-v1.yaml -o ./src/core/gen/v1.ts",
-		"generate:openapi:comprender": "npx openapi-typescript ./src/comprender/resources/openapi-v1.yaml -o ./src/comprender/gen/v1.ts",
+		"generate:openapi:graphic": "npx openapi-typescript ./src/graphic/resources/openapi-v1.yaml -o ./src/graphic/gen/v1.ts",
 		"lint": "eslint --ext .js,.ts src/",
 		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
 		"install:clean": "pnpm run clean && pnpm install",
 		"update:latest": "pnpm update --latest"
 	},
 	"exports": {
-		"./comprender": {
-			"source": "./src/comprender/index.ts",
-			"types": "./dist/comprender/index.d.ts"
+		"./graphic": {
+			"source": "./src/graphic/index.ts",
+			"types": "./dist/graphic/index.d.ts"
 		},
 		"./core": {
 			"source": "./src/core/index.ts",
@@ -25,8 +25,8 @@
 	},
 	"typesVersions": {
 		"*": {
-			"comprender": [
-				"./dist/comprender/index.d.ts"
+			"graphic": [
+				"./dist/graphic/index.d.ts"
 			],
 			"core": [
 				"./dist/core/index.d.ts"
