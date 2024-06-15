@@ -20,7 +20,7 @@ use std::{
 /// A container with a horizontal and vertical component.
 #[derive(Default, Copy, Clone, Eq, PartialEq, Hash)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
 pub struct Axes<T> {

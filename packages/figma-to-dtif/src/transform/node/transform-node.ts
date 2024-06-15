@@ -1,4 +1,4 @@
-import type { COMP } from '@dyn/comp-dtif';
+import type { ARB } from '@dyn/arb-dtif';
 
 import { InvisibleNodeException } from '../../exceptions';
 import type { TToTransformNode } from '../../FigmaNodeTreeProcessor';
@@ -13,7 +13,7 @@ export async function transformNode(
 	toTransformNode: TToTransformNode,
 	cx: Transformer,
 	config: TTransformNodeConfig
-): Promise<COMP.Node> {
+): Promise<ARB.Node> {
 	const { includeInvisible, shouldExportFrame } = config;
 
 	// Check whether node is visible

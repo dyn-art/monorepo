@@ -22,7 +22,8 @@ const MAX_ANGLE_RAD: f32 = 2.0 * PI; // 360 degrees in radians
 
 /// An angle describing a rotation.
 #[derive(Default, Eq, PartialEq, Ord, PartialOrd, Hash, Clone, Copy)]
-#[cfg_attr(feature = "serde_support", derive(specta::Type))]
+#[cfg_attr(feature = "specta_support", derive(specta::Type))]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub struct Angle(Scalar);
 
 impl Angle {
@@ -147,7 +148,7 @@ assign_impl!(Angle -= Angle);
 assign_impl!(Angle *= f32);
 assign_impl!(Angle /= f32);
 
-#[cfg(feature = "serde_support")]
+#[cfg(feature = "specta_support")]
 impl serde::Serialize for Angle {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
@@ -157,7 +158,7 @@ impl serde::Serialize for Angle {
     }
 }
 
-#[cfg(feature = "serde_support")]
+#[cfg(feature = "specta_support")]
 impl<'de> serde::Deserialize<'de> for Angle {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
@@ -171,7 +172,7 @@ impl<'de> serde::Deserialize<'de> for Angle {
 /// Different units of angular measurement.
 #[derive(Debug, Default, Eq, PartialEq, Hash, Clone, Copy)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
 pub enum AngleUnit {

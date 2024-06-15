@@ -6,6 +6,10 @@ import { fetchFont } from './utils';
 
 export const app = new Hono();
 
+app.get('/health', async (ctx) => {
+	return ctx.json({ status: 'Up', message: 'Running' }, 200);
+});
+
 app.post('/v1/satori', async (ctx) => {
 	const format = ctx.req.query('format');
 	const body = await ctx.req.json();

@@ -1,8 +1,8 @@
-import type { COMP } from '@dyn/comp-dtif';
+import type { ARB } from '@dyn/arb-dtif';
 
 export function mapFigmaTextAlignHorizontalToDtif(
 	align: TextNode['textAlignHorizontal']
-): COMP.HorizontalTextAlignment {
+): ARB.HorizontalTextAlignment {
 	switch (align) {
 		case 'LEFT':
 			return 'Left';

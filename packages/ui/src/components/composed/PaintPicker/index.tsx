@@ -1,9 +1,15 @@
 'use client';
 
 import React from 'react';
+import {
+	Popover,
+	PopoverContent,
+	PopoverTrigger,
+	Tabs,
+	TabsList,
+	TabsTrigger
+} from '@/components/primitive';
 
-import { Popover, PopoverContent, PopoverTrigger } from '../../layout';
-import { Tabs, TabsList, TabsTrigger } from '../../primitive';
 import { GradientPaintTab } from './GradientPaintTab';
 import { ImagePaintTab } from './ImagePaintTab';
 import { InputRow } from './InputRow';

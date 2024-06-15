@@ -54,7 +54,9 @@ module.exports = {
 				sm: 'calc(var(--radius) - 4px)'
 			},
 			fontFamily: {
-				sans: ['var(--font-sans)', ...fontFamily.sans]
+				sans: ['var(--font-sans)', ...fontFamily.sans],
+				display: ['var(--font-display)', ...fontFamily.sans],
+				body: ['var(--font-body)', ...fontFamily.sans]
 			},
 			fontWeight: {
 				normal: 400,

@@ -24,14 +24,15 @@
 	},
 	"homepage": "https://dyn.art/?source=package-json",
 	"dependencies": {
-		"@dyn/comp-dtif": "workspace:*",
-		"@dyn/comp-svg-builder": "workspace:*",
-		"@dyn/comp-svg-editor": "workspace:*",
+		"@dyn/arb-dtif": "workspace:*",
+		"@dyn/arb-svg-builder": "workspace:*",
+		"@dyn/arb-svg-editor": "workspace:*",
 		"@dyn/ui": "workspace:*",
 		"@tanstack/react-query": "^5.35.1",
 		"@vercel/analytics": "^1.2.2",
 		"clsx": "^2.1.1",
 		"feature-fetch": "^0.0.6",
+		"framer-motion": "^11.2.10",
 		"next": "14.0.4",
 		"react": "^18.3.1",
 		"react-dom": "^18.3.1"

@@ -2,37 +2,36 @@
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
-import {
-	isDtifComposition,
-	isMdtifComposition,
-	type COMP,
-	type TMdtifComposition
-} from '@dyn/comp-dtif';
-import { Editor, FieldBasedEditor } from '@dyn/comp-svg-editor';
-import { Container } from '@dyn/ui';
+import { isDtif, isMdtif, type ARB, type TMdtifArtboard } from '@dyn/arb-dtif';
+import { Editor, FieldBasedEditor } from '@dyn/arb-svg-editor';
+import { LayoutWrapper } from '@dyn/ui';
 
 const queryClient = new QueryClient();
 
 export const EditorWrapper: React.FC<TProps> = (props) => {
 	const { dtif } = props;
 
-	if (isMdtifComposition(dtif)) {
+	if (isMdtif(dtif)) {
 		return (
-			<Container size="default" tag="main">
-				<QueryClientProvider client={queryClient}>
-					<FieldBasedEditor mdtif={dtif} />
-				</QueryClientProvider>
-			</Container>
+			<LayoutWrapper size="default" asChild>
+				<main>
+					<QueryClientProvider client={queryClient}>
+						<FieldBasedEditor mdtif={dtif} />
+					</QueryClientProvider>
+				</main>
+			</LayoutWrapper>
 		);
 	}
 
-	if (isDtifComposition(dtif)) {
+	if (isDtif(dtif)) {
 		return (
-			<Container className="h-screen" size="full" tag="main">
-				<QueryClientProvider client={queryClient}>
-					<Editor dtif={dtif} />
-				</QueryClientProvider>
-			</Container>
+			<LayoutWrapper size="full" className="h-screen" asChild>
+				<main>
+					<QueryClientProvider client={queryClient}>
+						<Editor dtif={dtif} />
+					</QueryClientProvider>
+				</main>
+			</LayoutWrapper>
 		);
 	}
 
@@ -40,5 +39,5 @@ export const EditorWrapper: React.FC<TProps> = (props) => {
 };
 
 interface TProps {
-	dtif: COMP.DtifComposition | TMdtifComposition;
+	dtif: ARB.DtifArtboard | TMdtifArtboard;
 }

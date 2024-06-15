@@ -2,8 +2,8 @@
 resolver = "2"
 members = [
     "crates/*",
-    "packages/comp-svg-builder/rust",
-    "apps/comprender",
+    "packages/arb-svg-builder/rust",
+    "apps/ee_graphic",
     "apps/web",
 ]
 exclude = ["crates/_deprecated"]
@@ -27,11 +27,13 @@ bevy_utils = "0.13.2"
 # Bindgen
 # specta = { git = "https://github.com/oscartbeaumont/specta.git", rev = "5da3e56" }
 specta = "=2.0.0-rc.12"
-serde = "1.0.202"
+serde = "1.0.203"
 serde_json = "1.0.117"
+utoipa = "4.2.3"
 
 # Logging
 log = "0.4.21"
+env_logger = "0.11.3"
 
 # Utilities
 glam = "0.25.0"

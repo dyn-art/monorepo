@@ -1,8 +1,8 @@
-import type { COMP } from '@dyn/comp-dtif';
+import type { ARB } from '@dyn/arb-dtif';
 
 export function mapFigmaTextAlignVerticalToDtif(
 	align: TextNode['textAlignVertical']
-): COMP.VerticalTextAlignment {
+): ARB.VerticalTextAlignment {
 	switch (align) {
 		case 'TOP':
 			return 'Top';

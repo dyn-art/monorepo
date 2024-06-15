@@ -1,4 +1,4 @@
-import type { COMP } from '@dyn/comp-dtif';
+import type { ARB } from '@dyn/arb-dtif';
 
 import { ExportImageAssetException } from '../../exceptions';
 import type { TToTransformImageAsset } from '../../FigmaNodeTreeProcessor';
@@ -9,7 +9,7 @@ export async function transformImageAsset(
 	asset: TToTransformImageAsset,
 	nodeIds: SceneNode['id'][],
 	config: TTransformImageAssetConfig
-): Promise<COMP.AssetWithId> {
+): Promise<ARB.AssetWithId> {
 	const { export: exportConfig } = config;
 	const { hash: imageHash } = asset;
 

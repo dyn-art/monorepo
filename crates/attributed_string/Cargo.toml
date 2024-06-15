@@ -10,11 +10,16 @@ authors = { workspace = true }
 
 [features]
 default = []
-serde_support = [
+specta_support = [
     "dep:serde",
     "dep:specta",
-    "dyn-utils/serde_support",
-    "dyn-fonts-book/serde_support",
+    "dyn-utils/specta_support",
+    "dyn-fonts-book/specta_support",
+]
+utoipa_support = [
+    "dep:utoipa",
+    "dyn-utils/utoipa_support",
+    "dyn-fonts-book/utoipa_support",
 ]
 tracing = []
 
@@ -22,24 +27,27 @@ tracing = []
 dyn-fonts-book = { path = "../fonts_book" }
 dyn-utils = { path = "../utils" }
 either = "1.10.0"
-fontdb = "0.16.0"
+fontdb = "0.18.0"
 glam = { workspace = true }
-rustybuzz = "0.13.0"
+rustybuzz = "0.14.0"
 rust-lapper = { git = "https://github.com/bennoinbeta/rust-lapper.git", rev = "a03107f" }
 smallvec = { workspace = true }
 tiny-skia-path = { workspace = true }
-unicode-bidi = "0.3"
+unicode-bidi = "0.3.15"
 unicode-linebreak = "0.1.5"
-unicode-script = "0.5"
-unicode-vo = "0.1"
+unicode-script = "0.5.6"
+unicode-vo = "0.1.0"
 
-# serde_support (feature)
+# specta_support (feature)
 specta = { workspace = true, features = ["serde", "glam"], optional = true }
 serde = { workspace = true, features = ["derive"], optional = true }
+
+# utoipa_support (feature)
+utoipa = { workspace = true, optional = true }
 
 # Logging
 log = { workspace = true }
 
 [dev-dependencies]
-env_logger = "0.11.3"
+env_logger = { workspace = true }
 tiny-skia = "0.11.4"

@@ -4,7 +4,7 @@ import type { CalendarDateTime } from '@internationalized/date';
 import { CalendarIcon } from 'lucide-react';
 import React from 'react';
 import { useDatePickerState } from 'react-stately';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/layout';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/primitive/layout';
 
 import { Calendar } from '../Calendar';
 import { dateToCalendarDateTime } from './date-to-calendar-date-time';
@@ -40,7 +40,7 @@ export const DateTimePicker: React.FC<TProps> = (props) => {
 			>
 				<PopoverTrigger asChild>
 					<button
-						className="absolute inset-y-0 left-0 flex cursor-pointer items-center pl-3 "
+						className="absolute inset-y-0 left-0 flex cursor-pointer items-center pl-3"
 						type="button"
 					>
 						<CalendarIcon className="h-4 w-4" />

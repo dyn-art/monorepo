@@ -1,0 +1,816 @@
+{
+	"version": "V000001",
+	"extension": "MDTIF",
+	"size": [1155, 870],
+	"nodes": [
+		{
+			"type": "Ellipse",
+			"startingAngle": 0,
+			"endingAngle": 6.2831854820251465,
+			"innerRadiusRatio": 0,
+			"visible": true,
+			"size": [120, 120],
+			"translation": [0, 0],
+			"rotationDeg": 0,
+			"blendMode": "Normal",
+			"opacity": 1,
+			"layoutElement": {
+				"type": "Static",
+				"horizontalSizingMode": "Fixed",
+				"verticalSizingMode": "Fixed"
+			},
+			"styles": [
+				{
+					"type": "Fill",
+					"paintId": { "type": "ReferenceId", "referenceId": "p6" },
+					"blendMode": "Normal",
+					"opacity": 1,
+					"visible": true,
+					"id": "s5"
+				}
+			],
+			"id": "n5"
+		},
+		{
+			"type": "Text",
+			"text": "John Kappa",
+			"attributes": [
+				{
+					"start": 0,
+					"end": 10,
+					"attributes": {
+						"fontFamily": { "Named": "Inter" },
+						"fontStretch": 1,
+						"fontStyle": "Normal",
+						"fontWeight": 700,
+						"fontSize": 32,
+						"letterSpacing": { "type": "Em", "value": -0.03 }
+					}
+				}
+			],
+			"lineWrap": "Word",
+			"horizontalTextAlignment": "Left",
+			"verticalTextAlignment": "Top",
+			"sizingMode": "WidthAndHeight",
+			"visible": true,
+			"size": [177, 39],
+			"translation": [0, 0],
+			"rotationDeg": 0,
+			"blendMode": "Normal",
+			"opacity": 1,
+			"layoutElement": {
+				"type": "Static",
+				"horizontalSizingMode": "Fixed",
+				"verticalSizingMode": "Fixed"
+			},
+			"styles": [
+				{
+					"type": "Fill",
+					"paintId": { "type": "ReferenceId", "referenceId": "p11" },
+					"blendMode": "Normal",
+					"opacity": 1,
+					"visible": true
+				}
+			],
+			"id": "n9"
+		},
+		{
+			"type": "Vector",
+			"path": "M 32 16.75 C 32 17.8687499608749 31.731247535118687 18.906251271565754 31.193747495993588 19.856251252003204 C 30.65624745686849 20.806251232440655 29.9375 21.549999090341423 29.03125 22.068749060997597 C 29.056249999083004 22.23749905366164 29.068747495993588 22.49999970656175 29.068747495993588 22.8562496869992 C 29.068747495993588 24.5499995304988 28.5 25.987498747996796 27.375 27.174998747996796 C 26.24375005868765 28.368748689309147 24.881248963184845 28.962499373998398 23.287499060997597 28.962499373998398 C 22.574999100122696 28.962499373998398 21.893749970656174 28.831247476431038 21.25 28.568747495993588 C 20.75 29.59374745686849 20.03124931531075 30.418748708871693 19.087499373998398 31.049998747996792 C 18.149999373998398 31.687498728434242 17.1187499608749 32 16 32 C 14.8562500782502 32 13.818749452248598 31.693747495993588 12.893749530498798 31.068747495993588 C 11.962499569623898 30.449997535118687 11.249999217497997 29.618747417743386 10.749999217497997 28.568747495993588 C 10.106249246841822 28.831247476431038 9.431249325092022 28.962499373998398 8.712499373998398 28.962499373998398 C 7.118749471811149 28.962499373998398 5.749999608748999 28.368748689309147 4.606249686999199 27.174998747996796 C 3.462499765249399 25.987498747996796 2.8937499217497997 24.5437496869992 2.8937499217497997 22.8562496869992 C 2.8937499217497997 22.668749699225792 2.9187499620975594 22.406249046325684 2.9624999608749 22.068749060997597 C 2.0562499608749 21.543749100122696 1.337500009781275 20.806251232440655 0.7999999706561749 19.856251252003204 C 0.2687499706561749 18.906251271565754 0 17.8687499608749 0 16.75 C 0 15.5625 0.2999999217497996 14.468749608748999 0.8937499217497996 13.481249686999199 C 1.4874999217497997 12.4937497652494 2.2874998434995995 11.762499833718325 3.2874998434995995 11.2874998434996 C 3.0249998630621495 10.574999882624699 2.8937499217497997 9.856249491373699 2.8937499217497997 9.143749530498798 C 2.8937499217497997 7.456249530498798 3.462499765249399 6.012499686999199 4.606249686999199 4.824999686999199 C 5.749999608748999 3.637499686999199 7.118749471811149 3.0374998434995995 8.712499373998398 3.0374998434995995 C 9.424999334873299 3.0374998434995995 10.106249246841822 3.168749784811949 10.749999217497997 3.4312497652493987 C 11.249999217497997 2.406249804374499 11.96874990218725 1.58125001956255 12.9124998434996 0.9499999804374499 C 13.8499998434996 0.3187499413123498 14.8812500391251 0 16 0 C 17.1187499608749 0 18.149999373998398 0.3187499413123497 19.087499373998398 0.9437499413123497 C 20.024999373998398 1.57499998043745 20.75 2.3999999608749 21.25 3.4249999217497997 C 21.893749970656174 3.16249994131235 22.568749109903973 3.0312498043744993 23.287499060997597 3.0312498043744993 C 24.881248963184845 3.0312498043744993 26.24375005868765 3.6249999021872497 27.375 4.8187498434995995 C 28.50624994131235 6.012499784811949 29.068747495993588 7.449999686999199 29.068747495993588 9.137499686999199 C 29.068747495993588 9.924999677217924 28.94999936910776 10.637499246841822 28.712499373998398 11.281249217497997 C 29.712499373998398 11.756249207716722 30.51249812199519 12.487499139247795 31.10624812199519 13.474999060997595 C 31.69999812199519 14.468749021872494 32 15.5625 32 16.75 Z M 15.318749060997595 21.568749060997597 L 21.924998747996796 11.674999530498798 C 22.09374874066084 11.412499550061348 22.143749371553078 11.124999828827686 22.087499373998398 10.8187498434996 C 22.024999373998398 10.512499858171513 21.86874966743665 10.268749677217924 21.6062496869992 10.106249686999199 C 21.34374970656175 9.937499694335155 21.056249985328087 9.881249531721458 20.75 9.924999530498798 C 20.4375 9.97499952866481 20.187499987773407 10.124999706561749 20 10.387499686999199 L 14.181249373998398 19.137501252003204 L 11.499999217497997 16.462499373998398 C 11.262499222388636 16.224999378889034 10.987499359326485 16.112500000458496 10.681249373998398 16.125 C 10.368749373998398 16.137499999541504 10.09999952560816 16.24999938867031 9.862499530498798 16.462499373998398 C 9.649999545170711 16.674999359326485 9.543749686999199 16.943748767559345 9.543749686999199 17.268748747996796 C 9.543749686999199 17.58749873821552 9.649999545170711 17.856251252003204 9.862499530498798 18.075001252003204 L 13.543749686999199 21.756249060997597 L 13.724999060997595 21.899999373998398 C 13.937499046325682 22.04374936910776 14.156249388670311 22.112498747996796 14.368749373998398 22.112498747996796 C 14.787499354435848 22.106248748226044 15.106249075669508 21.93124905610696 15.318749060997595 21.568749060997597 Z",
+			"windingRule": "Nonzero",
+			"visible": true,
+			"size": [32, 32],
+			"translation": [187, 3.5],
+			"rotationDeg": 0,
+			"blendMode": "Normal",
+			"opacity": 1,
+			"layoutElement": {
+				"type": "Static",
+				"horizontalSizingMode": "Fixed",
+				"verticalSizingMode": "Fixed"
+			},
+			"styles": [
+				{
+					"type": "Fill",
+					"paintId": { "type": "ReferenceId", "referenceId": "p13" },
+					"blendMode": "Normal",
+					"opacity": 1,
+					"visible": true
+				}
+			],
+			"id": "n12"
+		},
+		{
+			"type": "Frame",
+			"clipContent": false,
+			"layoutParent": {
+				"flexDirection": "Row",
+				"alignItems": "Center",
+				"justifyContent": "Start",
+				"padding": {
+					"top": { "type": "Abs", "value": 0 },
+					"bottom": { "type": "Abs", "value": 0 },
+					"left": { "type": "Abs", "value": 0 },
+					"right": { "type": "Abs", "value": 0 }
+				},
+				"gap": { "x": { "type": "Abs", "value": 10 }, "y": { "type": "Abs", "value": 0 } },
+				"horizontalSizingMode": "Fixed",
+				"verticalSizingMode": "Hug"
+			},
+			"visible": true,
+			"children": [
+				{ "type": "ReferenceId", "referenceId": "n12" },
+				{ "type": "ReferenceId", "referenceId": "n9" }
+			],
+			"size": [654, 39],
+			"translation": [0, 0],
+			"rotationDeg": 0,
+			"cornerRadii": [0, 0, 0, 0],
+			"blendMode": "Normal",
+			"opacity": 1,
+			"layoutElement": {
+				"type": "Static",
+				"horizontalSizingMode": "Fixed",
+				"verticalSizingMode": "Fixed"
+			},
+			"styles": [],
+			"id": "n8"
+		},
+		{
+			"type": "Text",
+			"text": "@johnkappa",
+			"attributes": [
+				{
+					"start": 0,
+					"end": 10,
+					"attributes": {
+						"fontFamily": { "Named": "Inter" },
+						"fontStretch": 1,
+						"fontStyle": "Normal",
+						"fontWeight": 400,
+						"fontSize": 32,
+						"letterSpacing": { "type": "Em", "value": -0.03 }
+					}
+				}
+			],
+			"lineWrap": "Word",
+			"horizontalTextAlignment": "Left",
+			"verticalTextAlignment": "Top",
+			"sizingMode": "WidthAndHeight",
+			"visible": true,
+			"size": [179, 39],
+			"translation": [0, 45],
+			"rotationDeg": 0,
+			"blendMode": "Normal",
+			"opacity": 1,
+			"layoutElement": {
+				"type": "Static",
+				"horizontalSizingMode": "Fixed",
+				"verticalSizingMode": "Fixed"
+			},
+			"styles": [
+				{
+					"type": "Fill",
+					"paintId": { "type": "ReferenceId", "referenceId": "p16" },
+					"blendMode": "Normal",
+					"opacity": 1,
+					"visible": true
+				}
+			],
+			"id": "n14"
+		},
+		{
+			"type": "Frame",
+			"clipContent": false,
+			"layoutParent": {
+				"flexDirection": "Column",
+				"alignItems": "Start",
+				"justifyContent": "Start",
+				"padding": {
+					"top": { "type": "Abs", "value": 0 },
+					"bottom": { "type": "Abs", "value": 0 },
+					"left": { "type": "Abs", "value": 0 },
+					"right": { "type": "Abs", "value": 0 }
+				},
+				"gap": { "x": { "type": "Abs", "value": 0 }, "y": { "type": "Abs", "value": 6 } },
+				"horizontalSizingMode": "Fixed",
+				"verticalSizingMode": "Hug"
+			},
+			"visible": true,
+			"children": [
+				{ "type": "ReferenceId", "referenceId": "n14" },
+				{ "type": "ReferenceId", "referenceId": "n8" }
+			],
+			"size": [654, 84],
+			"translation": [136, 18],
+			"rotationDeg": 0,
+			"cornerRadii": [0, 0, 0, 0],
+			"blendMode": "Normal",
+			"opacity": 1,
+			"layoutElement": {
+				"type": "Static",
+				"horizontalSizingMode": "Fixed",
+				"verticalSizingMode": "Fixed"
+			},
+			"styles": [],
+			"id": "n7"
+		},
+		{
+			"type": "Frame",
+			"clipContent": false,
+			"layoutParent": {
+				"flexDirection": "Row",
+				"alignItems": "Center",
+				"justifyContent": "Start",
+				"padding": {
+					"top": { "type": "Abs", "value": 0 },
+					"bottom": { "type": "Abs", "value": 0 },
+					"left": { "type": "Abs", "value": 0 },
+					"right": { "type": "Abs", "value": 0 }
+				},
+				"gap": { "x": { "type": "Abs", "value": 16 }, "y": { "type": "Abs", "value": 0 } },
+				"horizontalSizingMode": "Fixed",
+				"verticalSizingMode": "Hug"
+			},
+			"visible": true,
+			"children": [
+				{ "type": "ReferenceId", "referenceId": "n7" },
+				{ "type": "ReferenceId", "referenceId": "n5" }
+			],
+			"size": [790, 120],
+			"translation": [0, 0],
+			"rotationDeg": 0,
+			"cornerRadii": [0, 0, 0, 0],
+			"blendMode": "Normal",
+			"opacity": 1,
+			"layoutElement": {
+				"type": "Static",
+				"horizontalSizingMode": "Fixed",
+				"verticalSizingMode": "Fixed"
+			},
+			"styles": [],
+			"id": "n4"
+		},
+		{
+			"type": "Text",
+			"text": "This is the original component. Edit me to\nmake global changes to allasdf. 🎉",
+			"attributes": [
+				{
+					"start": 0,
+					"end": 79,
+					"attributes": {
+						"fontFamily": { "Named": "Inter" },
+						"fontStretch": 1,
+						"fontStyle": "Normal",
+						"fontWeight": 400,
+						"fontSize": 42,
+						"letterSpacing": { "type": "Em", "value": -0.03 },
+						"lineHeight": { "type": "Em", "value": 1.2999999523162842 }
+					}
+				}
+			],
+			"lineWrap": "Word",
+			"horizontalTextAlignment": "Left",
+			"verticalTextAlignment": "Top",
+			"sizingMode": "Height",
+			"visible": true,
+			"size": [790, 110],
+			"translation": [0, 140],
+			"rotationDeg": 0,
+			"blendMode": "Normal",
+			"opacity": 1,
+			"layoutElement": {
+				"type": "Static",
+				"horizontalSizingMode": "Fixed",
+				"verticalSizingMode": "Fixed"
+			},
+			"styles": [
+				{
+					"type": "Fill",
+					"paintId": { "type": "ReferenceId", "referenceId": "p11" },
+					"blendMode": "Normal",
+					"opacity": 1,
+					"visible": true
+				}
+			],
+			"id": "n17"
+		},
+		{
+			"type": "Frame",
+			"clipContent": false,
+			"layoutParent": {
+				"flexDirection": "Column",
+				"alignItems": "Start",
+				"justifyContent": "Start",
+				"padding": {
+					"top": { "type": "Abs", "value": 0 },
+					"bottom": { "type": "Abs", "value": 0 },
+					"left": { "type": "Abs", "value": 0 },
+					"right": { "type": "Abs", "value": 0 }
+				},
+				"gap": { "x": { "type": "Abs", "value": 0 }, "y": { "type": "Abs", "value": 20 } },
+				"horizontalSizingMode": "Hug",
+				"verticalSizingMode": "Hug"
+			},
+			"visible": true,
+			"children": [
+				{ "type": "ReferenceId", "referenceId": "n17" },
+				{ "type": "ReferenceId", "referenceId": "n4" }
+			],
+			"size": [790, 250],
+			"translation": [50, 50],
+			"rotationDeg": 0,
+			"cornerRadii": [0, 0, 0, 0],
+			"blendMode": "Normal",
+			"opacity": 1,
+			"layoutElement": {
+				"type": "Static",
+				"horizontalSizingMode": "Fixed",
+				"verticalSizingMode": "Fixed"
+			},
+			"styles": [],
+			"id": "n3"
+		},
+		{
+			"type": "Text",
+			"text": "12:30 PM · Apr 21, 2021",
+			"attributes": [
+				{
+					"start": 0,
+					"end": 24,
+					"attributes": {
+						"fontFamily": { "Named": "Inter" },
+						"fontStretch": 1,
+						"fontStyle": "Normal",
+						"fontWeight": 500,
+						"fontSize": 26,
+						"letterSpacing": { "type": "Em", "value": -0.03 }
+					}
+				}
+			],
+			"lineWrap": "Word",
+			"horizontalTextAlignment": "Left",
+			"verticalTextAlignment": "Top",
+			"sizingMode": "WidthAndHeight",
+			"visible": true,
+			"size": [274, 31],
+			"translation": [0, 0],
+			"rotationDeg": 0,
+			"blendMode": "Normal",
+			"opacity": 1,
+			"layoutElement": {
+				"type": "Static",
+				"horizontalSizingMode": "Fixed",
+				"verticalSizingMode": "Fixed"
+			},
+			"styles": [
+				{
+					"type": "Fill",
+					"paintId": { "type": "ReferenceId", "referenceId": "p16" },
+					"blendMode": "Normal",
+					"opacity": 1,
+					"visible": true
+				}
+			],
+			"id": "n19"
+		},
+		{
+			"type": "Text",
+			"text": "·",
+			"attributes": [
+				{
+					"start": 0,
+					"end": 2,
+					"attributes": {
+						"fontFamily": { "Named": "Inter" },
+						"fontStretch": 1,
+						"fontStyle": "Normal",
+						"fontWeight": 500,
+						"fontSize": 26,
+						"letterSpacing": { "type": "Em", "value": -0.03 }
+					}
+				}
+			],
+			"lineWrap": "Word",
+			"horizontalTextAlignment": "Center",
+			"verticalTextAlignment": "Top",
+			"sizingMode": "WidthAndHeight",
+			"visible": true,
+			"size": [8, 31],
+			"translation": [284, 0],
+			"rotationDeg": 0,
+			"blendMode": "Normal",
+			"opacity": 1,
+			"layoutElement": {
+				"type": "Static",
+				"horizontalSizingMode": "Fixed",
+				"verticalSizingMode": "Fixed"
+			},
+			"styles": [
+				{
+					"type": "Fill",
+					"paintId": { "type": "ReferenceId", "referenceId": "p16" },
+					"blendMode": "Normal",
+					"opacity": 1,
+					"visible": true
+				}
+			],
+			"id": "n21"
+		},
+		{
+			"type": "Text",
+			"text": "Twitter Web App",
+			"attributes": [
+				{
+					"start": 0,
+					"end": 15,
+					"attributes": {
+						"fontFamily": { "Named": "Inter" },
+						"fontStretch": 1,
+						"fontStyle": "Normal",
+						"fontWeight": 500,
+						"fontSize": 26,
+						"letterSpacing": { "type": "Em", "value": -0.03 }
+					}
+				}
+			],
+			"lineWrap": "Word",
+			"horizontalTextAlignment": "Left",
+			"verticalTextAlignment": "Top",
+			"sizingMode": "WidthAndHeight",
+			"visible": true,
+			"size": [197, 31],
+			"translation": [302, 0],
+			"rotationDeg": 0,
+			"blendMode": "Normal",
+			"opacity": 1,
+			"layoutElement": {
+				"type": "Static",
+				"horizontalSizingMode": "Fixed",
+				"verticalSizingMode": "Fixed"
+			},
+			"styles": [
+				{
+					"type": "Fill",
+					"paintId": { "type": "ReferenceId", "referenceId": "p23" },
+					"blendMode": "Normal",
+					"opacity": 1,
+					"visible": true
+				}
+			],
+			"id": "n22"
+		},
+		{
+			"type": "Frame",
+			"clipContent": false,
+			"layoutParent": {
+				"flexDirection": "Row",
+				"alignItems": "Start",
+				"justifyContent": "Start",
+				"padding": {
+					"top": { "type": "Abs", "value": 0 },
+					"bottom": { "type": "Abs", "value": 0 },
+					"left": { "type": "Abs", "value": 0 },
+					"right": { "type": "Abs", "value": 0 }
+				},
+				"gap": { "x": { "type": "Abs", "value": 10 }, "y": { "type": "Abs", "value": 0 } },
+				"horizontalSizingMode": "Fixed",
+				"verticalSizingMode": "Hug"
+			},
+			"visible": true,
+			"children": [
+				{ "type": "ReferenceId", "referenceId": "n22" },
+				{ "type": "ReferenceId", "referenceId": "n21" },
+				{ "type": "ReferenceId", "referenceId": "n19" }
+			],
+			"size": [770, 31],
+			"translation": [50, 330],
+			"rotationDeg": 0,
+			"cornerRadii": [0, 0, 0, 0],
+			"blendMode": "Normal",
+			"opacity": 1,
+			"layoutElement": {
+				"type": "Static",
+				"horizontalSizingMode": "Fixed",
+				"verticalSizingMode": "Fixed"
+			},
+			"styles": [],
+			"id": "n18"
+		},
+		{
+			"type": "Frame",
+			"clipContent": false,
+			"layoutParent": {
+				"flexDirection": "Column",
+				"alignItems": "Start",
+				"justifyContent": "Center",
+				"padding": {
+					"top": { "type": "Abs", "value": 50 },
+					"bottom": { "type": "Abs", "value": 50 },
+					"left": { "type": "Abs", "value": 50 },
+					"right": { "type": "Abs", "value": 50 }
+				},
+				"gap": { "x": { "type": "Abs", "value": 0 }, "y": { "type": "Abs", "value": 30 } },
+				"horizontalSizingMode": "Hug",
+				"verticalSizingMode": "Hug"
+			},
+			"visible": true,
+			"children": [
+				{ "type": "ReferenceId", "referenceId": "n18" },
+				{ "type": "ReferenceId", "referenceId": "n3" }
+			],
+			"size": [890, 411],
+			"translation": [133, 229],
+			"rotationDeg": 0,
+			"cornerRadii": [10, 10, 10, 10],
+			"blendMode": "Normal",
+			"opacity": 1,
+			"layoutElement": {
+				"type": "Absolute",
+				"constraints": { "horizontal": "Center", "vertical": "Center" }
+			},
+			"styles": [
+				{
+					"type": "Fill",
+					"paintId": { "type": "ReferenceId", "referenceId": "p24" },
+					"blendMode": "Normal",
+					"opacity": 1,
+					"visible": true
+				},
+				{
+					"type": "DropShadow",
+					"color": [0, 0, 0],
+					"position": [0, 20],
+					"blur": 60,
+					"spread": 0,
+					"visible": true,
+					"blendMode": "Normal",
+					"opacity": 0.20000000298023224
+				}
+			],
+			"id": "n2"
+		},
+		{
+			"type": "Frame",
+			"clipContent": false,
+			"layoutParent": null,
+			"visible": true,
+			"children": [{ "type": "ReferenceId", "referenceId": "n2" }],
+			"size": [1155, 870],
+			"translation": [0, 0],
+			"rotationDeg": 0,
+			"cornerRadii": [0, 0, 0, 0],
+			"blendMode": "Normal",
+			"opacity": 1,
+			"layoutElement": {
+				"type": "Absolute",
+				"constraints": { "horizontal": "Start", "vertical": "Start" }
+			},
+			"styles": [
+				{
+					"type": "Fill",
+					"paintId": { "type": "ReferenceId", "referenceId": "p25" },
+					"blendMode": "Normal",
+					"opacity": 1,
+					"visible": true,
+					"id": "s1"
+				}
+			],
+			"id": "n1"
+		}
+	],
+	"paints": [
+		{
+			"type": "Gradient",
+			"variant": {
+				"type": "Linear",
+				"transform": [6.123234262925839e-17, -1, 0, 1, 6.123234262925839e-17, 0, 0, 1, 1]
+			},
+			"stops": [
+				{ "color": [255, 0, 0], "position": 0 },
+				{ "color": [0, 133, 255], "position": 1 }
+			],
+			"id": "p6"
+		},
+		{ "type": "Solid", "color": [0, 0, 0], "id": "p11" },
+		{ "type": "Solid", "color": [29, 161, 242], "id": "p13" },
+		{ "type": "Solid", "color": [142, 142, 142], "id": "p16" },
+		{ "type": "Solid", "color": [42, 163, 239], "id": "p23" },
+		{ "type": "Solid", "color": [255, 255, 255], "id": "p24" },
+		{ "type": "Solid", "color": [255, 219, 219], "id": "p25" }
+	],
+	"assets": [
+		{
+			"content": {
+				"type": "Url",
+				"url": "https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuFuYMZhrib2Bg-4.ttf",
+				"contentType": { "mimeType": "font/ttf" }
+			},
+			"contentType": { "type": "Ttf" },
+			"id": "a10"
+		},
+		{
+			"content": {
+				"type": "Url",
+				"url": "https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfMZhrib2Bg-4.ttf",
+				"contentType": { "mimeType": "font/ttf" }
+			},
+			"contentType": { "type": "Ttf" },
+			"id": "a15"
+		},
+		{
+			"content": {
+				"type": "Url",
+				"url": "https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuI6fMZhrib2Bg-4.ttf",
+				"contentType": { "mimeType": "font/ttf" }
+			},
+			"contentType": { "type": "Ttf" },
+			"id": "a20"
+		}
+	],
+	"viewport": { "physicalPosition": [0, 0], "physicalSize": [1155, 870] },
+	"scripts": [
+		{
+			"id": "userName",
+			"displayName": "User Name",
+			"inputVariant": { "type": "TEXT", "default": { "input": "John Kappa" } },
+			"source": [
+				"local userName = args.input",
+				"arb.sendEvent({",
+				"    type = \"UpdateTextNode\",",
+				"    id = { type = \"ReferenceId\", referenceId = \"n9\" },",
+				"    text = userName",
+				"})"
+			]
+		},
+		{
+			"id": "userHandle",
+			"displayName": "User Handle",
+			"inputVariant": { "type": "TEXT", "default": { "input": "johnkappa" } },
+			"source": [
+				"local userHandle = '@' .. args.input",
+				"arb.sendEvent({",
+				"    type = \"UpdateTextNode\",",
+				"    id = { type = \"ReferenceId\", referenceId = \"n14\" },",
+				"    text = userHandle",
+				"})"
+			]
+		},
+		{
+			"id": "tweetText",
+			"displayName": "Tweet Text",
+			"inputVariant": {
+				"type": "TEXT",
+				"default": {
+					"input": "This is the original component. Edit me to\nmake global changes to allasdf. 🎉"
+				},
+				"area": true
+			},
+			"source": [
+				"local tweetText = args.input",
+				"arb.sendEvent({",
+				"    type = \"UpdateTextNode\",",
+				"    id = { type = \"ReferenceId\", referenceId = \"n17\" },",
+				"    text = tweetText",
+				"})"
+			]
+		},
+		{
+			"id": "verifiedBadge",
+			"displayName": "Verified Badge",
+			"inputVariant": { "type": "BOOLEAN", "default": { "input": true } },
+			"source": [
+				"local verifiedBadge = args.input",
+				"arb.sendEvent({",
+				"    type = \"UpdateEntityVisibility\",",
+				"    id = { type = \"ReferenceId\", referenceId = \"n12\" },",
+				"    visible = verifiedBadge",
+				"})"
+			]
+		},
+		{
+			"id": "cornerRadius",
+			"displayName": "Corner Radius",
+			"inputVariant": {
+				"type": "RANGE",
+				"default": { "input": 10 },
+				"min": 0,
+				"max": 30,
+				"step": 1
+			},
+			"source": [
+				"local cornerRadius = args.input",
+				"local cornerRadii = { cornerRadius, cornerRadius, cornerRadius, cornerRadius }",
+				"arb.sendEvent({",
+				"    type = \"UpdateEntityCornerRadii\",",
+				"    id = { type = \"ReferenceId\", referenceId = \"n2\" },",
+				"    cornerRadii = cornerRadii",
+				"})"
+			]
+		},
+		{
+			"id": "backgroundColor",
+			"displayName": "Background Color",
+			"inputVariant": { "type": "COLOR", "default": { "r": 255, "g": 219, "b": 219, "a": 1 } },
+			"source": [
+				"local rgb = { args.r, args.g, args.b }",
+				"local alpha = args.a",
+				"arb.sendEvents({",
+				"    {",
+				"        type = \"UpdateSolidPaint\",",
+				"        id = { type = \"ReferenceId\", referenceId = \"p25\" },",
+				"        color = rgb",
+				"    },",
+				"    {",
+				"        type = \"UpdateEntityOpacity\",",
+				"        id = { type = \"ReferenceId\", referenceId = \"s1\" },",
+				"        opacity = alpha",
+				"    }",
+				"})"
+			]
+		},
+		{
+			"id": "profilePicture",
+			"displayName": "Profile Picture",
+			"inputVariant": {
+				"type": "PAINT",
+				"default": { "paint": { "type": "Solid", "color": [255, 219, 219] }, "opacity": 1 }
+			},
+			"source": [
+				"function mergeTables(dest, source)",
+				"    if source ~= nil then",
+				"        for key, value in pairs(source) do",
+				"            dest[key] = value",
+				"        end",
+				"    end",
+				"    return dest",
+				"end",
+
+				"local paint = {",
+				"    id = \"p6\",",
+				"}",
+
+				"-- Merge args.paint into paint",
+				"paint = mergeTables(paint, args.paint)",
+
+				"local content = args.content",
+				"if content ~= nil then",
+				"    arb.sendEvent({",
+				"        type = \"CreateAsset\",",
+				"        asset = {",
+				"            id = \"a99\",",
+				"            content = { type = \"Binary\", content = content },",
+				"            contentType = { type = \"Png\" }",
+				"        }",
+				"    })",
+				"    paint.imageId = { type = \"ReferenceId\", referenceId = \"a99\" }",
+				"end",
+
+				"arb.sendEvents({",
+				"    {",
+				"        type = \"CreatePaint\",",
+				"        paint = paint",
+				"    },",
+				"    {",
+				"        type = \"UpdateFillStyle\",",
+				"        id = { type = \"ReferenceId\", referenceId = \"s5\" },",
+				"        paintId = { type = \"ReferenceId\", referenceId = \"p6\" }",
+				"    }",
+				"})",
+
+				"local opacity = args.opacity",
+				"if opacity ~= nil then",
+				"    arb.sendEvent({",
+				"        type = \"UpdateEntityOpacity\",",
+				"        id = { type = \"ReferenceId\", referenceId = \"s5\" },",
+				"        opacity = opacity",
+				"    })",
+				"end"
+			]
+		},
+		{
+			"id": "date",
+			"displayName": "Date",
+			"inputVariant": { "type": "DATETIME", "default": "NOW", "withTime": true },
+			"source": [
+				"local date = args.input",
+				"local dateObj = arb.date.parse(date)",
+				"local hours = dateObj.hour",
+				"local minutes = dateObj.minute",
+				"local ampm = hours >= 12 and 'PM' or 'AM'",
+				"hours = hours % 12",
+				"hours = hours ~= 0 and hours or 12",
+				"local minutesStr = minutes < 10 and '0' .. minutes or minutes",
+				"local timeStr = hours .. \":\" .. minutesStr .. \" \" .. ampm",
+				"local dateStr = arb.date.format('%b %d, %Y', date)",
+				"local combinedStr = timeStr .. \" · \" .. dateStr",
+				"",
+				"arb.sendEvent({",
+				"    type = \"UpdateTextNode\",",
+				"    id = { type = \"ReferenceId\", referenceId = \"n19\" },",
+				"    text = combinedStr",
+				"})"
+			]
+		}
+	]
+}

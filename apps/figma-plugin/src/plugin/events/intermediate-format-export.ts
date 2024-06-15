@@ -1,5 +1,5 @@
-import { NodeException, Transformer, type COMP } from '@dyn/figma-to-dtif';
 import { extractErrorData, notEmpty, sleep } from '@ibg/utils';
+import { NodeException, Transformer, type ARB } from '@dyn/figma-to-dtif';
 
 import type { TCustomPluginCallbackRegistration, TPluginHandler } from '../../types';
 import { googleWebfontsClient } from '../fetch-client';
@@ -72,7 +72,7 @@ async function processNode(node: FrameNode, instance: TPluginHandler): Promise<v
 }
 
 async function handleSuccess(
-	result: COMP.DtifComposition,
+	result: ARB.DtifArtboard,
 	node: SceneNode,
 	instance: TPluginHandler
 ): Promise<void> {

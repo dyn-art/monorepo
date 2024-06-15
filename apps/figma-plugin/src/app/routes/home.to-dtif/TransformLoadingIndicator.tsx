@@ -50,8 +50,8 @@ export const TransformLoadingIndicator: React.FC<TProps> = (props) => {
 							case ETransformStatus.TRANSFORMING_ASSETS:
 								setMessage('Transforming Assets');
 								break;
-							case ETransformStatus.CONSTRUCTING_COMPOSITON:
-								setMessage('Constructing Composition');
+							case ETransformStatus.CONSTRUCTING_CANVAS:
+								setMessage('Constructing Artboard');
 								break;
 							case ETransformStatus.END:
 								setMessage('Completed transforming Frame to DTIF');

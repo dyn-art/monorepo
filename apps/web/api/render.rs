@@ -1,15 +1,17 @@
 use bevy_app::App;
 use bevy_ecs::query::{With, Without};
-use dyn_comp_asset::asset::AssetContent;
-use dyn_comp_bundles::components::marker::Root;
-use dyn_comp_core::{resources::composition::CompositionRes, CompCorePlugin};
-use dyn_comp_dtif::DtifComposition;
-use dyn_comp_svg_builder::{svg::svg_bundle::SvgBundleVariant, CompSvgBuilderPlugin};
+use dyn_arb_asset::asset::AssetContent;
+use dyn_arb_bundles::components::marker::Root;
+use dyn_arb_core::{resources::canvas::ArtboardRes, ArbCorePlugin};
+use dyn_arb_dtif::DtifArtboard;
+use dyn_arb_svg_builder::{
+    events::SvgBuilderOutputEvent, svg::svg_bundle::SvgBundleVariant, ArbSvgBuilderPlugin,
+};
 use dyn_web_api::{
     app_error,
     models::app_error::{AppError, ErrorCode, IntoVercelResponse},
 };
-use std::collections::HashMap;
+use std::{collections::HashMap, sync::mpsc::channel};
 use url::Url;
 use vercel_runtime::{run, Body, Error, Request, Response, StatusCode};
 
@@ -35,7 +37,7 @@ pub async fn handler(_req: Request) -> Result<Response<Body>, Error> {
         .unwrap_or("svg");
 
     // Parse body
-    let mut body: DtifComposition = match serde_json::from_slice(_req.body()) {
+    let mut body: DtifArtboard = match serde_json::from_slice(_req.body()) {
         Ok(v) => v,
         Err(_) => {
             return app_error!(StatusCode::BAD_REQUEST, ErrorCode::new("INVALID_BODY"))
@@ -44,7 +46,7 @@ pub async fn handler(_req: Request) -> Result<Response<Body>, Error> {
     };
 
     // Build SVG string
-    match prepare_dtif_composition(&mut body).await {
+    match prepare_dtif_canvas(&mut body).await {
         Err(_) => {
             return app_error!(
                 StatusCode::INTERNAL_SERVER_ERROR,
@@ -116,10 +118,8 @@ pub async fn handler(_req: Request) -> Result<Response<Body>, Error> {
     };
 }
 
-async fn prepare_dtif_composition(
-    dtif_composition: &mut DtifComposition,
-) -> Result<(), reqwest::Error> {
-    for asset in dtif_composition.assets.iter_mut() {
+async fn prepare_dtif_canvas(dtif_canvas: &mut DtifArtboard) -> Result<(), reqwest::Error> {
+    for asset in dtif_canvas.assets.iter_mut() {
         let mut maybe_content = None;
         if let AssetContent::Url { url } = &asset.content {
             maybe_content = Some(reqwest::get(url).await?.bytes().await?.to_vec());
@@ -132,17 +132,21 @@ async fn prepare_dtif_composition(
     return Ok(());
 }
 
-fn build_svg_string(mut dtif: DtifComposition) -> Result<String, AppError> {
+fn build_svg_string(mut dtif: DtifArtboard) -> Result<String, AppError> {
     let mut app = App::new();
+
+    let (svg_builder_output_event_sender, _) = channel::<SvgBuilderOutputEvent>();
 
     // Register plugins
     app.add_plugins((
-        CompCorePlugin {
+        ArbCorePlugin {
             version: dtif.version,
             size: dtif.size,
             viewport: dtif.viewport,
         },
-        CompSvgBuilderPlugin {},
+        ArbSvgBuilderPlugin {
+            output_event_sender: svg_builder_output_event_sender,
+        },
     ));
 
     dtif.send_into_world(&mut app.world);
@@ -151,19 +155,19 @@ fn build_svg_string(mut dtif: DtifComposition) -> Result<String, AppError> {
     app.update();
 
     let mut result = String::new();
-    let comp_res = app
+    let arb_res = app
         .world
-        .get_resource::<CompositionRes>()
+        .get_resource::<ArtboardRes>()
         .ok_or(AppError::new(
             StatusCode::INTERNAL_SERVER_ERROR,
-            ErrorCode::new("COMPOSITION_RES_NOT_FOUND"),
+            ErrorCode::new("CANVAS_RES_NOT_FOUND"),
         ))?;
 
     // Open SVG tag
     result.push_str(&format!(
         "<svg width=\"{}\" height=\"{}\" xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\">",
-        comp_res.size.width(),
-        comp_res.size.height()
+        arb_res.size.width(),
+        arb_res.size.height()
     ));
 
     let mut system_state: bevy_ecs::system::SystemState<(

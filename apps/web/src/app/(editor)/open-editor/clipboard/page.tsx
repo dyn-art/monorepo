@@ -1,9 +1,9 @@
 'use client';
 
 import React from 'react';
-import { isDtifComposition, isMdtifComposition } from '@dyn/comp-dtif';
-import { Editor, FieldBasedEditor } from '@dyn/comp-svg-editor';
-import { Container, Skeleton } from '@dyn/ui';
+import { isDtif, isMdtif } from '@dyn/arb-dtif';
+import { Editor, FieldBasedEditor } from '@dyn/arb-svg-editor';
+import { LayoutWrapper, Skeleton } from '@dyn/ui';
 
 import { useDtifFromClipboard } from './_hooks';
 
@@ -14,19 +14,23 @@ const Page: React.FC = () => {
 		return <Skeleton className="h-full w-full rounded-none" />;
 	}
 
-	if (isMdtifComposition(dtif)) {
+	if (isMdtif(dtif)) {
 		return (
-			<Container size="default" tag="main">
-				<FieldBasedEditor mdtif={dtif} />
-			</Container>
+			<LayoutWrapper size="default" asChild>
+				<main>
+					<FieldBasedEditor mdtif={dtif} />
+				</main>
+			</LayoutWrapper>
 		);
 	}
 
-	if (isDtifComposition(dtif)) {
+	if (isDtif(dtif)) {
 		return (
-			<Container className="h-screen" size="full" tag="main">
-				<Editor dtif={dtif} />
-			</Container>
+			<LayoutWrapper className="h-screen" size="full" asChild>
+				<main>
+					<Editor dtif={dtif} />
+				</main>
+			</LayoutWrapper>
 		);
 	}
 

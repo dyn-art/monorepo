@@ -61,7 +61,7 @@ impl Size {
     }
 }
 
-#[cfg(feature = "serde_support")]
+#[cfg(feature = "specta_support")]
 const _: () = {
     use serde::{
         de::{self, SeqAccess, Visitor},

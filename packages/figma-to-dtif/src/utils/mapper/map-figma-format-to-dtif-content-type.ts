@@ -1,4 +1,4 @@
-import type { COMP } from '@dyn/comp-dtif';
+import type { ARB } from '@dyn/arb-dtif';
 
 import type { TFigmaFormat } from '../../types';
 
@@ -6,7 +6,7 @@ export function mapFigmaFormatToDtifContentType(
 	format: TFigmaFormat,
 	width: number,
 	height: number
-): COMP.AssetContentType {
+): ARB.AssetContentType {
 	switch (format) {
 		case 'JPG':
 			return { type: 'Jpeg' };

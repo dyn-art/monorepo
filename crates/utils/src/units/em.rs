@@ -22,9 +22,10 @@ use std::ops::{Add, Div, Mul, Neg};
 /// `1em` is the same as the font size.
 #[derive(Default, Eq, PartialEq, Ord, PartialOrd, Hash, Clone, Copy)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub struct Em(Scalar);
 
 impl Em {

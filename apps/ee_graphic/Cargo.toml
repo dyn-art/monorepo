@@ -1,0 +1,95 @@
+[package]
+name = "dyn-graphic"
+version = "0.0.1"
+description = ""
+edition = { workspace = true }
+homepage = { workspace = true }
+repository = { workspace = true }
+license = { workspace = true }
+authors = { workspace = true }
+
+[lib]
+path = "src/lib.rs"
+crate-type = ["cdylib", "rlib"]
+
+[[bin]]
+name = "dyn_graphic"       # Needs to be called like the package so that the Dockerfile can work with `dyn_[name]` pattern
+path = "src/bin/server.rs"
+
+[[bin]]
+name = "cli"
+path = "src/bin/cli.rs"
+
+[features]
+default = []
+cli = ["dep:clap"]
+tracing = [
+    "dyn-arb-core/tracing",
+    "dyn-arb-svg-builder/tracing",
+    "dyn-arb-dtif/tracing",
+]
+
+[dependencies]
+dyn-arb-asset = { path = "../../crates/arb_asset", features = [
+    "utoipa_support",
+] }
+dyn-arb-core = { path = "../../crates/arb_core", features = [
+    "specta_support",
+    "lua_scripts",
+] }
+dyn-arb-dtif = { path = "../../crates/arb_dtif", features = [
+    "specta_support",
+    "utoipa_support",
+    "lua_scripts",
+] }
+dyn-arb-bundles = { path = "../../crates/arb_bundles", features = [
+    "specta_support",
+    "utoipa_support",
+    "lua_scripts",
+] }
+dyn-arb-svg-builder = { path = "../../crates/arb_svg_builder", features = [
+    "specta_support",
+] }
+dyn-arb-lua = { path = "../../crates/arb_lua", features = [
+    "specta_support",
+    "utoipa_support",
+] }
+dyn-utils = { path = "../../crates/utils", features = ["utoipa_support"] }
+dyn-attributed-string = { path = "../../crates/attributed_string", features = [
+    "utoipa_support",
+] }
+bevy_app = { workspace = true }
+bevy_ecs = { workspace = true }
+bevy_transform = { workspace = true }
+axum = { version = "0.7.5", features = ["macros"] }
+axum-extra = { version = "0.9.3", features = ["query"] }
+tokio = { version = "1.38.0", features = ["full"] }
+dotenv_config = "0.1.9"
+dotenvy = "0.15.7"
+resvg = "0.42.0"
+usvg = "0.42.0"
+fontdb = "0.18.0"
+tiny-skia = "0.11.4"
+reqwest = "0.12.4"
+svg2pdf = "0.11.0"
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+serde_qs = "0.13.0"
+specta = { workspace = true }
+
+# Logging
+log = { workspace = true }
+env_logger = { workspace = true }
+
+# cli (feature)
+clap = { version = "4.5.1", features = ["derive"], optional = true }
+utoipa = { workspace = true, features = ["axum_extras", "yaml"] }
+utoipauto = "0.1.11"
+# utoipauto = "0.1.11" # Currenlty can't be used due: https://github.com/ProbablyClem/utoipauto/issues/13
+
+[profile.release]
+opt-level = "s"
+lto = true
+
+[profile.dev.package."*"]
+opt-level = 3

@@ -18,22 +18,20 @@ path = "api/render.rs"
 [features]
 default = []
 tracing = [
-    "dyn-comp-core/tracing",
-    "dyn-comp-svg-builder/tracing",
-    "dyn-comp-dtif/tracing",
+    "dyn-arb-core/tracing",
+    "dyn-arb-svg-builder/tracing",
+    "dyn-arb-dtif/tracing",
 ]
 
 [dependencies]
-dyn-comp-asset = { path = "../../crates/comp_asset" }
-dyn-comp-core = { path = "../../crates/comp_core", features = [
-    "serde_support",
+dyn-arb-asset = { path = "../../crates/arb_asset" }
+dyn-arb-core = { path = "../../crates/arb_core", features = ["specta_support"] }
+dyn-arb-dtif = { path = "../../crates/arb_dtif" }
+dyn-arb-bundles = { path = "../../crates/arb_bundles", features = [
+    "specta_support",
 ] }
-dyn-comp-dtif = { path = "../../crates/comp_dtif" }
-dyn-comp-bundles = { path = "../../crates/comp_bundles", features = [
-    "serde_support",
-] }
-dyn-comp-svg-builder = { path = "../../crates/comp_svg_builder", features = [
-    "serde_support",
+dyn-arb-svg-builder = { path = "../../crates/arb_svg_builder", features = [
+    "specta_support",
 ] }
 bevy_app = { workspace = true }
 bevy_ecs = { workspace = true }

@@ -1,8 +1,8 @@
-import type { COMP } from '@dyn/comp-dtif';
+import type { ARB } from '@dyn/arb-dtif';
 
 export function mapFigmaLayoutParentSizingModeToDtif(
 	sizingMode: 'FIXED' | 'HUG' | 'FILL'
-): COMP.LayoutParentSizingMode {
+): ARB.LayoutParentSizingMode {
 	switch (sizingMode) {
 		case 'FIXED':
 		case 'FILL':

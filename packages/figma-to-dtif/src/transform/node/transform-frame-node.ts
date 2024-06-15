@@ -1,4 +1,4 @@
-import type { COMP } from '@dyn/comp-dtif';
+import type { ARB } from '@dyn/arb-dtif';
 
 import type {
 	TToTransformEffect,
@@ -17,7 +17,7 @@ import {
 export function transformFrameNode(
 	node: FrameNode | ComponentNode | InstanceNode,
 	config: TTransformFrameNodeConfig
-): { type: 'Frame' } & COMP.FrameNode {
+): { type: 'Frame' } & ARB.FrameNode {
 	const { childrenIds, fills, strokes, effects, autoLayout } = config;
 
 	return {

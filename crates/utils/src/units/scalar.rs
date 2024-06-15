@@ -24,9 +24,10 @@ use std::ops::{
 /// Panics if it's `NaN` during any of those operations.
 #[derive(Default, Clone, Copy)]
 #[cfg_attr(
-    feature = "serde_support",
+    feature = "specta_support",
     derive(serde::Serialize, serde::Deserialize, specta::Type)
 )]
+#[cfg_attr(feature = "utoipa_support", derive(utoipa::ToSchema))]
 pub struct Scalar(f32);
 
 impl Scalar {

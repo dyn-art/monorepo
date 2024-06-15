@@ -1,6 +1,6 @@
-import type { COMP } from '@dyn/comp-dtif';
+import type { ARB } from '@dyn/arb-dtif';
 
-export function mapFigmaConstraintToDtif(figmaConstraint?: ConstraintType): COMP.Constraint {
+export function mapFigmaConstraintToDtif(figmaConstraint?: ConstraintType): ARB.Constraint {
 	switch (figmaConstraint) {
 		case 'MIN':
 			return 'Start';
