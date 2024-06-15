@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use crate::{
     error::app_error::{AppError, ErrorCode},
-    routes::{health::{HealthDto, HealthStatus}, v1::arb::render::FileFormat},
+    routes::{health::{HealthDto, HealthStatus}, v1::artboard::render::FileFormat},
 };
 use dyn_attributed_string::{
     dyn_fonts_book::font::{
