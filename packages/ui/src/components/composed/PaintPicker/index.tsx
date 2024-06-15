@@ -2,8 +2,8 @@
 
 import React from 'react';
 
-import { Popover, PopoverContent, PopoverTrigger } from '../../layout';
 import { Tabs, TabsList, TabsTrigger } from '../../primitive';
+import { Popover, PopoverContent, PopoverTrigger } from '../../primitive/layout';
 import { GradientPaintTab } from './GradientPaintTab';
 import { ImagePaintTab } from './ImagePaintTab';
 import { InputRow } from './InputRow';

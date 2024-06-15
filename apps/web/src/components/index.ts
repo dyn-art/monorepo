@@ -1,1 +1,1 @@
-export * from '../app/(marketing)/_components/Navbar';
+export * from './auth';

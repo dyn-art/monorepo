@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import React from 'react';
 import { Button, cn, LogoIcon } from '@dyn/ui';
+import { SignInSlot } from '@/components';
 
 import { TNavLink } from './types';
 
@@ -24,7 +25,7 @@ export const DesktopNavContent: React.FC<TProps> = (props) => {
 				<LogoIcon className="h-6 w-6" />
 			</Link>
 
-			<ul className="mx-4 flex space-x-2 text-sm font-medium">
+			<ul className="ml-4 flex space-x-2 text-sm font-medium">
 				{links.map(({ path, title }) => {
 					const isActive = path === lastPath;
 
@@ -42,11 +43,13 @@ export const DesktopNavContent: React.FC<TProps> = (props) => {
 				})}
 			</ul>
 
-			<div className="border-border h-6 border-l-[1px]" />
+			<div className="border-border mx-4 h-6 border-l-[1px]" />
 
-			<Button asChild variant={'ghost'} className="ml-4 px-3 py-2 font-medium">
-				<Link href={'https://dyn.art/app'}>Join Waitlist</Link>
-			</Button>
+			<SignInSlot>
+				<Button variant={'ghost'} className="px-3 py-2 font-medium">
+					Sign in
+				</Button>
+			</SignInSlot>
 		</nav>
 	);
 };

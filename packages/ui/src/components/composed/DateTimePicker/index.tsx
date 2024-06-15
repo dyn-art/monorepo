@@ -4,7 +4,7 @@ import type { CalendarDateTime } from '@internationalized/date';
 import { CalendarIcon } from 'lucide-react';
 import React from 'react';
 import { useDatePickerState } from 'react-stately';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/layout';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/primitive/layout';
 
 import { Calendar } from '../Calendar';
 import { dateToCalendarDateTime } from './date-to-calendar-date-time';

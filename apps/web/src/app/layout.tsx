@@ -69,7 +69,7 @@ export const metadata: Metadata = {
 	}
 };
 
-const RootLayout: React.FC<TProps> = (props) => {
+const Layout: React.FC<TProps> = (props) => {
 	const { children } = props;
 	return (
 		<html lang="en">
@@ -89,7 +89,7 @@ const RootLayout: React.FC<TProps> = (props) => {
 	);
 };
 
-export default RootLayout;
+export default Layout;
 
 interface TProps {
 	children: React.ReactNode;

@@ -1,99 +1,209 @@
-openapi: 3.1.0
+openapi: 3.0.3
 info:
-  title: "@dyn/core"
-  description: "API documentation for @dyn/core"
+  title: Dyn.Art Core Service API
+  description: API for validating API keys, fetching and uploading templates and assets.
   version: 1.0.0
-  contact:
-    email: dev@physical.art
-
 servers:
-  - url: http://localhost:9000
-    description: Development server
-
-tags:
-  - name: auth
-    description: Authentication endpoint
-  - name: media
-    description: Media endpoint
+  - url: https://api.dyn.art
+    description: Production server
 
 paths:
-  /v1/ping:
-    get:
-      summary: API Ping
-      description: Ping the API to check if it's working.
-      operationId: getPingAPI
+  /v1/validate-key:
+    post:
+      summary: Validate API key and count usage
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                apiKey:
+                  type: string
+                  description: API key to be validated
+              required:
+                - apiKey
       responses:
-        200:
-          description: Success
+        '200':
+          description: API key is valid
           content:
             application/json:
               schema:
-                type: boolean
-              example: true
-  /v1/hello:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: API key is valid
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Unauthorized
+
+  /v1/asset:
+    post:
+        summary: Upload asset for user
+        tags:
+          - Upload
+        requestBody:
+          required: true
+          content:
+            multipart/form-data:
+              schema:
+                type: object
+                properties:
+                  userId:
+                    type: string
+                  asset:
+                    type: string
+                    format: binary
+                required:
+                  - userId
+                  - asset
+        security:
+          - ApiKeyAuth: []
+        responses:
+          '201':
+            description: Asset uploaded successfully
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+                      example: Asset uploaded successfully
+          '401':
+            description: Unauthorized
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+                      example: Unauthorized
     get:
-      summary: API Hello
-      description: Say Hello.
-      operationId: getHelloAPI
+      summary: Get asset URL
+      tags:
+        - Assets
       parameters:
-      - name: name
-        in: query
-        required: true
-        schema:
-          type: string
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: string
+          description: ID of the asset
+      security:
+        - ApiKeyAuth: []
       responses:
-        200:
-          description: Success
+        '200':
+          description: Presigned URL for the asset
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  url:
+                    type: string
+                    example: https://yourbucket.s3.amazonaws.com/asset-id?presigned-url
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Unauthorized
+
+  /v1/template:
+    post:
+        summary: Upload template for user
+        tags:
+          - Upload
+        requestBody:
+          required: true
+          content:
+            multipart/form-data:
+              schema:
+                type: object
+                properties:
+                  userId:
+                    type: string
+                  template:
+                    type: string
+                    format: binary
+                required:
+                  - userId
+                  - template
+        security:
+          - ApiKeyAuth: []
+        responses:
+          '201':
+            description: Template uploaded successfully
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+                      example: Template uploaded successfully
+          '401':
+            description: Unauthorized
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+                      example: Unauthorized
+    get:
+      summary: Get template content
+      tags:
+        - Templates
+      parameters:
+        - name: path
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Path of the template
+      security:
+        - ApiKeyAuth: []
+      responses:
+        '200':
+          description: Template content
           content:
             application/json:
               schema:
                 type: string
-              example: 'Hello Jeff'
-
+                example: Template content here
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Unauthorized
+   
 
 components:
-  responses:
-    BadRequest:
-      description: Bad Request
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ServerError'
-    ServerError:
-      description: Server Error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ServerError'
-    NotFound:
-      description: Not Found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ServerError'
-
-  schemas:
-    ServerError:
-      type: object
-      description: Error Response
-      properties:
-        error_code:
-          type: string
-          description: Error code
-        error_description:
-          type: string
-          description: Error description
-          nullable: true
-        error_uri:
-          type: string
-          description: Error URI
-          nullable: true
-        additional_errors:
-          type: array
-          items:
-            type: object
-      example:
-        error_code: "400"
-        error_description: "Bad Request"
-        error_uri: null
-        additional_errors: []
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
