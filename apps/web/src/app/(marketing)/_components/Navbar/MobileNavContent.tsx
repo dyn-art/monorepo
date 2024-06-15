@@ -12,6 +12,7 @@ import {
 	PopoverContent,
 	PopoverTrigger
 } from '@dyn/ui';
+import { SignInSlot } from '@/components';
 
 import { TNavLink } from './types';
 
@@ -46,23 +47,29 @@ export const MobileNavContent: React.FC<TProps> = (props) => {
 				</PopoverTrigger>
 				<PopoverContent align="start" className="mr-2 mt-2 bg-[#FCFAF4]">
 					<nav>
-						<ul className="mb-6 space-y-6 px-3 pt-6 text-xl">
+						<ul className="mb-6 space-y-6 pt-6">
 							{links.map(({ path, title }) => {
 								const isActive = path === lastPath;
 
 								return (
 									<li key={path}>
-										<Link href={path} className={cn(isActive && 'underline')}>
-											{title}
-										</Link>
+										<Button
+											className={cn('text-xl', isActive && 'underline')}
+											asChild
+											variant={'ghost'}
+										>
+											<Link href={path}>{title}</Link>
+										</Button>
 									</li>
 								);
 							})}
 
-							<li className="mt-auto border-t-[1px] pt-8">
-								<Link className="text-primary text-xl" href="https://dyn.art/app">
-									Join Waitlist
-								</Link>
+							<li className="border-t-[1px] pt-8">
+								<SignInSlot>
+									<Button variant={'ghost'} className="text-xl">
+										Sign in
+									</Button>
+								</SignInSlot>
 							</li>
 						</ul>
 					</nav>

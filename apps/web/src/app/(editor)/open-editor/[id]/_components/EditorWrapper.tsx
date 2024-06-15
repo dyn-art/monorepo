@@ -4,7 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
 import { isDtif, isMdtif, type ARB, type TMdtifArtboard } from '@dyn/arb-dtif';
 import { Editor, FieldBasedEditor } from '@dyn/arb-svg-editor';
-import { Container } from '@dyn/ui';
+import { LayoutWrapper } from '@dyn/ui';
 
 const queryClient = new QueryClient();
 
@@ -13,21 +13,25 @@ export const EditorWrapper: React.FC<TProps> = (props) => {
 
 	if (isMdtif(dtif)) {
 		return (
-			<Container size="default" tag="main">
-				<QueryClientProvider client={queryClient}>
-					<FieldBasedEditor mdtif={dtif} />
-				</QueryClientProvider>
-			</Container>
+			<LayoutWrapper size="default" asChild>
+				<main>
+					<QueryClientProvider client={queryClient}>
+						<FieldBasedEditor mdtif={dtif} />
+					</QueryClientProvider>
+				</main>
+			</LayoutWrapper>
 		);
 	}
 
 	if (isDtif(dtif)) {
 		return (
-			<Container className="h-screen" size="full" tag="main">
-				<QueryClientProvider client={queryClient}>
-					<Editor dtif={dtif} />
-				</QueryClientProvider>
-			</Container>
+			<LayoutWrapper size="full" className="h-screen" asChild>
+				<main>
+					<QueryClientProvider client={queryClient}>
+						<Editor dtif={dtif} />
+					</QueryClientProvider>
+				</main>
+			</LayoutWrapper>
 		);
 	}
 

@@ -3,7 +3,7 @@
 import React from 'react';
 import { isDtif, isMdtif } from '@dyn/arb-dtif';
 import { Editor, FieldBasedEditor } from '@dyn/arb-svg-editor';
-import { Container, Skeleton } from '@dyn/ui';
+import { LayoutWrapper, Skeleton } from '@dyn/ui';
 
 import { useDtifFromClipboard } from './_hooks';
 
@@ -16,17 +16,21 @@ const Page: React.FC = () => {
 
 	if (isMdtif(dtif)) {
 		return (
-			<Container size="default" tag="main">
-				<FieldBasedEditor mdtif={dtif} />
-			</Container>
+			<LayoutWrapper size="default" asChild>
+				<main>
+					<FieldBasedEditor mdtif={dtif} />
+				</main>
+			</LayoutWrapper>
 		);
 	}
 
 	if (isDtif(dtif)) {
 		return (
-			<Container className="h-screen" size="full" tag="main">
-				<Editor dtif={dtif} />
-			</Container>
+			<LayoutWrapper className="h-screen" size="full" asChild>
+				<main>
+					<Editor dtif={dtif} />
+				</main>
+			</LayoutWrapper>
 		);
 	}
 

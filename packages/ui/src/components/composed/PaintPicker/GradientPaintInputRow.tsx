@@ -1,3 +1,5 @@
+'use client';
+
 import { isValidAlpha } from '@ibg/utils';
 import React from 'react';
 import { AdvancedInput } from '@/components/primitive';

@@ -1,12 +1,12 @@
-import { Container } from '@dyn/ui';
+import { LayoutWrapper } from '@dyn/ui';
 
 const Layout: React.FC<TProps> = (props) => {
 	const { children } = props;
 
 	return (
-		<Container size="default" tag="main">
-			{children}
-		</Container>
+		<LayoutWrapper size="default" asChild>
+			<main>{children}</main>
+		</LayoutWrapper>
 	);
 };
 

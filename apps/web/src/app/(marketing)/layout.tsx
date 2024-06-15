@@ -1,4 +1,4 @@
-import { Container } from '@dyn/ui';
+import { LayoutWrapper } from '@dyn/ui';
 
 import { Navbar } from './_components';
 
@@ -49,10 +49,10 @@ const Layout: React.FC<TProps> = (props) => {
 						}}
 					/>
 				</div>
-				<Container size="full" tag="main" className="h-screen">
+				<LayoutWrapper size="full">
 					<Navbar />
 					{children}
-				</Container>
+				</LayoutWrapper>
 			</div>
 		</div>
 	);
