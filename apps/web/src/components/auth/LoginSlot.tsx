@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import React from 'react';
 import { ButtonProps, composeRefs, getElementRef, hasDisplayName, Slot } from '@dyn/ui';
 
-export const SignInSlot = React.forwardRef<HTMLElement, TProps>((props, forwardRef) => {
+export const LoginSlot = React.forwardRef<HTMLElement, TProps>((props, forwardRef) => {
 	const { children, mode = 'redirect' } = props;
 	const router = useRouter();
 

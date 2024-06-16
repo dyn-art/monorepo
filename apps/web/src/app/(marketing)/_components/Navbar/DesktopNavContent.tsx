@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import React from 'react';
 import { Button, cn, LogoIcon } from '@dyn/ui';
-import { SignInSlot } from '@/components';
+import { LoginSlot } from '@/components';
 
 import { TNavLink } from './types';
 
@@ -45,11 +45,11 @@ export const DesktopNavContent: React.FC<TProps> = (props) => {
 
 			<div className="border-border mx-4 h-6 border-l-[1px]" />
 
-			<SignInSlot>
+			<LoginSlot>
 				<Button variant={'ghost'} className="px-3 py-2 font-medium">
 					Sign in
 				</Button>
-			</SignInSlot>
+			</LoginSlot>
 		</nav>
 	);
 };

@@ -12,7 +12,7 @@ import {
 	PopoverContent,
 	PopoverTrigger
 } from '@dyn/ui';
-import { SignInSlot } from '@/components';
+import { LoginSlot } from '@/components';
 
 import { TNavLink } from './types';
 
@@ -65,11 +65,11 @@ export const MobileNavContent: React.FC<TProps> = (props) => {
 							})}
 
 							<li className="border-t-[1px] pt-8">
-								<SignInSlot>
+								<LoginSlot>
 									<Button variant={'ghost'} className="text-xl">
 										Sign in
 									</Button>
-								</SignInSlot>
+								</LoginSlot>
 							</li>
 						</ul>
 					</nav>
