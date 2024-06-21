@@ -59,6 +59,8 @@
 		"class-variance-authority": "^0.7.0",
 		"clsx": "^2.1.1",
 		"date-fns": "^3.6.0",
+		"feature-form": "link:/Users/benno/Documents/workspace/projects/inbeta-group/b_product-development/code/monorepo/packages/feature-form",
+		"feature-react": "link:/Users/benno/Documents/workspace/projects/inbeta-group/b_product-development/code/monorepo/packages/feature-react",
 		"framer-motion": "^11.2.10",
 		"install": "^0.13.0",
 		"lucide-react": "^0.367.0",

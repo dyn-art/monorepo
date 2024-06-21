@@ -31,6 +31,9 @@ export const LoginForm: React.FC = () => {
 		}
 	});
 
+	const test = form.getFieldState('email');
+	const test2 = form.formState;
+
 	const onSubmit = React.useCallback((values: z.infer<typeof LoginSchema>) => {
 		console.log(values);
 	}, []);
@@ -39,19 +42,24 @@ export const LoginForm: React.FC = () => {
 		<AuthFormWrapper
 			headerLabel="Sign in to your account"
 			backChildren={
-				<p className="font-body mt-4 text-center text-sm text-gray-500">
-					Not a member?{' '}
-					<Link
-						href="/auth/register"
-						className="ml-1 font-semibold leading-6 text-indigo-600 hover:text-indigo-500"
-					>
-						Start for free
+				<p className="mt-4 text-center text-sm">
+					Don't have an account?{' '}
+					<Link href="#" className="underline">
+						Sign up
 					</Link>
 				</p>
 			}
 		>
 			<Form {...form}>
-				<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+				<form
+					onSubmit={form.handleSubmit(
+						(data) => {},
+						(errors) => {
+							// TODO
+						}
+					)}
+					className="space-y-6"
+				>
 					<div className="space-y-4">
 						<FormField
 							control={form.control}
