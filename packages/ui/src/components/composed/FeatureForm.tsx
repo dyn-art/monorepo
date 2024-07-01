@@ -2,6 +2,7 @@
 
 import type * as LabelPrimitive from '@radix-ui/react-label';
 import { TFormField } from 'feature-form';
+import { registerFormField, TRegisterFormFieldResponse } from 'feature-react/form';
 import { useGlobalState } from 'feature-react/state';
 import React from 'react';
 import { cn } from '@/utils';
@@ -22,21 +23,31 @@ export function useFormFieldContext(): TFormFieldWithId {
 	return formField;
 }
 
-export const FormField = React.forwardRef<HTMLDivElement, TFormFieldProps<any>>((props, ref) => {
-	const { formField, className, ...other } = props;
+export const FormField = <GValue,>(props: TFormFieldProps<GValue>) => {
+	const { formField, children } = props;
 	const id = React.useId();
 
 	return (
-		<FormFieldContext.Provider value={Object.assign(formField, { id })}>
-			<div className={cn('space-y-2', className)} ref={ref} {...other} />
+		<FormFieldContext.Provider value={Object.assign(formField as TFormField<any>, { id })}>
+			{children({ formField, fieldData: registerFormField(formField, false) })}
 		</FormFieldContext.Provider>
 	);
-});
-FormField.displayName = 'FormField';
+};
 
-export interface TFormFieldProps<GValue> extends React.HTMLAttributes<HTMLDivElement> {
+export interface TFormFieldProps<GValue, GKey = string> {
 	formField: TFormField<GValue>;
+	children: (args: {
+		fieldData: TRegisterFormFieldResponse<GKey, GValue>;
+		formField: TFormField<GValue>;
+	}) => React.ReactNode;
 }
+
+export const FormItem = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+	(props, ref) => {
+		const { className, ...other } = props;
+		return <div className={cn('space-y-2', className)} ref={ref} {...other} />;
+	}
+);
 
 export const FormLabel = React.forwardRef<
 	React.ElementRef<typeof LabelPrimitive.Root>,
