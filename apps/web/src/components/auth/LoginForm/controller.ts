@@ -1,6 +1,39 @@
-import * as z from 'zod';
+import {
+	bitwiseFlag,
+	createForm,
+	FormFieldReValidateMode,
+	FormFieldValidateMode,
+	valibotValidator
+} from 'feature-form';
+import { withGlobalBind } from 'feature-react/state';
+import * as v from 'valibot';
 
-export const LoginSchema = z.object({
-	email: z.string().email({ message: 'A valid Email is required' }),
-	password: z.string().min(1, { message: 'Password is required' })
-});
+type TLoginFormFields = {
+	email: string;
+	password: string;
+};
+
+export const $loginForm = withGlobalBind(
+	'_form',
+	createForm<TLoginFormFields>({
+		fields: {
+			email: {
+				validator: valibotValidator(
+					v.pipe(
+						v.string(),
+						v.nonEmpty('Please enter your email.'),
+						v.email('The email is badly formatted.'),
+						v.maxLength(30, 'Your email is too long.')
+					)
+				),
+				defaultValue: ''
+			},
+			password: {
+				validator: valibotValidator(v.pipe(v.string(), v.nonEmpty('Please enter your password.'))),
+				defaultValue: ''
+			}
+		},
+		validateMode: bitwiseFlag(FormFieldValidateMode.OnSubmit),
+		reValidateMode: bitwiseFlag(FormFieldReValidateMode.OnBlur)
+	})
+);

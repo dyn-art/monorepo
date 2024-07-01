@@ -28,17 +28,18 @@
 		"@dyn/arb-svg-builder": "workspace:*",
 		"@dyn/arb-svg-editor": "workspace:*",
 		"@dyn/ui": "workspace:*",
-		"@hookform/resolvers": "^3.6.0",
+		"@ibg/utils": "link:/Users/benno/Documents/workspace/projects/inbeta-group/b_product-development/code/monorepo/packages/utils",
 		"@tanstack/react-query": "^5.35.1",
 		"@vercel/analytics": "^1.2.2",
 		"clsx": "^2.1.1",
 		"feature-fetch": "^0.0.6",
+		"feature-form": "link:/Users/benno/Documents/workspace/projects/inbeta-group/b_product-development/code/monorepo/packages/feature-form",
+		"feature-react": "link:/Users/benno/Documents/workspace/projects/inbeta-group/b_product-development/code/monorepo/packages/feature-react",
 		"framer-motion": "^11.2.10",
 		"next": "14.0.4",
 		"react": "^18.3.1",
 		"react-dom": "^18.3.1",
-		"react-hook-form": "^7.51.5",
-		"zod": "^3.23.8"
+		"valibot": "^0.35.0"
 	},
 	"devDependencies": {
 		"@ibg/config": "^0.0.11",

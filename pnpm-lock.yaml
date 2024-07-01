@@ -205,9 +205,9 @@ importers:
       '@dyn/ui':
         specifier: workspace:*
         version: link:../../packages/ui
-      '@hookform/resolvers':
-        specifier: ^3.6.0
-        version: 3.6.0(react-hook-form@7.51.5(react@18.3.1))
+      '@ibg/utils':
+        specifier: link:/Users/benno/Documents/workspace/projects/inbeta-group/b_product-development/code/monorepo/packages/utils
+        version: link:../../../../../../inbeta-group/b_product-development/code/monorepo/packages/utils
       '@tanstack/react-query':
         specifier: ^5.35.1
         version: 5.45.0(react@18.3.1)
@@ -220,6 +220,12 @@ importers:
       feature-fetch:
         specifier: ^0.0.6
         version: 0.0.6
+      feature-form:
+        specifier: link:/Users/benno/Documents/workspace/projects/inbeta-group/b_product-development/code/monorepo/packages/feature-form
+        version: link:../../../../../../inbeta-group/b_product-development/code/monorepo/packages/feature-form
+      feature-react:
+        specifier: link:/Users/benno/Documents/workspace/projects/inbeta-group/b_product-development/code/monorepo/packages/feature-react
+        version: link:../../../../../../inbeta-group/b_product-development/code/monorepo/packages/feature-react
       framer-motion:
         specifier: ^11.2.10
         version: 11.2.10(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -232,12 +238,9 @@ importers:
       react-dom:
         specifier: ^18.3.1
         version: 18.3.1(react@18.3.1)
-      react-hook-form:
-        specifier: ^7.51.5
-        version: 7.51.5(react@18.3.1)
-      zod:
-        specifier: ^3.23.8
-        version: 3.23.8
+      valibot:
+        specifier: ^0.35.0
+        version: 0.35.0
     devDependencies:
       '@ibg/config':
         specifier: ^0.0.11
@@ -1962,11 +1965,6 @@ packages:
 
   '@formatjs/intl-localematcher@0.5.4':
     resolution: {integrity: sha512-zTwEpWOzZ2CiKcB93BLngUX59hQkuZjT2+SAQEscSm52peDW/getsawMcWF1rGRpMCX6D7nSJA3CzJ8gn13N/g==}
-
-  '@hookform/resolvers@3.6.0':
-    resolution: {integrity: sha512-UBcpyOX3+RR+dNnqBd0lchXpoL8p4xC21XP8H6Meb8uve5Br1GCnmg0PcBoKKqPKgGu9GHQ/oygcmPrQhetwqw==}
-    peerDependencies:
-      react-hook-form: ^7.0.0
 
   '@humanwhocodes/config-array@0.11.14':
     resolution: {integrity: sha512-3T8LkOmg45BV5FICb15QQMsyUSWrQ8AygVfC7ZG32zOalnqrilm018ZVCw0eapXux8FtA33q8PSRSstjee3jSg==}
@@ -10304,10 +10302,6 @@ snapshots:
   '@formatjs/intl-localematcher@0.5.4':
     dependencies:
       tslib: 2.6.3
-
-  '@hookform/resolvers@3.6.0(react-hook-form@7.51.5(react@18.3.1))':
-    dependencies:
-      react-hook-form: 7.51.5(react@18.3.1)
 
   '@humanwhocodes/config-array@0.11.14':
     dependencies:

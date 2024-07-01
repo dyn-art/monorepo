@@ -11,14 +11,7 @@ import { useForm } from 'feature-react/form';
 import { maxLength, minLength, pipe, regex, string } from 'valibot';
 
 import { Input } from '../primitive';
-import {
-	FormControl,
-	FormDescription,
-	FormField,
-	FormItem,
-	FormLabel,
-	FormMessage
-} from './FeatureForm';
+import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from './Form';
 
 type TFormData = {
 	firstName: string;
