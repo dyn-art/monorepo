@@ -1,5 +1,9 @@
+const withBundleAnalyzer = require('@next/bundle-analyzer')({
+	enabled: process.env.ANALYZE === 'true'
+});
+
 /** @type {import('next').NextConfig} */
-module.exports = {
+const nextConfig = {
 	pageExtensions: ['js', 'jsx', 'ts', 'tsx'],
 	reactStrictMode: true,
 	rewrites: async () => {
@@ -23,3 +27,5 @@ module.exports = {
 		return rewrites;
 	}
 };
+
+module.exports = withBundleAnalyzer(nextConfig);

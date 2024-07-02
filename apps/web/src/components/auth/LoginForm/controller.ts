@@ -34,6 +34,7 @@ export const $loginForm = withGlobalBind(
 			}
 		},
 		validateMode: bitwiseFlag(FormFieldValidateMode.OnSubmit),
-		reValidateMode: bitwiseFlag(FormFieldReValidateMode.OnBlur)
+		reValidateMode: bitwiseFlag(FormFieldReValidateMode.OnBlur),
+		notifyOnStatusChange: false
 	})
 );

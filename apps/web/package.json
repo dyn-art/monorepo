@@ -29,6 +29,7 @@
 		"@dyn/arb-svg-editor": "workspace:*",
 		"@dyn/ui": "workspace:*",
 		"@ibg/utils": "link:/Users/benno/Documents/workspace/projects/inbeta-group/b_product-development/code/monorepo/packages/utils",
+		"@next/bundle-analyzer": "^14.2.4",
 		"@tanstack/react-query": "^5.35.1",
 		"@vercel/analytics": "^1.2.2",
 		"clsx": "^2.1.1",

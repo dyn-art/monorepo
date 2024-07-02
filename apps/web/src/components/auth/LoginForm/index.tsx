@@ -4,6 +4,7 @@ import { useForm } from 'feature-react/form';
 import Link from 'next/link';
 import React from 'react';
 import {
+	AdvancedInput,
 	BlockMessage,
 	Button,
 	FormControl,
@@ -12,8 +13,7 @@ import {
 	FormLabel,
 	FormMessage,
 	GithubIcon,
-	GoogleIcon,
-	Input
+	GoogleIcon
 } from '@dyn/ui';
 
 import { AuthFormWrapper } from '../AuthFormWrapper';
@@ -48,22 +48,36 @@ export const LoginForm: React.FC = () => {
 			>
 				<div className="space-y-4">
 					<FormField formField={field('email')}>
-						{({ fieldData }) => (
+						{(fieldData) => (
 							<FormItem>
 								<FormLabel>Email</FormLabel>
 								<FormControl>
-									<Input {...fieldData} placeholder="john.doe@example.com" type="email" />
+									{(status) => (
+										<AdvancedInput
+											{...fieldData}
+											placeholder="john.doe@example.com"
+											type="email"
+											variant={status.type === 'INVALID' ? 'destructive' : 'default'}
+										/>
+									)}
 								</FormControl>
 								<FormMessage />
 							</FormItem>
 						)}
 					</FormField>
 					<FormField formField={field('password')}>
-						{({ fieldData }) => (
+						{(fieldData) => (
 							<FormItem>
 								<FormLabel>Password</FormLabel>
 								<FormControl>
-									<Input {...fieldData} placeholder="*******" type="password" />
+									{(status) => (
+										<AdvancedInput
+											{...fieldData}
+											placeholder="*******"
+											type="password"
+											variant={status.type === 'INVALID' ? 'destructive' : 'default'}
+										/>
+									)}
 								</FormControl>
 								<FormMessage />
 							</FormItem>

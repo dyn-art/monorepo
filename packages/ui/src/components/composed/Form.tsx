@@ -1,7 +1,7 @@
 'use client';
 
 import type * as LabelPrimitive from '@radix-ui/react-label';
-import { TFormField } from 'feature-form';
+import { TFormField, TFormFieldStatusValue } from 'feature-form';
 import { registerFormField, TRegisterFormFieldResponse } from 'feature-react/form';
 import { useGlobalState } from 'feature-react/state';
 import React from 'react';
@@ -24,22 +24,30 @@ export function useFormFieldContext(): TFormFieldWithId {
 }
 
 export const FormField = <GValue,>(props: TFormFieldProps<GValue>) => {
-	const { formField, children } = props;
+	const { formField, children, controlled = false } = props;
 	const id = React.useId();
 
 	return (
-		<FormFieldContext.Provider value={Object.assign(formField as TFormField<any>, { id })}>
-			{children({ formField, fieldData: registerFormField(formField, false) })}
-		</FormFieldContext.Provider>
+		<FormFieldContext.Provider
+			value={Object.assign(formField as TFormField<any>, { id })}
+			children={
+				typeof children === 'function'
+					? children(registerFormField(formField, controlled), formField)
+					: children
+			}
+		/>
 	);
 };
 
 export interface TFormFieldProps<GValue, GKey = string> {
 	formField: TFormField<GValue>;
-	children: (args: {
-		fieldData: TRegisterFormFieldResponse<GKey, GValue>;
-		formField: TFormField<GValue>;
-	}) => React.ReactNode;
+	controlled?: boolean;
+	children?:
+		| React.ReactNode
+		| ((
+				fieldData: TRegisterFormFieldResponse<GKey, GValue>,
+				formField: TFormField<GValue>
+		  ) => React.ReactNode);
 }
 
 export const FormItem = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
@@ -53,43 +61,40 @@ export const FormLabel = React.forwardRef<
 	React.ElementRef<typeof LabelPrimitive.Root>,
 	React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root>
 >((props, ref) => {
-	const { className, ...other } = props;
 	const formField = useFormFieldContext();
-	const status = useGlobalState(formField.status);
 
-	return (
-		<Label
-			className={cn(status.type === 'INVALID' && 'text-destructive', className)}
-			htmlFor={formField.id}
-			ref={ref}
-			{...other}
-		/>
-	);
+	return <Label htmlFor={formField.id} ref={ref} {...props} />;
 });
 FormLabel.displayName = 'FormLabel';
 
-export const FormControl = React.forwardRef<
-	React.ElementRef<typeof Slot>,
-	React.ComponentPropsWithoutRef<typeof Slot>
->((props, ref) => {
-	const formField = useFormFieldContext();
-	const status = useGlobalState(formField.status);
+export const FormControl = React.forwardRef<React.ElementRef<typeof Slot>, TFormControlProps>(
+	(props, ref) => {
+		const { children, ...other } = props;
+		const formField = useFormFieldContext();
+		const status = useGlobalState(formField.status);
 
-	return (
-		<Slot
-			aria-describedby={
-				status.type !== 'INVALID'
-					? `${formField.id}-form-item-description`
-					: `${formField.id}-form-item-description ${formField.id}-form-item-message`
-			}
-			aria-invalid={status.type === 'INVALID'}
-			id={formField.key}
-			ref={ref}
-			{...props}
-		/>
-	);
-});
+		return (
+			<Slot
+				aria-describedby={
+					status.type !== 'INVALID'
+						? `${formField.id}-form-item-description`
+						: `${formField.id}-form-item-description ${formField.id}-form-item-message`
+				}
+				aria-invalid={status.type === 'INVALID'}
+				id={formField.key}
+				ref={ref}
+				children={typeof children === 'function' ? children(status) : children}
+				{...other}
+			/>
+		);
+	}
+);
 FormControl.displayName = 'FormControl';
+
+export interface TFormControlProps
+	extends Omit<React.ComponentPropsWithoutRef<typeof Slot>, 'children'> {
+	children?: React.ReactNode | ((status: Readonly<TFormFieldStatusValue>) => React.ReactNode);
+}
 
 export const FormDescription = React.forwardRef<
 	HTMLParagraphElement,
