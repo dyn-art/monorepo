@@ -2,9 +2,9 @@ import {
 	bitwiseFlag,
 	createForm,
 	FormFieldReValidateMode,
-	FormFieldValidateMode,
-	valibotValidator
+	FormFieldValidateMode
 } from 'feature-form';
+import { valibotValidator } from 'feature-form-validators/valibot';
 import { withGlobalBind } from 'feature-react/state';
 import * as v from 'valibot';
 
