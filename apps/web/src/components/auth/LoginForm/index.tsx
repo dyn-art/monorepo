@@ -35,6 +35,7 @@ export const LoginForm: React.FC = () => {
 			}
 		>
 			<form
+				// eslint-disable-next-line @typescript-eslint/no-misused-promises -- ok
 				onSubmit={handleSubmit({
 					onInvalidSubmit: (errors) => {
 						console.log({ errors });

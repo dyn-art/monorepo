@@ -1,8 +1,8 @@
 'use client';
 
 import type * as LabelPrimitive from '@radix-ui/react-label';
-import { TFormField, TFormFieldStatusValue } from 'feature-form';
-import { registerFormField, TRegisterFormFieldResponse } from 'feature-react/form';
+import { type TFormField, type TFormFieldStatusValue } from 'feature-form';
+import { registerFormField, type TRegisterFormFieldResponse } from 'feature-react/form';
 import { useGlobalState } from 'feature-react/state';
 import React from 'react';
 import { cn } from '@/utils';
@@ -23,19 +23,16 @@ export function useFormFieldContext(): TFormFieldWithId {
 	return formField;
 }
 
-export const FormField = <GValue,>(props: TFormFieldProps<GValue>) => {
+export const FormField = <GValue,>(props: TFormFieldProps<GValue>): React.ReactNode => {
 	const { formField, children, controlled = false } = props;
 	const id = React.useId();
 
 	return (
-		<FormFieldContext.Provider
-			value={Object.assign(formField as TFormField<any>, { id })}
-			children={
-				typeof children === 'function'
-					? children(registerFormField(formField, controlled), formField)
-					: children
-			}
-		/>
+		<FormFieldContext.Provider value={Object.assign(formField as TFormField<any>, { id })}>
+			{typeof children === 'function'
+				? children(registerFormField(formField, controlled), formField)
+				: children}
+		</FormFieldContext.Provider>
 	);
 };
 
@@ -56,6 +53,7 @@ export const FormItem = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HT
 		return <div className={cn('space-y-2', className)} ref={ref} {...other} />;
 	}
 );
+FormItem.displayName = 'FormItem';
 
 export const FormLabel = React.forwardRef<
 	React.ElementRef<typeof LabelPrimitive.Root>,
@@ -83,9 +81,10 @@ export const FormControl = React.forwardRef<React.ElementRef<typeof Slot>, TForm
 				aria-invalid={status.type === 'INVALID'}
 				id={formField.key}
 				ref={ref}
-				children={typeof children === 'function' ? children(status) : children}
 				{...other}
-			/>
+			>
+				{typeof children === 'function' ? children(status) : children}
+			</Slot>
 		);
 	}
 );

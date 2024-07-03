@@ -28,13 +28,13 @@
 	},
 	"homepage": "https://dyn.art/?source=package-json",
 	"dependencies": {
-		"@ibg/utils": "^0.0.6",
+		"@ibg/utils": "^0.0.9",
 		"object-hash": "^3.0.0"
 	},
 	"devDependencies": {
 		"@dyn/arb-dtif": "workspace:*",
 		"@figma/plugin-typings": "^1.94.0",
-		"@ibg/config": "^0.0.11",
+		"@ibg/config": "^0.0.12",
 		"@types/node": "^20.14.1",
 		"@types/object-hash": "^3.0.6"
 	},

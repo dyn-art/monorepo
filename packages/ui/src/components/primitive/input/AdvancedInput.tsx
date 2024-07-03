@@ -32,31 +32,26 @@ export interface TAdvancedInputProps
 	childrenAfter?: React.ReactElement;
 }
 
-const AdvancedInput = React.forwardRef<HTMLInputElement, TAdvancedInputProps>(
-	({ className, variant, size, children, childrenAfter, ...props }, ref) => {
-		if (variant === 'destructive' && childrenAfter == null) {
-			childrenAfter = (
-				<div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-					<AlertCircleIcon aria-hidden="true" className="text-destructive h-5 w-5" />
-				</div>
-			);
-		}
-
-		if (childrenAfter != null || children != null) {
-			return (
-				<div className="relative">
-					{children}
-					<input className={cn(inputVariants({ variant, size, className }))} ref={ref} {...props} />
-					{childrenAfter}
-				</div>
-			);
-		}
-
-		return (
-			<input className={cn(inputVariants({ variant, size, className }))} ref={ref} {...props} />
+const AdvancedInput = React.forwardRef<HTMLInputElement, TAdvancedInputProps>((props, ref) => {
+	const { className, variant, size, children, ...other } = props;
+	let childrenAfter = props.childrenAfter;
+	if (variant === 'destructive' && childrenAfter == null) {
+		childrenAfter = (
+			<div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+				<AlertCircleIcon aria-hidden="true" className="text-destructive h-5 w-5" />
+			</div>
 		);
 	}
-);
+
+	return (
+		<div className="relative">
+			{children}
+			{/* The input element must stay the same to avoid resetting its state in non-controlled forms */}
+			<input className={cn(inputVariants({ variant, size, className }))} ref={ref} {...other} />
+			{childrenAfter}
+		</div>
+	);
+});
 AdvancedInput.displayName = 'AdvancedInput';
 
 export { AdvancedInput };
