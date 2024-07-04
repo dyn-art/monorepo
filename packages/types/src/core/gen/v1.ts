@@ -3,110 +3,159 @@
  * Do not make direct changes to the file.
  */
 
-
 export interface paths {
-  "/v1/ping": {
-    /**
-     * API Ping
-     * @description Ping the API to check if it's working.
-     */
-    get: operations["getPingAPI"];
-  };
-  "/v1/hello": {
-    /**
-     * API Hello
-     * @description Say Hello.
-     */
-    get: operations["getHelloAPI"];
-  };
+    "/v1/health": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Health endpoint
+         * @description Check whether api can be reached
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Server is up and running */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["HealthDto"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/auth/login": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * User login endpoint
+         * @description Authenticate a user with their credentials
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            /** @description User credentials */
+            requestBody: {
+                content: {
+                    "application/json": {
+                        /**
+                         * Format: email
+                         * @example user@example.com
+                         */
+                        email: string;
+                        /**
+                         * Format: password
+                         * @example Admin12345!
+                         */
+                        password: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description Successful login */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /**
+                             * @description JWT token for authenticated user
+                             * @example eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                             */
+                            token?: string;
+                        };
+                    };
+                };
+                /** @description Invalid input */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @example Invalid email or password */
+                            message?: string;
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @example Unauthorized */
+                            message?: string;
+                        };
+                    };
+                };
+                /** @description Server error */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @example Internal server error */
+                            message?: string;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
-
 export type webhooks = Record<string, never>;
-
 export interface components {
-  schemas: {
-    /**
-     * @description Error Response
-     * @example {
-     *   "error_code": "400",
-     *   "error_description": "Bad Request",
-     *   "error_uri": null,
-     *   "additional_errors": []
-     * }
-     */
-    ServerError: {
-      /** @description Error code */
-      error_code?: string;
-      /** @description Error description */
-      error_description?: string | null;
-      /** @description Error URI */
-      error_uri?: string | null;
-      additional_errors?: Record<string, never>[];
+    schemas: {
+        HealthDto: {
+            message: string;
+            status: components["schemas"]["HealthStatus"];
+        };
+        /** @enum {string} */
+        HealthStatus: "Up";
     };
-  };
-  responses: {
-    /** @description Bad Request */
-    BadRequest: {
-      content: {
-        "application/json": components["schemas"]["ServerError"];
-      };
-    };
-    /** @description Server Error */
-    ServerError: {
-      content: {
-        "application/json": components["schemas"]["ServerError"];
-      };
-    };
-    /** @description Not Found */
-    NotFound: {
-      content: {
-        "application/json": components["schemas"]["ServerError"];
-      };
-    };
-  };
-  parameters: never;
-  requestBodies: never;
-  headers: never;
-  pathItems: never;
+    responses: never;
+    parameters: never;
+    requestBodies: never;
+    headers: never;
+    pathItems: never;
 }
-
 export type $defs = Record<string, never>;
-
-export type external = Record<string, never>;
-
-export interface operations {
-
-  /**
-   * API Ping
-   * @description Ping the API to check if it's working.
-   */
-  getPingAPI: {
-    responses: {
-      /** @description Success */
-      200: {
-        content: {
-          "application/json": boolean;
-        };
-      };
-    };
-  };
-  /**
-   * API Hello
-   * @description Say Hello.
-   */
-  getHelloAPI: {
-    parameters: {
-      query: {
-        name: string;
-      };
-    };
-    responses: {
-      /** @description Success */
-      200: {
-        content: {
-          "application/json": string;
-        };
-      };
-    };
-  };
-}
+export type operations = Record<string, never>;

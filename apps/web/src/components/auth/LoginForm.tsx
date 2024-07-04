@@ -15,12 +15,27 @@ import {
 	GithubIcon,
 	GoogleIcon
 } from '@dyn/ui';
+import { $loginForm } from '@/core';
 
-import { AuthFormWrapper } from '../AuthFormWrapper';
-import { $loginForm } from './controller';
+import { AuthFormWrapper } from './AuthFormWrapper';
 
 export const LoginForm: React.FC = () => {
 	const { field, handleSubmit } = useForm($loginForm);
+	const isDisabled = false; // TODO: Disable if submitting
+	const [blockMessage, setBlockMessage] = React.useState<{
+		variant: 'error' | 'success' | 'warn';
+		message: string;
+	} | null>(null);
+
+	const onSubmit = handleSubmit({
+		onInvalidSubmit: (errors) => {
+			console.log({ errors });
+		},
+		onValidSubmit: (data) => {
+			console.log({ data });
+		},
+		preventDefault: true
+	});
 
 	return (
 		<AuthFormWrapper
@@ -28,7 +43,7 @@ export const LoginForm: React.FC = () => {
 			backChildren={
 				<p className="mt-4 text-center text-sm">
 					Don't have an account?{' '}
-					<Link href="#" className="underline">
+					<Link href="/auth/register" className="underline">
 						Sign up
 					</Link>
 				</p>
@@ -36,15 +51,7 @@ export const LoginForm: React.FC = () => {
 		>
 			<form
 				// eslint-disable-next-line @typescript-eslint/no-misused-promises -- ok
-				onSubmit={handleSubmit({
-					onInvalidSubmit: (errors) => {
-						console.log({ errors });
-					},
-					onValidSubmit: (data) => {
-						console.log({ data });
-					},
-					preventDefault: true
-				})}
+				onSubmit={onSubmit}
 				className="space-y-6"
 			>
 				<div className="space-y-4">
@@ -56,6 +63,7 @@ export const LoginForm: React.FC = () => {
 									{(status) => (
 										<AdvancedInput
 											{...fieldData}
+											disabled={isDisabled}
 											placeholder="john.doe@example.com"
 											type="email"
 											variant={status.type === 'INVALID' ? 'destructive' : 'default'}
@@ -74,6 +82,7 @@ export const LoginForm: React.FC = () => {
 									{(status) => (
 										<AdvancedInput
 											{...fieldData}
+											disabled={isDisabled}
 											placeholder="*******"
 											type="password"
 											variant={status.type === 'INVALID' ? 'destructive' : 'default'}
@@ -85,17 +94,19 @@ export const LoginForm: React.FC = () => {
 						)}
 					</FormField>
 				</div>
-				<BlockMessage variant="error">This is a message in a Block Message</BlockMessage>
-				<Button type="submit" className="w-full">
+				{blockMessage != null && (
+					<BlockMessage variant={blockMessage.variant}>{blockMessage.message}</BlockMessage>
+				)}
+				<Button type="submit" className="w-full" disabled={isDisabled}>
 					Sign in
 				</Button>
 			</form>
 
-			<div className="flex w-full items-center gap-x-2">
-				<Button size="lg" className="w-full" variant="outline">
+			<div className="mt-6 flex w-full items-center gap-x-2">
+				<Button size="lg" className="w-full" variant="outline" disabled={isDisabled}>
 					<GoogleIcon className="h-6 w-6" />
 				</Button>
-				<Button size="lg" className="w-full" variant="outline">
+				<Button size="lg" className="w-full" variant="outline" disabled={isDisabled}>
 					<GithubIcon className="h-6 w-6" />
 				</Button>
 			</div>

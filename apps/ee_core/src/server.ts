@@ -7,7 +7,7 @@ import { logger } from '@/logger';
 	// TODO:
 
 	// Import the Express app module after async dependencies are initialized
-	// to ensure that the app only starts handling requests after all dependencies are ready
+	// to ensure that the app only starts handling requests after all necessary dependencies are ready
 	const { app } = await import('./app');
 	app.set('port', appConfig.port);
 
@@ -20,8 +20,8 @@ import { logger } from '@/logger';
 		logger.error(`Error occurred in http server: ${error.message}`);
 	});
 	httpServer.on('listening', () => {
-		logger.info(`Server running on Port: ${appConfig.port}`);
+		logger.info(`Server running on Port: ${appConfig.port.toString()}`);
 	});
-})().catch(() => {
-	// do nothing
+})().catch((e: unknown) => {
+	logger.error('Failed to start server by exception: ', e);
 });

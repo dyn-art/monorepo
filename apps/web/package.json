@@ -35,7 +35,7 @@
 		"clsx": "^2.1.1",
 		"feature-fetch": "^0.0.7",
 		"feature-form": "^0.0.9",
-		"feature-form-validators": "^0.0.2",
+		"feature-form-validators": "^0.0.3",
 		"feature-react": "^0.0.15",
 		"framer-motion": "^11.2.10",
 		"next": "14.0.4",
