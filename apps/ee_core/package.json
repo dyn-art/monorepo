@@ -7,8 +7,7 @@
 		"build": "shx rm -rf dist && ../../scripts/cli.sh bundle node",
 		"start:dev": "nodemon --config ./nodemon.json",
 		"db:generate": "drizzle-kit generate",
-		"db:migrate": "node ./.drizzle/migrate.js",
-		"db:push": "drizzle-kit push",
+		"db:migrate": "node ./drizzle/migrate.js",
 		"db:studio": "drizzle-kit studio",
 		"lint": "eslint --ext .js,.ts src/",
 		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
@@ -32,8 +31,6 @@
 	"dependencies": {
 		"@auth/drizzle-adapter": "^1.4.1",
 		"@auth/express": "^0.5.6",
-		"@auth/prisma-adapter": "^2.4.1",
-		"@prisma/client": "^5.16.1",
 		"drizzle-orm": "^0.31.2",
 		"express": "^4.19.2",
 		"feature-logger": "^0.0.13",
@@ -49,7 +46,6 @@
 		"dotenv": "^16.4.5",
 		"drizzle-kit": "^0.22.8",
 		"nodemon": "^3.1.4",
-		"openapi-typescript": "^7.0.1",
 		"ts-node": "^10.9.2"
 	},
 	"files": [

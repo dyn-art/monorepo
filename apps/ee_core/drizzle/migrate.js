@@ -18,7 +18,7 @@ if (nodeEnv === 'local') {
 	const migrationClient = postgres(process.env.DB_URL, { max: 1 });
 
 	await migrate(drizzle(migrationClient), {
-		migrationsFolder: './.drizzle/migrations'
+		migrationsFolder: './drizzle/migrations'
 	});
 
 	migrationClient.end();

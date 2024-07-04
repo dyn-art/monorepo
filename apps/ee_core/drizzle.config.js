@@ -8,7 +8,7 @@ if (nodeEnv === 'local') {
 /** @type { import("drizzle-kit").Config } */
 export default {
 	schema: './src/db/schema.ts',
-	out: './.drizzle/migrations',
+	out: './drizzle/migrations',
 	dialect: 'postgresql',
 	dbCredentials: {
 		url: process.env.DB_URL
