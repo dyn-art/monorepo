@@ -1,7 +1,7 @@
-import { valibotValidator } from 'feature-form-validators/valibot';
 import * as v from 'valibot';
+import { valibotAdapter } from 'validation-adapters/valibot';
 
-export const emailValidator = valibotValidator(
+export const emailValidator = valibotAdapter(
 	v.pipe(
 		v.string(),
 		v.nonEmpty('Please enter your email.'),

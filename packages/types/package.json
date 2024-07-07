@@ -30,9 +30,6 @@
 			],
 			"core": [
 				"./dist/core/index.d.ts"
-			],
-			"utility": [
-				"./dist/utility.d.ts"
 			]
 		}
 	},
@@ -48,7 +45,8 @@
 	},
 	"homepage": "https://dyn.art/?source=package-json",
 	"devDependencies": {
-		"@ibg/config": "^0.0.12"
+		"@ibg/config": "^0.0.13",
+		"openapi-typescript": "^7.0.2"
 	},
 	"files": [
 		"dist",

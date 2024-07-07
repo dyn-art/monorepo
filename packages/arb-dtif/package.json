@@ -28,10 +28,10 @@
 	},
 	"homepage": "https://dyn.art/?source=package-json",
 	"dependencies": {
-		"@ibg/utils": "^0.0.9"
+		"@ibg/utils": "^0.0.10"
 	},
 	"devDependencies": {
-		"@ibg/config": "^0.0.12",
+		"@ibg/config": "^0.0.13",
 		"@types/node": "^20.8.10"
 	},
 	"files": [

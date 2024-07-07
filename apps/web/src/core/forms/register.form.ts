@@ -4,8 +4,8 @@ import {
 	FormFieldReValidateMode,
 	FormFieldValidateMode
 } from 'feature-form';
-import { valibotValidator } from 'feature-form-validators/valibot';
 import * as v from 'valibot';
+import { valibotAdapter } from 'validation-adapters/valibot';
 
 import { emailValidator } from './validators';
 
@@ -18,11 +18,11 @@ interface TRegisterFormFields {
 export const $registerForm = createForm<TRegisterFormFields>({
 	fields: {
 		email: {
-			validator: emailValidator,
+			validationAdapter: emailValidator,
 			defaultValue: ''
 		},
 		password: {
-			validator: valibotValidator(
+			validationAdapter: valibotAdapter(
 				v.pipe(
 					v.string(),
 					v.nonEmpty('Please enter your password.'),
@@ -32,7 +32,7 @@ export const $registerForm = createForm<TRegisterFormFields>({
 			defaultValue: ''
 		},
 		name: {
-			validator: valibotValidator(v.pipe(v.string(), v.nonEmpty('Please enter your name.'))),
+			validationAdapter: valibotAdapter(v.pipe(v.string(), v.nonEmpty('Please enter your name.'))),
 			defaultValue: ''
 		}
 	},

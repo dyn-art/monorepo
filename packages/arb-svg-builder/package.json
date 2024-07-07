@@ -37,11 +37,11 @@
 	"homepage": "https://dyn.art/?source=package-json",
 	"dependencies": {
 		"@dyn/arb-dtif": "workspace:*",
-		"@ibg/utils": "^0.0.9"
+		"@ibg/utils": "^0.0.10"
 	},
 	"devDependencies": {
 		"@dyn/types": "workspace:*",
-		"@ibg/config": "^0.0.12",
+		"@ibg/config": "^0.0.13",
 		"@rollup/plugin-wasm": "^6.2.2",
 		"@types/node": "^20.8.10",
 		"@types/react": "^18.2.33"
