@@ -31,11 +31,11 @@
 	"dependencies": {
 		"@auth/drizzle-adapter": "^1.4.1",
 		"@auth/express": "^0.5.6",
-		"@ibg/openapi-router": "^0.0.6",
+		"@ibg/openapi-router": "^0.0.7",
 		"bcrypt": "^5.1.1",
 		"drizzle-orm": "^0.31.2",
 		"express": "^4.19.2",
-		"feature-logger": "^0.0.15",
+		"feature-logger": "^0.0.16",
 		"postgres": "^3.4.4",
 		"valibot": "^0.35.0",
 		"validation-adapters": "^0.0.5"

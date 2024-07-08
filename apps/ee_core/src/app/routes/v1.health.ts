@@ -1,7 +1,10 @@
 import { openApiRouter } from './router';
 
 openApiRouter.get('/v1/health', {
-	handler: async (req, res) => {
-		res.status(200).send({});
+	handler: (_req, res) => {
+		res.send({
+			message: 'Up and running',
+			status: 'Up'
+		});
 	}
 });
