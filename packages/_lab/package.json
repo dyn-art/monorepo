@@ -32,12 +32,12 @@
 	},
 	"homepage": "https://dyn.art/?source=package-json",
 	"dependencies": {
-		"@ibg/utils": "^0.0.10",
+		"@ibg/utils": "^0.0.11",
 		"bitecs": "^0.3.40",
 		"piecs": "^0.4.0"
 	},
 	"devDependencies": {
-		"@ibg/config": "^0.0.13",
+		"@ibg/config": "^0.0.14",
 		"@types/node": "^20.8.10"
 	},
 	"files": [

@@ -37,14 +37,14 @@
 		"@dyn/arb-dtif": "workspace:*",
 		"@dyn/arb-svg-builder": "workspace:*",
 		"@dyn/ui": "workspace:*",
-		"@ibg/utils": "^0.0.10"
+		"@ibg/utils": "^0.0.11"
 	},
 	"peerDependencies": {
 		"@tanstack/react-query": "^5.35.1",
 		"react": "^18.2.0"
 	},
 	"devDependencies": {
-		"@ibg/config": "^0.0.13",
+		"@ibg/config": "^0.0.14",
 		"@storybook/addon-essentials": "^8.1.0-alpha.8",
 		"@storybook/addon-interactions": "^8.1.0-alpha.8",
 		"@storybook/addon-links": "^8.1.0-alpha.8",

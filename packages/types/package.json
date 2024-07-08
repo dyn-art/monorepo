@@ -45,7 +45,7 @@
 	},
 	"homepage": "https://dyn.art/?source=package-json",
 	"devDependencies": {
-		"@ibg/config": "^0.0.13",
+		"@ibg/config": "^0.0.14",
 		"openapi-typescript": "^7.0.2"
 	},
 	"files": [

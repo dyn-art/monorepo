@@ -53,6 +53,9 @@ importers:
       '@auth/express':
         specifier: ^0.5.6
         version: 0.5.6(express@4.19.2)
+      '@ibg/openapi-router':
+        specifier: ^0.0.5
+        version: 0.0.5
       bcrypt:
         specifier: ^5.1.1
         version: 5.1.1
@@ -63,24 +66,24 @@ importers:
         specifier: ^4.19.2
         version: 4.19.2
       feature-logger:
-        specifier: ^0.0.14
-        version: 0.0.14
-      openapi-express:
-        specifier: ^0.0.7
-        version: 0.0.7
+        specifier: ^0.0.15
+        version: 0.0.15
       postgres:
         specifier: ^3.4.4
         version: 3.4.4
       valibot:
         specifier: ^0.35.0
         version: 0.35.0
+      validation-adapters:
+        specifier: ^0.0.5
+        version: 0.0.5
     devDependencies:
       '@dyn/types':
         specifier: workspace:*
         version: link:../../packages/types
       '@ibg/config':
-        specifier: ^0.0.13
-        version: 0.0.13(@next/eslint-plugin-next@14.2.4)(@remix-run/eslint-config@2.10.0(eslint@9.6.0)(react@18.3.1)(typescript@5.5.3))(eslint@9.6.0)(prettier@3.3.2)(typescript@5.5.3)(vite@5.3.3(@types/node@20.14.9)(sass@1.77.6))(vitest@1.6.0(@edge-runtime/vm@3.2.0)(@types/node@20.14.9)(sass@1.77.6))
+        specifier: ^0.0.14
+        version: 0.0.14(@next/eslint-plugin-next@14.2.4)(@remix-run/eslint-config@2.10.0(eslint@9.6.0)(react@18.3.1)(typescript@5.5.3))(eslint@9.6.0)(prettier@3.3.2)(typescript@5.5.3)(vite@5.3.3(@types/node@20.14.9)(sass@1.77.6))(vitest@1.6.0(@edge-runtime/vm@3.2.0)(@types/node@20.14.9)(sass@1.77.6))
       '@types/bcrypt':
         specifier: ^5.0.2
         version: 5.0.2
@@ -121,8 +124,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/ui
       '@ibg/utils':
-        specifier: ^0.0.10
-        version: 0.0.10
+        specifier: ^0.0.11
+        version: 0.0.11
       '@tanstack/react-query':
         specifier: ^5.35.1
         version: 5.45.0(react@18.3.1)
@@ -130,17 +133,17 @@ importers:
         specifier: ^2.1.1
         version: 2.1.1
       feature-state:
-        specifier: ^0.0.15
-        version: 0.0.15
+        specifier: ^0.0.16
+        version: 0.0.16
       feature-state-react:
         specifier: ^0.0.7
         version: 0.0.7(react@18.3.1)
       figma-connect:
+        specifier: ^0.0.9
+        version: 0.0.9
+      google-webfonts-client:
         specifier: ^0.0.8
         version: 0.0.8
-      google-webfonts-client:
-        specifier: ^0.0.7
-        version: 0.0.7
       react:
         specifier: ^18.3.1
         version: 18.3.1
@@ -158,8 +161,8 @@ importers:
         specifier: ^1.93.0
         version: 1.96.0
       '@ibg/config':
-        specifier: ^0.0.13
-        version: 0.0.13(@next/eslint-plugin-next@14.2.4)(@remix-run/eslint-config@2.10.0(eslint@9.6.0)(react@18.3.1)(typescript@5.5.3))(eslint@9.6.0)(prettier@3.3.2)(typescript@5.5.3)(vite@5.3.1(@types/node@20.14.2)(sass@1.77.6))(vitest@1.6.0(@edge-runtime/vm@3.2.0)(@types/node@20.14.2)(sass@1.77.6))
+        specifier: ^0.0.14
+        version: 0.0.14(@next/eslint-plugin-next@14.2.4)(@remix-run/eslint-config@2.10.0(eslint@9.6.0)(react@18.3.1)(typescript@5.5.3))(eslint@9.6.0)(prettier@3.3.2)(typescript@5.5.3)(vite@5.3.1(@types/node@20.14.2)(sass@1.77.6))(vitest@1.6.0(@edge-runtime/vm@3.2.0)(@types/node@20.14.2)(sass@1.77.6))
       '@types/express':
         specifier: ^4.17.21
         version: 4.17.21
@@ -218,8 +221,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/ui
       '@ibg/utils':
-        specifier: ^0.0.10
-        version: 0.0.10
+        specifier: ^0.0.11
+        version: 0.0.11
       '@next/bundle-analyzer':
         specifier: ^14.2.4
         version: 14.2.4
@@ -233,14 +236,14 @@ importers:
         specifier: ^2.1.1
         version: 2.1.1
       feature-fetch:
-        specifier: ^0.0.8
-        version: 0.0.8
+        specifier: ^0.0.9
+        version: 0.0.9
       feature-form:
-        specifier: ^0.0.10
-        version: 0.0.10
+        specifier: ^0.0.11
+        version: 0.0.11
       feature-react:
-        specifier: ^0.0.16
-        version: 0.0.16(react@18.3.1)
+        specifier: ^0.0.17
+        version: 0.0.17(react@18.3.1)
       framer-motion:
         specifier: ^11.2.10
         version: 11.2.10(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -257,12 +260,12 @@ importers:
         specifier: ^0.35.0
         version: 0.35.0
       validation-adapters:
-        specifier: ^0.0.4
-        version: 0.0.4
+        specifier: ^0.0.5
+        version: 0.0.5
     devDependencies:
       '@ibg/config':
-        specifier: ^0.0.13
-        version: 0.0.13(@next/eslint-plugin-next@14.2.4)(@remix-run/eslint-config@2.10.0(eslint@9.6.0)(react@18.3.1)(typescript@5.5.3))(eslint@9.6.0)(prettier@3.3.2)(typescript@5.5.3)(vite@5.3.3(@types/node@20.14.2)(sass@1.77.5))(vitest@1.6.0(@edge-runtime/vm@3.2.0)(@types/node@20.14.2)(sass@1.77.5))
+        specifier: ^0.0.14
+        version: 0.0.14(@next/eslint-plugin-next@14.2.4)(@remix-run/eslint-config@2.10.0(eslint@9.6.0)(react@18.3.1)(typescript@5.5.3))(eslint@9.6.0)(prettier@3.3.2)(typescript@5.5.3)(vite@5.3.3(@types/node@20.14.2)(sass@1.77.5))(vitest@1.6.0(@edge-runtime/vm@3.2.0)(@types/node@20.14.2)(sass@1.77.5))
       '@types/node':
         specifier: ^20.12.10
         version: 20.14.2
@@ -288,8 +291,8 @@ importers:
   packages/_lab:
     dependencies:
       '@ibg/utils':
-        specifier: ^0.0.10
-        version: 0.0.10
+        specifier: ^0.0.11
+        version: 0.0.11
       bitecs:
         specifier: ^0.3.40
         version: 0.3.40
@@ -298,8 +301,8 @@ importers:
         version: 0.4.0
     devDependencies:
       '@ibg/config':
-        specifier: ^0.0.13
-        version: 0.0.13(@next/eslint-plugin-next@14.2.4)(@remix-run/eslint-config@2.10.0(eslint@9.6.0)(react@18.3.1)(typescript@5.5.3))(eslint@9.6.0)(prettier@3.3.2)(typescript@5.5.3)(vite@5.3.3(@types/node@20.14.2)(sass@1.77.6))(vitest@1.6.0(@edge-runtime/vm@3.2.0)(@types/node@20.14.2)(sass@1.77.6))
+        specifier: ^0.0.14
+        version: 0.0.14(@next/eslint-plugin-next@14.2.4)(@remix-run/eslint-config@2.10.0(eslint@9.6.0)(react@18.3.1)(typescript@5.5.3))(eslint@9.6.0)(prettier@3.3.2)(typescript@5.5.3)(vite@5.3.3(@types/node@20.14.2)(sass@1.77.6))(vitest@1.6.0(@edge-runtime/vm@3.2.0)(@types/node@20.14.2)(sass@1.77.6))
       '@types/node':
         specifier: ^20.8.10
         version: 20.14.2
@@ -307,12 +310,12 @@ importers:
   packages/arb-dtif:
     dependencies:
       '@ibg/utils':
-        specifier: ^0.0.10
-        version: 0.0.10
+        specifier: ^0.0.11
+        version: 0.0.11
     devDependencies:
       '@ibg/config':
-        specifier: ^0.0.13
-        version: 0.0.13(@next/eslint-plugin-next@14.2.4)(@remix-run/eslint-config@2.10.0(eslint@9.6.0)(react@18.3.1)(typescript@5.5.3))(eslint@9.6.0)(prettier@3.3.2)(typescript@5.5.3)(vite@5.3.3(@types/node@20.14.2)(sass@1.77.6))(vitest@1.6.0(@edge-runtime/vm@3.2.0)(@types/node@20.14.2)(sass@1.77.6))
+        specifier: ^0.0.14
+        version: 0.0.14(@next/eslint-plugin-next@14.2.4)(@remix-run/eslint-config@2.10.0(eslint@9.6.0)(react@18.3.1)(typescript@5.5.3))(eslint@9.6.0)(prettier@3.3.2)(typescript@5.5.3)(vite@5.3.3(@types/node@20.14.2)(sass@1.77.6))(vitest@1.6.0(@edge-runtime/vm@3.2.0)(@types/node@20.14.2)(sass@1.77.6))
       '@types/node':
         specifier: ^20.8.10
         version: 20.14.2
@@ -323,15 +326,15 @@ importers:
         specifier: workspace:*
         version: link:../arb-dtif
       '@ibg/utils':
-        specifier: ^0.0.10
-        version: 0.0.10
+        specifier: ^0.0.11
+        version: 0.0.11
     devDependencies:
       '@dyn/types':
         specifier: workspace:*
         version: link:../types
       '@ibg/config':
-        specifier: ^0.0.13
-        version: 0.0.13(@next/eslint-plugin-next@14.2.4)(@remix-run/eslint-config@2.10.0(eslint@9.6.0)(react@18.3.1)(typescript@5.5.3))(eslint@9.6.0)(prettier@3.3.2)(typescript@5.5.3)(vite@5.3.3(@types/node@20.14.2)(sass@1.77.6))(vitest@1.6.0(@edge-runtime/vm@3.2.0)(@types/node@20.14.2)(sass@1.77.6))
+        specifier: ^0.0.14
+        version: 0.0.14(@next/eslint-plugin-next@14.2.4)(@remix-run/eslint-config@2.10.0(eslint@9.6.0)(react@18.3.1)(typescript@5.5.3))(eslint@9.6.0)(prettier@3.3.2)(typescript@5.5.3)(vite@5.3.3(@types/node@20.14.2)(sass@1.77.6))(vitest@1.6.0(@edge-runtime/vm@3.2.0)(@types/node@20.14.2)(sass@1.77.6))
       '@rollup/plugin-wasm':
         specifier: ^6.2.2
         version: 6.2.2(rollup@4.18.0)
@@ -354,12 +357,12 @@ importers:
         specifier: workspace:*
         version: link:../ui
       '@ibg/utils':
-        specifier: ^0.0.10
-        version: 0.0.10
+        specifier: ^0.0.11
+        version: 0.0.11
     devDependencies:
       '@ibg/config':
-        specifier: ^0.0.13
-        version: 0.0.13(@next/eslint-plugin-next@14.2.4)(@remix-run/eslint-config@2.10.0(eslint@9.6.0)(react@18.3.1)(typescript@5.5.3))(eslint@9.6.0)(prettier@3.3.2)(typescript@5.5.3)(vite@5.3.1(@types/node@20.14.2)(sass@1.77.6))(vitest@1.6.0(@edge-runtime/vm@3.2.0)(@types/node@20.14.2)(sass@1.77.6))
+        specifier: ^0.0.14
+        version: 0.0.14(@next/eslint-plugin-next@14.2.4)(@remix-run/eslint-config@2.10.0(eslint@9.6.0)(react@18.3.1)(typescript@5.5.3))(eslint@9.6.0)(prettier@3.3.2)(typescript@5.5.3)(vite@5.3.1(@types/node@20.14.2)(sass@1.77.6))(vitest@1.6.0(@edge-runtime/vm@3.2.0)(@types/node@20.14.2)(sass@1.77.6))
       '@storybook/addon-essentials':
         specifier: ^8.1.0-alpha.8
         version: 8.1.9(@types/react-dom@18.3.0)(@types/react@18.3.3)(prettier@3.3.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -430,8 +433,8 @@ importers:
   packages/figma-to-dtif:
     dependencies:
       '@ibg/utils':
-        specifier: ^0.0.10
-        version: 0.0.10
+        specifier: ^0.0.11
+        version: 0.0.11
       object-hash:
         specifier: ^3.0.0
         version: 3.0.0
@@ -443,8 +446,8 @@ importers:
         specifier: ^1.94.0
         version: 1.96.0
       '@ibg/config':
-        specifier: ^0.0.13
-        version: 0.0.13(@next/eslint-plugin-next@14.2.4)(@remix-run/eslint-config@2.10.0(eslint@9.6.0)(react@18.3.1)(typescript@5.5.3))(eslint@9.6.0)(prettier@3.3.2)(typescript@5.5.3)(vite@5.3.3(@types/node@20.14.2)(sass@1.77.6))(vitest@1.6.0(@edge-runtime/vm@3.2.0)(@types/node@20.14.2)(sass@1.77.6))
+        specifier: ^0.0.14
+        version: 0.0.14(@next/eslint-plugin-next@14.2.4)(@remix-run/eslint-config@2.10.0(eslint@9.6.0)(react@18.3.1)(typescript@5.5.3))(eslint@9.6.0)(prettier@3.3.2)(typescript@5.5.3)(vite@5.3.3(@types/node@20.14.2)(sass@1.77.6))(vitest@1.6.0(@edge-runtime/vm@3.2.0)(@types/node@20.14.2)(sass@1.77.6))
       '@types/node':
         specifier: ^20.14.1
         version: 20.14.2
@@ -455,8 +458,8 @@ importers:
   packages/types:
     devDependencies:
       '@ibg/config':
-        specifier: ^0.0.13
-        version: 0.0.13(@next/eslint-plugin-next@14.2.4)(@remix-run/eslint-config@2.10.0(eslint@9.6.0)(react@18.3.1)(typescript@5.5.3))(eslint@9.6.0)(prettier@3.3.2)(typescript@5.5.3)(vite@5.3.3(@types/node@16.18.11)(sass@1.77.6))(vitest@1.6.0(@edge-runtime/vm@3.2.0)(@types/node@16.18.11)(sass@1.77.6))
+        specifier: ^0.0.14
+        version: 0.0.14(@next/eslint-plugin-next@14.2.4)(@remix-run/eslint-config@2.10.0(eslint@9.6.0)(react@18.3.1)(typescript@5.5.3))(eslint@9.6.0)(prettier@3.3.2)(typescript@5.5.3)(vite@5.3.3(@types/node@16.18.11)(sass@1.77.6))(vitest@1.6.0(@edge-runtime/vm@3.2.0)(@types/node@16.18.11)(sass@1.77.6))
       openapi-typescript:
         specifier: ^7.0.2
         version: 7.0.2(typescript@5.5.3)
@@ -464,8 +467,8 @@ importers:
   packages/ui:
     dependencies:
       '@ibg/utils':
-        specifier: ^0.0.10
-        version: 0.0.10
+        specifier: ^0.0.11
+        version: 0.0.11
       '@internationalized/date':
         specifier: ^3.5.4
         version: 3.5.4
@@ -539,11 +542,11 @@ importers:
         specifier: ^3.6.0
         version: 3.6.0
       feature-form:
-        specifier: ^0.0.10
-        version: 0.0.10
+        specifier: ^0.0.11
+        version: 0.0.11
       feature-react:
-        specifier: ^0.0.16
-        version: 0.0.16(react@18.3.1)
+        specifier: ^0.0.17
+        version: 0.0.17(react@18.3.1)
       framer-motion:
         specifier: ^11.2.10
         version: 11.2.10(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -579,8 +582,8 @@ importers:
         version: 1.0.7(tailwindcss@3.4.4(ts-node@10.9.2(@types/node@20.14.2)(typescript@5.5.3)))
     devDependencies:
       '@ibg/config':
-        specifier: ^0.0.13
-        version: 0.0.13(@next/eslint-plugin-next@14.2.4)(@remix-run/eslint-config@2.10.0(eslint@9.6.0)(react@18.3.1)(typescript@5.5.3))(eslint@9.6.0)(prettier@3.3.2)(typescript@5.5.3)(vite@5.3.1(@types/node@20.14.2)(sass@1.77.6))(vitest@1.6.0(@edge-runtime/vm@3.2.0)(@types/node@20.14.2)(sass@1.77.6))
+        specifier: ^0.0.14
+        version: 0.0.14(@next/eslint-plugin-next@14.2.4)(@remix-run/eslint-config@2.10.0(eslint@9.6.0)(react@18.3.1)(typescript@5.5.3))(eslint@9.6.0)(prettier@3.3.2)(typescript@5.5.3)(vite@5.3.1(@types/node@20.14.2)(sass@1.77.6))(vitest@1.6.0(@edge-runtime/vm@3.2.0)(@types/node@20.14.2)(sass@1.77.6))
       '@storybook/addon-essentials':
         specifier: ^8.1.5
         version: 8.1.9(@types/react-dom@18.3.0)(@types/react@18.3.3)(prettier@3.3.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -2444,14 +2447,17 @@ packages:
       '@next/eslint-plugin-next': ^14.0.1
       '@remix-run/eslint-config': ^2.2.0
 
-  '@ibg/config@0.0.13':
-    resolution: {integrity: sha512-W3rjDIazARmNCEQzi+bk7sNyElZDE9BG/IgEjlF2nUyEHA6/TM/ok4cX0fjvNBamZ5H0A/T9GwfxrYWPCrExeA==}
+  '@ibg/config@0.0.14':
+    resolution: {integrity: sha512-v/RP5U5YGxUf3wai1wqKmIV8YmVl+mZYlzKmC2+4ULsQLQ30yFoLKAJ+YfGG+W/KNEe2/mgrKEXh1mOuY/kBZA==}
     peerDependencies:
       '@next/eslint-plugin-next': ^14.0.1
       '@remix-run/eslint-config': ^2.2.0
 
-  '@ibg/utils@0.0.10':
-    resolution: {integrity: sha512-gMlvZJp3on4bgi4Kc/nzWJ7J/gvWt/LmL4C978eL3r6l7vwGISGaJBi+MVbYgT5AnXkZkKL3TufYNDNfclONsQ==}
+  '@ibg/openapi-router@0.0.5':
+    resolution: {integrity: sha512-/Nyhyu4CehM3U/myoap4BhmAxOMtmD1hZp38HJ26Mv+GQ/eADOP67alybgvMTOnBJnM+BYu6sws5fd2aFWwQmQ==}
+
+  '@ibg/utils@0.0.11':
+    resolution: {integrity: sha512-iNov8Dk0acE2lCjKg9jcmB1KKsYJUtZrjqBmuaF8anZ0xurn/E7+nkBT28e4j+AY6Rlkk++/n8j/tfPkN5w2gw==}
 
   '@ibg/utils@0.0.6':
     resolution: {integrity: sha512-ROAXt5t7dAUkPerux3Np+7h3gVPeOFTGtFg1Y1ErNJsGlQqXc7iB6MXcchWVCiNH/nhPP4K2XkOZx0ftgmKgjQ==}
@@ -6041,17 +6047,17 @@ packages:
   fd-slicer@1.1.0:
     resolution: {integrity: sha512-cE1qsB/VwyQozZ+q1dGxR8LBYNZeofhEdUNGSMbQD3Gw2lAzX9Zb3uIU6Ebc/Fmyjo9AWWfnn0AUCHqtevs/8g==}
 
-  feature-fetch@0.0.8:
-    resolution: {integrity: sha512-xYDSBTA0AjfdDx+/kDHXofdL/nj+4ha9zlejasOO5XFp0zqdLuYrMyqPKRKeM+nEfFegcADVqjE8B8KqP1tCWg==}
+  feature-fetch@0.0.9:
+    resolution: {integrity: sha512-xuimxH6LnQMKlJrgURfuzUyRysRp6Np2/Q2rkzCKd4qoy8HrpAXzIzzBJlXWvxlcOD/CoBq1AzjawXmk8O4I7Q==}
 
-  feature-form@0.0.10:
-    resolution: {integrity: sha512-m21vzNgfHRFLaV7hmjDjHzBGo4EWfBnvIrmr5sUpLkyJK3WJQredEkNLtQZO+jsWXwgn1cuo4C9/aqQQ8QIw0w==}
+  feature-form@0.0.11:
+    resolution: {integrity: sha512-PyhAIdNn0f4iordSNAGKWcBlaPwhxm0ysPSGORF4RBPRNjvTmIitMt+Xn7i5mogn3skEOMzJxwwOKby1BaMtMg==}
 
-  feature-logger@0.0.14:
-    resolution: {integrity: sha512-GRKHQfZI7+4xbeAw3XGbbzpScQbAE8Eu8ceZzziCeLzvy/GOLkjWyiYX87M0ozOkf6x8v1cxJwJVFY75TzB4tg==}
+  feature-logger@0.0.15:
+    resolution: {integrity: sha512-N24z+M3uxYGZq3vMa1bS8eBsth+xVdUkR8vDKaBdIPnJw6h/YmCNxRl/SoEkw/Sl1/wpDyU5EbX38J86SJYCQQ==}
 
-  feature-react@0.0.16:
-    resolution: {integrity: sha512-/JrcI+95sMSYXWhRT4wI1szchbCPBIP5XNN1eEfl3+Xx49Ygc8Lvlmb98vuT1TItTtij3IlQ2d12At9z7Is9Eg==}
+  feature-react@0.0.17:
+    resolution: {integrity: sha512-QOaPpFm8DaZPd5ISyquHtbLDeG0S/0nugHtghfpUp/plz2pa7a0sCgm++q2nz4wVJyblaPTf734kZqjnvthylQ==}
     peerDependencies:
       react: ^18.3.1
 
@@ -6060,8 +6066,8 @@ packages:
     peerDependencies:
       react: ^18.2.0
 
-  feature-state@0.0.15:
-    resolution: {integrity: sha512-rMJ1lUsEFF8TK5rFAiTwyA512+7uJLoOYWbWKIrJ3Ul/SoLVxtFKjHRyBVCLJAX7VptFwNTXlvhKe4cxBFugIQ==}
+  feature-state@0.0.16:
+    resolution: {integrity: sha512-ppfG84wZJkWefu+VhN7Q4KnEF/G65Y0EU8CzoEgH0023hy0Iq34+LBCvyL84vrdc1/a1xXaMz/wvKpcGD3fISw==}
 
   feature-state@0.0.7:
     resolution: {integrity: sha512-9+huWW+ECqDRjXhc5e1AwguPrqj7ugQOJemAm/MHYkrpSaWH8cv6fXTQ+O3h+eqd5m22HlbuLwAAKZSLhoyzQg==}
@@ -6074,8 +6080,8 @@ packages:
     engines: {node: '>= 0.4.0'}
     hasBin: true
 
-  figma-connect@0.0.8:
-    resolution: {integrity: sha512-xrEOreqUIT0F7xA+73KubKhtsB0MzNCCGZRUy/ipnf0k1mCMc3vIDU+kcOQiaF7a7AJAVFpOXxLx673IZAmysg==}
+  figma-connect@0.0.9:
+    resolution: {integrity: sha512-b400gy1baJ4cZuR3exkCic5yCyrXNFKQthGdv2su4j9TBrD0/52t4y1bhYXAySbWGihtpEBFgu4rHuHEm9Ll7w==}
 
   figures@1.7.0:
     resolution: {integrity: sha512-UxKlfCRuCBxSXU4C6t9scbDyWZ4VlaFFdojKtzJuSkuOBQ5CNFum+zZXFwHjo+CxBC1t6zlYPgHIgFjL8ggoEQ==}
@@ -6370,8 +6376,8 @@ packages:
   globrex@0.1.2:
     resolution: {integrity: sha512-uHJgbwAMwNFf5mLst7IWLNg14x1CkeqglJb/K3doi4dw6q2IvAAmM/Y81kevy83wP+Sst+nutFTYOGg3d1lsxg==}
 
-  google-webfonts-client@0.0.7:
-    resolution: {integrity: sha512-oVw8LhR08Nua3UJ6ysZpstgSlX4SJkx020j33bQ8pCo6q3JdfeJN7F9o5DbOaKGmwNBzNqSwzgv+76F4yflJWQ==}
+  google-webfonts-client@0.0.8:
+    resolution: {integrity: sha512-mCAEEQdqhV8y0BQB7to+flDWNZYGQYp6OquCwPuR/bnLo2IEd94vP3xJTPpR0yDc8yNGvVNjNklQBWY1qwGBBg==}
 
   gopd@1.0.1:
     resolution: {integrity: sha512-d65bNlIadxvpb/A2abVdlqKqV563juRnZ1Wtk6s1sIR8uNsXR70xqIzVqxVf1eTqDunwT2MkczEeaezCKTZhwA==}
@@ -7460,9 +7466,6 @@ packages:
   open@8.4.2:
     resolution: {integrity: sha512-7x81NCL719oNbsq/3mh+hVrAWmFuEYUqrq/Iw3kUzH8ReypT9QQ0BLoJS7/G9k6N81XjW4qHWtjWwe/9eLy1EQ==}
     engines: {node: '>=12'}
-
-  openapi-express@0.0.7:
-    resolution: {integrity: sha512-/sZcyKoE5RynkLrILSgB9hIrOXJsEnse3RFS2V/RSUvzEEJkvmw/7DzplNhD3kI8yFk0BMBEMofu+tocdIvWCg==}
 
   openapi-typescript@7.0.2:
     resolution: {integrity: sha512-BBrYEf0YdW31Ernd07cD/qHoalSuiiUQvy+rHvU/1Iz9WbcFpRsIXrnfEnrEuiGTRuKCG6cDQCrxNK/rbwQRLg==}
@@ -9475,11 +9478,11 @@ packages:
   validate-npm-package-license@3.0.4:
     resolution: {integrity: sha512-DpKm2Ui/xN7/HQKCtpZxoRWBhZ9Z0kqtygG8XCgNQ8ZlDnxuQmWhj566j8fN4Cu3/JmbhsDo7fcAJq4s9h27Ew==}
 
-  validation-adapter@0.0.3:
-    resolution: {integrity: sha512-8up/v4IGhMaewEdEGMxy91wUhCkS04/WfCpOZQORURdwz7zmOt5ArgcdI+bPacdb7iTa7AHjsQIct7jIIuEyVQ==}
+  validation-adapter@0.0.4:
+    resolution: {integrity: sha512-EJ9j20yubqy4zGWnbnhF6r2vVEhhCc5MVN3e2u8UgnF1mFxNYSEaoykr5cLOv7d3kN16ztm+L5QvHQmvKIdOBQ==}
 
-  validation-adapters@0.0.4:
-    resolution: {integrity: sha512-DgZE5rJlzxva6l/hsD64ypb9CRdATHOmmt8M4w7Iu+0hXi3JfDJ0QVqkk/lcCWeOasGbUMev+iumXZ3vSbwxdA==}
+  validation-adapters@0.0.5:
+    resolution: {integrity: sha512-V5BBcWfIMUGYh9siTSNVATGEBXV6BD562TjwVXVVrRHeDbtPzDyVmwcfZgH+TZQmgqC8mq9x/s0uSb2WKraK4A==}
 
   vary@1.1.2:
     resolution: {integrity: sha512-BNGbWLfd0eUPabhkXUVm0j8uuvREyTh5ovRa/dyow/BqAbZJyC+5fU+IzQOzmAKzYqYRAISoRhdQr3eIZ/PXqg==}
@@ -11478,7 +11481,7 @@ snapshots:
       - vite
       - vitest
 
-  '@ibg/config@0.0.13(@next/eslint-plugin-next@14.2.4)(@remix-run/eslint-config@2.10.0(eslint@9.6.0)(react@18.3.1)(typescript@5.5.3))(eslint@9.6.0)(prettier@3.3.2)(typescript@5.5.3)(vite@5.3.1(@types/node@20.14.2)(sass@1.77.6))(vitest@1.6.0(@edge-runtime/vm@3.2.0)(@types/node@20.14.2)(sass@1.77.6))':
+  '@ibg/config@0.0.14(@next/eslint-plugin-next@14.2.4)(@remix-run/eslint-config@2.10.0(eslint@9.6.0)(react@18.3.1)(typescript@5.5.3))(eslint@9.6.0)(prettier@3.3.2)(typescript@5.5.3)(vite@5.3.1(@types/node@20.14.2)(sass@1.77.6))(vitest@1.6.0(@edge-runtime/vm@3.2.0)(@types/node@20.14.2)(sass@1.77.6))':
     dependencies:
       '@next/eslint-plugin-next': 14.2.4
       '@remix-run/eslint-config': 2.10.0(eslint@9.6.0)(react@18.3.1)(typescript@5.5.3)
@@ -11496,7 +11499,7 @@ snapshots:
       - vite
       - vitest
 
-  '@ibg/config@0.0.13(@next/eslint-plugin-next@14.2.4)(@remix-run/eslint-config@2.10.0(eslint@9.6.0)(react@18.3.1)(typescript@5.5.3))(eslint@9.6.0)(prettier@3.3.2)(typescript@5.5.3)(vite@5.3.3(@types/node@16.18.11)(sass@1.77.6))(vitest@1.6.0(@edge-runtime/vm@3.2.0)(@types/node@16.18.11)(sass@1.77.6))':
+  '@ibg/config@0.0.14(@next/eslint-plugin-next@14.2.4)(@remix-run/eslint-config@2.10.0(eslint@9.6.0)(react@18.3.1)(typescript@5.5.3))(eslint@9.6.0)(prettier@3.3.2)(typescript@5.5.3)(vite@5.3.3(@types/node@16.18.11)(sass@1.77.6))(vitest@1.6.0(@edge-runtime/vm@3.2.0)(@types/node@16.18.11)(sass@1.77.6))':
     dependencies:
       '@next/eslint-plugin-next': 14.2.4
       '@remix-run/eslint-config': 2.10.0(eslint@9.6.0)(react@18.3.1)(typescript@5.5.3)
@@ -11514,7 +11517,7 @@ snapshots:
       - vite
       - vitest
 
-  '@ibg/config@0.0.13(@next/eslint-plugin-next@14.2.4)(@remix-run/eslint-config@2.10.0(eslint@9.6.0)(react@18.3.1)(typescript@5.5.3))(eslint@9.6.0)(prettier@3.3.2)(typescript@5.5.3)(vite@5.3.3(@types/node@20.14.2)(sass@1.77.5))(vitest@1.6.0(@edge-runtime/vm@3.2.0)(@types/node@20.14.2)(sass@1.77.5))':
+  '@ibg/config@0.0.14(@next/eslint-plugin-next@14.2.4)(@remix-run/eslint-config@2.10.0(eslint@9.6.0)(react@18.3.1)(typescript@5.5.3))(eslint@9.6.0)(prettier@3.3.2)(typescript@5.5.3)(vite@5.3.3(@types/node@20.14.2)(sass@1.77.5))(vitest@1.6.0(@edge-runtime/vm@3.2.0)(@types/node@20.14.2)(sass@1.77.5))':
     dependencies:
       '@next/eslint-plugin-next': 14.2.4
       '@remix-run/eslint-config': 2.10.0(eslint@9.6.0)(react@18.3.1)(typescript@5.5.3)
@@ -11532,7 +11535,7 @@ snapshots:
       - vite
       - vitest
 
-  '@ibg/config@0.0.13(@next/eslint-plugin-next@14.2.4)(@remix-run/eslint-config@2.10.0(eslint@9.6.0)(react@18.3.1)(typescript@5.5.3))(eslint@9.6.0)(prettier@3.3.2)(typescript@5.5.3)(vite@5.3.3(@types/node@20.14.2)(sass@1.77.6))(vitest@1.6.0(@edge-runtime/vm@3.2.0)(@types/node@20.14.2)(sass@1.77.6))':
+  '@ibg/config@0.0.14(@next/eslint-plugin-next@14.2.4)(@remix-run/eslint-config@2.10.0(eslint@9.6.0)(react@18.3.1)(typescript@5.5.3))(eslint@9.6.0)(prettier@3.3.2)(typescript@5.5.3)(vite@5.3.3(@types/node@20.14.2)(sass@1.77.6))(vitest@1.6.0(@edge-runtime/vm@3.2.0)(@types/node@20.14.2)(sass@1.77.6))':
     dependencies:
       '@next/eslint-plugin-next': 14.2.4
       '@remix-run/eslint-config': 2.10.0(eslint@9.6.0)(react@18.3.1)(typescript@5.5.3)
@@ -11550,7 +11553,7 @@ snapshots:
       - vite
       - vitest
 
-  '@ibg/config@0.0.13(@next/eslint-plugin-next@14.2.4)(@remix-run/eslint-config@2.10.0(eslint@9.6.0)(react@18.3.1)(typescript@5.5.3))(eslint@9.6.0)(prettier@3.3.2)(typescript@5.5.3)(vite@5.3.3(@types/node@20.14.9)(sass@1.77.6))(vitest@1.6.0(@edge-runtime/vm@3.2.0)(@types/node@20.14.9)(sass@1.77.6))':
+  '@ibg/config@0.0.14(@next/eslint-plugin-next@14.2.4)(@remix-run/eslint-config@2.10.0(eslint@9.6.0)(react@18.3.1)(typescript@5.5.3))(eslint@9.6.0)(prettier@3.3.2)(typescript@5.5.3)(vite@5.3.3(@types/node@20.14.9)(sass@1.77.6))(vitest@1.6.0(@edge-runtime/vm@3.2.0)(@types/node@20.14.9)(sass@1.77.6))':
     dependencies:
       '@next/eslint-plugin-next': 14.2.4
       '@remix-run/eslint-config': 2.10.0(eslint@9.6.0)(react@18.3.1)(typescript@5.5.3)
@@ -11568,7 +11571,11 @@ snapshots:
       - vite
       - vitest
 
-  '@ibg/utils@0.0.10': {}
+  '@ibg/openapi-router@0.0.5':
+    dependencies:
+      validation-adapter: 0.0.4
+
+  '@ibg/utils@0.0.11': {}
 
   '@ibg/utils@0.0.6': {}
 
@@ -13229,7 +13236,7 @@ snapshots:
       eslint: 9.6.0
       eslint-import-resolver-node: 0.3.7
       eslint-import-resolver-typescript: 3.6.1(@typescript-eslint/parser@5.62.0(eslint@9.6.0)(typescript@5.5.3))(eslint-import-resolver-node@0.3.7)(eslint-plugin-import@2.29.1)(eslint@9.6.0)
-      eslint-plugin-import: 2.29.1(@typescript-eslint/parser@5.62.0(eslint@9.6.0)(typescript@5.5.3))(eslint-import-resolver-typescript@3.6.1)(eslint@9.6.0)
+      eslint-plugin-import: 2.29.1(@typescript-eslint/parser@5.62.0(eslint@9.6.0)(typescript@5.5.3))(eslint@9.6.0)
       eslint-plugin-jest: 26.9.0(@typescript-eslint/eslint-plugin@5.62.0(@typescript-eslint/parser@5.62.0(eslint@9.6.0)(typescript@5.5.3))(eslint@9.6.0)(typescript@5.5.3))(eslint@9.6.0)(typescript@5.5.3)
       eslint-plugin-jest-dom: 4.0.3(eslint@9.6.0)
       eslint-plugin-jsx-a11y: 6.9.0(eslint@9.6.0)
@@ -14714,7 +14721,7 @@ snapshots:
       eslint-import-resolver-alias: 1.1.2(eslint-plugin-import@2.29.1(@typescript-eslint/parser@7.13.0(eslint@8.57.0)(typescript@5.4.5))(eslint-import-resolver-typescript@3.6.1)(eslint@8.57.0))
       eslint-import-resolver-typescript: 3.6.1(@typescript-eslint/parser@7.13.0(eslint@8.57.0)(typescript@5.4.5))(eslint-plugin-import@2.29.1)(eslint@8.57.0)
       eslint-plugin-eslint-comments: 3.2.0(eslint@8.57.0)
-      eslint-plugin-import: 2.29.1(@typescript-eslint/parser@7.13.0(eslint@8.57.0)(typescript@5.4.5))(eslint-import-resolver-typescript@3.6.1)(eslint@8.57.0)
+      eslint-plugin-import: 2.29.1(@typescript-eslint/parser@7.13.0(eslint@8.57.0)(typescript@5.4.5))(eslint@8.57.0)
       eslint-plugin-jest: 27.9.0(@typescript-eslint/eslint-plugin@7.13.0(@typescript-eslint/parser@7.13.0(eslint@8.57.0)(typescript@5.4.5))(eslint@8.57.0)(typescript@5.4.5))(eslint@8.57.0)(typescript@5.4.5)
       eslint-plugin-jsx-a11y: 6.8.0(eslint@8.57.0)
       eslint-plugin-playwright: 1.6.2(eslint-plugin-jest@27.9.0(@typescript-eslint/eslint-plugin@7.13.0(@typescript-eslint/parser@7.13.0(eslint@8.57.0)(typescript@5.4.5))(eslint@8.57.0)(typescript@5.4.5))(eslint@8.57.0)(typescript@5.4.5))(eslint@8.57.0)
@@ -14782,7 +14789,7 @@ snapshots:
       eslint-import-resolver-alias: 1.1.2(eslint-plugin-import@2.29.1(@typescript-eslint/parser@7.13.0(eslint@9.6.0)(typescript@5.5.3))(eslint-import-resolver-typescript@3.6.1)(eslint@9.6.0))
       eslint-import-resolver-typescript: 3.6.1(@typescript-eslint/parser@7.13.0(eslint@9.6.0)(typescript@5.5.3))(eslint-plugin-import@2.29.1)(eslint@9.6.0)
       eslint-plugin-eslint-comments: 3.2.0(eslint@9.6.0)
-      eslint-plugin-import: 2.29.1(@typescript-eslint/parser@7.13.0(eslint@9.6.0)(typescript@5.5.3))(eslint@9.6.0)
+      eslint-plugin-import: 2.29.1(@typescript-eslint/parser@7.13.0(eslint@9.6.0)(typescript@5.5.3))(eslint-import-resolver-typescript@3.6.1)(eslint@9.6.0)
       eslint-plugin-jest: 27.9.0(@typescript-eslint/eslint-plugin@7.13.0(@typescript-eslint/parser@7.13.0(eslint@9.6.0)(typescript@5.5.3))(eslint@9.6.0)(typescript@5.5.3))(eslint@9.6.0)(typescript@5.5.3)
       eslint-plugin-jsx-a11y: 6.8.0(eslint@9.6.0)
       eslint-plugin-playwright: 1.6.2(eslint-plugin-jest@27.9.0(@typescript-eslint/eslint-plugin@7.13.0(@typescript-eslint/parser@7.13.0(eslint@9.6.0)(typescript@5.5.3))(eslint@9.6.0)(typescript@5.5.3))(eslint@9.6.0)(typescript@5.5.3))(eslint@9.6.0)
@@ -16346,11 +16353,11 @@ snapshots:
 
   eslint-import-resolver-alias@1.1.2(eslint-plugin-import@2.29.1(@typescript-eslint/parser@7.13.0(eslint@8.57.0)(typescript@5.4.5))(eslint-import-resolver-typescript@3.6.1)(eslint@8.57.0)):
     dependencies:
-      eslint-plugin-import: 2.29.1(@typescript-eslint/parser@7.13.0(eslint@8.57.0)(typescript@5.4.5))(eslint-import-resolver-typescript@3.6.1)(eslint@8.57.0)
+      eslint-plugin-import: 2.29.1(@typescript-eslint/parser@7.13.0(eslint@8.57.0)(typescript@5.4.5))(eslint@8.57.0)
 
   eslint-import-resolver-alias@1.1.2(eslint-plugin-import@2.29.1(@typescript-eslint/parser@7.13.0(eslint@9.6.0)(typescript@5.5.3))(eslint-import-resolver-typescript@3.6.1)(eslint@9.6.0)):
     dependencies:
-      eslint-plugin-import: 2.29.1(@typescript-eslint/parser@7.13.0(eslint@9.6.0)(typescript@5.5.3))(eslint@9.6.0)
+      eslint-plugin-import: 2.29.1(@typescript-eslint/parser@7.13.0(eslint@9.6.0)(typescript@5.5.3))(eslint-import-resolver-typescript@3.6.1)(eslint@9.6.0)
 
   eslint-import-resolver-node@0.3.7:
     dependencies:
@@ -16391,7 +16398,7 @@ snapshots:
       enhanced-resolve: 5.17.0
       eslint: 9.6.0
       eslint-module-utils: 2.8.1(@typescript-eslint/parser@5.62.0(eslint@9.6.0)(typescript@5.5.3))(eslint-import-resolver-node@0.3.7)(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@5.62.0(eslint@9.6.0)(typescript@5.5.3))(eslint-import-resolver-node@0.3.7)(eslint-plugin-import@2.29.1)(eslint@9.6.0))(eslint@9.6.0)
-      eslint-plugin-import: 2.29.1(@typescript-eslint/parser@5.62.0(eslint@9.6.0)(typescript@5.5.3))(eslint-import-resolver-typescript@3.6.1)(eslint@9.6.0)
+      eslint-plugin-import: 2.29.1(@typescript-eslint/parser@5.62.0(eslint@9.6.0)(typescript@5.5.3))(eslint@9.6.0)
       fast-glob: 3.3.2
       get-tsconfig: 4.7.5
       is-core-module: 2.13.1
@@ -16408,7 +16415,7 @@ snapshots:
       enhanced-resolve: 5.17.0
       eslint: 8.57.0
       eslint-module-utils: 2.8.1(@typescript-eslint/parser@7.13.0(eslint@8.57.0)(typescript@5.4.5))(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@7.13.0(eslint@8.57.0)(typescript@5.4.5))(eslint-plugin-import@2.29.1)(eslint@8.57.0))(eslint@8.57.0)
-      eslint-plugin-import: 2.29.1(@typescript-eslint/parser@7.13.0(eslint@8.57.0)(typescript@5.4.5))(eslint-import-resolver-typescript@3.6.1)(eslint@8.57.0)
+      eslint-plugin-import: 2.29.1(@typescript-eslint/parser@7.13.0(eslint@8.57.0)(typescript@5.4.5))(eslint@8.57.0)
       fast-glob: 3.3.2
       get-tsconfig: 4.7.5
       is-core-module: 2.13.1
@@ -16425,7 +16432,7 @@ snapshots:
       enhanced-resolve: 5.17.0
       eslint: 9.6.0
       eslint-module-utils: 2.8.1(@typescript-eslint/parser@7.13.0(eslint@9.6.0)(typescript@5.5.3))(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@7.13.0(eslint@9.6.0)(typescript@5.5.3))(eslint-plugin-import@2.29.1)(eslint@9.6.0))(eslint@9.6.0)
-      eslint-plugin-import: 2.29.1(@typescript-eslint/parser@7.13.0(eslint@9.6.0)(typescript@5.5.3))(eslint@9.6.0)
+      eslint-plugin-import: 2.29.1(@typescript-eslint/parser@7.13.0(eslint@9.6.0)(typescript@5.5.3))(eslint-import-resolver-typescript@3.6.1)(eslint@9.6.0)
       fast-glob: 3.3.2
       get-tsconfig: 4.7.5
       is-core-module: 2.13.1
@@ -16573,7 +16580,7 @@ snapshots:
       - eslint-import-resolver-webpack
       - supports-color
 
-  eslint-plugin-import@2.29.1(@typescript-eslint/parser@5.62.0(eslint@9.6.0)(typescript@5.5.3))(eslint-import-resolver-typescript@3.6.1)(eslint@9.6.0):
+  eslint-plugin-import@2.29.1(@typescript-eslint/parser@5.62.0(eslint@9.6.0)(typescript@5.5.3))(eslint@9.6.0):
     dependencies:
       array-includes: 3.1.8
       array.prototype.findlastindex: 1.2.5
@@ -16600,7 +16607,7 @@ snapshots:
       - eslint-import-resolver-webpack
       - supports-color
 
-  eslint-plugin-import@2.29.1(@typescript-eslint/parser@7.13.0(eslint@8.57.0)(typescript@5.4.5))(eslint-import-resolver-typescript@3.6.1)(eslint@8.57.0):
+  eslint-plugin-import@2.29.1(@typescript-eslint/parser@7.13.0(eslint@8.57.0)(typescript@5.4.5))(eslint@8.57.0):
     dependencies:
       array-includes: 3.1.8
       array.prototype.findlastindex: 1.2.5
@@ -16628,33 +16635,6 @@ snapshots:
       - supports-color
 
   eslint-plugin-import@2.29.1(@typescript-eslint/parser@7.13.0(eslint@9.6.0)(typescript@5.5.3))(eslint-import-resolver-typescript@3.6.1)(eslint@9.6.0):
-    dependencies:
-      array-includes: 3.1.8
-      array.prototype.findlastindex: 1.2.5
-      array.prototype.flat: 1.3.2
-      array.prototype.flatmap: 1.3.2
-      debug: 3.2.7
-      doctrine: 2.1.0
-      eslint: 9.6.0
-      eslint-import-resolver-node: 0.3.9
-      eslint-module-utils: 2.8.1(@typescript-eslint/parser@7.13.0(eslint@9.6.0)(typescript@5.5.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@7.13.0(eslint@9.6.0)(typescript@5.5.3))(eslint-plugin-import@2.29.1)(eslint@9.6.0))(eslint@9.6.0)
-      hasown: 2.0.2
-      is-core-module: 2.13.1
-      is-glob: 4.0.3
-      minimatch: 3.1.2
-      object.fromentries: 2.0.8
-      object.groupby: 1.0.3
-      object.values: 1.2.0
-      semver: 6.3.1
-      tsconfig-paths: 3.15.0
-    optionalDependencies:
-      '@typescript-eslint/parser': 7.13.0(eslint@9.6.0)(typescript@5.5.3)
-    transitivePeerDependencies:
-      - eslint-import-resolver-typescript
-      - eslint-import-resolver-webpack
-      - supports-color
-
-  eslint-plugin-import@2.29.1(@typescript-eslint/parser@7.13.0(eslint@9.6.0)(typescript@5.5.3))(eslint@9.6.0):
     dependencies:
       array-includes: 3.1.8
       array.prototype.findlastindex: 1.2.5
@@ -17348,22 +17328,22 @@ snapshots:
     dependencies:
       pend: 1.2.0
 
-  feature-fetch@0.0.8:
+  feature-fetch@0.0.9:
     dependencies:
-      '@ibg/utils': 0.0.10
+      '@ibg/utils': 0.0.11
       ts-results-es: 4.2.0
 
-  feature-form@0.0.10:
+  feature-form@0.0.11:
     dependencies:
-      '@ibg/utils': 0.0.10
-      feature-state: 0.0.15
-      validation-adapter: 0.0.3
+      '@ibg/utils': 0.0.11
+      feature-state: 0.0.16
+      validation-adapter: 0.0.4
 
-  feature-logger@0.0.14:
+  feature-logger@0.0.15:
     dependencies:
-      '@ibg/utils': 0.0.10
+      '@ibg/utils': 0.0.11
 
-  feature-react@0.0.16(react@18.3.1):
+  feature-react@0.0.17(react@18.3.1):
     dependencies:
       react: 18.3.1
 
@@ -17372,9 +17352,9 @@ snapshots:
       feature-state: 0.0.7
       react: 18.3.1
 
-  feature-state@0.0.15:
+  feature-state@0.0.16:
     dependencies:
-      '@ibg/utils': 0.0.10
+      '@ibg/utils': 0.0.11
 
   feature-state@0.0.7:
     dependencies:
@@ -17384,9 +17364,9 @@ snapshots:
 
   figlet@1.7.0: {}
 
-  figma-connect@0.0.8:
+  figma-connect@0.0.9:
     dependencies:
-      '@ibg/utils': 0.0.10
+      '@ibg/utils': 0.0.11
 
   figures@1.7.0:
     dependencies:
@@ -17715,9 +17695,9 @@ snapshots:
 
   globrex@0.1.2: {}
 
-  google-webfonts-client@0.0.7:
+  google-webfonts-client@0.0.8:
     dependencies:
-      feature-fetch: 0.0.8
+      feature-fetch: 0.0.9
 
   gopd@1.0.1:
     dependencies:
@@ -18662,8 +18642,6 @@ snapshots:
       define-lazy-prop: 2.0.0
       is-docker: 2.2.1
       is-wsl: 2.2.0
-
-  openapi-express@0.0.7: {}
 
   openapi-typescript@7.0.2(typescript@5.5.3):
     dependencies:
@@ -20884,11 +20862,11 @@ snapshots:
       spdx-correct: 3.2.0
       spdx-expression-parse: 3.0.1
 
-  validation-adapter@0.0.3:
+  validation-adapter@0.0.4:
     dependencies:
-      '@ibg/utils': 0.0.10
+      '@ibg/utils': 0.0.11
 
-  validation-adapters@0.0.4: {}
+  validation-adapters@0.0.5: {}
 
   vary@1.1.2: {}
 

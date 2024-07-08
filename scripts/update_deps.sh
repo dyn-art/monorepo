@@ -9,14 +9,15 @@ dependencies=(
     "@ibg/config"
     "feature-fetch"
     "feature-form"
-    "feature-form-validators"
     "feature-logger"
-    "feature-state"
     "feature-react"
+    "feature-state"
     "figma-connect"
     "google-webfonts-client"
-    "openapi-express"
+    "@ibg/openapi-router"
     "@ibg/utils"
+    "validation-adapter"
+    "validation-adapters"
 )
 
 # Find the absolute path to the monorepo's root directory

@@ -1,4 +1,3 @@
-import './v1.hello';
-import './v1.ping';
+import './v1.health';
 
 export * from './router';
