@@ -144,6 +144,24 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /**
+         * @description Error Response
+         * @example {
+         *       "error_code": "400",
+         *       "error_description": "Bad Request",
+         *       "error_uri": null,
+         *       "additional_errors": []
+         *     }
+         */
+        ServiceError: {
+            /** @description Error code */
+            error_code?: string;
+            /** @description Error description */
+            error_description?: string | null;
+            /** @description Error URI */
+            error_uri?: string | null;
+            additional_errors?: Record<string, never>[];
+        };
         HealthDto: {
             message: string;
             status: components["schemas"]["HealthStatus"];
