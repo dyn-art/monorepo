@@ -37,7 +37,7 @@
 		"feature-state": "^0.0.17",
 		"feature-state-react": "^0.0.7",
 		"figma-connect": "^0.0.9",
-		"google-webfonts-client": "^0.0.9",
+		"google-webfonts-client": "^0.0.10",
 		"react": "^18.3.1",
 		"react-dom": "^18.3.1",
 		"react-json-tree": "^0.18.0",

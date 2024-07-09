@@ -1,19 +1,24 @@
 openapi: 3.0.3
 info:
-  title: Dyn.Art Core Service API
-  description: wip
-  version: 1.0.0
+  title: dyn.art core service
+  version: 0.0.1
 servers:
   - url: https://api.dyn.art
     description: Production server
+tags:
+  - name: info
+    description: Endpoints to retrieve general information about the service e.g. its health status
+  - name: user
+    description: Endpoints related to the user entity
 
 paths:
   /v1/health:
     get:
-      summary: Health endpoint
-      description: Check whether api can be reached
       tags:
-        - Health
+        - info
+      summary: Check health
+      description: ''
+      operationId: checkHealth
       responses:
         '200':
           description: Server is up and running
@@ -21,79 +26,122 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HealthDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppErrorDto'
 
-  /v1/auth/login:
+  /v1/user/register:
     post:
-      summary: User login endpoint
-      description: Authenticate a user with their credentials
       tags:
-        - Authentication
+        - user
+      summary: Register user
+      description: ''
+      operationId: registerUser
       requestBody:
-        description: User credentials
         required: true
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                email: 
-                  type: string
-                  format: email
-                  example: user@example.com
-                password:
-                  type: string
-                  format: password
-                  example: Admin12345!
-              required:
-                - email
-                - password
+              $ref: '#/components/schemas/RegisterUserDto'
       responses:
         '200':
-          description: Successful login
+          description: Successful operation
+        '409':
+          description: Email address already registered
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  token:
-                    type: string
-                    description: JWT token for authenticated user
-                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-        '400':
-          description: Invalid input
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: Invalid email or password
-        '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: Unauthorized
+                $ref: '#/components/schemas/AppErrorDto'
         '500':
-          description: Server error
+          description: Internal server error
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: Internal server error
+                $ref: '#/components/schemas/AppErrorDto'
+  /v1/user/login:
+    get:
+      tags:
+        - user
+      summary: Log user in
+      description: ''
+      operationId: loginUser
+      parameters:
+        - name: email
+          in: query
+          description: The email for login
+          required: true
+          schema:
+            type: string
+        - name: password
+          in: query
+          description: The password for login in clear text
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          headers:
+            X-Rate-Limit:
+              description: Calls per hour allowed by the user
+              schema:
+                type: integer
+                format: int32
+            X-Expires-After:
+              description: Date in UTC when token expires
+              schema:
+                type: string
+                format: date-time
+          content:
+            application/xml:
+              schema:
+                type: string
+            application/json:
+              schema:
+                type: string
+        '400':
+          description: Invalid username/email/password supplied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppErrorDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppErrorDto'
+  /v1/user/logout:
+    get:
+      tags:
+        - user
+      summary: Log out current logged in user session
+      description: ''
+      operationId: logoutUser
+      parameters: []
+      responses:
+        '200':
+          description: Successful operation
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppErrorDto'
+
 components:
   schemas:
-    ServiceError:
+    AppErrorDto:
       type: object
-      description: Error Response
+      required:
+        - error_code
+        - error_description
+        - error_uri
+        - additional_errors
+      description: Application error
       properties:
         error_code:
           type: string
@@ -115,6 +163,7 @@ components:
         error_description: "Bad Request"
         error_uri: null
         additional_errors: []
+
     HealthDto:
       type: object
       required:
@@ -129,6 +178,27 @@ components:
       type: string
       enum:
         - Up
+        - Restricted
+        - Down
+      example: Up
+
+    RegisterUserDto:
+      type: object
+      required:
+        - email
+        - username
+        - password
+      properties:
+        email:
+          type: string
+          description: The email for the registeration
+        username:
+          type: string
+          description: The user name for the registeration
+        password: 
+          type: string
+          description: The password for the registeration in clear text
+
   securitySchemes:
     BearerAuth:
       type: http

@@ -11,30 +11,8 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /**
-         * Health endpoint
-         * @description Check whether api can be reached
-         */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Server is up and running */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["HealthDto"];
-                    };
-                };
-            };
-        };
+        /** Check health */
+        get: operations["checkHealth"];
         put?: never;
         post?: never;
         delete?: never;
@@ -43,7 +21,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/v1/auth/login": {
+    "/v1/user/register": {
         parameters: {
             query?: never;
             header?: never;
@@ -52,88 +30,42 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /**
-         * User login endpoint
-         * @description Authenticate a user with their credentials
-         */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            /** @description User credentials */
-            requestBody: {
-                content: {
-                    "application/json": {
-                        /**
-                         * Format: email
-                         * @example user@example.com
-                         */
-                        email: string;
-                        /**
-                         * Format: password
-                         * @example Admin12345!
-                         */
-                        password: string;
-                    };
-                };
-            };
-            responses: {
-                /** @description Successful login */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            /**
-                             * @description JWT token for authenticated user
-                             * @example eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-                             */
-                            token?: string;
-                        };
-                    };
-                };
-                /** @description Invalid input */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            /** @example Invalid email or password */
-                            message?: string;
-                        };
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            /** @example Unauthorized */
-                            message?: string;
-                        };
-                    };
-                };
-                /** @description Server error */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            /** @example Internal server error */
-                            message?: string;
-                        };
-                    };
-                };
-            };
+        /** Register user */
+        post: operations["registerUser"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/user/login": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
+        /** Log user in */
+        get: operations["loginUser"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/user/logout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Log out current logged in user session */
+        get: operations["logoutUser"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -145,7 +77,7 @@ export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
         /**
-         * @description Error Response
+         * @description Application error
          * @example {
          *       "error_code": "400",
          *       "error_description": "Bad Request",
@@ -153,21 +85,32 @@ export interface components {
          *       "additional_errors": []
          *     }
          */
-        ServiceError: {
+        AppErrorDto: {
             /** @description Error code */
-            error_code?: string;
+            error_code: string;
             /** @description Error description */
-            error_description?: string | null;
+            error_description: string | null;
             /** @description Error URI */
-            error_uri?: string | null;
-            additional_errors?: Record<string, never>[];
+            error_uri: string | null;
+            additional_errors: Record<string, never>[];
         };
         HealthDto: {
             message: string;
             status: components["schemas"]["HealthStatus"];
         };
-        /** @enum {string} */
-        HealthStatus: "Up";
+        /**
+         * @example Up
+         * @enum {string}
+         */
+        HealthStatus: "Up" | "Restricted" | "Down";
+        RegisterUserDto: {
+            /** @description The email for the registeration */
+            email: string;
+            /** @description The user name for the registeration */
+            username: string;
+            /** @description The password for the registeration in clear text */
+            password: string;
+        };
     };
     responses: never;
     parameters: never;
@@ -176,4 +119,149 @@ export interface components {
     pathItems: never;
 }
 export type $defs = Record<string, never>;
-export type operations = Record<string, never>;
+export interface operations {
+    checkHealth: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Server is up and running */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HealthDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AppErrorDto"];
+                };
+            };
+        };
+    };
+    registerUser: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RegisterUserDto"];
+            };
+        };
+        responses: {
+            /** @description Successful operation */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Email address already registered */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AppErrorDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AppErrorDto"];
+                };
+            };
+        };
+    };
+    loginUser: {
+        parameters: {
+            query: {
+                /** @description The email for login */
+                email: string;
+                /** @description The password for login in clear text */
+                password: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful operation */
+            200: {
+                headers: {
+                    /** @description Calls per hour allowed by the user */
+                    "X-Rate-Limit"?: number;
+                    /** @description Date in UTC when token expires */
+                    "X-Expires-After"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/xml": string;
+                    "application/json": string;
+                };
+            };
+            /** @description Invalid username/email/password supplied */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AppErrorDto"];
+                };
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AppErrorDto"];
+                };
+            };
+        };
+    };
+    logoutUser: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful operation */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Internal server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AppErrorDto"];
+                };
+            };
+        };
+    };
+}
