@@ -1,0 +1,43 @@
+{
+	"name": "@dyn/core-node",
+	"description": "dyn.art core api for Node.Js",
+	"version": "0.0.1",
+	"private": true,
+	"scripts": {
+		"build": "shx rm -rf dist && ../../scripts/cli.sh bundle node",
+		"start:dev": "tsx watch ./src/index.ts",
+		"lint": "eslint --ext .js,.ts src/",
+		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
+		"install:clean": "pnpm run clean && pnpm install",
+		"test": "vitest run",
+		"update:latest": "pnpm update --latest"
+	},
+	"source": "./src/index.ts",
+	"main": "./dist/index.js",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/dyn-art/monorepo.git"
+	},
+	"keywords": [],
+	"author": "@bennoinbeta",
+	"license": "AGPL-3.0-or-later",
+	"bugs": {
+		"url": "https://github.com/dyn-art/monorepo/issues"
+	},
+	"homepage": "https://dyn.art/?source=package-json",
+	"dependencies": {
+		"@dyn/api-core": "workspace:*",
+		"@hono/node-server": "^1.12.0",
+		"hono": "^4.4.12"
+	},
+	"devDependencies": {
+		"@ibg/config": "^0.0.14",
+		"@types/node": "^20.14.10",
+		"dotenv": "^16.4.5",
+		"tsx": "^4.16.2"
+	},
+	"files": [
+		"dist",
+		"README.md"
+	]
+}

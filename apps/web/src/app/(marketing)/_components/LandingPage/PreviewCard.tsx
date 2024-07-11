@@ -19,6 +19,7 @@ export const PreviewCard = React.forwardRef<HTMLDivElement, TProps>((props, ref)
 		</div>
 	);
 });
+PreviewCard.displayName = 'PreviewCard';
 
 interface TProps {
 	src: string;

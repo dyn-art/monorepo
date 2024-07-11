@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import React from 'react';
-import { ButtonProps, composeRefs, getElementRef, hasDisplayName, Slot } from '@dyn/ui';
+import { composeRefs, getElementRef, hasDisplayName, Slot, type ButtonProps } from '@dyn/ui';
 
 export const LoginSlot = React.forwardRef<HTMLElement, TProps>((props, forwardRef) => {
 	const { children, mode = 'redirect' } = props;
@@ -34,6 +34,7 @@ export const LoginSlot = React.forwardRef<HTMLElement, TProps>((props, forwardRe
 		</Slot>
 	);
 });
+LoginSlot.displayName = 'LoginSlot';
 
 interface TProps {
 	children: React.ReactNode;

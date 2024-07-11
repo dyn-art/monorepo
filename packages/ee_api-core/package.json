@@ -1,0 +1,59 @@
+{
+	"name": "@dyn/api-core",
+	"description": "dyn.art core api",
+	"version": "0.0.1",
+	"private": true,
+	"scripts": {
+		"build": "shx rm -rf dist && ../../scripts/cli.sh bundle",
+		"start:dev": "tsx watch ./dev.js",
+		"db:generate": "drizzle-kit generate",
+		"db:migrate": "node ./drizzle/migrate.js",
+		"db:studio": "drizzle-kit studio",
+		"lint": "eslint --ext .js,.ts src/",
+		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
+		"install:clean": "pnpm run clean && pnpm install",
+		"test": "vitest run",
+		"update:latest": "pnpm update --latest"
+	},
+	"source": "./src/index.ts",
+	"main": "./dist/cjs/index.js",
+	"module": "./dist/esm/index.js",
+	"types": "./dist/types/index.d.ts",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/dyn-art/monorepo.git"
+	},
+	"keywords": [],
+	"author": "@bennoinbeta",
+	"license": "AGPL-3.0-or-later",
+	"bugs": {
+		"url": "https://github.com/dyn-art/monorepo/issues"
+	},
+	"homepage": "https://dyn.art/?source=package-json",
+	"dependencies": {
+		"@auth/core": "^0.34.1",
+		"@hono/auth-js": "^1.0.10",
+		"@ibg/openapi-router": "^0.0.10",
+		"bcrypt": "^5.1.1",
+		"drizzle-orm": "^0.32.0",
+		"feature-logger": "^0.0.17",
+		"hono": "^4.4.12",
+		"postgres": "^3.4.4",
+		"valibot": "^0.35.0",
+		"validation-adapters": "^0.0.7"
+	},
+	"devDependencies": {
+		"@dyn/types": "workspace:*",
+		"@hono/node-server": "^1.12.0",
+		"@ibg/config": "^0.0.14",
+		"@types/bcrypt": "^5.0.2",
+		"@types/node": "^20.14.10",
+		"dotenv": "^16.4.5",
+		"drizzle-kit": "^0.23.0",
+		"tsx": "^4.16.2"
+	},
+	"files": [
+		"dist",
+		"README.md"
+	]
+}

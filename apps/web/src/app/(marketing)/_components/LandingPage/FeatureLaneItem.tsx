@@ -7,7 +7,7 @@ export const FeatureLaneItem: React.FC<TProps> = (props) => {
 		case 'Text':
 			return (
 				<div
-					key={`${index}-${item.type}`}
+					key={`${index.toString()}-${item.type}`}
 					className="flex items-center justify-center rounded-full bg-black px-3 py-1 text-xs text-white sm:text-lg lg:text-xl"
 				>
 					{item.text}
@@ -15,7 +15,10 @@ export const FeatureLaneItem: React.FC<TProps> = (props) => {
 			);
 		case 'Icon':
 			return (
-				<div key={`${index}-${item.type}`} className="flex items-center gap-2 text-white lg:gap-4">
+				<div
+					key={`${index.toString()}-${item.type}`}
+					className="flex items-center gap-2 text-white lg:gap-4"
+				>
 					<div className="flex h-6 w-6 items-center justify-center rounded-full border border-black bg-gray-300 sm:h-10 sm:w-10">
 						<span className="text-xs text-black sm:text-xl">{item.icon}</span>
 					</div>

@@ -4,9 +4,7 @@
 	"version": "0.0.1",
 	"private": true,
 	"scripts": {
-		"start:dev": "pnpm run start:dev:app & pnpm run start:dev:rust",
-		"start:dev:app": "next dev",
-		"start:dev:rust": "cd ../.. && npx vercel dev --listen 3001",
+		"start:dev": "next dev",
 		"build": "next build",
 		"build:vercel": "cd ../.. && pnpm run prebuild:vercel && turbo run build --filter=web",
 		"start": "next start",
@@ -24,6 +22,7 @@
 	},
 	"homepage": "https://dyn.art/?source=package-json",
 	"dependencies": {
+		"@dyn/api-core": "workspace:*",
 		"@dyn/arb-dtif": "workspace:*",
 		"@dyn/arb-svg-builder": "workspace:*",
 		"@dyn/arb-svg-editor": "workspace:*",
@@ -33,15 +32,16 @@
 		"@tanstack/react-query": "^5.35.1",
 		"@vercel/analytics": "^1.2.2",
 		"clsx": "^2.1.1",
-		"feature-fetch": "^0.0.11",
-		"feature-form": "^0.0.12",
+		"feature-fetch": "^0.0.13",
+		"feature-form": "^0.0.14",
 		"feature-react": "^0.0.17",
 		"framer-motion": "^11.2.10",
+		"hono": "^4.4.12",
 		"next": "14.0.4",
 		"react": "^18.3.1",
 		"react-dom": "^18.3.1",
 		"valibot": "^0.35.0",
-		"validation-adapters": "^0.0.5"
+		"validation-adapters": "^0.0.7"
 	},
 	"devDependencies": {
 		"@dyn/types": "workspace:*",

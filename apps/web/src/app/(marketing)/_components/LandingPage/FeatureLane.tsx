@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import React from 'react';
 import { cn } from '@dyn/ui';
 
-import { FeatureLaneItem, TFeatureLaneItem } from './FeatureLaneItem';
+import { FeatureLaneItem, type TFeatureLaneItem } from './FeatureLaneItem';
 
 export const FeatureLane: React.FC<TProps> = (props) => {
 	const {
@@ -22,7 +22,7 @@ export const FeatureLane: React.FC<TProps> = (props) => {
 				'flex w-[200%] overflow-hidden border-b-2 border-t-2 border-black py-2 md:w-[150%] lg:w-[120%]',
 				className
 			)}
-			style={{ backgroundColor, transform: `rotate(${rotationInDeg}deg)` }}
+			style={{ backgroundColor, transform: `rotate(${rotationInDeg.toString()}deg)` }}
 		>
 			<motion.div
 				initial={{ x: from }}
@@ -31,7 +31,7 @@ export const FeatureLane: React.FC<TProps> = (props) => {
 				className="flex w-full flex-shrink-0 justify-between"
 			>
 				{items.map((item, index) => (
-					<FeatureLaneItem key={index} item={item} index={index} />
+					<FeatureLaneItem key={`${index.toString()}-${item.type}`} item={item} index={index} />
 				))}
 				<div />
 			</motion.div>

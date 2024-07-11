@@ -42,7 +42,7 @@ export const LoginForm: React.FC = () => {
 			headerLabel="Sign in to your account"
 			backChildren={
 				<p className="mt-4 text-center text-sm">
-					Don't have an account?{' '}
+					{`Don't have an account? `}
 					<Link href="/auth/register" className="underline">
 						Sign up
 					</Link>

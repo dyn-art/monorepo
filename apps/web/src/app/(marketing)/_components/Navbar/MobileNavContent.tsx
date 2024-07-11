@@ -14,12 +14,12 @@ import {
 } from '@dyn/ui';
 import { LoginSlot } from '@/components';
 
-import { TNavLink } from './types';
+import { type TNavLink } from './types';
 
 export const MobileNavContent: React.FC<TProps> = (props) => {
 	const { links, className } = props;
 	const pathname = usePathname();
-	const lastPath = React.useMemo(() => `/${pathname.split('/').pop()}`, [pathname]);
+	const lastPath = React.useMemo(() => `/${pathname.split('/').pop() ?? ''}`, [pathname]);
 
 	return (
 		<div
@@ -33,15 +33,15 @@ export const MobileNavContent: React.FC<TProps> = (props) => {
 				<LogoIcon className="h-6 w-6" />
 			</Link>
 
-			<Button asChild variant={'ghost'} className="ml-auto px-3 py-2 font-medium">
-				<Link href={'https://dyn.art'}>Join Waitlist</Link>
+			<Button asChild variant="ghost" className="ml-auto px-3 py-2 font-medium">
+				<Link href="https://dyn.art">Join Waitlist</Link>
 			</Button>
 
 			<div className="border-border mx-4 h-6 border-l-[1px]" />
 
 			<Popover>
 				<PopoverTrigger asChild>
-					<Button variant={'ghost'} size={'icon'}>
+					<Button variant="ghost" size="icon">
 						<HamburgerMenuIcon className="h-5 w-5" />
 					</Button>
 				</PopoverTrigger>
@@ -56,7 +56,7 @@ export const MobileNavContent: React.FC<TProps> = (props) => {
 										<Button
 											className={cn('text-xl', isActive && 'underline')}
 											asChild
-											variant={'ghost'}
+											variant="ghost"
 										>
 											<Link href={path}>{title}</Link>
 										</Button>
@@ -66,7 +66,7 @@ export const MobileNavContent: React.FC<TProps> = (props) => {
 
 							<li className="border-t-[1px] pt-8">
 								<LoginSlot>
-									<Button variant={'ghost'} className="text-xl">
+									<Button variant="ghost" className="text-xl">
 										Sign in
 									</Button>
 								</LoginSlot>
