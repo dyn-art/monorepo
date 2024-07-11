@@ -1,5 +1,5 @@
 {
-	"name": "@dyn/core-node",
+	"name": "@dyn/core-node-v1",
 	"description": "Core backend",
 	"version": "0.0.1",
 	"private": true,
