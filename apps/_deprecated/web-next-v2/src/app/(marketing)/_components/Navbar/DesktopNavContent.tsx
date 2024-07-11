@@ -4,14 +4,14 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import React from 'react';
 import { Button, cn, LogoIcon } from '@dyn/ui';
-import { LoginSlot } from '@/components';
+import { SignInSlot } from '@/components';
 
-import { type TNavLink } from './types';
+import { TNavLink } from './types';
 
 export const DesktopNavContent: React.FC<TProps> = (props) => {
 	const { links, className } = props;
 	const pathname = usePathname();
-	const lastPath = React.useMemo(() => `/${pathname.split('/').pop() ?? ''}`, [pathname]);
+	const lastPath = React.useMemo(() => `/${pathname.split('/').pop()}`, [pathname]);
 
 	return (
 		<nav
@@ -33,7 +33,7 @@ export const DesktopNavContent: React.FC<TProps> = (props) => {
 						<li key={path}>
 							<Button
 								asChild
-								variant="ghost"
+								variant={'ghost'}
 								className={cn('h-8 px-3 py-2', isActive && 'underline')}
 							>
 								<Link href={path}>{title}</Link>
@@ -45,11 +45,11 @@ export const DesktopNavContent: React.FC<TProps> = (props) => {
 
 			<div className="border-border mx-4 h-6 border-l-[1px]" />
 
-			<LoginSlot>
-				<Button variant="ghost" className="px-3 py-2 font-medium">
+			<SignInSlot>
+				<Button variant={'ghost'} className="px-3 py-2 font-medium">
 					Sign in
 				</Button>
-			</LoginSlot>
+			</SignInSlot>
 		</nav>
 	);
 };

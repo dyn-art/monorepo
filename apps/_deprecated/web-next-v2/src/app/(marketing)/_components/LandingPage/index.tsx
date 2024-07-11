@@ -20,9 +20,8 @@ export const LandingPage: React.FC = () => {
 						<ScribbleRepeatIcon className="absolute left-64 top-28 h-16 w-16 rotate-45 text-[#683DFD] sm:left-96 sm:top-32 sm:h-20 sm:w-20" />
 
 						<p className="font-body mt-8 text-xl sm:text-2xl">
-							<mark className="bg-transparent font-bold">dyn.art</mark> is your tool for{' '}
-							<mark className="bg-transparent font-bold">auto-generating</mark> posters, social
-							media visuals, and more through our user-friendly{' '}
+							Your tool for <mark className="bg-transparent font-bold">auto-generating</mark>{' '}
+							posters, social media visuals, and more through our user-friendly{' '}
 							<mark className="bg-transparent font-bold">API</mark> and{' '}
 							<mark className="bg-transparent font-bold">integrations</mark>
 						</p>
