@@ -1,6 +1,6 @@
 {
 	"name": "@dyn/core-node",
-	"description": "dyn.art core api for Node.Js",
+	"description": "dyn.art core api with NodeJs runtime",
 	"version": "0.0.1",
 	"private": true,
 	"scripts": {
