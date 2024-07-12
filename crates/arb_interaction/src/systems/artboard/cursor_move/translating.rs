@@ -5,7 +5,7 @@ use bevy_ecs::{query::With, system::Query};
 use bevy_hierarchy::Parent;
 use bevy_transform::components::{GlobalTransform, Transform};
 use dyn_arb_bundles::utils::{get_parent_global_transfrom, global_to_local_vector3};
-use dyn_arb_core::resources::canvas::ArtboardRes;
+use dyn_arb_core::resources::artboard::ArtboardRes;
 use glam::Vec2;
 
 pub fn handle_translating(

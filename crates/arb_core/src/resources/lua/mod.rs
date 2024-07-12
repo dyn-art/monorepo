@@ -2,8 +2,8 @@
 
 pub mod arb_table;
 
-use bevy_ecs::system::Resource;
 use arb_table::{load_arb_table_global, FrozenWorld};
+use bevy_ecs::system::Resource;
 use dyn_arb_bundles::reference_id::ReferenceId;
 use dyn_arb_lua::{
     script::{LuaScript, LuaScriptError},
@@ -78,7 +78,8 @@ mod tests {
     use dyn_arb_bundles::{
         events::{
             CoreInputEvent, ExecuteLuaScriptInputEvent, InputEvent, RegisterLuaScriptInputEvent,
-            UpdateArtboardSizeInputEvent, UpdateEntityTransformInputEvent, UpdateTextNodeInputEvent,
+            UpdateArtboardSizeInputEvent, UpdateEntityTransformInputEvent,
+            UpdateTextNodeInputEvent,
         },
         reference_id::ReferenceId,
         LuaScriptWithId,
@@ -110,7 +111,7 @@ mod tests {
         app.add_systems(
             Update,
             (
-                update_canvas_size_input_system,
+                update_artboard_size_input_system,
                 update_entity_transform_input_system,
                 update_text_node_input_system,
             ),
@@ -126,7 +127,7 @@ mod tests {
 
             -- error("A message?")
 
-            local update_canvas_size_event = {
+            local update_artboard_size_event = {
                 type = "UpdateArtboardSize",
                 size = { args.input, 100 }
             }
@@ -139,7 +140,7 @@ mod tests {
 
             dyn.log.info("Table Log:", update_entity_transform_event, {10, 20, 30})
 
-            arb.sendEvents({ update_canvas_size_event, update_entity_transform_event })
+            arb.sendEvents({ update_artboard_size_event, update_entity_transform_event })
 
             local date = args.date
             local dateObj = dyn.date.parse(date)
@@ -183,9 +184,11 @@ mod tests {
         app.update();
     }
 
-    fn update_canvas_size_input_system(mut event_reader: EventReader<UpdateArtboardSizeInputEvent>) {
+    fn update_artboard_size_input_system(
+        mut event_reader: EventReader<UpdateArtboardSizeInputEvent>,
+    ) {
         for event in event_reader.read() {
-            log::info!("[update_canvas_size_input_system] {:?}", event);
+            log::info!("[update_artboard_size_input_system] {:?}", event);
         }
     }
 

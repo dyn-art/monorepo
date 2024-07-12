@@ -20,7 +20,7 @@ use dyn_arb_bundles::{
 };
 use dyn_arb_core::{
     resources::{
-        canvas::ArtboardRes,
+        artboard::ArtboardRes,
         lua::{arb_table::FrozenWorld, LuaRes},
     },
     ArbCorePlugin,

@@ -1,6 +1,6 @@
 {
 	"name": "@dyn/arb-svg-builder",
-	"description": "SVG based canvas outlet",
+	"description": "SVG based artboard outlet",
 	"version": "0.0.1",
 	"private": true,
 	"scripts": {

@@ -27,9 +27,9 @@ use dyn_arb_bundles::LuaScriptWithId;
 pub struct DtifArtboard {
     #[cfg_attr(feature = "specta_support", serde(default))]
     pub version: Option<ArbVersion>,
-    /// The absolute size of the canvas.
+    /// The absolute size of the artboard.
     pub size: Size,
-    /// The viewport of the canvas.
+    /// The viewport of the artboard.
     #[cfg_attr(feature = "specta_support", serde(default))]
     pub viewport: Option<Viewport>,
     /// A list of nodes.

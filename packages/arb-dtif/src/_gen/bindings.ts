@@ -231,11 +231,11 @@ export type DropShadowStyle = { id?: ReferenceId | null; color?: Color; position
  */
 export type DtifArtboard = { version?: ArbVersion | null; 
 /**
- * The absolute size of the canvas.
+ * The absolute size of the artboard.
  */
 size: Size; 
 /**
- * The viewport of the canvas.
+ * The viewport of the artboard.
  */
 viewport?: Viewport | null; 
 /**
@@ -456,7 +456,7 @@ export type InteractionInputEvent = ({ type: "KeyDownOnArtboard" } & KeyDownOnAr
 
 export type InteractionMode = 
 /**
- * Default canvas mode. Nothing is happening.
+ * Default artboard mode. Nothing is happening.
  */
 { type: "None" } | 
 /**

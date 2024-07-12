@@ -5,7 +5,7 @@ use crate::{
 use bevy_ecs::{query::With, system::Query};
 use bevy_transform::components::{GlobalTransform, Transform};
 use dyn_arb_bundles::{components::mixins::SizeMixin, utils::transform_to_z_rotation_rad};
-use dyn_arb_core::resources::canvas::ArtboardRes;
+use dyn_arb_core::resources::artboard::ArtboardRes;
 use dyn_utils::math::matrix::rotate_around_point;
 use glam::{Vec2, Vec3};
 

@@ -11,13 +11,13 @@ use dyn_arb_bundles::{
     properties::{ArbVersion, Viewport},
 };
 use dyn_utils::properties::size::Size;
-use resources::{canvas::ArtboardRes, layout::LayoutRes, referencer::ReferencerRes, tick::TickRes};
+use resources::{artboard::ArtboardRes, layout::LayoutRes, referencer::ReferencerRes, tick::TickRes};
 use systems::{
     cleanup::despawn_removed_entities_system,
     events::{
         create_asset_input_system, create_node_input_system, create_paint_input_system,
         delete_entity_input_system, focus_root_nodes_input_system, move_entity_input_system,
-        update_canvas_size_input_system, update_canvas_viewport_input_system,
+        update_artboard_size_input_system, update_artboard_viewport_input_system,
         update_drop_shadow_style_input_system, update_ellipse_node_input_system,
         update_entity_blend_mode_input_system, update_entity_children_input_system,
         update_entity_corner_radii_input_system, update_entity_opacity_input_system,
@@ -64,7 +64,7 @@ enum ArbCoreSystemSet {
     PreCompute,
     Compute,
 
-    /// After this label, the system has applied layout calculations to the canvas's nodes.
+    /// After this label, the system has applied layout calculations to the artboard's nodes.
     PreLayout,
     StaticLayout,
     AbsoluteLayout,
@@ -72,10 +72,10 @@ enum ArbCoreSystemSet {
     // After this label, the system has prepared the nodes for visual outlining.
     Prepare,
 
-    /// After this label, the system has outlined the canvas nodes.
+    /// After this label, the system has outlined the artboard nodes.
     Outline,
 
-    /// After this label, the system has made modifications based on the outlined canvas nodes.
+    /// After this label, the system has made modifications based on the outlined artboard nodes.
     PostOutline,
 
     Hierarchy,
@@ -150,8 +150,8 @@ impl Plugin for ArbCorePlugin {
             Update,
             (
                 // Artboard
-                update_canvas_size_input_system.in_set(ArbCoreSystemSet::UpdateInputEvents),
-                update_canvas_viewport_input_system.in_set(ArbCoreSystemSet::UpdateInputEvents),
+                update_artboard_size_input_system.in_set(ArbCoreSystemSet::UpdateInputEvents),
+                update_artboard_viewport_input_system.in_set(ArbCoreSystemSet::UpdateInputEvents),
             ),
         );
         app.add_systems(

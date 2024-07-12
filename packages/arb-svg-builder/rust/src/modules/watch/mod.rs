@@ -11,7 +11,7 @@ use self::{
     systems::{
         extract::extract_changed_components,
         queue::{
-            queue_canvas_changes, queue_changed_components, queue_cursor_changes,
+            queue_artboard_changes, queue_changed_components, queue_cursor_changes,
             queue_interaction_mode_changes, queue_interaction_tool_changes,
             queue_selected_entities_changes,
         },
@@ -54,7 +54,7 @@ impl Plugin for ArbWatchPlugin {
             (
                 extract_changed_components.in_set(ArbWatchSystemSet::Extract),
                 queue_changed_components.in_set(ArbWatchSystemSet::Queue),
-                queue_canvas_changes.in_set(ArbWatchSystemSet::Queue),
+                queue_artboard_changes.in_set(ArbWatchSystemSet::Queue),
                 queue_selected_entities_changes.in_set(ArbWatchSystemSet::Queue),
             ),
         );

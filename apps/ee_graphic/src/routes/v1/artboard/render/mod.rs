@@ -17,7 +17,7 @@ use dyn_arb_bundles::{
     events::{CoreInputEvent, ExecuteLuaScriptInputEvent},
     reference_id::ReferenceId,
 };
-use dyn_arb_core::{resources::canvas::ArtboardRes, ArbCorePlugin};
+use dyn_arb_core::{resources::artboard::ArtboardRes, ArbCorePlugin};
 use dyn_arb_dtif::DtifArtboard;
 use dyn_arb_lua::tables::args_table::LuaScriptArgsMap;
 use dyn_arb_svg_builder::{
@@ -84,7 +84,7 @@ async fn handler(
         }
     }
 
-    prepare_dtif_canvas(&mut dtif).await.map_err(|err| {
+    prepare_dtif_artboard(&mut dtif).await.map_err(|err| {
         AppError::new_with_options(
             StatusCode::INTERNAL_SERVER_ERROR,
             ErrorCode::new("PREPARE_DTIF"),
@@ -151,8 +151,8 @@ async fn handler(
     }
 }
 
-async fn prepare_dtif_canvas(dtif_canvas: &mut DtifArtboard) -> Result<(), reqwest::Error> {
-    for asset in dtif_canvas.assets.iter_mut() {
+async fn prepare_dtif_artboard(dtif_artboard: &mut DtifArtboard) -> Result<(), reqwest::Error> {
+    for asset in dtif_artboard.assets.iter_mut() {
         let mut maybe_content = None;
         if let AssetContent::Url { url } = &asset.content {
             maybe_content = Some(reqwest::get(url).await?.bytes().await?.to_vec());

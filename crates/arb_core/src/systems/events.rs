@@ -1,4 +1,4 @@
-use crate::resources::{canvas::ArtboardRes, referencer::ReferencerRes};
+use crate::resources::{artboard::ArtboardRes, referencer::ReferencerRes};
 use bevy_ecs::{
     entity::Entity,
     event::{EventReader, EventWriter},
@@ -16,9 +16,7 @@ use dyn_arb_bundles::{
             BlendModeMixin, CornerRadiiMixin, ImageAssetMixin, OpacityMixin, PaintChildMixin,
             PaintParentMixin, SizeMixin, StyleChildrenMixin, StyleParentMixin, VisibilityMixin,
         },
-        nodes::{
-            ArbNode, EllipseArbNode, FrameArbNode, PolygonArbNode, StarArbNode, TextArbNode,
-        },
+        nodes::{ArbNode, EllipseArbNode, FrameArbNode, PolygonArbNode, StarArbNode, TextArbNode},
         paints::{ArbPaint, GradientArbPaint, ImageArbPaint, SolidArbPaint},
         styles::{DropShadowArbStyle, FillArbStyle, StrokeArbStyle},
     },
@@ -47,7 +45,7 @@ use smallvec::SmallVec;
 // Artboard
 // =============================================================================
 
-pub fn update_canvas_size_input_system(
+pub fn update_artboard_size_input_system(
     mut arb_res: ResMut<ArtboardRes>,
     mut event_reader: EventReader<UpdateArtboardSizeInputEvent>,
 ) {
@@ -57,7 +55,7 @@ pub fn update_canvas_size_input_system(
     }
 }
 
-pub fn update_canvas_viewport_input_system(
+pub fn update_artboard_viewport_input_system(
     mut arb_res: ResMut<ArtboardRes>,
     mut event_reader: EventReader<UpdateArtboardViewportInputEvent>,
 ) {

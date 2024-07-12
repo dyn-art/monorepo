@@ -18,7 +18,7 @@ use bevy_ecs::{
     query::With,
     system::{Local, Query, Res, ResMut},
 };
-use dyn_arb_core::resources::canvas::ArtboardRes;
+use dyn_arb_core::resources::artboard::ArtboardRes;
 use dyn_arb_interaction::{
     components::Selected,
     resources::arb_interaction::{ArbInteractionRes, HandleSide, InteractionMode, InteractionTool},
@@ -36,7 +36,7 @@ pub fn queue_changed_components(
     }
 }
 
-pub fn queue_canvas_changes(
+pub fn queue_artboard_changes(
     output_event_sender_res: ResMut<OutputEventSenderRes>,
     arb_res: Res<ArtboardRes>,
 ) {

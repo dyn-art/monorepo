@@ -7,7 +7,6 @@ use crate::{
 use bevy_ecs::{query::With, system::Query};
 use bevy_hierarchy::Parent;
 use bevy_transform::components::{GlobalTransform, Transform};
-use dyn_attributed_string::layout::TextSizingMode;
 use dyn_arb_bundles::{
     components::{
         mixins::{
@@ -18,7 +17,8 @@ use dyn_arb_bundles::{
     },
     utils::{get_parent_global_transfrom, global_to_local_point3, transform_to_z_rotation_rad},
 };
-use dyn_arb_core::resources::canvas::ArtboardRes;
+use dyn_arb_core::resources::artboard::ArtboardRes;
+use dyn_attributed_string::layout::TextSizingMode;
 use dyn_utils::units::abs::Abs;
 use glam::Vec2;
 

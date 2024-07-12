@@ -26,7 +26,7 @@ use dyn_arb_bundles::components::{
     mixins::{SizeMixin, StaticLayoutElementMixin, StaticLayoutParentMixin},
     nodes::{ArbNode, TextArbNode},
 };
-use dyn_arb_core::resources::canvas::ArtboardRes;
+use dyn_arb_core::resources::artboard::ArtboardRes;
 
 pub fn cursor_moved_on_arb_input_system(
     mut commands: Commands,

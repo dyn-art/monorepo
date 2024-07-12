@@ -33,7 +33,7 @@ use dyn_arb_bundles::{
     EllipseArbNodeBundle, FillStyleBundle, PolygonArbNodeBundle, RectangleArbNodeBundle,
     SolidPaintBundle, StarArbNodeBundle,
 };
-use dyn_arb_core::resources::canvas::ArtboardRes;
+use dyn_arb_core::resources::artboard::ArtboardRes;
 use dyn_utils::properties::{color::Color, size::Size};
 use glam::Vec2;
 use smallvec::smallvec;
