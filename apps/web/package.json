@@ -29,6 +29,7 @@
 		"@dyn/ui": "workspace:*",
 		"@ibg/config": "^0.0.14",
 		"@ibg/utils": "^0.0.13",
+		"@tanstack/react-query": "^5.35.1",
 		"@vercel/analytics": "^1.3.1",
 		"feature-logger": "^0.0.17",
 		"next": "14.2.5",

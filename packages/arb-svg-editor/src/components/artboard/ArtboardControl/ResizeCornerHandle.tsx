@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import type { ARB } from '@dyn/arb-dtif';
 
