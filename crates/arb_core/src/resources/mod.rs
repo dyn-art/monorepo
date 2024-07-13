@@ -1,4 +1,4 @@
-pub mod canvas;
+pub mod artboard;
 pub mod layout;
 #[cfg(feature = "lua_scripts")]
 pub mod lua;

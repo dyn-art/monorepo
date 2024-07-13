@@ -1,16 +1,17 @@
 {
 	"name": "@dyn/web",
-	"description": "Web client for dyn.art",
+	"description": "dyn.art web client",
 	"version": "0.0.1",
 	"private": true,
 	"scripts": {
-		"start:dev": "pnpm run start:dev:app & pnpm run start:dev:rust",
-		"start:dev:app": "next dev",
-		"start:dev:rust": "cd ../.. && npx vercel dev --listen 3001",
 		"build": "next build",
-		"build:vercel": "cd ../.. && pnpm run prebuild:vercel && turbo run build --filter=web",
 		"start": "next start",
-		"lint": "next lint"
+		"start:dev": "next dev",
+		"lint": "eslint --ext .js,.ts src/",
+		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo && shx rm -rf .next",
+		"install:clean": "pnpm run clean && pnpm install",
+		"test": "vitest run",
+		"update:latest": "pnpm update --latest"
 	},
 	"repository": {
 		"type": "git",
@@ -24,27 +25,23 @@
 	},
 	"homepage": "https://dyn.art/?source=package-json",
 	"dependencies": {
-		"@dyn/arb-dtif": "workspace:*",
-		"@dyn/arb-svg-builder": "workspace:*",
 		"@dyn/arb-svg-editor": "workspace:*",
 		"@dyn/ui": "workspace:*",
+		"@ibg/config": "^0.0.14",
+		"@ibg/utils": "^0.0.13",
 		"@tanstack/react-query": "^5.35.1",
-		"@vercel/analytics": "^1.2.2",
-		"clsx": "^2.1.1",
-		"feature-fetch": "^0.0.6",
-		"framer-motion": "^11.2.10",
-		"next": "14.0.4",
+		"@vercel/analytics": "^1.3.1",
+		"feature-logger": "^0.0.17",
+		"next": "14.2.5",
 		"react": "^18.3.1",
 		"react-dom": "^18.3.1"
 	},
 	"devDependencies": {
-		"@ibg/config": "^0.0.11",
-		"@types/node": "^20.12.10",
-		"@types/react": "^18.3.1",
+		"@types/node": "^20.14.10",
+		"@types/react": "^18.3.3",
 		"@types/react-dom": "^18.3.0",
-		"autoprefixer": "^10.4.19",
-		"postcss": "^8.4.38",
-		"sass": "^1.77.0",
-		"tailwindcss": "^3.4.3"
+		"postcss": "^8.4.39",
+		"tailwindcss": "^3.4.4",
+		"typescript": "^5.5.3"
 	}
 }

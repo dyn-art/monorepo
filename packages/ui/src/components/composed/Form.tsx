@@ -1,174 +1,140 @@
-/**
- * -----------------------------------------------------------------------------
- * This file includes code derived from the project shadcn-ui/ui by \@shadcn.
- * Project Repository: https://github.com/shadcn-ui/ui/blob/main/apps/www/registry/new-york/ui/form.tsx
- *
- * Date of Import: 19 May 2024
- * -----------------------------------------------------------------------------
- * The code included in this file is licensed under the MIT License,
- * as per the original project by \@shadcn.
- * For the license text, see: https://github.com/shadcn-ui/ui/blob/main/LICENSE.md
- * -----------------------------------------------------------------------------
- */
-
 'use client';
 
 import type * as LabelPrimitive from '@radix-ui/react-label';
-import * as React from 'react';
-import {
-	Controller,
-	FormProvider,
-	useFormContext,
-	type ControllerProps,
-	type FieldPath,
-	type FieldValues
-} from 'react-hook-form';
-import { Label, Slot } from '@/components/primitive';
+import { type TFormField, type TFormFieldStatusValue } from 'feature-form';
+import { registerFormField, type TRegisterFormFieldResponse } from 'feature-react/form';
+import { useGlobalState } from 'feature-react/state';
+import React from 'react';
 import { cn } from '@/utils';
 
-interface FormFieldContextValue<
-	TFieldValues extends FieldValues = FieldValues,
-	TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
-> {
-	name: TName;
+import { Label, Slot } from '../primitive';
+
+export const FormFieldContext = React.createContext<TFormFieldWithId | null>(null);
+
+interface TFormFieldWithId<GValue = any> extends TFormField<GValue> {
+	id: string;
 }
 
-const FormFieldContext = React.createContext<FormFieldContextValue>({} as FormFieldContextValue);
+export function useFormFieldContext(): TFormFieldWithId {
+	const formField = React.useContext(FormFieldContext);
+	if (formField == null) {
+		throw Error('useFormFieldContext() has to be used within <FormFieldContext.Provider>');
+	}
+	return formField;
+}
 
-const FormField = <
-	TFieldValues extends FieldValues = FieldValues,
-	TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
->({
-	...props
-}: ControllerProps<TFieldValues, TName>) => {
+export const FormField = <GValue,>(props: TFormFieldProps<GValue>): React.ReactNode => {
+	const { formField, children, controlled = false } = props;
+	const id = React.useId();
+
 	return (
-		<FormFieldContext.Provider value={{ name: props.name }}>
-			<Controller {...props} />
+		<FormFieldContext.Provider value={Object.assign(formField as TFormField<any>, { id })}>
+			{typeof children === 'function'
+				? children(registerFormField(formField, controlled), formField)
+				: children}
 		</FormFieldContext.Provider>
 	);
 };
 
-const useFormField = () => {
-	const fieldContext = React.useContext(FormFieldContext);
-	const itemContext = React.useContext(FormItemContext);
-	const { getFieldState, formState } = useFormContext();
-
-	const fieldState = getFieldState(fieldContext.name, formState);
-
-	const { id } = itemContext;
-
-	return {
-		id,
-		name: fieldContext.name,
-		formItemId: `${id}-form-item`,
-		formDescriptionId: `${id}-form-item-description`,
-		formMessageId: `${id}-form-item-message`,
-		...fieldState
-	};
-};
-
-interface FormItemContextValue {
-	id: string;
+export interface TFormFieldProps<GValue, GKey = string> {
+	formField: TFormField<GValue>;
+	controlled?: boolean;
+	children?:
+		| React.ReactNode
+		| ((
+				fieldData: TRegisterFormFieldResponse<GKey, GValue>,
+				formField: TFormField<GValue>
+		  ) => React.ReactNode);
 }
 
-const FormItemContext = React.createContext<FormItemContextValue>({} as FormItemContextValue);
-
-const FormItem = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-	({ className, ...props }, ref) => {
-		const id = React.useId();
-
-		return (
-			<FormItemContext.Provider value={{ id }}>
-				<div className={cn('space-y-2', className)} ref={ref} {...props} />
-			</FormItemContext.Provider>
-		);
+export const FormItem = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+	(props, ref) => {
+		const { className, ...other } = props;
+		return <div className={cn('space-y-2', className)} ref={ref} {...other} />;
 	}
 );
 FormItem.displayName = 'FormItem';
 
-const FormLabel = React.forwardRef<
+export const FormLabel = React.forwardRef<
 	React.ElementRef<typeof LabelPrimitive.Root>,
 	React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root>
->(({ className, ...props }, ref) => {
-	const { error, formItemId } = useFormField();
+>((props, ref) => {
+	const formField = useFormFieldContext();
 
-	return (
-		<Label
-			className={cn(error && 'text-destructive', className)}
-			htmlFor={formItemId}
-			ref={ref}
-			{...props}
-		/>
-	);
+	return <Label htmlFor={formField.id} ref={ref} {...props} />;
 });
 FormLabel.displayName = 'FormLabel';
 
-const FormControl = React.forwardRef<
-	React.ElementRef<typeof Slot>,
-	React.ComponentPropsWithoutRef<typeof Slot>
->(({ ...props }, ref) => {
-	const { error, formItemId, formDescriptionId, formMessageId } = useFormField();
+export const FormControl = React.forwardRef<React.ElementRef<typeof Slot>, TFormControlProps>(
+	(props, ref) => {
+		const { children, ...other } = props;
+		const formField = useFormFieldContext();
+		const status = useGlobalState(formField.status);
 
-	return (
-		<Slot
-			aria-describedby={!error ? formDescriptionId : `${formDescriptionId} ${formMessageId}`}
-			aria-invalid={Boolean(error)}
-			id={formItemId}
-			ref={ref}
-			{...props}
-		/>
-	);
-});
+		return (
+			<Slot
+				aria-describedby={
+					status.type !== 'INVALID'
+						? `${formField.id}-form-item-description`
+						: `${formField.id}-form-item-description ${formField.id}-form-item-message`
+				}
+				aria-invalid={status.type === 'INVALID'}
+				id={formField.key}
+				ref={ref}
+				{...other}
+			>
+				{typeof children === 'function' ? children(status) : children}
+			</Slot>
+		);
+	}
+);
 FormControl.displayName = 'FormControl';
 
-const FormDescription = React.forwardRef<
+export interface TFormControlProps
+	extends Omit<React.ComponentPropsWithoutRef<typeof Slot>, 'children'> {
+	children?: React.ReactNode | ((status: Readonly<TFormFieldStatusValue>) => React.ReactNode);
+}
+
+export const FormDescription = React.forwardRef<
 	HTMLParagraphElement,
 	React.HTMLAttributes<HTMLParagraphElement>
->(({ className, ...props }, ref) => {
-	const { formDescriptionId } = useFormField();
+>((props, ref) => {
+	const { className, ...other } = props;
+	const formField = useFormFieldContext();
 
 	return (
 		<p
 			className={cn('text-muted-foreground text-[0.8rem]', className)}
-			id={formDescriptionId}
+			id={`${formField.id}-form-item-description`}
 			ref={ref}
-			{...props}
+			{...other}
 		/>
 	);
 });
 FormDescription.displayName = 'FormDescription';
 
-const FormMessage = React.forwardRef<
+export const FormMessage = React.forwardRef<
 	HTMLParagraphElement,
 	React.HTMLAttributes<HTMLParagraphElement>
->(({ className, children, ...props }, ref) => {
-	const { error, formMessageId } = useFormField();
-	const body = error ? String(error.message) : children;
+>((props, ref) => {
+	const { children, className, ...other } = props;
+	const formField = useFormFieldContext();
+	const status = useGlobalState(formField.status);
+	const body = status.type === 'INVALID' ? String(status.errors[0]?.message) : children;
 
-	if (!body) {
+	if (body == null) {
 		return null;
 	}
 
 	return (
 		<p
 			className={cn('text-destructive text-[0.8rem] font-medium', className)}
-			id={formMessageId}
+			id={formField.id}
 			ref={ref}
-			{...props}
+			{...other}
 		>
 			{body}
 		</p>
 	);
 });
 FormMessage.displayName = 'FormMessage';
-
-export {
-	FormProvider as Form,
-	FormControl,
-	FormDescription,
-	FormField,
-	FormItem,
-	FormLabel,
-	FormMessage,
-	useFormField
-};

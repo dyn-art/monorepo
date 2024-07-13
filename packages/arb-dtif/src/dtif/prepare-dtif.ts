@@ -1,7 +1,7 @@
 import type { ARB } from '../arb';
 
 /**
- * Prepares a DTIF canvas by resolving the URLs of assets.
+ * Prepares a DTIF artboard by resolving the URLs of assets.
  * This is necessary because the Rust part of the project cannot yet resolve URLs
  * due to immature WebAssembly (WASM) bindings.
  */

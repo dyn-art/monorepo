@@ -1,5 +1,5 @@
 import { cva, type VariantProps } from 'class-variance-authority';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircleIcon } from 'lucide-react';
 import * as React from 'react';
 import { cn } from '@/utils';
 
@@ -9,7 +9,7 @@ const inputVariants = cva(
 		variants: {
 			variant: {
 				default: 'focus-visible:ring-ring focus-visible:ring-1',
-				destructive: 'text-red-900 ring-2 ring-destructive focus-visible:ring-offset-2'
+				destructive: 'text-destructive ring-2 ring-destructive focus-visible:ring-offset-2'
 			},
 			size: {
 				default: 'h-9 rounded-md text-sm',
@@ -32,32 +32,26 @@ export interface TAdvancedInputProps
 	childrenAfter?: React.ReactElement;
 }
 
-const AdvancedInput = React.forwardRef<HTMLInputElement, TAdvancedInputProps>(
-	({ className, variant, size, children, childrenAfter, ...props }, ref) => {
-		if (variant === 'destructive' && childrenAfter == null) {
-			// eslint-disable-next-line no-param-reassign -- Ok here
-			childrenAfter = (
-				<div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-					<AlertCircle aria-hidden="true" className="h-5 w-5 text-red-500" />
-				</div>
-			);
-		}
-
-		if (childrenAfter != null || children != null) {
-			return (
-				<div className="relative">
-					{children}
-					<input className={cn(inputVariants({ variant, size, className }))} ref={ref} {...props} />
-					{childrenAfter}
-				</div>
-			);
-		}
-
-		return (
-			<input className={cn(inputVariants({ variant, size, className }))} ref={ref} {...props} />
+const AdvancedInput = React.forwardRef<HTMLInputElement, TAdvancedInputProps>((props, ref) => {
+	const { className, variant, size, children, ...other } = props;
+	let childrenAfter = props.childrenAfter;
+	if (variant === 'destructive' && childrenAfter == null) {
+		childrenAfter = (
+			<div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+				<AlertCircleIcon aria-hidden="true" className="text-destructive h-5 w-5" />
+			</div>
 		);
 	}
-);
+
+	return (
+		<div className="relative">
+			{children}
+			{/* The input element must stay the same to avoid resetting its state in non-controlled forms */}
+			<input className={cn(inputVariants({ variant, size, className }))} ref={ref} {...other} />
+			{childrenAfter}
+		</div>
+	);
+});
 AdvancedInput.displayName = 'AdvancedInput';
 
 export { AdvancedInput };

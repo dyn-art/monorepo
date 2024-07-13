@@ -10,6 +10,7 @@ export * from './TwitterIcon';
 
 // Third Party Icons
 export {
+	CheckCircledIcon,
 	CheckIcon,
 	ChevronDownIcon,
 	ChevronLeftIcon,
@@ -19,6 +20,7 @@ export {
 	CopyIcon,
 	CursorArrowIcon,
 	DiscordLogoIcon,
+	ExclamationTriangleIcon,
 	ExternalLinkIcon,
 	FrameIcon,
 	GearIcon,
@@ -30,9 +32,11 @@ export {
 	VercelLogoIcon
 } from '@radix-ui/react-icons';
 export {
+	AlertCircle as AlertCircleIcon,
 	Bird as BirdIcon,
 	Book as BookIcon,
 	Bot as BotIcon,
+	CheckCircle as CheckCircleIcon,
 	Code2 as Code2Icon,
 	CornerDownLeft as CornerDownLeftIcon,
 	LifeBuoy as LifeBuoyIcon,

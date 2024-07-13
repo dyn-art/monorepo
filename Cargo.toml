@@ -1,11 +1,6 @@
 [workspace]
 resolver = "2"
-members = [
-    "crates/*",
-    "packages/arb-svg-builder/rust",
-    "apps/ee_graphic",
-    "apps/web",
-]
+members = ["crates/*", "packages/arb-svg-builder/rust", "apps/ee_graphic"]
 exclude = ["crates/_deprecated"]
 
 [workspace.package]

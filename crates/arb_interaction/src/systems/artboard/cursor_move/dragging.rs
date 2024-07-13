@@ -1,6 +1,6 @@
 use crate::events::CursorMovedOnArbInputEvent;
 use dyn_arb_bundles::properties::Viewport;
-use dyn_arb_core::resources::canvas::ArtboardRes;
+use dyn_arb_core::resources::artboard::ArtboardRes;
 use glam::Vec2;
 
 pub fn handle_dragging(

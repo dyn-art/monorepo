@@ -1,0 +1,50 @@
+{
+	"name": "@dyn/web-next-v2",
+	"description": "Web client for dyn.art",
+	"version": "0.0.1",
+	"private": true,
+	"scripts": {
+		"start:dev": "pnpm run start:dev:app & pnpm run start:dev:rust",
+		"start:dev:app": "next dev",
+		"start:dev:rust": "cd ../.. && npx vercel dev --listen 3001",
+		"build": "next build",
+		"build:vercel": "cd ../.. && pnpm run prebuild:vercel && turbo run build --filter=web",
+		"start": "next start",
+		"lint": "next lint"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/monatheoctocat/my_package.git"
+	},
+	"keywords": [],
+	"author": "@bennoinbeta",
+	"license": "AGPL-3.0-or-later",
+	"bugs": {
+		"url": "https://github.com/dyn-art/monorepo/issues"
+	},
+	"homepage": "https://dyn.art/?source=package-json",
+	"dependencies": {
+		"@dyn/arb-dtif": "workspace:*",
+		"@dyn/arb-svg-builder": "workspace:*",
+		"@dyn/arb-svg-editor": "workspace:*",
+		"@dyn/ui": "workspace:*",
+		"@tanstack/react-query": "^5.35.1",
+		"@vercel/analytics": "^1.2.2",
+		"clsx": "^2.1.1",
+		"feature-fetch": "^0.0.6",
+		"framer-motion": "^11.2.10",
+		"next": "14.0.4",
+		"react": "^18.3.1",
+		"react-dom": "^18.3.1"
+	},
+	"devDependencies": {
+		"@ibg/config": "^0.0.11",
+		"@types/node": "^20.12.10",
+		"@types/react": "^18.3.1",
+		"@types/react-dom": "^18.3.0",
+		"autoprefixer": "^10.4.19",
+		"postcss": "^8.4.38",
+		"sass": "^1.77.0",
+		"tailwindcss": "^3.4.3"
+	}
+}

@@ -1,5 +1,6 @@
 export * from './Avatar';
 export * from './Badge';
+export * from './BlockMessage';
 export * from './Label';
 export * from './Progress';
 export * from './Separator';

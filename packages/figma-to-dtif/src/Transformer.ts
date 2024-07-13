@@ -98,9 +98,9 @@ export class Transformer {
 			throw new FailedToResolveRootNodeException();
 		}
 
-		// Construct canvas
+		// Construct artboard
 		await this.onTransformStatusUpdate({ type: ETransformStatus.CONSTRUCTING_CANVAS });
-		const canvas: ARB.DtifArtboard = {
+		const artboard: ARB.DtifArtboard = {
 			version: 'V000001',
 			size: [this._toTransformRootNode.width, this._toTransformRootNode.height],
 			nodes: this.nodes,
@@ -114,7 +114,7 @@ export class Transformer {
 
 		nodeConfig.exportContainerNode.remove();
 		await this.onTransformStatusUpdate({ type: ETransformStatus.END });
-		return canvas;
+		return artboard;
 	}
 
 	private async onTransformStatusUpdate(status: TTransformStatusUpdate): Promise<void> {

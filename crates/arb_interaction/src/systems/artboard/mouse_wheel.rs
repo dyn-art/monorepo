@@ -7,7 +7,7 @@ use bevy_ecs::{
     system::{Res, ResMut},
 };
 use dyn_arb_bundles::properties::Viewport;
-use dyn_arb_core::resources::canvas::ArtboardRes;
+use dyn_arb_core::resources::artboard::ArtboardRes;
 use dyn_utils::{properties::size::Size, units::abs::Abs};
 
 static ZOOM_FACTOR: f32 = 0.9;
@@ -43,7 +43,7 @@ pub fn mouse_wheeled_on_arb_input_system(
                 ZOOM_FACTOR
             };
 
-            // Calculate relative cursor position within the canvas
+            // Calculate relative cursor position within the artboard
             let relative_cursor =
                 (*cursor_position / size.to_vec2()) * physical_size.to_vec2() + *physical_position;
 
@@ -54,7 +54,7 @@ pub fn mouse_wheeled_on_arb_input_system(
             let new_physical_position =
                 relative_cursor - (*cursor_position / size.to_vec2()) * new_physical_size.to_vec2();
 
-            // Update the canvas's viewport
+            // Update the artboard's viewport
             arb_res.viewport.physical_position = new_physical_position;
             arb_res.viewport.physical_size = new_physical_size;
         } else {

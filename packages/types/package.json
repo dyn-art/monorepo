@@ -4,10 +4,10 @@
 	"version": "0.0.1",
 	"private": true,
 	"scripts": {
-		"build": "shx rm -rf dist && pnpm run generate:openapi && ../../scripts/cli.sh bundle -b typesonly",
-		"generate:openapi": "pnpm run generate:openapi:core && pnpm run generate:openapi:graphic",
-		"generate:openapi:core": "npx openapi-typescript ./src/core/resources/openapi-v1.yaml -o ./src/core/gen/v1.ts",
-		"generate:openapi:graphic": "npx openapi-typescript ./src/graphic/resources/openapi-v1.yaml -o ./src/graphic/gen/v1.ts",
+		"build": "shx rm -rf dist && pnpm run gen:openapi && ../../scripts/cli.sh bundle -b typesonly",
+		"gen:openapi": "pnpm run gen:openapi:core && pnpm run gen:openapi:graphic",
+		"gen:openapi:core": "npx openapi-typescript ./src/core/resources/openapi-v1.yaml -o ./src/core/gen/v1.ts",
+		"gen:openapi:graphic": "npx openapi-typescript ./src/graphic/resources/openapi-v1.yaml -o ./src/graphic/gen/v1.ts",
 		"lint": "eslint --ext .js,.ts src/",
 		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
 		"install:clean": "pnpm run clean && pnpm install",
@@ -30,9 +30,6 @@
 			],
 			"core": [
 				"./dist/core/index.d.ts"
-			],
-			"utility": [
-				"./dist/utility.d.ts"
 			]
 		}
 	},
@@ -48,7 +45,8 @@
 	},
 	"homepage": "https://dyn.art/?source=package-json",
 	"devDependencies": {
-		"@ibg/config": "^0.0.11"
+		"@ibg/config": "^0.0.14",
+		"openapi-typescript": "^7.0.2"
 	},
 	"files": [
 		"dist",

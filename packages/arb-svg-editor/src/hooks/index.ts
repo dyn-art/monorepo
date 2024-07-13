@@ -1,2 +1,2 @@
+export * from './artboard';
 export * from './use-prepared-dtif';
-export * from './use-svg-canvas';
