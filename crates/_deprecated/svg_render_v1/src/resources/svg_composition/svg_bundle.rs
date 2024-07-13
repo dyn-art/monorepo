@@ -1,208 +1,77 @@
+use std::collections::BTreeMap;
+use std::fmt::Debug;
+
 use bevy_ecs::entity::Entity;
+use dyn_composition::utils::continuous_id::ContinuousId;
 
+#[cfg(feature = "output-event")]
 use crate::events::output_event::ElementChangeEvent;
+use crate::resources::changed_entities::{ChangedEntity, ChangedEntityType};
 
-use super::{
-    svg_element::{SVGChildElementIdentifier, SVGElement},
-    SVGCompositionRes,
-};
+use super::{svg_context::SVGContext, svg_element::SVGElement};
 
-pub trait SVGBundle {
-    fn get_bundle(&self) -> &BaseSVGBundle;
-    fn get_bundle_mut(&mut self) -> &mut BaseSVGBundle;
-    fn drain_changes(&mut self) -> Vec<ElementChangeEvent>;
-    fn to_string(&self, composition: &SVGCompositionRes) -> String;
-}
+/// Represents a collection of SVG elements representing a single `Entity`.
+pub trait SVGBundle: Sync + Send + Debug {
+    /// Returns a reference to the associated `Entity`.
+    fn get_entity(&self) -> &Entity;
 
-/// Wrapped SVGElement with static children (known from compile time) for quick access.
-#[derive(Debug)]
-pub struct BaseSVGBundle {
-    entity: Entity,
-    // The primary SVG element associated with this bundle
-    element: SVGElement,
-    // Children that are directly related to this bundles's context.
-    // The Vector is fixed and the items order shouldn't change after initialization
-    // because SVGElements point to SVGElements in this Vector who is the owner!
-    // Using a Vector for child_elements as:
-    // - The size is known at compile time, minimizing dynamic changes
-    // - Offers efficient O(1) access by index, suitable for this use case
-    // - More memory-efficient and simpler than a HashMap for fixed-size collections
-    children: Vec<SVGBundleChildElement>, // SmallVec<[SVGBundleChildElement; 6]>,
-}
+    /// Retrieves the type of the changed entity.
+    fn get_type(&self) -> ChangedEntityType;
 
-#[derive(Debug)]
-pub enum SVGBundleChildElement {
-    // Fixed SVGElement
-    Element(SVGElement),
-    // Dynamic Vector of SVGElement whose content can change without side effects.
-    // But these SVGElement have to be end branches of the SVG Tree
-    // and can't have dynamic children.
-    Portal(Vec<SVGElement>),
-}
+    /// Updates the SVG bundle elements based on specified changes in the given context.
+    fn update(&mut self, changed_entity: ChangedEntity, cx: &mut SVGContext);
 
-impl BaseSVGBundle {
-    pub fn new(mut element: SVGElement, entity: Entity) -> Self {
-        element.define_as_bundle_root(entity);
-        Self {
-            entity,
-            element,
-            children: Vec::new(),
-        }
-    }
+    /// Retrieves child SVG elements in a sorted order, starting from the top-level element and
+    /// proceeding hierarchically to its children & siblings.
+    ///
+    /// Returns a `BTreeMap` mapping `ContinuousId` to references of `SVGElement`,
+    /// ensuring the elements are sorted from the highest in the hierarchy to the lowest
+    /// while allowing easy querying for single elements.
+    fn get_child_elements(&self) -> BTreeMap<ContinuousId, &SVGElement>;
 
-    // =========================================================================
-    // Getter & Setter
-    // =========================================================================
+    /// Similar to `get_child_elements`, but returns mutable references to the SVG elements.
+    fn get_child_elements_mut(&mut self) -> BTreeMap<ContinuousId, &mut SVGElement>;
 
-    pub fn get_children(&self) -> &Vec<SVGBundleChildElement> {
-        &self.children
-    }
+    /// Returns a reference to the root `SVGElement`.
+    fn get_root_element(&self) -> &SVGElement;
 
-    pub fn get_root(&self) -> &SVGElement {
-        &self.element
-    }
+    /// Returns a mutable reference to the root `SVGElement`.
+    fn get_root_element_mut(&mut self) -> &mut SVGElement;
 
-    pub fn get_root_mut(&mut self) -> &mut SVGElement {
-        &mut self.element
-    }
+    /// Destroys the specified SVG bundle and its elements.
+    /// This method only handles the destruction of the bundle and its elements itself.
+    /// It is the responsibility of the caller to ensure that any references to this bundle are properly managed.
+    fn destroy(&mut self, cx: &mut SVGContext);
 
-    pub fn get_child_element(&self, index: usize) -> Option<&SVGElement> {
-        let maybe_child = self.children.get(index);
-        if let Some(child) = maybe_child {
-            match child {
-                SVGBundleChildElement::Element(element) => {
-                    return Some(element);
-                }
-                _ => {}
-            }
-        }
-        return None;
-    }
+    /// Converts the SVG bundle into its SVG string representation.
+    fn to_string(&self, cx: &SVGContext) -> String;
 
-    pub fn get_child_element_mut(&mut self, index: usize) -> Option<&mut SVGElement> {
-        let maybe_child = self.children.get_mut(index);
-        if let Some(child) = maybe_child {
-            match child {
-                SVGBundleChildElement::Element(element) => {
-                    return Some(element);
-                }
-                _ => {}
-            }
-        }
-        return None;
-    }
+    /// Drains and returns all changes caused by the last update/s.
+    #[cfg(feature = "output-event")]
+    fn drain_changes(&mut self) -> Vec<ElementChangeEvent> {
+        let mut drained_changes: Vec<ElementChangeEvent> = Vec::new();
 
-    pub fn get_child_portal_mut(&mut self, index: usize) -> Option<&mut Vec<SVGElement>> {
-        let maybe_child = self.children.get_mut(index);
-        if let Some(child) = maybe_child {
-            match child {
-                SVGBundleChildElement::Portal(elements) => {
-                    return Some(elements);
-                }
-                _ => {}
-            }
-        }
-        return None;
-    }
-
-    // =========================================================================
-    // Children
-    // =========================================================================
-
-    pub fn append_child_element_to(
-        &mut self,
-        index: usize,
-        mut element: SVGElement,
-    ) -> Option<usize> {
-        let next_index = self.get_next_child_index();
-        if let Some(target_element) = self.children.get_mut(index) {
-            if let SVGBundleChildElement::Element(target_element) = target_element {
-                target_element.append_child_element(
-                    &mut element,
-                    SVGChildElementIdentifier::InBundleContext(self.entity, next_index),
-                );
-                self.children.push(SVGBundleChildElement::Element(element));
-                return Some(next_index);
-            }
-        }
-        return None;
-    }
-
-    pub fn append_child_portal_to(&mut self, index: usize) -> Option<usize> {
-        let next_index = self.get_next_child_index();
-        if let Some(target_element) = self.children.get_mut(index) {
-            if let SVGBundleChildElement::Element(target_element) = target_element {
-                target_element.append_child_portal(
-                    &mut Vec::new(),
-                    SVGChildElementIdentifier::InBundleContext(self.entity, next_index),
-                );
-                self.children
-                    .push(SVGBundleChildElement::Portal(Vec::new()));
-                return Some(next_index);
-            }
-        }
-        return None;
-    }
-
-    pub fn append_child_element(&mut self, mut element: SVGElement) -> usize {
-        let next_index = self.get_next_child_index();
-        self.element.append_child_element(
-            &mut element,
-            SVGChildElementIdentifier::InBundleContext(self.entity, next_index),
-        );
-        self.children.push(SVGBundleChildElement::Element(element));
-        return next_index;
-    }
-
-    #[inline]
-    pub fn get_next_child_index(&self) -> usize {
-        self.children.len()
-    }
-
-    // =========================================================================
-    // Other
-    // =========================================================================
-
-    pub fn drain_changes(&mut self) -> Vec<ElementChangeEvent> {
-        let mut drained_updates: Vec<ElementChangeEvent> = Vec::new();
-
-        // Drain updates from root element
-        drained_updates.push(ElementChangeEvent {
-            id: self.element.get_id(),
-            changes: self.element.drain_changes(),
-        });
-
-        // Drain updates from child elements
-        for child in &mut self.children {
-            match child {
-                SVGBundleChildElement::Element(element) => {
-                    BaseSVGBundle::drain_svg_element_changes(&mut drained_updates, element);
-                }
-                SVGBundleChildElement::Portal(elements) => {
-                    for element in elements {
-                        BaseSVGBundle::drain_svg_element_changes(&mut drained_updates, element);
-                    }
-                }
-            }
-        }
-
-        return drained_updates;
-    }
-
-    fn drain_svg_element_changes(
-        drained_updates: &mut Vec<ElementChangeEvent>,
-        element: &mut SVGElement,
-    ) {
-        let changes = element.drain_changes();
+        // Drain changes from root element
+        let root = self.get_root_element_mut();
+        let changes = root.drain_changes();
         if !changes.is_empty() {
-            drained_updates.push(ElementChangeEvent {
-                id: element.get_id(),
+            drained_changes.push(ElementChangeEvent {
+                id: root.get_id(),
                 changes,
-            })
+            });
         }
-    }
 
-    pub fn to_string(&self, composition: &SVGCompositionRes) -> String {
-        self.element.to_string(self, composition)
+        // Drain changes from children
+        for (_, child_element) in self.get_child_elements_mut() {
+            let changes = child_element.drain_changes();
+            if !changes.is_empty() {
+                drained_changes.push(ElementChangeEvent {
+                    id: child_element.get_id(),
+                    changes,
+                });
+            }
+        }
+
+        return drained_changes;
     }
 }
