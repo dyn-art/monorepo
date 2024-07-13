@@ -1,11 +1,11 @@
 use dyn_arb_bundles::properties::Viewport;
-use dyn_arb_core::resources::canvas::ArtboardRes;
+use dyn_arb_core::resources::artboard::ArtboardRes;
 use glam::Vec2;
 
-/// Transforms a point from the canvas coordinate system to the viewport coordinate system.
+/// Transforms a point from the artboard coordinate system to the viewport coordinate system.
 ///
-/// This function is essential for aligning cursor interactions on the canvas with
-/// the SVG content, which is manipulated by the viewport. The canvas coordinates
+/// This function is essential for aligning cursor interactions on the artboard with
+/// the SVG content, which is manipulated by the viewport. The artboard coordinates
 /// are transformed to match the scale and position defined by the viewport.
 pub fn transform_point_to_viewport(
     arb_res: &ArtboardRes,

@@ -43,7 +43,7 @@ pub enum ShapeVariant {
     serde(tag = "type")
 )]
 pub enum InteractionMode {
-    /// Default canvas mode. Nothing is happening.
+    /// Default artboard mode. Nothing is happening.
     #[default]
     None,
     /// When the user's pointer is pressed.

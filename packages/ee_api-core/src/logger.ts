@@ -4,5 +4,5 @@ export const logger = withPrefix(
 	createLogger({
 		level: LOG_LEVEL.INFO
 	}),
-	'@dyn/core'
+	'[@dyn/api-core]'
 );

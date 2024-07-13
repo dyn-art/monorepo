@@ -1,5 +1,5 @@
 {
-	"name": "@dyn/web-next",
+	"name": "@dyn/web-next-v1",
 	"description": "Web client for dyn.art",
 	"version": "0.0.1",
 	"private": true,

@@ -26,13 +26,13 @@ export class SvgBuilder {
 
 	private _cursorInArbBounds = false;
 
-	constructor(canvas: Artboard, options: TSvgBuilderOptions = {}) {
+	constructor(artboard: Artboard, options: TSvgBuilderOptions = {}) {
 		const { domElement = document.body, callbackBased = true, interactive = false } = options;
-		this._arb = () => canvas;
+		this._arb = () => artboard;
 		this._isCallbackBased = callbackBased;
 		this._isInteractive = interactive;
 		this._domElement = domElement;
-		this._svgElementId = `svg-canvas_${shortId()}`;
+		this._svgElementId = `svg-artboard_${shortId()}`;
 
 		// Create SVG root
 		this._svgElement = document.createElementNS(NS, 'svg');
@@ -42,22 +42,22 @@ export class SvgBuilder {
 		this._svgElement.style.setProperty('pointer-events', 'none');
 		this._domElement.appendChild(this._svgElement);
 
-		canvas.watchOutputEvent('SvgElementChange', (event) => {
+		artboard.watchOutputEvent('SvgElementChange', (event) => {
 			this.applyElementChanges(event);
 		});
-		canvas.watchOutputEvent('ArtboardChange', (event) => {
+		artboard.watchOutputEvent('ArtboardChange', (event) => {
 			this.applyArtboardChange(event);
 		});
 
 		// Register callbacks
-		// Note: To prevent blocking canvas events, non-blocking elements
+		// Note: To prevent blocking artboard events, non-blocking elements
 		// like SelectionBox should be direct children of _domElement.
 		// We attach event listeners to the parent, not the SVG directly, to allow
 		// event propagation from sibling nodes (like the SelectionBox).
 		if (this.isInteractive) {
 			this._domElement.addEventListener('pointermove', (e) => {
 				e.preventDefault();
-				this.canvas.emitInputEvent(
+				this.artboard.emitInputEvent(
 					'Interaction',
 					{
 						type: 'CursorMovedOnArtboard',
@@ -68,7 +68,7 @@ export class SvgBuilder {
 			});
 			this._domElement.addEventListener('wheel', (e) => {
 				e.preventDefault();
-				this.canvas.emitInputEvent(
+				this.artboard.emitInputEvent(
 					'Interaction',
 					{
 						type: 'MouseWheeledOnArtboard',
@@ -80,7 +80,7 @@ export class SvgBuilder {
 			});
 			this._domElement.addEventListener('pointerdown', (e) => {
 				e.preventDefault();
-				this.canvas.emitInputEvent(
+				this.artboard.emitInputEvent(
 					'Interaction',
 					{
 						type: 'CursorDownOnArtboard',
@@ -92,7 +92,7 @@ export class SvgBuilder {
 			});
 			this._domElement.addEventListener('pointerup', (e) => {
 				e.preventDefault();
-				this.canvas.emitInputEvent(
+				this.artboard.emitInputEvent(
 					'Interaction',
 					{
 						type: 'CursorUpOnArtboard',
@@ -105,7 +105,7 @@ export class SvgBuilder {
 			this._domElement.addEventListener('pointerenter', (e) => {
 				e.preventDefault();
 				if (!this._cursorInArbBounds) {
-					this.canvas.emitInputEvent(
+					this.artboard.emitInputEvent(
 						'Interaction',
 						{
 							type: 'CursorEnteredArtboard'
@@ -118,16 +118,16 @@ export class SvgBuilder {
 			this._domElement.addEventListener('pointerleave', (e) => {
 				e.preventDefault();
 				const arbPoint = this.pointerEventToArbPoint(e);
-				// Check whether cursor actually left canvas
+				// Check whether cursor actually left artboard
 				// or whether its just on some UI layer like the selection box
 				if (
 					this._cursorInArbBounds &&
 					(arbPoint[0] < 0 ||
-						arbPoint[0] > this.canvas.size[0] ||
+						arbPoint[0] > this.artboard.size[0] ||
 						arbPoint[1] < 0 ||
-						arbPoint[1] > this.canvas.size[1])
+						arbPoint[1] > this.artboard.size[1])
 				) {
-					this.canvas.emitInputEvent(
+					this.artboard.emitInputEvent(
 						'Interaction',
 						{
 							type: 'CursorExitedArtboard'
@@ -140,7 +140,7 @@ export class SvgBuilder {
 			window.addEventListener('keydown', (e) => {
 				if (this._cursorInArbBounds) {
 					e.preventDefault();
-					this.canvas.emitInputEvent(
+					this.artboard.emitInputEvent(
 						'Interaction',
 						{
 							type: 'KeyDownOnArtboard',
@@ -153,7 +153,7 @@ export class SvgBuilder {
 			window.addEventListener('keyup', (e) => {
 				if (this._cursorInArbBounds) {
 					e.preventDefault();
-					this.canvas.emitInputEvent(
+					this.artboard.emitInputEvent(
 						'Interaction',
 						{
 							type: 'KeyUpOnArtboard',
@@ -166,7 +166,7 @@ export class SvgBuilder {
 		}
 	}
 
-	protected get canvas(): Artboard {
+	protected get artboard(): Artboard {
 		return this._arb();
 	}
 
@@ -208,7 +208,7 @@ export class SvgBuilder {
 						if (entity != null) {
 							newElement.addEventListener('pointerdown', (e) => {
 								e.preventDefault();
-								this.canvas.emitInputEvent('Interaction', {
+								this.artboard.emitInputEvent('Interaction', {
 									type: 'CursorDownOnEntity',
 									entity,
 									position: this.pointerEventToArbPoint(e),
