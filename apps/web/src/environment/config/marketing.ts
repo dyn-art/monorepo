@@ -2,8 +2,9 @@ export const marketingConfig = {
 	meta: {
 		title: {
 			default: 'dyn.art | Leave the repetitive design to us',
-			template: (title: string) => `${title} | dyn.art`
+			template: '%s | dyn.art'
 		},
+
 		description: 'Leave the repetitive design to us'
 	},
 	navbar: {
@@ -18,7 +19,7 @@ export const marketingConfig = {
 			},
 			{
 				title: 'Demos',
-				path: '/demos'
+				path: '/open-editor'
 			},
 			{
 				title: 'Docs',

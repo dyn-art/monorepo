@@ -33,8 +33,8 @@ export interface TAdvancedInputProps
 }
 
 const AdvancedInput = React.forwardRef<HTMLInputElement, TAdvancedInputProps>((props, ref) => {
-	const { className, variant, size, children, ...other } = props;
-	let childrenAfter = props.childrenAfter;
+	const { className, variant, size, children, childrenAfter: maybeChildrenAfter, ...other } = props;
+	let childrenAfter = maybeChildrenAfter;
 	if (variant === 'destructive' && childrenAfter == null) {
 		childrenAfter = (
 			<div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">

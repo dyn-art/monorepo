@@ -1,5 +1,5 @@
 {
-  "extends": "@ibg/config/nextjs.tsconfig.json",
+	"extends": "@ibg/config/nextjs.tsconfig.json",
 	"compilerOptions": {
 		"plugins": [{ "name": "next" }],
 		"baseUrl": ".",
@@ -7,6 +7,6 @@
 			"@/*": ["./src/*"]
 		}
 	},
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "tailwind.config.js"],
-  "exclude": ["node_modules"]
+	"include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+	"exclude": ["node_modules"]
 }
