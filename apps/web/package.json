@@ -8,7 +8,7 @@
 		"start:dev:app": "next dev",
 		"start:dev:rust": "cd ../.. && npx vercel dev --listen 3001",
 		"build": "next build",
-		"build:vercel": "cd ../.. && pnpm run prebuild:vercel && turbo run build --filter=web",
+		"build:vercel": "cd ../.. && pnpm run prebuild:vercel && turbo run build --filter=@dyn/web",
 		"start": "next start",
 		"lint": "next lint"
 	},
