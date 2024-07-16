@@ -37,7 +37,7 @@
 		"@dyn/arb-dtif": "workspace:*",
 		"@dyn/arb-svg-builder": "workspace:*",
 		"@dyn/ui": "workspace:*",
-		"@ibg/utils": "^0.0.11"
+		"@ibg/utils": "^0.0.13"
 	},
 	"peerDependencies": {
 		"@tanstack/react-query": "^5.35.1",

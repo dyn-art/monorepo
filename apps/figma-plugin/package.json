@@ -31,7 +31,7 @@
 		"@dyn/arb-svg-editor": "workspace:*",
 		"@dyn/figma-to-dtif": "workspace:*",
 		"@dyn/ui": "workspace:*",
-		"@ibg/utils": "^0.0.11",
+		"@ibg/utils": "^0.0.13",
 		"@tanstack/react-query": "^5.35.1",
 		"clsx": "^2.1.1",
 		"feature-state": "^0.0.18",

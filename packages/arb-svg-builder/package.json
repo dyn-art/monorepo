@@ -37,7 +37,7 @@
 	"homepage": "https://dyn.art/?source=package-json",
 	"dependencies": {
 		"@dyn/arb-dtif": "workspace:*",
-		"@ibg/utils": "^0.0.11"
+		"@ibg/utils": "^0.0.13"
 	},
 	"devDependencies": {
 		"@dyn/types": "workspace:*",

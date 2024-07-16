@@ -28,7 +28,7 @@
 	},
 	"homepage": "https://dyn.art/?source=package-json",
 	"dependencies": {
-		"@ibg/utils": "^0.0.11",
+		"@ibg/utils": "^0.0.13",
 		"object-hash": "^3.0.0"
 	},
 	"devDependencies": {

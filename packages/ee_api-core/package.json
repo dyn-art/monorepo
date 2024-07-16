@@ -34,6 +34,7 @@
 		"@auth/core": "^0.34.1",
 		"@hono/auth-js": "^1.0.10",
 		"@ibg/openapi-router": "^0.0.10",
+		"@ibg/utils": "^0.0.13",
 		"bcrypt": "^5.1.1",
 		"drizzle-orm": "^0.32.0",
 		"feature-logger": "^0.0.17",
