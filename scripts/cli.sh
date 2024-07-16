@@ -12,12 +12,8 @@ set -e
 
 DIR="$(dirname "$0")"
 
-echo "VERCEL: ${VERCEL}"
-echo "CI: ${CI}"
-echo "VERCEL_ENV: ${VERCEL_ENV}"
-
 # Check if we are running on Vercel (https://vercel.com/docs/projects/environment-variables/system-environment-variables)
-if [ "$VERCEL" = "1" ]; then # TODO: Doesn't detect vercel env
+if [ -n "$VERCEL_ENV" ]; then
     echo "🔄 - ⬛️ Detected Vercel environment. Setting up..."
     chmod +x "$DIR/vercel/setup_cli.sh"
     source "$DIR/vercel/setup_cli.sh"
